@@ -31,10 +31,14 @@ import java.util.*;
  * perform certain operations on data of a particular MIME content type.
  *
  * <p>For example, the following mailcap file specifies 2 beans that
- * perform different operations on the <code>text/html</code> MIME type:
+ * perform different operations on the <code>text/html</code> MIME type and
+ * a bean that displays JPEG images:
  * <pre>
- *   text/html; ; x-java-edit=gnu.inet.html.HTMLBrowser; \
- *      x-java-print=gnu.inet.xml.DocPrinter;
+ *   text/html; ; x-java-edit=gnu.inet.mime.html.HTMLBrowser
+ *   text/&asterisk; ;  \
+ *	       x-java-print=gnu.inet.mime.xml.DocPrinter
+ *   image/jpeg; jpegviewercprog %s \
+ *             ; x-java-view=gnu.inet.mime.JPEGViewer
  * </pre>
  * </p>
  *
@@ -57,6 +61,7 @@ extends CommandMap
 {
 
   /** the database of mailcap registrys.
+   * Each entry is a hash of <code>CommandInfo[]</code>s.
    */
   private Hashtable[] DB=null;
 
@@ -199,13 +204,28 @@ extends CommandMap
 
   /** get the list of all commands based on MIME type.
    * The commands in all the registries of the mailcap database
-   * are searched.
+   * are searched. 
+   *
+   * <p><h4>MIME type matching</h4>
+   * The specified mime type matches against all the registry entries
+   * where the mime type match exactly and also wildcard cases.
+   * For example <code>text/html</code> matches against:
+   * <ul>
+   * <li>text/html
+   * <li>text/&asterisk;
+   * </ul>
+   * </p>
    *
    * @param mimeType MIME type to search for
    * @return command information associated with the mime type
    */
   public CommandInfo[] getAllCommands(String mimeType) 
   {
+    //NOTE:
+    //It should be easy to add a cache for this command
+    //a single hash could store the results of searches on
+    //particular mime type - using addMailcap() would invalidate
+    //the cache but otherwise it would work well.
     CommandInfo[] allCommands=null;
     synchronized(DB)
     {
@@ -213,9 +233,17 @@ extends CommandMap
       int size=0;
       for(int i=0; i<DB.length; i++)
       {
+	//count the mimetype that matches directly
 	CommandInfo[] entry=(CommandInfo[])DB[i].get(mimeType);
 	if(entry!=null)
 	size+=entry.length;
+	//if the specified mimetype is not a generic type test that specifically
+	if(!mimetype.endsWith("/*"));
+	{
+	  entry=(CommandInfo[])DB[i].get(mimetype.substring(0,mimetype.indexOf("/"))+"*");
+	  if(entry!=null)
+	  size+=entry.length;
+	}
       }
       //create an array big enough
       allCommands=new CommandInfo[size];
@@ -228,6 +256,16 @@ extends CommandMap
 	{
 	  System.arraycopy(entry,0,allCommands,pos,entry.length);
 	  pos+=entry.length;
+	}
+	//if the specified mimetype is not a generic type test that specifically
+	if(!mimetype.endsWith("/*"));
+	{
+	  entry=(CommandInfo[])DB[i].get(mimetype.substring(0,mimetype.indexOf("/"))+"*");
+	  if(entry!=null)
+	  {
+	    System.arraycopy(entry,0,allcommands,pos,entry.length);
+	    pos+=entry.length;
+	  }
 	}
       }
     }
@@ -254,26 +292,43 @@ extends CommandMap
 
   /** get list of preferred commands based on MIME type.
    * The registry is searched for a mailcap entry assigned to the
-   * specified MIME type. The first entry that matches the MIME
-   * type is returned.
+   * specified MIME type. ALL the commands that match the particular
+   * MIME type are returned but each command type is only returned once.
+   * Thus, if two mailcap files specify the same command for a bean
+   * then only the command from the registry with the greater preference
+   * will appear in the resulting list. But if two mailcap files specify
+   * different commands for a particular MIME type then both commands
+   * will be returned from this method.
    *
    * @param mimeType MIME type to search for
    * @return listing of preferred command information
    */
   public CommandInfo[] getPreferredCommands(String mimeType) 
   {
-    CommandInfo[] entry=null;
-    synchronized(DB)
+    CommandInfo[] all=getAllCommands(mimeType);
+    Vector uniqueCommands=new Vector();
+    for(int i=0; i<all.length; i++)
     {
-      for(int i=0; i<DB.length; i++)
+      CommandInfo cmd=all[i];
+      //search the unique list looking for the cmd
+      boolean found=false;
+      for(int k=0; k<uniqueCommands.size() && !found; i++)
       {
-	Hashtable registry=DB[i];
-	entry=(CommandInfo[])registry.get(mimeType);
-	if(entry!=null)
-	break;
+	CommandInfo uniqueCmd=(CommandInfo)uniqueCommands.elementAt(i);
+	found=uniqueCmd.equals(cmd);
       }
+      //if we haven't found it then add it to the list
+      if(!found)
+      uniqueCommands.addElement(cmd);
     }
-    return entry;
+    //make the array to hold the preferred commands
+    CommandInfo[] pref=new CommandInfo[uniqueCommands.size()];
+    uniqueCommands.copyInto(pref);
+    //NOTE:
+    //again, caching could be usefull here... it depends what
+    //people use... I guess the other thing we could do is have
+    //configure switches to turn caching on or off
+    return pref;
   }
 
   /** loads a mailcap file from the specified stream.
