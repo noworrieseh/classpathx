@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.6 2001-10-24 22:37:59 db Exp $
+ * $Id: Consumer.java,v 1.7 2001-11-04 01:17:18 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -60,10 +60,11 @@ import gnu.xml.pipeline.EventConsumer;
  *
  * <p> Note that SAX2 does not expose the literal text of the DTD's
  * internal subset, so it will not be present in DOM trees constructed
- * using this API.
+ * using this API.  (Though with a good SAX2 implementation, it could
+ * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-10-24 22:37:59 $
+ * @version $Date: 2001-11-04 01:17:18 $
  */
 public class Consumer extends DomConsumer
 {
@@ -211,7 +212,7 @@ public class Consumer extends DomConsumer
 	    for (int i = 0; i < length; i++) {
 		if (attrs.isSpecified (i))
 		    continue;
-		
+
 		// value was defaulted.
 		String		temp = attrs.getQName (i);
 		DomAttr		attr;
@@ -237,12 +238,38 @@ public class Consumer extends DomConsumer
 	// except implicitly.
 
 // FIXME:
-
 // override clearDocument(), delegate then:
 // doc.setCheckingCharacters (true);
 
-// FIXME: we should be able to put entity ref nodes on the stack
-// and populate them (mark readonly when done) ...
+	// these three methods collaborate to populate entity
+	// refs, marking contents readonly on end-of-entity
 
+	public boolean canPopulateEntityRefs ()
+	    { return true; }
+
+	public void startEntity (String name)
+	throws SAXException
+	{
+	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
+		return;
+	    super.startEntity (name);
+
+	    DomNode	top = (DomNode) getTop ();
+
+	    if (top.getNodeType () == Node.ENTITY_REFERENCE_NODE)
+		top.readonly = false;
+	}
+
+	public void endEntity (String name)
+	throws SAXException
+	{
+	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
+		return;
+	    DomNode	top = (DomNode) getTop ();
+
+	    if (top.getNodeType () == Node.ENTITY_REFERENCE_NODE)
+		top.makeReadonly ();
+	    super.endEntity (name);
+	}
     }
 }
