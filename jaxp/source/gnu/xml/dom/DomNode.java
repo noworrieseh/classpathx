@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.11 2001-11-20 04:48:59 db Exp $
+ * $Id: DomNode.java,v 1.12 2001-11-21 01:53:41 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.11 2001-11-20 04:48:59 db Exp $
+// $Id: DomNode.java,v 1.12 2001-11-21 01:53:41 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 04:48:59 $
+ * @version $Date: 2001-11-21 01:53:41 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -730,8 +730,13 @@ public abstract class DomNode
      */
     final public Node item (int index)
     {
-	if (children != null && index >= 0 && index < length)
-	    return children [index];
+	try {
+	    if (index < length)
+		return children [index];
+	} catch (RuntimeException e) {
+	    // children == null or index < 0 ... bad parameter
+	    // FALLTHROUGh
+	}
 	return null;
     }
 
@@ -780,17 +785,28 @@ public abstract class DomNode
 	if (parent == null || getNodeType() == ATTRIBUTE_NODE)
 	    return null;
 
-	NodeList	siblings = parent.getChildNodes ();
-	int		len = siblings.getLength ();
+	// we know parent.getChildNodes () returns itself
+	// ... and that we're somewhere in parent.children[]
+	int index;
 
-	if (siblings.item (parentIndex) == this)
-	    return siblings.item (parentIndex + 1);
+	if (parentIndex < parent.length
+		&& parent.children [parentIndex] == this) {
+	    index = parentIndex + 1;
+	    if (index < parent.length)
+		return parent.children [index];
+	    else
+		return null;
+	}
 
-	for (int i = 0; i < len; i++)
-	    if (siblings.item (i) == this) {
-		parentIndex = i;
-		return siblings.item (++i);
+	for (index = 0; index < parent.length; index++) {
+	    if (parent.children [index] == this) {
+		parentIndex = index++;
+		if (index < parent.length)
+		    return parent.children [index];
+		else
+		    break;
 	    }
+	}
 	return null;
     }
 
@@ -1313,40 +1329,40 @@ public abstract class DomNode
 
 	    for (index = 0, current = parent;
 		    current != null && index < ancestorLen;
-		    index++, current = current.parent)
+		    index++, current = current.parent) {
+		if (current.nListeners != 0)
+		    haveAncestorRegistrations = true;
 		ancestors [index] = current;
+	    }
 	    if (current != null)
 		throw new RuntimeException ("dispatchEvent capture stack size");
 
 	    ancestorMax = index;
 	    e.stop = false;
-	    e.eventPhase = Event.CAPTURING_PHASE;
 
-	    while (!e.stop && index-- > 0) {
-		current = ancestors [index];
-		if (current.nListeners != 0) {
-		    haveAncestorRegistrations = true;
-		    notifyNode (e, current, true, notificationSet);
+	    if (haveAncestorRegistrations) {
+		e.eventPhase = Event.CAPTURING_PHASE;
+		while (!e.stop && index-- > 0) {
+		    current = ancestors [index];
+		    if (current.nListeners != 0)
+			notifyNode (e, current, true, notificationSet);
 		}
 	    }
 
 	    // Always deliver events to the target node (this)
-	    // unless stopPropagation was called.
+	    // unless stopPropagation was called.  If we saw
+	    // no registrations yet (typical!), we never will.
 	    if (!e.stop && nListeners != 0) {
 		e.eventPhase = Event.AT_TARGET;
 		notifyNode (e, this, false, notificationSet);
-	    }
+	    } else if (!haveAncestorRegistrations)
+		e.stop = true;
 
 	    // If the event bubbles and propagation wasn't halted,
 	    // walk back up the ancestor list.  Stop bubbling when
 	    // any bubbled event handler stops it.
 
-		// NOTE:  the "haveAncestorRegistrations" flag isn't
-		// strictly correct, someone may have just registered.
-		// But while the "no registrations" case stays typical,
-		// this flag is also a sizable win.
-
-	    if (!e.stop && e.bubbles && haveAncestorRegistrations) {
+	    if (!e.stop && e.bubbles) {
 		e.eventPhase = Event.BUBBLING_PHASE;
 		for (index = 0;
 			!e.stop
@@ -1365,14 +1381,15 @@ public abstract class DomNode
 
 	} finally {
 	    if (haveDispatchDataLock) {
-		// null out refs to ensure they'll be GC'd
-		for (int i = 0; i < ancestorMax; i++)
-		    ancestors [i] = null;
-		// notificationSet handled by notifyNode
+		// synchronize to force write ordering
+		synchronized (lockNode) {
+		    // null out refs to ensure they'll be GC'd
+		    for (int i = 0; i < ancestorMax; i++)
+			ancestors [i] = null;
+		    // notificationSet handled by notifyNode
 
-		// The JVM guarantees this write is atomic; no
-		// other synchronization is needed.
-		dispatchDataLock = false;
+		    dispatchDataLock = false;
+		}
 	    }
 	}
     }
