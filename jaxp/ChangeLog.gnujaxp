@@ -1,4 +1,15 @@
-2004-11-20  Chris Burdess  <dog@gnu.org>
+2004-11-27  Julian Scheid  <julian@sektor37.de>
+
+   	* SubstringFunction.java: Fixed a bug which would copy one character
+   	short if the length is specified explicitly.
+   	
+2004-11-26  Chris Burdess  <dog@gnu.org>
+
+	* TransformerException.java,TransformerConfigurationException.java:
+   	Include message from cause exception if none specified.
+	* transform: Import circularity detection.
+   	
+2004-11-25  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Selector and node test fixes.
    	

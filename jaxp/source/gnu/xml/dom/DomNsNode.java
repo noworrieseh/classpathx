@@ -151,7 +151,7 @@ public abstract class DomNsNode
                         this, 0);
       }
 
-    DomDocument.verifyXmlName(prefix);
+    DomDocument.checkName(prefix, "1.1".equals(owner.getXmlVersion()));
     if (prefix.indexOf (':') != -1)
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,

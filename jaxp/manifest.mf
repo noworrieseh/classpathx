@@ -9,10 +9,35 @@ Name: gnu/xml/aelfred2/
 Implementation-Title: AElfred2
 
 Name: gnu/xml/dom/
-Implementation-Title: DOM2
+Implementation-Title: DOM3
 
 Name: org/w3c/dom
 Specification-Title: Document Object Model (DOM)
+Specification-Vendor: www.w3c.org
+Specification-Version: Level 3
+
+Name: org/w3c/dom/events
+Specification-Title: Document Object Model (DOM) Events
+Specification-Vendor: www.w3c.org
+Specification-Version: Level 2
+
+Name: org/w3c/dom/ls
+Specification-Title: Document Object Model (DOM) Load & Save
+Specification-Vendor: www.w3c.org
+Specification-Version: Level 3
+
+Name: org/w3c/dom/range
+Specification-Title: Document Object Model (DOM) Range
+Specification-Vendor: www.w3c.org
+Specification-Version: Level 2
+
+Name: org/w3c/dom/traversal
+Specification-Title: Document Object Model (DOM) Traversal
+Specification-Vendor: www.w3c.org
+Specification-Version: Level 2
+
+Name: org/w3c/dom/xpath
+Specification-Title: Document Object Model (DOM) XPath
 Specification-Vendor: www.w3c.org
 Specification-Version: Level 3
 

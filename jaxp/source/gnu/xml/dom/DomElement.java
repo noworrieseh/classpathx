@@ -413,7 +413,8 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI
+                .equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
                 return (XMLConstants.XMLNS_ATTRIBUTE.equals(qName));
@@ -434,7 +435,8 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI
+                .equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
                 if (XMLConstants.XMLNS_ATTRIBUTE.equals(qName))

@@ -725,7 +725,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: acinclude.m4,v 1.12 2004-11-02 17:03:05 dog Exp $
+# $Id: acinclude.m4,v 1.13 2004-11-28 19:54:50 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,
@@ -746,7 +746,9 @@ AC_DEFUN([_SOSUFFIX_INTERNAL], [
 	release=""
 	libname=libfoo
 	eval _SOSUFFIX=\"$shrext\"
-	if test "X$_SOSUFFIX" = "X" ; then
+        if test `uname` = "Darwin"; then
+                _SOSUFFIX=".dylib"
+	elif test "X$_SOSUFFIX" = "X" ; then
 		_SOSUFFIX=".so"
 		if test `$LIBTOOL_PROG --config | grep build_libtool_libs | grep no` 2>/dev/null; then
 			if test "X$_SOSUFFIX_MESSAGE" = "X"; then

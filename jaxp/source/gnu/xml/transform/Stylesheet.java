@@ -96,6 +96,7 @@ class Stylesheet
 
   final TransformerFactoryImpl factory;
   TransformerImpl transformer;
+  Stylesheet parent;
   final XPathImpl xpath;
   final String systemId;
   final int precedence;
@@ -189,6 +190,7 @@ class Stylesheet
     this.factory = factory;
     this.systemId = systemId;
     this.precedence = precedence;
+    this.parent = parent;
     extensionElementPrefixes = new HashSet();
     excludeResultPrefixes = new HashSet();
     stripSpace = new LinkedHashSet();
@@ -206,11 +208,15 @@ class Stylesheet
       }
     else
       {
-        /* Test for import circularity *
+        /* Test for import circularity */
         for (Stylesheet ctx = this; ctx.parent != null; ctx = ctx.parent)
           {
-            if (systemId.equals(
-          }*/
+            if (systemId != null && systemId.equals(ctx.parent.systemId))
+              {
+                String msg = "circularity importing " + systemId;
+                throw new TransformerConfigurationException(msg);
+              }
+          }
         /* OK */
         bindings = parent.bindings;
         attributeSets = parent.attributeSets;
@@ -1554,6 +1560,10 @@ class Stylesheet
             if (uri == XMLConstants.XMLNS_ATTRIBUTE_NS_URI)
               {
                 String prefix = attr.getLocalName();
+                if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix))
+                  {
+                    prefix = "#default";
+                  }
                 String ns = attr.getNodeValue();
                 // Should the namespace be excluded?
                 if (XSL_NS.equals(ns) ||
@@ -1564,6 +1574,10 @@ class Stylesheet
                     continue;
                   }
                 // Is the namespace already defined on the target?
+                if (prefix == "#default")
+                  {
+                    prefix = null;
+                  }
                 if (target.lookupNamespaceURI(prefix) != null)
                   {
                     continue;

@@ -37,626 +37,652 @@
 # exception statement from your version. 
 
 JAVADOC = javadoc
+JAR = @JAR@
+JAVAH = @JAVAH@
 
 SOFLAGS=        @SOFLAGS@
 LIBMAJOR=       @XMLJ_VERSION_MAJOR@
 LIBVERSION=     @XMLJ_VERSION_MAJOR@.@XMLJ_VERSION_MINOR@
 
-src = @srcdir@/source
-dst = @srcdir@/classes
-doc = @srcdir@/apidoc
-
-sources = \
-$(src)/org/w3c/dom/Attr.java \
-$(src)/org/w3c/dom/CDATASection.java \
-$(src)/org/w3c/dom/CharacterData.java \
-$(src)/org/w3c/dom/Comment.java \
-$(src)/org/w3c/dom/DOMConfiguration.java \
-$(src)/org/w3c/dom/DOMError.java \
-$(src)/org/w3c/dom/DOMErrorHandler.java \
-$(src)/org/w3c/dom/DOMException.java \
-$(src)/org/w3c/dom/DOMImplementation.java \
-$(src)/org/w3c/dom/DOMImplementationList.java \
-$(src)/org/w3c/dom/DOMImplementationSource.java \
-$(src)/org/w3c/dom/DOMLocator.java \
-$(src)/org/w3c/dom/DOMStringList.java \
-$(src)/org/w3c/dom/Document.java \
-$(src)/org/w3c/dom/DocumentFragment.java \
-$(src)/org/w3c/dom/DocumentType.java \
-$(src)/org/w3c/dom/Element.java \
-$(src)/org/w3c/dom/Entity.java \
-$(src)/org/w3c/dom/EntityReference.java \
-$(src)/org/w3c/dom/NameList.java \
-$(src)/org/w3c/dom/NamedNodeMap.java \
-$(src)/org/w3c/dom/Node.java \
-$(src)/org/w3c/dom/NodeList.java \
-$(src)/org/w3c/dom/Notation.java \
-$(src)/org/w3c/dom/ProcessingInstruction.java \
-$(src)/org/w3c/dom/Text.java \
-$(src)/org/w3c/dom/TypeInfo.java \
-$(src)/org/w3c/dom/UserDataHandler.java \
-$(src)/org/w3c/dom/bootstrap/DOMImplementationRegistry.java \
-$(src)/org/w3c/dom/css/CSS2Azimuth.java \
-$(src)/org/w3c/dom/css/CSS2BackgroundPosition.java \
-$(src)/org/w3c/dom/css/CSS2BorderSpacing.java \
-$(src)/org/w3c/dom/css/CSS2CounterIncrement.java \
-$(src)/org/w3c/dom/css/CSS2CounterReset.java \
-$(src)/org/w3c/dom/css/CSS2Cursor.java \
-$(src)/org/w3c/dom/css/CSS2FontFaceSrc.java \
-$(src)/org/w3c/dom/css/CSS2FontFaceWidths.java \
-$(src)/org/w3c/dom/css/CSS2PageSize.java \
-$(src)/org/w3c/dom/css/CSS2PlayDuring.java \
-$(src)/org/w3c/dom/css/CSS2Properties.java \
-$(src)/org/w3c/dom/css/CSS2TextShadow.java \
-$(src)/org/w3c/dom/css/CSSCharsetRule.java \
-$(src)/org/w3c/dom/css/CSSFontFaceRule.java \
-$(src)/org/w3c/dom/css/CSSImportRule.java \
-$(src)/org/w3c/dom/css/CSSMediaRule.java \
-$(src)/org/w3c/dom/css/CSSPageRule.java \
-$(src)/org/w3c/dom/css/CSSPrimitiveValue.java \
-$(src)/org/w3c/dom/css/CSSRule.java \
-$(src)/org/w3c/dom/css/CSSRuleList.java \
-$(src)/org/w3c/dom/css/CSSStyleDeclaration.java \
-$(src)/org/w3c/dom/css/CSSStyleRule.java \
-$(src)/org/w3c/dom/css/CSSStyleSheet.java \
-$(src)/org/w3c/dom/css/CSSUnknownRule.java \
-$(src)/org/w3c/dom/css/CSSValue.java \
-$(src)/org/w3c/dom/css/CSSValueList.java \
-$(src)/org/w3c/dom/css/Counter.java \
-$(src)/org/w3c/dom/css/DOMImplementationCSS.java \
-$(src)/org/w3c/dom/css/DocumentCSS.java \
-$(src)/org/w3c/dom/css/ElementCSSInlineStyle.java \
-$(src)/org/w3c/dom/css/RGBColor.java \
-$(src)/org/w3c/dom/css/Rect.java \
-$(src)/org/w3c/dom/css/ViewCSS.java \
-$(src)/org/w3c/dom/events/DocumentEvent.java \
-$(src)/org/w3c/dom/events/Event.java \
-$(src)/org/w3c/dom/events/EventException.java \
-$(src)/org/w3c/dom/events/EventListener.java \
-$(src)/org/w3c/dom/events/EventTarget.java \
-$(src)/org/w3c/dom/events/MouseEvent.java \
-$(src)/org/w3c/dom/events/MutationEvent.java \
-$(src)/org/w3c/dom/events/UIEvent.java \
-$(src)/org/w3c/dom/html/HTMLAnchorElement.java \
-$(src)/org/w3c/dom/html/HTMLAppletElement.java \
-$(src)/org/w3c/dom/html/HTMLAreaElement.java \
-$(src)/org/w3c/dom/html/HTMLBRElement.java \
-$(src)/org/w3c/dom/html/HTMLBaseElement.java \
-$(src)/org/w3c/dom/html/HTMLBaseFontElement.java \
-$(src)/org/w3c/dom/html/HTMLBodyElement.java \
-$(src)/org/w3c/dom/html/HTMLButtonElement.java \
-$(src)/org/w3c/dom/html/HTMLCollection.java \
-$(src)/org/w3c/dom/html/HTMLDListElement.java \
-$(src)/org/w3c/dom/html/HTMLDOMImplementation.java \
-$(src)/org/w3c/dom/html/HTMLDirectoryElement.java \
-$(src)/org/w3c/dom/html/HTMLDivElement.java \
-$(src)/org/w3c/dom/html/HTMLDocument.java \
-$(src)/org/w3c/dom/html/HTMLElement.java \
-$(src)/org/w3c/dom/html/HTMLFieldSetElement.java \
-$(src)/org/w3c/dom/html/HTMLFontElement.java \
-$(src)/org/w3c/dom/html/HTMLFormElement.java \
-$(src)/org/w3c/dom/html/HTMLFrameElement.java \
-$(src)/org/w3c/dom/html/HTMLFrameSetElement.java \
-$(src)/org/w3c/dom/html/HTMLHRElement.java \
-$(src)/org/w3c/dom/html/HTMLHeadElement.java \
-$(src)/org/w3c/dom/html/HTMLHeadingElement.java \
-$(src)/org/w3c/dom/html/HTMLHtmlElement.java \
-$(src)/org/w3c/dom/html/HTMLIFrameElement.java \
-$(src)/org/w3c/dom/html/HTMLImageElement.java \
-$(src)/org/w3c/dom/html/HTMLInputElement.java \
-$(src)/org/w3c/dom/html/HTMLIsIndexElement.java \
-$(src)/org/w3c/dom/html/HTMLLIElement.java \
-$(src)/org/w3c/dom/html/HTMLLabelElement.java \
-$(src)/org/w3c/dom/html/HTMLLegendElement.java \
-$(src)/org/w3c/dom/html/HTMLLinkElement.java \
-$(src)/org/w3c/dom/html/HTMLMapElement.java \
-$(src)/org/w3c/dom/html/HTMLMenuElement.java \
-$(src)/org/w3c/dom/html/HTMLMetaElement.java \
-$(src)/org/w3c/dom/html/HTMLModElement.java \
-$(src)/org/w3c/dom/html/HTMLOListElement.java \
-$(src)/org/w3c/dom/html/HTMLObjectElement.java \
-$(src)/org/w3c/dom/html/HTMLOptGroupElement.java \
-$(src)/org/w3c/dom/html/HTMLOptionElement.java \
-$(src)/org/w3c/dom/html/HTMLParagraphElement.java \
-$(src)/org/w3c/dom/html/HTMLParamElement.java \
-$(src)/org/w3c/dom/html/HTMLPreElement.java \
-$(src)/org/w3c/dom/html/HTMLQuoteElement.java \
-$(src)/org/w3c/dom/html/HTMLScriptElement.java \
-$(src)/org/w3c/dom/html/HTMLSelectElement.java \
-$(src)/org/w3c/dom/html/HTMLStyleElement.java \
-$(src)/org/w3c/dom/html/HTMLTableCaptionElement.java \
-$(src)/org/w3c/dom/html/HTMLTableCellElement.java \
-$(src)/org/w3c/dom/html/HTMLTableColElement.java \
-$(src)/org/w3c/dom/html/HTMLTableElement.java \
-$(src)/org/w3c/dom/html/HTMLTableRowElement.java \
-$(src)/org/w3c/dom/html/HTMLTableSectionElement.java \
-$(src)/org/w3c/dom/html/HTMLTextAreaElement.java \
-$(src)/org/w3c/dom/html/HTMLTitleElement.java \
-$(src)/org/w3c/dom/html/HTMLUListElement.java \
-$(src)/org/w3c/dom/ls/DOMImplementationLS.java \
-$(src)/org/w3c/dom/ls/LSException.java \
-$(src)/org/w3c/dom/ls/LSInput.java \
-$(src)/org/w3c/dom/ls/LSLoadEvent.java \
-$(src)/org/w3c/dom/ls/LSOutput.java \
-$(src)/org/w3c/dom/ls/LSParser.java \
-$(src)/org/w3c/dom/ls/LSParserFilter.java \
-$(src)/org/w3c/dom/ls/LSProgressEvent.java \
-$(src)/org/w3c/dom/ls/LSResourceResolver.java \
-$(src)/org/w3c/dom/ls/LSSerializer.java \
-$(src)/org/w3c/dom/ls/LSSerializerFilter.java \
-$(src)/org/w3c/dom/ranges/DocumentRange.java \
-$(src)/org/w3c/dom/ranges/Range.java \
-$(src)/org/w3c/dom/ranges/RangeException.java \
-$(src)/org/w3c/dom/stylesheets/DocumentStyle.java \
-$(src)/org/w3c/dom/stylesheets/LinkStyle.java \
-$(src)/org/w3c/dom/stylesheets/MediaList.java \
-$(src)/org/w3c/dom/stylesheets/StyleSheet.java \
-$(src)/org/w3c/dom/stylesheets/StyleSheetList.java \
-$(src)/org/w3c/dom/traversal/DocumentTraversal.java \
-$(src)/org/w3c/dom/traversal/NodeFilter.java \
-$(src)/org/w3c/dom/traversal/NodeIterator.java \
-$(src)/org/w3c/dom/traversal/TreeWalker.java \
-$(src)/org/w3c/dom/views/AbstractView.java \
-$(src)/org/w3c/dom/views/DocumentView.java \
-$(src)/org/w3c/dom/xpath/XPathEvaluator.java \
-$(src)/org/w3c/dom/xpath/XPathException.java \
-$(src)/org/w3c/dom/xpath/XPathExpression.java \
-$(src)/org/w3c/dom/xpath/XPathNamespace.java \
-$(src)/org/w3c/dom/xpath/XPathNSResolver.java \
-$(src)/org/w3c/dom/xpath/XPathResult.java \
-$(src)/org/xml/sax/AttributeList.java \
-$(src)/org/xml/sax/Attributes.java \
-$(src)/org/xml/sax/ContentHandler.java \
-$(src)/org/xml/sax/DTDHandler.java \
-$(src)/org/xml/sax/DocumentHandler.java \
-$(src)/org/xml/sax/EntityResolver.java \
-$(src)/org/xml/sax/ErrorHandler.java \
-$(src)/org/xml/sax/HandlerBase.java \
-$(src)/org/xml/sax/InputSource.java \
-$(src)/org/xml/sax/Locator.java \
-$(src)/org/xml/sax/Parser.java \
-$(src)/org/xml/sax/SAXException.java \
-$(src)/org/xml/sax/SAXNotRecognizedException.java \
-$(src)/org/xml/sax/SAXNotSupportedException.java \
-$(src)/org/xml/sax/SAXParseException.java \
-$(src)/org/xml/sax/XMLFilter.java \
-$(src)/org/xml/sax/XMLReader.java \
-$(src)/org/xml/sax/ext/Attributes2.java \
-$(src)/org/xml/sax/ext/Attributes2Impl.java \
-$(src)/org/xml/sax/ext/DeclHandler.java \
-$(src)/org/xml/sax/ext/DefaultHandler2.java \
-$(src)/org/xml/sax/ext/EntityResolver2.java \
-$(src)/org/xml/sax/ext/LexicalHandler.java \
-$(src)/org/xml/sax/ext/Locator2.java \
-$(src)/org/xml/sax/ext/Locator2Impl.java \
-$(src)/org/xml/sax/helpers/AttributeListImpl.java \
-$(src)/org/xml/sax/helpers/AttributesImpl.java \
-$(src)/org/xml/sax/helpers/DefaultHandler.java \
-$(src)/org/xml/sax/helpers/LocatorImpl.java \
-$(src)/org/xml/sax/helpers/NamespaceSupport.java \
-$(src)/org/xml/sax/helpers/NewInstance.java \
-$(src)/org/xml/sax/helpers/ParserAdapter.java \
-$(src)/org/xml/sax/helpers/ParserFactory.java \
-$(src)/org/xml/sax/helpers/XMLFilterImpl.java \
-$(src)/org/xml/sax/helpers/XMLReaderAdapter.java \
-$(src)/org/xml/sax/helpers/XMLReaderFactory.java \
-$(src)/javax/xml/XMLConstants.java \
-$(src)/javax/xml/datatype/DatatypeConfigurationException.java \
-$(src)/javax/xml/datatype/DatatypeConstants.java \
-$(src)/javax/xml/datatype/DatatypeFactory.java \
-$(src)/javax/xml/datatype/Duration.java \
-$(src)/javax/xml/datatype/XMLGregorianCalendar.java \
-$(src)/javax/xml/namespace/NamespaceContext.java \
-$(src)/javax/xml/namespace/QName.java \
-$(src)/javax/xml/parsers/DocumentBuilder.java \
-$(src)/javax/xml/parsers/DocumentBuilderFactory.java \
-$(src)/javax/xml/parsers/FactoryConfigurationError.java \
-$(src)/javax/xml/parsers/ParserConfigurationException.java \
-$(src)/javax/xml/parsers/SAXParser.java \
-$(src)/javax/xml/parsers/SAXParserFactory.java \
-$(src)/javax/xml/transform/ErrorListener.java \
-$(src)/javax/xml/transform/OutputKeys.java \
-$(src)/javax/xml/transform/Result.java \
-$(src)/javax/xml/transform/Source.java \
-$(src)/javax/xml/transform/SourceLocator.java \
-$(src)/javax/xml/transform/Templates.java \
-$(src)/javax/xml/transform/Transformer.java \
-$(src)/javax/xml/transform/TransformerConfigurationException.java \
-$(src)/javax/xml/transform/TransformerException.java \
-$(src)/javax/xml/transform/TransformerFactory.java \
-$(src)/javax/xml/transform/TransformerFactoryConfigurationError.java \
-$(src)/javax/xml/transform/URIResolver.java \
-$(src)/javax/xml/transform/dom/DOMLocator.java \
-$(src)/javax/xml/transform/dom/DOMResult.java \
-$(src)/javax/xml/transform/dom/DOMSource.java \
-$(src)/javax/xml/transform/sax/SAXResult.java \
-$(src)/javax/xml/transform/sax/SAXSource.java \
-$(src)/javax/xml/transform/sax/SAXTransformerFactory.java \
-$(src)/javax/xml/transform/sax/TemplatesHandler.java \
-$(src)/javax/xml/transform/sax/TransformerHandler.java \
-$(src)/javax/xml/transform/stream/StreamResult.java \
-$(src)/javax/xml/transform/stream/StreamSource.java \
-$(src)/javax/xml/validation/Schema.java \
-$(src)/javax/xml/validation/SchemaFactory.java \
-$(src)/javax/xml/validation/TypeInfoProvider.java \
-$(src)/javax/xml/validation/Validator.java \
-$(src)/javax/xml/validation/ValidatorHandler.java \
-$(src)/javax/xml/xpath/XPath.java \
-$(src)/javax/xml/xpath/XPathConstants.java \
-$(src)/javax/xml/xpath/XPathException.java \
-$(src)/javax/xml/xpath/XPathExpression.java \
-$(src)/javax/xml/xpath/XPathExpressionException.java \
-$(src)/javax/xml/xpath/XPathFactory.java \
-$(src)/javax/xml/xpath/XPathFactoryConfigurationException.java \
-$(src)/javax/xml/xpath/XPathFunction.java \
-$(src)/javax/xml/xpath/XPathFunctionResolver.java \
-$(src)/javax/xml/xpath/XPathFunctionException.java \
-$(src)/javax/xml/xpath/XPathVariableResolver.java \
-$(src)/gnu/xml/aelfred2/ContentHandler2.java \
-$(src)/gnu/xml/aelfred2/JAXPFactory.java \
-$(src)/gnu/xml/aelfred2/SAXDriver.java \
-$(src)/gnu/xml/aelfred2/XmlParser.java \
-$(src)/gnu/xml/aelfred2/XmlReader.java \
-$(src)/gnu/xml/dom/Consumer.java \
-$(src)/gnu/xml/dom/DTDAttributeTypeInfo.java \
-$(src)/gnu/xml/dom/DTDElementTypeInfo.java \
-$(src)/gnu/xml/dom/DomAttr.java \
-$(src)/gnu/xml/dom/DomCDATA.java \
-$(src)/gnu/xml/dom/DomCharacterData.java \
-$(src)/gnu/xml/dom/DomComment.java \
-$(src)/gnu/xml/dom/DomDoctype.java \
-$(src)/gnu/xml/dom/DomDocument.java \
-$(src)/gnu/xml/dom/DomDocumentBuilder.java \
-$(src)/gnu/xml/dom/DomDocumentBuilderFactory.java \
-$(src)/gnu/xml/dom/DomDocumentConfiguration.java \
-$(src)/gnu/xml/dom/DomElement.java \
-$(src)/gnu/xml/dom/DomEntity.java \
-$(src)/gnu/xml/dom/DomEntityReference.java \
-$(src)/gnu/xml/dom/DomEvent.java \
-$(src)/gnu/xml/dom/DomEx.java \
-$(src)/gnu/xml/dom/DomExtern.java \
-$(src)/gnu/xml/dom/DomFragment.java \
-$(src)/gnu/xml/dom/DomImpl.java \
-$(src)/gnu/xml/dom/DomIterator.java \
-$(src)/gnu/xml/dom/DomNamedNodeMap.java \
-$(src)/gnu/xml/dom/DomNode.java \
-$(src)/gnu/xml/dom/DomNotation.java \
-$(src)/gnu/xml/dom/DomNsNode.java \
-$(src)/gnu/xml/dom/DomNSResolverContext.java \
-$(src)/gnu/xml/dom/DomPI.java \
-$(src)/gnu/xml/dom/DomText.java \
-$(src)/gnu/xml/dom/DomXPathExpression.java \
-$(src)/gnu/xml/dom/DomXPathNSResolver.java \
-$(src)/gnu/xml/dom/DomXPathResult.java \
-$(src)/gnu/xml/dom/ImplementationSource.java \
-$(src)/gnu/xml/dom/ImplementationList.java \
-$(src)/gnu/xml/dom/JAXPFactory.java \
-$(src)/gnu/xml/dom/ls/DomLSEx.java \
-$(src)/gnu/xml/dom/ls/DomLSInput.java \
-$(src)/gnu/xml/dom/ls/DomLSOutput.java \
-$(src)/gnu/xml/dom/ls/DomLSParser.java \
-$(src)/gnu/xml/dom/ls/DomLSSerializer.java \
-$(src)/gnu/xml/dom/ls/FilteredSAXEventSink.java \
-$(src)/gnu/xml/dom/ls/ReaderInputStream.java \
-$(src)/gnu/xml/dom/ls/SAXEventSink.java \
-$(src)/gnu/xml/dom/ls/WriterOutputStream.java \
-$(src)/gnu/xml/pipeline/CallFilter.java \
-$(src)/gnu/xml/pipeline/DomConsumer.java \
-$(src)/gnu/xml/pipeline/EventConsumer.java \
-$(src)/gnu/xml/pipeline/EventFilter.java \
-$(src)/gnu/xml/pipeline/LinkFilter.java \
-$(src)/gnu/xml/pipeline/NSFilter.java \
-$(src)/gnu/xml/pipeline/PipelineFactory.java \
-$(src)/gnu/xml/pipeline/TeeConsumer.java \
-$(src)/gnu/xml/pipeline/TextConsumer.java \
-$(src)/gnu/xml/pipeline/ValidationConsumer.java \
-$(src)/gnu/xml/pipeline/WellFormednessFilter.java \
-$(src)/gnu/xml/pipeline/XIncludeFilter.java \
-$(src)/gnu/xml/pipeline/XsltFilter.java \
-$(src)/gnu/xml/xpath/AndExpr.java \
-$(src)/gnu/xml/xpath/ArithmeticExpr.java \
-$(src)/gnu/xml/xpath/BooleanFunction.java \
-$(src)/gnu/xml/xpath/CeilingFunction.java \
-$(src)/gnu/xml/xpath/ConcatFunction.java \
-$(src)/gnu/xml/xpath/Constant.java \
-$(src)/gnu/xml/xpath/ContainsFunction.java \
-$(src)/gnu/xml/xpath/CountFunction.java \
-$(src)/gnu/xml/xpath/DocumentOrderComparator.java \
-$(src)/gnu/xml/xpath/EqualityExpr.java \
-$(src)/gnu/xml/xpath/Expr.java \
-$(src)/gnu/xml/xpath/FalseFunction.java \
-$(src)/gnu/xml/xpath/FloorFunction.java \
-$(src)/gnu/xml/xpath/Function.java \
-$(src)/gnu/xml/xpath/FunctionCall.java \
-$(src)/gnu/xml/xpath/IdFunction.java \
-$(src)/gnu/xml/xpath/LangFunction.java \
-$(src)/gnu/xml/xpath/LastFunction.java \
-$(src)/gnu/xml/xpath/LocalNameFunction.java \
-$(src)/gnu/xml/xpath/NameFunction.java \
-$(src)/gnu/xml/xpath/NamespaceUriFunction.java \
-$(src)/gnu/xml/xpath/NamespaceTest.java \
-$(src)/gnu/xml/xpath/NameTest.java \
-$(src)/gnu/xml/xpath/NegativeExpr.java \
-$(src)/gnu/xml/xpath/NodeTypeTest.java \
-$(src)/gnu/xml/xpath/NormalizeSpaceFunction.java \
-$(src)/gnu/xml/xpath/NotFunction.java \
-$(src)/gnu/xml/xpath/NumberFunction.java \
-$(src)/gnu/xml/xpath/OrExpr.java \
-$(src)/gnu/xml/xpath/ParenthesizedExpr.java \
-$(src)/gnu/xml/xpath/Path.java \
-$(src)/gnu/xml/xpath/Pattern.java \
-$(src)/gnu/xml/xpath/Predicate.java \
-$(src)/gnu/xml/xpath/PositionFunction.java \
-$(src)/gnu/xml/xpath/RelationalExpr.java \
-$(src)/gnu/xml/xpath/Root.java \
-$(src)/gnu/xml/xpath/RoundFunction.java \
-$(src)/gnu/xml/xpath/Selector.java \
-$(src)/gnu/xml/xpath/Steps.java \
-$(src)/gnu/xml/xpath/StartsWithFunction.java \
-$(src)/gnu/xml/xpath/StringFunction.java \
-$(src)/gnu/xml/xpath/StringLengthFunction.java \
-$(src)/gnu/xml/xpath/SubstringAfterFunction.java \
-$(src)/gnu/xml/xpath/SubstringBeforeFunction.java \
-$(src)/gnu/xml/xpath/SubstringFunction.java \
-$(src)/gnu/xml/xpath/SumFunction.java \
-$(src)/gnu/xml/xpath/Test.java \
-$(src)/gnu/xml/xpath/TranslateFunction.java \
-$(src)/gnu/xml/xpath/TrueFunction.java \
-$(src)/gnu/xml/xpath/UnionExpr.java \
-$(src)/gnu/xml/xpath/VariableReference.java \
-$(src)/gnu/xml/xpath/XPathImpl.java \
-$(src)/gnu/xml/xpath/XPathFactoryImpl.java \
-$(src)/gnu/xml/xpath/XPathTokenizer.java \
-$(src)/gnu/xml/xpath/XPathParser.java \
-$(src)/gnu/xml/xpath/XPathTest.java \
-$(src)/gnu/xml/transform/AbstractNumberNode.java \
-$(src)/gnu/xml/transform/ApplyTemplatesNode.java \
-$(src)/gnu/xml/transform/AttributeNode.java \
-$(src)/gnu/xml/transform/AttributeSet.java \
-$(src)/gnu/xml/transform/Bindings.java \
-$(src)/gnu/xml/transform/CallTemplateNode.java \
-$(src)/gnu/xml/transform/ChooseNode.java \
-$(src)/gnu/xml/transform/CommentNode.java \
-$(src)/gnu/xml/transform/CopyNode.java \
-$(src)/gnu/xml/transform/CopyOfNode.java \
-$(src)/gnu/xml/transform/CurrentFunction.java \
-$(src)/gnu/xml/transform/DocumentFunction.java \
-$(src)/gnu/xml/transform/DOMSourceLocator.java \
-$(src)/gnu/xml/transform/ElementNode.java \
-$(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
-$(src)/gnu/xml/transform/ForEachNode.java \
-$(src)/gnu/xml/transform/FormatNumberFunction.java \
-$(src)/gnu/xml/transform/GenerateIdFunction.java \
-$(src)/gnu/xml/transform/IfNode.java \
-$(src)/gnu/xml/transform/Key.java \
-$(src)/gnu/xml/transform/KeyFunction.java \
-$(src)/gnu/xml/transform/LiteralNode.java \
-$(src)/gnu/xml/transform/MessageNode.java \
-$(src)/gnu/xml/transform/NodeNumberNode.java \
-$(src)/gnu/xml/transform/NumberNode.java \
-$(src)/gnu/xml/transform/OtherwiseNode.java \
-$(src)/gnu/xml/transform/ParameterNode.java \
-$(src)/gnu/xml/transform/ProcessingInstructionNode.java \
-$(src)/gnu/xml/transform/SAXSerializer.java \
-$(src)/gnu/xml/transform/SortKey.java \
-$(src)/gnu/xml/transform/StreamSerializer.java \
-$(src)/gnu/xml/transform/Stylesheet.java \
-$(src)/gnu/xml/transform/SystemPropertyFunction.java \
-$(src)/gnu/xml/transform/Template.java \
-$(src)/gnu/xml/transform/TemplateNode.java \
-$(src)/gnu/xml/transform/TemplatesImpl.java \
-$(src)/gnu/xml/transform/TextNode.java \
-$(src)/gnu/xml/transform/TransformerFactoryImpl.java \
-$(src)/gnu/xml/transform/TransformerImpl.java \
-$(src)/gnu/xml/transform/UnparsedEntityUriFunction.java \
-$(src)/gnu/xml/transform/URIResolverEntityResolver.java \
-$(src)/gnu/xml/transform/ValueOfNode.java \
-$(src)/gnu/xml/transform/WhenNode.java \
-$(src)/gnu/xml/transform/WithParam.java \
-$(src)/gnu/xml/transform/XSLComparator.java \
-$(src)/gnu/xml/transform/XSLURIResolver.java \
-$(src)/gnu/xml/util/DoParse.java \
-$(src)/gnu/xml/util/DomParser.java \
-$(src)/gnu/xml/util/Resolver.java \
-$(src)/gnu/xml/util/SAXNullTransformerFactory.java \
-$(src)/gnu/xml/util/XCat.java \
-$(src)/gnu/xml/util/XHTMLWriter.java \
-$(src)/gnu/xml/util/XMLWriter.java \
-$(src)/gnu/xml/libxmlj/RawData.java \
-$(src)/gnu/xml/libxmlj/RawData32.java \
-$(src)/gnu/xml/libxmlj/RawData64.java \
-$(src)/gnu/xml/libxmlj/sax/GnomeLocator.java \
-$(src)/gnu/xml/libxmlj/sax/GnomeSAXParser.java \
-$(src)/gnu/xml/libxmlj/sax/GnomeSAXParserFactory.java \
-$(src)/gnu/xml/libxmlj/sax/GnomeXMLReader.java \
-$(src)/gnu/xml/libxmlj/sax/Namespaces.java \
-$(src)/gnu/xml/libxmlj/sax/StringArrayAttributes.java \
-$(src)/gnu/xml/libxmlj/sax/XMLName.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeAttr.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeCDATASection.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeCharacterData.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeComment.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDocument.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDocumentBuilder.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDocumentBuilderFactory.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDocumentFragment.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDocumentType.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDOMException.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeDOMStringList.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeElement.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeEntity.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeNode.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeNodeIterator.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeText.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeTypeInfo.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeXPathNodeList.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
-$(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
-$(src)/gnu/xml/libxmlj/transform/ErrorListenerErrorHandler.java \
-$(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
-$(src)/gnu/xml/libxmlj/transform/GnomeTransformer.java \
-$(src)/gnu/xml/libxmlj/transform/TransformTest.java \
-$(src)/gnu/xml/libxmlj/transform/URIResolverEntityResolver.java \
-$(src)/gnu/xml/libxmlj/util/EmptyNodeList.java \
-$(src)/gnu/xml/libxmlj/util/NamedInputStream.java \
-$(src)/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
-$(src)/gnu/xml/libxmlj/util/StandaloneLocator.java \
-$(src)/gnu/xml/libxmlj/util/XMLJ.java
-
-classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
-
-headers = \
-gnu_xml_libxmlj_sax_GnomeLocator.h \
-gnu_xml_libxmlj_sax_GnomeXMLReader.h \
-gnu_xml_libxmlj_dom_GnomeAttr.h \
-gnu_xml_libxmlj_dom_GnomeDocument.h \
-gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h \
-gnu_xml_libxmlj_dom_GnomeDocumentType.h \
-gnu_xml_libxmlj_dom_GnomeElement.h \
-gnu_xml_libxmlj_dom_GnomeEntity.h \
-gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h \
-gnu_xml_libxmlj_dom_GnomeNode.h \
-gnu_xml_libxmlj_dom_GnomeNodeList.h \
-gnu_xml_libxmlj_dom_GnomeNotation.h \
-gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
-gnu_xml_libxmlj_dom_GnomeTypeInfo.h \
-gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
-gnu_xml_libxmlj_dom_GnomeXPathNodeList.h \
-gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
-gnu_xml_libxmlj_dom_GnomeXPathResult.h \
-gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
-gnu_xml_libxmlj_transform_GnomeTransformer.h
-
-jni_sources = \
-xmlj_dom.c \
-xmlj_error.c \
-xmlj_io.c \
-xmlj_node.c \
-xmlj_sax.c \
-xmlj_transform.c \
-xmlj_util.c \
-xmlj_xpath.c
-
-jni_objects = $(patsubst %.c, %.o, $(jni_sources))
-jni_lobjects = $(patsubst %.c, %.lo, $(jni_sources))
+GCJ_CLASS_FLAGS = -fassume-compiled -I$(srcdir)/source
+AM_GCJFLAGS = -fjni -fassume-compiled -I$(srcdir)/source
 
 libj_jarfile=   gnujaxp.jar
 
-#XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -export-dynamic -D_JNI_IMPLEMENTATION_
-XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
-XMLJ_CFLAGS=    $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -I. -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -fbounds-check
-LT_COMPILE=     $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
-LT_LINK=        $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
-LT_INSTALL=     $(LIBTOOL) --mode=install $(INSTALL)
-
-libjso_base=    libxmlj
-libjso=         $(libjso_base)-$(LIBVERSION)@JMODSUFFIX@
-libjso_default= $(libjso_base)@JMODSUFFIX@
-libjso_target=  $(libjso_base).la
+#XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
+#XMLJ_CFLAGS=    $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -I. -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -fbounds-check
+#LT_COMPILE=     $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
+#LT_LINK=        $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
+#LT_INSTALL=     $(LIBTOOL) --mode=install $(INSTALL)
 
 package_names = \
-javax.xml \
-javax.xml.datatype \
-javax.xml.namespace \
-javax.xml.parsers \
-javax.xml.transform \
-javax.xml.transform.dom \
-javax.xml.transform.sax \
-javax.xml.transform.stream \
-javax.xml.validation \
-javax.xml.xpath \
-org.w3c.dom \
-org.w3c.dom.bootstrap \
-org.w3c.dom.css \
-org.w3c.dom.events \
-org.w3c.dom.html \
-org.w3c.dom.ls \
-org.w3c.dom.ranges \
-org.w3c.dom.stylesheets \
-org.w3c.dom.traversal \
-org.w3c.dom.views \
-org.w3c.dom.xpath \
-org.xml.sax \
-org.xml.sax.ext \
-org.xml.sax.helpers \
-gnu.xml.aelfred2 \
-gnu.xml.dom \
-gnu.xml.dom.ls \
-gnu.xml.libxmlj.dom \
-gnu.xml.libxmlj.sax \
-gnu.xml.libxmlj.transform \
-gnu.xml.pipeline \
-gnu.xml.util
+	javax.xml \
+	javax.xml.datatype \
+	javax.xml.namespace \
+	javax.xml.parsers \
+	javax.xml.transform \
+	javax.xml.transform.dom \
+	javax.xml.transform.sax \
+	javax.xml.transform.stream \
+	javax.xml.validation \
+	javax.xml.xpath \
+	org.w3c.dom \
+	org.w3c.dom.bootstrap \
+	org.w3c.dom.css \
+	org.w3c.dom.events \
+	org.w3c.dom.html \
+	org.w3c.dom.ls \
+	org.w3c.dom.ranges \
+	org.w3c.dom.stylesheets \
+	org.w3c.dom.traversal \
+	org.w3c.dom.views \
+	org.w3c.dom.xpath \
+	org.xml.sax \
+	org.xml.sax.ext \
+	org.xml.sax.helpers \
+	gnu.xml.aelfred2 \
+	gnu.xml.dom \
+	gnu.xml.dom.ls \
+	gnu.xml.libxmlj.dom \
+	gnu.xml.libxmlj.sax \
+	gnu.xml.libxmlj.transform \
+	gnu.xml.pipeline \
+	gnu.xml.transform \
+	gnu.xml.util \
+	gnu.xml.xpath
+	
+lib_LTLIBRARIES = \
+	libxmlj.la \
+	lib-javax-xml.la \
+	lib-org-w3c-dom.la \
+	lib-org-xml-sax.la \
+	lib-gnu-xml.la
 
-BUILT_SOURCES = $(libj_jarfile) $(libjso_target)
+libxmlj_la_SOURCES = \
+	xmlj_dom.c \
+	xmlj_dom.h \
+	xmlj_error.c \
+	xmlj_error.h \
+	xmlj_io.c \
+	xmlj_io.h \
+	xmlj_node.c \
+	xmlj_node.h \
+	xmlj_sax.c \
+	xmlj_sax.h \
+	xmlj_transform.c \
+	xmlj_util.c \
+	xmlj_util.h \
+	xmlj_xpath.c
+
+libxmlj_la_LDFLAGS = -release $(LIBVERSION) -export-dynamic -shrext @JMODSUFFIX@
+libxmlj_la_CFLAGS = -pedantic -Wall -Wno-long-long -fbounds-check
+libxmlj_la_DEPENDENCIES = $(noinst_HEADERS)
+
+lib_javax_xml_la_SOURCES = \
+	source/javax/xml/datatype/DatatypeConfigurationException.java \
+	source/javax/xml/datatype/DatatypeConstants.java \
+	source/javax/xml/datatype/DatatypeFactory.java \
+	source/javax/xml/datatype/Duration.java \
+	source/javax/xml/datatype/XMLGregorianCalendar.java \
+	source/javax/xml/XMLConstants.java \
+	source/javax/xml/namespace/NamespaceContext.java \
+	source/javax/xml/namespace/QName.java \
+	source/javax/xml/parsers/DocumentBuilder.java \
+	source/javax/xml/parsers/DocumentBuilderFactory.java \
+	source/javax/xml/parsers/FactoryConfigurationError.java \
+	source/javax/xml/parsers/ParserConfigurationException.java \
+	source/javax/xml/parsers/SAXParser.java \
+	source/javax/xml/parsers/SAXParserFactory.java \
+	source/javax/xml/transform/dom/DOMLocator.java \
+	source/javax/xml/transform/dom/DOMResult.java \
+	source/javax/xml/transform/dom/DOMSource.java \
+	source/javax/xml/transform/sax/SAXResult.java \
+	source/javax/xml/transform/sax/SAXSource.java \
+	source/javax/xml/transform/sax/SAXTransformerFactory.java \
+	source/javax/xml/transform/sax/TemplatesHandler.java \
+	source/javax/xml/transform/sax/TransformerHandler.java \
+	source/javax/xml/transform/ErrorListener.java \
+	source/javax/xml/transform/OutputKeys.java \
+	source/javax/xml/transform/Result.java \
+	source/javax/xml/transform/Source.java \
+	source/javax/xml/transform/SourceLocator.java \
+	source/javax/xml/transform/Templates.java \
+	source/javax/xml/transform/Transformer.java \
+	source/javax/xml/transform/TransformerConfigurationException.java \
+	source/javax/xml/transform/TransformerException.java \
+	source/javax/xml/transform/TransformerFactory.java \
+	source/javax/xml/transform/TransformerFactoryConfigurationError.java \
+	source/javax/xml/transform/URIResolver.java \
+	source/javax/xml/transform/stream/StreamResult.java \
+	source/javax/xml/transform/stream/StreamSource.java \
+	source/javax/xml/validation/Schema.java \
+	source/javax/xml/validation/SchemaFactory.java \
+	source/javax/xml/validation/TypeInfoProvider.java \
+	source/javax/xml/validation/Validator.java \
+	source/javax/xml/validation/ValidatorHandler.java \
+	source/javax/xml/xpath/XPath.java \
+	source/javax/xml/xpath/XPathConstants.java \
+	source/javax/xml/xpath/XPathException.java \
+	source/javax/xml/xpath/XPathExpression.java \
+	source/javax/xml/xpath/XPathExpressionException.java \
+	source/javax/xml/xpath/XPathFactory.java \
+	source/javax/xml/xpath/XPathFactoryConfigurationException.java \
+	source/javax/xml/xpath/XPathFunction.java \
+	source/javax/xml/xpath/XPathFunctionException.java \
+	source/javax/xml/xpath/XPathFunctionResolver.java \
+	source/javax/xml/xpath/XPathVariableResolver.java
+lib_javax_xml_la_LDFLAGS = -release $(VERSION)
+
+lib_org_w3c_dom_la_SOURCES = \
+	source/org/w3c/dom/bootstrap/DOMImplementationRegistry.java \
+	source/org/w3c/dom/Attr.java \
+	source/org/w3c/dom/CDATASection.java \
+	source/org/w3c/dom/CharacterData.java \
+	source/org/w3c/dom/Comment.java \
+	source/org/w3c/dom/DOMConfiguration.java \
+	source/org/w3c/dom/DOMError.java \
+	source/org/w3c/dom/DOMErrorHandler.java \
+	source/org/w3c/dom/DOMException.java \
+	source/org/w3c/dom/DOMImplementation.java \
+	source/org/w3c/dom/DOMImplementationList.java \
+	source/org/w3c/dom/DOMImplementationSource.java \
+	source/org/w3c/dom/DOMLocator.java \
+	source/org/w3c/dom/DOMStringList.java \
+	source/org/w3c/dom/Document.java \
+	source/org/w3c/dom/DocumentFragment.java \
+	source/org/w3c/dom/DocumentType.java \
+	source/org/w3c/dom/Element.java \
+	source/org/w3c/dom/Entity.java \
+	source/org/w3c/dom/EntityReference.java \
+	source/org/w3c/dom/NameList.java \
+	source/org/w3c/dom/NamedNodeMap.java \
+	source/org/w3c/dom/Node.java \
+	source/org/w3c/dom/NodeList.java \
+	source/org/w3c/dom/Notation.java \
+	source/org/w3c/dom/ProcessingInstruction.java \
+	source/org/w3c/dom/Text.java \
+	source/org/w3c/dom/TypeInfo.java \
+	source/org/w3c/dom/UserDataHandler.java \
+	source/org/w3c/dom/css/CSS2Azimuth.java \
+	source/org/w3c/dom/css/CSS2BackgroundPosition.java \
+	source/org/w3c/dom/css/CSS2BorderSpacing.java \
+	source/org/w3c/dom/css/CSS2CounterIncrement.java \
+	source/org/w3c/dom/css/CSS2CounterReset.java \
+	source/org/w3c/dom/css/CSS2Cursor.java \
+	source/org/w3c/dom/css/CSS2FontFaceSrc.java \
+	source/org/w3c/dom/css/CSS2FontFaceWidths.java \
+	source/org/w3c/dom/css/CSS2PageSize.java \
+	source/org/w3c/dom/css/CSS2PlayDuring.java \
+	source/org/w3c/dom/css/CSS2Properties.java \
+	source/org/w3c/dom/css/CSS2TextShadow.java \
+	source/org/w3c/dom/css/CSSCharsetRule.java \
+	source/org/w3c/dom/css/CSSFontFaceRule.java \
+	source/org/w3c/dom/css/CSSImportRule.java \
+	source/org/w3c/dom/css/CSSMediaRule.java \
+	source/org/w3c/dom/css/CSSPageRule.java \
+	source/org/w3c/dom/css/CSSPrimitiveValue.java \
+	source/org/w3c/dom/css/CSSRule.java \
+	source/org/w3c/dom/css/CSSRuleList.java \
+	source/org/w3c/dom/css/CSSStyleDeclaration.java \
+	source/org/w3c/dom/css/CSSStyleRule.java \
+	source/org/w3c/dom/css/CSSStyleSheet.java \
+	source/org/w3c/dom/css/CSSUnknownRule.java \
+	source/org/w3c/dom/css/CSSValue.java \
+	source/org/w3c/dom/css/CSSValueList.java \
+	source/org/w3c/dom/css/Counter.java \
+	source/org/w3c/dom/css/DOMImplementationCSS.java \
+	source/org/w3c/dom/css/DocumentCSS.java \
+	source/org/w3c/dom/css/ElementCSSInlineStyle.java \
+	source/org/w3c/dom/css/RGBColor.java \
+	source/org/w3c/dom/css/Rect.java \
+	source/org/w3c/dom/css/ViewCSS.java \
+	source/org/w3c/dom/events/DocumentEvent.java \
+	source/org/w3c/dom/events/Event.java \
+	source/org/w3c/dom/events/EventException.java \
+	source/org/w3c/dom/events/EventListener.java \
+	source/org/w3c/dom/events/EventTarget.java \
+	source/org/w3c/dom/events/MouseEvent.java \
+	source/org/w3c/dom/events/MutationEvent.java \
+	source/org/w3c/dom/events/UIEvent.java \
+	source/org/w3c/dom/html/HTMLAnchorElement.java \
+	source/org/w3c/dom/html/HTMLAppletElement.java \
+	source/org/w3c/dom/html/HTMLAreaElement.java \
+	source/org/w3c/dom/html/HTMLBRElement.java \
+	source/org/w3c/dom/html/HTMLBaseElement.java \
+	source/org/w3c/dom/html/HTMLBaseFontElement.java \
+	source/org/w3c/dom/html/HTMLBodyElement.java \
+	source/org/w3c/dom/html/HTMLButtonElement.java \
+	source/org/w3c/dom/html/HTMLCollection.java \
+	source/org/w3c/dom/html/HTMLDListElement.java \
+	source/org/w3c/dom/html/HTMLDOMImplementation.java \
+	source/org/w3c/dom/html/HTMLDirectoryElement.java \
+	source/org/w3c/dom/html/HTMLDivElement.java \
+	source/org/w3c/dom/html/HTMLDocument.java \
+	source/org/w3c/dom/html/HTMLElement.java \
+	source/org/w3c/dom/html/HTMLFieldSetElement.java \
+	source/org/w3c/dom/html/HTMLFontElement.java \
+	source/org/w3c/dom/html/HTMLFormElement.java \
+	source/org/w3c/dom/html/HTMLFrameElement.java \
+	source/org/w3c/dom/html/HTMLFrameSetElement.java \
+	source/org/w3c/dom/html/HTMLHRElement.java \
+	source/org/w3c/dom/html/HTMLHeadElement.java \
+	source/org/w3c/dom/html/HTMLHeadingElement.java \
+	source/org/w3c/dom/html/HTMLHtmlElement.java \
+	source/org/w3c/dom/html/HTMLIFrameElement.java \
+	source/org/w3c/dom/html/HTMLImageElement.java \
+	source/org/w3c/dom/html/HTMLInputElement.java \
+	source/org/w3c/dom/html/HTMLIsIndexElement.java \
+	source/org/w3c/dom/html/HTMLLIElement.java \
+	source/org/w3c/dom/html/HTMLLabelElement.java \
+	source/org/w3c/dom/html/HTMLLegendElement.java \
+	source/org/w3c/dom/html/HTMLLinkElement.java \
+	source/org/w3c/dom/html/HTMLMapElement.java \
+	source/org/w3c/dom/html/HTMLMenuElement.java \
+	source/org/w3c/dom/html/HTMLMetaElement.java \
+	source/org/w3c/dom/html/HTMLModElement.java \
+	source/org/w3c/dom/html/HTMLOListElement.java \
+	source/org/w3c/dom/html/HTMLObjectElement.java \
+	source/org/w3c/dom/html/HTMLOptGroupElement.java \
+	source/org/w3c/dom/html/HTMLOptionElement.java \
+	source/org/w3c/dom/html/HTMLParagraphElement.java \
+	source/org/w3c/dom/html/HTMLParamElement.java \
+	source/org/w3c/dom/html/HTMLPreElement.java \
+	source/org/w3c/dom/html/HTMLQuoteElement.java \
+	source/org/w3c/dom/html/HTMLScriptElement.java \
+	source/org/w3c/dom/html/HTMLSelectElement.java \
+	source/org/w3c/dom/html/HTMLStyleElement.java \
+	source/org/w3c/dom/html/HTMLTableCaptionElement.java \
+	source/org/w3c/dom/html/HTMLTableCellElement.java \
+	source/org/w3c/dom/html/HTMLTableColElement.java \
+	source/org/w3c/dom/html/HTMLTableElement.java \
+	source/org/w3c/dom/html/HTMLTableRowElement.java \
+	source/org/w3c/dom/html/HTMLTableSectionElement.java \
+	source/org/w3c/dom/html/HTMLTextAreaElement.java \
+	source/org/w3c/dom/html/HTMLTitleElement.java \
+	source/org/w3c/dom/html/HTMLUListElement.java \
+	source/org/w3c/dom/ls/DOMImplementationLS.java \
+	source/org/w3c/dom/ls/LSException.java \
+	source/org/w3c/dom/ls/LSInput.java \
+	source/org/w3c/dom/ls/LSLoadEvent.java \
+	source/org/w3c/dom/ls/LSOutput.java \
+	source/org/w3c/dom/ls/LSParser.java \
+	source/org/w3c/dom/ls/LSParserFilter.java \
+	source/org/w3c/dom/ls/LSProgressEvent.java \
+	source/org/w3c/dom/ls/LSResourceResolver.java \
+	source/org/w3c/dom/ls/LSSerializer.java \
+	source/org/w3c/dom/ls/LSSerializerFilter.java \
+	source/org/w3c/dom/ranges/DocumentRange.java \
+	source/org/w3c/dom/ranges/Range.java \
+	source/org/w3c/dom/ranges/RangeException.java \
+	source/org/w3c/dom/stylesheets/DocumentStyle.java \
+	source/org/w3c/dom/stylesheets/LinkStyle.java \
+	source/org/w3c/dom/stylesheets/MediaList.java \
+	source/org/w3c/dom/stylesheets/StyleSheet.java \
+	source/org/w3c/dom/stylesheets/StyleSheetList.java \
+	source/org/w3c/dom/traversal/DocumentTraversal.java \
+	source/org/w3c/dom/traversal/NodeFilter.java \
+	source/org/w3c/dom/traversal/NodeIterator.java \
+	source/org/w3c/dom/traversal/TreeWalker.java \
+	source/org/w3c/dom/views/AbstractView.java \
+	source/org/w3c/dom/views/DocumentView.java \
+	source/org/w3c/dom/xpath/XPathEvaluator.java \
+	source/org/w3c/dom/xpath/XPathException.java \
+	source/org/w3c/dom/xpath/XPathExpression.java \
+	source/org/w3c/dom/xpath/XPathNSResolver.java \
+	source/org/w3c/dom/xpath/XPathNamespace.java \
+	source/org/w3c/dom/xpath/XPathResult.java
+lib_org_w3c_dom_la_LDFLAGS = -release $(VERSION)
+
+lib_org_xml_sax_la_SOURCES = \
+	source/org/xml/sax/ext/Attributes2.java \
+	source/org/xml/sax/ext/Attributes2Impl.java \
+	source/org/xml/sax/ext/DeclHandler.java \
+	source/org/xml/sax/ext/DefaultHandler2.java \
+	source/org/xml/sax/ext/EntityResolver2.java \
+	source/org/xml/sax/ext/LexicalHandler.java \
+	source/org/xml/sax/ext/Locator2.java \
+	source/org/xml/sax/ext/Locator2Impl.java \
+	source/org/xml/sax/AttributeList.java \
+	source/org/xml/sax/Attributes.java \
+	source/org/xml/sax/ContentHandler.java \
+	source/org/xml/sax/DTDHandler.java \
+	source/org/xml/sax/DocumentHandler.java \
+	source/org/xml/sax/EntityResolver.java \
+	source/org/xml/sax/ErrorHandler.java \
+	source/org/xml/sax/HandlerBase.java \
+	source/org/xml/sax/InputSource.java \
+	source/org/xml/sax/Locator.java \
+	source/org/xml/sax/Parser.java \
+	source/org/xml/sax/SAXException.java \
+	source/org/xml/sax/SAXNotRecognizedException.java \
+	source/org/xml/sax/SAXNotSupportedException.java \
+	source/org/xml/sax/SAXParseException.java \
+	source/org/xml/sax/XMLFilter.java \
+	source/org/xml/sax/XMLReader.java \
+	source/org/xml/sax/helpers/AttributeListImpl.java \
+	source/org/xml/sax/helpers/AttributesImpl.java \
+	source/org/xml/sax/helpers/DefaultHandler.java \
+	source/org/xml/sax/helpers/LocatorImpl.java \
+	source/org/xml/sax/helpers/NamespaceSupport.java \
+	source/org/xml/sax/helpers/NewInstance.java \
+	source/org/xml/sax/helpers/ParserAdapter.java \
+	source/org/xml/sax/helpers/ParserFactory.java \
+	source/org/xml/sax/helpers/XMLFilterImpl.java \
+	source/org/xml/sax/helpers/XMLReaderAdapter.java \
+	source/org/xml/sax/helpers/XMLReaderFactory.java
+lib_org_xml_sax_la_LDFLAGS = -release $(VERSION)
+
+lib_gnu_xml_la_SOURCES = \
+	source/gnu/xml/aelfred2/JAXPFactory.java \
+	source/gnu/xml/aelfred2/SAXDriver.java \
+	source/gnu/xml/aelfred2/XmlParser.java \
+	source/gnu/xml/aelfred2/XmlReader.java \
+	source/gnu/xml/aelfred2/ContentHandler2.java \
+	source/gnu/xml/dom/ls/DomLSEx.java \
+	source/gnu/xml/dom/ls/DomLSInput.java \
+	source/gnu/xml/dom/ls/DomLSOutput.java \
+	source/gnu/xml/dom/ls/DomLSParser.java \
+	source/gnu/xml/dom/ls/DomLSSerializer.java \
+	source/gnu/xml/dom/ls/FilteredSAXEventSink.java \
+	source/gnu/xml/dom/ls/ReaderInputStream.java \
+	source/gnu/xml/dom/ls/SAXEventSink.java \
+	source/gnu/xml/dom/ls/WriterOutputStream.java \
+	source/gnu/xml/dom/Consumer.java \
+	source/gnu/xml/dom/DomAttr.java \
+	source/gnu/xml/dom/DomCDATA.java \
+	source/gnu/xml/dom/DomCharacterData.java \
+	source/gnu/xml/dom/DomComment.java \
+	source/gnu/xml/dom/DomDoctype.java \
+	source/gnu/xml/dom/DomDocument.java \
+	source/gnu/xml/dom/DomDocumentBuilder.java \
+	source/gnu/xml/dom/DomDocumentBuilderFactory.java \
+	source/gnu/xml/dom/DomDocumentConfiguration.java \
+	source/gnu/xml/dom/DomElement.java \
+	source/gnu/xml/dom/DomEntity.java \
+	source/gnu/xml/dom/DomEntityReference.java \
+	source/gnu/xml/dom/DomEvent.java \
+	source/gnu/xml/dom/DomEx.java \
+	source/gnu/xml/dom/DomExtern.java \
+	source/gnu/xml/dom/DomFragment.java \
+	source/gnu/xml/dom/DomImpl.java \
+	source/gnu/xml/dom/DomIterator.java \
+	source/gnu/xml/dom/DomNamedNodeMap.java \
+	source/gnu/xml/dom/DomNode.java \
+	source/gnu/xml/dom/DomNotation.java \
+	source/gnu/xml/dom/DomNsNode.java \
+	source/gnu/xml/dom/DomNSResolverContext.java \
+	source/gnu/xml/dom/DomPI.java \
+	source/gnu/xml/dom/DomText.java \
+	source/gnu/xml/dom/DomXPathExpression.java \
+	source/gnu/xml/dom/DomXPathNSResolver.java \
+	source/gnu/xml/dom/DomXPathResult.java \
+	source/gnu/xml/dom/DTDAttributeTypeInfo.java \
+	source/gnu/xml/dom/DTDElementTypeInfo.java \
+	source/gnu/xml/dom/ImplementationList.java \
+	source/gnu/xml/dom/ImplementationSource.java \
+	source/gnu/xml/dom/JAXPFactory.java \
+	source/gnu/xml/libxmlj/dom/GnomeAttr.java \
+	source/gnu/xml/libxmlj/dom/GnomeCDATASection.java \
+	source/gnu/xml/libxmlj/dom/GnomeCharacterData.java \
+	source/gnu/xml/libxmlj/dom/GnomeComment.java \
+	source/gnu/xml/libxmlj/dom/GnomeDOMException.java \
+	source/gnu/xml/libxmlj/dom/GnomeDOMStringList.java \
+	source/gnu/xml/libxmlj/dom/GnomeDocument.java \
+	source/gnu/xml/libxmlj/dom/GnomeDocumentBuilder.java \
+	source/gnu/xml/libxmlj/dom/GnomeDocumentBuilderFactory.java \
+	source/gnu/xml/libxmlj/dom/GnomeDocumentFragment.java \
+	source/gnu/xml/libxmlj/dom/GnomeDocumentType.java \
+	source/gnu/xml/libxmlj/dom/GnomeElement.java \
+	source/gnu/xml/libxmlj/dom/GnomeEntity.java \
+	source/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
+	source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java \
+	source/gnu/xml/libxmlj/dom/GnomeNode.java \
+	source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java \
+	source/gnu/xml/libxmlj/dom/GnomeNodeList.java \
+	source/gnu/xml/libxmlj/dom/GnomeNotation.java \
+	source/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
+	source/gnu/xml/libxmlj/dom/GnomeText.java \
+	source/gnu/xml/libxmlj/dom/GnomeTypeInfo.java \
+	source/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
+	source/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
+	source/gnu/xml/libxmlj/dom/GnomeXPathNodeList.java \
+	source/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
+	source/gnu/xml/libxmlj/sax/GnomeLocator.java \
+	source/gnu/xml/libxmlj/sax/GnomeSAXParser.java \
+	source/gnu/xml/libxmlj/sax/GnomeSAXParserFactory.java \
+	source/gnu/xml/libxmlj/sax/GnomeXMLReader.java \
+	source/gnu/xml/libxmlj/sax/Namespaces.java \
+	source/gnu/xml/libxmlj/sax/StringArrayAttributes.java \
+	source/gnu/xml/libxmlj/sax/XMLName.java \
+	source/gnu/xml/libxmlj/RawData.java \
+	source/gnu/xml/libxmlj/RawData32.java \
+	source/gnu/xml/libxmlj/RawData64.java \
+	source/gnu/xml/libxmlj/transform/ErrorListenerErrorHandler.java \
+	source/gnu/xml/libxmlj/transform/GnomeTransformer.java \
+	source/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
+	source/gnu/xml/libxmlj/transform/TransformTest.java \
+	source/gnu/xml/libxmlj/transform/URIResolverEntityResolver.java \
+	source/gnu/xml/libxmlj/util/EmptyNodeList.java \
+	source/gnu/xml/libxmlj/util/NamedInputStream.java \
+	source/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
+	source/gnu/xml/libxmlj/util/StandaloneLocator.java \
+	source/gnu/xml/libxmlj/util/XMLJ.java \
+	source/gnu/xml/pipeline/CallFilter.java \
+	source/gnu/xml/pipeline/DomConsumer.java \
+	source/gnu/xml/pipeline/EventConsumer.java \
+	source/gnu/xml/pipeline/EventFilter.java \
+	source/gnu/xml/pipeline/LinkFilter.java \
+	source/gnu/xml/pipeline/NSFilter.java \
+	source/gnu/xml/pipeline/PipelineFactory.java \
+	source/gnu/xml/pipeline/TeeConsumer.java \
+	source/gnu/xml/pipeline/TextConsumer.java \
+	source/gnu/xml/pipeline/ValidationConsumer.java \
+	source/gnu/xml/pipeline/WellFormednessFilter.java \
+	source/gnu/xml/pipeline/XIncludeFilter.java \
+	source/gnu/xml/pipeline/XsltFilter.java \
+	source/gnu/xml/util/DoParse.java \
+	source/gnu/xml/util/DomParser.java \
+	source/gnu/xml/util/Resolver.java \
+	source/gnu/xml/util/SAXNullTransformerFactory.java \
+	source/gnu/xml/util/XCat.java \
+	source/gnu/xml/util/XHTMLWriter.java \
+	source/gnu/xml/util/XMLWriter.java \
+	source/gnu/xml/xpath/AndExpr.java \
+	source/gnu/xml/xpath/ArithmeticExpr.java \
+	source/gnu/xml/xpath/Constant.java \
+	source/gnu/xml/xpath/EqualityExpr.java \
+	source/gnu/xml/xpath/Expr.java \
+	source/gnu/xml/xpath/Function.java \
+	source/gnu/xml/xpath/FunctionCall.java \
+	source/gnu/xml/xpath/NameTest.java \
+	source/gnu/xml/xpath/NegativeExpr.java \
+	source/gnu/xml/xpath/NodeTypeTest.java \
+	source/gnu/xml/xpath/OrExpr.java \
+	source/gnu/xml/xpath/ParenthesizedExpr.java \
+	source/gnu/xml/xpath/Path.java \
+	source/gnu/xml/xpath/RelationalExpr.java \
+	source/gnu/xml/xpath/Root.java \
+	source/gnu/xml/xpath/Selector.java \
+	source/gnu/xml/xpath/Steps.java \
+	source/gnu/xml/xpath/Test.java \
+	source/gnu/xml/xpath/UnionExpr.java \
+	source/gnu/xml/xpath/XPathParser.java \
+	source/gnu/xml/xpath/XPathTokenizer.java \
+	source/gnu/xml/xpath/BooleanFunction.java \
+	source/gnu/xml/xpath/CeilingFunction.java \
+	source/gnu/xml/xpath/ConcatFunction.java \
+	source/gnu/xml/xpath/ContainsFunction.java \
+	source/gnu/xml/xpath/CountFunction.java \
+	source/gnu/xml/xpath/DocumentOrderComparator.java \
+	source/gnu/xml/xpath/FalseFunction.java \
+	source/gnu/xml/xpath/FloorFunction.java \
+	source/gnu/xml/xpath/IdFunction.java \
+	source/gnu/xml/xpath/LangFunction.java \
+	source/gnu/xml/xpath/LastFunction.java \
+	source/gnu/xml/xpath/LocalNameFunction.java \
+	source/gnu/xml/xpath/NameFunction.java \
+	source/gnu/xml/xpath/NamespaceUriFunction.java \
+	source/gnu/xml/xpath/NormalizeSpaceFunction.java \
+	source/gnu/xml/xpath/NotFunction.java \
+	source/gnu/xml/xpath/NumberFunction.java \
+	source/gnu/xml/xpath/PositionFunction.java \
+	source/gnu/xml/xpath/RoundFunction.java \
+	source/gnu/xml/xpath/StartsWithFunction.java \
+	source/gnu/xml/xpath/StringFunction.java \
+	source/gnu/xml/xpath/StringLengthFunction.java \
+	source/gnu/xml/xpath/SubstringAfterFunction.java \
+	source/gnu/xml/xpath/SubstringBeforeFunction.java \
+	source/gnu/xml/xpath/SubstringFunction.java \
+	source/gnu/xml/xpath/SumFunction.java \
+	source/gnu/xml/xpath/TranslateFunction.java \
+	source/gnu/xml/xpath/TrueFunction.java \
+	source/gnu/xml/xpath/VariableReference.java \
+	source/gnu/xml/xpath/XPathFactoryImpl.java \
+	source/gnu/xml/xpath/XPathImpl.java \
+	source/gnu/xml/xpath/XPathTest.java \
+	source/gnu/xml/xpath/Pattern.java \
+	source/gnu/xml/xpath/Predicate.java \
+	source/gnu/xml/xpath/NamespaceTest.java \
+	source/gnu/xml/transform/AbstractNumberNode.java \
+	source/gnu/xml/transform/ApplyTemplatesNode.java \
+	source/gnu/xml/transform/AttributeNode.java \
+	source/gnu/xml/transform/Bindings.java \
+	source/gnu/xml/transform/CallTemplateNode.java \
+	source/gnu/xml/transform/ChooseNode.java \
+	source/gnu/xml/transform/CommentNode.java \
+	source/gnu/xml/transform/CopyNode.java \
+	source/gnu/xml/transform/CopyOfNode.java \
+	source/gnu/xml/transform/DOMSourceLocator.java \
+	source/gnu/xml/transform/DocumentFunction.java \
+	source/gnu/xml/transform/ElementNode.java \
+	source/gnu/xml/transform/ForEachNode.java \
+	source/gnu/xml/transform/ErrorListenerErrorHandler.java \
+	source/gnu/xml/transform/IfNode.java \
+	source/gnu/xml/transform/KeyFunction.java \
+	source/gnu/xml/transform/LiteralNode.java \
+	source/gnu/xml/transform/NodeNumberNode.java \
+	source/gnu/xml/transform/NumberNode.java \
+	source/gnu/xml/transform/OtherwiseNode.java \
+	source/gnu/xml/transform/ParameterNode.java \
+	source/gnu/xml/transform/ProcessingInstructionNode.java \
+	source/gnu/xml/transform/SAXSerializer.java \
+	source/gnu/xml/transform/SortKey.java \
+	source/gnu/xml/transform/StreamSerializer.java \
+	source/gnu/xml/transform/Stylesheet.java \
+	source/gnu/xml/transform/Template.java \
+	source/gnu/xml/transform/TemplateNode.java \
+	source/gnu/xml/transform/TemplatesImpl.java \
+	source/gnu/xml/transform/TextNode.java \
+	source/gnu/xml/transform/TransformerFactoryImpl.java \
+	source/gnu/xml/transform/TransformerImpl.java \
+	source/gnu/xml/transform/URIResolverEntityResolver.java \
+	source/gnu/xml/transform/ValueOfNode.java \
+	source/gnu/xml/transform/WhenNode.java \
+	source/gnu/xml/transform/WithParam.java \
+	source/gnu/xml/transform/XSLComparator.java \
+	source/gnu/xml/transform/XSLURIResolver.java \
+	source/gnu/xml/transform/CurrentFunction.java \
+	source/gnu/xml/transform/FormatNumberFunction.java \
+	source/gnu/xml/transform/GenerateIdFunction.java \
+	source/gnu/xml/transform/SystemPropertyFunction.java \
+	source/gnu/xml/transform/UnparsedEntityUriFunction.java \
+	source/gnu/xml/transform/MessageNode.java \
+	source/gnu/xml/transform/AttributeSet.java \
+	source/gnu/xml/transform/Key.java
+
+lib_gnu_xml_la_LDFLAGS = -release-info $(VERSION)
+lib_gnu_xml_la_LIBADD = -l-javax-xml -l-org-w3c-dom -l-org-xml-sax
+
+data_JARS = javax-xml-$(VERSION).jar gnu-xml-$(VERSION).jar \
+	org-w3c-dom-$(VERSION).jar org-xml-sax-$(VERSION).jar \
+	$(libj_jarfile)
+
+BUILT_SOURCES = $(data_JARS) $(noinst_HEADERS)
+
+noinst_HEADERS = \
+	gnu_xml_libxmlj_dom_GnomeDocument.h \
+	gnu_xml_libxmlj_dom_GnomeXPathNodeList.h \
+	gnu_xml_libxmlj_dom_GnomeDocumentType.h \
+	gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+	gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
+	gnu_xml_libxmlj_dom_GnomeTypeInfo.h \
+	gnu_xml_libxmlj_dom_GnomeNodeList.h \
+	gnu_xml_libxmlj_dom_GnomeNotation.h \
+	gnu_xml_libxmlj_dom_GnomeXPathResult.h \
+	gnu_xml_libxmlj_dom_GnomeElement.h \
+	gnu_xml_libxmlj_dom_GnomeEntity.h \
+	gnu_xml_libxmlj_dom_GnomeNode.h \
+	gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
+	gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h \
+	gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h \
+	gnu_xml_libxmlj_dom_GnomeAttr.h \
+	gnu_xml_libxmlj_sax_GnomeLocator.h \
+	gnu_xml_libxmlj_sax_GnomeXMLReader.h \
+	gnu_xml_libxmlj_transform_GnomeTransformer.h \
+	gnu_xml_libxmlj_transform_GnomeTransformerFactory.h
 
 # Generate header files for classes containing native code.
-#$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
-#	@JAVAH@ -jni -d $(jni) -classpath $(dst) $($<:/=.)
-
 # I did remove the -force argument (not available in gcjh nor in kaffe)
+$(noinst_HEADERS): $(gnu_xml_jar_CLASSES)
 
-#gnu_xml_libxmlj_dom_%.h: $(dst)/gnu/xml/libxmlj/dom/%.class
-#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
-#
-#gnu_xml_libxmlj_sax_%.h: $(dst)/gnu/xml/libxmlj/sax/%.class
-#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
-#
-#gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class
-#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
+gnu_xml_libxmlj_dom_%.h: classes/gnu/xml/libxmlj/dom/%.class
+	$(JAVAH) -jni -classpath classes gnu.xml.libxmlj.dom.$*
 
-gnu_xml_libxmlj_dom_%.h: $(libj_jarfile)
-	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
+gnu_xml_libxmlj_sax_%.h: classes/gnu/xml/libxmlj/sax/%.class
+	$(JAVAH) -jni -classpath classes gnu.xml.libxmlj.sax.$*
 
-gnu_xml_libxmlj_sax_%.h: $(libj_jarfile)
-	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
+gnu_xml_libxmlj_transform_%.h: classes/gnu/xml/libxmlj/transform/%.class
+	$(JAVAH) -jni -classpath classes gnu.xml.libxmlj.transform.$*
 
-gnu_xml_libxmlj_transform_%.h: $(libj_jarfile)
-	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
+gnu_xml_jar_CLASSES     = $(patsubst source/%.java,classes/%.class,$(lib_gnu_xml_la_SOURCES))
+javax_xml_jar_CLASSES   = $(patsubst source/%.java,classes/%.class,$(lib_javax_xml_la_SOURCES))
+org_w3c_dom_jar_CLASSES = $(patsubst source/%.java,classes/%.class,$(lib_org_w3c_dom_la_SOURCES))
+org_xml_sax_jar_CLASSES = $(patsubst source/%.java,classes/%.class,$(lib_org_xml_sax_la_SOURCES))
 
-# Rule for compiling Java source files
-$(classes): $(dst)/%.class: $(src)/%.java $(dst)
-	@JAVAC@ @JAVACFLAGS@ -d $(dst) -classpath $(src) $<
+gnu-xml-$(VERSION).jar: classes $(gnu_xml_jar_CLASSES)
+	$(JAR) cf $@ -C classes gnu
 
-$(dst):
-	mkdir -p $(dst)
+javax-xml-$(VERSION).jar: classes $(javax_xml_jar_CLASSES)
+	$(JAR) cf $@ -C classes javax
 
-# Jar file
-$(libj_jarfile): $(classes)
-	@JAR@ cfm $(libj_jarfile) $(top_srcdir)/manifest.mf \
-		-C $(dst) gnu \
-		-C $(dst) javax \
-		-C $(dst) org
+org-w3c-dom-$(VERSION).jar: classes $(org_w3c_dom_jar_CLASSES)
+	$(JAR) cf $@ -C classes org/w3c
 
-# JNI objects
-$(jni_lobjects): %.lo: @srcdir@/%.c $(headers)
-	$(LT_COMPILE) $< 
+org-xml-sax-$(VERSION).jar: classes $(org_xml_sax_jar_CLASSES)
+	$(JAR) cf $@ -C classes org/xml
 
-# Shared JNI library
-$(libjso_target): $(jni_lobjects)
-	$(LT_LINK) -shrext @JMODSUFFIX@ -o $@ $(jni_lobjects) 
+$(libj_jarfile): $(gnu_xml_jar_CLASSES) $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES)
+	$(JAR) cfm $@ @srcdir@/manifest.mf -C classes gnu -C classes javax -C classes org
+
+$(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $(gnu_xml_jar_CLASSES): classes
+
+$(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $(gnu_xml_jar_CLASSES): classes/%.class: $(srcdir)/source/%.java
+	$(GCJ) $(GCJ_CLASS_FLAGS) -g -C -d classes $<
+
+classes:
+	mkdir -p classes
 
 # API documentation
 javadoc:
-	mkdir -p $(doc)
-	$(JAVADOC) -d $(doc) -sourcepath @srcdir@/source \
+	mkdir -p @srcdir@/apidoc
+	$(JAVADOC) -d @srcdir@/apidoc -sourcepath @srcdir@/source \
 		$(package_names)
 #		-windowtitle "GNU JAXP Library" $(package_names)
 
 # Remove classes and jar file
+
 clean-local:
-	rm -rf $(libj_jarfile) $(dst) $(doc) $(headers) $(jni_objects)
+	rm -f $(data_JARS)
+	rm -rf classes
+	rm -f $(noinst_HEADERS)
 
 # Run a simple transformation to check that the package is working
 check-local: gnu/xml/libxmlj/transform/TransformTest.class
 	@JAVA@  -classpath "${CLASSPATH}:${libj_jarfile}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
 	diff @srcdir@/testdocs/transformed.xml transformed.xml
+#	./transform-test $(srcdir)/testdocs/test.xml $(srcdir)/testdocs/testsheet.xsl transformed.xml
+#	diff $(srcdir)/testdocs/transformed.xml transformed.xml
+
 
 dist-hook:
 	mkdir $(distdir)/source/gnu
@@ -664,9 +690,11 @@ dist-hook:
 	mkdir $(distdir)/testdocs
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
 
-install-data-local:
-	@srcdir@/mkinstalldirs $(DESTDIR)$(libdir)
-	$(LT_INSTALL) ${libjso_target} $(DESTDIR)$(libdir)
-	@srcdir@/mkinstalldirs $(DESTDIR)$(datadir)/java/
-	$(INSTALL_DATA) ${libj_jarfile} $(DESTDIR)$(datadir)/java/
-
+install-data-hook:
+	$(INSTALL) -d $(datadir)/java
+	$(INSTALL) -d $(datadir)/java/ext
+	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/java
+	$(LN_S) -f $(datadir)/java/javax-xml-$(VERSION).jar $(datadir)/java/ext/javax-xml.jar
+	$(LN_S) -f $(datadir)/java/gnu-xml-$(VERSION).jar $(datadir)/java/ext/gnu-xml.jar
+	$(LN_S) -f $(datadir)/java/org-w3c-dom-$(VERSION).jar $(datadir)/java/ext/org-w3c-dom.jar
+	$(LN_S) -f $(datadir)/java/org-xml-sax-$(VERSION).jar $(datadir)/java/ext/org-xml-sax.jar

@@ -1,3 +1,19 @@
+2004-11-27  Chris Burdess	<dog@gnu.org>
+
+	* Makefile.am: Removed redundant 'sources' and 'classes' makefile
+	variables. Added -W-no-long-long to libxmlj compilation flags.
+
+2004-11-26  Andrew Overholt  <overholt@redhat.com>
+
+	* Makefile.am: Update for gcj.
+	* configure.ac: Likewise.
+	* Makefile.in: Update generated.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+	* config/config.guess: Likewise.
+	* config/config.sub: Likewise.
+	* config/ltmain.sh: Likewise.
+
 2004-10-06  Chris Burdess	<dog@gnu.org>
 
 	* Makefile.am: Fixes to permit gcj compilation.

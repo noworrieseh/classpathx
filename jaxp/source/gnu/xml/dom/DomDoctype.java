@@ -199,7 +199,8 @@ public class DomDoctype
       }
     getEntities();
     
-    DomDocument.verifyXmlName(name);
+    DomDocument.checkName(name, (owner != null) ?
+                          "1.1".equals(owner.getXmlVersion()) : false);
     if (entities.getNamedItem(name) != null)
       {
         return null;
@@ -254,7 +255,8 @@ public class DomDoctype
       }
     getNotations();
     
-    DomDocument.verifyXmlName(name);
+    DomDocument.checkName(name, (owner != null) ?
+                          "1.1".equals(owner.getXmlVersion()) : false);
     
     notation = new DomNotation(owner, name, publicId, systemId);
     notations.setNamedItem(notation);
