@@ -25,11 +25,12 @@ package javax.activation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 
 /**
  * Data Content Handler.
  * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface DataContentHandler
 {
@@ -65,7 +66,7 @@ public interface DataContentHandler
    * @throws IOException IO exception occurred
    */
   public Object getTransferData(DataFlavor flavor,DataSource source)
-  throws IOException;
+    throws UnsupportedFlavorException, IOException;
 
   /**
    * Get a list of transfer data flavors.

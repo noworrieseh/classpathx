@@ -23,7 +23,8 @@ package gnu.mail.providers.smtp;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 import javax.mail.*;
 import javax.mail.event.TransportEvent;
 import javax.mail.internet.*;
@@ -71,11 +72,11 @@ public class SMTPTransport
   private MimeMessage mimeMessage;
   private Address[] addresses;
   //private InternetAddress[] validSentAddr;
-  private List validSentAddrList;
+  private Vector validSentAddrList;
   //private InternetAddress[] validUnsentAddr;
-  private List validUnsentAddrList;
+  private Vector validUnsentAddrList;
   //private InternetAddress[] invalidAddr;
-  private List invalidAddrList;
+  private Vector invalidAddrList;
   private Hashtable extMap;
   private boolean noAuth;
   private String name;
@@ -99,9 +100,9 @@ public class SMTPTransport
   public SMTPTransport(Session session, URLName urlName) 
   {
     super(session, urlName);
-    validSentAddrList = new ArrayList(2);
-    validUnsentAddrList = new ArrayList(2);
-    invalidAddrList = new ArrayList();
+    validSentAddrList = new Vector(2);
+    validUnsentAddrList = new Vector(2);
+    invalidAddrList = new Vector();
     // TODO
   }
 
@@ -128,82 +129,83 @@ public class SMTPTransport
     int connectPort;
     
     try 
-      {	
-        // Check mail.smtp.port
-        String mailPort = session.getProperty("mail.smtp.port");
-
-        if (mailPort != null) 
-          {
-            connectPort = Integer.parseInt(mailPort);
-          } 
-	else if (port == -1) 
-	  {
-	    connectPort = 25;
-	  } 
-	else 
-	  {
-	    connectPort = port;
-	  }
+    {	
+      // Check mail.smtp.port
+      String mailPort = session.getProperty("mail.smtp.port");
       
-        // Open Server
-        openServer(host, connectPort);
-      
-        // TODO: Currently doesn't support user authentication
-      
-      } 
-    catch (Exception e) 
+      if (mailPort != null) 
       {
-	e.printStackTrace();
-	return false;
+        connectPort = Integer.parseInt(mailPort);
       } 
+      else if (port == -1) 
+      {
+        connectPort = 25;
+      } 
+      else 
+      {
+        connectPort = port;
+      }
+      
+      // Open Server
+      openServer(host, connectPort);
+      
+      // TODO: Currently doesn't support user authentication
+      
+    } 
+    catch (Exception e) 
+    {
+      e.printStackTrace();
+      return false;
+    } 
     
     // Return Valid Connection
     return true;
     
   }
-
+  
   private void openServer(String host, int port) throws MessagingException 
   {
-
+    
     // Variables
     String timeout;
-
+    
     // Create Server Socket
     try
-      {
-        socket = new Socket(host, port);
-      } 
+    {
+      socket = new Socket(host, port);
+    } 
     catch (IOException ioe)
-        {
-          ioe.printStackTrace();
-        }
-
+    {
+      ioe.printStackTrace();
+    }
+    
     // Check for "mail.smtp.timeout" option
     timeout = session.getProperty("mail.smtp.timeout");
     if (timeout != null) 
+    {
+      try
       {
-        try
-          {
-            socket.setSoTimeout(Integer.parseInt(timeout));
-          } 
-	catch (SocketException se)
-	  {
-	    se.printStackTrace();
-	  }
-      }
-
-    try 
-      {
-        serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        serverOutput = new SMTPOutputStream(socket.getOutputStream());
+        socket.setSoTimeout(Integer.parseInt(timeout));
       } 
-    catch (IOException ioe)
+      catch (SocketException se)
       {
-	ioe.printStackTrace();
+        se.printStackTrace();
       }
-
+    }
+    
+    try 
+    {
+      InputStream sin = socket.getInputStream();
+      serverInput = new BufferedReader(new InputStreamReader(sin));
+      serverOutput = new SMTPOutputStream(socket.getOutputStream());
+    } 
+    catch (IOException ioe)
+    {
+      ioe.printStackTrace();
+    }
+    
   }
-
+  
   /**
    * Sends the SMTP message to the server.
    *
@@ -213,64 +215,64 @@ public class SMTPTransport
    * @exception SendFailedException if an error occurs
    */
   public synchronized void sendMessage(Message message,
-                                       Address[] addresses)
-    throws MessagingException,
-	   SendFailedException 
+      Address[] addresses)
+    throws MessagingException, SendFailedException 
   {
-
+    
     // Variables
     String ehlo;
-
+    
     // Store Message and addresses
     mimeMessage = (MimeMessage) message;
     this.addresses = addresses;
-
+    
     // Greeting
     readServerResponse();
-
+    
     // EHLO/HELO
     ehlo = session.getProperty("mail.smtp.ehlo");
     if (ehlo != null && ehlo.toUpperCase().equals("FALSE")) 
-      {
-        helo(getLocalHost());
-      } 
+    {
+      helo(getLocalHost());
+    } 
     else if (ehlo(getLocalHost()) == false) 
-      {
-	helo(getLocalHost());
-      }
-
+    {
+      helo(getLocalHost());
+    }
+    
     // Send Header
     mailFrom();
     rcptTo();
     
     // Send Data
     try
-      {
-        mimeMessage.writeTo(data());
-      } 
+    {
+      mimeMessage.writeTo(data());
+    } 
     catch (IOException ioe)
-      {
-	ioe.printStackTrace();
-      }
+    {
+      ioe.printStackTrace();
+    }
     finishData();
     
     notifyTransportListeners();
-
+    
   }
-
+  
   /**
    * Inform anybody listening to us how the message sending resulted.
    */
   private void notifyTransportListeners() 
   {
-
-    Address[] validSentAddr = (InternetAddress[]) validSentAddrList.toArray(new InternetAddress[0]);
-    Address[] validUnsentAddr = (InternetAddress[]) validUnsentAddrList.toArray(new InternetAddress[0]);
-    Address[] invalidAddr = (InternetAddress[]) invalidAddrList.toArray(new InternetAddress[0]);
+    Address[] validSentAddr = new Address[validSentAddrList.size()];
+    validSentAddrList.copyInto(validSentAddr);
+    Address[] validUnsentAddr = new Address[validUnsentAddrList.size()];
+    validUnsentAddrList.copyInto(validUnsentAddr);
+    Address[] invalidAddr = new Address[invalidAddrList.size()];
+    invalidAddrList.copyInto(invalidAddr);
 
     notifyTransportListeners(deliveryStatus, validSentAddr, validUnsentAddr,
 			     invalidAddr, mimeMessage);
-
   }
 
   public synchronized void connect() throws MessagingException 
@@ -286,14 +288,14 @@ public class SMTPTransport
 
     // Check if Host Set
     if (host == null) 
-      {
-        throw new MessagingException("No SMTP host has been " +
-                                     "set (mail.smtp.host)");
-      } 
-
+    {
+      throw new MessagingException("No SMTP host has been " +
+          "set (mail.smtp.host)");
+    } 
+    
     // Connect
     connect(host, user, null);
-
+    
   }
 
 //    private void checkConnected() 
@@ -307,37 +309,39 @@ public class SMTPTransport
    *
    * @exception MessagingException if an error occurs
    */
-  public synchronized void close() throws MessagingException 
+  public synchronized void close()
+    throws MessagingException 
   {
     // TODO
 
     // Check if connection is Open
     if (isConnected()) 
-      {
-        closeConnection();
-      } 
+    {
+      closeConnection();
+    } 
 
     super.close();
 
   }
 
-  private void closeConnection() throws MessagingException 
+  private void closeConnection()
+    throws MessagingException 
   {
 
     simpleCommand("QUIT");
 
     try 
-      {
-        // Close Streams
-        serverOutput.close();
-        serverInput.close();
-        socket.close();
-
-      } 
+    {
+      // Close Streams
+      serverOutput.close();
+      serverInput.close();
+      socket.close();
+      
+    } 
     catch (IOException e) 
-      {
-      }
-
+    {
+    }
+    
   }
 
   /**
@@ -356,28 +360,28 @@ public class SMTPTransport
 
     // Check for Local Host String
     if (localHostName != null) 
-      {
-        return localHostName;
-      } 
-
+    {
+      return localHostName;
+    } 
+    
     // Check For mail.smtp.localhost property
     localHostName = session.getProperty("mail.smtp.localhost");
     if (localHostName != null) 
-      {
-        return localHostName;
-      } 
-
+    {
+      return localHostName;
+    } 
+    
     // Determine Localhost
     try 
-      {
-        localHostName = InetAddress.getLocalHost().getHostName();
-        return localHostName;
-      } 
+    {
+      localHostName = InetAddress.getLocalHost().getHostName();
+      return localHostName;
+    } 
     catch (UnknownHostException e) 
-      {
-	// not sure what circumstances can cause this to happen.
-      }
-
+    {
+      // not sure what circumstances can cause this to happen.
+    }
+    
     // Return Unknown
     return "";
 
@@ -406,9 +410,9 @@ public class SMTPTransport
 
     // Check for space after code
     if (value.charAt(3) == ' ') 
-      {
-        return false;
-      } 
+    {
+      return false;
+    } 
 
     return true;
   }
@@ -428,7 +432,8 @@ public class SMTPTransport
    * @returns true if SMTP extensions are supported, false otherwise
    * @exception MessagingException Problem has occurred
    */
-  private boolean ehlo(String domain) throws MessagingException 
+  private boolean ehlo(String domain)
+    throws MessagingException 
   {
 
     String command = "EHLO " + domain;
@@ -436,10 +441,10 @@ public class SMTPTransport
     int response = simpleCommand(command);
 
     if (response != 250) 
-      {
-        return false;
-      }
-
+    {
+      return false;
+    }
+    
     return true;
 
   }
@@ -471,7 +476,8 @@ public class SMTPTransport
    * @exception SendFailedException if no valid message sender is found.
    * @exception MessagingException for any other error cause.
    */
-  private void mailFrom() throws SendFailedException, MessagingException 
+  private void mailFrom()
+    throws SendFailedException, MessagingException 
   {
 
     Address from;
@@ -481,29 +487,29 @@ public class SMTPTransport
 
     addressFromProperty = session.getProperty("mail.smtp.from");
     if (addressFromProperty != null) 
-      {
-	from = new InternetAddress(addressFromProperty);
-      }
+    {
+      from = new InternetAddress(addressFromProperty);
+    }
     else if ((from = mimeMessage.getFrom()[0]) != null)
-      {
-	from = mimeMessage.getFrom()[0];
-      }
+    {
+      from = mimeMessage.getFrom()[0];
+    }
     else
-      {
-	deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
-	throw new SendFailedException("No valid message sender specified");
-      }
-
+    {
+      deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+      throw new SendFailedException("No valid message sender specified");
+    }
+    
     mailFrom = "MAIL FROM: <" + from + ">";
     response = simpleCommand(mailFrom);
     
     if (response != 250) 
-      {
-	deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
-	throw new SendFailedException("Sender " + from + " was rejected: "
-				     + response);
-      }
-
+    {
+      deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+      throw new SendFailedException("Sender " + from + " was rejected: "
+          + response);
+    }
+    
   }
 
   /**
@@ -512,32 +518,33 @@ public class SMTPTransport
    *
    * @exception SendFailedException Problem has occurred
    */
-  private void rcptTo() throws SendFailedException, MessagingException 
+  private void rcptTo()
+    throws SendFailedException, MessagingException 
   {
     
     // Process each Address
     for (int i = 0; i < addresses.length; i++) 
+    {
+      
+      String rcptTo = "RCPT TO: <" + addresses[i] + ">";
+      int response = simpleCommand(rcptTo);
+      
+      if (response == 250) 
       {
-      
-        String rcptTo = "RCPT TO: <" + addresses[i] + ">";
-	int response = simpleCommand(rcptTo);
-      
-	if (response == 250) 
-	  {
-	    validSentAddrList.add(0, addresses[i]);
-	  }
-	else
-	  {
-	    invalidAddrList.add(0, addresses[i]);
-	  }
+        validSentAddrList.add(0, addresses[i]);
       }
-
+      else
+      {
+        invalidAddrList.add(0, addresses[i]);
+      }
+    }
+    
     if (validSentAddrList.size() == 0)
-      {
-	deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
-	throw new SendFailedException("No valid mail recipients specified");	
-      }
-
+    {
+      deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+      throw new SendFailedException("No valid mail recipients specified");	
+    }
+    
   }
 
   private OutputStream data() throws MessagingException 
@@ -562,25 +569,25 @@ public class SMTPTransport
 
     /* Process address Lists depending on result of DATA command. */
     if (response != 250)
-      {
-	validUnsentAddrList.addAll(validSentAddrList);
-	validSentAddrList.clear();
-	deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
-      }
+    {
+      validUnsentAddrList.addAll(validSentAddrList);
+      validSentAddrList.clear();
+      deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+    }
     else 
+    {
+      if (invalidAddrList.size() == 0)
       {
-	if (invalidAddrList.size() == 0)
-	  {
-	    deliveryStatus = TransportEvent.MESSAGE_DELIVERED;
-	  }
-	else 
-	  {
-	    deliveryStatus = TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
-	  }
+        deliveryStatus = TransportEvent.MESSAGE_DELIVERED;
       }
-
+      else 
+      {
+        deliveryStatus = TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
+      }
+    }
+    
   }
-
+  
   private String normalizeAddress(String address) 
   {
     return null; // TODO
@@ -599,26 +606,26 @@ public class SMTPTransport
     boolean end;
 
     // Read Each Line of Input From Server
-
+    
     try
+    {
+      lastServerResponse = serverInput.readLine();
+      while (isNotLastLine(lastServerResponse)) 
       {
         lastServerResponse = serverInput.readLine();
-        while (isNotLastLine(lastServerResponse)) 
-          {
-            lastServerResponse = serverInput.readLine();
-          }
-      } 
+      }
+    } 
     catch (IOException ioe)
-      {
-	ioe.printStackTrace();
-      }
-
+    {
+      ioe.printStackTrace();
+    }
+    
     if (session.getDebug())
-      {
-	System.out.println("DEBUG SMTP RECV: " + lastServerResponse);
-      }
+    {
+      System.out.println("DEBUG SMTP RECV: " + lastServerResponse);
+    }
     code = lastServerResponse.substring(0, 3);
-
+    
     // Return Code
     return Integer.parseInt(code);
 
@@ -630,7 +637,8 @@ public class SMTPTransport
    * @returns Return code from SMTP server
    * @exception MessagingException Problem has occurred
    */
-  private int simpleCommand(String command) throws MessagingException 
+  private int simpleCommand(String command)
+    throws MessagingException 
   {
 
     // Send Command
@@ -646,24 +654,25 @@ public class SMTPTransport
    * @param command Command to send
    * @exception MessagingException Problem has occurred
    */
-  private void sendCommand(String command) throws MessagingException 
+  private void sendCommand(String command)
+    throws MessagingException 
   {
     try 
-      {
-        serverOutput.write(command.getBytes());
-        serverOutput.write(CRLF);
-      } 
+    {
+      serverOutput.write(command.getBytes());
+      serverOutput.write(CRLF);
+    } 
     catch (IOException e) 
-      {
-	e.printStackTrace();
-	throw new MessagingException("Problem writing to server");
-      }
+    {
+      e.printStackTrace();
+      throw new MessagingException("Problem writing to server");
+    }
     
     if (session.getDebug()) 
-      {
-        System.out.println("DEBUG SMTP SENT: " + command);
-      }
-      
+    {
+      System.out.println("DEBUG SMTP SENT: " + command);
+    }
+    
   }
 
 //    private boolean supportsAuthentication(String value) 

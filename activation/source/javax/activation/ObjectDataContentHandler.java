@@ -23,16 +23,17 @@ package javax.activation;
 
 // Imports
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.OutputStream;
 import java.io.IOException;
 
 /**
  * Object Data Content Handler.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ObjectDataContentHandler
-implements DataContentHandler 
+  implements DataContentHandler 
 {
 
   //-------------------------------------------------------------
@@ -76,7 +77,7 @@ implements DataContentHandler
     this.handler = handler;
     obj = object;
     mimeType = mimetype;
-  } // ObjectDataContentHandler()
+  }
 
 
   //-------------------------------------------------------------
@@ -90,7 +91,7 @@ implements DataContentHandler
   public DataContentHandler getDCH() 
   {
     return handler;
-  } // getDCH()
+  }
 
   /**
    * Get transfer data flavors.
@@ -98,21 +99,37 @@ implements DataContentHandler
    */
   public DataFlavor[] getTransferDataFlavors() 
   {
+    if (transferFlavors==null)
+    {
+      if (handler!=null)
+        transferFlavors = handler.getTransferDataFlavors();
+      else
+      {
+        transferFlavors = new DataFlavor[1];
+        Class t = obj.getClass();
+        transferFlavors[0] = new ActivationDataFlavor(t, mimeType, mimeType);
+      }
+    }
     return transferFlavors;
-  } // getTransferDataFlavors()
+  }
 
   /**
    * Get transfer data flavor.
    * @param flavor Data flavor
    * @param source Data source
-   * @return TODO
    * @throws IOException IO exception occurred
    */
   public Object getTransferData(DataFlavor flavor, DataSource source) 
-  throws IOException 
+    throws UnsupportedFlavorException, IOException 
   {
-    return null; // TODO
-  } // getTransferData()
+    if (handler!=null)
+      return handler.getTransferData(flavor, source);
+    getTransferDataFlavors();
+    if (flavor.equals(transferFlavors[0]))
+      return obj;
+    else
+      throw new UnsupportedFlavorException(flavor);
+  }
 
   /**
    * Get content.
@@ -121,8 +138,8 @@ implements DataContentHandler
    */
   public Object getContent(DataSource source) 
   {
-    return null; // TODO
-  } // getContent()
+    return obj;
+  }
 
   /**
    * Write to.
@@ -132,9 +149,12 @@ implements DataContentHandler
    * @throws IOException IO exception occurred
    */
   public void writeTo(Object object, String mimeType, OutputStream stream)
-  throws IOException 
+    throws IOException 
   {
-  } // writeTo()
+    if (handler!=null)
+      handler.writeTo(object, mimeType, stream);
+    else
+      throw new UnsupportedDataTypeException("No handler for MIME content type: "+mimeType);
+  }
 
-
-} // ObjectDataContentHandler
+}

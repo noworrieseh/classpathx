@@ -35,7 +35,7 @@ import java.net.URL;
 /**
  * Data Handler.
  * @author Andrew Selkirk
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class DataHandler implements Transferable 
 {
@@ -258,9 +258,11 @@ public class DataHandler implements Transferable
       }
 
     } // if: dataSource
-
-    // TODO: Object case
-
+    else
+    {
+      DataContentHandler handler = getDataContentHandler();
+      handler.writeTo(object, objectMimeType, stream);
+    }
   } // writeTo()
 
   /**
@@ -306,7 +308,19 @@ public class DataHandler implements Transferable
    */
   private synchronized String getBaseType() 
   {
-    return null; // TODO
+    if (shortType==null)
+    {
+      String contentType = getContentType();
+      try
+      {
+        shortType = new MimeType(contentType).getBaseType();
+      }
+      catch (MimeTypeParseException e)
+      {
+        shortType = contentType;
+      }
+    }
+    return shortType;
   } // getBaseType()
 
   /**

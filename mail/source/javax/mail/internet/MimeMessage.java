@@ -157,8 +157,8 @@ public class MimeMessage
 
   // Header constants.
   static final String TO_NAME = "To";
-  static final String CC_NAME = "To";
-  static final String BCC_NAME = "To";
+  static final String CC_NAME = "Cc";
+  static final String BCC_NAME = "Bcc";
   static final String NEWSGROUPS_NAME = "Newsgroups";
   static final String FROM_NAME = "From";
   static final String SENDER_NAME = "Sender";

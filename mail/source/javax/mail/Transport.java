@@ -79,6 +79,15 @@ public abstract class Transport
     throws MessagingException
   {
     msg.saveChanges();
+    /*
+    try
+    {
+      msg.writeTo(System.out);
+    } catch (java.io.IOException e)
+    {
+      e.printStackTrace();
+    }
+    */
     doSend(msg, msg.getAllRecipients());
   }
 
@@ -106,7 +115,7 @@ public abstract class Transport
   {
     if (addresses==null || addresses.length==0)
       throw new SendFailedException("No recipient addresses");
-    
+
     Hashtable addressesByType = new Hashtable();
     for (int i = 0; i<addresses.length; i++)
     {

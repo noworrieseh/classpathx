@@ -246,7 +246,7 @@ public abstract class Message
     Address[] to = getRecipients(RecipientType.TO);
     Address[] cc = getRecipients(RecipientType.CC);
     Address[] bcc = getRecipients(RecipientType.BCC);
-    
+   
     if (cc==null && bcc==null)
       return to;
     

@@ -31,7 +31,7 @@ import java.io.IOException;
  * Represents a MIME type as per RFC2046.
  *
  * @author Andrew Selkirk
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class MimeType
 implements Externalizable
@@ -73,15 +73,9 @@ implements Externalizable
    * @param rawdata MIME Type entry
    */
   public MimeType(String rawdata) 
+    throws MimeTypeParseException
   {
-    // TODO: should we be silently failing here?
-    try 
-    {
-      parse(rawdata);
-    }
-    catch (Exception e) 
-    {
-    }
+    parse(rawdata);
   } // MimeType
 
   /**
