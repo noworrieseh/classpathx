@@ -77,7 +77,7 @@ typedef struct _SAXParseContext
   jmethodID fatalError;
 
   jmethodID resolveURIAndOpen; /* JavaProxy */
-  
+  jclass stringClass; 
 }
 SAXParseContext;
 

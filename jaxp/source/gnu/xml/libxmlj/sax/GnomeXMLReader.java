@@ -562,28 +562,31 @@ implements XMLReader
         // Handle defined namespaces
         ns.push ();
         int len = attrs.length;
-        ArrayList filtered = new ArrayList (len);
-        for (int i = 0; i < len; i += 2)
+        if (len > 0)
           {
-            String attName = attrs[i];
-            String attValue = attrs[i + 1];
-            if (attName.equals ("xmlns"))
+            ArrayList filtered = new ArrayList (len);
+            for (int i = 0; i < len; i += 2)
               {
-                startPrefixMapping ("", attValue);
+                String attName = attrs[i];
+                String attValue = attrs[i + 1];
+                if (attName.equals ("xmlns"))
+                  {
+                    startPrefixMapping ("", attValue);
+                  }
+                else if (attName.startsWith ("xmlns:"))
+                  {
+                    startPrefixMapping (attName.substring (6), attValue);
+                  }
+                else
+                  {
+                    filtered.add (attName);
+                    filtered.add (attValue);
+                  }
               }
-            else if (attName.startsWith ("xmlns:"))
-              {
-                startPrefixMapping (attName.substring (6), attValue);
-              }
-            else
-              {
-                filtered.add (attName);
-                filtered.add (attValue);
-              }
+            // Remove xmlns attributes
+            attrs = new String[filtered.size ()];
+            filtered.toArray (attrs);
           }
-        // Remove xmlns attributes
-        attrs = new String[filtered.size ()];
-        filtered.toArray (attrs);
       }
     // Construct attributes
     Attributes atts = new StringArrayAttributes (this, attrs);

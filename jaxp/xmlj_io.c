@@ -300,7 +300,7 @@ xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx,
   ret->fatalError = NULL;
 
   ret->resolveURIAndOpen = NULL;
-  
+  ret->stringClass = NULL; 
   return ret;
 }
 

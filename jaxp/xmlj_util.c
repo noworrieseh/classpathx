@@ -118,14 +118,31 @@ jmethodID xmljGetMethodID (JNIEnv *env,
                              signature);
   if (ret == NULL)
     {
-      jclass clscls = (*env)->FindClass (env, "java/lang/Class");
-      jmethodID nm = (*env)->GetMethodID (env, clscls, "getName",
-                                          "()Ljava/lang/String;");
-      jstring clsname = (jstring) (*env)->CallObjectMethod (env,
-                                                            (jobject)cls,
-                                                            nm);
-      const char * c_clsName = (*env)->GetStringUTFChars (env, clsname, 0);
+      jclass clscls;
+      jmethodID nm;
+      jstring clsname;
+      const char *c_clsName;
       char cat[512] = "[method signature too long]";
+      
+      clscls = (*env)->FindClass (env, "java/lang/Class");
+      if (clscls == NULL)
+        {
+          return NULL;
+        }
+      nm = (*env)->GetMethodID (env, clscls, "getName",
+                                "()Ljava/lang/String;");
+      if (nm == NULL)
+        {
+          return NULL;
+        }
+      clsname = (jstring) (*env)->CallObjectMethod (env,
+                                                    (jobject)cls,
+                                                    nm);
+      if (clsname == NULL)
+        {
+          return NULL;
+        }
+      c_clsName = (*env)->GetStringUTFChars (env, clsname, 0);
       sprintf (cat, "%s.%s %s", c_clsName, name, signature);
       xmljThrowException (env,
                           "java/lang/NoSuchMethodException",

@@ -771,7 +771,6 @@ xmljSAXStartElement (void *vctx,
   SAXParseContext *sax;
   JNIEnv *env;
   jobject target;
-  jclass cls;
   jstring j_name;
   jobjectArray j_attrs;
   jstring j_attr;
@@ -802,24 +801,47 @@ xmljSAXStartElement (void *vctx,
   j_name = xmljNewString (env, name);
   /* build attributes array */
   len = 0;
-  for (len = 0; attrs && attrs[len] != NULL; len++)
+  for (len = 0; attrs && attrs[len]; len++)
     {
     }
-  cls = (*env)->FindClass (env, "java/lang/String");
-  j_attrs = (*env)->NewObjectArray (env, len, cls, NULL);
-  len = 0;
-  for (len = 0; attrs && attrs[len] != NULL; len++)
+  if (len)
     {
-      j_attr = xmljNewString (env, attrs[len]);
-      (*env)->SetObjectArrayElement (env, j_attrs, len, j_attr);
+      if (sax->stringClass == NULL)
+        {
+          sax->stringClass = (*env)->FindClass (env, "java/lang/String");
+          if (sax->stringClass == NULL)
+            {
+              return;
+            }
+        }
+      j_attrs = (*env)->NewObjectArray (env, len, sax->stringClass, NULL);
+      if (j_attrs == NULL)
+        {
+          return;
+        }
+      len = 0;
+      for (len = 0; attrs && attrs[len]; len++)
+        {
+          j_attr = xmljNewString (env, attrs[len]);
+          (*env)->SetObjectArrayElement (env, j_attrs, len, j_attr);
+        }
+      
+      (*env)->CallVoidMethod (env,
+                              target,
+                              sax->startElement,
+                              j_name,
+                              j_attrs);
+      (*env)->DeleteLocalRef (env, j_attrs);
     }
-
-  (*env)->CallVoidMethod (env,
-                          target,
-                          sax->startElement,
-                          j_name,
-                          j_attrs);
-  /* TODO free array? */
+  else
+    {
+      (*env)->CallVoidMethod (env,
+                              target,
+                              sax->startElement,
+                              j_name,
+                              NULL);
+      
+    }
 }
 
 void

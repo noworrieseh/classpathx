@@ -2,6 +2,7 @@
 
 	* GnomeElement: getAttribute(NS) returns empty strings instead of
 	    null.
+	* sax: Cached java.lang.String class.
 
 2004-07-21  Chris Burdess <dog@gnu.org>
 
