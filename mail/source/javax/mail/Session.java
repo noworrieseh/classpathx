@@ -112,8 +112,8 @@ public final class Session
     else
       loader = authenticator.getClass().getClassLoader();
     // Load the providers
-    loadProviders(loader.getResourceAsStream(DEFAULT_PROVIDERS), "default");
-    loadProviders(loader.getResourceAsStream(CUSTOM_PROVIDERS), "custom");
+    loadProviders(getResourceAsStream(loader, DEFAULT_PROVIDERS), "default");
+    loadProviders(getResourceAsStream(loader, CUSTOM_PROVIDERS), "custom");
     try
     {
       File file = new File(SYSTEM_PROVIDERS);
@@ -133,8 +133,8 @@ public final class Session
 			   + providersByProtocol.toString());
     }
     // Load the address map
-    loadAddressMap(loader.getResourceAsStream(DEFAULT_ADDRESS_MAP), "default");
-    loadAddressMap(loader.getResourceAsStream(CUSTOM_ADDRESS_MAP), "custom");
+    loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP), "default");
+    loadAddressMap(getResourceAsStream(loader, CUSTOM_ADDRESS_MAP), "custom");
     try
     {
       File file = new File(SYSTEM_ADDRESS_MAP);
@@ -146,6 +146,32 @@ public final class Session
     	if (debug)
 	      System.out.println("DEBUG: no system address map");
     }
+  }
+
+  /**
+   * Get an input stream for a resource.
+   * <code>ClassLoader.getResourceAsStream</code> should work,
+   * but Class.getClassLoader() returns null in kaffe (2003-01-22).
+   */
+  private InputStream getResourceAsStream(ClassLoader loader, String resource)
+  {
+    InputStream in = null;
+    try
+    {
+      if (loader!=null)
+        in = loader.getResourceAsStream(resource);
+      else
+        in = getClass().getResourceAsStream(resource);
+      if (in==null && resource.charAt(0)!='/')
+        in = getResourceAsStream(loader, new StringBuffer()
+            .append('/')
+            .append(resource)
+            .toString());
+    }
+    catch (Exception e)
+    {
+    }
+    return in;
   }
 
   /** Load the provider database description.

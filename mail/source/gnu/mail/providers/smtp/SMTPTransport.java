@@ -318,7 +318,12 @@ public class SMTPTransport
       try 
       {
         simpleCommand("QUIT");
+      catch (MessagingException e) 
+      {
+      }
         
+      try 
+      {
         // Close streams
         out.close();
         in.close();

@@ -123,6 +123,17 @@ public class POP3Connection
 			throw new ProtocolException("Connect failed: "+response);
 		// APOP timestamp
 		timestamp = parseTimestamp(response);
+    /* TODO
+    // Try STARTTLS method
+    send("STLS");
+    if (getResponse())
+    {
+      SocketFactory factory = SSLSocketFactory.getDefault();
+      socket = factory.createSocket(socket, hostname, port, true);
+      in = new CRLFInputStream(socket.getInputStream());
+      out = new CRLFOutputStream(socket.getOutputStream());
+    }
+    */
 	}
 
 	/**
@@ -150,7 +161,7 @@ public class POP3Connection
 	public boolean authenticate(String username, String password)
 		throws IOException
 	{
-		if (username==null)
+		if (username==null || password==null)
 			return false;
 		String cmd;
 		if (timestamp!=null)
@@ -190,8 +201,6 @@ public class POP3Connection
 						"to plain authentication");
 			}
 		}
-    if (password==null)
-      return false;
 		// USER <username>
 		cmd = new StringBuffer(USER)
 			.append(' ')
