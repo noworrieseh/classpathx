@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.2 2003-09-13 16:36:52 dog Exp $
+$Id: build.xml,v 1.3 2003-09-14 10:50:35 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -88,7 +88,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/smtp/*.java'/>
 		</javac>
-		<echo file='${address-map}'>rfc822=smtp
+		<echo file='${address.map}'>rfc822=smtp
 		</echo>
 		<echo file='${providers}' append='true'>protocol=smtp; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;
 		</echo>
@@ -117,7 +117,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='nntp.classpath'/>
 			<include name='gnu/mail/providers/nntp/*.java'/>
 		</javac>
-		<echo file='${address-map}'>rfc822=nntp-post'
+		<echo file='${address.map}'>rfc822=nntp-post'
 		</echo>
 		<echo file='${providers}' append='true'>protocol=nntp; type=store; class=gnu.mail.providers.nntp.NNTPStore; vendor=dog@gnu.org;
 		</echo>
@@ -261,6 +261,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 				<include name='gnu/mail/providers/imap'/>
 				<include name='gnu/mail/providers/pop3'/>
 				<include name='gnu/mail/providers/nntp'/>
+				<include name='gnu/mail/providers/mbox'/>
+				<include name='gnu/mail/providers/maildir'/>
 			</packageset>
 		</javadoc>
 	</target>

@@ -55,12 +55,5 @@ Filtering
 No inherent filtering mechanism is currently supplied, although you are free
 to use procmail or any other filtering MTA as you see fit.
 
-Session properties
 
-There is a session property you can set that may speed up disk reads:
-
-  property --------------------+ type ---+ default + description ----------
-  mail.mbox.fetchsize          | int     | 1024    | read buffer size
-
-
-Chris Burdess, August 2001
+Chris Burdess, September 2003

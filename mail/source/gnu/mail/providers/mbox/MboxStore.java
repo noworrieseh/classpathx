@@ -53,7 +53,6 @@ public final class MboxStore
   private static final char separatorChar = '/';
   private static final String INBOX = "inbox";
   
-  static int fetchsize = 1024;
   static boolean attemptFallback = true;
 
   private List statusListeners = new ArrayList();
@@ -64,19 +63,7 @@ public final class MboxStore
   public MboxStore(Session session, URLName urlname) 
   {
     super(session, urlname);
-    String fs = session.getProperty("mail.mbox.fetchsize");
-    if (fs!=null) 
-    {
-      try 
-      { 
-        fetchsize = Math.max(Integer.parseInt(fs), 1024); 
-      } 
-      catch (NumberFormatException e) 
-      {
-        log("fetchsize "+fs+" is not a number");
-      }
-    }
-    String af = session.getProperty("mail.mbox.attemptFallback");
+    String af = session.getProperty("mail.mbox.attemptfallback");
     if (af!=null) 
       attemptFallback = Boolean.valueOf(af).booleanValue();
   }

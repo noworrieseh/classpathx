@@ -61,32 +61,5 @@ No filtering mechanism is currently supplied. It was originally hoped that
 JavaMail would provide a standard architecture for this, but this
 possibility now seems remote. Suggestions are welcome.
 
-Callbacks
 
-Some news servers can be very slow at providing lists of newsgroups, and may
-contain thousands of articles. The NNTP provider provides a callback
-mechanism by which your application can register itself as an interested
-listener, and will be notified of the progress of the listing process.
-
-This callback process was thought to be generally useful and was submitted
-to the JavaMail team for consideration, but nothing has yet come of this.
-Therefore, you need to use the gnu.mail.treeutil classes. Your application
-should implement StatusListener, check that the Store is instanceof
-StatusSource, and if it is (the NNTP store is) register yourself as a
-listener on it during potentially long article or newsgroup listings. You
-can easily use this callback facility to update a progress bar in a GUI, for
-instance, so that the end user has some idea of how long the operation is
-likely to take.
-
-Session properties
-
-There are a few session properties you can set that may help in certain cases:
-
-  property --------------------+ type ---+ default + description ----------
-  mail.nntp.fetchsize          | int     | 1024    | read buffer size
-  mail.nntp.memoryOptimisation | boolean | false   | optimise size not speed
-  mail.nntp.useNewNews         | boolean | false   | server understands the
-                               |         |           NEWNEWS command
-
-
-Chris Burdess, August 2001
+Chris Burdess, September 2003
