@@ -44,6 +44,7 @@
 int xmljValidateChildNode (xmlNodePtr parent, xmlNodePtr child);
 int xmljIsEqualNode (xmlNodePtr node1, xmlNodePtr node2);
 int xmljIsEqualNodeList (xmlNodePtr node1, xmlNodePtr node2);
+void xmljNormalizeNode (xmlNodePtr node);
 
 /* Utility */
 jobject xmljCreateDocument (JNIEnv * env, jobject self, xmlDocPtr doc);

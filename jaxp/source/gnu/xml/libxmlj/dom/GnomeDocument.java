@@ -62,6 +62,23 @@ implements Document, DOMConfiguration, XPathEvaluator
    * Not currently used.
    */
   boolean strictErrorChecking;
+
+  /* DOMConfiguration */
+  boolean canonicalForm = false;
+  boolean cdataSections = true;
+  boolean checkCharacterNormalization = false;
+  boolean comments = true;
+  boolean datatypeNormalization = false;
+  boolean elementContentWhitespace = true;
+  boolean entities = true;
+  DOMErrorHandler errorHandler;
+  boolean namespaces = true;
+  boolean namespaceDeclarations = true;
+  boolean normalizeCharacters = false;
+  boolean splitCdataSections = true;
+  boolean validate = false;
+  boolean validateIfSchema = false;
+  boolean wellFormed = true;
   
   GnomeDocument(Object id)
   {
@@ -163,11 +180,8 @@ implements Document, DOMConfiguration, XPathEvaluator
 
   public native void setDocumentURI (String documentURI);
 
-  public Node adoptNode (Node source)
-    throws DOMException
-  {
-    throw new DOMException (DOMException.NOT_SUPPORTED_ERR, null);
-  }
+  public native Node adoptNode (Node source)
+    throws DOMException;
 
   public DOMConfiguration getDomConfig ()
   {
@@ -176,7 +190,7 @@ implements Document, DOMConfiguration, XPathEvaluator
 
   public void normalizeDocument ()
   {
-    // TODO
+    normalize ();
   }
 
   public native Node renameNode (Node n, String namespaceURI,
@@ -187,15 +201,175 @@ implements Document, DOMConfiguration, XPathEvaluator
   public void setParameter (String name, Object value)
     throws DOMException
   {
-    /* TODO */
-    throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+    if ("canonical-form".equals (name))
+      {
+        /* optional
+        canonicalForm = getBooleanValue (value);*/
+      }
+    else if ("cdata-sections".equals (name))
+      {
+        cdataSections = getBooleanValue (value);
+      }
+    else if ("check-character-normalization".equals (name))
+      {
+        /* optional
+        checkCharacterNormalization = getBooleanValue (value);*/
+      }
+    else if ("comments".equals (name))
+      {
+        comments = getBooleanValue (value);
+      }
+    else if ("datatype-normalization".equals (name))
+      {
+        /* optional
+        datatypeNormalization = getBooleanValue (value);*/
+      }
+    else if ("element-content-whitespace".equals (name))
+      {
+        /* optional
+        elementContentWhitespace = getBooleanValue (value);*/
+      }
+    else if ("entities".equals (name))
+      {
+        entities = getBooleanValue (value);
+      }
+    else if ("error-handler".equals (name))
+      {
+        errorHandler = (DOMErrorHandler) value;
+      }
+    else if ("infoset".equals (name))
+      {
+        if (getBooleanValue (value))
+          {
+            validateIfSchema = false;
+            entities = false;
+            datatypeNormalization = false;
+            cdataSections = false;
+            namespaceDeclarations = true;
+            wellFormed = true;
+            elementContentWhitespace = true;
+            comments = true;
+            namespaces = true;
+          }
+      }
+    else if ("namespaces".equals (name))
+      {
+        /* optional
+        namespaces = getBooleanValue (value);*/
+      }
+    else if ("namespace-declarations".equals (name))
+      {
+        namespaceDeclarations = getBooleanValue (value);
+      }
+    else if ("normalize-characters".equals (name))
+      {
+        /* optional
+        normalizeCharacters = getBooleanValue (value);*/
+      }
+    else if ("split-cdata-sections".equals (name))
+      {
+        splitCdataSections = getBooleanValue (value);
+      }
+    else if ("validate".equals (name))
+      {
+        /* optional
+        validate = getBooleanValue (value);*/
+      }
+    else if ("validate-if-schema".equals (name))
+      {
+        /* optional
+        validateIfSchema = getBooleanValue (value);*/
+      }
+    else if ("well-formed".equals (name))
+      {
+        /* optional
+        wellFormed = getBooleanValue (value);*/
+      }
+    else
+      {
+        throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+      }
   }
 
   public Object getParameter (String name)
     throws DOMException
   {
-    /* TODO */
-    throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+    if ("canonical-form".equals (name))
+      {
+        return new Boolean (canonicalForm);
+      }
+    else if ("cdata-sections".equals (name))
+      {
+        return new Boolean (cdataSections);
+      }
+    else if ("check-character-normalization".equals (name))
+      {
+        return new Boolean (checkCharacterNormalization);
+      }
+    else if ("comments".equals (name))
+      {
+        return new Boolean (comments);
+      }
+    else if ("datatype-normalization".equals (name))
+      {
+        return new Boolean (datatypeNormalization);
+      }
+    else if ("element-content-whitespace".equals (name))
+      {
+        return new Boolean (elementContentWhitespace);
+      }
+    else if ("entities".equals (name))
+      {
+        return new Boolean (entities);
+      }
+    else if ("error-handler".equals (name))
+      {
+        return errorHandler;
+      }
+    else if ("infoset".equals (name))
+      {
+        return new Boolean (!validateIfSchema &&
+                            !entities &&
+                            !datatypeNormalization &&
+                            !cdataSections &&
+                            namespaceDeclarations &&
+                            wellFormed &&
+                            elementContentWhitespace &&
+                            comments &&
+                            namespaces);
+      }
+    else if ("namespaces".equals (name))
+      {
+        return new Boolean (namespaces);
+      }
+    else if ("namespace-declarations".equals (name))
+      {
+        return new Boolean (namespaceDeclarations);
+      }
+    else if ("normalize-characters".equals (name))
+      {
+        return new Boolean (normalizeCharacters);
+      }
+    else if ("split-cdata-sections".equals (name))
+      {
+        return new Boolean (splitCdataSections);
+      }
+    else if ("validate".equals (name))
+      {
+        return new Boolean (validate);
+      }
+    else if ("validate-if-schema".equals (name))
+      {
+        return new Boolean (validateIfSchema);
+      }
+    else if ("well-formed".equals (name))
+      {
+        return new Boolean (wellFormed);
+      }
+    else
+      {
+        throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+      }
   }
 
   public boolean canSetParameter (String name, Object value)
@@ -204,13 +378,48 @@ implements Document, DOMConfiguration, XPathEvaluator
       {
         return true;
       }
-    /* TODO */
-    return false;
+    return ("cdata-sections".equals (name) ||
+            "comments".equals (name) ||
+            "entities".equals (name) ||
+            "error-handler".equals (name) ||
+            "namespace-declarations".equals (name) ||
+            "split-cdata-sections".equals (name));
   }
   
   public DOMStringList getParameterNames ()
   {
-    return new GnomeDOMStringList (new String[0]);
+    String[] names = new String[] {
+      "canonical-form",
+      "cdata-sections",
+      "check-character-normalization",
+      "comments",
+      "datatype-normalization",
+      "element-content-whitespace",
+      "entities",
+      "error-handler",
+      "infoset",
+      "namespaces",
+      "namespace-declarations",
+      "normalize-characters",
+      "split-cdata-sections",
+      "validate",
+      "validate-if-schema",
+      "well-formed"
+    };
+    return new GnomeDOMStringList (names);
+  }
+
+  private boolean getBooleanValue (Object value)
+  {
+    if (value instanceof Boolean)
+      {
+        return ((Boolean) value).booleanValue ();
+      }
+    else if (value instanceof String)
+      {
+        return new Boolean ((String) value).booleanValue ();
+      }
+    return false;
   }
 
   // -- XPathEvaluator methods --
