@@ -25,6 +25,7 @@
 Available targets are:
 compile --> compiles the source code
 check   --> checks the style of the source code
+test    --> run unit tests
 release	--> package into release
 clean	--> cleans the build directory
 javadoc	--> build JavaDoc
@@ -67,6 +68,41 @@ javadoc	--> build JavaDoc
 	
 
 	<!--************************************************************-->
+	<!-- test target ***********************************************-->
+	<!--************************************************************-->
+
+	<target name="test" depends="compile">
+		<mkdir dir="${test.build}"/>
+		<javac 	srcdir="${test.src}" destdir="${test.build}">
+			<classpath>
+				<pathelement location="${src}"/>
+				<pathelement location="${test.src}"/> 
+			</classpath>
+		</javac>		
+		<mkdir dir="${test.results}"/>
+		<mkdir dir="${test.report}"/>
+		<junit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<pathelement location="${build}"/>
+				<pathelement location="${test.build}"/>
+			</classpath>
+			<formatter type="xml"/>
+			<batchtest fork="no" todir="${test.results}">
+				<fileset dir="${test.src}">
+					<include name="**/*UnitTest.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport todir="${test.report}">
+			<fileset dir="${test.results}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="${test.report}"/>
+		</junitreport>
+	</target>
+
+
+	<!--************************************************************-->
 	<!-- release target ********************************************-->
 	<!--************************************************************-->
 
@@ -98,35 +134,14 @@ javadoc	--> build JavaDoc
 	
 
 	<!--************************************************************-->
-	<!-- Test target ***********************************************-->
-	<!--************************************************************-->
-
-	<target name="test" depends="init">
-		<junit printsummary="yes" haltonfailure="yes">
-		  <classpath>
-		  	<fileset dir="${libsrc}">
-		  		<include name="**/*.jar"/>
-		  	</fileset>
-		  	<pathelement location="${src}"/>
-		  	<pathelement location="${libsrc}"/> 
-		</classpath>
-	
-	        <formatter type="plain" />
-		
-		<test name="TestCase" haltonfailure="no" outfile="result" >
-		    <formatter type="xml" />
-		</test>
-		
-		</junit>
-	</target>
-	
-
-	<!--************************************************************-->
 	<!-- clean target **********************************************-->
 	<!--************************************************************-->
 	
 	<target name="clean" depends="init" > 
 		<delete dir="${build}"/>
+		<delete dir="${test.build}"/>
+		<delete dir="${test.results}"/>
+		<delete dir="${test.report}"/>
 		<delete dir="${doc.dest}"/>
 		<delete file="${project.base}/infobus.jar"/>
 	</target>
