@@ -1,5 +1,5 @@
 /*
- * $Id: TransformerConfigurationException.java,v 1.4 2001-11-02 22:07:45 db Exp $
+ * $Id: TransformerConfigurationException.java,v 1.5 2003-08-19 09:51:21 avdyk Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * 
  * This file is part of GNU JAXP, a library.
@@ -33,6 +33,8 @@ package javax.xml.transform;
  */
 public class TransformerConfigurationException extends TransformerException {
 
+  protected SourceLocator locator = null;
+  
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
@@ -53,6 +55,15 @@ public class TransformerConfigurationException extends TransformerException {
 		super(msg, ex);
 	} // TransformerConfigurationException()
 
+  public TransformerConfigurationException(String msg, SourceLocator locator) {
+    super(msg);
+    this.locator = locator;
+  }
+
+  public TransformerConfigurationException(String msg, SourceLocator locator, Throwable ex) {
+    super(msg, ex);
+    this.locator = locator;
+  }  
 
 } // TranformerConfigurationException
 
