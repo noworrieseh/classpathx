@@ -169,7 +169,7 @@ public class IMAPStore
             if (authenticationMechanisms != null &&
                 !authenticationMechanisms.isEmpty ())
               {
-                if (username != null && password != null)
+                if (username == null || password == null)
                   {
                     PasswordAuthentication pa =
                       session.getPasswordAuthentication (url);

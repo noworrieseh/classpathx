@@ -208,7 +208,7 @@ public class SMTPTransport
             !authenticationMechanisms.isEmpty () &&
             (authRequired || propertyIsTrue ("auth")))
           {
-            if (username != null && password != null)
+            if (username == null || password == null)
               {
                 PasswordAuthentication pa =
                   session.getPasswordAuthentication (url);

@@ -379,7 +379,7 @@ public class URLName
           }
         
         // user:password@host?
-        int atIndex = hostPart.indexOf ('@');
+        int atIndex = hostPart.lastIndexOf ('@');
         if (atIndex != -1)
           {
             String userPart = hostPart.substring (0, atIndex);
