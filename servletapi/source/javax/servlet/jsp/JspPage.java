@@ -25,16 +25,17 @@ import javax.servlet.Servlet;
 /**
  * XXX
  */
-public interface JspPage extends Servlet {
+public interface JspPage extends Servlet 
+{
 	
-	/**
-	 * XXX
-	 */
-	void jspInit();
+  /**
+   * XXX
+   */
+  void jspInit();
 	
-	/**
-	 * XXX
-	 */
-	void jspDestroy();
+  /**
+   * XXX
+   */
+  void jspDestroy();
 
 }

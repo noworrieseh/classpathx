@@ -30,8 +30,8 @@ import javax.servlet.ServletException;
  *
  * @author Mark Wielaard <mark@klomp.org>
  */
-public interface HttpJspPage extends JspPage {
-
+public interface HttpJspPage extends JspPage 
+{
   /**
    * Provide a service for a page.
    *

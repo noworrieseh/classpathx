@@ -27,59 +27,62 @@ import javax.servlet.ServletResponse;
 /**
  * XXX
  */
-public abstract class JspFactory {
+public abstract class JspFactory 
+{
 
-	// Class variables
+  //  Class variables
 
-	// Holds the default JspFactory
-	// set with setDefaultFactory()
-	// returned by getDefaultFactory() 
-	private static JspFactory defaultFactory;
+  //  Holds the default JspFactory
+  //  set with setDefaultFactory()
+  //  returned by getDefaultFactory() 
+  private static JspFactory defaultFactory;
 
-	// Constructors
+  //  Constructors
 
-	/**
-	 * XXX [mjw] Why is this public, shouldn't it be protected?
-	 */
-	public JspFactory() {}
+  /**
+   * XXX [mjw] Why is this public, shouldn't it be protected?
+   */
+  public JspFactory() {}
 
-	// Methods
+  //  Methods
 
-	/**
-	 * XXX
-	 *
-	 * @param s XXX
-	 * @param req XXX
-	 * @param res XXX
-	 * @param needsSession XXX
-	 * @param bufferSize XXX
-	 * @param autoflush XXX
-	 * @return XXX
-	 */
-	public abstract PageContext creatPageContext(Servlet s,
-												 ServletRequest req,
-												 ServletResponse res,
-												 boolean needsSession,
-												 int bufferSize,
-												 boolean autoflush);
+  /**
+   * XXX
+   *
+   * @param s XXX
+   * @param req XXX
+   * @param res XXX
+   * @param needsSession XXX
+   * @param bufferSize XXX
+   * @param autoflush XXX
+   * @return XXX
+   */
+  public abstract PageContext creatPageContext(Servlet s,
+					       ServletRequest req,
+					       ServletResponse res,
+					       boolean needsSession,
+					       int bufferSize,
+					       boolean autoflush);
 
-	/**
-	 * XXX
-	 *
-	 * @return XXX
-	 */
-	public static JspFactory getDefaultFactory() {
-		return defaultFactory;
-	}
+  /**
+   * XXX
+   *
+   * @return XXX
+   */
+  public static JspFactory getDefaultFactory() 
+  {
+    return defaultFactory;
+  }
 	
 
-	/**
-	 * XXX
-	 *
-	 * @param fac XXX
-	 */
-	public static void setDefaultFactory(JspFactory fac) {
-		defaultFactory = fac;
-	}
+  /**
+   * XXX
+   *
+   * @param fac XXX
+   */
+  public static void setDefaultFactory(JspFactory fac) 
+  {
+    defaultFactory = fac;
+  }
 
 }
