@@ -1,17 +1,6 @@
-AC_INIT(source/javax/mail/Session.java)
-
-
-dnl Tool discovery
-
-AC_PATH_PROG(JAR, jar,)
-dnl AC_PATH_PROG(JAVAC, gcj, javac,)
-
-AC_PROG_JAVA_CC(javac gcj)
-
-
-dnl Setup the output files
-
-AC_OUTPUT(Makefile)
-
-
-dnl End.
+AC_INIT
+AC_CONFIG_SRCDIR([source/javax/mail/Session.java])
+AC_PROG_JAR()
+AC_PROG_JAVA_CC()
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

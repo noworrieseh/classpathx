@@ -5,15 +5,11 @@
 empty:=
 space:=$(empty) $(empty)
 
-# Set by configure. TODO
-#PROJECTROOT = @srcdir@
-#JAVAC = @JAVA_CC@
-#JAVAC_OPTS = @JAVA_CC_OPTS@
-#JAR = @JAR_TOOL@
-PROJECTROOT = .
-JAVAC = /usr/bin/javac
-JAVAC_OPTS = 
-JAR = /usr/bin/jar
+# Set by configure.
+PROJECTROOT = @srcdir@
+JAVAC = @JAVA_CC@
+JAVAC_OPTS = @JAVA_CC_OPTS@
+JAR = @JAR@
 
 # The default is to just build the jar file.
 all: mail.jar
@@ -46,12 +42,9 @@ META-INF/mailcap: META-INF $(PROJECTROOT)/mailcap
 #META-INF/COPYING: META-INF COPYING
 #	cp $(PROJECTROOT)/COPYING $@
 
-#SUPPORTFILES = 	META-INF/COPYING \
-#		META-INF/javamail.default.address.map \
-#		META-INF/javamail.default.providers
 SUPPORTFILES = \
     META-INF/javamail.default.address.map \
-		META-INF/javamail.default.providers
+	META-INF/javamail.default.providers
 
 # This is an automakejar target.
 mail.jar:
