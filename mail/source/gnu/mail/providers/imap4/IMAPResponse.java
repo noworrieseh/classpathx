@@ -131,7 +131,7 @@ public class IMAPResponse
   /**
    * ANSI-coloured toString for debugging.
    */
-  public String toString()
+  public String toANSIString()
   {
     StringBuffer buffer = new StringBuffer();
     buffer.append(tag);
@@ -141,9 +141,12 @@ public class IMAPResponse
       buffer.append(count);
       buffer.append("\u001b[00m");
     }
-    buffer.append(" \u001b[01m");
-    buffer.append(id);
-    buffer.append("\u001b[00m");
+    if (!isContinuation())
+    {
+      buffer.append(" \u001b[01m");
+      buffer.append(id);
+      buffer.append("\u001b[00m");
+    }
     if (mailbox!=null)
     {
       buffer.append(" \u001b[00;35m");
@@ -167,6 +170,45 @@ public class IMAPResponse
       buffer.append(" \u001b[00;33m");
       buffer.append(text);
       buffer.append("\u001b[00m");
+    }
+    return buffer.toString();
+  }
+
+  public String toString()
+  {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(tag);
+    if (count!=-1)
+    {
+      buffer.append(' ');
+      buffer.append(count);
+    }
+    if (!isContinuation())
+    {
+      buffer.append(' ');
+      buffer.append(id);
+    }
+    if (mailbox!=null)
+    {
+      buffer.append(' ');
+      buffer.append(mailbox);
+    }
+    if (code!=null)
+    {
+      buffer.append(' ');
+      buffer.append(code);
+    }
+    if (content!=null)
+    {
+      buffer.append(' ');
+      buffer.append('{');
+      buffer.append(content.length);
+      buffer.append('}');
+    }
+    if (text!=null)
+    {
+      buffer.append(' ');
+      buffer.append(text);
     }
     return buffer.toString();
   }

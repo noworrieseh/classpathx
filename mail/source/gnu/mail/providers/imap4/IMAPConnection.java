@@ -48,45 +48,14 @@ import java.util.Map;
 public class IMAPConnection implements IMAPConstants
 {
 
-  // -- TESTING
-  public static void main(String[] args) {
-    try {
-      IMAPConnection c = new IMAPConnection("localhost", 143);
-      c.setDebug(true);
-      // login
-      if (!c.login("test", "imaptest")) {
-        System.err.println("bad login");
-        c.logout();
-        System.exit(1);
-      }
-      // list
-      ListEntry[] le = c.list(null, "*");
-      for (int i=0; i<le.length; i++) {
-        System.out.println(le[i]);
-      }
-      // select INBOX
-      MailboxStatus fs = c.select("INBOX");
-      System.out.println("INBOX has "+fs.messageCount+" messages");
-      // fetch message 2
-      int[] messages = new int[] { 2 };
-      String[] fetchCommands = new String[] { "BODY.PEEK[]" };
-      MessageStatus[] ms = c.fetch(messages, fetchCommands);
-      for (int i=0; i<ms.length; i++) {
-        System.out.println("Message "+ms[i].messageNumber+" properties:");
-        System.out.println(ms[i].properties);
-      }
-      // close
-      c.close();
-      // logout
-      c.logout();
-    } catch (IOException e) {
-      e.printStackTrace(System.err);
-    }
-  } // -- END TESTING
-
-  // Prefix for tags
+  /**
+   * Prefix for tags.
+   */
   protected static final String TAG_PREFIX = "A";
 
+  /**
+   * The encoding used to create strings for IMAP commands.
+   */
   protected static final String DEFAULT_ENCODING = "US-ASCII";
 
   /**
@@ -198,7 +167,7 @@ public class IMAPConnection implements IMAPConstants
   {
     IMAPResponse response = in.next();
     if (debug)
-      System.err.println("< "+response.toString());
+      System.err.println("< "+response.toANSIString());
     return response;
   }
 
@@ -596,10 +565,16 @@ public class IMAPConnection implements IMAPConstants
     buffer.append(content.length);
     buffer.append('}');
     sendCommand(tag, buffer.toString());
+    IMAPResponse response = readResponse();
+    if (!response.isContinuation())
+      throw new IMAPException(response.getID(), response.getText());
     out.write(content); // write the message body
+    out.write(0x0a);
+    out.write(0x0d); // write CRLF
+    out.flush();
     while (true)
     {
-      IMAPResponse response = readResponse();
+      response = readResponse();
       if (response.isTagged()) {
         String id = response.getID();
         if (id==OK)
