@@ -57,9 +57,9 @@ public class TransformTest
    /**
     *  Launches the test.
     *
-    *  @param args[0] Path or URL of the source XML document
+    *  @param args[0] Path or URL of the XSLT sheet
     *
-    *  @param args[1] Path or URL of the XSLT sheet
+    *  @param args[1] Path or URL of the source XML document
     *
     *  @param args[2] Path of the the file the resulting XML document
     *  will be written to.
@@ -77,10 +77,10 @@ public class TransformTest
     if (args.length != 3)
       {
 	System.err.println ("Usage: java " + TransformTest.class.getName ()
-			    + " <source> <stylesheet> <result>");
+			    + " <stylesheet> <source> <result>");
       }
-    Source source = new StreamSource (args[0]);
-    Source xsltSource = new StreamSource (args[1]);
+    Source xsltSource = new StreamSource (args[0]);
+    Source source = new StreamSource (args[1]);
     Result target = new StreamResult (args[2]);
 
     // Prepare stylesheet
@@ -88,9 +88,9 @@ public class TransformTest
     Transformer transformer = transformerFactory.newTransformer (xsltSource);
 
     // Set test parameters
-      transformer.setParameter ("bar", "'lala'");
-
+    transformer.setParameter ("bar", "'lala'");
+    
     // Perform transformation
-      transformer.transform (source, target);
+    transformer.transform (source, target);
   }
 }

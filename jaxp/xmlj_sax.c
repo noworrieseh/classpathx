@@ -180,6 +180,7 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
     {
       sax->resolveEntity = &xmljSAXResolveEntity;
       /* The above function is never called in libxml2 */
+      printf ("Set custom external entity loader\n");
       xmlSetExternalEntityLoader (xmljExternalEntityLoader);
     }
   else

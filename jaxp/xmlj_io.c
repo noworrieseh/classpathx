@@ -314,7 +314,11 @@ xmljDetectCharEncoding (JNIEnv * env, jbyteArray buffer)
 {
   xmlCharEncoding ret;
   jint nread;
- 
+
+  if (buffer == NULL)
+    {
+      return XML_CHAR_ENCODING_ERROR;
+    }
   nread = (*env)->GetArrayLength (env, buffer);
   if (nread >= 5)
     {
@@ -366,6 +370,8 @@ xmljNewParserContext (JNIEnv * env,
                                                  inputContext, encoding);
           if (NULL != parserContext)
             {
+              parserContext->userData = parserContext;
+              
               /* Set parsing options */
               options = 0;
               if (validate)
@@ -374,12 +380,14 @@ xmljNewParserContext (JNIEnv * env,
                   options |= XML_PARSE_DTDVALID;
                 }
               if (coalesce)
-                options |= XML_PARSE_NOCDATA;
+                {
+                  options |= XML_PARSE_NOCDATA;
+                }
               if (expandEntities)
-                options |= XML_PARSE_NOENT;
-
+                {
+                  options |= XML_PARSE_NOENT;
+                }
               xmlCtxtUseOptions (parserContext, options);
-              parserContext->userData = parserContext;
 
               return parserContext;
             }

@@ -268,14 +268,15 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
                               inPublicId, 0, 0, 0);
   if (ctx == NULL)
     {
-      return NULL;
+      return 0;
     }
+
   saxParseContext = 
     xmljNewSAXParseContext (env, javaContext, ctx, inSystemId);
   if (saxParseContext == NULL)
     {
       xmljFreeParserContext (ctx);
-      return NULL;
+      return 0;
     }
   
   sax = xmljNewSAXHandler (ctx->sax, 0, 0, 0, 0, 0, 0);
@@ -283,7 +284,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
     {
       xmljFreeSAXParseContext (saxParseContext);
       xmljFreeParserContext (ctx);
-      return NULL;
+      return 0;
     }
   
   xsltSourceDoc
@@ -295,146 +296,133 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
       
       xmljSetThreadContext (saxParseContext);
       
-      if (!(*env)->ExceptionOccurred (env) && NULL != saxParseContext)
+      /*xsltSetGenericErrorFunc (ctx, xmljSAXError);*/
+          
+      nativeStylesheetHandle =
+        xsltParseStylesheetDoc (xsltSourceDoc);
+          
+      if (!(*env)->ExceptionOccurred (env))
         {
-          xsltSetGenericErrorFunc (ctx, xmljSAXError);
-          
-  printf("newLibxsltStylesheet:1\n");
-          nativeStylesheetHandle =
-            xsltParseStylesheetDoc (xsltSourceDoc);
-  printf("newLibxsltStylesheet:2\n");
-          
-          if (!(*env)->ExceptionOccurred (env))
+          if (NULL != nativeStylesheetHandle)
             {
-              if (NULL != nativeStylesheetHandle)
+              jclass propertiesClass
+                = (*env)->FindClass (env, "java/util/Properties");
+              
+              jmethodID setPropertyMethodID
+                = (*env)->GetMethodID (env, propertiesClass,
+                                       "setProperty",
+                                       "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;");
+              
+              nativeStylesheetHandle->_private = saxParseContext;
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "encoding",
+                               nativeStylesheetHandle->encoding);
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "media-type",
+                               nativeStylesheetHandle->mediaType);
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID,
+                               "doctype-public",
+                               nativeStylesheetHandle->
+                               doctypePublic);
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID,
+                               "doctype-system",
+                               nativeStylesheetHandle->
+                               doctypeSystem);
+                  
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "indent",
+                               (const xmlChar
+                                *) (nativeStylesheetHandle->
+                                    indent ? "yes" : "no"));
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "method",
+                               nativeStylesheetHandle->method);
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "standalone",
+                               (const xmlChar
+                                *) (nativeStylesheetHandle->
+                                    standalone ? "yes" : "no"));
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID, "version",
+                               nativeStylesheetHandle->version);
+              
+              xmljSetProperty (env, outputProperties,
+                               setPropertyMethodID,
+                               "omit-xml-declaration",
+                               (const xmlChar
+                                *) (nativeStylesheetHandle->
+                                    omitXmlDeclaration ? "yes" :
+                                    "no"));
+              
                 {
-                  jclass propertiesClass
-                    = (*env)->FindClass (env, "java/util/Properties");
+                  CdataSectionScannerInfo info;
+                  jclass stringBufferClass
+                    =
+                    (*env)->FindClass (env,
+                                       "java/lang/StringBuffer");
+                  jmethodID stringBufferConstructorID =
+                    (*env)->GetMethodID (env, stringBufferClass,
+                                         "<init>", "()V");
+                  jmethodID toStringMethodID =
+                    (*env)->GetMethodID (env, stringBufferClass,
+                                         "toString",
+                                         "()Ljava/lang/String;");
+                  info.env = env;
+                  info.isFirst = 1;
+                  info.stringBuffer
+                    = (*env)->AllocObject (env, stringBufferClass);
+                  (*env)->CallVoidMethod (env, info.stringBuffer,
+                                          stringBufferConstructorID);
+                  info.appendMethodID =
+                    (*env)->GetMethodID (env, stringBufferClass,
+                                         "append",
+                                         "(Ljava/lang/String;)Ljava/lang/StringBuffer;");
                   
-                  jmethodID setPropertyMethodID
-                    = (*env)->GetMethodID (env, propertiesClass,
-                                           "setProperty",
-                                           "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;");
-                  
-                  nativeStylesheetHandle->_private = saxParseContext;
-                      
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "encoding",
-                                   nativeStylesheetHandle->encoding);
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "media-type",
-                                   nativeStylesheetHandle->mediaType);
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID,
-                                   "doctype-public",
-                                   nativeStylesheetHandle->
-                                   doctypePublic);
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID,
-                                   "doctype-system",
-                                   nativeStylesheetHandle->
-                                   doctypeSystem);
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "indent",
-                                   (const xmlChar
-                                    *) (nativeStylesheetHandle->
-                                        indent ? "yes" : "no"));
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "method",
-                                   nativeStylesheetHandle->method);
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "standalone",
-                                   (const xmlChar
-                                    *) (nativeStylesheetHandle->
-                                        standalone ? "yes" : "no"));
-                  
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID, "version",
-                                       nativeStylesheetHandle->version);
-                      
-                  xmljSetProperty (env, outputProperties,
-                                   setPropertyMethodID,
-                                   "omit-xml-declaration",
-                                   (const xmlChar
-                                    *) (nativeStylesheetHandle->
-                                        omitXmlDeclaration ? "yes" :
-                                        "no"));
+                  xmlHashScan (nativeStylesheetHandle->cdataSection,
+                               cdataSectionScanner, &info);
                   
                     {
-                      CdataSectionScannerInfo info;
-                      jclass stringBufferClass
+                      jstring result = (jstring)
+                        (*env)->CallObjectMethod (env,
+                                                  info.stringBuffer,
+                                                  toStringMethodID);
+                      
+                      jstring nameString =
+                        (*env)->NewStringUTF (env,
+                                              "cdata-section-elements");
+                      
+                      jobject prevValue
                         =
-                        (*env)->FindClass (env,
-                                           "java/lang/StringBuffer");
-                      jmethodID stringBufferConstructorID =
-                        (*env)->GetMethodID (env, stringBufferClass,
-                                             "<init>", "()V");
-                      jmethodID toStringMethodID =
-                        (*env)->GetMethodID (env, stringBufferClass,
-                                             "toString",
-                                             "()Ljava/lang/String;");
-                      info.env = env;
-                      info.isFirst = 1;
-                      info.stringBuffer
-                        = (*env)->AllocObject (env, stringBufferClass);
-                      (*env)->CallVoidMethod (env, info.stringBuffer,
-                                              stringBufferConstructorID);
-                      info.appendMethodID =
-                        (*env)->GetMethodID (env, stringBufferClass,
-                                             "append",
-                                             "(Ljava/lang/String;)Ljava/lang/StringBuffer;");
-                      
-                      xmlHashScan (nativeStylesheetHandle->cdataSection,
-                                   cdataSectionScanner, &info);
-                      
+                        (*env)->CallObjectMethod (env,
+                                                  outputProperties,
+                                                  setPropertyMethodID,
+                                                  nameString, result);
+                      if (NULL != prevValue)
                         {
-                          jstring result = (jstring)
-                            (*env)->CallObjectMethod (env,
-                                                      info.stringBuffer,
-                                                      toStringMethodID);
-                          
-                          jstring nameString =
-                            (*env)->NewStringUTF (env,
-                                                  "cdata-section-elements");
-                          
-                          jobject prevValue
-                            =
-                            (*env)->CallObjectMethod (env,
-                                                      outputProperties,
-                                                      setPropertyMethodID,
-                                                      nameString, result);
-                          if (NULL != prevValue)
-                            {
-                              (*env)->DeleteLocalRef (env, prevValue);
-                            }
-                          (*env)->DeleteLocalRef (env, nameString);
-                          printf("newLibxsltStylesheet:end\n");
+                          (*env)->DeleteLocalRef (env, prevValue);
                         }
-                      
-                      (*env)->DeleteLocalRef (env, info.stringBuffer);
+                      (*env)->DeleteLocalRef (env, nameString);
                     }
-                }
-              else
-                {
-                  xmljThrowException (env,
-                                      "javax/xml/transform/TransformerException",
-                                      "Cannot interpret XSLT sheet");
+                  
+                  (*env)->DeleteLocalRef (env, info.stringBuffer);
                 }
             }
+          else
+            {
+              xmljThrowException (env,
+                                  "javax/xml/transform/TransformerException",
+                                  "Cannot interpret XSLT sheet");
+            }
         }
-      else
-        {
-          xmljThrowException (env,
-                              "javax/xml/transform/TransformerException",
-                              "Cannot create internal error context object");
-        }
-      
       xmljClearThreadContext ();
     }
 
@@ -495,237 +483,94 @@ xmljXPathFuncLookupFunc (void * ctxt,
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
-  JNIEnv *env, jclass clazz, jint xsltSource, jobject inputStream,
-  jbyteArray detectBuffer,
+  JNIEnv *env, jclass clazz, jint xsltSource, jobject jdocument,
   jstring inSystemId, jstring inPublicId, jobject outputStream,
   jobjectArray parametersArray, jobject javaContext)
 {
-  jclass cls;
-  jmethodID parseDocumentCached;
-  jobject jdocument;
-  xmlDocPtr xmlSourceDoc;
+  xsltStylesheetPtr stylesheet;
+  xmlDocPtr sourceDoc;
+  xmlDocPtr resultDoc;
   
-  /* Create the libxml source document for XML source data */
-
-  xsltStylesheetPtr stylesheet = ((xsltStylesheetPtr) (int) xsltSource);
+  stylesheet = ((xsltStylesheetPtr) (int) xsltSource);
+  sourceDoc = (xmlDocPtr) xmljGetNodeID (env, jdocument);
   
-  printf("transform:1\n");
-  cls = (*env)->GetObjectClass (env, javaContext);
-  parseDocumentCached
-    = (*env)->GetMethodID (env, cls,
-                           "parseDocumentCached",
-                           "(Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/String;)Lgnu/xml/libxmlj/dom/GnomeDocument;");
-  
-  printf("transform:2\n");
-  jdocument = 
-    (*env)->CallObjectMethod (env, 
-                              javaContext,
-                              parseDocumentCached,
-                              inputStream,
-                              inSystemId,
-                              inPublicId);
-  
-  if (jdocument == NULL && !(*env)->ExceptionOccurred (env))
+  if (!(*env)->ExceptionOccurred (env) && NULL != sourceDoc)
     {
-      xmljThrowException (env, "java/io/IOException", NULL);
-    }
-  if ((*env)->ExceptionOccurred (env))
-    {
-      return;
-    }
-  printf("transform:3\n");
-  xmlSourceDoc = (xmlDocPtr) xmljGetNodeID (env, jdocument);
-  (*env)->DeleteLocalRef(env, jdocument);
-  
-  xmlSourceDoc->_private = (void*) (*env)->NewGlobalRef(env, jdocument);
-  
-  if (!(*env)->ExceptionOccurred (env))
-    {
-      jclass transformerExceptionClass
-        =
-        (*env)->FindClass (env, "javax/xml/transform/TransformerException");
+      /* Transform the source document with the stylesheet
+       * and the given parameters. Return the result as
+       * byte array.
+       */
+      int parameterCount =
+        (*env)->GetArrayLength (env, parametersArray);
       
-      if (NULL != xmlSourceDoc)
+      const char **parameters =
+        (const char **) malloc ((parameterCount + 2) *
+                                sizeof (const char *));
+      
+      if (NULL != parameters)
         {
-          /* Transform the source document with the stylesheet
-           * and the given parameters. Return the result as
-           * byte array.
-           */
-          int parameterCount =
-            (*env)->GetArrayLength (env, parametersArray);
+          int i;
           
-          const char **parameters
-            =
-            (const char **) malloc ((parameterCount + 2) *
-                                    sizeof (const char *));
-          
-  printf("transform:4\n");
-          if (NULL != parameters)
+          for (i = 0; i < parameterCount; ++i)
             {
-              int i;
+              jstring string =
+                (jstring) (*env)->GetObjectArrayElement (env,
+                                                         parametersArray,
+                                                         i);
               
-              for (i = 0; i < parameterCount; ++i)
+              if (NULL != string)
                 {
-                  jstring string =
-                    (jstring) (*env)->GetObjectArrayElement (env,
-                                                             parametersArray,
-                                                             i);
-                  
-                  if (NULL != string)
-                    {
-                      parameters[i] =
-                        (*env)->GetStringUTFChars (env, string, NULL);
-                    }
-                  else
-                    {
-                      parameters[i] = NULL;
-                    }
+                  parameters[i] =
+                    (*env)->GetStringUTFChars (env, string, NULL);
                 }
-              
-              parameters[parameterCount] = 0;
-              parameters[parameterCount + 1] = 0;
-              
-              /* Apply stylesheet */
+              else
                 {
-                  xsltTransformContextPtr transformContext;
-  printf("transform:5 stylesheet=%d xmlSourceDoc=%d\n",stylesheet, xmlSourceDoc);
-                  transformContext
-                    = xsltNewTransformContext (stylesheet, xmlSourceDoc);
-                  
-  printf("transform:6\n");
-                  if (!(*env)->ExceptionOccurred (env))
-                    {
-                      if (NULL != transformContext)
-                        {
-                          xmlParserCtxtPtr ctx;
-                          SAXParseContext *saxParseContext;
-                          
-  printf("transform:7\n");
-                          ctx = xmljNewParserContext (env, inputStream,
-                                                      detectBuffer,
-                                                      inSystemId,
-                                                      inPublicId, 0, 0, 0);
-                          if (ctx == NULL)
-                            {
-                              return;
-                            }
-  printf("transform:8\n");
-                          saxParseContext
-                            = xmljNewSAXParseContext (env,
-                                                      javaContext,
-                                                      ctx,
-                                                      inSystemId);
-                          
-  printf("transform:9\n");
-                          xsltSetTransformErrorFunc (transformContext,
-                                                     0, xmljSAXError);
-                          
-                          xmlXPathRegisterFuncLookup (transformContext->xpathCtxt,
-                                                      xmljXPathFuncLookupFunc,
-                                                      transformContext->xpathCtxt);
-                          
-                          stylesheet->_private = saxParseContext;
-                          
-                            {
-                              xmlDocPtr resultTree
-                                = xsltApplyStylesheetUser (stylesheet,
-                                                           xmlSourceDoc,
-                                                           parameters,
-                                                           NULL,
-                                                           NULL,
-                                                           transformContext);
-  printf("transform:10\n");
-                              
-                              if (!(*env)->ExceptionOccurred (env)
-                                  && NULL == resultTree)
-                                {
-                                  (*env)->ThrowNew (env,
-                                                    transformerExceptionClass,
-                                                    "XSL transformation failed");
-                                }
-                              
-                              if (!(*env)->ExceptionOccurred (env)
-                                  && NULL != resultTree)
-                                {
-                                  xmljSaveFileToJavaOutputStream (env,
-                                                                  outputStream,
-                                                                  resultTree,
-                                                                  (const char*)
-                                                                  stylesheet->encoding);
-  printf("transform:11\n");
-                                }
-                              
-                              if (NULL != resultTree)
-                                {
-                                  xmlFreeDoc (resultTree);
-                                }
-                            }
-                          
-  printf("transform:12\n");
-                          xmljFreeSAXParseContext ((SAXParseContext *)
-                                                   stylesheet->_private);
-                          
-                            {
-                              xsltDocumentPtr cur, doc;
-                              
-                              cur = transformContext->docList;
-                              while (cur != NULL) {
-                                doc = cur;
-                                cur = cur->next;
-                                xsltFreeDocumentKeys(doc);
-                                xmlFree(doc);
-                              }
-                              
-                              cur = transformContext->styleList;
-                              while (cur != NULL) {
-                                doc = cur;
-                                cur = cur->next;
-                                xsltFreeDocumentKeys(doc);
-                                xmlFree(doc);
-                              }
-                            }
-                          transformContext->docList = NULL;
-                          transformContext->styleList = NULL;
-                          xsltFreeTransformContext (transformContext);
-                        }
-                      else
-                        {
-                          (*env)->ThrowNew (env,
-                                            transformerExceptionClass,
-                                            "Could not establish transform context");
-                        }
-                    }
+                  parameters[i] = NULL;
                 }
-              
-              /* Release parameter strings */
-              
-              for (i = 0; i < parameterCount; ++i)
-                {
-                  jstring string =
-                    (jstring) (*env)->GetObjectArrayElement (env,
-                                                             parametersArray,
-                                                             i);
-                  
-                  (*env)->ReleaseStringUTFChars (env, string,
-                                                 parameters[i]);
-                }
-              
-              free (parameters);
+            }
+          
+          parameters[parameterCount] = 0;
+          parameters[parameterCount + 1] = 0;
+          
+          /* Apply stylesheet */
+          resultDoc = xsltApplyStylesheet(stylesheet, sourceDoc, parameters);
+          if (resultDoc == NULL)
+            {
+              xmljThrowException (env,
+                                  "javax/xml/transform/TransformerException",
+                                  "XSL transformation failed");
             }
           else
             {
-              (*env)->ThrowNew (env, transformerExceptionClass,
-                                "Couldn't allocate memory for parameters");
+              xmljSaveFileToJavaOutputStream (env,
+                                              outputStream,
+                                              resultDoc,
+                                              (const char*) stylesheet->encoding);
+              xmlFreeDoc (resultDoc);
             }
+          
+          /* Release parameter strings */
+          
+          for (i = 0; i < parameterCount; ++i)
+            {
+              jstring string =
+                (jstring) (*env)->GetObjectArrayElement (env,
+                                                         parametersArray,
+                                                         i);
+              
+              (*env)->ReleaseStringUTFChars (env, string,
+                                             parameters[i]);
+            }
+          
+          free (parameters);
         }
       else
         {
-          (*env)->ThrowNew (env, transformerExceptionClass,
-                            "Couldn't parse source document");
+          xmljThrowException (env,
+                              "javax/xml/transform/TransformerException",
+                              "Couldn't allocate memory for parameters");
         }
     }
-  (*env)->DeleteGlobalRef(env, (jobject) xmlSourceDoc->_private);
-  printf("transform:13\n");
 }
 
 /*
