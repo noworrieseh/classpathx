@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: CipherFactory.java,v 1.4 2002-06-08 04:58:38 raif Exp $
+// $Id: CipherFactory.java,v 1.5 2002-06-28 13:07:37 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * <p>A <i>Factory</i> to instantiate symmetric block cipher instances.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class CipherFactory implements Registry {
 
@@ -62,10 +62,10 @@ public class CipherFactory implements Registry {
     *
     * @param name the case-insensitive name of the symmetric-key block cipher
     * algorithm.
-    * @return an instance of the cipher algorithm, or <tt>null</tt> if none
-    * found.
-    * @exception InternalError if the implementation does not pass its self-
-    * test.
+    * @return an instance of the designated cipher algorithm, or
+    * <code>null</code> if none is found.
+    * @exception InternalError if the implementation does not pass its
+    * self-test.
     */
    public static final IBlockCipher getInstance(String name) {
       if (name == null) {
@@ -99,7 +99,7 @@ public class CipherFactory implements Registry {
    }
 
    /**
-    * <p>Returns a {@link java.util.Set} of symmetric block cipher
+    * <p>Returns a {@link java.util.Set} of symmetric key block cipher
     * implementation names supported by this <i>Factory</i>.</p>
     *
     * @return a {@link java.util.Set} of block cipher names (Strings).
