@@ -17,7 +17,7 @@ if test $use_gcj = "yes"; then
 
     # Need very new versions of GCJ for this:  GCJ 3.0.x won't work ...
     gcj_compile_tester='source/gnu/xml/dom/DomNode.java'
-    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&$AC_FD_CC'
+    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&AC_FD_CC'
     if AC_TRY_EVAL(ac_gcj_test); then
 	COMPILER='GCJ'
     else
