@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseHash.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: BaseHash.java,v 1.4 2001-12-08 21:42:27 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto.hash;
 /**
  * A base abstract class to facilitate hash implementations.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class BaseHash implements IMessageDigest {
 
@@ -133,6 +133,8 @@ public abstract class BaseHash implements IMessageDigest {
 
    // methods to be implemented by concrete subclasses
    // -------------------------------------------------------------------------
+
+   public abstract Object clone() throws CloneNotSupportedException;
 
    public abstract boolean selfTest();
 
