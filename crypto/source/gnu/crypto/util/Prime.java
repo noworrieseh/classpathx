@@ -1,7 +1,7 @@
 package gnu.crypto.util;
 
 // ----------------------------------------------------------------------------
-// $Id: Prime.java,v 1.2 2002-01-11 21:42:38 raif Exp $
+// $Id: Prime.java,v 1.3 2002-08-12 13:14:49 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,7 +36,7 @@ import java.math.BigInteger;
 /**
  * A collection of prime number related utility methods used in this library.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Prime {
 
@@ -397,7 +397,6 @@ public class Prime {
     * @param w the integer to test.
     * @return <code>true</code> iff the designated number has no small prime
     * divisor passes the Euler criterion, and optionally a Miller-Rabin test.
-    * @see #DO_MILLER_RABIN
     */
    public static boolean isProbablePrime(BigInteger w) {
       return isProbablePrime(w, DO_MILLER_RABIN);
