@@ -1,5 +1,5 @@
 /*
- * Pair.java
+ * IMAPMultipart.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
@@ -25,42 +25,39 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
-import java.util.List;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ProtocolException;
+import javax.mail.MultipartDataSource;
+import javax.mail.Part;
+import javax.mail.internet.MimeMultipart;
 
 /**
- * Implementation of a key-value pair.
- * The key is always a String, and the value must be a List.
+ * An IMAP multipart component.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 0.1
  */
-public final class Pair
+public class IMAPMultipart
+  extends MimeMultipart
 {
 
-  private String key;
-  private List value;
+  /**
+   * The message this multipart belongs to.
+   */
+  protected IMAPMessage message;
 
-  Pair(String key, List value)
+  /**
+   * Called by the IMAPMessage.
+   */
+  protected IMAPMultipart(IMAPMessage message, Part parent, String subtype)
   {
-    this.key = key;
-    this.value = value;
-  }
-  
-  public String getKey()
-  {
-    return key;
-  }
-
-  public List getValue()
-  {
-    return value;
-  }
-
-  public String toString()
-  {
-    return new StringBuffer(key).append(value).toString();
+    super(subtype);
+    setParent(parent);
+    this.message = message;
   }
 
 }

@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
 /**
  * Encodes and decodes text according to the BASE64 encoding.

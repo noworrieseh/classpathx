@@ -1,4 +1,4 @@
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
 import java.io.IOException;
 import java.util.Properties;

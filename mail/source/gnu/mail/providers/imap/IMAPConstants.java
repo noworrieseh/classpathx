@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
 /**
  * IMAP4rev1 string constants.

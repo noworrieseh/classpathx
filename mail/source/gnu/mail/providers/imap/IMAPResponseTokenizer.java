@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

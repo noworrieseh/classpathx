@@ -1,5 +1,5 @@
 /*
- * IMAPException.java
+ * MailboxStatus.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
@@ -25,34 +25,33 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap4;
+package gnu.mail.providers.imap;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
- * Exception corresponding to an IMAP4 BAD or NO server response.
+ * Represents the state of a mailbox.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 0.1
  */
-public class IMAPException
-  extends IOException
+public class MailboxStatus
 {
 
-  /**
-   * ID of the exception (BAD or NO).
-   */
-  protected String id;
-  
-  public IMAPException(String id, String message)
-  {
-    super(message);
-    this.id = id;
-  }
+  public int messageCount = -1;
 
-  public String getId()
-  {
-    return id;
-  }
+  public int newMessageCount = -1;
+
+  public int firstUnreadMessage = -1;
+
+  public int uidNext = -1;
   
+  public int uidValidity = -1;
+
+  public List flags;
+
+  public List permanentFlags;
+
+  public boolean readWrite;
+
 }
