@@ -1,0 +1,115 @@
+<project name="infobus" default="usage" basedir=".">
+
+	<property file="build.properties"/>
+	
+
+	<!--************************************************************-->
+	<!-- Initialization target *************************************-->
+	<!--************************************************************-->
+
+	<target name="init">
+		<!-- Create time stamp-->
+		<tstamp/>
+		
+		<echo message="-- ${project.name} --"/>
+		<mkdir dir="${build}"/>
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- usage information *****************************************-->
+	<!--************************************************************-->
+
+	<target name="usage">
+		<echo>
+Available targets are:
+compile --> compiles the source code
+release	--> package into release
+clean	--> cleans the build directory
+javadoc	--> build JavaDoc
+		</echo>					
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- compile target ********************************************-->
+	<!--************************************************************-->
+
+	<target name="compile" depends="init">
+		<javac 	srcdir="${src}"	destdir="${build}">
+			<classpath>
+				<pathelement location="${src}"/>
+				<pathelement location="${libsrc}"/> 
+			</classpath>
+		</javac>		
+	
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- release target ********************************************-->
+	<!--************************************************************-->
+
+	<target name="release" depends="init,compile">
+		<jar basedir="${build}" jarfile="${project.base}/infobus.jar">
+		</jar>
+	
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- Runs javadoc on the project *******************************-->
+	<!--************************************************************-->
+
+	<target name="javadoc" depends="init">
+		<mkdir dir="${doc.dest}"/>
+		<javadoc sourcepath="${src}"
+			packagenames="javax.infobus.*"
+			destdir="${doc.dest}"
+			author="true"
+			version="true"
+			private="true"
+			windowtitle="InfoBus Documents">
+			<classpath>
+				<pathelement location="${src}"/>
+			</classpath>
+		</javadoc>
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- Test target ***********************************************-->
+	<!--************************************************************-->
+
+	<target name="test" depends="init">
+		<junit printsummary="yes" haltonfailure="yes">
+		  <classpath>
+		  	<fileset dir="${libsrc}">
+		  		<include name="**/*.jar"/>
+		  	</fileset>
+		  	<pathelement location="${src}"/>
+		  	<pathelement location="${libsrc}"/> 
+		</classpath>
+	
+	        <formatter type="plain" />
+		
+		<test name="TestCase" haltonfailure="no" outfile="result" >
+		    <formatter type="xml" />
+		</test>
+		
+		</junit>
+	</target>
+	
+
+	<!--************************************************************-->
+	<!-- clean target **********************************************-->
+	<!--************************************************************-->
+	
+	<target name="clean" depends="init" > 
+		<delete dir="${build}"/>
+		<delete dir="${doc.dest}"/>
+		<delete file="${project.base}/infobus.jar"/>
+	</target>
+
+
+</project>
