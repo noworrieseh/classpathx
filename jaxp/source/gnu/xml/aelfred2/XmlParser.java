@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.10 2001-07-18 17:03:17 db Exp $
+ * $Id: XmlParser.java,v 1.11 2001-07-29 19:26:03 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.10 2001-07-18 17:03:17 db Exp $
+// $Id: XmlParser.java,v 1.11 2001-07-29 19:26:03 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-18 17:03:17 $
+ * @version $Date: 2001-07-29 19:26:03 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -1077,7 +1077,6 @@ loop:
 	    switch (c) {
 
 	    case '&': 			// Found "&"
-
 		c = readCh ();
 		if (c == '#') {
 		    parseCharRef ();
@@ -1695,6 +1694,7 @@ loop2:
 
 	name = readNmtoken (true);
 	require (';');
+	dataBufferFlush ();
 	switch (getEntityType (name)) {
 	case ENTITY_UNDECLARED:
 	    error ("reference to undeclared entity", name, null);
@@ -3492,19 +3492,26 @@ loop:
 		if (temp < 0)
 		    encoding = null;	// autodetect
 		else {
-		    temp = encoding.indexOf ('=', temp + 7);
-		    encoding = encoding.substring (temp);
+		    // only this one attribute
 		    if ((temp = encoding.indexOf (';')) > 0)
 			encoding = encoding.substring (0, temp);
 
-		    // attributes can have comment fields (RFC 822)
-		    if ((temp = encoding.indexOf ('(')) > 0)
-			encoding = encoding.substring (0, temp);
-		    // ... and values may be quoted
-		    if ((temp = encoding.indexOf ('"')) > 0)
-			encoding = encoding.substring (temp + 1,
-				encoding.indexOf ('"', temp + 2));
-		    encoding.trim ();
+		    if ((temp = encoding.indexOf ('=', temp + 7)) > 0) {
+			encoding = encoding.substring (temp + 1);
+
+			// attributes can have comment fields (RFC 822)
+			if ((temp = encoding.indexOf ('(')) > 0)
+			    encoding = encoding.substring (0, temp);
+			// ... and values may be quoted
+			if ((temp = encoding.indexOf ('"')) > 0)
+			    encoding = encoding.substring (temp + 1,
+				    encoding.indexOf ('"', temp + 2));
+			encoding.trim ();
+		    } else {
+			handler.warn ("ignoring illegal MIME attribute: "
+				+ encoding);
+			encoding = null;
+		    }
 		}
 	    }
 	}
@@ -3882,6 +3889,7 @@ loop:
     {
 	String ename = (String) entityStack.pop ();
 
+	dataBufferFlush ();
 	switch (sourceType) {
 	case INPUT_STREAM:
 	    handler.endExternalEntity (ename);
