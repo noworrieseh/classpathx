@@ -1,6 +1,7 @@
 2004-09-07  Chris Burdess  <dog@bluezoo.org>
 
 	* SMTPTransport.java: Expose ESMTP extension list.
+	* SMTPTransport.java: Don't pass ESMTP parameters when EHLO fails.
 
 2004-08-06  Chris Burdess  <dog@bluezoo.org>
 

@@ -286,7 +286,7 @@ public class SMTPTransport
             String reversePath = from.getAddress ();
             // DSN RET
             String dsnRet = getProperty ("dsn.ret");
-            if (dsnRet != null)
+            if (dsnRet != null && extensions != null)
               {
                 String FULL = "FULL", HDRS = "HDRS";
                 String value = null;
@@ -313,7 +313,7 @@ public class SMTPTransport
             
             // DSN NOTIFY
             String dsnNotify = getProperty ("dsn.notify");
-            if (dsnNotify != null)
+            if (dsnNotify != null && extensions != null)
               {
                 String NEVER = "NEVER", SUCCESS = "SUCCESS";
                 String FAILURE = "FAILURE", DELAY = "DELAY";
