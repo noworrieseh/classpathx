@@ -224,6 +224,14 @@ $(src)/org/xml/sax/helpers/ParserFactory.java \
 $(src)/org/xml/sax/helpers/XMLFilterImpl.java \
 $(src)/org/xml/sax/helpers/XMLReaderAdapter.java \
 $(src)/org/xml/sax/helpers/XMLReaderFactory.java \
+$(src)/javax/xml/XMLConstants.java \
+$(src)/javax/xml/datatype/DatatypeConfigurationException.java \
+$(src)/javax/xml/datatype/DatatypeConstants.java \
+$(src)/javax/xml/datatype/DatatypeFactory.java \
+$(src)/javax/xml/datatype/Duration.java \
+$(src)/javax/xml/datatype/XMLGregorianCalendar.java \
+$(src)/javax/xml/namespace/NamespaceContext.java \
+$(src)/javax/xml/namespace/QName.java \
 $(src)/javax/xml/parsers/ClassStuff.java \
 $(src)/javax/xml/parsers/DocumentBuilder.java \
 $(src)/javax/xml/parsers/DocumentBuilderFactory.java \
@@ -254,6 +262,22 @@ $(src)/javax/xml/transform/sax/TemplatesHandler.java \
 $(src)/javax/xml/transform/sax/TransformerHandler.java \
 $(src)/javax/xml/transform/stream/StreamResult.java \
 $(src)/javax/xml/transform/stream/StreamSource.java \
+$(src)/javax/xml/validation/Schema.java \
+$(src)/javax/xml/validation/SchemaFactory.java \
+$(src)/javax/xml/validation/TypeInfoProvider.java \
+$(src)/javax/xml/validation/Validator.java \
+$(src)/javax/xml/validation/ValidatorHandler.java \
+$(src)/javax/xml/xpath/XPath.java \
+$(src)/javax/xml/xpath/XPathConstants.java \
+$(src)/javax/xml/xpath/XPathException.java \
+$(src)/javax/xml/xpath/XPathExpression.java \
+$(src)/javax/xml/xpath/XPathExpressionException.java \
+$(src)/javax/xml/xpath/XPathFactory.java \
+$(src)/javax/xml/xpath/XPathFactoryConfigurationException.java \
+$(src)/javax/xml/xpath/XPathFunction.java \
+$(src)/javax/xml/xpath/XPathFunctionResolver.java \
+$(src)/javax/xml/xpath/XPathFunctionException.java \
+$(src)/javax/xml/xpath/XPathVariableResolver.java \
 $(src)/gnu/xml/aelfred2/JAXPFactory.java \
 $(src)/gnu/xml/aelfred2/SAXDriver.java \
 $(src)/gnu/xml/aelfred2/XmlParser.java \
@@ -427,11 +451,16 @@ libjso_default= $(libjso_base)@JMODSUFFIX@
 libjso_target=  $(libjso_base).la
 
 package_names = \
+javax.xml \
+javax.xml.datatype \
+javax.xml.namespace \
 javax.xml.parsers \
 javax.xml.transform \
 javax.xml.transform.dom \
 javax.xml.transform.sax \
 javax.xml.transform.stream \
+javax.xml.validation \
+javax.xml.xpath \
 org.w3c.dom \
 org.w3c.dom.bootstrap \
 org.w3c.dom.css \

@@ -1,3 +1,9 @@
+2004-10-20  Chris Burdess  <dog@gnu.org>
+
+   	* all: Updates to bring API in line with JAXP 1.3: introduction of
+   	datatype, namespace, validation, and xpath JAXP packages and
+        miscellaneous updates to other packages. Style corrections.
+   	
 2004-10-18  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Number parsing fixes.
