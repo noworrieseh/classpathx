@@ -180,7 +180,17 @@ implements Document, DOMConfiguration, XPathEvaluator
 
   public native void setDocumentURI (String documentURI);
 
-  public native Node adoptNode (Node source)
+  public Node adoptNode (Node source)
+    throws DOMException
+  {
+    if (source == null || !(source instanceof GnomeNode))
+      {
+        return null;
+      }
+    return doAdoptNode (source);
+  }
+
+  private native Node doAdoptNode (Node source)
     throws DOMException;
 
   public DOMConfiguration getDomConfig ()

@@ -1,3 +1,7 @@
+2004-07-06  Chris Burdess <dog@gnu.org>
+
+	* xpath: Permit wildcards in getElementsByTagName[NS].
+
 2004-07-04  Chris Burdess <dog@gnu.org>
 
 	* dom: Skeleton DOMConfiguration implementation.

@@ -41,7 +41,7 @@
 
 #include <libxml/parser.h>
 
-int xmljValidateChildNode (xmlNodePtr parent, xmlNodePtr child);
+void xmljValidateChildNode (JNIEnv *env, xmlNodePtr parent, xmlNodePtr child);
 int xmljIsEqualNode (xmlNodePtr node1, xmlNodePtr node2);
 int xmljIsEqualNodeList (xmlNodePtr node1, xmlNodePtr node2);
 void xmljNormalizeNode (xmlNodePtr node);

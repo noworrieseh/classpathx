@@ -373,10 +373,21 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagName (JNIEnv *env,
   xmlXPathObjectPtr eval = NULL;
   
   s_name = xmljGetStringChars (env, name);
-  format = xmlCharStrdup ("descendant-or-self::*[name()='%s']");
-  if (xmlStrPrintf (expr, 256, format, s_name) == -1)
+  if (xmlStrEqual (s_name, BAD_CAST "*"))
     {
-      return NULL;
+      format = xmlCharStrdup ("descendant-or-self::*[node-type()=1]");
+      if (xmlStrPrintf (expr, 256, format) == -1)
+        {
+          return NULL;
+        }
+    }
+  else
+    {
+      format = xmlCharStrdup ("descendant-or-self::*[name()='%s']");
+      if (xmlStrPrintf (expr, 256, format, s_name) == -1)
+        {
+          return NULL;
+        }
     }
   node = xmljGetNodeID (env, self);
   if (node == NULL)
@@ -422,18 +433,61 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagNameNS (JNIEnv *env,
   s_localName = xmljGetStringChars (env, localName);
   if (uri == NULL)
     {
-      format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='' and local-name()='%s']");
-      if (xmlStrPrintf (expr, 256, format, s_localName) == -1)
+      /* namespace URI is empty */
+      if (xmlStrEqual (s_localName, BAD_CAST "*"))
         {
-          return NULL;
+          format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='' and node-type()=1]");
+          if (xmlStrPrintf (expr, 256, format) == -1)
+            {
+              return NULL;
+            }
+        }
+      else
+        {
+          format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='' and local-name()='%s']");
+          if (xmlStrPrintf (expr, 256, format, s_localName) == -1)
+            {
+              return NULL;
+            }
+        }
+    }
+  else if (xmlStrEqual (s_uri, BAD_CAST "*"))
+    {
+      /* matches all namespaces */
+      if (xmlStrEqual (s_localName, BAD_CAST "*"))
+        {
+          format = xmlCharStrdup ("descendant-or-self::*[node-type()=1]");
+          if (xmlStrPrintf (expr, 256, format) == -1)
+            {
+              return NULL;
+            }
+        }
+      else
+        {
+          format = xmlCharStrdup ("descendant-or-self::*[local-name()='%s']");
+          if (xmlStrPrintf (expr, 256, format, s_localName) == -1)
+            {
+              return NULL;
+            }
         }
     }
   else
     {
-      format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='%s' and local-name()='%s']");
-      if (xmlStrPrintf (expr, 256, format, s_uri, s_localName) == -1)
+      if (xmlStrEqual (s_localName, BAD_CAST "*"))
         {
-          return NULL;
+          format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='%s' and node-type()=1]");
+          if (xmlStrPrintf (expr, 256, format, s_uri) == -1)
+            {
+              return NULL;
+            }
+        }
+      else
+        {
+          format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='%s' and local-name()='%s']");
+          if (xmlStrPrintf (expr, 256, format, s_uri, s_localName) == -1)
+            {
+              return NULL;
+            }
         }
     }
   node = xmljGetNodeID (env, self);

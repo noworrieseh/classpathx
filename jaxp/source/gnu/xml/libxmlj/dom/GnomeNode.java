@@ -289,10 +289,13 @@ implements Node
   {
     switch (getNodeType ())
       {
+      case ENTITY_REFERENCE_NODE:
+        // entity references are read only
+        throw new GnomeDOMException (DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                                     null);
       case ELEMENT_NODE:
       case ATTRIBUTE_NODE:
       case ENTITY_NODE:
-      case ENTITY_REFERENCE_NODE:
       case DOCUMENT_FRAGMENT_NODE:
         NodeList children = getChildNodes ();
         int len = children.getLength ();
