@@ -2481,6 +2481,7 @@ loop:
 	// Read the literal.
 	try {
 	    c = readCh ();
+	    boolean ampRead = false;
 loop:
 	    while (! (c == delim && readBuffer == ourBuf)) {
 		switch (c) {
@@ -2510,10 +2511,11 @@ loop:
 			// dataBuffer [dataBufferPos - 1] == '&', and
 			// following chars are a _partial_ entity/char ref
                         
-                        if (dataBuffer [dataBufferPos - 1] == '&'){
+                        if (dataBuffer [dataBufferPos - 1] == '&'
+                            && !ampRead){
                             //after & there must be a: 
-                            //  char ref     ( & already parsed) 
-                            // 	| entity ref ( & already parsed) 
+                            //  char ref     ( & already read) 
+                            // 	| entity ref ( & already read) 
                             // to be WF  	
                             
                             //workaround for possible input pop before marking
@@ -2532,16 +2534,19 @@ loop:
                             	readNmtoken (true);
                         	require (';');
                             }
-                            readBufferPos = bufferPosMark;    
+                            readBufferPos = bufferPosMark;
+                            ampRead = false;
                         }
+                       
 		    // It looks like an entity ref ...
 		    } else {
 			unread (c);
 			// Expand it?
 			if ((flags & LIT_ENTITY_REF) > 0) {
 			    parseEntityRef (false);
-
-			// Is it just data?
+			    if (String.valueOf (readBuffer).equals("&#38;"))
+			    	ampRead = true;
+                        //Is it just data?
 			} else if ((flags & LIT_DISABLE_EREF) != 0) {
 			    dataBufferAppend ('&');
 

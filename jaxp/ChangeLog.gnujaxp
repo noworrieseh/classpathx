@@ -3,6 +3,11 @@
 	* SAXDriver.java: Fixed bug intruduced with the partial character
 	ref, partial entity references checks.
 	
+2004-08-05  Musachy Barroso  <musachy@gmail.com>
+
+	* SAXDriver.java: Fixed bug intruduced with the partial character
+	ref, partial entity references checks.
+	
 2004-08-03  Musachy Barroso  <musachy@gmail.com>
 
 	* SAXDriver.java: Check added for namespaces names containing only
