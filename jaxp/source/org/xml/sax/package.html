@@ -1,0 +1,153 @@
+<html><head>
+</head><body>
+
+<p> This package provides the core SAX1 and SAX2 APIs.
+SAX1 APIs are deprecated to encourage integration of
+namespace-awareness into designs of new applications
+and maintainance of existing infrastructure.
+For more information on SAX, see
+<a href="http://www.megginson.com/SAX/index.html">the SAX page</a>.
+
+<h2> SAX2 Standard Feature Flags </h2>
+
+<p> One of the essential characteristics of SAX2 is that it added
+feature flags that can be used to examine and perhaps modify
+parser modes, in particular modes such as validation.
+Since features are identified by (absolute) URIs, anyone
+can define such features.   
+Currently defined standard feature URIs have the prefix
+<code>http://xml.org/sax/features/</code> before an identifier such as
+<code>validation</code>.  One could turn that feature on or off using
+<em>setFeature</em>.  Those standard identifiers are: </p>
+
+
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr align="center" bgcolor="#ccccff">
+	<th>Feature ID</th>
+	<th>Default</th>
+	<th>Description</th>
+	</tr>
+
+    <tr>
+	<td>external-general-entities</td>
+	<td><em>unspecified</em></td>
+	<td> Reports whether this parser processes external
+	    general entities; always true if validating</td>
+	</tr>
+
+    <tr>
+	<td>external-parameter-entities</td>
+	<td><em>unspecified</em></td>
+	<td> Reports whether this parser processes external
+	    parameter entities; always true if validating</td>
+	</tr>
+
+    <tr>
+	<td>namespaces</td>
+	<td>true</td>
+	<td> true indicates namespace URIs and unprefixed local names
+	    for element and attribute names will be available </td>
+	</tr>
+
+    <tr>
+	<td>namespace-prefixes</td>
+	<td>false</td>
+	<td> true indicates XML 1.0 names (with prefixes) and attributes
+	    (including <em>xmlns*</em> attributes) will be available </td>
+	</tr>
+
+    <tr>
+	<td>string-interning</td>
+	<td><em>unspecified</em></td>
+	<td> true if all XML names provided will have been interned
+	    using <em>java.lang.String.intern</em>, supporting fast
+	    testing of equality/inequality with string constants </td>
+	</tr>
+
+    <tr>
+	<td>validation</td>
+	<td><em>unspecified</em> (false?)</td>
+	<td> controls whether the parser is validating its input </td>
+	</tr>
+
+</table>
+
+<h2> SAX2 Standard Handler and Property IDs </h2>
+
+<p> For parser interface characteristics that aren't boolean
+flags, a separate namespace for objects is defined.  The
+objects in this namespace are again identified by URI, and
+the standard property URIs have the prefix
+<code>http://xml.org/sax/properties/</code> before an identifier such as
+<code>lexical-handler</code> or
+<code>dom-node</code>.  One could manage those properties using
+<em>setProperty()</em>.  Those identifiers are: </p>
+
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr align="center" bgcolor="#ccccff">
+	<th>Property ID</th>
+	<th>Description</th>
+	</tr>
+
+    <tr>
+	<td>declaration-handler</td>
+	<td> Used to see most DTD declarations except those treated
+	    as lexical ("root element name is ...") or which are
+	    mandatory for all SAX parsers (<em>DTDHandler</em>).
+	    The Object must implement <em>DeclHandler</em>.  </td>
+	</tr>
+
+    <tr>
+	<td>dom-node</td>
+	<td> For "DOM Walker" style parsers, which ignore their
+	    <em>parser.parse()</em> parameters, this is used to
+	    specify the DOM (sub)tree being walked by the parser.
+	    </td>
+	</tr>
+
+    <tr>
+	<td>lexical-handler</td>
+	<td> Used to see some syntax events that are essential in some
+	    applications:  comments, CDATA delimeters, selected general
+	    entity inclusions, and the start and end of the DTD.
+	    The Object must implement <em>LexicalHandler</em>.  </td>
+	</tr>
+
+    <tr>
+	<td>xml-string</td>
+	<td> Readable only during a parser callback, this exposes a TBS
+	    chunk of characters responsible for the current event. </td>
+	</tr>
+
+</table>
+
+
+<h2> SAX2 Namespace Support </h2>
+
+<p> Namespace support is the root of the incompatibilities between 
+SAX1 and SAX2. 
+Namespaces are not part of XML itself, but are felt to be
+sufficiently strategic that this layer has been integrated
+into the SAX2 API.
+Existing applications needs to change two method signatures, and add
+two new handler methods, to handle SAX2 namespace features.
+
+<p>
+Names in the <a href="ContentHandler.html">ContentHandler</a> startElement
+and endElement callback must now, by default, conform to the XML + Namespaces
+specification.  You will get two callbacks describing the beginning and end
+of a scope for a given name prefix, and may also see the attributes
+which tell you that same thing.  (As a rule, ignore those callbacks.)
+
+<p> If you explicitly enable the <em>namespace-prefixes</em>
+feature on a parser, you can see the <em>xmlns*</em> attributes, and
+the element and attribute names as found in the document (with prefixes).
+If your SAX1 application is currently namespace aware, or needs to work
+with data that may use prefixed (or perhaps hierarchical) names, you must
+enable that feature in order to continue working correctly with a SAX2
+parser, in addition to making the various call syntax changes.
+(You can phase in use of the SAX2 namespace features incrementally,
+as you verify that it's safe for use with each existing application's
+data set or messaging partner.)
+
+</body></html>
