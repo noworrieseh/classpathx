@@ -115,7 +115,7 @@ final class ApplyTemplatesNode
                                      node);
             if (t != null)
               {
-                if (s.debug)
+                if (stylesheet.debug)
                   {
                     System.err.println("Applying " + t);
                   }

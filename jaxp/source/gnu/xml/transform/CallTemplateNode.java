@@ -82,7 +82,6 @@ final class CallTemplateNode
             stylesheet.bindings.set(p.name, value, false);
           }
       }
-    // If this fails, a transformation error is signalled
     TemplateNode t = stylesheet.getTemplate(mode, name);
     if (t != null)
       {

@@ -206,6 +206,12 @@ class Stylesheet
       }
     else
       {
+        /* Test for import circularity *
+        for (Stylesheet ctx = this; ctx.parent != null; ctx = ctx.parent)
+          {
+            if (systemId.equals(
+          }*/
+        /* OK */
         bindings = parent.bindings;
         attributeSets = parent.attributeSets;
         namespaceAliases = parent.namespaceAliases;
@@ -387,7 +393,8 @@ class Stylesheet
       }
     if (candidates.isEmpty())
       {
-        throw new TransformerException("template '" + name + "' not found");
+        return null;
+        //throw new TransformerException("template '" + name + "' not found");
       }
     return ((Template) candidates.iterator().next()).node;
   }
