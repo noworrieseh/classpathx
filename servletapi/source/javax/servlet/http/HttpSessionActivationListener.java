@@ -21,6 +21,9 @@
 
 package javax.servlet.http;
 
+
+import java.util.EventListener;
+
 /**
  * Objects that are bound to a session as an attribute and implementing
  * this interface will be notified whenever the session to which they
@@ -34,6 +37,7 @@ package javax.servlet.http;
  */
 
 public interface HttpSessionActivationListener
+extends EventListener
 {
   /**
    * This method is called to notify that the session has just been activated

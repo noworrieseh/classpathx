@@ -21,6 +21,8 @@
 
 package javax.servlet.http;
 
+import java.util.EventListener;
+
 /**
  * Implementers of this interface can receive notifications when
  * the attributes of the sessions in a web application change
@@ -32,6 +34,7 @@ package javax.servlet.http;
  */
 
 public interface HttpSessionAttributeListener
+extends EventListener
 {
   /**
    * Indicates that an attribute has been added to a session

@@ -20,6 +20,7 @@
 */
 package javax.servlet.http;
 
+import java.util.EventListener;
 
 /** listener class for simple session events.
  *
@@ -28,6 +29,7 @@ package javax.servlet.http;
  * @since Servlet API 2.3
  */
 public interface HttpSessionListener
+extends EventListener
 {
 
   /** signalled when the session is created.
