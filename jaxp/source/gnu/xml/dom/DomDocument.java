@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.3 2001-10-23 17:42:25 db Exp $
+ * $Id: DomDocument.java,v 1.4 2001-11-16 13:34:14 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,7 +31,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomDocument.java,v 1.3 2001-10-23 17:42:25 db Exp $
+// $Id: DomDocument.java,v 1.4 2001-11-16 13:34:14 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -43,7 +43,7 @@ import org.w3c.dom.traversal.*;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-16 13:34:14 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -83,7 +83,7 @@ public class DomDocument extends DomNode
      *
      * <p> Note that this constructor enables character checking;
      * this constructor is not normally used when connecting a DOM
-     * to an XML parser, so
+     * to an XML parser.
      *
      * @see DomImpl
      * @see #setCheckingCharacters
@@ -274,8 +274,8 @@ public class DomDocument extends DomNode
 	}
 	if (name.lastIndexOf (':') != index)
 	    throw new DomEx (DomEx.NAMESPACE_ERR, name, null, 0);
-	verifyXmlName (name.substring (0, index - 1));
-	verifyXmlName (name.substring (index));
+	verifyXmlName (name.substring (0, index));
+	verifyXmlName (name.substring (index + 1));
     }
 
     // package private
