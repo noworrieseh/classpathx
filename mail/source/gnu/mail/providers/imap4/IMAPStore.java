@@ -47,36 +47,6 @@ public class IMAPStore
   extends Store
 {
 
-  // -- TESTING --
-  public static void main(String[] args) {
-    try {
-      Session session = Session.getDefaultInstance(System.getProperties());
-      session.setDebug(true);
-      URLName url = new URLName("imap://localhost/");
-      Store s = session.getStore(url);
-      s.connect("localhost", "test", "imaptest");
-      Folder f = s.getFolder("INBOX");
-      f.open(Folder.READ_ONLY);
-      javax.mail.Message[] m = f.getMessages();
-      for (int i=0; i<m.length; i++) {
-        System.out.println(m[i].getSubject());
-        //System.out.println("------->"+m[i].getContentType());
-        //System.out.println(m[i].getContent());
-        Flags flags = m[i].getFlags();
-        if (flags.contains(Flags.Flag.FLAGGED))
-          flags.remove(Flags.Flag.FLAGGED);
-        else
-          flags.add(Flags.Flag.FLAGGED);
-        m[i].setFlags(flags, true);
-      }
-      f.close(false);
-      s.close();
-    } catch (Exception e) {
-      e.printStackTrace(System.err);
-    }
-  }
-  // -- END TESTING --
-
   /**
    * The default IMAP port.
    */
@@ -91,6 +61,11 @@ public class IMAPStore
    * Folder representing the root namespace of the IMAP connection.
    */
   protected IMAPFolder root;
+
+  /**
+   * The currently selected folder.
+   */
+  protected IMAPFolder selected;
 
   /**
    * Constructor.
@@ -181,6 +156,22 @@ public class IMAPStore
     throws MessagingException
   {
     return getFolder(urlname.getFile());
+  }
+
+  /**
+   * Indicates whether the specified folder is selected.
+   */
+  protected boolean isSelected(IMAPFolder folder)
+  {
+    return folder.equals(selected);
+  }
+
+  /**
+   * Sets the selected folder.
+   */
+  protected void setSelected(IMAPFolder folder)
+  {
+    selected = folder;
   }
 
 }

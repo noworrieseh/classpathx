@@ -250,7 +250,8 @@ public class IMAPFolder
   public void open(int mode) 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPStore s = (IMAPStore)store;
+    IMAPConnection connection = s.connection;
     try
     {
       MailboxStatus status = null;
@@ -270,6 +271,7 @@ public class IMAPFolder
         }
         update(status, false);
       }
+      s.setSelected(this);
       notifyConnectionListeners(ConnectionEvent.OPENED);
     }
     catch (IOException e)
@@ -366,24 +368,34 @@ public class IMAPFolder
   public void close(boolean expunge) 
     throws MessagingException 
   {
-    if (!isOpen())
-      throw new MessagingException("Folder is not open");
-    if (expunge)
-      expunge();
-    IMAPConnection connection = ((IMAPStore)store).connection;
-    try
-    {
-      synchronized (connection)
-      {
-        connection.close();
-      }
-    }
-    catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
+    if (mode==-1)
+      return;
+    IMAPStore s = (IMAPStore)store;
+    boolean selected = s.isSelected(this);
+    if (selected)
+      s.setSelected(null);
     mode = -1;
     notifyConnectionListeners(ConnectionEvent.CLOSED);
+    if (expunge)
+    {
+      if (!selected)
+        throw new FolderClosedException(this);
+      IMAPConnection connection = s.connection;
+      try
+      {
+        boolean success;
+        synchronized (connection)
+        {
+          success = connection.close();
+        }
+        if (!success)
+          throw new IllegalWriteException();
+      }
+      catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    }
   }
 
   /**
@@ -572,24 +584,7 @@ public class IMAPFolder
       {
         entries = connection.list(path, pattern);
       }
-      List unique = new ArrayList(entries.length);
-      for (int i=0; i<entries.length; i++)
-      {
-        boolean suppress = false;
-        List attributes = entries[i].attributes;
-        if (attributes!=null)
-          suppress = (attributes.contains(LIST_NOSELECT) ||
-              attributes.contains(LIST_UNMARKED));
-        if (!suppress)
-        {
-          Folder f = getFolder(entries[i].mailbox);
-          if (!unique.contains(f))
-            unique.add(f);
-        }
-      }
-      Folder[] folders = new Folder[unique.size()];
-      unique.toArray(folders);
-      return folders;
+      return getFolders(entries);
     }
     catch (IOException e)
     {
@@ -611,29 +606,34 @@ public class IMAPFolder
       {
         entries = connection.lsub(path, pattern);
       }
-      List unique = new ArrayList(entries.length);
-      for (int i=0; i<entries.length; i++)
-      {
-        boolean suppress = false;
-        List attributes = entries[i].attributes;
-        if (attributes!=null)
-          suppress = (attributes.contains(LIST_NOSELECT) ||
-              attributes.contains(LIST_UNMARKED));
-        if (!suppress)
-        {
-          Folder f = getFolder(entries[i].mailbox);
-          if (!unique.contains(f))
-            unique.add(f);
-        }
-      }
-      Folder[] folders = new Folder[unique.size()];
-      unique.toArray(folders);
-      return folders;
+      return getFolders(entries);
     }
     catch (IOException e)
     {
       throw new MessagingException(e.getMessage(), e);
     }
+  }
+
+  Folder[] getFolders(ListEntry[] entries)
+    throws MessagingException
+  {
+    List unique = new ArrayList(entries.length);
+    for (int i=0; i<entries.length; i++)
+    {
+      boolean suppress = false;
+      List attributes = entries[i].attributes;
+      if (attributes!=null)
+        suppress = (attributes.contains(LIST_NOSELECT));
+      if (!suppress)
+      {
+        Folder f = getFolder(entries[i].mailbox);
+          if (!unique.contains(f))
+            unique.add(f);
+      }
+    }
+    Folder[] folders = new Folder[unique.size()];
+    unique.toArray(folders);
+    return folders;
   }
 
   /**
