@@ -1,9 +1,9 @@
 package test.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: AllTests.java,v 1.3 2002-06-08 05:33:17 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,9 +36,9 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * TestSuite that runs all tests of the mode package.
+ * <p>TestSuite that runs all tests of the mode package.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AllTests extends TestCase {
 
@@ -63,6 +63,8 @@ public class AllTests extends TestCase {
       TestSuite result = new TestSuite("GNU Crypto mode package tests");
 
       result.addTest(TestOfModeFactory.suite());
+      result.addTest(TestOfECB.suite());
+      result.addTest(TestOfOFB.suite());
 
       return result;
    }
