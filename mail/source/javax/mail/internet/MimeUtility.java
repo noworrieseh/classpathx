@@ -479,7 +479,7 @@ public class MimeUtility
     if (charset==null)
     {
       javaCharset = getDefaultJavaCharset();
-      charset = mimeCharset(charset);
+      charset = mimeCharset(javaCharset);
     }
     else
       javaCharset = javaCharset(charset);
