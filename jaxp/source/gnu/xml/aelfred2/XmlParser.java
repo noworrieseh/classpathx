@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.20 2001-11-07 01:17:20 db Exp $
+ * $Id: XmlParser.java,v 1.21 2001-11-09 20:24:02 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.20 2001-11-07 01:17:20 db Exp $
+// $Id: XmlParser.java,v 1.21 2001-11-09 20:24:02 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-07 01:17:20 $
+ * @version $Date: 2001-11-09 20:24:02 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -810,7 +810,7 @@ ee.printStackTrace ();
 
 	// report (a) declaration of name, (b) lexical info (ids)
 	handler.doctypeDecl (doctypeName, ids [0],
-		    handler.resolveURIs ()
+		    (ids [1] != null && handler.resolveURIs ())
 			? absolutize (ids [1])
 			: ids [1]);
 
@@ -3342,16 +3342,19 @@ loop:
     {
 	boolean	ignoreEncoding = false;
 
-	// See if we should skip or substitue non-document entities.
+	// See if we should skip or substitute non-document entities.
 	// The systemID was already absolutized.
 
-	if ("[document]" != ename) {
+	if ("[document]" == ename)
+	    handler.startExternalEntity (ename, systemId);
+	else {
 	    InputSource	source;
 
+	    // if we're not skipping, this will report startEntity()
 	    scratch.setSystemId (systemId);
 	    scratch.setPublicId (publicId);
 	    scratch.setEncoding (encoding);
-	    source = handler.resolveEntity (isPE, scratch);
+	    source = handler.resolveEntity (isPE, ename, scratch);
 
 	    // Skip this entity?
 	    if (source == null) {
@@ -3398,13 +3401,6 @@ loop:
 	line = 1;
 	column = 0;
 	currentByteCount = 0;
-
-	// Start the entity.
-	if (systemId != null) {
-	    handler.startExternalEntity (ename, systemId);
-	} else {
-	    handler.startExternalEntity (ename, "[unidentified data stream]");
-	}
 
 	// If there's an explicit character stream, just
 	// ignore encoding declarations.
