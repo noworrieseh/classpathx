@@ -12,20 +12,20 @@ AC_DEFUN([IFVAL],
 # are set in the variable JAVA_CC_OPTS
 AC_DEFUN([AC_PROG_JAVA_CC],
 [IFVAL([$1],
-      [AC_PATH_PROGS(JAVA_CC, [$1])],
-[AC_PATH_PROG(JAVA_CC, gcj)
+      [AC_CHECK_PROGS(JAVA_CC, [$1], , $PATH)],
+[AC_CHECK_PROG(JAVA_CC, gcj, gcj, , $PATH)
 if test -z "$JAVA_CC"; then
-  AC_PATH_PROG(JAVA_CC, javac)
+  AC_CHECK_PROG(JAVA_CC, javac, javac, , $PATH)
 fi
 if test -z "$JAVA_CC"; then
-  AC_PATH_PROG(JAVA_CC, jikes)
+  AC_CHECK_PROG(JAVA_CC, jikes, jikes, , $PATH)
 fi
 ])
 
 if test "$JAVA_CC" = "gcj"; then
    if test "$GCJ_OPTS" = ""; then
-      echo > /dev/null
       AC_SUBST(GCJ_OPTS,-C)
+      echo > /dev/null
    fi
    AC_SUBST(JAVA_CC_OPTS, @GCJ_OPTS@,
 	[Define the compilation options for GCJ])

@@ -923,42 +923,37 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-for ac_prog in jikes gcj javac
+for ac_prog in javac gcj
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:930: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_JAVA_CC+set}" = set; then
+if test "${ac_cv_prog_JAVA_CC+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $JAVA_CC in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_JAVA_CC="$JAVA_CC" # Let the user override the test with a path.
-  ;;
-  *)
+  if test -n "$JAVA_CC"; then
+  ac_cv_prog_JAVA_CC="$JAVA_CC" # Let the user override the test.
+else
   ac_save_IFS=$IFS; IFS=$ac_path_separator
 ac_dummy="$PATH"
 for ac_dir in $ac_dummy; do
   IFS=$ac_save_IFS
   test -z "$ac_dir" && ac_dir=.
-  if $as_executable_p "$ac_dir/$ac_word"; then
-   ac_cv_path_JAVA_CC="$ac_dir/$ac_word"
-   echo "$as_me:947: found $ac_dir/$ac_word" >&5
-   break
-fi
+  $as_executable_p "$ac_dir/$ac_word" || continue
+ac_cv_prog_JAVA_CC="$ac_prog"
+echo "$as_me:945: found $ac_dir/$ac_word" >&5
+break
 done
 
-  ;;
-esac
 fi
-JAVA_CC=$ac_cv_path_JAVA_CC
-
+fi
+JAVA_CC=$ac_cv_prog_JAVA_CC
 if test -n "$JAVA_CC"; then
-  echo "$as_me:958: result: $JAVA_CC" >&5
+  echo "$as_me:953: result: $JAVA_CC" >&5
 echo "${ECHO_T}$JAVA_CC" >&6
 else
-  echo "$as_me:961: result: no" >&5
+  echo "$as_me:956: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -967,14 +962,14 @@ done
 
 if test "$JAVA_CC" = "gcj"; then
    if test "$GCJ_OPTS" = ""; then
-      echo > /dev/null
       GCJ_OPTS=-C
 
+      echo > /dev/null
    fi
    JAVA_CC_OPTS=@GCJ_OPTS@
 
 fi
-test -z "$JAVA_CC" && { { echo "$as_me:977: error: no acceptable java compiler found in \$PATH" >&5
+test -z "$JAVA_CC" && { { echo "$as_me:972: error: no acceptable java compiler found in \$PATH" >&5
 echo "$as_me: error: no acceptable java compiler found in \$PATH" >&2;}
    { (exit 1); exit 1; }; }
 
@@ -1088,7 +1083,7 @@ rm -f confdef2opt.sed
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:1091: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:1086: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -1255,7 +1250,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:1258: error: ambiguous option: $1
+    { { echo "$as_me:1253: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -1274,7 +1269,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:1277: error: unrecognized option: $1
+  -*) { { echo "$as_me:1272: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -1310,7 +1305,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  *) { { echo "$as_me:1313: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:1308: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -1503,7 +1498,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:1506: creating $ac_file" >&5
+    { echo "$as_me:1501: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -1521,7 +1516,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:1524: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:1519: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -1534,7 +1529,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:1537: error: cannot find input file: $f" >&5
+           { { echo "$as_me:1532: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
