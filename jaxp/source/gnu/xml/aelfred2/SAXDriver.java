@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.8 2001-07-14 20:14:30 db Exp $
+ * $Id: SAXDriver.java,v 1.9 2001-07-17 20:20:19 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.8 2001-07-14 20:14:30 db Exp $
+// $Id: SAXDriver.java,v 1.9 2001-07-17 20:20:19 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -102,17 +102,13 @@ import gnu.xml.util.DefaultHandler;
  *	the DTD (the internal subset is not detectible). </td></tr>
  * </table>
  *
- * <p> Although support for several features and properties is "built in"
- * to this parser, it supports all others by storing the assigned values
- * and returning them.
- *
  * <p>This parser currently implements the SAX1 Parser API, but
  * it may not continue to do so in the future.
  *
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-14 20:14:30 $
+ * @version $Date: 2001-07-17 20:20:19 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -143,10 +139,6 @@ final public class SAXDriver
     private boolean			nspending = false;
     private String			nsTemp [] = new String [3];
     private NamespaceSupport		prefixStack = new NamespaceSupport ();
-
-    private Hashtable			features;
-    private Hashtable			properties;
-
 
     //
     // Constructor.
@@ -321,6 +313,7 @@ final public class SAXDriver
 	    } finally {
 		contentHandler.endDocument ();
 		entityStack.removeAllElements ();
+		parser = null;
 	    }
 	}
     }
@@ -376,9 +369,6 @@ final public class SAXDriver
 	if ((FEATURE + "string-interning").equals (featureId))
 	    return true;
 
-	if (features != null && features.containsKey (featureId))
-	    return ((Boolean)features.get (featureId)).booleanValue ();
-
 	throw new SAXNotRecognizedException (featureId);
     }
 
@@ -400,60 +390,45 @@ final public class SAXDriver
 	if ((PROPERTY + "lexical-handler").equals (propertyId))
 	    return lexicalHandler;
 	
-	if (properties != null && properties.containsKey (propertyId))
-	    return properties.get (propertyId);
-
 	// unknown properties
 	throw new SAXNotRecognizedException (propertyId);
     }
 
     /**
      * <b>SAX2</b>:  Sets the state of feature flags in this parser.  Some
-     * built-in feature flags are mutable; all flags not built-in are
-     * motable.
+     * built-in feature flags are mutable.
      */
     public void setFeature (String featureId, boolean state)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	boolean	value;
 	
-	try {
-	    // Features with a defined value, we just change it if we can.
-	    value = getFeature (featureId);
+	// Features with a defined value, we just change it if we can.
+	value = getFeature (featureId);
 
-	    if (state == value)
-		return;
+	if (state == value)
+	    return;
+	if (parser != null)
+	    throw new SAXNotSupportedException ("not while parsing");
 
-	    if ((FEATURE + "namespace-prefixes").equals (featureId)) {
-		// in this implementation, this only affects xmlns reporting
-		xmlNames = state;
-		return;
-	    }
-
-	    if ((FEATURE + "namespaces").equals (featureId)) {
-		// XXX if not currently parsing ...
-		if (true) {
-		    namespaces = state;
-		    return;
-		}
-		// if in mid-parse, critical info hasn't been computed/saved
-	    }
-
-	    // can't change builtins
-	    if (features == null || !features.containsKey (featureId))
-		throw new SAXNotSupportedException (featureId);
-
-	} catch (SAXNotRecognizedException e) {
-	    // as-yet unknown features
-	    if (features == null)
-		features = new Hashtable (5);
+	if ((FEATURE + "namespace-prefixes").equals (featureId)) {
+	    // in this implementation, this only affects xmlns reporting
+	    xmlNames = state;
+	    // forcibly prevent illegal parser state
+	    if (!xmlNames)
+		namespaces = true;
+	    return;
 	}
 
-	// record first value, or modify existing one
-	features.put (featureId, 
-	    state
-		? Boolean.TRUE
-		: Boolean.FALSE);
+	if ((FEATURE + "namespaces").equals (featureId)) {
+	    namespaces = state;
+	    // forcibly prevent illegal parser state
+	    if (!namespaces)
+		xmlNames = true;
+	    return;
+	}
+
+	throw new SAXNotSupportedException (featureId);
     }
 
     /**
@@ -463,44 +438,32 @@ final public class SAXDriver
     public void setProperty (String propertyId, Object property)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
-	try {
-	    // see if the property is recognized
-	    getProperty (propertyId);
+	// see if the property is recognized
+	getProperty (propertyId);
 
-	    // Properties with a defined value, we just change it if we can.
+	// Properties with a defined value, we just change it if we can.
 
-	    if ((PROPERTY + "declaration-handler").equals (propertyId)) {
-		if (property == null)
-		    declHandler = base;
-		else if (! (property instanceof DeclHandler))
-		    throw new SAXNotSupportedException (propertyId);
-		else
-		    declHandler = (DeclHandler) property;
-		return ;
-	    }
-
-	    if ((PROPERTY + "lexical-handler").equals (propertyId)) {
-		if (property == null)
-		    lexicalHandler = base;
-		else if (! (property instanceof LexicalHandler))
-		    throw new SAXNotSupportedException (propertyId);
-		else
-		    lexicalHandler = (LexicalHandler) property;
-		return ;
-	    }
-
-	    // can't change builtins
-	    if (properties == null || !properties.containsKey (propertyId))
+	if ((PROPERTY + "declaration-handler").equals (propertyId)) {
+	    if (property == null)
+		declHandler = base;
+	    else if (! (property instanceof DeclHandler))
 		throw new SAXNotSupportedException (propertyId);
-
-	} catch (SAXNotRecognizedException e) {
-	    // as-yet unknown properties
-	    if (properties == null)
-		properties = new Hashtable (5);
+	    else
+		declHandler = (DeclHandler) property;
+	    return ;
 	}
 
-	// record first value, or modify existing one
-	properties.put (propertyId, property);
+	if ((PROPERTY + "lexical-handler").equals (propertyId)) {
+	    if (property == null)
+		lexicalHandler = base;
+	    else if (! (property instanceof LexicalHandler))
+		throw new SAXNotSupportedException (propertyId);
+	    else
+		lexicalHandler = (LexicalHandler) property;
+	    return ;
+	}
+
+	throw new SAXNotSupportedException (propertyId);
     }
 
 
