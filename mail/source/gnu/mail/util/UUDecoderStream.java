@@ -1,6 +1,6 @@
 /*
   GNU-Classpath Extensions: javamail
-  Copyright (C) 2000 Andrew Selkirk
+  Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
   For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
 
