@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseCipher.java,v 1.5 2002-06-08 04:56:54 raif Exp $
+// $Id: BaseCipher.java,v 1.6 2002-06-28 13:05:27 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -37,10 +37,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * <p>A basic abstract class to facilitate implementing symmetric block ciphers.
- * </p>
+ * <p>A basic abstract class to facilitate implementing symmetric key block
+ * ciphers.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
 
@@ -164,6 +164,8 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
    public boolean selfTest() {
       int ks;
       Iterator bit;
+
+      // do symmetry tests for all block-size/key-size combos
       for (Iterator kit = keySizes(); kit.hasNext(); ) {
          ks = ((Integer) kit.next()).intValue();
          for (bit = blockSizes(); bit.hasNext(); ) {
@@ -197,6 +199,29 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
          decrypt(ct, 0, cpt, 0, k, bs);
 
          return Util.areEqual(pt, cpt);
+
+      } catch (Exception x) {
+         x.printStackTrace(System.err);
+         return false;
+      }
+   }
+
+   protected boolean testKat(byte[] kb, byte[] ct) {
+      try {
+         int bs = ct.length;
+         byte[] pt = new byte[bs]; // all-zero plaintext
+         byte[] t = new byte[bs];
+
+         Object k = makeKey(kb, bs);
+
+         // test encryption
+         encrypt(pt, 0, t,  0, k, bs);
+         if (!Util.areEqual(t, ct)) {
+            return false;
+         }
+         // test decryption
+         decrypt(t, 0, t, 0, k, bs);
+         return Util.areEqual(t, pt);
 
       } catch (Exception x) {
          x.printStackTrace(System.err);
