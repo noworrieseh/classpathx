@@ -1,5 +1,5 @@
 /*
- * $Id: WellFormednessFilter.java,v 1.4 2001-10-23 17:42:25 db Exp $
+ * $Id: WellFormednessFilter.java,v 1.5 2001-10-25 07:41:40 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -71,7 +71,7 @@ import gnu.xml.util.DefaultHandler;
  * and more.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 07:41:40 $
  */
 public final class WellFormednessFilter extends EventFilter
 {
@@ -144,18 +144,18 @@ public final class WellFormednessFilter extends EventFilter
     /**
      * Throws an exception when called after startDocument.
      *
-     * @param l the locator, to be used in error reporting or relative
+     * @param locator the locator, to be used in error reporting or relative
      *	URI resolution.
      *
      * @exception IllegalStateException when called after the document
      *	has already been started
      */
-    public void setDocumentLocator (Locator l)
+    public void setDocumentLocator (Locator locator)
     {
 	if (startedDoc)
 	    throw new IllegalStateException (
 		    "setDocumentLocator called after startDocument");
-	super.setDocumentLocator (l);
+	super.setDocumentLocator (locator);
     }
 
     public void startDocument () throws SAXException
@@ -169,8 +169,8 @@ public final class WellFormednessFilter extends EventFilter
     }
 
     public void startElement (
-	String ns, String l,
-	String name, Attributes atts
+	String uri, String localName,
+	String qName, Attributes atts
     ) throws SAXException
     {
 	if (!startedDoc)
@@ -181,32 +181,32 @@ public final class WellFormednessFilter extends EventFilter
 	    dtdState = "after";
 	if (startedCDATA)
 	    fatalError ("element inside CDATA section");
-	if (name == null || "".equals (name))
+	if (qName == null || "".equals (qName))
 	    fatalError ("startElement name missing");
-	elementStack.push (name);
-	super.startElement (ns, l, name, atts);
+	elementStack.push (qName);
+	super.startElement (uri, localName, qName, atts);
     }
 
-    public void endElement (String ns, String l, String name)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
 	if (startedCDATA)
 	    fatalError ("element inside CDATA section");
-	if (name == null || "".equals (name))
+	if (qName == null || "".equals (qName))
 	    fatalError ("endElement name missing");
 	
 	try {
 	    String	top = (String) elementStack.pop ();
 
-	    if (!name.equals (top))
-		fatalError ("<" + top + " ...>...</" + name + ">");
+	    if (!qName.equals (top))
+		fatalError ("<" + top + " ...>...</" + qName + ">");
 	    // XXX could record/test namespace info
 	} catch (EmptyStackException e) {
-	    fatalError ("endElement without startElement:  </" + name + ">");
+	    fatalError ("endElement without startElement:  </" + qName + ">");
 	}
-	super.endElement (ns, l, name);
+	super.endElement (uri, localName, qName);
     }
 
     public void endDocument () throws SAXException
@@ -219,7 +219,7 @@ public final class WellFormednessFilter extends EventFilter
     }
 
 
-    public void startDTD (String root, String p, String s)
+    public void startDTD (String root, String publicId, String systemId)
     throws SAXException
     {
 	if (!startedDoc)
@@ -229,27 +229,28 @@ public final class WellFormednessFilter extends EventFilter
 	if (!elementStack.empty ())
 	    fatalError ("DTD must precede root element");
 	dtdState = "inside";
-	super.startDTD (root, p, s);
+	super.startDTD (root, publicId, systemId);
     }
 
-    public void notationDecl (String name, String pub, String sys)
+    public void notationDecl (String name, String publicId, String systemId)
     throws SAXException
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
 	if ("after" == dtdState)
 	    fatalError ("not inside DTD");
-	super.notationDecl (name, pub, sys);
+	super.notationDecl (name, publicId, systemId);
     }
 
-    public void unparsedEntityDecl (String name, String p, String s, String n)
+    public void unparsedEntityDecl (String name,
+    	String publicId, String systemId, String notationName)
     throws SAXException
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
 	if ("after" == dtdState)
 	    fatalError ("not inside DTD");
-	super.unparsedEntityDecl (name, p, s, n);
+	super.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
 
     // FIXME:  add the four DeclHandler calls too
@@ -265,38 +266,38 @@ public final class WellFormednessFilter extends EventFilter
 	super.endDTD ();
     }
 
-    public void characters (char buf [], int off, int len)
+    public void characters (char ch [], int start, int length)
     throws SAXException
     {
-	int here = off, end = off + len;
+	int here = start, end = start + length;
 	if (elementStack.empty ())
 	    fatalError ("characters must be in an element");
 	while (here < end) {
-	    if (buf [here++] != ']')
+	    if (ch [here++] != ']')
 		continue;
 	    if (here == end)	// potential problem ...
 		continue;
-	    if (buf [here++] != ']')
+	    if (ch [here++] != ']')
 		continue;
 	    if (here == end)	// potential problem ...
 		continue;
-	    if (buf [here++] == '>')
+	    if (ch [here++] == '>')
 		fatalError ("character data can't contain \"]]>\"");
 	}
-	super.characters (buf, off, len);
+	super.characters (ch, start, length);
     }
 
-    public void ignorableWhitespace (char buf [], int off, int len)
+    public void ignorableWhitespace (char ch [], int start, int length)
     throws SAXException
     {
-	int here = off, end = off + len;
+	int here = start, end = start + length;
 	if (elementStack.empty ())
 	    fatalError ("characters must be in an element");
 	while (here < end) {
-	    if (buf [here++] == '\r')
+	    if (ch [here++] == '\r')
 		fatalError ("whitespace can't contain CR");
 	}
-	super.ignorableWhitespace (buf, off, len);
+	super.ignorableWhitespace (ch, start, length);
     }
 
     public void processingInstruction (String target, String data)
@@ -308,25 +309,25 @@ public final class WellFormednessFilter extends EventFilter
 	    fatalError ("PIs can't contain \"?>\"");
     }
 
-    public void comment (char buf [], int off, int len)
+    public void comment (char ch [], int start, int length)
     throws SAXException
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
 	if (startedCDATA)
 	    fatalError ("comments can't nest in CDATA");
-	int here = off, end = off + len;
+	int here = start, end = start + length;
 	while (here < end) {
-	    if (buf [here] == '\r')
+	    if (ch [here] == '\r')
 		fatalError ("comments can't contain CR");
-	    if (buf [here++] != '-')
+	    if (ch [here++] != '-')
 		continue;
 	    if (here == end)
 		fatalError ("comments can't end with \"--->\"");
-	    if (buf [here++] == '-')
+	    if (ch [here++] == '-')
 		fatalError ("comments can't contain \"--\"");
 	}
-	super.comment (buf, off, len);
+	super.comment (ch, start, length);
     }
 
     public void startCDATA ()
