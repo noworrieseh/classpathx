@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.10 2001-10-23 17:42:25 db Exp $
+ * $Id: EventFilter.java,v 1.11 2001-10-25 06:49:43 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -126,7 +126,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 06:49:43 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -343,13 +343,15 @@ public class EventFilter
      * Otherwise the specified handlers will be returned.
      *
      * <p> <em>Downstream Event Setup:</em>
-     * Subclasses chain event delivery to the specified XMLFilterImpl,
+     * Subclasses may chain event delivery to the specified XMLFilterImpl
+     * by invoking the appropiate superclass methods,
      * as if their constructor passed a "next" EventConsumer to the
      * constructor for this class.
      * If this EventFilter has an ErrorHandler, it is assigned as
      * the error handler for the XMLFilterImpl, just as would be
      * done for a next stage implementing {@link EventConsumer}.
      *
+     * @param next the next downstream component of the pipeline.
      * @exception IllegalStateException if the "next" consumer has
      *	already been set through the constructor.
      */
@@ -504,11 +506,11 @@ public class EventFilter
     // CONTENT HANDLER DELEGATIONS
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void setDocumentLocator (Locator l)
+    public void setDocumentLocator (Locator locator)
     {
-	locator = l;
+	this.locator = locator;
 	if (docNext != null)
-	    docNext.setDocumentLocator (l);
+	    docNext.setDocumentLocator (locator);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
@@ -519,10 +521,10 @@ public class EventFilter
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void skippedEntity (String n) throws SAXException
+    public void skippedEntity (String name) throws SAXException
     {
 	if (docNext != null)
-	    docNext.skippedEntity (n);
+	    docNext.skippedEntity (name);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
@@ -534,51 +536,52 @@ public class EventFilter
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void characters (char buf [], int off, int len)
+    public void characters (char ch [], int start, int length)
     throws SAXException
     {
 	if (docNext != null)
-	    docNext.characters (buf, off, len);
+	    docNext.characters (ch, start, length);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void ignorableWhitespace (char buf [], int off, int len)
+    public void ignorableWhitespace (char ch [], int start, int length)
     throws SAXException
     {
 	if (docNext != null)
-	    docNext.ignorableWhitespace (buf, off, len);
+	    docNext.ignorableWhitespace (ch, start, length);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void startPrefixMapping (String p, String u) throws SAXException
+    public void startPrefixMapping (String prefix, String uri)
+    throws SAXException
     {
 	if (docNext != null)
-	    docNext.startPrefixMapping (p, u);
+	    docNext.startPrefixMapping (prefix, uri);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
     public void startElement (
-	String ns, String l,
-	String name, Attributes atts
+	String uri, String localName,
+	String qName, Attributes atts
     ) throws SAXException
     {
 	if (docNext != null)
-	    docNext.startElement (ns, l, name, atts);
+	    docNext.startElement (uri, localName, qName, atts);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void endElement (String ns, String l, String n)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
 	if (docNext != null)
-	    docNext.endElement (ns, l, n);
+	    docNext.endElement (uri, localName, qName);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void endPrefixMapping (String p) throws SAXException
+    public void endPrefixMapping (String prefix) throws SAXException
     {
 	if (docNext != null)
-	    docNext.endPrefixMapping (p);
+	    docNext.endPrefixMapping (prefix);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
@@ -593,30 +596,34 @@ public class EventFilter
     // DTD HANDLER DELEGATIONS
     
     /** <b>SAX1:</b> passes this callback to the next consumer, if any */
-    public void unparsedEntityDecl (String s1, String s2, String s3, String s4)
-    throws SAXException
+    public void unparsedEntityDecl (
+	String name,
+	String publicId,
+	String systemId,
+	String notationName
+    ) throws SAXException
     {
 	if (dtdNext != null)
-	    dtdNext.unparsedEntityDecl (s1, s2, s3, s4);
+	    dtdNext.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
     
     /** <b>SAX1:</b> passes this callback to the next consumer, if any */
-    public void notationDecl (String s1, String s2, String s3)
+    public void notationDecl (String name, String publicId, String systemId)
     throws SAXException
     {
 	if (dtdNext != null)
-	    dtdNext.notationDecl (s1, s2, s3);
+	    dtdNext.notationDecl (name, publicId, systemId);
     }
     
 
     // LEXICAL HANDLER DELEGATIONS
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void startDTD (String root, String p, String s)
+    public void startDTD (String name, String publicId, String systemId)
     throws SAXException
     {
 	if (lexNext != null)
-	    lexNext.startDTD (root, p, s);
+	    lexNext.startDTD (name, publicId, systemId);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
@@ -628,11 +635,11 @@ public class EventFilter
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void comment (char buf [], int off, int len)
+    public void comment (char ch [], int start, int length)
     throws SAXException
     {
 	if (lexNext != null)
-	    lexNext.comment (buf, off, len);
+	    lexNext.comment (ch, start, length);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
@@ -684,20 +691,21 @@ public class EventFilter
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void attributeDecl (String e, String a,
-	    String b, String c, String d)
+    public void attributeDecl (String eName, String aName,
+	    String type, String mode, String value)
     throws SAXException
     {
 	if (declNext != null)
-	    declNext.attributeDecl (e, a, b, c, d);
+	    declNext.attributeDecl (eName, aName, type, mode, value);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
-    public void externalEntityDecl (String name, String pub, String sys)
+    public void externalEntityDecl (String name,
+    	String publicId, String systemId)
     throws SAXException
     {
 	if (declNext != null)
-	    declNext.externalEntityDecl (name, pub, sys);
+	    declNext.externalEntityDecl (name, publicId, systemId);
     }
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
