@@ -258,6 +258,11 @@ extends ServletResponse
   int SC_MOVED_TEMPORARILY = 302;
 
   /**
+   * 302 Found (http1.1?)
+   */
+  int SC_FOUND = 302;
+
+  /**
    * 303 See Other.
    * <P>
    * The response to the request can be found under a different URI and
@@ -320,6 +325,11 @@ extends ServletResponse
    * The recipient is expected to repeat the request via the proxy.
    */
   int SC_USE_PROXY = 305;
+
+  /**
+   * 307 Temporary Redirect
+   */
+  int SC_TEMPORARY_REDIRECT = 307;
 
   /**
    * 400 Bad Request.
