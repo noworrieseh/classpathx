@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: IMessageDigest.java,v 1.6 2002-01-11 21:55:08 raif Exp $
+// $Id: IMessageDigest.java,v 1.7 2002-01-21 10:06:25 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto.hash;
 /**
  * The basic visible methods of any hash algorithm.
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public interface IMessageDigest extends Cloneable {
 
@@ -104,5 +104,5 @@ public interface IMessageDigest extends Cloneable {
     *
     * @return a clone copy of this instance.
     */
-   Object clone() throws CloneNotSupportedException;
+   Object clone();
 }
