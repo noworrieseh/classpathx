@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.5 2001-11-04 01:15:00 db Exp $
+ * $Id: JAXPFactory.java,v 1.6 2001-11-16 09:08:58 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -53,7 +53,7 @@ import javax.xml.parsers.SAXParserFactory;
  * @see Consumer
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 01:15:00 $
+ * @version $Date: 2001-11-16 09:08:58 $
  */
 public final class JAXPFactory extends DocumentBuilderFactory
 {
@@ -152,7 +152,7 @@ public final class JAXPFactory extends DocumentBuilderFactory
 		// if validating, report validity errors, and default
 		// to treating them as fatal
 		if (factory.isValidating ()) {
-		    producer.setFeature (FEATURE + "validating",
+		    producer.setFeature (FEATURE + "validation",
 			true);
 		    producer.setErrorHandler (this);
 		}
