@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: UHash32.java,v 1.1 2002-06-08 05:06:33 raif Exp $
+// $Id: UHash32.java,v 1.2 2002-07-06 23:51:58 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -76,7 +76,7 @@ import java.util.Map;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class UHash32 extends BaseMac {
 
@@ -189,7 +189,7 @@ public class UHash32 extends BaseMac {
 
    public void init(Map attributes)
    throws InvalidKeyException, IllegalStateException {
-      K = (byte[]) attributes.get(MAC_KEY_MATERIAL);
+      byte[] K = (byte[]) attributes.get(MAC_KEY_MATERIAL);
       if (K == null) {
          throw new InvalidKeyException("Null Key");
       } else if (K.length != UMac32.KEY_LEN) {
