@@ -20,7 +20,7 @@
 */
 
 // SAX input source.
-// $Id: InputSource.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// $Id: InputSource.java,v 1.3 2001-07-12 21:03:50 db Exp $
 
 package org.xml.sax;
 
@@ -206,7 +206,7 @@ public class InputSource {
      *
      * <p>If the system ID is a URL, it will be fully resolved.</p>
      *
-     * @return The system identifier.
+     * @return The system identifier, or null if none was supplied.
      * @see #setSystemId
      * @see #getEncoding
      */
