@@ -1,3 +1,34 @@
+##
+## ----------------------------------------------------------------------------
+## $Id: Makefile.am,v 1.2 2002-06-08 05:47:20 raif Exp $
+##
+## Copyright (C) 2002 Free Software Foundation, Inc.
+##
+## This program is free software; you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2 of the License or (at your option) any
+## later version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; see the file COPYING.  If not, write to the
+##
+##    Free Software Foundation Inc.,
+##    59 Temple Place - Suite 330,
+##    Boston, MA 02111-1307
+##    USA
+##
+## As a special exception, if you link this library with other files to produce
+## an executable, this library does not by itself cause the resulting
+## executable to be covered by the GNU General Public License.  This exception
+## does not however invalidate any other reasons why the executable file might
+## be covered by the GNU General Public License.
+## ----------------------------------------------------------------------------
+##
 ## Process this file with automake to produce Makefile.in.
 ##
 AUTOMAKE_OPTIONS = gnu
@@ -10,7 +41,7 @@ AM_GCJFLAGS = --encoding=UTF-8 -fassume-compiled -fCLASSPATH=.
 
 BUILT_SOURCES = $(crypto_jar)
 data_DATA = $(crypto_jar)
-EXTRA_DIST = 
+EXTRA_DIST =
 
 # #############################################################################
 # Libraries and executables to compile.
@@ -27,7 +58,7 @@ check_PROGRAMS = \
 # #############################################################################
 # Crypto library config
 #
-lib_gnu_crypto_la_LIBADD = 
+lib_gnu_crypto_la_LIBADD =
 lib_gnu_crypto_la_LDFLAGS = -version-info 1:0
 lib_gnu_crypto_la_SOURCES = $(crypto_sources)
 
@@ -86,6 +117,7 @@ crypto_sources = \
  gnu/crypto/cipher/Khazad.java \
  gnu/crypto/cipher/NullCipher.java \
  gnu/crypto/cipher/Rijndael.java \
+ gnu/crypto/cipher/Serpent.java \
  gnu/crypto/cipher/Square.java \
  gnu/crypto/cipher/Twofish.java \
  gnu/crypto/hash/BaseHash.java \
@@ -96,27 +128,6 @@ crypto_sources = \
  gnu/crypto/hash/RipeMD160.java \
  gnu/crypto/hash/Sha160.java \
  gnu/crypto/hash/Whirlpool.java \
- gnu/crypto/mode/BaseMode.java \
- gnu/crypto/mode/CTR.java \
- gnu/crypto/mode/ECB.java \
- gnu/crypto/mode/ICM.java \
- gnu/crypto/mode/IMode.java \
- gnu/crypto/mode/ModeFactory.java \
- gnu/crypto/pad/BasePad.java \
- gnu/crypto/pad/IPad.java \
- gnu/crypto/pad/PKCS7.java \
- gnu/crypto/pad/PadFactory.java \
- gnu/crypto/pad/TBC.java \
- gnu/crypto/pad/WrongPaddingException.java \
- gnu/crypto/prng/BasePRNG.java \
- gnu/crypto/prng/ICMGenerator.java \
- gnu/crypto/prng/IRandom.java \
- gnu/crypto/prng/LimitReachedException.java \
- gnu/crypto/prng/MDGenerator.java \
- gnu/crypto/prng/PRNGFactory.java \
- gnu/crypto/util/PRNG.java \
- gnu/crypto/util/Prime.java \
- gnu/crypto/util/Util.java \
  gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
@@ -138,6 +149,32 @@ crypto_sources = \
  gnu/crypto/mac/HMac.java \
  gnu/crypto/mac/HMacFactory.java \
  gnu/crypto/mac/IMac.java \
+ gnu/crypto/mac/MacFactory.java \
+ gnu/crypto/mac/UHash32.java \
+ gnu/crypto/mac/UMac32.java \
+ gnu/crypto/mode/BaseMode.java \
+ gnu/crypto/mode/CTR.java \
+ gnu/crypto/mode/ECB.java \
+ gnu/crypto/mode/ICM.java \
+ gnu/crypto/mode/IMode.java \
+ gnu/crypto/mode/ModeFactory.java \
+ gnu/crypto/mode/OFB.java \
+ gnu/crypto/pad/BasePad.java \
+ gnu/crypto/pad/IPad.java \
+ gnu/crypto/pad/PadFactory.java \
+ gnu/crypto/pad/PKCS7.java \
+ gnu/crypto/pad/TBC.java \
+ gnu/crypto/pad/WrongPaddingException.java \
+ gnu/crypto/prng/BasePRNG.java \
+ gnu/crypto/prng/ICMGenerator.java \
+ gnu/crypto/prng/IRandom.java \
+ gnu/crypto/prng/LimitReachedException.java \
+ gnu/crypto/prng/MDGenerator.java \
+ gnu/crypto/prng/PRNGFactory.java \
+ gnu/crypto/prng/UMacGenerator.java \
+ gnu/crypto/util/Prime.java \
+ gnu/crypto/util/PRNG.java \
+ gnu/crypto/util/Util.java \
  gnu/crypto/sig/BaseSignature.java \
  gnu/crypto/sig/IKeyPairCodec.java \
  gnu/crypto/sig/IKeyPairGenerator.java \

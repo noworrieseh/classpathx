@@ -29,6 +29,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/cipher/Khazad.java \
 	$(SOURCEDIR)/gnu/crypto/cipher/NullCipher.java \
 	$(SOURCEDIR)/gnu/crypto/cipher/Rijndael.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/Serpent.java \
 	$(SOURCEDIR)/gnu/crypto/cipher/Square.java \
 	$(SOURCEDIR)/gnu/crypto/cipher/Twofish.java \
 	\
@@ -41,12 +42,21 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/hash/Sha160.java \
 	$(SOURCEDIR)/gnu/crypto/hash/Whirlpool.java \
 	\
+	$(SOURCEDIR)/gnu/crypto/mac/BaseMac.java \
+	$(SOURCEDIR)/gnu/crypto/mac/HMac.java \
+	$(SOURCEDIR)/gnu/crypto/mac/HMacFactory.java \
+	$(SOURCEDIR)/gnu/crypto/mac/IMac.java \
+	$(SOURCEDIR)/gnu/crypto/mac/MacFactory.java \
+	$(SOURCEDIR)/gnu/crypto/mac/UHash32.java \
+	$(SOURCEDIR)/gnu/crypto/mac/UMash32.java \
+	\
 	$(SOURCEDIR)/gnu/crypto/mode/BaseMode.java \
 	$(SOURCEDIR)/gnu/crypto/mode/CTR.java \
 	$(SOURCEDIR)/gnu/crypto/mode/ECB.java \
 	$(SOURCEDIR)/gnu/crypto/mode/ICM.java \
 	$(SOURCEDIR)/gnu/crypto/mode/IMode.java \
 	$(SOURCEDIR)/gnu/crypto/mode/ModeFactory.java \
+	$(SOURCEDIR)/gnu/crypto/mode/OFB.java \
 	\
 	$(SOURCEDIR)/gnu/crypto/pad/BasePad.java \
 	$(SOURCEDIR)/gnu/crypto/pad/IPad.java \
@@ -61,6 +71,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/prng/LimitReachedException.java \
 	$(SOURCEDIR)/gnu/crypto/prng/MDGenerator.java \
 	$(SOURCEDIR)/gnu/crypto/prng/PRNGFactory.java \
+	$(SOURCEDIR)/gnu/crypto/prng/UMacGenerator.java \
 	\
 	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSKey.java \
 	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSKeyPairGenerator.java \
@@ -77,6 +88,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/tool/NistMCT.java \
 	\
 	$(SOURCEDIR)/gnu/crypto/util/Prime.java \
+	$(SOURCEDIR)/gnu/crypto/util/PRNG.java \
 	$(SOURCEDIR)/gnu/crypto/util/Util.java
 
 TESTFILES = \
@@ -99,8 +111,14 @@ TESTFILES = \
 	$(SOURCEDIR)/test/hash/TestOfSha160.java \
 	$(SOURCEDIR)/test/hash/TestOfWhirlpool.java \
 	\
+	$(SOURCEDIR)/test/mac/AllTests.java \
+	$(SOURCEDIR)/test/mac/TestOfHMacFactory.java \
+	$(SOURCEDIR)/test/mac/TestOfMacFactory.java \
+	\
 	$(SOURCEDIR)/test/mode/AllTests.java \
+	$(SOURCEDIR)/test/mode/TestOfECB.java \
 	$(SOURCEDIR)/test/mode/TestOfModeFactory.java \
+	$(SOURCEDIR)/test/mode/TestOfOFB.java \
 	\
 	$(SOURCEDIR)/test/pad/AllTests.java \
 	$(SOURCEDIR)/test/pad/TestOfPKCS7.java \
@@ -111,10 +129,19 @@ TESTFILES = \
 	$(SOURCEDIR)/test/prng/TestOfICMGenerator.java \
 	$(SOURCEDIR)/test/prng/TestOfPRNGFactory.java \
 	\
+	$(SOURCEDIR)/test/sig/AllTests.java \
+	$(SOURCEDIR)/test/sig/TestOfKeyPairGeneratorFactory.java \
+	$(SOURCEDIR)/test/sig/TestOfSignatureFactory.java \
+	\
 	$(SOURCEDIR)/test/sig/dss/AllTests.java \
 	$(SOURCEDIR)/test/sig/dss/TestOfDSSCodec.java \
 	$(SOURCEDIR)/test/sig/dss/TestOfDSSKeyGeneration.java \
 	$(SOURCEDIR)/test/sig/dss/TestOfDSSSignature.java \
+	\
+	$(SOURCEDIR)/test/sig/rsa/AllTests.java \
+	$(SOURCEDIR)/test/sig/rsa/TestOfRSACodec.java \
+	$(SOURCEDIR)/test/sig/rsa/TestOfRSAKeyGeneration.java \
+	$(SOURCEDIR)/test/sig/rsa/TestOfRSAPSSSignature.java \
 
 PKGFILES =
 
@@ -199,7 +226,7 @@ lib/$(LIBNAME)-doc.zip:
 		-header "For the latest news and information visit<BR> \
 		<A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>" \
 		\
-		-bottom "Copyright &copy;2001 <A HREF="mailto:classpathx-crypto@gnu.org"> \
+		-bottom "Copyright &copy;2001-2002 <A HREF="mailto:classpathx-crypto@gnu.org"> \
 		Free Software Foundation, Inc.</A> All Rights Reserved." \
 		-classpath "$(SOURCEDIR)" \
 		\
