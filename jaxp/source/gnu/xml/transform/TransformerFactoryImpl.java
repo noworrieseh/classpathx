@@ -84,11 +84,17 @@ public class TransformerFactoryImpl
   public Transformer newTransformer()
     throws TransformerConfigurationException
   {
-    Stylesheet stylesheet = new Stylesheet(xpath);
-    return new TransformerImpl(uriResolver, errorListener, stylesheet);
+    return new TransformerImpl(uriResolver, errorListener, null);
   }
 
   public Templates newTemplates(Source source)
+    throws TransformerConfigurationException
+  {
+    Stylesheet stylesheet = newStylesheet(source, 0);
+    return new TemplatesImpl(uriResolver, errorListener, stylesheet);
+  }
+
+  Stylesheet newStylesheet(Source source, int precedence)
     throws TransformerConfigurationException
   {
     Document doc = null;
@@ -104,8 +110,7 @@ public class TransformerFactoryImpl
         doc = (node instanceof Document) ? (Document) node :
           node.getOwnerDocument();
       }
-    Stylesheet stylesheet = new Stylesheet(xpath, doc, 0);
-    return new TemplatesImpl(uriResolver, errorListener, stylesheet);
+    return new Stylesheet(this, doc, precedence);
   }
 
   public Source getAssociatedStylesheet(Source source,

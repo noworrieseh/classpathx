@@ -50,8 +50,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Attr;
@@ -61,7 +63,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import gnu.xml.xpath.XPathImpl;
+import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Root;
 
 /**
  * An XSL stylesheet.
@@ -77,7 +80,8 @@ class Stylesheet
   static final int OUTPUT_HTML = 1;
   static final int OUTPUT_TEXT = 2;
 
-  final XPathImpl xpath;
+  final TransformerFactoryImpl factory;
+  final int precedence;
 
   /**
    * Version of XSLT.
@@ -100,11 +104,18 @@ class Stylesheet
   int outputMethod;
   String outputPublicId;
   String outputSystemId;
+  String outputEncoding;
+  boolean outputIndent;
 
   // TODO keys
   // TODO decimal-format
   // TODO namespace-alias
-  // TODO attribute-set
+
+  /**
+   * Attribute-sets.
+   */
+  Map attributeSets;
+  Map usedAttributeSets;
 
   /**
    * Variables (cannot be overridden by parameters)
@@ -121,175 +132,193 @@ class Stylesheet
    */
   List templates;
 
-  Stylesheet(XPathImpl xpath)
+  Stylesheet(TransformerFactoryImpl factory, Document doc, int precedence)
     throws TransformerConfigurationException
   {
-    this(xpath, null, 0);
-  }
-
-  Stylesheet(XPathImpl xpath, Document doc, int precedence)
-    throws TransformerConfigurationException
-  {
-    this.xpath = xpath;
+    this.factory = factory;
+    this.precedence = precedence;
     stripSpace = new LinkedHashSet();
     preserveSpace = new LinkedHashSet();
+    attributeSets = new LinkedHashMap();
+    usedAttributeSets = new LinkedHashMap();
     variables = new LinkedHashMap();
     parameters = new LinkedHashMap();
     templates = new LinkedList();
-    parse(xpath, doc, precedence);
+    parse(doc.getDocumentElement(), true);
   }
 
-  void parse(XPathImpl xpath, Document doc, int precedence)
+  void parse(Node node, boolean root)
     throws TransformerConfigurationException
   {
+    if (node == null)
+      {
+        return;
+      }
     try
       {
-        if (doc == null)
-          {
-            // Identity transformation
-            templates.add(new Template(xpath,
-                                       "/descendant-or-self::node()",
-                                       null,
-                                       precedence, Template.DEFAULT_PRIORITY,
-                                       null));
-            return;
-          }
-        Element root = doc.getDocumentElement();
-        String namespaceUri = root.getNamespaceURI();
+        String namespaceUri = node.getNamespaceURI();
         if (XSL_NS.equals(namespaceUri) &&
-            "stylesheet".equals(root.getLocalName()))
+            node.getNodeType() == Node.ELEMENT_NODE)
           {
-            // Stylesheet element
-            version = root.getAttribute("version");
-
-            NodeList rc = root.getChildNodes();
-            int len = rc.getLength();
-            for (int i = 0; i < len; i++)
+            Element element = (Element) node;
+            String name = element.getLocalName();
+            if ("stylesheet".equals(name))
               {
-                Node child = rc.item(i);
-                if (Node.ELEMENT_NODE == child.getNodeType())
+                version = element.getAttribute("version");
+                parse(element.getFirstChild(), false);
+              }
+            else if ("template".equals(name))
+              {
+                String tname = element.getAttribute("name");
+                String m = element.getAttribute("match");
+                Expr match = (m != null) ?
+                  (Expr) factory.xpath.compile(m) : null;
+                String priority = element.getAttribute("priority");
+                String mode = element.getAttribute("mode");
+                double p = (priority == null ||
+                            priority.length() == 0) ?
+                  Template.DEFAULT_PRIORITY :
+                  Double.parseDouble(priority);
+                templates.add(new Template(this,
+                                           tname,
+                                           match,
+                                           element.getFirstChild(),
+                                           precedence,
+                                           p,
+                                           mode));
+                parse(element.getNextSibling(), false);
+              }
+            else if ("param".equals(name) ||
+                     "variable".equals(name))
+              {
+                Map target = "variable".equals(name) ? variables : parameters;
+                Node content = element.getFirstChild();
+                String paramName = element.getAttribute("name");
+                String select = element.getAttribute("select");
+                if (select != null)
                   {
-                    Element element = (Element) child;
-                    namespaceUri = element.getNamespaceURI();
-                    if (XSL_NS.equals(namespaceUri))
+                    if (content != null)
                       {
-                        String name = element.getLocalName();
-                        if ("template".equals(name))
-                          {
-                            Collection nodeset = getNodeSet(element);
-                            String match = element.getAttribute("match");
-                            String priority = element.getAttribute("priority");
-                            String mode = element.getAttribute("mode");
-                            double p = (priority == null ||
-                                        priority.length() == 0) ?
-                              Template.DEFAULT_PRIORITY :
-                              Double.parseDouble(priority);
-                            templates.add(new Template(xpath,
-                                                       match,
-                                                       nodeset,
-                                                       precedence,
-                                                       p,
-                                                       mode));
-                          }
-                        else if ("param".equals(name) ||
-                                 "variable".equals(name))
-                          {
-                            Map target = "variable".equals(name) ?
-                              variables : parameters;
-                            Collection nodeset = getNodeSet(element);
-                            String paramName = element.getAttribute("name");
-                            String select = element.getAttribute("select");
-                            if (select != null)
-                              {
-                                if (!nodeset.isEmpty())
-                                  {
-                                    throw new TransformerConfigurationException("parameter has both select and content", new DOMSourceLocator(element));
-                                  }
-                                target.put(paramName, xpath.compile(select));
-                              }
-                            else if (!nodeset.isEmpty())
-                              {
-                                target.put(paramName, nodeset);
-                              }
-                            else
-                              {
-                                target.put(paramName, "");
-                              }
-                          }
-                        else if ("include".equals(name))
-                          {
-                            // TODO
-                          }
-                        else if ("import".equals(name))
-                          {
-                            // TODO
-                          }
-                        else if ("output".equals(name))
-                          {
-                            String method = element.getAttribute("method");
-                            if ("xml".equals(method))
-                              {
-                                outputMethod = OUTPUT_XML;
-                              }
-                            else if ("html".equals(method))
-                              {
-                                outputMethod = OUTPUT_HTML;
-                              }
-                            else if ("text".equals(method))
-                              {
-                                outputMethod = OUTPUT_TEXT;
-                              }
-                            else
-                              {
-                                throw new TransformerConfigurationException("unsupported output method: " + method, new DOMSourceLocator(element));
-                              }
-                            outputPublicId = element.getAttribute("public-id");
-                            outputSystemId = element.getAttribute("system-id");
-                          }
-                        else if ("preserve-space".equals(name))
-                          {
-                            String elements = element.getAttribute("elements");
-                            StringTokenizer st = new StringTokenizer(elements,
-                                                                     " ");
-                            while (st.hasMoreTokens())
-                              {
-                                preserveSpace.add(QName.valueOf(st.nextToken()));
-                              }
-                          }
-                        else if ("strip-space".equals(name))
-                          {
-                            String elements = element.getAttribute("elements");
-                            StringTokenizer st = new StringTokenizer(elements,
-                                                                     " ");
-                            while (st.hasMoreTokens())
-                              {
-                                stripSpace.add(QName.valueOf(st.nextToken()));
-                              }
-                          }
-                        // TODO keys
-                        // TODO decimal-format
-                        // TODO namespace-alias
-                        // TODO attribute-set
+                        throw new TransformerConfigurationException("parameter has both select and content", new DOMSourceLocator(element));
                       }
+                    target.put(paramName,
+                               factory.xpath.compile(select));
+                  }
+                else if (content != null)
+                  {
+                    target.put(paramName, content);
+                  }
+                else
+                  {
+                    target.put(paramName, "");
+                  }
+                parse(element.getNextSibling(), false);
+              }
+            else if ("include".equals(name) || "import".equals(name))
+              {
+                int p = "import".equals(name) ? -1 : 0;
+                String systemId = element.getAttribute("href");
+                Source source = new StreamSource(systemId);
+                Stylesheet stylesheet =
+                  factory.newStylesheet(source, precedence + p);
+                templates.addAll(stylesheet.templates);
+                parse(element.getNextSibling(), false);
+              }
+            else if ("output".equals(name))
+              {
+                String method = element.getAttribute("method");
+                if ("xml".equals(method))
+                  {
+                    outputMethod = OUTPUT_XML;
+                  }
+                else if ("html".equals(method))
+                  {
+                    outputMethod = OUTPUT_HTML;
+                  }
+                else if ("text".equals(method))
+                  {
+                    outputMethod = OUTPUT_TEXT;
+                  }
+                else
+                  {
+                    throw new TransformerConfigurationException("unsupported output method: " + method, new DOMSourceLocator(element));
+                  }
+                outputPublicId = element.getAttribute("public-id");
+                outputSystemId = element.getAttribute("system-id");
+                outputEncoding = element.getAttribute("encoding");
+                String indent = element.getAttribute("indent");
+                outputIndent = "yes".equals(indent);
+                parse(element.getNextSibling(), false);
+              }
+            else if ("preserve-space".equals(name))
+              {
+                String elements = element.getAttribute("elements");
+                StringTokenizer st = new StringTokenizer(elements,
+                                                         " ");
+                while (st.hasMoreTokens())
+                  {
+                    preserveSpace.add(QName.valueOf(st.nextToken()));
+                  }
+                parse(element.getNextSibling(), false);
+              }
+            else if ("strip-space".equals(name))
+              {
+                String elements = element.getAttribute("elements");
+                StringTokenizer st = new StringTokenizer(elements,
+                                                         " ");
+                while (st.hasMoreTokens())
+                  {
+                    stripSpace.add(QName.valueOf(st.nextToken()));
+                  }
+                parse(element.getNextSibling(), false);
+              }
+            // TODO keys
+            // TODO decimal-format
+            // TODO namespace-alias
+            else if ("attribute-set".equals(name))
+              {
+                String asName = element.getAttribute("name");
+                String uas = element.getAttribute("use-attribute-sets");
+                attributeSets.put(asName, element.getFirstChild());
+                if (uas != null)
+                  {
+                    usedAttributeSets.put(asName, uas);
                   }
               }
+            else
+              {
+                // Forwards-compatible processing: ignore unknown XSL
+                // elements
+                parse(element.getNextSibling(), false);
+              }
+          }
+        else if (root)
+          {
+            // Literal document element
+            Attr versionNode =
+              ((Element)node).getAttributeNodeNS(XSL_NS, "version");
+            if (versionNode == null)
+              {
+                String msg = "no xsl:version attribute on literal result node";
+                DOMSourceLocator l = new DOMSourceLocator(node);
+                throw new TransformerConfigurationException(msg, l);
+              }
+            version = versionNode.getValue();
+            Node rootClone = node.cloneNode(true);
+            NamedNodeMap attrs = rootClone.getAttributes();
+            attrs.removeNamedItemNS(XSL_NS, "version");
+            templates.add(new Template(this,
+                                       null,
+                                       new Root(),
+                                       rootClone,
+                                       precedence,
+                                       Template.DEFAULT_PRIORITY,
+                                       null));
           }
         else
           {
-            // Literal document element
-            Attr versionNode = root.getAttributeNodeNS(XSL_NS, "version");
-            if (versionNode == null)
-              {
-                throw new TransformerConfigurationException("no xsl:version attribute on literal result node", new DOMSourceLocator(root));
-              }
-            version = versionNode.getValue();
-            Node rootClone = root.cloneNode(true);
-            NamedNodeMap attrs = rootClone.getAttributes();
-            attrs.removeNamedItemNS(XSL_NS, "version");
-            templates.add(new Template(xpath, "/",
-                                       Collections.singletonList(rootClone),
-                                       precedence, Template.DEFAULT_PRIORITY,
-                                       null));
+            // Skip unknown elements, text, comments, etc
+            parse(node.getNextSibling(), false);
           }
       }
     catch (DOMException e)
@@ -302,45 +331,21 @@ class Stylesheet
       }
   }
 
-  Collection getNodeSet(Node parent)
-  {
-    Collection nodeset = new LinkedList();
-    NodeList tc = parent.getChildNodes();
-    int tl = tc.getLength();
-    for (int j = 0; j < tl; j++)
-      {
-        nodeset.add(tc.item(j));
-      }
-    return nodeset;
-  }
-
-  void applyTemplates(Node context, String select, String mode,
+  void applyTemplates(Node context, Expr select, String mode,
                       Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (select == null || select.length() == 0)
+    Object ret = select.evaluate(context);
+    //System.out.println("applyTemplates: "+select+" selected "+ret);
+    if (ret != null && ret instanceof Collection)
       {
-        select = "child::node()";
-      }
-    try
-      {
-        Object ret = xpath.evaluate(select, context,
-                                    XPathConstants.NODESET);
-        //System.out.println("applyTemplates: "+select+" selected "+ret);
-        if (ret != null && ret instanceof Collection)
+        Collection ns = (Collection) ret;
+        // TODO sort
+        for (Iterator i = ns.iterator(); i.hasNext(); )
           {
-            Collection ns = (Collection) ret;
-            // TODO sort
-            for (Iterator i = ns.iterator(); i.hasNext(); )
-              {
-                Node subject = (Node) i.next();
-                applyTemplates(context, subject, mode, parent, nextSibling);
-              }
+            Node subject = (Node) i.next();
+            applyTemplates(context, subject, mode, parent, nextSibling);
           }
-      }
-    catch (XPathExpressionException e)
-      {
-        throw new TransformerException(select, e);
       }
   }
 
@@ -365,6 +370,21 @@ class Stylesheet
           (Template) candidates.iterator().next();
         //System.out.println("applyTemplates: template="+t.expr+" subject="+subject);
         t.apply(this, subject, mode, parent, nextSibling);
+      }
+  }
+
+  void callTemplate(Node context, String name, String mode,
+                    Node parent, Node nextSibling)
+    throws TransformerException
+  {
+    for (Iterator j = templates.iterator(); j.hasNext(); )
+      {
+        Template t = (Template) j.next();
+        if (name.equals(t.name))
+          {
+            t.apply(this, context, mode, parent, nextSibling);
+            return;
+          }
       }
   }
     

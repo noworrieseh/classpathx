@@ -1,3 +1,8 @@
+2004-11-02  Chris Burdess  <dog@gnu.org>
+
+   	* transform: Fully compiled templates; many more XSL language
+   	features supported; stream, SAX, and DOM results.
+   	
 2004-10-31  Chris Burdess  <dog@gnu.org>
 
 	* DomNode.java: Implement Comparable using natural document order. 

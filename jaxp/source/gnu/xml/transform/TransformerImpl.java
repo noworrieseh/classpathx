@@ -38,6 +38,9 @@
 
 package gnu.xml.transform;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -51,9 +54,21 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
+import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.NodeTypeTest;
+import gnu.xml.xpath.Selector;
+import gnu.xml.xpath.Test;
 
 class TransformerImpl
   extends Transformer
@@ -81,10 +96,14 @@ class TransformerImpl
   {
     DOMSource source =
       new DOMSourceWrapper(xmlSource, uriResolver, errorListener);
-    DOMResult result = new DOMResultWrapper(outputTarget);
     Node context = source.getNode();
-    Node parent = result.getNode();
-    Node nextSibling = result.getNextSibling();
+    Node parent = null, nextSibling = null;
+    if (outputTarget instanceof DOMResult)
+      {
+        DOMResult dr = (DOMResult) outputTarget;
+        parent = dr.getNode();
+        nextSibling = dr.getNextSibling();
+      }
     boolean created = false;
     if (parent == null)
       {
@@ -93,11 +112,133 @@ class TransformerImpl
         parent = doc.createDocumentFragment();
         created = true;
       }
-    stylesheet.applyTemplates(context, (String) null, null,
-                              parent, nextSibling);
-    if (created)
+    int outputMethod = Stylesheet.OUTPUT_XML;
+    String encoding = null;
+    if (stylesheet != null)
       {
-        result.setNode(parent);
+        // XSLT transformation
+        Test t = new NodeTypeTest((short) 0);
+        Expr select =
+          new Selector(Selector.CHILD, Collections.singletonList(t));
+        stylesheet.applyTemplates(context, select, null,
+                                  parent, nextSibling);
+        outputMethod = stylesheet.outputMethod;
+        encoding = stylesheet.outputEncoding;
+        // TODO stylesheet.outputIndent
+        String publicId = stylesheet.outputPublicId;
+        if (publicId.length() == 0)
+          {
+            publicId = null;
+          }
+        String systemId = stylesheet.outputSystemId;
+        if (systemId.length() == 0)
+          {
+            systemId = null;
+          }
+        
+        if (created)
+          {
+            Node root = parent.getFirstChild();
+            while (root != null && root.getNodeType() != Node.ELEMENT_NODE)
+              {
+                root = root.getNextSibling();
+              }
+            // Now that we know the name of the root element we can create
+            // the document
+            Document doc = (context instanceof Document) ? (Document) context :
+              context.getOwnerDocument();
+            DOMImplementation impl = doc.getImplementation();
+            DocumentType doctype = (publicId != null || systemId != null) ?
+              impl.createDocumentType(root.getNodeName(), publicId, systemId) :
+              null;
+            Document newDoc = impl.createDocument(root.getNamespaceURI(),
+                                                  root.getNodeName(), doctype);
+            Node newRoot = newDoc.getDocumentElement();
+            copyAttributes(newDoc, root, newRoot);
+            copyChildren(newDoc, root, newRoot);
+            parent = newDoc;
+          }
+      }
+    else
+      {
+        // Identity transform
+        Node clone = context.cloneNode(true);
+        if (nextSibling != null)
+          {
+            parent.insertBefore(clone, nextSibling);
+          }
+        else
+          {
+            parent.appendChild(clone);
+          }
+      }
+    if (outputTarget instanceof DOMResult)
+      {
+        if (created)
+          {
+            ((DOMResult) outputTarget).setNode(parent);
+          }
+      }
+    else if (outputTarget instanceof StreamResult)
+      {
+        StreamResult sr = (StreamResult) outputTarget;
+        try
+          {
+            OutputStream out = sr.getOutputStream();
+            StreamSerializer serializer = new StreamSerializer(encoding);
+            serializer.serialize(parent, out, outputMethod);
+            out.close();
+          }
+        catch (IOException e)
+          {
+            errorListener.error(new TransformerException(e));
+          }
+      }
+    else if (outputTarget instanceof SAXResult)
+      {
+        SAXResult sr = (SAXResult) outputTarget;
+        try
+          {
+            ContentHandler ch = sr.getHandler();
+            LexicalHandler lh = sr.getLexicalHandler();
+            if (lh == null && ch instanceof LexicalHandler)
+              {
+                lh = (LexicalHandler) ch;
+              }
+            SAXSerializer serializer = new SAXSerializer();
+            serializer.serialize(parent, ch, lh);
+          }
+        catch (SAXException e)
+          {
+            errorListener.error(new TransformerException(e));
+          }
+      }
+  }
+
+  void copyAttributes(Document dstDoc, Node src, Node dst)
+  {
+    NamedNodeMap srcAttrs = src.getAttributes();
+    NamedNodeMap dstAttrs = dst.getAttributes();
+    if (srcAttrs != null && dstAttrs != null)
+      {
+        int len = srcAttrs.getLength();
+        for (int i = 0; i < len; i++)
+          {
+            Node node = srcAttrs.item(i);
+            node = dstDoc.adoptNode(node);
+            dstAttrs.setNamedItemNS(node);
+          }
+      }
+  }
+
+  void copyChildren(Document dstDoc, Node src, Node dst)
+  {
+    Node srcChild = src.getFirstChild();
+    while (srcChild != null)
+      {
+        Node dstChild = dstDoc.adoptNode(srcChild);
+        dst.appendChild(dstChild);
+        srcChild = srcChild.getNextSibling();
       }
   }
 

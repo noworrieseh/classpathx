@@ -725,7 +725,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: acinclude.m4,v 1.11 2004-10-27 18:20:33 dog Exp $
+# $Id: acinclude.m4,v 1.12 2004-11-02 17:03:05 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,
@@ -893,14 +893,12 @@ main()
  /* Compare xml2-config output to the libxml headers */
   if ((xml_major_version != $xml_config_major_version) ||
       (xml_minor_version > $xml_config_minor_version)
-#if 0
       ||
 /* The last released version of libxml-1.x has an incorrect micro version in
  * the header file so neither the includes nor the library will match the
  * micro_version to the output of xml2-config
  */
       (xml_micro_version != $xml_config_micro_version)
-#endif 
 	  )
 	  
     {
@@ -917,10 +915,10 @@ main()
     LIBXML_TEST_VERSION;
 
     /* Test that the library is greater than or equal to our minimum version */
-    if (($xml_config_major_version > major) ||
-        (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
-        (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
-        ($xml_config_micro_version >= micro)))
+    if ((xml_major_version > major) ||
+        ((xml_major_version == major) && (xml_minor_version > minor)) ||
+        ((xml_major_version == major) && (xml_minor_version == minor) &&
+        (xml_micro_version >= micro)))
       {
         return 0;
        }

@@ -1,5 +1,5 @@
 /*
- * DOMResultWrapper.java
+ * WhenNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,88 +38,46 @@
 
 package gnu.xml.transform;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import javax.xml.transform.Result;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * A DOM result that wraps an underlying result.
+ * A template node representing an XSL <code>when</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class DOMResultWrapper
-  extends DOMResult
+final class WhenNode
+  extends TemplateNode
 {
 
-  final Result result;
+  final Expr test;
 
-  DOMResultWrapper(Result result)
+  WhenNode(TemplateNode children, TemplateNode next, Expr test)
   {
-    this.result = result;
+    super(children, next);
+    this.test = test;
   }
-  
-  public Node getNode()
+
+  void apply(Stylesheet stylesheet, Node context, String mode,
+             Node parent, Node nextSibling)
+    throws TransformerException
   {
-    if (result instanceof DOMResult)
+    Object ret = test.evaluate(context);
+    if (ret instanceof Boolean && ((Boolean) ret).booleanValue())
       {
-        return ((DOMResult) result).getNode();
-      }
-    return null;
-  }
-
-  public Node getNextSibling()
-  {
-    if (result instanceof DOMResult)
-      {
-        return ((DOMResult) result).getNextSibling();
-      }
-    return null;
-  }
-
-  public String getSystemId()
-  {
-    return result.getSystemId();
-  }
-
-  public void setSystemId(String systemId)
-  {
-    result.setSystemId(systemId);
-  }
-
-  public void setNode(Node node)
-  {
-    if (result instanceof DOMResult)
-      {
-        ((DOMResult) result).setNode(node);
-      }
-    else if (result instanceof StreamResult)
-      {
-        try
+        if (children != null)
           {
-            StreamResult sr = (StreamResult) result;
-            OutputStream out = sr.getOutputStream();
-            DOMSerializer.serialize(node, out);
-            out.close();
-          }
-        catch (IOException e)
-          {
-            // TODO
-            e.printStackTrace();
+            children.apply(stylesheet, context, mode, parent, nextSibling);
           }
       }
-    else if (result instanceof SAXResult)
+    else
       {
-        // TODO
+        if (next != null)
+          {
+            next.apply(stylesheet, context, mode, parent, nextSibling);
+          }
       }
-  }
-
-  public void setNextSibling(Node node)
-  {
-    // Will never be called by transform
   }
   
 }

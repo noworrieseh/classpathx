@@ -868,7 +868,7 @@ nyi (); // FIXME createTreeWalker
           DomNode node = (DomNode) source;
           if (node.parent != null)
             {
-              return null;
+              node = (DomNode) node.cloneNode(true);
             }
           node.owner = this;
           return node;
