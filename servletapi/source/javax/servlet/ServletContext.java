@@ -389,4 +389,13 @@ public interface ServletContext
    *   instead; now this always returns an empty <code>Enumeration</code>.
    */
   Enumeration getServletNames();
+
+  /**
+   * Get the Servlet Context Name
+   *
+   * @return Name of the web-app or null if the context has no name.
+   * 
+   * @since Servlet API 2.3
+   */
+  String getServletContextName();
 }
