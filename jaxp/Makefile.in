@@ -227,7 +227,28 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/JAXPFactory.java \
 	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
 	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
-	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java
+	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomAttr.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomCDATA.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomCharacterData.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomComment.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomDoctype.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomDocument.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomElement.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomEntity.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomEntityReference.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomEvent.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomEx.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomExtern.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomFragment.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomImpl.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomIterator.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomNamedNodeMap.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomNode.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomNotation.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomNsNode.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomPI.java \
+	$(SOURCEDIR)/gnu/xml/dom/DomText.java
 
 #a mangling of the SOURCEFILES list above
 #This is not quite perfect, we've had to harcode the 
@@ -265,7 +286,7 @@ all: $(LIBNAME).jar
 # for normal development
 # must rerun "make" after this
 clean:
-	-rm -rf $(LIBNAME).jar $(CC-DESTDIR) Log
+	-rm -rf $(LIBNAME).jar $(CC-DESTDIR) Log apidoc apidoc.zip
 
 # must rerun configure after this
 distclean:	clean
@@ -274,6 +295,40 @@ distclean:	clean
 # must rerun autoconf (and configure) after this
 mrproper:	distclean
 	-rm -f configure
+
+javadoc:
+	-rm -rf apidoc
+	mkdir -p apidoc
+	javadoc -d apidoc \
+	    -windowtitle "GNU JAXP Library" \
+	    -nodeprecatedlist \
+	    -version -author \
+	    -footer "<p>Source code is GPL'd at \
+		<a href='http://savannah.gnu.org/projects/classpathx'> \
+		http://savannah.gnu.org/projects/classpathx</a> \
+		<br>This documentation was derived from that\
+		source code on `date -I`.\
+		</p>" \
+	    -classpath "$(SOURCEDIR)" \
+	    \
+	    -group "SAX2/AElfred2 XML Utilities (Free Software)" \
+	    	"gnu.xml.aelfred2:gnu.xml.pipeline:gnu.xml.util" \
+	    -group "DOM2, implementing DOM Level 2 (Free Software)" \
+	    	"gnu.xml.dom" \
+	    \
+	    -group "SAX and SAX2 (Free Software)" \
+	    	"org.xml.sax:org.xml.sax.ext:org.xml.sax.helpers" \
+	    -group "DOM Level 2 (W3C)" \
+	    	"org.w3c.*" \
+	    -group "Java API for XML (v1.1) (Sun)" \
+	    	"javax.xml.*" \
+	    \
+	    gnu.xml.aelfred2 gnu.xml.util \
+	    gnu.xml.dom \
+	    org.xml.sax org.xml.sax.ext org.xml.sax.helpers \
+	    org.w3c.dom \
+	    javax.xml.parsers
+	zip -9qr apidoc.zip apidoc
 
 ##useful rules that handle unpacking the jar files properly
 
@@ -313,7 +368,7 @@ $(LIBNAME): compile
 #The problem is that it does not recognise the existance of files created
 #within commands caused by pre-requisites.
 compile: $(CLASSESLIST)
-	-mkdir $(CC-DESTDIR)
+	mkdir -p $(CC-DESTDIR)
 	if [ -e filelist.mak ] ; then \
 	  javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak  ; \
 	  rm filelist.mak ; \
