@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_io.h,v 1.1.1.1 2003-02-27 01:22:23 julian Exp $
+ * $Id: xmlj_io.h,v 1.2 2003-02-27 13:01:16 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -36,9 +36,6 @@ void xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
 					const char *outputEncoding);
 xmlParserInputPtr  xmljLoadExternalEntity (const char *URL, const char *ID,
 					      xmlParserCtxtPtr ctxt);
-void xmljSetGlobalJNIEnv (JNIEnv * env);
-void xmljClearGlobalJNIEnv ();
-JNIEnv * xmljGetGlobalJNIEnv ();
 jobject xmljResolveURI (SaxErrorContext * saxErrorContext, const char *URL,
 			  const char *ID);
 xmlDocPtr
@@ -46,10 +43,13 @@ xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
 		       const char *URL, const char *ID);
 
 void
-xmljSetGlobalContext (SaxErrorContext * ctxt);
+xmljSetThreadContext (SaxErrorContext *ctxt);
+
+SaxErrorContext *
+xmljGetThreadContext (void);
 
 void
-xmljClearGlobalContext ();
+xmljClearThreadContext ();
 
 
 #endif	/* !defined XMLJ_IO_H */

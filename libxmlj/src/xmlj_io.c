@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_io.c,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: xmlj_io.c,v 1.2 2003-02-27 13:01:16 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -31,6 +31,8 @@
 
 #include <libxml/xmlIO.h>
 #include <libxml/parserInternals.h>
+
+#include <pthread.h>
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
@@ -261,59 +263,6 @@ xmljDetectCharEncoding (JNIEnv * env, jobject pushbackInputStream)
     }
 }
 
-/*
- *  Following is a non-thread safe hack which allows to access the
- *  Java environment from xmljLoadExternalEntity(). Should be removed
- *  as soon as parent context can be passed to entity loader.
- */
-
-SaxErrorContext *globalContext;
-
-/*
-JNIEnv *globalEnv;
-
-void
-xmljSetGlobalJNIEnv (JNIEnv * env)
-{
-  globalEnv = env;
-}
-
-void
-xmljClearGlobalJNIEnv ()
-{
-  globalEnv = NULL;
-}
-
-JNIEnv *
-xmljGetGlobalJNIEnv ()
-{
-  return globalEnv;
-}
-*/
-
-void
-xmljSetGlobalContext (SaxErrorContext * ctxt)
-{
-  globalContext = ctxt;
-}
-
-void
-xmljClearGlobalContext ()
-{
-  globalContext = NULL;
-}
-
-SaxErrorContext *
-xmljGetGlobalContext ()
-{
-  return globalContext;
-}
-
-/*
- *  Hack end
- */
-
-
 xmlParserCtxtPtr
 xmljEstablishParserContext (JNIEnv * env,
 			    jobject inputStream,
@@ -403,7 +352,7 @@ xmljParseJavaInputStream (JNIEnv * env,
 
   if (NULL != inputParserCtx)
     {
-      xmljSetGlobalContext ((SaxErrorContext *) inputParserCtx->_private);
+      xmljSetThreadContext ((SaxErrorContext *) inputParserCtx->_private);
 
       if (0 == xmlParseDocument (inputParserCtx))
 	{
@@ -414,7 +363,7 @@ xmljParseJavaInputStream (JNIEnv * env,
 	  /* ... */
 	}
 
-      xmljClearGlobalContext ();
+      xmljClearThreadContext ();
 
       xmljReleaseParserContext (inputParserCtx);
     }
@@ -520,7 +469,7 @@ xmljLoadExternalEntity (const char *URL, const char *ID,
 			xmlParserCtxtPtr ctxt)
 {
 
-  SaxErrorContext *saxErrorContext = xmljGetGlobalContext ();
+  SaxErrorContext *saxErrorContext = xmljGetThreadContext ();
 
   JNIEnv *env = saxErrorContext->env;
 
@@ -587,4 +536,37 @@ xmljLoadExternalEntity (const char *URL, const char *ID,
 	  (char *) xmlStrdup ((const xmlChar *) inputStream->directory);
       return (inputStream);
     }
+}
+
+/* Key for the thread-specific buffer */
+static pthread_key_t thread_context_key;
+
+/* Once-only initialisation of the key */
+static pthread_once_t thread_context_once = PTHREAD_ONCE_INIT;
+
+/* Allocate the key */
+static void 
+thread_context_key_alloc()
+{
+  pthread_key_create(&thread_context_key, NULL);
+}
+
+void 
+xmljSetThreadContext(SaxErrorContext *context)
+{
+  pthread_once(&thread_context_once, thread_context_key_alloc);
+  pthread_setspecific(thread_context_key, context);
+}
+
+void 
+xmljClearThreadContext(void)
+{
+  pthread_setspecific(thread_context_key, NULL);
+}
+
+/* Return the thread-specific buffer */
+SaxErrorContext *
+xmljGetThreadContext(void)
+{
+  return (SaxErrorContext *) pthread_getspecific(thread_context_key);
 }
