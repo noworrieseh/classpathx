@@ -47,6 +47,14 @@ implements Locator
     {
       this.ctx = ctx;
       this.loc = loc;
+      if (ctx == 0L)
+        {
+          throw new NullPointerException ("ctx");
+        }
+      if (loc == 0L)
+        {
+          throw new NullPointerException ("loc");
+        }
     }
 
   public String getPublicId ()

@@ -264,7 +264,7 @@ xmljFreeOutputStreamContext (OutputStreamContext * outContext)
 
 SAXParseContext *
 xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx,
-                        jstring systemId)
+                        jstring publicId, jstring systemId)
 {
   SAXParseContext *ret;
   
@@ -274,6 +274,7 @@ xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx,
   ret->ctx = ctx;
   ret->sax = ctx->sax;
   ret->loc = NULL;
+  ret->publicId = publicId;
   ret->systemId = systemId;
   
   ret->startDTD = NULL;
@@ -441,7 +442,7 @@ xmljParseDocument (JNIEnv * env,
                               validate, coalesce, expandEntities);
   if (ctx != NULL)
     {
-      saxCtx = xmljNewSAXParseContext (env, self, ctx, systemId);
+      saxCtx = xmljNewSAXParseContext (env, self, ctx, publicId, systemId);
       if (saxCtx != NULL)
         {
           sax = xmljNewSAXHandler (contentHandler ? NULL : ctx->sax,

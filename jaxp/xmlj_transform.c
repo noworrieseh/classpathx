@@ -272,7 +272,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
     }
 
   saxParseContext = 
-    xmljNewSAXParseContext (env, javaContext, ctx, inSystemId);
+    xmljNewSAXParseContext (env, javaContext, ctx, inPublicId, inSystemId);
   if (saxParseContext == NULL)
     {
       xmljFreeParserContext (ctx);

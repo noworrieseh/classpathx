@@ -51,6 +51,7 @@ typedef struct _SAXParseContext
   xmlParserCtxtPtr ctx; /* libxml2 parser context */
   xmlSAXLocatorPtr loc; /* libxml2 SAX locator */
   xmlSAXHandlerPtr sax; /* pristine SAX handler */
+  jstring publicId;
   jstring systemId;
 
   jmethodID startDTD;
@@ -82,7 +83,7 @@ SAXParseContext;
 
 SAXParseContext *
 xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx,
-                        jstring systemId);
+                        jstring publicId, jstring systemId);
 
 void
 xmljFreeSAXParseContext (SAXParseContext * saxCtx);

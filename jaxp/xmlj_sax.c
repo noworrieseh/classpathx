@@ -42,10 +42,13 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
+  SAXParseContext *sax;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-  return xmljNewString (env, loc->getPublicId (ctx));
+  sax = (SAXParseContext *) ctx->_private;
+  
+  return sax->publicId;
 }
 
 JNIEXPORT jstring JNICALL
@@ -56,10 +59,13 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
+  SAXParseContext *sax;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-  return xmljNewString (env, loc->getSystemId (ctx));
+  sax = (SAXParseContext *) ctx->_private;
+  
+  return sax->systemId;
 }
 
 JNIEXPORT jint JNICALL
@@ -73,7 +79,11 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-  return loc->getLineNumber (ctx);
+  if (ctx == NULL || ctx->input == NULL)
+    {
+      return -1;
+    }
+  return ctx->input->line;
 }
 
 JNIEXPORT jint JNICALL
@@ -87,7 +97,11 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv * env,
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-  return loc->getColumnNumber (ctx);
+  if (ctx == NULL || ctx->input == NULL)
+    {
+      return -1;
+    }
+  return ctx->input->col;
 }
 
 /* -- GnomeXMLReader -- */
