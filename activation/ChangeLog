@@ -1,4 +1,9 @@
+2004-01-12  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Added META-INF files and javadoc generation.
+	* configure.ac: See above.
+
 2004-01-11  Chris Burdess  <dog@bluezoo.org>
 
-	* Makefile.am: Added javax.* classfiles to jar
+	* Makefile.am: Added javax.* classfiles to jar.
 

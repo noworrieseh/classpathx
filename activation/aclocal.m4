@@ -29,7 +29,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASS,[
 AC_REQUIRE([AC_PROG_JAVA])
@@ -133,7 +133,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASSPATH,[
 if test "x$CLASSPATH" = x; then
@@ -177,7 +177,7 @@ dnl     echo "exec @JUNIT@ my.package.name.AllJunitTests" >> $@
 dnl     chmod +x $@
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN([AC_CHECK_JUNIT],[
 AC_CACHE_VAL(ac_cv_prog_JUNIT,[
@@ -215,7 +215,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 
 AC_DEFUN(AC_CHECK_RQRD_CLASS,[
@@ -239,7 +239,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_JAVA_OPTIONS,[
 AC_ARG_WITH(java-prefix,
@@ -284,7 +284,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAR],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -360,7 +360,7 @@ dnl
 dnl    AC_OUTPUT(Makefile)
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -386,7 +386,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA_WORKS, [
 AC_CHECK_PROG(uudecode, uudecode$EXEEXT, yes)
@@ -500,7 +500,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -526,7 +526,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC_WORKS,[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
@@ -572,7 +572,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVADOC],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -592,7 +592,7 @@ dnl and looks for the jni.h header file. If available, JAVAH is set to
 dnl the full path of javah and CPPFLAGS is updated accordingly.
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVAH],[
 AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
@@ -627,7 +627,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_COMPILE_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -666,7 +666,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_RUN_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -706,7 +706,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.5 2004-01-11 11:32:07 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2004-01-12 17:06:23 dog Exp $
 dnl
 AC_DEFUN([AC_TRY_RUN_JAVA],[
 AC_REQUIRE([AC_PROG_JAVAC])dnl

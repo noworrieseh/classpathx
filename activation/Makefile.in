@@ -99,6 +99,7 @@ uudecode = @uudecode@
 
 src = source
 dst = classes
+doc = docs
 
 # Source files.
 sources = \
@@ -131,9 +132,15 @@ BUILT_SOURCES = activation.jar
 
 ACTIVATION_CLASSPATH = $(dst):$(src)
 META_INF = $(dst)/META-INF
-META_INF_FILES = $(META_INF)/COPYING
+META_INF_FILES = \
+$(META_INF)/COPYING \
+$(META_INF)/mailcap.default \
+$(META_INF)/mimetypes.default
+
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
+
+package_names = javax.activation
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -340,11 +347,19 @@ uninstall-am: uninstall-info-am
 activation.jar: meta-inf activation
 	$(JAR) cf activation.jar -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
 
-meta-inf: $(META_INF_FILES)
+meta-inf: $(META_INF) $(META_INF_FILES)
+
+$(META_INF):
+	test ! -d META-INF && mkdir -p META-INF
 
 $(META_INF)/COPYING: COPYING
-	mkdir -p $(META_INF)
 	cp COPYING $(META_INF)/
+
+$(META_INF)/mailcap.default: mailcap.default
+	cp mailcap.default $(META_INF)/
+
+$(META_INF)/mimetypes.default: mimetypes.default
+	cp mimetypes.default $(META_INF)/
 
 # Compilation
 
@@ -353,13 +368,19 @@ activation: $(classes)
 $(classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(ACTIVATION_CLASSPATH) -d $(dst) $<
 
+# Documentation
+
+javadoc:
+	mkdir -p $(doc)
+	$(JAVADOC) -d $(doc) -windowtitle "GNU JAF API documentation" \
+		-sourcepath $(src) $(package_names)
+
 clean-local:
-	rm $(META_INF_FILES)
-	rmdir $(META_INF)
+	rm -rf $(META_INF_FILES) $(META_INF) $(doc)
 	find $(dst) -name '*.class' -exec rm -f '{}' ';'
 
 distclean-local: clean-local
-	rm -f Makefile config.log config.status
+	rm -f config.log config.status
 
 # End of Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
