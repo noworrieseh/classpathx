@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.13 2001-08-09 18:33:20 db Exp $
+ * $Id: XmlParser.java,v 1.14 2001-10-07 03:56:13 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.13 2001-08-09 18:33:20 db Exp $
+// $Id: XmlParser.java,v 1.14 2001-10-07 03:56:13 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-08-09 18:33:20 $
+ * @version $Date: 2001-10-07 03:56:13 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -797,7 +797,7 @@ final class XmlParser
 
 	// Read the External subset's IDs
 	skipWhitespace ();
-	ids = readExternalIds (false);
+	ids = readExternalIds (false, true);
 
 	// report (a) declaration of name, (b) lexical info (ids)
 	handler.doctypeDecl (doctypeName, ids [0], ids [1]);
@@ -824,6 +824,8 @@ final class XmlParser
 
 	// Read the external subset, if any
 	if (ids [1] != null) {
+	    ids [1] = absolutize (ids [1]);
+
 	    // NOTE:  [dtd] is so we say what SAX2 expects,
 	    // even though it's misleading, 
 	    pushURL ("[dtd]", ids [0], ids [1], null, null, null);
@@ -1820,10 +1822,8 @@ loop2:
 	    setInternalEntity (name, value);
 	} else {
 	    // Read the external IDs
-	    String ids [] = readExternalIds (false);
-	    if (ids [1] == null) {
-		error ("system identifer missing", name, null);
-	    }
+	    String ids [] = readExternalIds (false, false);
+	    String absolute = absolutize (ids [1]);
 
 	    // Check for NDATA declaration.
 	    boolean white = tryWhitespace ();
@@ -1832,9 +1832,14 @@ loop2:
 		    error ("whitespace required before NDATA");
 		requireWhitespace ();
 		String notationName = readNmtoken (true);
-		setExternalDataEntity (name, ids [0], ids [1], notationName);
+		setEntity (name, ENTITY_NDATA, ids [0], absolute,
+			null, notationName);
+		handler.getDTDHandler ()
+		    .unparsedEntityDecl (name, ids [0], ids [1], notationName);
 	    } else {
-		setExternalTextEntity (name, ids [0], ids [1]);
+		setEntity (name, ENTITY_TEXT, ids [0], absolute, null, null);
+		handler.getDeclHandler ()
+		    .externalEntityDecl (name, ids [0], ids [1]);
 	    }
 	}
 
@@ -1865,10 +1870,7 @@ loop2:
 	requireWhitespace ();
 
 	// Read the external identifiers.
-	ids = readExternalIds (true);
-	if (ids [0] == null && ids [1] == null) {
-	    error ("external identifer missing", nname, null);
-	}
+	ids = readExternalIds (true, false);
 
 	// Register the notation.
 	setNotation (nname, ids [0], ids [1]);
@@ -2306,10 +2308,11 @@ loop:
     /**
      * Try reading external identifiers.
      * A system identifier is not required for notations.
-     * @param inNotation Are we in a notation?
-     * @return A two-member String array containing the identifiers.
+     * @param inNotation Are we parsing a notation decl?
+     * @param isSubset Parsing external subset decl (may be omitted)?
+     * @return A two-member String array containing the identifiers, or nulls.
      */
-    private String[] readExternalIds (boolean inNotation)
+    private String[] readExternalIds (boolean inNotation, boolean isSubset)
     throws Exception
     {
 	char	c;
@@ -2345,42 +2348,41 @@ loop:
 	} else if (tryRead ("SYSTEM")) {
 	    requireWhitespace ();
 	    ids [1] = readLiteral (flags);
-	} 
-
-// FIXME:  SAX spec says these always get absolutized ... 
-
-	// postprocessing for URIs
-	if (ids [1] != null && !inNotation) {
-
-	    // XXX should probably normalize system IDs as follows:
-	    // - Convert to UTF-8
-	    // - Map reserved and non-ASCII characters to %HH
-	    // Unclear if that needs to be done before passing URIs
-	    // to the JVM, or how the JVM does handles non-ASCII...
-
-	    // absolutize the system ID immediately,
-	    // relative to the appropriate base URI
-	    try {
-		URL	base;
-
-		if (externalEntity != null)
-		    base = externalEntity.getURL ();
-		else if (baseURI != null)
-		    base = new URL (baseURI);
-		else {
-		    handler.warn ("No base URI; hope this is absolute: "
-			    + ids [1]);
-		    base = null;
-		}
-		if (base != null)
-		    ids [1] = new URL (base, ids [1]).toString ();
-	    } catch (MalformedURLException e) {
-		handler.warn ("Can't understand URI, hope it's absolute: <"
-			+ ids [1] + ">");
-	    }
-	}
+	} else if (!isSubset) 
+		error ("missing SYSTEM or PUBLIC keyword");
 
 	return ids;
+    }
+
+    // absolutize a system ID relative to the appropriate base URI
+    private String absolutize (String uri)
+    throws SAXException
+    {
+	// XXX should probably normalize system IDs as follows:
+	// - Convert to UTF-8
+	// - Map reserved and non-ASCII characters to %HH
+	// Unclear if that needs to be done before passing URIs
+	// to the JVM, or how the JVM does handles non-ASCII...
+
+	try {
+	    URL	base;
+
+	    if (externalEntity != null)
+		base = externalEntity.getURL ();
+	    else if (baseURI != null)
+		base = new URL (baseURI);
+	    else {
+		handler.warn ("No base URI; hope this is absolute: "
+			+ uri);
+		base = null;
+	    }
+	    if (base != null)
+		uri = new URL (base, uri).toString ();
+	} catch (MalformedURLException e) {
+	    handler.warn ("Can't understand URI, hope it's absolute: <"
+		    + uri + ">");
+	}
+	return uri;
     }
 
 
@@ -3127,32 +3129,6 @@ loop:
 	    return;
 	handler.getDeclHandler ()
 	    .internalEntityDecl (eName, value);
-    }
-
-
-    /**
-     * Register an external data entity.
-     */
-    private void setExternalDataEntity (String eName, String pubid,
-				 String sysid, String nName)
-    throws SAXException
-    {
-	setEntity (eName, ENTITY_NDATA, pubid, sysid, null, nName);
-	handler.getDTDHandler ()
-	    .unparsedEntityDecl (eName, pubid, sysid, nName);
-    }
-
-
-    /**
-     * Register an external text entity.
-     */
-    private void setExternalTextEntity (String eName,
-		    String pubid, String sysid)
-    throws SAXException
-    {
-	setEntity (eName, ENTITY_TEXT, pubid, sysid, null, null);
-	handler.getDeclHandler ()
-	    .externalEntityDecl (eName, pubid, sysid);
     }
 
 
