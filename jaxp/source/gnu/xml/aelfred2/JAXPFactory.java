@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.3 2001-07-05 02:42:56 db Exp $
+ * $Id: JAXPFactory.java,v 1.4 2001-07-13 17:39:26 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -63,7 +63,7 @@ public final class JAXPFactory extends SAXParserFactory
 		SAXDriver.FEATURE + "namespaces",
 		isNamespaceAware ());
 	parser.setFeature (
-		SAXDriver.FEATURE + "validating",
+		SAXDriver.FEATURE + "validation",
 		isValidating ());
 	// that makes SAX2 feature flags trump JAXP
 
