@@ -43,6 +43,8 @@ import java.util.List;
 import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.FolderNotFoundException;
+import javax.mail.IllegalWriteException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
@@ -197,19 +199,15 @@ public final class MaildirFolder
     if (!maildir.exists() || !maildir.canRead())
       throw new FolderNotFoundException(this);
     // create subdirectories if necessary
-    try
-    {
-      if (!tmpdir.exists())
-        tmpdir.mkdirs();
-      if (!newdir.dir.exists())
-        newdir.dir.mkdirs();
-      if (!curdir.dir.exists())
-        curdir.dir.mkdirs();
-    }
-    catch (IOException e)
-    {
-      throw new FolderNotFoundException(this, "Can't create subdirectories");
-    }
+    boolean success = true;
+    if (!tmpdir.exists())
+      success = success && tmpdir.mkdirs();
+    if (!newdir.dir.exists())
+      success = success && newdir.dir.mkdirs();
+    if (!curdir.dir.exists())
+      success = success && curdir.dir.mkdirs();
+    if (!success)
+      throw new MessagingException("Unable to create directories");
     if (mode==READ_WRITE) 
     {
       if (!maildir.canWrite())
@@ -371,30 +369,23 @@ public final class MaildirFolder
     long timestamp = dir.dir.lastModified();
     if (timestamp==dir.timestamp)
       return;
-    try
+    File[] files = dir.dir.listFiles(filter);
+    int mlen = files.length;
+    dir.messages = new MaildirMessage[mlen];
+    for (int i=0; i<mlen; i++)
     {
-      File[] files = dir.dir.listFiles(filter);
-      int mlen = files.length;
-      dir.messages = new MaildirMessage[mlen];
-      for (int i=0; i<mlen; i++)
+      File file = files[i];
+      String uniq = file.getName();
+      String info = null;
+      int ci = uniq.indexOf(':');
+      if (ci!=-1)
       {
-        File file = files[i];
-        String uniq = file.getName();
-        String info = null;
-        int ci = uniq.indexOf(':');
-        if (ci!=-1)
-        {
-          info = uniq.substring(ci+1);
-          uniq = uniq.substring(0, ci);
-        }
-        dir.messages[i] = new MaildirMessage(this, file, uniq, info, i+1);
+        info = uniq.substring(ci+1);
+        uniq = uniq.substring(0, ci);
       }
-      dir.timestamp = timestamp;
+      dir.messages[i] = new MaildirMessage(this, file, uniq, info, i+1);
     }
-    catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
+    dir.timestamp = timestamp;
   }
 
   /**
@@ -404,28 +395,20 @@ public final class MaildirFolder
   void setSeen(MaildirMessage message, boolean seen)
     throws MessagingException
   {
-    try
+    File src = message.file;
+    File dst = null;
+    if (seen)
     {
-      File src = message.file;
-      if (seen)
-      {
-        String dstname = new StringBuffer(message.uniq)
-          .append(':')
-          .append(message.getInfo())
-          .toString();
-        File dst = new File(curdir.dir, dstname);
-        src.renameTo(dst);
-      }
-      else
-      {
-        File dst = new File(newdir.dir, message.uniq);
-        src.renameTo(dst);
-      }
+      String dstname = new StringBuffer(message.uniq)
+        .append(':')
+        .append(message.getInfo())
+        .toString();
+      dst = new File(curdir.dir, dstname);
     }
-    catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
+    else
+      dst = new File(newdir.dir, message.uniq);
+    if (!src.renameTo(dst))
+      throw new MessagingException("Unable to move message");
   }
 
   /**
@@ -626,7 +609,8 @@ public final class MaildirFolder
       case HOLDS_FOLDERS:
         try 
         {
-          maildir.mkdirs();
+          if (!maildir.mkdirs())
+            return false;
           this.type = type;
           notifyFolderListeners(FolderEvent.CREATED);
           return true;
@@ -638,21 +622,20 @@ public final class MaildirFolder
       case HOLDS_MESSAGES:
         try 
         {
+          boolean success = true;
           synchronized (this) 
           {
-            maildir.mkdirs();
-            tmpdir.mkdirs();
-            newdir.dir.mkdirs();
-            curdir.dir.mkdirs();
+            success = success && maildir.mkdirs();
+            success = success && tmpdir.mkdirs();
+            success = success && newdir.dir.mkdirs();
+            success = success && curdir.dir.mkdirs();
           }
+          if (!success)
+            return false;
           this.type = type;
           notifyFolderListeners(FolderEvent.CREATED);
           return true;
         } 
-        catch (IOException e) 
-        {
-          throw new MessagingException("I/O error writing mailbox", e);
-        }
         catch (SecurityException e) 
         {
           throw new MessagingException("Access denied", e);
@@ -678,7 +661,8 @@ public final class MaildirFolder
             if (!folders[i].delete(recurse))
               return false;
         }
-        delete(maildir);
+        if (!delete(maildir))
+          return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
       } 
@@ -697,7 +681,8 @@ public final class MaildirFolder
           if (folders.length>0)
             return false;
         }
-        delete(maildir);
+        if (!delete(maildir))
+          return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
       } 
@@ -711,16 +696,19 @@ public final class MaildirFolder
   /**
    * Depth-first file/directory delete.
    */
-  void delete(File file)
+  boolean delete(File file)
     throws SecurityException
   {
     if (file.isDirectory())
     {
       File[] files = file.listFiles();
       for (int i=0; i<files.length; i++)
-        delete(files[i]);
+      {
+        if (!delete(files[i]))
+          return false;
+      }
     }
-    file.delete();
+    return file.delete();
   }
 
   /**
