@@ -1,5 +1,5 @@
 /*
- * $Id: XmlReader.java,v 1.6 2001-11-05 22:55:20 db Exp $
+ * $Id: XmlReader.java,v 1.7 2001-11-09 22:55:43 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,13 +31,12 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.xml.sax.*;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.ext.*;
 
 import gnu.xml.pipeline.*;
 
 
-// $Id: XmlReader.java,v 1.6 2001-11-05 22:55:20 db Exp $
+// $Id: XmlReader.java,v 1.7 2001-11-09 22:55:43 db Exp $
 
 /**
  * This SAX2 parser optionally layers a validator over the &AElig;lfred2
@@ -61,7 +60,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.ValidationConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-11-05 22:55:20 $
+ * @version $Date: 2001-11-09 22:55:43 $
  */
 public final class XmlReader implements XMLReader
 {
@@ -82,7 +81,7 @@ public final class XmlReader implements XMLReader
     public XmlReader (boolean invalidIsFatal)
     {
 	if (invalidIsFatal)
-	    setErrorHandler (new DefaultHandler () {
+	    setErrorHandler (new DefaultHandler2 () {
 		public void error (SAXParseException e)
 		throws SAXException
 		    { throw e; }

@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.19 2001-11-09 20:26:43 db Exp $
+ * $Id: SAXDriver.java,v 1.20 2001-11-09 22:55:43 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -60,10 +60,8 @@ import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import gnu.xml.util.DefaultHandler;
 
-
-// $Id: SAXDriver.java,v 1.19 2001-11-09 20:26:43 db Exp $
+// $Id: SAXDriver.java,v 1.20 2001-11-09 22:55:43 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -118,13 +116,13 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-09 20:26:43 $
+ * @version $Date: 2001-11-09 22:55:43 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
     implements Locator, Attributes2, XMLReader, Parser, AttributeList
 {
-    private final DefaultHandler	base = new DefaultHandler ();
+    private final DefaultHandler2	base = new DefaultHandler2 ();
     private XmlParser			parser;
 
     private EntityResolver		entityResolver = base;
