@@ -11,6 +11,7 @@ Louchart-Fletcher, Olivier <olivier@zipworld.com.au>
 Marshall, Casey <mstatic@metastatic.org>
    + implementation of the Serpent symmetric-key block cipher.
    + implementation of the MD4 hash.
+   + valuable contributions to the testing framework and classes.
 
 Naffah, Raif S. <raif@fl.net.au>
    + starting the project.
