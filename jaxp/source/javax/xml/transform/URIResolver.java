@@ -1,5 +1,4 @@
 /*
- * $Id: URIResolver.java,v 1.3 2001-11-02 22:07:45 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * 
  * This file is part of GNU JAXP, a library.

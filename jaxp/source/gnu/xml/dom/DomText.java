@@ -1,5 +1,4 @@
 /*
- * $Id: DomText.java,v 1.4 2001-11-20 04:54:32 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,13 +29,10 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomText.java,v 1.4 2001-11-20 04:54:32 db Exp $
-
 /**
  * <p> "Text" implementation.  </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:54:32 $
  */
 public class DomText extends DomCharacterData implements Text
 {

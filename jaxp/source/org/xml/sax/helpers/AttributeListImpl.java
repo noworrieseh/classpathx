@@ -1,7 +1,6 @@
 // SAX default implementation for AttributeList.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: AttributeListImpl.java,v 1.7 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.helpers;
 

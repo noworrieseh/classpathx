@@ -1,5 +1,4 @@
 /*
- * $Id: DomNotation.java,v 1.3 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,8 +29,6 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomNotation.java,v 1.3 2001-11-20 04:53:46 db Exp $
-
 /**
  * <p> "Notation" implementation.  This is a non-core DOM class, supporting
  * the "XML" feature. </p>
@@ -50,7 +47,6 @@ import org.w3c.dom.*;
  * @see DomPI
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomNotation extends DomExtern implements Notation
 {

@@ -1,5 +1,4 @@
 /*
- * $Id: PipelineFactory.java,v 1.5 2001-11-09 22:53:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,8 +37,6 @@ import java.util.StringTokenizer;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 
-
-// $Id: PipelineFactory.java,v 1.5 2001-11-09 22:53:17 db Exp $
 
 /**
  * This provides static factory methods for creating simple event pipelines.
@@ -183,7 +180,6 @@ import org.xml.sax.ext.*;
  * it's absolutely necessary.
  *
  * @author David Brownell
- * @version $Date: 2001-11-09 22:53:17 $
  */
 public class PipelineFactory
 {

@@ -1,5 +1,4 @@
 /*
- * $Id: DomNamedNodeMap.java,v 1.6 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,15 +31,12 @@ import java.util.Vector;
 import org.w3c.dom.*;
 
 
-// $Id: DomNamedNodeMap.java,v 1.6 2001-11-29 22:48:11 db Exp $
-
 /**
  * <p> "NamedNodeMap" implementation. </p>
  * Used mostly to hold element attributes, but sometimes also
  * to list notations or entities.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-29 22:48:11 $
  */
 public class DomNamedNodeMap implements NamedNodeMap
 {

@@ -1,5 +1,4 @@
 /*
- * $Id: DomParser.java,v 1.6 2001-11-29 23:35:49 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -100,7 +99,6 @@ import org.w3c.dom.*;
  * by this "parser" are unspecified; don't do it! </P>
  *
  * @author David Brownell
- * @version $Date: 2001-11-29 23:35:49 $
  */
 final public class DomParser implements XMLReader
 {

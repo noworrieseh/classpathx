@@ -1,5 +1,4 @@
 /*
- * $Id: EventFilter.java,v 1.15 2002-03-07 19:06:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -125,7 +124,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2002-03-07 19:06:46 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,

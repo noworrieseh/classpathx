@@ -1,5 +1,4 @@
 /*
- * $Id: XCat.java,v 1.2 2002-02-03 01:42:41 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.

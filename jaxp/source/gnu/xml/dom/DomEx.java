@@ -1,5 +1,4 @@
 /*
- * $Id: DomEx.java,v 1.3 2001-11-20 04:57:05 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,8 +29,6 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomEx.java,v 1.3 2001-11-20 04:57:05 db Exp $
-
 /**
  * <p> DOMException implementation.   The version that
  * is provided by the W3C is abstract, so it can't be instantiated.
@@ -41,7 +38,6 @@ import org.w3c.dom.*;
  * and data.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:57:05 $
  */
 public class DomEx extends DOMException
 {

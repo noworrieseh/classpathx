@@ -1,5 +1,4 @@
 /*
- * $Id: DomEntityReference.java,v 1.3 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -29,8 +28,6 @@ package gnu.xml.dom;
 
 import org.w3c.dom.*;
 
-
-// $Id: DomEntityReference.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "EntityReference" implementation (reference to parsed entity).
@@ -63,7 +60,6 @@ import org.w3c.dom.*;
  * @see DomEntity
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomEntityReference extends DomNode implements EntityReference
 {

@@ -1,5 +1,4 @@
 /*
- * $Id: JAXPFactory.java,v 1.6 2001-11-03 00:50:18 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.

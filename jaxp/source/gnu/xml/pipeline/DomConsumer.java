@@ -1,5 +1,4 @@
 /*
- * $Id: DomConsumer.java,v 1.14 2002-05-31 16:09:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +78,6 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2002-05-31 16:09:20 $
  */
 public class DomConsumer implements EventConsumer
 {

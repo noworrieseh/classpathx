@@ -1,5 +1,4 @@
 /*
- * $Id: DomAttr.java,v 1.5 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,8 +30,6 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomAttr.java,v 1.5 2001-11-20 04:53:46 db Exp $
-
 /**
  * <p> "Attr" implementation.  In DOM, attributes cost quite a lot of
  * memory because their values are complex structures rather than just
@@ -59,7 +56,6 @@ import org.w3c.dom.events.MutationEvent;
  * nodes you work with.</em> </p>
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomAttr extends DomNsNode implements Attr
 {

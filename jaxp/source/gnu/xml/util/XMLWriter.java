@@ -1,5 +1,4 @@
 /*
- * $Id: XMLWriter.java,v 1.8 2001-11-20 01:15:45 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -92,7 +91,6 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 01:15:45 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler

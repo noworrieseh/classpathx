@@ -1,5 +1,4 @@
 /*
- * $Id: TextConsumer.java,v 1.4 2001-10-23 17:42:25 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -46,7 +45,6 @@ import gnu.xml.util.XMLWriter;
  * @see WellFormednessFilter
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
  */
 public class TextConsumer extends XMLWriter implements EventConsumer
 {

@@ -1,5 +1,4 @@
 /*
- * $Id: Consumer.java,v 1.14 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +64,6 @@ import gnu.xml.pipeline.EventConsumer;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-29 22:48:11 $
  */
 public class Consumer extends DomConsumer
 {

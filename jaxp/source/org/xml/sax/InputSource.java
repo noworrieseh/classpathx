@@ -1,7 +1,6 @@
 // SAX input source.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: InputSource.java,v 1.8 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax;
 
