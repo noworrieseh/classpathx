@@ -1,6 +1,6 @@
 /*
- * $Id: DomNode.java,v 1.8 2001-11-16 22:46:54 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomNode.java,v 1.9 2001-11-17 02:38:18 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.8 2001-11-16 22:46:54 db Exp $
+// $Id: DomNode.java,v 1.9 2001-11-17 02:38:18 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-16 22:46:54 $
+ * @version $Date: 2001-11-17 02:38:18 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -994,9 +994,6 @@ public abstract class DomNode
     }
 
 
-    //
-    // XXX needs testing yet ...
-    //
     final class LiveNodeList implements NodeList, EventListener, NodeFilter
     {
 	private String		elementURI;
@@ -1027,15 +1024,22 @@ public abstract class DomNode
 	    if (element == DomNode.this)
 		return FILTER_SKIP;
 
-	    if (elementURI != null
-		    && !elementURI.equals (element.getNamespaceURI ()))
-		return FILTER_SKIP;
+	    // use namespace-aware matching ...
+	    if (elementURI != null) {
+		if (!("*".equals (elementURI)
+			|| elementURI.equals (element.getNamespaceURI ())))
+		    return FILTER_SKIP;
+		if (!("*".equals (elementName)
+			|| elementName.equals (element.getLocalName ())))
+		    return FILTER_SKIP;
 
-	    if (elementName.equals (element.getNodeName ())
-		    || "*".equals (elementName))
-		return FILTER_ACCEPT;
-	    else
-		return FILTER_SKIP;
+	    // ... or qName-based kind.
+	    } else {
+		if (!("*".equals (elementName)
+			|| elementName.equals (element.getNodeName ())))
+		    return FILTER_SKIP;
+	    }
+	    return FILTER_ACCEPT;
 	}
 
 	private DomIterator createIterator ()
