@@ -73,6 +73,16 @@ xmlDocPtr
 xmljParseDocument (JNIEnv *env,
     xmlParserCtxtPtr inputParserCtx);
 
+xmlParserInputPtr
+xmljNewParserInput (JNIEnv *env,
+    jobject inputStream,
+    xmlParserCtxtPtr parserContext);
+
+xmlParserInputBufferPtr
+xmljNewParserInputBuffer (JNIEnv *env,
+    jobject inputStream,
+    xmlCharEncoding encoding);
+
 void xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
 					xmlDocPtr tree,
 					const char *outputEncoding);

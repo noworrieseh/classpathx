@@ -68,9 +68,12 @@ class Namespaces
     {
       HashMap ns = (HashMap)stack.get(i);
       if (ns != null && ns.containsKey(prefix))
-        return (String)ns.get(prefix);
+      {
+        String ret = (String)ns.get(prefix);
+        return (ret == null) ? "" : ret;
+      }
     }
-    return null;
+    return "";
   }
 
   /**

@@ -46,7 +46,8 @@ class XMLName
     if (ci == -1)
     {
       localName = qName;
-      uri = prefix = null;
+      prefix = null;
+      uri = "";
     }
     else
     {

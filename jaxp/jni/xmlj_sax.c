@@ -1,4 +1,4 @@
-/* * xmlj_sax.c
+/* xmlj_sax.c
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ static xmlSAXHandler handler = {
   (hasInternalSubsetSAXFunc)xmljSAXHasInternalSubset,
   (hasExternalSubsetSAXFunc)xmljSAXHasExternalSubset,
   (resolveEntitySAXFunc)xmljSAXResolveEntity,
-  (getEntitySAXFunc)xmljSAXGetEntity,
+  0, /*(getEntitySAXFunc)xmljSAXGetEntity,*/
   (entityDeclSAXFunc)xmljSAXEntityDecl,
   (notationDeclSAXFunc)xmljSAXNotationDecl,
   (attributeDeclSAXFunc)xmljSAXAttributeDecl,
@@ -92,98 +92,77 @@ xmljFreeSAXParseContext(SAXParseContext *saxCtx)
 
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
-	jobject self)
+	jobject self,
+    jint j_ctx,
+    jint j_loc)
 {
-	xmlSAXLocatorPtr locator;
-	jclass cls;
-	jfieldID field;
-	const xmlChar *ret;
-	jstring j_ret;
+  xmlParserCtxtPtr ctx;
+  xmlSAXLocatorPtr loc;
+  const xmlChar *ret;
+  jstring j_ret;
 
-	/* Get the locator ID */
-	cls = (*env)->GetObjectClass(env, self);
-	field = (*env)->GetFieldID(env, cls, "id", "I");
-	locator = (xmlSAXLocatorPtr)(*env)->GetIntField(env, self, field);
+  ctx = (xmlParserCtxtPtr)j_ctx;
+  loc = (xmlSAXLocatorPtr)j_loc;
 
-	/*ret = locator->getPublicId();*/
-    ret = NULL; /* FIXME */
-	j_ret = xmljNewString(env, ret);
-	return j_ret;
+  ret = loc->getPublicId(ctx);
+  j_ret = xmljNewString(env, ret);
+  return j_ret;
 }
 
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
-	jobject self)
+    jobject self,
+    jint j_ctx,
+    jint j_loc)
 {
-	xmlSAXLocatorPtr locator;
-	jclass cls;
-	jfieldID field;
-	const xmlChar *ret;
-	jstring j_ret;
+  xmlParserCtxtPtr ctx;
+  xmlSAXLocatorPtr loc;
+  const xmlChar *ret;
+  jstring j_ret;
 
-	/* Get the locator ID */
-	cls = (*env)->GetObjectClass(env, self);
-	field = (*env)->GetFieldID(env, cls, "id", "I");
-	locator = (xmlSAXLocatorPtr)(*env)->GetIntField(env, self, field);
+  ctx = (xmlParserCtxtPtr)j_ctx;
+  loc = (xmlSAXLocatorPtr)j_loc;
 
-	/*ret = locator->getSystemId();*/
-    ret = NULL; /* FIXME */
-	j_ret = xmljNewString(env, ret);
-	return j_ret;
+  ret = loc->getSystemId(ctx);
+  j_ret = xmljNewString(env, ret);
+  return j_ret;
 }
 
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv *env,
-	jobject self)
+	jobject self,
+    jint j_ctx,
+    jint j_loc)
 {
-	xmlSAXLocatorPtr locator;
-	jclass cls;
-	jfieldID field;
+  xmlParserCtxtPtr ctx;
+  xmlSAXLocatorPtr loc;
+  jint ret;
 
-	/* Get the locator ID */
-	cls = (*env)->GetObjectClass(env, self);
-	field = (*env)->GetFieldID(env, cls, "id", "I");
-	locator = (xmlSAXLocatorPtr)(*env)->GetObjectField(env, self, field);
+  ctx = (xmlParserCtxtPtr)j_ctx;
+  loc = (xmlSAXLocatorPtr)j_loc;
 
-	/*return locator->getLineNumber();*/
-    return -1; /* FIXME */
+  ret = loc->getLineNumber(ctx);
+  return ret;
 }
 
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv *env,
-	jobject self)
+	jobject self,
+    jint j_ctx,
+    jint j_loc)
 {
-	xmlSAXLocatorPtr locator;
-	jclass cls;
-	jfieldID field;
+  xmlParserCtxtPtr ctx;
+  xmlSAXLocatorPtr loc;
+  jint ret;
 
-	/* Get the locator ID */
-	cls = (*env)->GetObjectClass(env, self);
-	field = (*env)->GetFieldID(env, cls, "id", "I");
-	locator = (xmlSAXLocatorPtr)(*env)->GetObjectField(env, self, field);
-
-	/*return locator->getColumnNumber();*/
-    return -1; /* FIXME */
+  ctx = (xmlParserCtxtPtr)j_ctx;
+  loc = (xmlSAXLocatorPtr)j_loc;
+	
+  ret = loc->getColumnNumber(ctx);
+  return ret;
 }
 
 /* -- GnomeXMLReader -- */
-
-/*JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_createContext (JNIEnv *env,
-		jobject self)
-{
-	return (jint)xmlCreateIOParserCtxt(&sax_parser, NULL, NULL, NULL, NULL,
-		XML_CHAR_ENCODING_UTF8);
-}*/
-
-/*JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_clearContext (JNIEnv *env,
-		jobject self,
-		jint context)
-{
-  xmlClearParserCtxt((xmlParserCtxtPtr)context);
-  return 0;
-}*/
 
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeXMLReader_getFeature (JNIEnv *env,
@@ -289,27 +268,6 @@ xmljInitSAXHandler (xmlSAXHandler *sax)
   sax->fatalError = &xmljSAXFatalError;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_sax_GnomeXMLReader
- * Method:    parseFile
- * Signature: (ILjava/lang/String;)V
- *
-JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseFile (JNIEnv *env,
-		jobject self,
-		jint context,
-		jstring filename)
-{
-	const char *s_filename;
-	jint ret;
-
-	sax_cb_env = env;
-	s_filename = (*env)->GetStringUTFChars(env, filename, 0);
-	ret = xmlSAXUserParseFile(&sax_parser, self, s_filename);
-	(*env)->ReleaseStringUTFChars(env, filename, s_filename);
-	return ret;
-}*/
-
 /* -- Callback functions -- */
 
 void
@@ -378,8 +336,43 @@ xmljSAXResolveEntity (void *vctx,
     const xmlChar *publicId,
     const xmlChar *systemId)
 {
-  /* TODO */
-  return NULL;
+  xmlParserCtxtPtr ctx;
+  SAXParseContext *sax;
+
+  JNIEnv *env;
+  jobject target;
+  jclass cls;
+  jmethodID method;
+
+  jstring j_publicId;
+  jstring j_systemId;
+  jobject inputStream;
+
+  printf("xmljSAXResolveEntity %s %s\n", publicId, systemId);
+
+  ctx = (xmlParserCtxtPtr)vctx;
+  sax = (SAXParseContext *)ctx->_private;
+  env = sax->env;
+  target = sax->obj;
+
+  cls = (*env)->GetObjectClass(env, target);
+
+  /* Get the resolveEntity method */
+  method = (*env)->GetMethodID(env, cls, "resolveEntity",
+      "(Ljava/lang/String;Ljava/lang/String;)Ljava/io/InputStream;");
+
+  j_publicId = xmljNewString(env, publicId);
+  j_systemId = xmljNewString(env, systemId);
+
+  /* Invoke the method */
+  inputStream = (*env)->CallObjectMethod(env, target, method,
+                         j_publicId, j_systemId);
+
+  /* Return an xmlParserInputPtr corresponding to the input stream */
+  if (inputStream != NULL)
+    return xmljNewParserInput (env, inputStream, ctx);
+  else
+    return NULL;
 }
 
 xmlEntityPtr
@@ -387,6 +380,7 @@ xmljSAXGetEntity(void *vctx,
     const xmlChar *name)
 {
   /* TODO */
+  printf("xmljSAXGetEntity %s\n", name);
   return NULL;
 }
 
@@ -628,17 +622,15 @@ xmljSAXSetDocumentLocator (void *vctx,
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-
   cls = (*env)->GetObjectClass(env, target);
 	
   /* Get the unparsedEntityDecl method */
   method = (*env)->GetMethodID(env, cls,
       "setDocumentLocator",
-      "(I)V");
+      "(II)V");
   
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, (jint)loc);
+  (*env)->CallVoidMethod(env, target, method, (jint)ctx, (jint)loc);
 }
 
 void

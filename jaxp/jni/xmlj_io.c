@@ -485,6 +485,47 @@ xmljParseDocument (JNIEnv *env,
   return tree;
 }
 
+xmlParserInputPtr
+xmljNewParserInput (JNIEnv *env,
+    jobject inputStream,
+    xmlParserCtxtPtr parserContext)
+{
+  xmlParserInputBufferPtr input;
+  xmlCharEncoding encoding;
+
+  encoding = xmljDetectCharEncoding (env, inputStream);
+  if (encoding != XML_CHAR_ENCODING_ERROR)
+  {
+    input = xmljNewParserInputBuffer (env, inputStream, encoding);
+    if (input != NULL)
+      return xmlNewIOInputStream (parserContext, input, encoding);
+    xmlFreeParserInputBuffer (input);
+  }
+  return NULL;
+}
+
+xmlParserInputBufferPtr
+xmljNewParserInputBuffer (JNIEnv *env,
+    jobject inputStream,
+    xmlCharEncoding encoding)
+{
+  xmlParserInputBufferPtr ret;
+  InputStreamContext *inputContext;
+
+  inputContext = xmljNewInputStreamContext (env, inputStream);
+  if (NULL != inputContext)
+  {
+    ret = xmlParserInputBufferCreateIO (&xmljInputReadCallback,
+        &xmljInputCloseCallback,
+        inputContext,
+        encoding);
+    if (ret != NULL)
+      return ret;
+    xmljFreeInputStreamContext (inputContext);
+  }
+  return NULL;
+}
+
 void
 xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
 				xmlDocPtr tree,

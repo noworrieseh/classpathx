@@ -37,19 +37,44 @@ class GnomeLocator
 implements Locator
 {
 
-  final int id;
+  // An xmlParserCtxtPtr
+  private final int ctx;
 
-  GnomeLocator(int id)
+  // An xmlSAXLocatorPtr
+  private final int loc;
+
+  GnomeLocator(int ctx, int loc)
   {
-    this.id = id;
+    this.ctx = ctx;
+    this.loc = loc;
   }
 
-  public native String getPublicId();
+  public String getPublicId()
+  {
+    return getPublicId(ctx, loc);
+  }
 
-  public native String getSystemId();
+  private native String getPublicId(int ctx, int loc);
 
-  public native int getLineNumber();
+  public String getSystemId()
+  {
+    return getSystemId(ctx, loc);
+  }
 
-  public native int getColumnNumber();
+  private native String getSystemId(int ctx, int loc);
+
+  public int getLineNumber()
+  {
+    return getLineNumber(ctx, loc);
+  }
+  
+  private native int getLineNumber(int ctx, int loc);
+
+  public int getColumnNumber()
+  {
+    return getColumnNumber(ctx, loc);
+  }
+  
+  private native int getColumnNumber(int ctx, int loc);
 
 }

@@ -108,6 +108,8 @@ implements XMLReader
   // If true, do not invoke callback methods except endDocument
   private transient boolean seenFatalError;
 
+  private transient boolean seenStartDocument;
+
   public GnomeXMLReader()
   {
     this(true, true);
@@ -272,28 +274,31 @@ implements XMLReader
   public synchronized void parse(InputSource input)
     throws IOException, SAXException
   {
-    InputStream in = input.getByteStream();
+    InputStream in = getInputStream(input);
     String publicId = input.getPublicId();
     String systemId = input.getSystemId();
-    boolean opened = false;
-    if (in == null)
-    {
-      if (systemId != null)
-      {
-        in = new URL(systemId).openStream();
-        opened = true;
-      }
-      else
-        throw new IOException("Unable to locate input source");
-    }
-    in = new PushbackInputStream(in, 50);
     // Reset state
     standalone = false;
     seenFatalError = false;
+    seenStartDocument = false;
     // Parse
     parseStream(in, publicId, systemId, validation);
-    if (opened)
-      in.close();
+    in.close();
+  }
+
+  InputStream getInputStream(InputSource input)
+    throws IOException
+  {
+    InputStream in = input.getByteStream();
+    if (in == null)
+    {
+      String systemId = input.getSystemId();
+      if (systemId != null)
+        in = new URL(systemId).openStream();
+      else
+        throw new IOException("Unable to locate input source");
+    }
+    return new PushbackInputStream(in, 50);
   }
 
   native void parseStream(InputStream in, String publicId, String systemId,
@@ -330,6 +335,16 @@ implements XMLReader
       declarationHandler.internalEntityDecl(name, value);
   }
 
+  private InputStream resolveEntity(String publicId, String systemId)
+    throws SAXException, IOException
+  {
+    if (entityResolver != null)
+      return getInputStream(entityResolver.resolveEntity(publicId,
+            systemId));
+    else
+      return null;
+  }
+  
   private void notationDecl(String name, String publicId, String systemId)
     throws SAXException
   {
@@ -360,9 +375,9 @@ implements XMLReader
       dtdHandler.unparsedEntityDecl(name, publicId, systemId, notationName);
   }
 
-  private void setDocumentLocator(int id)
+  private void setDocumentLocator(int ctx, int loc)
   {
-    locator = new GnomeLocator(id);
+    locator = new GnomeLocator(ctx, loc);
     if (!seenFatalError && contentHandler != null)
       contentHandler.setDocumentLocator(locator);
   }
@@ -373,6 +388,7 @@ implements XMLReader
     if (contentHandler != null)
       contentHandler.startDocument();
     this.standalone = standalone;
+    seenStartDocument = true;
   }
 
   private void endDocument()
@@ -414,8 +430,7 @@ implements XMLReader
       }
       // Construct attributes
       Attributes atts = new StringArrayAttributes(this, attrs);
-      String uri = (xName.uri == null) ? "" : xName.uri;
-      contentHandler.startElement(uri, xName.localName, xName.qName,
+      contentHandler.startElement(xName.uri, xName.localName, xName.qName,
           atts);
     }
   }
@@ -515,6 +530,8 @@ implements XMLReader
   {
     if (!seenFatalError && errorHandler != null)
     {
+      if (!seenStartDocument)
+        startDocument(false);
       seenFatalError = true;
       errorHandler.fatalError(new SAXParseException(message, locator));
     }
