@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.11 2001-07-29 19:14:36 db Exp $
+ * $Id: SAXDriver.java,v 1.12 2001-07-31 06:42:30 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.11 2001-07-29 19:14:36 db Exp $
+// $Id: SAXDriver.java,v 1.12 2001-07-31 06:42:30 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -108,7 +108,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-29 19:14:36 $
+ * @version $Date: 2001-07-31 06:42:30 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -136,7 +136,7 @@ final public class SAXDriver
     private boolean			xmlNames = false;
 
     private int				attributeCount = 0;
-    private boolean			nspending = false;
+    private boolean			attributes;
     private String			nsTemp [] = new String [3];
     private NamespaceSupport		prefixStack = new NamespaceSupport ();
 
@@ -571,7 +571,8 @@ final public class SAXDriver
 	// many versions of nwalsh docbook stylesheets 
 	// have bogus URLs; so this can't be an error...
 	if (index < 1 && uri.length () != 0)
-	    warn ("illegal namespace URI: " + uri);
+	    warn ("relative URI for namespace: " + uri);
+
 	// FIXME:  char [0] must be ascii alpha; chars [1..index]
 	// must be ascii alphanumeric or in "+-." [RFC 2396]
 
@@ -582,67 +583,51 @@ final public class SAXDriver
 
 // FIXME  SAX2 has no way to say which attributes are specified
 
-    void attribute (String aname, String value, boolean isSpecified)
+    void attribute (String qname, String value, boolean isSpecified)
     throws SAXException
     {
-	if (attributeCount++ == 0) {
+	if (!attributes) {
+	    attributes = true;
 	    if (namespaces)
 		prefixStack.pushContext ();
 	}
 
-	// set nsTemp [0] == namespace URI (or empty)
-	// set nsTemp [1] == local name (or empty)
-	if (value != null) {
-	    if (namespaces) {
-		int	index = aname.indexOf (':');
+	// process namespace decls immediately;
+	// then maybe forget this as an attribute
+	if (namespaces) {
+	    int	index;
 
-		// prefixed name?
-		if (index > 0) {
-		    // prefix declaration?
-		    if (index == 5 && aname.startsWith ("xmlns")) {
-			String		prefix = aname.substring (index + 1);
+	    // default NS declaration?
+	    if ("xmlns" == qname) {
+		declarePrefix ("", value);
+		if (!xmlNames)
+		    return;
+	    }
 
-			if (value.length () == 0) {
-			    verror ("missing URI in namespace decl attribute: "
-					+ aname);
-			} else
-			    declarePrefix (prefix, value);
-			if (!xmlNames)
-			    return;
-			nsTemp [0] = "";
-			nsTemp [1] = aname;
+	    // NS prefix declaration?
+	    else if ((index = qname.indexOf (':')) == 5
+		    && qname.startsWith ("xmlns")) {
+		String		prefix = qname.substring (index + 1);
 
-		    // prefix reference
-		    } else {
-			if (prefixStack.processName (aname, nsTemp, true)
-				== null) {
-			    // prefix declaration not yet seen
-			    nsTemp [0] = "";
-			    nsTemp [1] = aname;
-			    nspending = true;
-			} // else nsTemp [0, 1] received { uri, local }
-		    }
-
-		// no prefix
-		} else {
-		    // default declaration?
-		    if ("xmlns".equals (aname)) {
-			declarePrefix ("", value);
-			if (!xmlNames)
-			    return;
-		    }
-		    nsTemp [0] = "";
-		    nsTemp [1] = aname;
-		}
-	    } else
-		nsTemp [0] = nsTemp [1] = "";
-
-	    attributeNamespaces.addElement (nsTemp [0]);
-	    attributeLocalNames.addElement (nsTemp [1]);
-	    attributeNames.addElement (aname);
-	    // attribute type comes from querying parser's DTD records
-	    attributeValues.addElement (value);
+		if (value.length () == 0) {
+		    verror ("missing URI in namespace decl attribute: "
+				+ qname);
+		} else
+		    declarePrefix (prefix, value);
+		if (!xmlNames)
+		    return;
+	    }
 	}
+
+	// remember this attribute ...
+	attributeCount++;
+	attributeNames.addElement (qname);
+	// attribute type comes from querying parser's DTD records
+	attributeValues.addElement (value);
+
+	// ... patching {lname, uri} later, if needed
+	attributeNamespaces.addElement ("");
+	attributeLocalNames.addElement ("");
     }
 
     void startElement (String elname)
@@ -655,6 +640,7 @@ final public class SAXDriver
 	// like six percent to parsing CPU time, in a large (~50 MB)
 	// document that doesn't use namespaces at all.  (Measured by PC
 	// sampling, with a bug where endElement processing was omitted.)
+	// [Measurement referred to older implementation, older JVM ...]
 	//
 	// It ought to become notably faster in such cases.  Most
 	// costs are the prefix stack calling Hashtable.get() (2%),
@@ -662,23 +648,34 @@ final public class SAXDriver
 	// the context, and two chunks of name processing.
 	//
 
-	if (attributeCount == 0)
+	if (!attributes)
 	    prefixStack.pushContext ();
-	else if (nspending) {
+	else if (namespaces) {
+
+	    // now we can patch up namespace refs; we saw all the
+	    // declarations, so now we'll do the Right Thing
 	    for (int i = 0; i < attributeCount; i++) {
-		String	aname = (String) attributeNames.elementAt (i);
-		
-		if (aname.indexOf (':') > 0) {
-		    if (prefixStack.processName (aname, nsTemp, true)
-			    == null)
-			verror ("undeclared attribute prefix in: " + aname);
-		    else {
-			attributeNamespaces.setElementAt (nsTemp [0], i);
-			attributeLocalNames.setElementAt (nsTemp [1], i);
-		    }
+		String	qname = (String) attributeNames.elementAt (i);
+		int	index;
+
+		// default NS declaration?
+		if ("xmlns" == qname)
+		    continue;
+
+		index = qname.indexOf (':');
+
+		// NS prefix declaration?
+		if (index == 5 && qname.startsWith ("xmlns"))
+		    continue;
+
+		// it's not a NS decl; patch namespace info items
+		if (prefixStack.processName (qname, nsTemp, true) == null)
+		    verror ("undeclared attribute prefix in: " + qname);
+		else {
+		    attributeNamespaces.setElementAt (nsTemp [0], i);
+		    attributeLocalNames.setElementAt (nsTemp [1], i);
 		}
 	    }
-	    nspending = false;
 	}
 
 	// save element name so attribute callbacks work
@@ -694,12 +691,13 @@ final public class SAXDriver
 	// elementName = null;
 
 	// elements with no attributes are pretty common!
-	if (attributeCount != 0) {
+	if (attributes) {
 	    attributeNames.removeAllElements ();
 	    attributeNamespaces.removeAllElements ();
 	    attributeLocalNames.removeAllElements ();
 	    attributeValues.removeAllElements ();
 	    attributeCount = 0;
+	    attributes = false;
 	}
     }
 
