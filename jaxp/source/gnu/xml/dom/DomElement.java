@@ -1,5 +1,5 @@
 /*
- * $Id: DomElement.java,v 1.3 2001-11-16 23:17:43 db Exp $
+ * $Id: DomElement.java,v 1.4 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,13 +30,13 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomElement.java,v 1.3 2001-11-16 23:17:43 db Exp $
+// $Id: DomElement.java,v 1.4 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "Element" implementation.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 23:17:43 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomElement extends DomNsNode implements Element
 {
@@ -59,7 +59,7 @@ public class DomElement extends DomNsNode implements Element
      */
     protected DomElement (Document owner, String namespaceURI, String name)
     {
-	super (owner, ELEMENT_NODE, namespaceURI, name);
+	super (owner, namespaceURI, name);
     }
 
 
@@ -126,6 +126,13 @@ public class DomElement extends DomNsNode implements Element
     {
 	return getNodeName ();
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant ELEMENT_NODE.
+     */
+    final public short getNodeType ()
+	{ return ELEMENT_NODE; }
 
 
     /**

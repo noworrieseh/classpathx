@@ -1,5 +1,5 @@
 /*
- * $Id: DomDoctype.java,v 1.5 2001-11-16 20:09:33 db Exp $
+ * $Id: DomDoctype.java,v 1.6 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.*;
 import java.util.Hashtable;
 
 
-// $Id: DomDoctype.java,v 1.5 2001-11-16 20:09:33 db Exp $
+// $Id: DomDoctype.java,v 1.6 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -61,7 +61,7 @@ import java.util.Hashtable;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 20:09:33 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomDoctype extends DomExtern implements DocumentType
 {
@@ -103,7 +103,7 @@ public class DomDoctype extends DomExtern implements DocumentType
 	String internalSubset
     )
     {
-	super (null, DOCUMENT_TYPE_NODE, name, publicId, systemId);
+	super (null, name, publicId, systemId);
 	implementation = impl;
 	subset = internalSubset;
     }
@@ -117,7 +117,7 @@ public class DomDoctype extends DomExtern implements DocumentType
 	String		systemId
     )
     {
-	super (doc, DOCUMENT_TYPE_NODE, name, publicId, systemId);
+	super (doc, name, publicId, systemId);
 	implementation = doc.getImplementation ();
     }
 
@@ -127,6 +127,13 @@ public class DomDoctype extends DomExtern implements DocumentType
      * Returns the root element's name (just like getNodeName).
      */
     final public String getName () { return getNodeName (); }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant DOCUMENT_TYPE_NODE.
+     */
+    final public short getNodeType ()
+	{ return DOCUMENT_TYPE_NODE; }
 
 
     /**

@@ -1,6 +1,6 @@
 /*
- * $Id: DomCDATA.java,v 1.3 2001-11-19 22:23:02 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomCDATA.java,v 1.4 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomCDATA.java,v 1.3 2001-11-19 22:23:02 db Exp $
+// $Id: DomCDATA.java,v 1.4 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "CDATASection" implementation.
@@ -45,7 +45,7 @@ import org.w3c.dom.*;
  * nodes in all your algorithms. </p>
  *
  * @author David Brownell
- * @version $Date: 2001-11-19 22:23:02 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomCDATA extends DomText implements CDATASection
 {
@@ -60,12 +60,12 @@ public class DomCDATA extends DomText implements CDATASection
      */
     protected DomCDATA (Document owner, String value)
     {
-	super (owner, CDATA_SECTION_NODE, value);
+	super (owner, value);
     }
 
     protected DomCDATA (Document owner, char buf [], int off, int len)
     {
-	super (owner, CDATA_SECTION_NODE, buf, off, len);
+	super (owner, buf, off, len);
     }
 
 
@@ -77,4 +77,12 @@ public class DomCDATA extends DomText implements CDATASection
     {
 	return "#cdata-section";
     }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant CDATA_SECTION_NODE.
+     */
+    final public short getNodeType ()
+	{ return CDATA_SECTION_NODE; }
 }

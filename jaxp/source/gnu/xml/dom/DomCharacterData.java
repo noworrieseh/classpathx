@@ -1,6 +1,6 @@
 /*
- * $Id: DomCharacterData.java,v 1.6 2001-11-19 22:21:21 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomCharacterData.java,v 1.7 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -31,7 +31,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomCharacterData.java,v 1.6 2001-11-19 22:21:21 db Exp $
+// $Id: DomCharacterData.java,v 1.7 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> Abstract "CharacterData" implementation.  This
@@ -39,7 +39,7 @@ import org.w3c.dom.events.MutationEvent;
  * interface (Text, Comment, CDATASection).  </p>
  *
  * @author David Brownell
- * @version $Date: 2001-11-19 22:21:21 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public abstract class DomCharacterData extends DomNode
     implements CharacterData
@@ -47,9 +47,9 @@ public abstract class DomCharacterData extends DomNode
     private char		raw [];
 
     // package private
-    DomCharacterData (Document doc, short type, String value)
+    DomCharacterData (Document doc, String value)
     {
-	super (doc, type);
+	super (doc);
 	if (value != null)
 	    raw = value.toCharArray ();
 	else
@@ -57,10 +57,9 @@ public abstract class DomCharacterData extends DomNode
     }
 
     // package private
-    DomCharacterData (Document doc, short type,
-	    char buf [], int offset, int length)
+    DomCharacterData (Document doc, char buf [], int offset, int length)
     {
-	super (doc, type);
+	super (doc);
 	if (buf == null)
 	    raw = new char [0];
 	else {

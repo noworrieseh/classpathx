@@ -1,6 +1,6 @@
 /*
- * $Id: DomEntity.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomEntity.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomEntity.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomEntity.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "Entity" implementation.  This is a non-core DOM class, supporting the
@@ -59,7 +59,7 @@ import org.w3c.dom.*;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomEntity extends DomExtern implements Entity
 {
@@ -88,7 +88,7 @@ public class DomEntity extends DomExtern implements Entity
 	String notation
     )
     {
-	super (owner, ENTITY_NODE, name, publicId, systemId);
+	super (owner, name, publicId, systemId);
 	this.notation = notation;
 
 	// NOTE:  if notation == null, this is a parsed entity
@@ -105,4 +105,11 @@ public class DomEntity extends DomExtern implements Entity
     {
 	return notation;
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant ENTITY_NODE.
+     */
+    final public short getNodeType ()
+	{ return ENTITY_NODE; }
 }

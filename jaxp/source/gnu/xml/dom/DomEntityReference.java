@@ -1,6 +1,6 @@
 /*
- * $Id: DomEntityReference.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomEntityReference.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomEntityReference.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomEntityReference.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "EntityReference" implementation (reference to parsed entity).
@@ -63,7 +63,7 @@ import org.w3c.dom.*;
  * @see DomEntity
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomEntityReference extends DomNode implements EntityReference
 {
@@ -83,7 +83,7 @@ public class DomEntityReference extends DomNode implements EntityReference
      */
     protected DomEntityReference (Document owner, String name)
     {
-	super (owner, ENTITY_REFERENCE_NODE);
+	super (owner);
 	this.name = name;
     }
 
@@ -96,4 +96,11 @@ public class DomEntityReference extends DomNode implements EntityReference
     {
 	return name;
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant ENTITY_REFERENCE_NODE.
+     */
+    final public short getNodeType ()
+	{ return ENTITY_REFERENCE_NODE; }
 }

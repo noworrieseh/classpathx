@@ -1,6 +1,6 @@
 /*
- * $Id: DomNotation.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomNotation.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomNotation.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomNotation.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "Notation" implementation.  This is a non-core DOM class, supporting
@@ -50,7 +50,7 @@ import org.w3c.dom.*;
  * @see DomPI
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomNotation extends DomExtern implements Notation
 {
@@ -76,7 +76,14 @@ public class DomNotation extends DomExtern implements Notation
 	String systemId
     )
     {
-	super (owner, NOTATION_NODE, name, publicId, systemId);
+	super (owner, name, publicId, systemId);
 	makeReadonly ();
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant NOTATION_NODE.
+     */
+    final public short getNodeType ()
+	{ return NOTATION_NODE; }
 }

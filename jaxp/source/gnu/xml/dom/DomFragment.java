@@ -1,6 +1,6 @@
 /*
- * $Id: DomFragment.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomFragment.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,13 +30,13 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomFragment.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomFragment.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "DocumentFragment" implementation.  </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomFragment extends DomNode implements DocumentFragment
 {
@@ -50,7 +50,7 @@ public class DomFragment extends DomNode implements DocumentFragment
      */
     protected DomFragment (Document owner)
     {
-	super (owner, DOCUMENT_FRAGMENT_NODE);
+	super (owner);
     }
 
 
@@ -62,4 +62,11 @@ public class DomFragment extends DomNode implements DocumentFragment
     {
 	return "#document-fragment";
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant DOCUMENT_FRAGMENT_NODE.
+     */
+    final public short getNodeType ()
+	{ return DOCUMENT_FRAGMENT_NODE; }
 }

@@ -1,6 +1,6 @@
 /*
- * $Id: DomExtern.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomExtern.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomExtern.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomExtern.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> Abstract implemention of nodes describing external DTD-related
@@ -44,7 +44,7 @@ import org.w3c.dom.*;
  * XML feature they partially expose. </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public abstract class DomExtern extends DomNode
 {
@@ -65,13 +65,12 @@ public abstract class DomExtern extends DomNode
     // package private
     DomExtern (
 	Document owner,
-	short type,
 	String name,
 	String publicId,
 	String systemId
     )
     {
-	super (owner, type);
+	super (owner);
 	this.name = name;
 	this.publicId = publicId;
 	this.systemId = systemId;

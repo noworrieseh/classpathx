@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.10 2001-11-20 01:20:13 db Exp $
+ * $Id: DomNode.java,v 1.11 2001-11-20 04:48:59 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.10 2001-11-20 01:20:13 db Exp $
+// $Id: DomNode.java,v 1.11 2001-11-20 04:48:59 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,11 +64,15 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 01:20:13 $
+ * @version $Date: 2001-11-20 04:48:59 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
 {
+    //
+    // CLASS DATA
+    //
+
     // tunable
     //	NKIDS_* affects arrays of children (which grow)
     // (currently) fixed size:
@@ -86,28 +90,13 @@ public abstract class DomNode
     static final boolean		reportMutations = true;
 
     // locking protocol changeable only within this class
-    static final Object			lockNode = new Object ();
+    private static final Object		lockNode = new Object ();
 
-    private Document			owner;
-    private DomNode			parent;
+    // optimize space to share what we can
+    private static final DomNode	noKids [] = new DomNode [0];
 
-    // Bleech ... "package private" so a DOM builder can entity refs
-    // writable during construction.  DOM spec is nasty.
-    boolean				readonly;
 
-    // jdk 1.1 javac dislikes "final" here (bug)
-    private /*final*/ short		nodeType;
-
-    // children
-    private DomNode			children [];
-    private int				length;
-
-    // event registrations
-    private ListenerRecord		listeners [];
-    private int				nListeners;
-
-    // Optimize access to siblings by caching indices.
-    private transient int		parentIndex;
+    // NON-FINAL class data
 
     // Optimize event dispatch by not allocating memory each time
     private static boolean		dispatchDataLock;
@@ -121,8 +110,27 @@ public abstract class DomNode
     private static DomEvent.DomMutationEvent	mutationEvent
 		    = new DomEvent.DomMutationEvent (null);
     
-    // optimize space to share what we can
-    final private static DomNode	noKids [] = new DomNode [0];
+    //
+    // PER-INSTANCE DATA
+    //
+
+    private Document			owner;
+    private DomNode			parent;
+
+    // Bleech ... "package private" so a builder can populate entity refs.
+    // writable during construction.  DOM spec is nasty.
+    boolean				readonly;
+
+    // children
+    private DomNode			children [];
+    private int				length;
+
+    // event registrations
+    private ListenerRecord		listeners [];
+    private int				nListeners;
+
+    // Optimize access to siblings by caching indices.
+    private transient int		parentIndex;
 
 	//
 	// Some of the methods here are declared 'final' because
@@ -145,7 +153,9 @@ public abstract class DomNode
 	if (children != null && children != noKids) {
 	    if (length == 0)
 		children = noKids;
-	    else if (children.length != length) {
+	    // allow a bit of fuzz (max NKIDS_DELTA).
+	    // the JVM won't always use less memory for smaller arrays...
+	    else if ((children.length - length) > 1) {
 		DomNode	newKids [] = new DomNode [length];
 		System.arraycopy (children, 0, newKids, 0, length);
 		children = newKids;
@@ -168,13 +178,9 @@ public abstract class DomNode
      * and DocumentType nodes get an owner as soon as they are
      * associated with a document.
      */
-    protected DomNode (Document owner, short type)
+    protected DomNode (Document owner)
     {
-	// XXX consider going back to classes defining getNodeType().
-	// it's a bit faster to build a tree, a bit less data to save.
-	// And avoids the JDK 1.1 javac bug where it can't be final...
-
-	nodeType = type;
+	short 	type = getNodeType ();
 
 	if (owner == null) {
 	    // DOM calls never go down this path
@@ -203,15 +209,6 @@ public abstract class DomNode
 	}
     }
 
-
-    /**
-     * <b>DOM L1</b>
-     * Returns a code identifying the type of this object, such
-     * as ELEMENT_NODE, TEXT_NODE, and so on.
-     */
-    final public short getNodeType ()
-	{ return nodeType; }
-    
 
     /**
      * <b>DOM L1</b>
@@ -329,7 +326,8 @@ public abstract class DomNode
 	
 	Node myOwner = owner;
 	Node newOwner = child.owner;
-	short newType = child.nodeType;
+	short nodeType = getNodeType ();
+	short newType = child.getNodeType ();
 
 	if (nodeType == DOCUMENT_NODE)
 	    myOwner = this;
@@ -383,8 +381,10 @@ public abstract class DomNode
     //
     private void reparent (DomNode newChild)
     {
-	if (nodeType == DOCUMENT_NODE
-		&& newChild.nodeType == DOCUMENT_TYPE_NODE) {
+	short childType = newChild.getNodeType ();
+
+	if (getNodeType () == DOCUMENT_NODE
+		&& childType == DOCUMENT_TYPE_NODE) {
 	    DomDoctype	doctype = (DomDoctype) newChild;
 
 	    if (doctype.getImplementation ()
@@ -400,7 +400,7 @@ public abstract class DomNode
 	if (oldParent != null)
 	    oldParent.removeChild (newChild);
 	
-	if (newChild.nodeType != ATTRIBUTE_NODE)
+	if (childType != ATTRIBUTE_NODE)
 	    newChild.parent  = this;
     }
 
@@ -524,7 +524,7 @@ public abstract class DomNode
 	try {
 	    DomNode	child = (DomNode) newChild;
 
-	    if (child.nodeType != DOCUMENT_FRAGMENT_NODE) {
+	    if (newChild.getNodeType () != DOCUMENT_FRAGMENT_NODE) {
 		checkMisc (child);
 		if (!(length < children.length))
 		    ensureEnough (1);
@@ -575,7 +575,7 @@ public abstract class DomNode
 	try {
 	    DomNode	child = (DomNode) newChild;
 
-	    if (child.nodeType != DOCUMENT_FRAGMENT_NODE) {
+	    if (newChild.getNodeType () != DOCUMENT_FRAGMENT_NODE) {
 		checkMisc (child);
 		for (int i = 0; i < length; i++) {
 		    if (children [i] != refChild)
@@ -644,7 +644,7 @@ public abstract class DomNode
 	try {
 	    DomNode		child = (DomNode) newChild;
 
-	    if (child.nodeType != DOCUMENT_FRAGMENT_NODE) {
+	    if (newChild.getNodeType () != DOCUMENT_FRAGMENT_NODE) {
 		checkMisc (child);
 		for (int i = 0; i < length; i++) {
 		    if (children [i] != refChild)
@@ -777,7 +777,7 @@ public abstract class DomNode
      */
     final public Node getNextSibling ()
     {
-	if (parent == null || nodeType == ATTRIBUTE_NODE)
+	if (parent == null || getNodeType() == ATTRIBUTE_NODE)
 	    return null;
 
 	NodeList	siblings = parent.getChildNodes ();
@@ -801,7 +801,7 @@ public abstract class DomNode
      */
     final public Node getPreviousSibling ()
     {
-	if (parent == null || nodeType == ATTRIBUTE_NODE)
+	if (parent == null || getNodeType () == ATTRIBUTE_NODE)
 	    return null;
 
 	NodeList	siblings = parent.getChildNodes ();
@@ -843,7 +843,7 @@ public abstract class DomNode
 	Document		doc = owner;
 	DOMImplementation	impl = null;
 
-	if (doc == null && nodeType == DOCUMENT_NODE)
+	if (doc == null && getNodeType () == DOCUMENT_NODE)
 	    doc = (Document) this;
 
 	if (doc == null)
@@ -939,7 +939,7 @@ public abstract class DomNode
 	    retval.children = newKids;
 	    retval.length = length;
 
-	    if (nodeType == ENTITY_REFERENCE_NODE)
+	    if (getNodeType () == ENTITY_REFERENCE_NODE)
 		retval.makeReadonly ();
 	}
 	return retval;
@@ -1508,7 +1508,7 @@ public abstract class DomNode
     public boolean nameAndTypeEquals (Node other)
     {
 	// node types must match
-	if (nodeType != other.getNodeType ())
+	if (getNodeType () != other.getNodeType ())
 	    return false;
 
 	// if both have namespaces, do a "full" comparision

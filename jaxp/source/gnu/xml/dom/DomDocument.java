@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.9 2001-11-19 22:25:37 db Exp $
+ * $Id: DomDocument.java,v 1.10 2001-11-20 04:53:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import org.w3c.dom.traversal.*;
 import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
-// $Id: DomDocument.java,v 1.9 2001-11-19 22:25:37 db Exp $
+// $Id: DomDocument.java,v 1.10 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,7 +47,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-19 22:25:37 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -76,7 +76,7 @@ public class DomDocument extends DomNode
      */
     public DomDocument ()
     {
-	super (null, DOCUMENT_NODE);
+	super (null);
 	implementation = new DomImpl ();
     }
 
@@ -92,7 +92,7 @@ public class DomDocument extends DomNode
      */
     protected DomDocument (DOMImplementation impl)
     {
-	super (null, DOCUMENT_NODE);
+	super (null);
 	implementation = impl;
     }
 
@@ -105,6 +105,13 @@ public class DomDocument extends DomNode
     {
 	return "#document";
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant DOCUMENT_NODE.
+     */
+    final public short getNodeType ()
+	{ return DOCUMENT_NODE; }
 
 
     /**

@@ -1,6 +1,6 @@
 /*
- * $Id: DomNsNode.java,v 1.3 2001-11-16 22:44:43 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomNsNode.java,v 1.4 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,14 +30,14 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomNsNode.java,v 1.3 2001-11-16 22:44:43 db Exp $
+// $Id: DomNsNode.java,v 1.4 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> Abstract implemention of namespace support.  This facilitates
  * sharing code for attribute and element nodes.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 22:44:43 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public abstract class DomNsNode extends DomNode
 {
@@ -57,9 +57,9 @@ public abstract class DomNsNode extends DomNode
      * @param name Name of this node, which may include a prefix
      */
     // package private
-    DomNsNode (Document owner, short type, String namespaceURI, String name)
+    DomNsNode (Document owner, String namespaceURI, String name)
     {
-	super (owner, type);
+	super (owner);
 	this.name = name;
 	if ("".equals (namespaceURI))
 	    namespaceURI = null;

@@ -1,6 +1,6 @@
 /*
- * $Id: DomPI.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomPI.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomPI.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomPI.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "ProcessingInstruction" (PI) implementation.
@@ -48,7 +48,7 @@ import org.w3c.dom.*;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomPI extends DomNode implements ProcessingInstruction
 {
@@ -66,7 +66,7 @@ public class DomPI extends DomNode implements ProcessingInstruction
      */
     protected DomPI (Document owner, String target, String data)
     {
-	super (owner, PROCESSING_INSTRUCTION_NODE);
+	super (owner);
 	this.target = target;
 	this.data = data;
     }
@@ -91,6 +91,14 @@ public class DomPI extends DomNode implements ProcessingInstruction
     {
 	return target;
     }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant PROCESSING_INSTRUCTION_NODE.
+     */
+    final public short getNodeType ()
+	{ return PROCESSING_INSTRUCTION_NODE; }
 
 
     /**

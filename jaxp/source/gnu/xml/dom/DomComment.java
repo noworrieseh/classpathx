@@ -1,6 +1,6 @@
 /*
- * $Id: DomComment.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomComment.java,v 1.3 2001-11-20 04:53:46 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,7 +30,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomComment.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomComment.java,v 1.3 2001-11-20 04:53:46 db Exp $
 
 /**
  * <p> "Comment" implementation.
@@ -41,7 +41,7 @@ import org.w3c.dom.*;
  * those comments at some point in the processing pipeline. </p>
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:53:46 $
  */
 public class DomComment extends DomCharacterData implements Comment
 {
@@ -55,7 +55,7 @@ public class DomComment extends DomCharacterData implements Comment
      */
     protected DomComment (Document owner, String value)
     {
-	super (owner, COMMENT_NODE, value);
+	super (owner, value);
     }
 
 
@@ -67,4 +67,11 @@ public class DomComment extends DomCharacterData implements Comment
     {
 	return "#comment";
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant COMMENT_NODE.
+     */
+    final public short getNodeType ()
+	{ return COMMENT_NODE; }
 }
