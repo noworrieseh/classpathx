@@ -1,3 +1,8 @@
+2004-04-22  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	* source: sources directory has been moved to source directory,
+	src has been deleted. Sorry for the inconvenience.
+
 2004-04-20  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
 	Reported by Maarten Coene <MacBelgium@toughguy.net>:
