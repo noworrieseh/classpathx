@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.5 2001-10-25 08:09:19 db Exp $
+ * $Id: XMLWriter.java,v 1.6 2001-11-03 23:28:01 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -91,7 +91,7 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-10-25 08:09:19 $
+ * @version $Date: 2001-11-03 23:28:01 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -902,7 +902,6 @@ public class XMLWriter
 	    throw new IllegalArgumentException ("no XML name");
 
 	try {
-	    elementNestLevel++;
 	    if (entityNestLevel != 0)
 		return;
 	    if (prettyPrinting) {
@@ -930,6 +929,7 @@ public class XMLWriter
 			doIndent ();
 		}
 	    }
+	    elementNestLevel++;
 	    writeStartTag (qName, atts, xhtml && isEmptyElementTag (qName));
 
 	    if (xhtml) {
