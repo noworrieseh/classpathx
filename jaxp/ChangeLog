@@ -1,3 +1,33 @@
+2004-04-19  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	* src/xmlj_io.h, src/xmlj_io.c, src/xmlj_error.h,
+	src/xmlj_error.c, src/libxsltj.c,
+	src/gnu/xml/libxmlj/transform/URIResolverProxy.java,
+	src/gnu/xml/libxmlj/transform/TransformerImpl.java,
+	src/gnu/xml/libxmlj/transform/TransformerFactoryImpl.java,
+	src/gnu/xml/libxmlj/transform/TransformTest.java,
+	src/gnu/xml/libxmlj/transform/TemplatesImpl.java,
+	src/gnu/xml/libxmlj/transform/SourceWrapper.java,
+	src/gnu/xml/libxmlj/transform/SourceLocatorImpl.java,
+	src/gnu/xml/libxmlj/transform/LibxsltStylesheet.java,
+	src/gnu/xml/libxmlj/transform/LibxmlDocument.java,
+	src/gnu/xml/libxmlj/transform/JavaContext.java,
+	src/gnu/xml/libxmlj/transform/IOToolkit.java,
+	src/gnu/xml/libxmlj/transform/ErrorListenerProxy.java,
+	src/gnu/xml/libxmlj/transform/DefaultURIResolverImpl.java,
+	src/gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.java:
+	changed the copyright holder to FSF and changed the license to
+	GPL+linking exception, many thanks to Julian Scheid who wrote the
+	code and accepted to donate his code to the FSF and change the
+	license to GPL + linking exception.
+
+	* README: updated (added the libxmlj README comments)
+
+	* AUTHORS: added Julian.
+
+	* INSTALL: updated to match the current scheme (new dependency,
+	new build system)
+
 2004-04-15  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
 	* src/gnu/xml/aelfred2/SAXDriver.java (SAXDriver): removed the
@@ -70,6 +100,8 @@
 
 	* configure.ac, Makefile.am: now build jaxp and libxmlj together
 
+	* Makefile.aj, automakejar, configure.in: removed, no more used.
+	
 2004-02-05  Arnaud Vandyck  <avdyk@users.sourceforge.net>
 
 	* ChangeLog.libxmlj, source/*.c, source/*h,
