@@ -1,5 +1,5 @@
 /*
- * $Id: XmlReader.java,v 1.2 2001-07-10 23:00:00 db Exp $
+ * $Id: XmlReader.java,v 1.3 2001-08-09 18:31:06 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.pipeline.*;
 
 
-// $Id: XmlReader.java,v 1.2 2001-07-10 23:00:00 db Exp $
+// $Id: XmlReader.java,v 1.3 2001-08-09 18:31:06 db Exp $
 
 /**
  * This SAX2 parser optionally layers a validator over the &AElig;lfred2
@@ -53,7 +53,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.ValidationConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-07-10 23:00:00 $
+ * @version $Date: 2001-08-09 18:31:06 $
  */
 public final class XmlReader implements XMLReader
 {
@@ -207,7 +207,7 @@ public final class XmlReader implements XMLReader
      * @see SAXDriver
      */
     public boolean getFeature (String featureId)
-    throws SAXNotRecognizedException
+    throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if ((SAXDriver.FEATURE + "validation").equals (featureId))
 	    return isValidating;
