@@ -1,5 +1,5 @@
 /*
- * $Id: CallFilter.java,v 1.1 2001-07-11 18:32:10 db Exp $
+ * $Id: CallFilter.java,v 1.2 2001-10-07 04:18:12 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -26,10 +26,11 @@ import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import gnu.xml.util.Resolver;
 import gnu.xml.util.XMLWriter;
 
 
-// $Id: CallFilter.java,v 1.1 2001-07-11 18:32:10 db Exp $
+// $Id: CallFilter.java,v 1.2 2001-10-07 04:18:12 db Exp $
 
 /**
  * Input is sent as an XML request to given URI, and the output of this
@@ -72,7 +73,7 @@ import gnu.xml.util.XMLWriter;
  * @see XmlServlet
  *
  * @author David Brownell
- * @version $Date: 2001-07-11 18:32:10 $
+ * @version $Date: 2001-10-07 04:18:12 $
  */
 final public class CallFilter implements EventConsumer
 {
@@ -204,15 +205,18 @@ final public class CallFilter implements EventConsumer
 	    //
 	    InputSource	source;
 	    XMLReader	producer;
+	    String	encoding;
 
 	    try {
 
 		source = new InputSource (conn.getInputStream ());
 
-// XXX if it's anything but success, report it!!  It'd be good to
+// XXX if status is anything but success, report it!!  It'd be good to
 // save the request data just in case we need to deal with a forward.
 
-// XXX "should" source.setEncoding() from content-type ...
+		encoding = Resolver.getEncoding (conn.getContentType ());
+		if (encoding != null)
+		    source.setEncoding (encoding);
 
 		producer = XMLReaderFactory.createXMLReader ();
 		producer.setErrorHandler (errHandler);
