@@ -651,9 +651,9 @@ public final class ValidationConsumer extends EventFilter
 	    info = new ElementInfo (eName);
 	    elements.put (eName, info);
 	}
-	if ("ID" == type) {
+	if ("ID".equals (type)) {
 	    checkOne = true;
-	    if (!("#REQUIRED" == mode || "#IMPLIED".equals (mode))) {
+	    if (!("#REQUIRED".equals (mode) || "#IMPLIED".equals (mode))) {
 		// VC: ID Attribute Default
 		error ("ID attribute '" + aName
 		    + "' must be #IMPLIED or #REQUIRED");
@@ -697,14 +697,14 @@ public final class ValidationConsumer extends EventFilter
 	// VC: Attribute Default Legal
 	if (value != null) {
 
-	    if ("CDATA" == type) {
+	    if ("CDATA".equals (type)) {
 		// event source rejected '<'
 
-	    } else if ("NMTOKEN" == type) {
+	    } else if ("NMTOKEN".equals (type)) {
 		// VC: Name Token (is a nmtoken)
 		isNmtoken (value, "attribute default", aName);
 
-	    } else if ("NMTOKENS" == type) {
+	    } else if ("NMTOKENS".equals (type)) {
 		// VC: Name Token (is a nmtoken; at least one value)
 		StringTokenizer	tokens = new StringTokenizer (value);
 		if (!tokens.hasMoreTokens ())
@@ -715,14 +715,14 @@ public final class ValidationConsumer extends EventFilter
 		    isNmtoken (token, "attribute default", aName);
 		} while (tokens.hasMoreTokens ());
 
-	    } else if ("IDREF" == type || "ENTITY" == type) {
+	    } else if ("IDREF".equals (type) || "ENTITY".equals (type)) {
 		// VC: Entity Name (is a name)
 		// VC: IDREF (is a name) (is declared)
 		isName (value, "attribute default", aName);
-		if ("ENTITY" == type && !unparsed.contains (value))
+		if ("ENTITY".equals (type) && !unparsed.contains (value))
 		    uDeferred.addElement (value);
 
-	    } else if ("IDREFS" == type || "ENTITIES" == type) {
+	    } else if ("IDREFS".equals (type) || "ENTITIES".equals (type)) {
 		// VC: Entity Name (is a name; at least one value)
 		// VC: IDREF (is a name; at least one value)
 		StringTokenizer	names = new StringTokenizer (value);
@@ -732,7 +732,7 @@ public final class ValidationConsumer extends EventFilter
 		else do {
 		    String name = names.nextToken ();
 		    isName (name, "attribute default", aName);
-		    if ("ENTITIES" == type && !unparsed.contains (name))
+		    if ("ENTITIES".equals (type) && !unparsed.contains (name))
 			uDeferred.addElement (value);
 		} while (names.hasMoreTokens ());
 	    
@@ -1015,8 +1015,8 @@ public final class ValidationConsumer extends EventFilter
 
 	    // note that "==" for type names and "#FIXED" is correct
 	    // (and fast) since we've interned those literals.
-
-	    if ("#FIXED" == ainfo.mode) {
+      // not sure so I changed to .equals()
+	    if ("#FIXED".equals (ainfo.mode)) {
 		String expanded = expandDefaultRefs (ainfo.value);
 
 		// VC: Fixed Attribute Default
@@ -1028,7 +1028,7 @@ public final class ValidationConsumer extends EventFilter
 		}
 	    }
 
-	    if ("CDATA" == ainfo.type)
+	    if ("CDATA".equals (ainfo.type))
 		continue;
 	    
 	    //
@@ -1036,7 +1036,7 @@ public final class ValidationConsumer extends EventFilter
 	    // rules to follow.
 	    //
 	    
-	    if ("ID" == ainfo.type) {
+	    if ("ID".equals (ainfo.type)) {
 		// VC: ID (must be a name)
 		if (isName (value, "ID attribute", aname)) {
 		    if (Boolean.TRUE == ids.get (value))
@@ -1051,7 +1051,7 @@ public final class ValidationConsumer extends EventFilter
 		continue;
 	    } 
 
-	    if ("IDREF" == ainfo.type) {
+	    if ("IDREF".equals (ainfo.type)) {
 		// VC: IDREF (value must be a name)
 		if (isName (value, "IDREF attribute", aname)) {
 		    // VC: IDREF (must match some ID attribute)
@@ -1062,7 +1062,7 @@ public final class ValidationConsumer extends EventFilter
 		continue;
 	    } 
 
-	    if ("IDREFS" == ainfo.type) {
+	    if ("IDREFS".equals (ainfo.type)) {
 		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
@@ -1083,13 +1083,13 @@ public final class ValidationConsumer extends EventFilter
 		continue;
 	    }
 
-	    if ("NMTOKEN" == ainfo.type) {
+	    if ("NMTOKEN".equals (ainfo.type)) {
 		// VC: Name Token (is a name token)
 		isNmtoken (value, "NMTOKEN attribute", aname);
 		continue;
 	    }
 
-	    if ("NMTOKENS" == ainfo.type) {
+	    if ("NMTOKENS".equals (ainfo.type)) {
 		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
@@ -1105,7 +1105,7 @@ public final class ValidationConsumer extends EventFilter
 		continue;
 	    }
 
-	    if ("ENTITY" == ainfo.type) {
+	    if ("ENTITY".equals (ainfo.type)) {
 		if (!unparsed.contains (value))
 		    // VC: Entity Name
 		    error ("Value of attribute '" + aname
@@ -1114,7 +1114,7 @@ public final class ValidationConsumer extends EventFilter
 		continue;
 	    }
 
-	    if ("ENTITIES" == ainfo.type) {
+	    if ("ENTITIES".equals (ainfo.type)) {
 		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
@@ -1161,7 +1161,7 @@ public final class ValidationConsumer extends EventFilter
 		    ainfo = (AttributeInfo) table.get (aname);
 
 		    // "#REQUIRED" mode was interned in attributeDecl
-		    if ("#REQUIRED" == ainfo.mode
+		    if ("#REQUIRED".equals (ainfo.mode)
 			    && atts.getValue (aname) == null) {
 			// VC: Required Attribute
 			error ("Attribute '" + aname + "' must be specified "
