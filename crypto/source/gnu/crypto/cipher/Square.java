@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Square.java,v 1.1.1.1 2001-11-20 13:40:32 raif Exp $
+// $Id: Square.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,15 +38,14 @@ import java.util.Iterator;
  * Daemen, Lars Knudsen and Vincent Rijmen.<p>
  *
  * <b>References:</b>
- * <a href="http://www.esat.kuleuven.ac.be/~rijmen/square/">The block cipher
- * Square</a><br>
+ * <a href="../VR-9700.pdf">The block cipher Square</a>.<br>
  * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>,
  * <a href="mailto:lars.knudsen@esat.kuleuven.ac.be">Lars Knudsen</a> and
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class Square extends BaseCipher implements Cloneable {
+public final class Square extends BaseCipher implements IBlockCipherSpi {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Anubis.java,v 1.1.1.1 2001-11-20 13:40:25 raif Exp $
+// $Id: Anubis.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -41,13 +41,13 @@ import java.util.Iterator;
  * strategy and permits a wide variety of implementation trade-offs.<p>
  *
  * References:<br>
- * <a href="../Anubis-tweak.pdf">[ANUBIS]</a> The ANUBIS Block Cipher.<br>
+ * <a href="../Anubis-tweak.pdf">The ANUBIS Block Cipher</a>.<br>
  * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class Anubis extends BaseCipher implements Cloneable {
+public final class Anubis extends BaseCipher implements IBlockCipherSpi {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------

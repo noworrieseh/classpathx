@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: NullCipher.java,v 1.1.1.1 2001-11-20 13:40:27 raif Exp $
+// $Id: NullCipher.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -40,9 +40,9 @@ import java.util.Iterator;
  * 128-, 192- and 256-bit long, and key sizes from 64- to 512-bit in 8-bit
  * increments.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class NullCipher extends BaseCipher implements Cloneable {
+public final class NullCipher extends BaseCipher implements IBlockCipherSpi {
 
    // Constants and variables
    // -------------------------------------------------------------------------

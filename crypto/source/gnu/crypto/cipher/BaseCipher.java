@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseCipher.java,v 1.1.1.1 2001-11-20 13:40:25 raif Exp $
+// $Id: BaseCipher.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * A basic abstract class to facilitate implementing symmetric block ciphers.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class BaseCipher implements IBlockCipher {
 
@@ -62,8 +62,9 @@ public abstract class BaseCipher implements IBlockCipher {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial constructor for use by concrete subclasses.
+    * Trivial constructor for use by concrete subclasses.<p>
     *
+    * @param name the canonical name prefix of this instance.
     * @param defaultBlockSize the default block size in bytes.
     * @param defaultKeySize the default key size in bytes.
     */

@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Rijndael.java,v 1.1.1.1 2001-11-20 13:40:32 raif Exp $
+// $Id: Rijndael.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -39,14 +39,14 @@ import java.util.Iterator;
  * symmetric block cipher.<p>
  *
  * References:<br>
- * <a href="../Anubis-tweak.pdf">[RIJNDAEL]</a> The Rijndael Block Cipher -
- * AES Proposal.<br>
+ * <a href="../rijndael doc V2.pdf">The Rijndael Block Cipher - AES Proposal</a>
+ * .<br>
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a> and
  * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class Rijndael extends BaseCipher implements Cloneable {
+public final class Rijndael extends BaseCipher implements IBlockCipherSpi {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------

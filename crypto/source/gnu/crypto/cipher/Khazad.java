@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Khazad.java,v 1.1.1.1 2001-11-20 13:40:27 raif Exp $
+// $Id: Khazad.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -41,13 +41,13 @@ import java.util.Iterator;
  * a wide variety of implementation trade-offs.<p>
  *
  * References:<br>
- * <a href="../Khazad-tweak.pdf">[KHAZAD]</a> The Khazad Block Cipher.<br>
+ * <a href="../Khazad-tweak.pdf">The Khazad Block Cipher</a>.<br>
  * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class Khazad extends BaseCipher implements Cloneable {
+public final class Khazad extends BaseCipher implements IBlockCipherSpi {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------

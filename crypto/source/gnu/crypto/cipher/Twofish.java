@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Twofish.java,v 1.1.1.1 2001-11-20 13:40:33 raif Exp $
+// $Id: Twofish.java,v 1.2 2001-11-21 19:44:43 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -34,25 +34,23 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Twofish is an AES candidate algorithm. It is a balanced 128-bit Feistel
- * cipher, consisting of 16 rounds. In each round, a 64-bit S-box value is
- * computed from 64 bits of the block, and this value is xored into the other
- * half of the block. The two half-blocks are then exchanged, and the next
- * round begins. Before the first round, all input bits are xored with key-
- * dependent "whitening" subkeys, and after the final round the output bits
- * are xored with other key-dependent whitening subkeys; these subkeys are
- * not used anywhere else in the algorithm.<p>
+ * Twofish is a balanced 128-bit Feistel cipher, consisting of 16 rounds. In
+ * each round, a 64-bit S-box value is computed from 64 bits of the block, and
+ * this value is xored into the other half of the block. The two half-blocks are
+ * then exchanged, and the next round begins. Before the first round, all input
+ * bits are xored with key-dependent "whitening" subkeys, and after the final
+ * round the output bits are xored with other key-dependent whitening subkeys;
+ * these subkeys are not used anywhere else in the algorithm.<p>
  *
- * Twofish was submitted by Bruce Schneier, Doug Whiting, John Kelsey, Chris
- * Hall and David Wagner.<p>
+ * Twofish is designed by Bruce Schneier, Doug Whiting, John Kelsey, Chris Hall,
+ * David Wagner and Niels Ferguson.<p>
  *
- * Reference:<ol>
- *  <li>TWOFISH2.C -- Optimized C API calls for TWOFISH AES submission,
- *  Version 1.00, April 1998, by Doug Whiting.</ol><p>
+ * Reference:<br>
+ * <a href="../twofish.pdf">Twofish: A 128-bit Block Cipher</a>.<br>
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class Twofish extends BaseCipher implements Cloneable {
+public final class Twofish extends BaseCipher implements IBlockCipherSpi {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
