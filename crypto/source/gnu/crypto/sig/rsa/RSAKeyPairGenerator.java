@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: RSAKeyPairGenerator.java,v 1.1 2002-01-11 21:21:57 raif Exp $
+// $Id: RSAKeyPairGenerator.java,v 1.2 2002-01-17 11:53:31 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -40,6 +40,8 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +58,7 @@ import java.util.Map;
  * Cryptography</a>, Alfred J. Menezes, Paul C. van Oorschot and Scott A.
  * Vanstone. Section 11.3 RSA and related signature schemes.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RSAKeyPairGenerator implements IKeyPairGenerator {
 
@@ -74,9 +76,6 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   /** This implementation uses Fermat's F3 number as the public exponent. */
-   private static final BigInteger e = BigInteger.valueOf(65537L);
-
    /** The BigInteger constant 1. */
    private static final BigInteger ONE = BigInteger.ONE;
 
@@ -86,11 +85,35 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
    /** Property name of the length (Integer) of the modulus of an RSA key. */
    public static final String MODULUS_LENGTH = "gnu.crypto.rsa.L";
 
+   /**
+    * Property name of an optional {@link java.security.SecureRandom} instance
+    * to use. The default is to use a classloader singleton from
+    * {@link gnu.crypto.util.PRNG}.
+    */
+   public static final String SOURCE_OF_RANDOMNESS = "gnu.crypto.rsa.prng";
+
+   /**
+    * Property name of an optional {@link java.security.spec.RSAKeyGenParameterSpec}
+    * instance to use for this generator's <code>n</code>, and <code>e</code>
+    * values. The default is to generate <code>n</code> and use a fixed value
+    * for <code>e</.code> (Fermat's F4 number).
+    */
+   public static final String RSA_PARAMETERS = "gnu.crypto.rsa.params";
+
    /** Default value for the modulus length. */
    private static final int DEFAULT_MODULUS_LENGTH = 1024;
 
    /** The desired bit length of the modulus. */
    private int L;
+
+   /**
+    * This implementation uses, by default, Fermat's F4 number as the public
+    * exponent.
+    */
+   private BigInteger e = BigInteger.valueOf(65537L);
+
+   /** The optional {@link java.security.SecureRandom} instance to use. */
+   private SecureRandom rnd = null;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -112,14 +135,28 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
     *
     * @param attributes the map of name/value pairs to use.
     * @exception IllegalArgumentException if the designated MODULUS_LENGTH
-    * value is not greater than 1024.
+    * value is less than 1024.
     */
    public void setup(Map attributes) {
+      // do we have a SecureRandom, or should we use our own?
+      rnd = (SecureRandom) attributes.get(SOURCE_OF_RANDOMNESS);
+
+      // are we given a set of RSA params or we shall use our own?
+      RSAKeyGenParameterSpec params =
+         (RSAKeyGenParameterSpec) attributes.get(RSA_PARAMETERS);
+
       // find out the modulus length
-      Integer l = (Integer) attributes.get(MODULUS_LENGTH);
-      L = (l == null ? DEFAULT_MODULUS_LENGTH : l.intValue());
-      if (L < 1024)
+      if (params != null) {
+         L = params.getKeysize();
+         e = params.getPublicExponent();
+      } else {
+         Integer l = (Integer) attributes.get(MODULUS_LENGTH);
+         L = (l == null ? DEFAULT_MODULUS_LENGTH : l.intValue());
+      }
+
+      if (L < 1024) {
          throw new IllegalArgumentException(MODULUS_LENGTH);
+      }
    }
 
    /**
@@ -138,7 +175,7 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
       BigInteger upper = TWO.pow(M).subtract(ONE);
       byte[] kb = new byte[(M+7)/8]; // enough bytes to frame M bits
       step1: while (true) {
-         PRNG.nextBytes(kb);
+         nextRandomBytes(kb);
          p = new BigInteger(1, kb).setBit(0);
          if (     p.compareTo(lower) >= 0
                && p.compareTo(upper) <= 0
@@ -151,7 +188,7 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
       // 2. Generate a prime q such that the product of p and q is an L-bit
       // number, and such that GCD(q, e) = 1
       step2: while (true) {
-         PRNG.nextBytes(kb);
+         nextRandomBytes(kb);
          q = new BigInteger(1, kb).setBit(0);
          n = p.multiply(q);
          if (     n.bitLength() == L
@@ -172,5 +209,21 @@ public class RSAKeyPairGenerator implements IKeyPairGenerator {
       PrivateKey secK = new GnuRSAPrivateKey(p, q, e, d);
 
       return new KeyPair(pubK, secK);
+   }
+
+   // helper methods
+   // -------------------------------------------------------------------------
+
+   /**
+    * Fills the designated byte array with random data.
+    *
+    * @param buffer the byte array to fill with random data.
+    */
+   private void nextRandomBytes(byte[] buffer) {
+      if (rnd != null) {
+         rnd.nextBytes(buffer);
+      } else {
+         PRNG.nextBytes(buffer);
+      }
    }
 }
