@@ -231,6 +231,8 @@ public class IMAPFolder
         {
           entries = connection.list(parent, name);
         }
+        if (connection.alertsPending())
+          ((IMAPStore)store).processAlerts();
         if (entries.length>0)
         {
           type = entries[0].isNoinferiors() ?
@@ -305,6 +307,8 @@ public class IMAPFolder
       }
       s.setSelected(this);
       notifyConnectionListeners(ConnectionEvent.OPENED);
+      if (connection.alertsPending())
+        s.processAlerts();
     }
     catch (IOException e)
     {
@@ -336,6 +340,8 @@ public class IMAPFolder
       }
       if (ret)
         notifyFolderListeners(FolderEvent.CREATED);
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return ret;
     }
     catch (IOException e)
@@ -360,6 +366,8 @@ public class IMAPFolder
       }
       if (ret)
         notifyFolderListeners(FolderEvent.DELETED);
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return ret;
     }
     catch (IOException e)
@@ -384,6 +392,8 @@ public class IMAPFolder
       }
       if (ret)
         notifyFolderRenamedListeners(folder); // do we have to close?
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return ret;
     }
     catch (IOException e)
@@ -420,6 +430,8 @@ public class IMAPFolder
         {
           success = connection.close();
         }
+        if (connection.alertsPending())
+          s.processAlerts();
         if (!success)
           throw new IllegalWriteException();
       }
@@ -456,6 +468,8 @@ public class IMAPFolder
         messages[i] = new IMAPMessage(this, messageNumbers[i]);
       // do we need to do this?
       notifyMessageRemovedListeners(true, messages);
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return messages;
     }
     catch (IOException e)
@@ -487,25 +501,36 @@ public class IMAPFolder
   public int getMessageCount() 
     throws MessagingException 
   {
-    if (mode==-1 || messageCount<0)
+    MailboxStatus ms = null;
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
     {
-      IMAPConnection connection = ((IMAPStore)store).connection;
-      try
+      if (mode==-1 || messageCount<0)
       {
         String[] items = new String[1];
         items[0] = IMAPConnection.MESSAGES;
         synchronized (connection)
         {
-          MailboxStatus ms = connection.status(path, items);
-          update(ms, true);
+          ms = connection.status(path, items);
         }
+        update(ms, true);
       }
-      catch (IOException e)
+      else // NOOP
       {
-        throw new MessagingException(e.getMessage(), e);
+        synchronized (connection)
+        {
+          ms = connection.noop();
+        }
+        if (ms!=null)
+          update(ms, true);
       }
     }
-    // TODO else NOOP
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    if (connection.alertsPending())
+      ((IMAPStore)store).processAlerts();
     return messageCount;
   }
 
@@ -516,25 +541,36 @@ public class IMAPFolder
   public int getNewMessageCount() 
     throws MessagingException 
   {
-    if (mode==-1 || newMessageCount<0)
+    MailboxStatus ms = null;
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
     {
-      IMAPConnection connection = ((IMAPStore)store).connection;
-      try
+      if (mode==-1 || newMessageCount<0)
       {
         String[] items = new String[1];
         items[0] = IMAPConnection.RECENT;
         synchronized (connection)
         {
-          MailboxStatus ms = connection.status(path, items);
+          ms = connection.status(path, items);
           update(ms, true);
         }
       }
-      catch (IOException e)
+      else // NOOP
       {
-        throw new MessagingException(e.getMessage(), e);
+        synchronized (connection)
+        {
+          ms = connection.noop();
+        }
+        if (ms!=null)
+          update(ms, true);
       }
     }
-    // TODO else NOOP
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    if (connection.alertsPending())
+      ((IMAPStore)store).processAlerts();
     return newMessageCount;
   }
 
@@ -586,6 +622,8 @@ public class IMAPFolder
           connection.append(path, null, content);
         }
       }
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
     }
     catch (IOException e)
     {
@@ -669,6 +707,8 @@ public class IMAPFolder
           }
         }
       }
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
     }
     catch (IOException e)
     {
@@ -719,6 +759,8 @@ public class IMAPFolder
       Message[] messages = new Message[mn.length];
       for (int i=0; i<mn.length; i++)
         messages[i] = new IMAPMessage(this, mn[i]);
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       // Enforce final constraints
       return super.search(term, messages);
     }
@@ -949,6 +991,8 @@ public class IMAPFolder
       {
         entries = connection.list(path, pattern);
       }
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return getFolders(entries);
     }
     catch (IOException e)
@@ -971,6 +1015,8 @@ public class IMAPFolder
       {
         entries = connection.lsub(path, pattern);
       }
+      if (connection.alertsPending())
+        ((IMAPStore)store).processAlerts();
       return getFolders(entries);
     }
     catch (IOException e)
@@ -1057,6 +1103,8 @@ public class IMAPFolder
         {
           entries = connection.list(path, null);
         }
+        if (connection.alertsPending())
+          ((IMAPStore)store).processAlerts();
         if (entries.length>0)
           delimiter = entries[0].getDelimiter();
         else

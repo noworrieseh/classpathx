@@ -75,6 +75,16 @@ public class IMAPConnection implements IMAPConstants
    */
   protected OutputStream out;
 
+  /**
+   * List of responses received asynchronously.
+   */
+  protected List asyncResponses;
+
+  /**
+   * List of alert strings.
+   */
+  private List alerts;
+
   /*
    * Used to generate new tags for tagged commands.
    */
@@ -85,6 +95,11 @@ public class IMAPConnection implements IMAPConstants
    */
   private boolean debug = false;
 
+  /*
+   * Print debugging output using ANSI colour escape sequences.
+   */
+  private boolean ansiDebug = false;
+
   /**
    * Constructor.
    */
@@ -94,6 +109,8 @@ public class IMAPConnection implements IMAPConstants
     socket = new Socket(host, port);
     in = new IMAPResponseTokenizer(socket.getInputStream());
     out = socket.getOutputStream();
+    asyncResponses = new ArrayList();
+    alerts = new ArrayList();
   }
 
   /**
@@ -102,6 +119,14 @@ public class IMAPConnection implements IMAPConstants
   public void setDebug(boolean flag)
   {
     debug = flag;
+  }
+
+  /**
+   * Sets whether debugging output should use ANSI colour escape sequences.
+   */
+  public void setAnsiDebug(boolean flag)
+  {
+    ansiDebug = flag;
   }
 
   /**
@@ -143,8 +168,10 @@ public class IMAPConnection implements IMAPConstants
     while (true)
     {
       IMAPResponse response = readResponse();
-      if (response.isTagged()) {
-        String id = response.getID();
+      String id = response.getID();
+      if (tag.equals(response.getTag()))
+      {
+        processAlerts(response);
         if (id==OK)
           return true;
         else if (id==NO)
@@ -152,6 +179,10 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else if (response.isUntagged())
+        asyncResponses.add(response);
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -169,9 +200,38 @@ public class IMAPConnection implements IMAPConstants
   {
     IMAPResponse response = in.next();
     if (debug)
-      System.err.println("< "+response.toANSIString());
+    {
+      if (ansiDebug)
+        System.err.println("< "+response.toANSIString());
+      else
+        System.err.println("< "+response.toString());
+    }
     return response;
   }
+
+  // -- Alert notifications --
+
+  private void processAlerts(IMAPResponse response)
+  {
+    List code = response.getResponseCode();
+    if (code!=null && code.contains(ALERT))
+      alerts.add(response.getText());
+  }
+
+  boolean alertsPending()
+  {
+    return (alerts.size()>0);
+  }
+
+  String[] getAlerts()
+  {
+    String[] a = new String[alerts.size()];
+    alerts.toArray(a);
+    alerts.clear(); // flush
+    return a;
+  }
+
+  // -- IMAP commands --
 
   /**
    * Returns a list of the capabilities of the IMAP server.
@@ -184,9 +244,10 @@ public class IMAPConnection implements IMAPConstants
     while (true)
     {
       IMAPResponse response = readResponse();
-      if (response.isTagged())
+      String id = response.getID();
+      if (tag.equals(response.getTag()))
       {
-        String id = response.getID();
+        processAlerts(response);
         if (id==OK)
         {
           // The capability "list" is actually contained in the response
@@ -207,6 +268,52 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else if (response.isUntagged())
+        asyncResponses.add(response);
+      else
+        throw new IMAPException(id, response.getText());
+    }
+  }
+
+  /**
+   * Ping the server.
+   * If a change in mailbox state is detected, a new mailbox status is
+   * returned, otherwise this method returns null.
+   */
+  public MailboxStatus noop()
+    throws IOException
+  {
+    String tag = newTag();
+    sendCommand(tag, NOOP);
+    boolean changed = false;
+    MailboxStatus ms = new MailboxStatus();
+    Iterator asyncIterator = asyncResponses.iterator();
+    while (true)
+    {
+      IMAPResponse response;
+      // Process any asynchronous responses first
+      if (asyncIterator.hasNext())
+      {
+        response = (IMAPResponse)asyncIterator.next();
+        asyncIterator.remove();
+      }
+      else
+        response = readResponse();
+      String id = response.getID();
+      if (response.isUntagged())
+      {
+        changed = changed | updateMailboxStatus(ms, id, response);
+      }
+      else if (tag.equals(response.getTag()))
+      {
+        processAlerts(response);
+        if (id==OK)
+          return changed ? ms : null;
+        else
+          throw new IMAPException(id, response.getText());
+      }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -242,8 +349,9 @@ public class IMAPConnection implements IMAPConstants
     while (true)
     {
       IMAPResponse response = readResponse();
-      if (response.isTagged())
+      if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         String id = response.getID();
         if (id==OK)
           return true;
@@ -278,6 +386,8 @@ public class IMAPConnection implements IMAPConstants
           out.write(0x0d);
         }
       }
+      else
+        asyncResponses.add(response);
     }
   }
 
@@ -338,12 +448,20 @@ public class IMAPConnection implements IMAPConstants
     while (true)
     {
       IMAPResponse response = readResponse();
-      String id = response.getID();
-      if (id==OK)
+      if (response.isTagged() && tag.equals(response.getTag()))
       {
-        socket.close();
-        return;
+        processAlerts(response);
+        String id = response.getID();
+        if (id==OK)
+        {
+          socket.close();
+          return;
+        }
+        else
+          throw new IMAPException(id, response.getText());
       }
+      else
+        asyncResponses.add(response);
     }
   }
 
@@ -386,62 +504,12 @@ public class IMAPConnection implements IMAPConstants
       String id = response.getID();
       if (response.isUntagged())
       {
-        if (id==OK)
-        {
-          List rc = response.getResponseCode();
-          int len = rc.size();
-          for (int i=0; i<len; i++)
-          {
-            Object ocmd = rc.get(i);
-            if (ocmd instanceof String)
-            {
-              String cmd = (String)ocmd;
-              if (i+1<len)
-              {
-                Object oparam = rc.get(i+1);
-                if (oparam instanceof String)
-                {
-                  String param = (String)oparam;
-                  try
-                  {
-                    if (cmd==UNSEEN)
-                    {
-                      ms.firstUnreadMessage = Integer.parseInt(param);
-                      i++;
-                    }
-                    else if (cmd==UIDVALIDITY)
-                    {
-                      ms.uidValidity = Integer.parseInt(param);
-                      i++;
-                    }
-                  }
-                  catch (NumberFormatException e)
-                  {
-                    throw new ProtocolException("Illegal "+cmd+" value: "+
-                        param);
-                  }
-                }
-                else if (oparam instanceof List)
-                {
-                  if (cmd==PERMANENTFLAGS)
-                  {
-                    ms.permanentFlags = (List)oparam;
-                    i++;
-                  }
-                }
-              }
-            }
-          }
-        }
-        else if (id==EXISTS)
-          ms.messageCount = response.getCount();
-        else if (id==RECENT)
-          ms.newMessageCount = response.getCount();
-        else if (id==FLAGS)
-          ms.flags = response.getResponseCode();
+        if (!updateMailboxStatus(ms, id, response))
+          asyncResponses.add(response);
       }
       else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           List rc = response.getResponseCode();
@@ -452,7 +520,80 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
+  }
+
+  protected boolean updateMailboxStatus(MailboxStatus ms,
+      String id, IMAPResponse response)
+    throws IOException
+  {
+    if (id==OK)
+    {
+      List rc = response.getResponseCode();
+      int len = rc.size();
+      for (int i=0; i<len; i++)
+      {
+        Object ocmd = rc.get(i);
+        if (ocmd instanceof String)
+        {
+          String cmd = (String)ocmd;
+          if (i+1<len)
+          {
+            Object oparam = rc.get(i+1);
+            if (oparam instanceof String)
+            {
+              String param = (String)oparam;
+              try
+              {
+                if (cmd==UNSEEN)
+                {
+                  ms.firstUnreadMessage = Integer.parseInt(param);
+                  i++;
+                }
+                else if (cmd==UIDVALIDITY)
+                {
+                  ms.uidValidity = Integer.parseInt(param);
+                  i++;
+                }
+              }
+              catch (NumberFormatException e)
+              {
+                throw new ProtocolException("Illegal "+cmd+" value: "+
+                    param);
+              }
+            }
+            else if (oparam instanceof List)
+            {
+              if (cmd==PERMANENTFLAGS)
+              {
+                ms.permanentFlags = (List)oparam;
+                i++;
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }
+    else if (id==EXISTS)
+    {
+      ms.messageCount = response.getCount();
+      return true;
+    }
+    else if (id==RECENT)
+    {
+      ms.newMessageCount = response.getCount();
+      return true;
+    }
+    else if (id==FLAGS)
+    {
+      ms.flags = response.getResponseCode();
+      return true;
+    }
+    else
+      return false;
   }
 
   /**
@@ -611,9 +752,12 @@ public class IMAPConnection implements IMAPConstants
               noselect, marked, unmarked);
           acc.add(entry);
         }
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           ListEntry[] entries = new ListEntry[acc.size()];
@@ -623,6 +767,8 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -680,14 +826,19 @@ public class IMAPConnection implements IMAPConstants
             }
           }
         }
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
           return ms;
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -734,8 +885,9 @@ public class IMAPConnection implements IMAPConstants
     while (true)
     {
       response = readResponse();
-      if (response.isTagged()) {
-        String id = response.getID();
+      String id = response.getID();
+      if (tag.equals(response.getTag())) {
+        processAlerts(response);
         if (id==OK)
           return true;
         else if (id==NO)
@@ -743,6 +895,10 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else if (response.isUntagged())
+        asyncResponses.add(response);
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -784,9 +940,12 @@ public class IMAPConnection implements IMAPConstants
       {
         if (id==EXPUNGE)
           numbers.add(new Integer(response.getCount()));
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           int len = numbers.size();
@@ -798,6 +957,8 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -849,9 +1010,12 @@ public class IMAPConnection implements IMAPConstants
             throw new IMAPException(id, "Expecting number: "+text);
           }
         }
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           int len = list.size();
@@ -863,6 +1027,8 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -906,9 +1072,12 @@ public class IMAPConnection implements IMAPConstants
           MessageStatus status = new MessageStatus(msgnum, code);
           list.add(status);
         }
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           MessageStatus[] statuses = new MessageStatus[list.size()];
@@ -918,6 +1087,8 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 
@@ -977,9 +1148,12 @@ public class IMAPConnection implements IMAPConstants
           MessageStatus mf = new MessageStatus(msgnum, base);
           list.add(mf);
         }
+        else
+          asyncResponses.add(response);
       }
-      else if (response.isTagged())
+      else if (tag.equals(response.getTag()))
       {
+        processAlerts(response);
         if (id==OK)
         {
           MessageStatus[] mf = new MessageStatus[list.size()];
@@ -989,6 +1163,8 @@ public class IMAPConnection implements IMAPConstants
         else
           throw new IMAPException(id, response.getText());
       }
+      else
+        throw new IMAPException(id, response.getText());
     }
   }
 

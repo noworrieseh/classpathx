@@ -35,8 +35,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
-
-import javax.mail.Flags;
+import javax.mail.event.StoreEvent;
 
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
@@ -95,8 +94,12 @@ public class IMAPStore
       try
       {
         connection = new IMAPConnection(host, port);
+        
         if (session.getDebug())
           connection.setDebug(true);
+        if (new Boolean(session.getProperty("mail.debug.ansi")).booleanValue())
+          connection.setAnsiDebug(true);
+        
         List capabilities = connection.capability();
         if (capabilities.contains("AUTH="+CRAM_MD5))
           return connection.authenticate_CRAM_MD5(username, password);
@@ -110,6 +113,11 @@ public class IMAPStore
       catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
+      }
+      finally
+      {
+        if (connection.alertsPending())
+          processAlerts();
       }
     }
   }
@@ -178,6 +186,16 @@ public class IMAPStore
   protected void setSelected(IMAPFolder folder)
   {
     selected = folder;
+  }
+
+  /**
+   * Process any alerts supplied by the server.
+   */
+  protected void processAlerts()
+  {
+    String[] alerts = connection.getAlerts();
+    for (int i=0; i<alerts.length; i++)
+      notifyStoreListeners(StoreEvent.ALERT, alerts[i]);
   }
 
 }
