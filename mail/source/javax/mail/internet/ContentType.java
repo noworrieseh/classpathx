@@ -1,193 +1,256 @@
-/* ContentType.java */    
-
-/* Liscense goes here. */
+/*
+ * ContentType.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.internet;
 
-import javax.mail.internet.ParameterList;
-
 /**
- * This class represents a MIME content type value.
- *
- * @author Joey Lesh
+ * This class represents a MIME ContentType value.
+ * It provides methods to parse a ContentType string into individual 
+ * components and to generate a MIME style ContentType string.
  */
-public class ContentType {
-	
-	// +--------+-------------------------------------------
-	// | Fields | of Dreams
-	// +--------+
+public class ContentType
+{
 
-	private ParameterList params = null;
+  /*
+   * The primary type.
+   */
+  private String primaryType;
 
-	private String primaryType = "text";
-	
-	private String subType = "plain";
+  /*
+   * The subtype.
+   */
+  private String subType;
 
-	// +--------------+----------------------------------------
-	// | Constructors |
-	// +--------------+
+  /*
+   * The list of additional parameters.
+   */
+  private ParameterList list;
 
-	/**
-	 * Standard, no-argument constructor. Defaults with type "text/plain"
-	 * and no parameters.
-	 */
-	public ContentType() {
+  /**
+   * No-arg Constructor.
+   */
+  public ContentType()
+  {
+  }
 
-	}// ContentType()
-	
-	/**
-	 * Creates a "Content-Type" header by parsing the string.
-	 *
-	 * @param s The string to parse into a content-type.
-	 */
-	public ContentType(String s) throws ParseException {
+  /**
+   * Constructor.
+   * @param primaryType the primary type
+   * @param subType the subtype
+   * @param list the list of additional parameters
+   */
+  public ContentType(String primaryType, String subType, ParameterList list)
+  {
+    this.primaryType = primaryType;
+    this.subType = subType;
+    this.list = list;
+  }
 
-		// TO DO:  Waiting for Dave to do the HeaderTokenizer
-	}// ContentType(String)
-	
-	/**
-	 * Constructs a <code>ContentType</code> object with the specified
-	 * types and parameters.
-	 *
-	 * @param primaryType The primary type of the content.
-	 * @param subType The subtype of the content.
-	 * @param list The parameters associated with the value.
-	 */
-	public ContentType(String primaryType, String subType, ParameterList list) {
-		this.primaryType = primaryType;
-		this.subType = subType;
-		this.params = list;
-	}// ContentType(String, String, ParameterList)
+  /**
+   * Constructor that takes a Content-Type string.
+   * The String is parsed into its constituents: primaryType, subType and 
+   * parameters. A ParseException is thrown if the parse fails.
+   * @param s the Content-Type string.
+   * @exception ParseException if the parse fails.
+   */
+  public ContentType(String s)
+    throws ParseException
+  {
+    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
+    HeaderTokenizer.Token token = ht.next();
+    if (token.getType()!=HeaderTokenizer.Token.ATOM)
+      throw new ParseException();
+    primaryType = token.getValue();
+    token = ht.next();
+    if (token.getType()!=0x2f) // '/'
+      throw new ParseException();
+    token = ht.next();
+    if (token.getType()!=HeaderTokenizer.Token.ATOM)
+      throw new ParseException();
+    subType = token.getValue();
+    s = ht.getRemainder();
+    if (s!=null)
+      list = new ParameterList(s);
+  }
 
-	// +----------------+--------------------------------------
-	// | Public Methods |
-	// +----------------+
+  /**
+   * Return the primary type.
+   */
+  public String getPrimaryType()
+  {
+    return primaryType;
+  }
 
-	/**
-	 * Returns a MIME <code>String</code> without the parameters.
-	 *
-	 * @return A string of the type.
-	 */
-	public String getBaseType() {
-		return this.primaryType + "/" + this.subType;
-	}// getBaseType()
-	
-	/**
-	 * Gets the value of the parameter named by <code>name</code>.
-	 *
-	 * @return The parameter's value.
-	 */
-	public String getParameter(String name) {
-		return params.get(name);
-	}// getParameter(String)
-	
+  /**
+   * Return the subtype.
+   */
+  public String getSubType()
+  {
+    return subType;
+  }
 
-	/**
-	 * Returns the <code>ParameterList</code> containing
-	 * the values of the parameters keyed by the parameter names.
-	 *
-	 * @return The parameters.
-	 */
-	public ParameterList getParameterList() {
-		return this.params;
-	}// getParameterList()
-	
-	/**
-	 * Returns the primary type of this "Content-Type" header.
-	 *
-	 * @return The primary type. 
-	 */
-	public String getPrimaryType() {
-		return this.primaryType;
-	}// getPrimaryType()
-	
-	/**
-	 * Returns the subtype of this "Content-Type" header.
-	 *
-	 * @return The subtype. 
-	 */
-	public String getSubType() {
-		return this.subType;
-	}// getSubType()
-	
-	/**
-	 * Matches the <code>ContentType</code> to <code>this</code>.  A match
-	 * occurs when the base and sub types of each are the same (ignoring
-	 * case). Note that the subtype to match can be the special "*" which
-	 * any subtype will match.
-	 *
-	 * @param cType The object to match against.
-	 * @return true if they match.  
-	 */
-	public  boolean match(ContentType cType) {
-		if (cType.getBaseType().equalsIgnoreCase(this.getBaseType()))
-			if (cType.getSubType().equalsIgnoreCase(this.getSubType())
-				|| cType.getSubType().equals("*"))
-				return true;
-		return false;
-	}// match(ContentType)
-	
-	/**
-	 * Matches by comparing the type part only, ignoring case. Also, a 
-	 * subtype of the special star, "*", will match any subtype. For example:
-	 * <pre>
-	 * text/plain; foo=bar
-	 *      and
-	 * TEXT/*
-     * </pre>
-	 * are matches.
-	 *
-	 * @param s The <code>String</code> to match against.
-	 * @return <code>true</code> if they match.  
-	 */
- 	public boolean match(String s) {
-		return (new ContentType(s)).match(this);
-	} //match(boolean)
+  /**
+   * Return the MIME type string, without the parameters.
+   * The returned value is basically the concatenation of the primaryType,
+   * the '/' character and the secondaryType.
+   */
+  public String getBaseType()
+  {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(primaryType);
+    buffer.append('/');
+    buffer.append(subType);
+    return buffer.toString();
+  }
 
-	/**
-	 * Adds or replaces the parameter named <code>name</code>
-	 * with associated value <code>value</code>
-	 *
-	 * @param name The parameter's name.
-	 * @param value The parameter's value.
-	 */
-	public void setParameter(String name, String value) {
-		this.params.set(name, value);
-	}// setParameter(String, String)
-	
-	/**
-	 * Replaces the old <code>ParameterList</code> with a new
-	 * one.
-	 *
-	 * @param list The new list.
-	 */
-	public void setParameterList(ParameterList list) {
-		this.params = list;
-	}// setParameterList(ParameterList)
-	
-	/**
-	 *
-	 */
-	public void setPrimaryType(String primaryType) {
-		this.primaryType = primaryType;
-	}// setPrimaryType(String)
-	
-	/**
-	 * Sets the subtype to the parameter.
-	 */
-	public void setSubType(String subType) {
-		this.subType = subType;
-	}// setSubType(String)
-	
-	/**
-	 * Returns a MIME compliant "Content-Type" header with the parameters
-	 * and type.
-	 */
-	public String toString() {
-		return "Content-Type:" + primaryType+ "/" + subType + (params == null ? null : ";" + params.toString());
-	}// toString(String)
-	
-}// ContentType
+  /**
+   * Return the specified parameter value.
+   * Returns null if this parameter is absent.
+   */
+  public String getParameter(String name)
+  {
+    return (list==null) ? null : list.get(name);
+  }
 
+  /**
+   * Return a ParameterList object that holds all the available parameters.
+   * Returns null if no parameters are available.
+   */
+  public ParameterList getParameterList()
+  {
+    return list;
+  }
 
+  /**
+   * Set the primary type.
+   * Overrides existing primary type.
+   * @param primaryType the primary type
+   */
+  public void setPrimaryType(String primaryType)
+  {
+    this.primaryType = primaryType;
+  }
 
+  /**
+   * Set the subtype.
+   * Overrides existing subtype
+   * @param type the subtype
+   */
+  public void setSubType(String subType)
+  {
+    this.subType = subType;
+  }
+
+  /**
+   * Set the specified parameter.
+   * If this parameter already exists, it is replaced by this new value.
+   * @param name the parameter name
+   * @param value the parameter value
+   */
+  public void setParameter(String name, String value)
+  {
+    if (list==null)
+      list = new ParameterList();
+    list.set(name, value);
+  }
+
+  /**
+   * Set a new parameter list.
+   * @param list the Parameter list
+   */
+  public void setParameterList(ParameterList list)
+  {
+    this.list = list;
+  }
+
+  /**
+   * Retrieve a RFC2045 style string representation of this Content-Type.
+   * Returns null if the conversion failed.
+   * @return RFC2045 style string
+   */
+  public String toString()
+  {
+    if (primaryType==null || subType==null)
+      return null;
+    
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(primaryType);
+    buffer.append('/');
+    buffer.append(subType);
+    if (list!=null)
+    {
+      // Add the parameters, using the toString(int) method
+      // which allows the resulting string to fold properly onto the next
+      // header line.
+      int used = buffer.length()+14;
+      buffer.append(list.toString(used));
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Match with the specified ContentType object.
+   * This method compares only the primaryType and subType.
+   * The parameters of both operands are ignored.
+   * <p>
+   * For example, this method will return true when comparing the 
+   * ContentTypes for "text/plain" and "text/plain; charset=foobar".
+   * If the subType of either operand is the special character '*', then 
+   * the subtype is ignored during the match.
+   * For example, this method will return true when comparing the
+   * ContentTypes for "text/plain" and "text/*"
+   * @param cType the content type to compare this against
+   */
+  public boolean match(ContentType cType)
+  {
+    if (!primaryType.equalsIgnoreCase(cType.getPrimaryType()))
+      return false;
+    String cTypeSubType = cType.getSubType();
+    if (subType.charAt(0)=='*' || cTypeSubType.charAt(0)=='*')
+      return true;
+    else
+      return subType.equalsIgnoreCase(cTypeSubType);
+  }
+
+  /**
+   * Match with the specified content-type string.
+   * This method compares only the primaryType and subType.
+   * The parameters of both operands are ignored.
+   * <p>
+   * For example, this method will return true when comparing the 
+   * ContentType for "text/plain" with "text/plain; charset=foobar".
+   * If the subType of either operand is the special character '*', then 
+   * the subtype is ignored during the match.
+   * For example, this method will return true when comparing the 
+   * ContentType for "text/plain" with "text/*"
+   * @param s the string representation of the content type to match
+   */
+  public boolean match(String s)
+  {
+    try
+    {
+      return match(new ContentType(s));
+    }
+    catch (ParseException e)
+    {
+      return false;
+    }
+  }
+  
+}

@@ -1,145 +1,167 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * ContentDisposition.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.internet;
 
-// Imports
-import java.util.Vector;
-import java.util.Enumeration;
-
 /**
- * Content Disposition.  Used by MimeBodyPart.  Implementation of
- * RFC 2183.
- *
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class represents a MIME ContentDisposition value.
+ * It provides methods to parse a ContentDisposition string into 
+ * individual components and to generate a MIME style ContentDisposition 
+ * string.
  */
-class ContentDisposition {
+public class ContentDisposition
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /*
+   * The disposition value.
+   */
+  private String disposition;
 
-	/**
-	 * Disposition type.  RFC describes inline and attachment.
-	 */
-	private	String			disposition	= "";
+  /*
+   * The available parameters.
+   */
+  private ParameterList list;
 
-	/**
-	 * List of associated parameters to the disposition.
-	 */
-	private ParameterList	list		= new ParameterList();
+  /**
+   * No-arg constructor.
+   */
+  public ContentDisposition()
+  {
+  }
 
+  /**
+   * Constructor.
+   * @param disposition disposition
+   * @param list ParameterList
+   */
+  public ContentDisposition(String disposition, ParameterList list)
+  {
+    this.disposition = disposition;
+    this.list = list;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Constructor that takes a ContentDisposition string.
+   * The String is parsed into its constituents: disposition and parameters.
+   * A ParseException is thrown if the parse fails.
+   * @param s the ContentDisposition string.
+   * @exception ParseException if the parse fails.
+   */
+  public ContentDisposition(String s)
+    throws ParseException
+  {
+    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
+    HeaderTokenizer.Token token = ht.next();
+    if (token.getType()!=HeaderTokenizer.Token.ATOM)
+      throw new ParseException();
+    
+    disposition = token.getValue();
+    
+    s = ht.getRemainder();
+    if (s!=null)
+      list = new ParameterList(s);
+  }
 
-	/**
-	 * Default Constructor.  Create an empty content disposition.
-	 */
-	public ContentDisposition() {
-	} // ContentDisposition()
+  /**
+   * Return the disposition value.
+   * @return the disposition
+   */
+  public String getDisposition()
+  {
+    return disposition;
+  }
 
-	/**
-	 * Create a Content Disposition.
-	 * @param disposition Disposition type
-	 * @param list List of parameters
-	 */
-	public ContentDisposition(String disposition, ParameterList list) {
-		this.disposition = disposition;
-		this.list = list;
-	} // ContentDisposition()
+  /**
+   * Return the specified parameter value.
+   * Returns null if this parameter is absent.
+   * @param name the name of the parameter
+   * @return the parameter value
+   */
+  public String getParameter(String name)
+  {
+    return (list!=null) ? list.get(name) : null;
+  }
 
-	/**
-	 * Create Content Disposition object from a raw header.
-	 * @param rawValue Raw header line
-	 * @exception ParseException Error occurred in processing of header
-	 */
-	public ContentDisposition(String rawValue) throws ParseException {
+  /**
+   * Return a ParameterList object that holds all the available parameters.
+   * Returns null if no parameters are available.
+   */
+  public ParameterList getParameterList()
+  {
+    return list;
+  }
 
-		// Variables
-		int				index;
+  /**
+   * Set the primary type. Overrides existing primary type.
+   * @param primaryType the primary type
+   */
+  public void setDisposition(String disposition)
+  {
+    this.disposition = disposition;
+  }
 
-		// Check for Mail Header (Do we need to check for this??)
-		if (rawValue.startsWith("Content-Disposition:") == true) {
-			rawValue = rawValue.substring(20);
-		} // if
+  /**
+   * Set the specified parameter.
+   * If this parameter already exists, it is replaced by this new value.
+   * @param name the parameter name
+   * @param value the parameter value
+   */
+  public void setParameter(String name, String value)
+  {
+    if (list == null)
+      list = new ParameterList();
+    list.set(name, value);
+  }
 
-		// Check for seperator
-		index = rawValue.indexOf(";");
-		if (index != -1) {
-			setDisposition(rawValue.substring(0, index));
-			setParameterList(new ParameterList(rawValue.substring(index + 1)));
-		} else {
-			setDisposition(rawValue);
-		} // if
+  /**
+   * Set a new ParameterList.
+   * @param list the ParameterList
+   */
+  public void setParameterList(ParameterList list)
+  {
+    this.list = list;
+  }
 
-	} // ContentDisposition()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get string representation of content disposition.
-	 * @returns String
-	 */
-	public String toString() {
-		return null; // TODO
-	} // toString()
-
-	/**
-	 * Get content disposition type.
-	 * @returns Content disposition type
-	 */
-	public String getDisposition() {
-		return disposition;
-	} // getDisposition()
-
-	/**
-	 * Get parameter value for the specified name.
-	 * @param name Parameter name
-	 * @returns Parameter value
-	 */
-	public String getParameter(String name) {
-		return list.get(name);
-	} // getParameter()
-
-	/**
-	 * Get list of parameters.
-	 * @returns Parameter list
-	 */
-	public ParameterList getParameterList() {
-		return list;
-	} // getParameterList()
-
-	/**
-	 * Set the content disposition type.
-	 * @param value Type of disposition
-	 */
-	public void setDisposition(String value) {
-		disposition = value;
-	} // setDisposition()
-
-	/**
-	 * Set a parameter name and value for the disposition.
-	 * @param name Name of parameter
-	 * @param value Value of parameter
-	 */
-	public void setParameter(String name, String value) {
-		list.set(name, value);
-	} // setParameter()
-
-	/**
-	 * Set the parameters of the disposition.
-	 * @param list Parameter list
-	 */
-	public void setParameterList(ParameterList list) {
-		this.list = list;
-	} // setParameterList()
-
-
-} // ContentDisposition
+  /**
+   * Retrieve a RFC2045 style string representation of this 
+   * ContentDisposition.
+   * Returns null if the conversion failed.
+   * @return RFC2045 style string
+   */
+  public String toString()
+  {
+    if (disposition==null)
+      return null;
+    if (list==null)
+      return disposition;
+    else
+    {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append(disposition);
+      
+      // Add the parameters, using the toString(int) method
+      // which allows the resulting string to fold properly onto the next
+      // header line.
+      int used = buffer.length()+21; // "Content-Disposition: ".length()
+      buffer.append(list.toString(used));
+      return buffer.toString();
+    }
+  }
+  
+}

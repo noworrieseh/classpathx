@@ -1,107 +1,116 @@
-/**
- * This is part of the Open Java Extensions project. 
+/*
+ * AddressException.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 package javax.mail.internet;
 
-import java.lang.Exception;
-
 /**
- * This subclass of <code>ParseException</code> is used when an incorrectly
- * formatted address is encountered.
- * 
- * @author Joey Lesh (joey@gnu.org)
+ * The exception thrown when a wrongly formatted address is encountered.
  */
-public class AddressException extends ParseException {
-	
-	/**
-	 * The postion (index) in the <code>String</code> where the problem 
-	 * occurred. Value is -1 if position not known. */
-	protected int pos = -1;
+public class AddressException
+  extends ParseException
+{
 
-	/*
-	 * The <code>String</code> in which parsing failed.
-	 */
-	protected String ref;
-	
-	/**
-	 * Constructs an <code>AddressException</code> without a detail
-	 * message.
-	 */
-	public AddressException() {
-		super();
-	}
+  /**
+   * The string being parsed.
+   */
+  protected String ref;
 
-	/**
-	 * Constructs an <code>AddressException</code> with a message
-	 * giving more detail.
-	 */
-	public AddressException(String s) {
-		super(s);
-	}
+  /**
+   * The index in the string where the error occurred, or -1 if not known.
+   */
+  protected int pos;
 
-	/**
-	 * Constructs an <code>AddressException</code> with both a
-	 * message giving details of the exception and  the <code>String</code>
-	 * upon which the error ocurred.
-	 *
-	 * @param s the detail message
-	 * @param reference the <code>String</code> which caused the error.
-	 */ 
-	public AddressException(String s, String reference) {
-		super(s);
-		ref= reference;
-	}
+  /**
+   * Constructs an AddressException with no detail message.
+   */
+  public AddressException()
+  {
+    this(null, null, -1);
+  }
 
-	/**
-	 * Constructs an <code>AddressException</code> with both a
-	 * message giving details of the exception and  the <code>String</code>
-	 * upon which the error ocurred. It also includes the postion at which
-	 * the exception was thrown.
-	 *
-	 * @param s the detail message
-	 * @param reference the <code>String</code> which caused the error.
-	 * @param position the index at which the error was found.
-	 */ 
-	public AddressException(String s, String reference, int position) {
-		super(s);
-		ref= reference;
-		pos= position;
-	}
+  /**
+   * Constructs an AddressException with the specified detail message.
+   * @param s the detail message
+   */
+  public AddressException(String s)
+  {
+    this(s, null, -1);
+  }
 
-	/**
-	 * Gets the String which was being operated on when this exception was 
-	 * thrown.
-	 *
-	 * @return the reference String. 
-	 */
-	public String getRef() {
-		return this.ref;
-	}
-	
-	/**
-	 * Gets the index in <code>this.ref</code> at which the processing was
-	 * halted.
-	 *
-	 * @return the <code>int</code> index. 
-	 */
-	public int getPos() {
-		return this.pos;
-	}
+  /**
+   * Constructs an AddressException with the specified detail message and
+   * reference info.
+   * @param s the detail message
+   * @param ref the reference info
+   */
+  public AddressException(String s, String ref)
+  {
+    this(s, ref, -1);
+  }
 
-	/**
-	 * Creates a <code>String</code> that contains all of the information
-	 * that this <code>AddressException</code> has, including the reference
-	 * string and the position.
-	 *
-	 * @return the detail information.
-	 */
-	public String toString() {
-	    return super.toString() + (ref != null ? " In address " + ref + (pos > -1 ? " at " + new Integer(pos).toString() : "") : "");
-	}
+  /**
+   * Constructs an AddressException with the specified detail message and
+   * reference info.
+   * @param s the detail message
+   * @param ref the reference info
+   * @param pos the index in the string where the error occurred
+   */
+  public AddressException(String s, String ref, int pos)
+  {
+    super(s);
+    this.ref = ref;
+    this.pos = pos;
+  }
 
-}//public class AddressException
+  /**
+   * Get the string that was being parsed when the error was detected
+   * (null if not relevant).
+   */
+  public String getRef()
+  {
+    return ref;
+  }
 
-	
+  /**
+   * Get the position with the reference string where the error was detected 
+   * (-1 if not relevant).
+   */
+  public int getPos()
+  {
+    return pos;
+  }
 
-
-
+  public String toString()
+  {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(super.toString());
+    if (ref!=null)
+    {
+      buffer.append(" in string ");
+      buffer.append(ref);
+      if (pos>-1)
+      {
+        buffer.append(" at position ");
+        buffer.append(pos);
+      }
+    }
+    return buffer.toString();
+  }
+  
+}

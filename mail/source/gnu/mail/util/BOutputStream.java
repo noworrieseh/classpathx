@@ -1,5 +1,5 @@
 /*
- * Header.java
+ * BOutputStream.java
  * Copyright (C) 2001 dog <dog@dog.net.uk>
  * 
  * This library is free software; you can redistribute it and/or
@@ -17,49 +17,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package javax.mail;
+package gnu.mail.util;
+
+import java.io.OutputStream;
 
 /**
- * The Header class stores a name/value pair to represent headers.
+ * Provides RFC 2047 "B" transfer encoding.
+ * See section 4.1.
  */
-public class Header
+public class BOutputStream
+  extends Base64OutputStream
 {
 
-  /**
-   * The name.
-   */
-  protected String name;
-
-  /**
-   * The value.
-   */
-  protected String value;
-
-  /**
-   * Construct a Header object.
-   * @param name name of the header
-   * @param value value of the header
-   */
-  public Header(String name, String value)
+  public BOutputStream(OutputStream out)
   {
-    this.name = name;
-    this.value = value;
+    super(out, 0x7fffffff);
   }
 
-  /**
-   * Returns the name of this header.
-   */
-  public String getName()
+  public static int encodedLength(byte[] bytes)
   {
-    return name;
+    return ((bytes.length+2)/3)*4;
   }
-
-  /**
-   * Returns the value of this header.
-   */
-  public String getValue()
-  {
-    return value;
-  }
-
+  
 }

@@ -20,7 +20,7 @@
 */
 package gnu.mail.util;
 
-
+import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;

@@ -1,408 +1,398 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, LGPL License                 *
- ********************************************************************/
+/*
+ * HeaderTokenizer.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.internet;
 
-// Imports
-import javax.mail.internet.ParseException;
-
 /**
- * Tokenizes a <code>String</code> into the basic tokens of
- * RFC822 or MIME formatted headers.
- *
- * @author Joey Lesh
- * @author Andrew Selkirk
- * @version 1.0
+ * This class tokenizes RFC822 and MIME headers into the basic symbols 
+ * specified by RFC822 and MIME.
+ * <p>
+ * This class handles folded headers (ie headers with embedded CRLF SPACE
+ * sequences). The folds are removed in the returned tokens.
  */
-public class HeaderTokenizer {
-
-	// +--------+----------------------------------------------
-	// | Fields |
-	// +--------+
-
-	/**
-	 * RFC822 special characters. They delimit atoms.
-	 */
-	public static final String RFC822 = "()<>@,;:\\\".[]";
-	
-	/**
-	 * The MIME special characters. 
-	 */
-	public static final String MIME = "()<>@,;:\\\"[]/?";
-
-	/**
-	 * Token that represents the end of input.
-	 */
-	private	static final Token EOFToken =
-					new Token(Token.EOF, ""); // CHECK Value
-
-	/**
-	 * This the header we're parsing.
-	 */
-	private String string;
-	
-	/**
-	 * These are the delimiters to use during the parsing.
-	 */
-	private String delimiters;
-
-	/**
-	 * True if you are to not tokenize and return the comments.
-	 */
-	private boolean skipComments;
-
-	/**
-	 * Current position in parsing.
-	 */
-	private int		currentPos;
-
-	/**
-	 * End of input position.
-	 */
-	private	int		maxPos;
-
-	/**
-	 * Position of next token in input.
-	 */
-	private	int		nextPos;
-
-	/**
-	 * Position of next peek token in input.
-	 */
-	private	int		peekPos;
-
-
-	// +--------------+-------------------------------------------
-	// | Constructors |
-	// +--------------+
-
-	/**
-	 * Constructs a <code>HeaderTokenizer</code> that will use the parameter
-	 * as an RFC822 header when it will tokenize it. It also does not return
-	 * comments as tokens.
-	 *
-	 * @param header The RFC822 header to tokenize.
-	 */
-	public HeaderTokenizer(String header) {
-		this(header, RFC822, true);
-	}// HeaderTokenizer(String)
-
-	/**
-	 * Constructs a <code>HeaderTokenizer</code> that will use the
-	 * <code>delimiters</code> when tokenizing <code>header</code>.
-	 * It also skips comments.
-	 *
-	 * @param header The <code>String</code> to be turned into tokens.
-	 * @param delimiters A <code>String<code> that contains the characters
-	 *                   that delimit atoms.
-	 */
-	public HeaderTokenizer(String header, String delimiters) {
-		this(header, delimiters, true);
-	}// HeaderTokenizer(String, String)
-
-
-	/**
-	 * Constructs a <code>HeaderTokenizer</code> that will use the
-	 * <code>delimiters</code> when tokenizing <code>header</code>.
-	 * Allows you to specify whether or not to skip comments.
-	 *
-	 * @param header The <code>String</code> to be turned into tokens.
-	 * @param delimiters A <code>String<code> that contains the characters
-	 *                   that delimit atoms.
-	 * @param skipComments When <code>true</code> no comments are returned
-	 *            as tokens. When <code>false</code> it will return them.
-	 */
-	public HeaderTokenizer(String header, String delimiters, boolean skipComments) {
-		this.skipComments = skipComments;
-		this.string = header;
-		this.delimiters = delimiters;
-		this.currentPos = 0;
-		this.nextPos = 0;
-		this.peekPos = 0;
-		this.maxPos = string.length();
-	}// HeaderTokenizer(String, String, boolean)
-
-
-	// +----------------+--------------------------------------------
-	// | Public Methods |
-	// +----------------+
-
-	/**
-	 * Gets the next <code>HeaderTokenizer.Token</code>.
-	 *
-	 * @return The next <code>HeaderTokenizer.Token</code> in the parsing
-	 * stream.
-	 */
-	public HeaderTokenizer.Token next() throws ParseException {
-
-		// Variables
-		Token	nextToken;
-
-		// Set the Cursor to the Next Position
-		currentPos = nextPos;
-
-		do {
-			// Get Next Token
-			nextToken = getNext();
-
-		} while (skipComments == true &&
-					nextToken.getType() == Token.COMMENT);
-
-		// Set the Next Position to the Current
-		nextPos = currentPos;
-
-		// Reset Peek Position to the Current position as well
-		peekPos = currentPos;
-
-		// Return Token
-		return nextToken;
-
-	}// next()
-
-	/**
-	 * Gets the next <code>HeaderTokenizer.Token</code> without moving the
-	 * parsing stream forward. A subsequent call to <code>next()</code> will
-	 * return the same token as that from the previous call to
-	 * <code>peek()</code>.
-	 *
-	 * @return The next <code>HeaderTokenizer.Token</code> in the parsing
-	 * stream.
-	 */
-	public HeaderTokenizer.Token peek() throws ParseException {
-
-		// Variables
-		Token	peekToken;
-
-		// Set the Cursor to the Peek Position
-		currentPos = nextPos;
-
-		do {
-
-			// Get Peek Token
-			peekToken = getNext();
-
-		} while (skipComments == true &&
-					peekToken.getType() == Token.COMMENT);
-
-		// Set the Peek Position to the Current
-		peekPos = currentPos;
-
-		// Return Token
-		return peekToken;
-
-	}// peek()
-
-	/**
-	 * Gets the rest of the unparsed data and is returned as a
-	 * <code>String</code>.
-	 *
-	 * @return The unparsed data.
-	 */
-	public String getRemainder() {
-
-		// Variables
-		String	result;
-		// Check for end-of-input
-		if (currentPos == maxPos) {
-			return null;
-
-		// Return remaining string
-		// Note: currently sets the current position to the end
-		// Is this command supposed to consume the remaining tokens?
-		// If not, the position adjustments should be removed
-		} else {
-			result = string.substring(currentPos);
-			nextPos = maxPos;
-			peekPos = maxPos;
-			return result;
-		} // if
-
-	}// getRemainder()
-
-	private static String filterToken(String token, int value1,
-			int value2) {
-		return null; // TODO
-	} // filterToken()
-
-	private HeaderTokenizer.Token getNext() throws ParseException {
-
-// NOTE: Implementation does not incorporate the delimiters
-// as of yet.  Uncertain if this is a getNext() or skipWhitespace
-// issue.
-
-		// Variables
-		int		position;
-		Token	nextToken;
-		char	nextChar;
-
-		// Check For End
-		if (currentPos == maxPos) {
-			return EOFToken;
-		} // if
-
-		// Skip any whitespace
-		currentPos = skipWhiteSpace();
-		if (currentPos == maxPos) {
-			return EOFToken;
-		} // if
-
-		// Check for Comment
-		if (string.charAt(currentPos) == '(') {
-
-			// Check for End of comment
-			position = string.indexOf(")", currentPos + 1);
-			if (position == -1) {
-				throw new ParseException("Unbalanced comments");
-			} // if
-
-			// Create Token
-			nextToken = new Token(Token.COMMENT,
-						string.substring(currentPos + 1, position));
-
-			// Set new Position
-			currentPos = position;
-
-		// Check for Quoted String
-		} else if (string.charAt(currentPos) == '\"') {
-
-			// Check for End of quoted string
-			position = string.indexOf("\"", currentPos + 1);
-			if (position == -1) {
-				throw new ParseException("Unbalanced quoted string");
-			} // if
-
-			// Create Token
-			nextToken = new Token(Token.QUOTEDSTRING,
-						string.substring(currentPos + 1, position));
-
-			// Set new Position
-			currentPos = position;
-
-		// Check for Atom
-		} else {
-			// Process Characters
-			position = currentPos;
-			nextChar = string.charAt(position);
-			while (position < maxPos && nextChar > 32 && nextChar <= 127) {
-				position += 1;
-				nextChar = string.charAt(position);
-			} // while
-
-			// Create Token
-			nextToken = new Token(Token.ATOM,
-						string.substring(currentPos + 1, position));
-
-			// Set new Position
-			currentPos = position;
-
-		} // if
-
-		// Return Next Token
-		return nextToken;
-
-	} // getNext()
-
-	private int skipWhiteSpace() {
-
-		// Variables
-		int		position;
-		char	nextChar;
-
-		// Initialize to Current Position
-		position = currentPos;
-
-		// Process Characters
-		nextChar = string.charAt(position);
-		while (position < maxPos && (nextChar == 32 || nextChar == 9 ||
-				nextChar == 13 || nextChar == 10)) {
-			position += 1;
-			nextChar = string.charAt(position);
-		} // while
-
-		// Return New Position
-		return position;
-
-	} // skipWhiteSpace()
-
-
-	// +----------------+--------------------------------------------
-	// | Internal Class |
-	// +----------------+
-
-	/**
-	 * Represents a Token. Has a type and value. Type is atom, comment,
-	 * eof, or quoted string.
-	 *
-	 * @author Joey Lesh
-	 */
-	public static class Token {
-
-		/**
-		 * Type of Token.
-		 */
-		private int type;
-
-		/**
-		 * Value of token.
-		 */
-		private String value;
-
-		/*
-		 * Token type that represents an ATOM.
-		 */
-		public static final int ATOM		= 0;
-
-		/*
-		 * Token type that represents a comment.
-		 */
-		public static final int COMMENT		= 1;
-
-		/*
-		 * Token type indicating that the end of the
-		 * data has been reached.
-		 */
-		public static final int EOF			= 2;
-
-		/*
-		 * Token type representing a QUOTEDSTRING.
-		 */
-		public static final int QUOTEDSTRING= 3;
-
-		/**
-		 * Creates a new <code>Token</code>. The <code>value</code> parameter
-		 * should take its value from the static fields provided. For example,
-		 * <pre>
-		 * new HeaderTokenizer.Token(HeaderTokenizer.Token.ATOM, "John")
-		 *</pre>
-		 *
-		 * @param type The Token type, value should be ATOM, COMMENT, EOF,
-		 *         or QUOTEDSTRING.
-		 * @param value The value of the Token.
-		 */
-		public Token(int type, String value) {
-			this.type = type;
-			this.value = value;
-		} // Token()
-
-		/**
-		 * Get Type of token.
-		 * @returns Token type
-		 */
-		public int getType() {
-			return this.type;
-		}// getType()
-
-		/**
-		 * Get Value of token.
-		 * @returns Token value
-		 */
-		public String getValue() {
-			return this.value;
-		}// getvalue()
-
-
-	}// Token
-
-
-}// HeaderTokenizer
+public class HeaderTokenizer
+{
+
+  /**
+   * The Token class represents tokens returned by the HeaderTokenizer.
+   */
+  public static class Token
+  {
+
+    /**
+     * Token type indicating an ATOM.
+     */
+    public static final int ATOM = -1;
+
+    /**
+     * Token type indicating a quoted string.
+     * The value field contains the string without the quotes.
+     */
+    public static final int QUOTEDSTRING = -2;
+
+    /**
+     * Token type indicating a comment.
+     * The value field contains the comment string without the comment 
+     * start and end symbols.
+     */
+    public static final int COMMENT = -3;
+
+    /**
+     * Token type indicating end of input.
+     */
+    public static final int EOF = -4;
+
+    /*
+     * The type of the token.
+     */
+    private int type;
+
+    /*
+     * The value of the token if it is of type ATOM, QUOTEDSTRING, or
+     * COMMENT.
+     */
+    private String value;
+
+    /**
+     * Constructor.
+     * @param type Token type
+     * @param value Token value
+     */
+    public Token(int type, String value)
+    {
+      this.type = type;
+      this.value = value;
+    }
+    
+    /**
+     * Return the type of the token.
+     * If the token represents a delimiter or a control character,
+     * the type is that character itself, converted to an integer.
+     * Otherwise, it's value is one of the following:
+     * <ul>
+     * <li>ATOM A sequence of ASCII characters delimited by either 
+     * SPACE, CTL, '(', '"' or the specified SPECIALS
+     * <li>QUOTEDSTRING A sequence of ASCII characters within quotes
+     * <li>COMMENT A sequence of ASCII characters within '(' and ')'.
+     * <li>EOF End of header
+     */
+    public int getType()
+    {
+      return type;
+    }
+
+    /**
+     * Returns the value of the token just read.
+     * When the current token is a quoted string, this field contains 
+     * the body of the string, without the quotes.
+     * When the current token is a comment, this field contains the body
+     * of the comment.
+     */
+    public String getValue()
+    {
+      return value;
+    }
+
+  }
+
+  /**
+   * RFC822 specials
+   */
+  public static final String RFC822 = "()<>@,;:\\\"\t .[]";
+
+  /**
+   * MIME specials
+   */
+  public static final String MIME = "()<>@,;:\\\"\t []/?=";
+  
+  /*
+   * The EOF token.
+   */
+  private static final Token EOF = new Token(Token.EOF, null);
+
+  /*
+   * The header string to parse.
+   */
+  private String header;
+
+  /*
+   * The delimiters separating tokens.
+   */
+  private String delimiters;
+
+  /*
+   * Whather or not to skip comments.
+   */
+  private boolean skipComments;
+
+  /*
+   * The index of the character identified as current for the token()
+   * call.
+   */
+  private int pos = 0;
+
+  /*
+   * The index of the character that will be considered current on a call to
+   * next().
+   */
+  private int next = 0;
+
+  /*
+   * The index of the character that will be considered current on a call to
+   * peek().
+   */
+  private int peek = 0;
+  
+  private int maxPos;
+
+  /**
+   * Constructor that takes a rfc822 style header.
+   * @param header The rfc822 header to be tokenized
+   * @param delimiters Set of delimiter characters to be used to delimit ATOMS.
+   * These are usually RFC822 or MIME
+   * @param skipComments If true, comments are skipped and not returned 
+   * as tokens
+   */
+  public HeaderTokenizer(String header, String delimiters,
+      boolean skipComments)
+  {
+    this.header = (header==null) ? "" : header;
+    this.delimiters = delimiters;
+    this.skipComments = skipComments;
+    pos = next = peek = 0;
+    maxPos = header.length();
+  }
+
+  /**
+   * Constructor.
+   * Comments are ignored and not returned as tokens
+   * @param header The header that is tokenized
+   * @param delimiters The delimiters to be used
+   */
+  public HeaderTokenizer(String header, String delimiters)
+  {
+    this(header, delimiters, true);
+  }
+
+  /**
+   * Constructor.
+   * The RFC822 defined delimiters - RFC822 - are used to delimit ATOMS.
+   * Also comments are skipped and not returned as tokens
+   */
+  public HeaderTokenizer(String header)
+  {
+    this(header, RFC822, true);
+  }
+
+  /**
+   * Parses the next token from this String.
+   * <p>
+   * Clients sit in a loop calling <code>next()</code> to parse successive 
+   * tokens until an EOF Token is returned.
+   * @return the next token
+   * @exception ParseException if the parse fails
+   */
+  public Token next()
+    throws ParseException
+  {
+    pos = next;
+    Token token = token();
+    next = pos;
+    peek = next;
+    return token;
+  }
+
+  /**
+   * Peek at the next token, without actually removing the token 
+   * from the parse stream.
+   * Invoking this method multiple times will return successive tokens,
+   * until <code>next()</code> is called.
+   * @return the next peek token
+   * @param ParseException if the parse fails
+   */
+  public Token peek()
+    throws ParseException
+  {
+    pos = peek;
+    Token token = token();
+    peek = pos;
+    return token;
+  }
+
+  /**
+   * Return the rest of the header.
+   */
+  public String getRemainder()
+  {
+    return header.substring(next);
+  }
+
+  /*
+   * Returns the next token.
+   */
+  private Token token()
+    throws ParseException
+  {
+    if (pos>=maxPos)
+      return EOF;
+    if (skipWhitespace()==Token.EOF)
+      return EOF;
+    
+    boolean needsFilter = false;
+    char c;
+    
+    // comment
+    for (c = header.charAt(pos); c=='('; c = header.charAt(pos))
+    {
+      int start = ++pos;
+      int parenCount = 1;
+      while (parenCount>0 && pos<maxPos)
+      {
+        c = header.charAt(pos);
+        if (c == '\\')
+        {
+          pos++;
+          needsFilter = true;
+        }
+        else if (c=='\r')
+          needsFilter = true;
+        else if (c=='(')
+          parenCount++;
+        else if (c==')')
+          parenCount--;
+        pos++;
+      }
+
+      if (parenCount!=0)
+        throw new ParseException("Illegal comment");
+      
+      if (!skipComments)
+      {
+        if (needsFilter)
+          return new Token(Token.COMMENT, filter(header, start, pos-1));
+        else
+          return new Token(Token.COMMENT, header.substring(start, pos-1));
+      }
+      
+      if (skipWhitespace()==Token.EOF)
+        return EOF;
+    }
+
+    // quotedstring
+    if (c=='"')
+    {
+      int start = ++pos;
+      while (pos<maxPos)
+      {
+        c = header.charAt(pos);
+        if (c=='\\')
+        {
+          pos++;
+          needsFilter = true;
+        }
+        else if (c=='\r')
+          needsFilter = true;
+        else if (c=='"')
+        {
+          pos++;
+          if (needsFilter)
+            return new Token(Token.QUOTEDSTRING, 
+                filter(header, start, pos-1));
+          else
+            return new Token(Token.QUOTEDSTRING, 
+                header.substring(start, pos-1));
+        }
+        pos++;
+      }
+      throw new ParseException("Illegal quoted string");
+    }
+
+    // delimiter
+    if (c<' ' || c>='\177' || delimiters.indexOf(c)>=0)
+    {
+      pos++;
+      char[] chars = new char[1];
+      chars[0] = c;
+      return new Token(c, new String(chars));
+    }
+    
+    // atom
+    int start = pos;
+    while (pos<maxPos)
+    {
+      c = header.charAt(pos);
+      if (c<' ' || c>='\177' || c=='(' || c==' ' || c=='"' || 
+          delimiters.indexOf(c)>=0)
+        break;
+      pos++;
+    }
+    return new Token(Token.ATOM, header.substring(start, pos));
+  }
+
+  /*
+   * Advance pos over any whitespace delimiters.
+   */
+  private int skipWhitespace()
+  {
+    while (pos<maxPos)
+    {
+      char c = header.charAt(pos);
+      if (c!=' ' && c!='\t' && c!='\r' && c!='\n')
+        return pos;
+      pos++;
+    }
+    return Token.EOF;
+  }
+
+  /*
+   * Process out CR and backslash (line continuation) bytes.
+   */
+  private String filter(String s, int start, int end)
+  {
+    StringBuffer buffer = new StringBuffer();
+    boolean backslash = false;
+    boolean cr = false;
+    for (int i = start; i<end; i++)
+    {
+      char c = s.charAt(i);
+      if (c=='\n' && cr)
+        cr = false;
+      else
+      {
+        cr = false;
+        if (!backslash)
+        {
+          if (c=='\\')
+            backslash = true;
+          else if (c=='\r')
+            cr = true;
+          else
+            buffer.append(c);
+        }
+        else
+        {
+          buffer.append(c);
+          backslash = false;
+        }
+      }
+    }
+    return buffer.toString();
+  }
+
+}

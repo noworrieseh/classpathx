@@ -20,17 +20,16 @@
 */
 package gnu.mail.util;
 
-
 import java.io.*;
 
-
-/** an output stream that filters LFs into CR/LF pairs.
+/** 
+ * An output stream that filters LFs into CR/LF pairs.
  *
  * @author dog: dog@dog.net.uk
  * @version 1.1
  */
 public class CRLFOutputStream
-extends FilterOutputStream
+  extends FilterOutputStream
 {
 
   /**
@@ -67,7 +66,7 @@ extends FilterOutputStream
    * @exception IOException if an I/O error occurred
    */
   public void write(int ch)
-  throws IOException
+    throws IOException
   {
     if (ch==CR)
     out.write(CRLF);
@@ -88,7 +87,7 @@ extends FilterOutputStream
    * @exception IOException if an I/O error occurred
    */
   public void write(byte b[])
-  throws IOException
+    throws IOException
   {
     write(b, 0, b.length);
   }
@@ -98,7 +97,7 @@ extends FilterOutputStream
    * @exception IOException if an I/O error occurred
    */
   public void write(byte b[], int off, int len)
-  throws IOException
+    throws IOException
   {
     int d = off;
     len += off;
@@ -106,27 +105,38 @@ extends FilterOutputStream
     switch (b[i])
     {
       default:
-	break;
+        break;
       case CR:
-	if (i+1<len && b[i+1]==LF)
-	{
-	  i++;
-	}
-	else
-	{
-	  out.write(b, d, (i-d)+1);
-	  out.write(LF);
-	  d = i+1;
-	}
-	break;
+        if (i+1<len && b[i+1]==LF)
+        {
+          i++;
+        }
+        else
+        {
+          out.write(b, d, (i-d)+1);
+          out.write(LF);
+          d = i+1;
+        }
+        break;
       case LF:
-	out.write(b, d, i-d);
-	out.write(CRLF, 0, 2);
-	d = i+1;
-	break;
+        out.write(b, d, i-d);
+        out.write(CRLF, 0, 2);
+        d = i+1;
+        break;
     }
     if (len-d>0)
-    out.write(b, d, len-d);
+      out.write(b, d, len-d);
+  }
+
+  /**
+   * Writes the specified string to the underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  public void write(String text)
+    throws IOException
+  {
+    byte[] bytes = text.getBytes();
+    write(bytes, 0, bytes.length);
   }
 
   /**
@@ -134,7 +144,7 @@ extends FilterOutputStream
    * @exception IOException if an I/O error occurred
    */
   public void writeln()
-  throws IOException
+    throws IOException
   {
     out.write(CRLF);
   }

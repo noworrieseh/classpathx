@@ -29,10 +29,11 @@ import java.io.IOException;
  * Quoted Printable Encoding stream.
  *
  * @author Andrew Selkirk
+ * @author dog
  * @version 1.0
  * @see java.io.FilterOutputStream
  **/
-public class QPEncoderStream
+public class QPOutputStream
 extends FilterOutputStream
 {
 
@@ -69,11 +70,11 @@ extends FilterOutputStream
   //-------------------------------------------------------------
 
   /**
-   * Create a new Quoted PrintableEncoding stream.
+   * Create a new Quoted Printable Encoding stream.
    * @param stream Output stream
    * @param length Number of bytes per line
    */
-  public QPEncoderStream(OutputStream stream, int length) 
+  public QPOutputStream(OutputStream stream, int length) 
   {
     super(stream);
     this.bytesPerLine = length;
@@ -83,11 +84,11 @@ extends FilterOutputStream
   } // QPEncoderStream()
 
   /**
-   * Create a new Quoted PrintableEncoding stream with
+   * Create a new Quoted Printable Encoding stream with
    * the default 76 bytes per line.
    * @param stream Output stream
    */
-  public QPEncoderStream(OutputStream stream) 
+  public QPOutputStream(OutputStream stream) 
   {
     this(stream, 76);
   } // QPEWncoderStream()
@@ -103,16 +104,7 @@ extends FilterOutputStream
    */
   public void flush() throws IOException 
   {
-    if (gotSpace == true) 
-    {
-      out.write('=');
-      out.write(hex[32 >> 4]);
-      out.write(hex[32 & 0xF]);
-    } // if
-    if (gotCR == true) 
-    {
-      outputCRLF();
-    }
+    out.flush();
   } // flush()
 
   /**
@@ -154,148 +146,33 @@ extends FilterOutputStream
    */
   public void write(int b) throws IOException 
   {
-
-    // NOTE: WARNING!! This is ugly!!!!  The design needs
-    // to be redone.  Does work though...
-
-    // Check For printable characters
-    if (b >= 33 && b <= 126 && b != 61) 
+    b &= 0xff;
+    if (gotSpace)
     {
-
-      // Check for CR
-      if (gotCR == true) 
-      {
-	outputCRLF();
-	gotCR = false;
-	count = 0;
-      } // if
-
-      // Check for space
-      if (gotSpace == true) 
-      {
-	if (count == bytesPerLine - 1) 
-	{
-	  out.write('=');
-	  outputCRLF();
-	} // if
-	out.write(' ');
-	count += 1;
-	gotSpace = false;
-      } // if
-
-      // Check Byte position
-      if (count == bytesPerLine - 1) 
-      {
-	out.write('=');
-	outputCRLF();
-      } // if
-
-      // Write Byte
-      out.write(b);
-      count += 1;
-
-      // Check for SPACE
-    } else if (b == 32) 
-    {
-      // Check for space
-      if (gotSpace == true) 
-      {
-	if (count == bytesPerLine - 1) 
-	{
-	  out.write('=');
-	  outputCRLF();
-	} // if
-	out.write(' ');
-	count += 1;
-      } // if
+      if (b=='\n' || b=='\r')
+        output(' ', true);
+      else
+        output(' ', false);
+      gotSpace = false;
+    }
+    if (b==' ')
       gotSpace = true;
-
-      // Check for CR
-    } else if (b == 13) 
+    else if (b=='\r')
     {
-      if (gotSpace == true) 
-      {
-
-	// Check Bytes Position
-	if (count >= bytesPerLine - 3) 
-	{
-	  out.write('=');
-	  outputCRLF();
-	} // if
-
-	// Write Encoded Byte
-	out.write('=');
-	out.write(hex[32 >> 4]);
-	out.write(hex[32 & 0xF]);
-	count += 3;
-	gotSpace = false;
-
-      } // if
-
       gotCR = true;
-
-      // Check for LF
-    } else if (b == 10) 
-    {
-      if (gotSpace == true) 
-      {
-
-	// Check Bytes Position
-	if (count >= bytesPerLine - 3) 
-	{
-	  out.write('=');
-	  outputCRLF();
-	} // if
-
-	// Write Encoded Byte
-	out.write('=');
-	out.write(hex[32 >> 4]);
-	out.write(hex[32 & 0xF]);
-	count += 3;
-	gotSpace = false;
-
-      } // if
       outputCRLF();
-
-      // Write Encoded Character
-    } else 
+    }
+    else if (b=='\n')
     {
-
-      // Check for CR
-      if (gotCR == true) 
-      {
-	outputCRLF();
-	gotCR = false;
-      } // if
-
-      // Check for space
-      if (gotSpace == true) 
-      {
-	if (count == bytesPerLine - 1) 
-	{
-	  out.write('=');
-	  outputCRLF();
-	} // if
-	out.write(' ');
-	count += 1;
-	gotSpace = false;
-      } // if
-
-      // Check Bytes Position
-      if (count >= bytesPerLine - 3) 
-      {
-	out.write('=');
-	outputCRLF();
-      } // if
-
-      // Write Encoded Byte
-      out.write('=');
-      out.write(hex[b >> 4]);
-      out.write(hex[b & 0xF]);
-      count += 3;
-
-    } // if
-
+      if (gotCR)
+        gotCR = false;
+      else
+        outputCRLF();
+    }
+    if (b<' ' || b>=127 || b=='=')
+      output(b, true);
+    else
+      output(b, false);
   } // write()
 
   /**
@@ -304,13 +181,7 @@ extends FilterOutputStream
    */
   public void close() throws IOException 
   {
-
-    // Flush Stream
-    flush();
-
-    // Close
     out.close();
-
   } // close()
 
   /**
@@ -320,9 +191,32 @@ extends FilterOutputStream
    * @exception IOException IO Exception occurred
    */
   protected void output(int b, boolean value)
-  throws IOException 
+    throws IOException 
   {
-    // TODO
+    if (value)
+    {
+      if ((count += 3) > bytesPerLine)
+      {
+        out.write('=');
+        out.write('\r');
+        out.write('\n');
+        count = 3;
+      }
+      out.write('=');
+      out.write(hex[b >> 4]);
+      out.write(hex[b & 0xf]);
+    }
+    else
+    {
+      if (++count > bytesPerLine)
+      {
+        out.write('=');
+        out.write('\r');
+        out.write('\n');
+        count = 1;
+      }
+      out.write(b);
+    }
   } // output()
 
   /**
