@@ -1,5 +1,5 @@
 /*
- * $Id: DomDoctype.java,v 1.6 2001-11-20 04:53:46 db Exp $
+ * $Id: DomDoctype.java,v 1.7 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.*;
 import java.util.Hashtable;
 
 
-// $Id: DomDoctype.java,v 1.6 2001-11-20 04:53:46 db Exp $
+// $Id: DomDoctype.java,v 1.7 2001-11-29 22:48:11 db Exp $
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -61,7 +61,7 @@ import java.util.Hashtable;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:53:46 $
+ * @version $Date: 2001-11-29 22:48:11 $
  */
 public class DomDoctype extends DomExtern implements DocumentType
 {
@@ -322,23 +322,24 @@ public class DomDoctype extends DomExtern implements DocumentType
 
 	if (info != null)
 	    return info;
-	info = new ElementInfo ();
+	info = new ElementInfo (this);
 	elements.put (element, info);
 	return info;
     }
 
+    void setHasIds () { ids = true; }
     boolean hasIds () { return ids; }
 
-
     // package private
-    class ElementInfo extends Hashtable
+    static class ElementInfo extends Hashtable
     {
 	private String		idAttrName;
+	private DomDoctype	doctype;
 
 	// is-a vs has-a ... just to minimize number of objects.
 	// keys in table are attribute names, values are defaults.
 
-	ElementInfo () { super (5, 5); }
+	ElementInfo (DomDoctype dt) { super (5, 5); doctype = dt; }
 
 	void setAttrDefault (String attName, String value)
 	{
@@ -352,7 +353,7 @@ public class DomDoctype extends DomExtern implements DocumentType
 	{
 	    if (idAttrName == null)
 		idAttrName = attName;
-	    ids = true;
+	    doctype.setHasIds ();
 	}
 	String getIdAttr ()
 	    { return idAttrName; }

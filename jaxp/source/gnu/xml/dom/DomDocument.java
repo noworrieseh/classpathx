@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.10 2001-11-20 04:53:46 db Exp $
+ * $Id: DomDocument.java,v 1.11 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,10 +32,8 @@ import java.util.Enumeration;
 import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
-import gnu.xml.dom.DomDoctype.ElementInfo;
 
-
-// $Id: DomDocument.java,v 1.10 2001-11-20 04:53:46 db Exp $
+// $Id: DomDocument.java,v 1.11 2001-11-29 22:48:11 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,7 +45,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:53:46 $
+ * @version $Date: 2001-11-29 22:48:11 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -181,8 +179,8 @@ public class DomDocument extends DomNode
 	while (current != this) {
 	    // done?
 	    if (current.getNodeType () == ELEMENT_NODE) {
-		Element		element = (Element) current;
-		ElementInfo	info;
+		Element			element = (Element) current;
+		DomDoctype.ElementInfo	info;
 
 		info = doctype.getElementInfo (current.getNodeName ());
 		if (id.equals (element.getAttribute (info.getIdAttr ())))
@@ -443,8 +441,8 @@ public class DomDocument extends DomNode
 
     private void defaultAttributes (Element element, String name)
     {
-	DomDoctype	doctype = (DomDoctype) getDoctype ();
-	ElementInfo	info;
+	DomDoctype		doctype = (DomDoctype) getDoctype ();
+	DomDoctype.ElementInfo	info;
 
 	if (doctype == null)
 	    return;

@@ -1,5 +1,5 @@
 /*
- * $Id: DomNamedNodeMap.java,v 1.5 2001-11-20 04:46:24 db Exp $
+ * $Id: DomNamedNodeMap.java,v 1.6 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,10 +31,8 @@ import java.util.Vector;
 
 import org.w3c.dom.*;
 
-import gnu.xml.dom.DomDoctype.ElementInfo;
 
-
-// $Id: DomNamedNodeMap.java,v 1.5 2001-11-20 04:46:24 db Exp $
+// $Id: DomNamedNodeMap.java,v 1.6 2001-11-29 22:48:11 db Exp $
 
 /**
  * <p> "NamedNodeMap" implementation. </p>
@@ -42,7 +40,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * to list notations or entities.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-20 04:46:24 $
+ * @version $Date: 2001-11-29 22:48:11 $
  */
 public class DomNamedNodeMap implements NamedNodeMap
 {
@@ -248,10 +246,10 @@ public class DomNamedNodeMap implements NamedNodeMap
 
     private void maybeRestoreDefault (String uri, String name)
     {
-	DomDoctype	doctype = (DomDoctype)owner.getDoctype ();
-	ElementInfo	info;
-	String		value;
-	DomAttr		attr;
+	DomDoctype		doctype = (DomDoctype)owner.getDoctype ();
+	DomDoctype.ElementInfo	info;
+	String			value;
+	DomAttr			attr;
 
 	if (doctype == null)
 	    return;

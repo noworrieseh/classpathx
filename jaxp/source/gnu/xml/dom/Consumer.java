@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.13 2001-11-20 04:46:24 db Exp $
+ * $Id: Consumer.java,v 1.14 2001-11-29 22:48:11 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -44,8 +44,6 @@ import org.xml.sax.ext.Attributes2;
 import gnu.xml.pipeline.DomConsumer;
 import gnu.xml.pipeline.EventConsumer;
 
-import gnu.xml.dom.DomDoctype.ElementInfo;
-
 
 /**
  * Event consumer which constructs DOM documents using the implementation
@@ -67,7 +65,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 04:46:24 $
+ * @version $Date: 2001-11-29 22:48:11 $
  */
 public class Consumer extends DomConsumer
 {
@@ -269,8 +267,9 @@ public class Consumer extends DomConsumer
 	    if (value == null && !"ID".equals (type))
 		return;
 	    
-	    ElementInfo	info = getDoctype ().getElementInfo (ename);
+	    DomDoctype.ElementInfo	info;
 
+	    info = getDoctype ().getElementInfo (ename);
 	    if (value != null)
 		info.setAttrDefault (aname, value);
 	    if ("ID".equals (type))
