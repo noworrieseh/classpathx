@@ -473,6 +473,9 @@ final class XmlParser
 
 	expandPE = false;
 	name = readNmtoken (true);
+	//NE08
+	if (name.indexOf(':') >= 0)
+           error ("Illegal character(':') in processing instruction name ", name, null);
 	if ("xml".equalsIgnoreCase (name))
 	    error ("Illegal processing instruction target", name, null);
 	if (!tryRead (endDelimPI)) {
@@ -1776,7 +1779,7 @@ loop:
    * </pre>
    * <p>NOTE: the '&#' has already been read.
    */
-  private int tryReadCharRef ()
+  private void tryReadCharRef ()
   throws SAXException, IOException
   {
   	int value = 0;
@@ -1842,7 +1845,7 @@ loop2:
 	    error ("character reference " + value + " is too large for UTF-16",
 		   new Integer (value).toString (), null);
 	}
-	return value;
+
   }
   
     /**
@@ -1963,7 +1966,46 @@ loop2:
 		error (message);
 	    break;
 	case ENTITY_INTERNAL:
-	    pushString (name, getEntityValue (name));
+            pushString (name, getEntityValue (name));
+	    
+	    //workaround for possible input pop before marking
+            //the buffer reading position	
+            char t = readCh ();
+            unread (t);
+            int bufferPosMark = readBufferPos;
+           
+            int end = readBufferPos + getEntityValue (name).length();
+            for(int k = readBufferPos; k < end; k++){
+	            t = readCh ();
+	            if (t == '&'){
+	            	t = readCh ();   
+	            	if (t  == '#'){ 
+	            	   //try to match a character ref
+	                   tryReadCharRef ();
+	                   
+	                   //everything has been read
+	                   if (readBufferPos >= end)
+	                      break;
+	                   k = readBufferPos;
+	                   continue;
+	                }
+	                else if (Character.isLetter(t)){
+	            	   //looks like an entity ref
+	            	   unread (t);
+	            	   readNmtoken (true);
+	        	   require (';');
+	        	
+	        	   //everything has been read
+	        	   if (readBufferPos >= end)
+		              break;
+		           k = readBufferPos;
+	                   continue;
+	                }
+	                error(" malformed entity reference");
+	            }
+	           
+            }
+            readBufferPos = bufferPosMark;
 	    break;
 	case ENTITY_TEXT:
 	    if (externalAllowed) {
@@ -2058,6 +2100,9 @@ loop2:
 	// Read the entity name, and prepend
 	// '%' if necessary.
 	String name = readNmtoken (true);
+        //NE08
+	if (name.indexOf(':') >= 0)
+           error ("Illegal character(':') in entity name ", name, null);
 	if (peFlag) {
 	    name = "%" + name;
 	}
@@ -2121,7 +2166,9 @@ loop2:
 
 	requireWhitespace ();
 	nname = readNmtoken (true);
-
+        //NE08
+	if (nname.indexOf(':') >= 0)
+           error ("Illegal character(':') in notation name ", nname, null);
 	requireWhitespace ();
 
 	// Read the external identifiers.
@@ -2510,34 +2557,7 @@ loop:
 			// exotic WFness risk: this is an entity literal,
 			// dataBuffer [dataBufferPos - 1] == '&', and
 			// following chars are a _partial_ entity/char ref
-                        
-                        if (dataBuffer [dataBufferPos - 1] == '&'
-                            && !ampRead){
-                            //after & there must be a: 
-                            //  char ref     ( & already read) 
-                            // 	| entity ref ( & already read) 
-                            // to be WF  	
-                            
-                            //workaround for possible input pop before marking
-                            //the buffer reading position	
-                            char t = readCh ();
-                            unread (t);
-                            int bufferPosMark = readBufferPos;
-                            t = readCh ();
-                            if (t  == '#'){ 
-                               //try to match a character ref
-                               tryReadCharRef ();
-                            }
-                            else if (Character.isLetter(t)){
-                            	//looks like an entity ref
-                            	unread (t);
-                            	readNmtoken (true);
-                        	require (';');
-                            }
-                            readBufferPos = bufferPosMark;
-                            ampRead = false;
-                        }
-                       
+                   
 		    // It looks like an entity ref ...
 		    } else {
 			unread (c);
