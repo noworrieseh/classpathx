@@ -1776,7 +1776,7 @@ loop:
    * </pre>
    * <p>NOTE: the '&#' has already been read.
    */
-  private void tryReadCharRef ()
+  private int tryReadCharRef ()
   throws SAXException, IOException
   {
   	int value = 0;
@@ -1842,6 +1842,7 @@ loop2:
 	    error ("character reference " + value + " is too large for UTF-16",
 		   new Integer (value).toString (), null);
 	}
+	return value;
   }
   
     /**
@@ -2509,31 +2510,29 @@ loop:
 			// dataBuffer [dataBufferPos - 1] == '&', and
 			// following chars are a _partial_ entity/char ref
                         
-                        int bufferPosMark = readBufferPos;
                         if (dataBuffer [dataBufferPos - 1] == '&'){
-                            char t = readCh();
-                            boolean singleAmp = true;
+                            //after & there must be a: 
+                            //  char ref     ( & already parsed) 
+                            // 	| entity ref ( & already parsed) 
+                            // to be WF  	
+                            
+                            //workaround for possible input pop before marking
+                            //the buffer reading position	
+                            char t = readCh ();
+                            unread (t);
+                            int bufferPosMark = readBufferPos;
+                            t = readCh ();
                             if (t  == '#'){ 
                                //try to match a character ref
                                tryReadCharRef ();
-                               readBufferPos = bufferPosMark;
-                               singleAmp = false;
                             }
                             else if (Character.isLetter(t)){
                             	//looks like an entity ref
                             	unread (t);
                             	readNmtoken (true);
                         	require (';');
-                        	readBufferPos = bufferPosMark;
-                        	singleAmp = false;
                             }
-                            else if (t == '&'){
-                            	unread (t);
-                            	singleAmp = false;
-                            }
-                            if (singleAmp)	
-                            	error ("& must be encoded either as &amp; or" +
-                            			" as &#38;#38");
+                            readBufferPos = bufferPosMark;    
                         }
 		    // It looks like an entity ref ...
 		    } else {
