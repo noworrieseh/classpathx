@@ -1,3 +1,8 @@
+2004-08-03  Musachy Barroso  <musachy@gmail.com>
+
+	* SAXDriver.java: Check added for namespaces names containing only
+	':'. 
+	
 2004-07-31  Musachy Barroso  <musachy@gmail.com>
 
 	* XmlParser.java: Improved check for partial character references

@@ -880,7 +880,11 @@ final public class SAXDriver
       if ("xmlns".equals(qname))
 		    continue;
     }
-
+               //Illegal in the new Namespaces Draft
+               //should it be only in 1.1 docs??
+               if (qname.equals (":"))
+                   fatal ("namespace names consisting of a single colon " +
+                   		"character are invalid");
 		index = qname.indexOf (':');
 
 		// NS prefix declaration?
