@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.12 2001-07-31 06:38:18 db Exp $
+ * $Id: XmlParser.java,v 1.13 2001-08-09 18:33:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.12 2001-07-31 06:38:18 db Exp $
+// $Id: XmlParser.java,v 1.13 2001-08-09 18:33:20 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-31 06:38:18 $
+ * @version $Date: 2001-08-09 18:33:20 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -91,7 +91,6 @@ final class XmlParser
     // package private
     XmlParser ()
     {
-	cleanupVariables ();
     }
 
 
@@ -113,8 +112,9 @@ final class XmlParser
      * supply will become the base URI for resolving relative URI, and may
      * be used to acquire a reader or byte stream.
      *
-     * <p>You may parse more than one document, but that must be done
-     * sequentially.  Only one thread at a time may use this parser.
+     * <p> Only one thread at a time may use this parser; since it is
+     * private to this package, post-parse cleanup is done by the caller,
+     * which MUST NOT REUSE the parser (just null it).
      *
      * @param systemId Absolute URI of the document; should never be null,
      *	but may be so iff a reader <em>or</em> a stream is provided.
@@ -181,7 +181,6 @@ final class XmlParser
 		    reader.close ();
 		} catch (IOException e) { /* ignore */
 		}
-	    cleanupVariables ();
 	}
     }
 
@@ -595,7 +594,9 @@ final class XmlParser
 		error ("whitespace required before 'standalone='");
 	    parseEq ();
 	    standalone = readLiteral (flags);
-	    if (! ("yes".equals (standalone) || "no".equals (standalone)))
+	    if ("yes".equals (standalone))
+		docIsStandalone = true;
+	    else if (!"no".equals (standalone))
 		error ("standalone flag must be 'yes' or 'no'");
 	}
 
@@ -2678,6 +2679,9 @@ loop:
     //////////////////////////////////////////////////////////////////////
 
 
+    boolean isStandalone () { return docIsStandalone; }
+
+
     //
     // Elements
     //
@@ -4588,30 +4592,6 @@ loop:
     }
 
 
-    /**
-     * Clean up after the parse to allow some garbage collection.
-     */
-    private void cleanupVariables ()
-    {
-	dataBuffer = null;
-	nameBuffer = null;
-
-	elementInfo = null;
-	entityInfo = null;
-	notationInfo = null;
-
-	currentElement = null;
-
-	inputStack = null;
-	entityStack = null;
-	externalEntity = null;
-
-	tagAttributes = null;
-	rawReadBuffer = null;
-
-	symbolTable = null;
-    }
-
     /* used to restart reading with some InputStreamReader */
     static class EncodingException extends IOException
     {
@@ -4666,6 +4646,10 @@ loop:
     private char	nameBuffer [];
     private int		nameBufferPos;
 
+    //
+    // Save any standalone flag
+    //
+    private boolean	docIsStandalone;
 
     //
     // Hashtables for DTD information on elements, entities, and notations.
