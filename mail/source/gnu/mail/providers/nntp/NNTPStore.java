@@ -86,7 +86,8 @@ public class NNTPStore extends Store
     else
     {
       // ${HOME}/.newsrc[-${hostname}]
-      StringBuffer buffer = new StringBuffer(".newsrc");
+      String baseFilename = ".newsrc";
+      StringBuffer buffer = new StringBuffer(baseFilename);
       if (url!=null)
       {
         buffer.append('-');
@@ -95,6 +96,13 @@ public class NNTPStore extends Store
       String filename = buffer.toString();
       String home = System.getProperty("user.home");
       File file = new File(home, filename);
+      if (!file.exists())
+      {
+        // Fall back to base filename iff the file exists
+        File baseFile = new File(home, baseFilename);
+        if (baseFile.exists())
+          file = baseFile;
+      }
       newsrc = new FileNewsrc(file, session.getDebug());
     }
   }

@@ -51,6 +51,7 @@ public final class MboxStore
 {
 
   private static final char separatorChar = '/';
+  private static final String INBOX = "inbox";
   
   static int fetchsize = 1024;
   static boolean attemptFallback = true;
@@ -135,8 +136,10 @@ public final class MboxStore
   public Folder getFolder(String filename) 
     throws MessagingException
   {
+    if (filename==null)
+      filename = "";
     boolean inbox = false;
-    if ("inbox".equalsIgnoreCase(filename)) 
+    if (INBOX.equalsIgnoreCase(filename)) 
     {
       // First try the session property mail.mbox.inbox.
       String inboxname = session.getProperty("mail.mbox.inbox");

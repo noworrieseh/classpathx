@@ -203,22 +203,22 @@ extends Folder
    */
   public Folder getFolder(String name)
     throws MessagingException
-    {
-      NNTPStore ns = (NNTPStore)store;
-      return new NNTPFolder(ns, name);
-    }
+  {
+    NNTPStore ns = (NNTPStore)store;
+    return new NNTPFolder(ns, name);
+  }
 
   public Folder getParent()
     throws MessagingException
-    {
-      return null;
-    }
+  {
+    return null;
+  }
 
   public boolean exists()
     throws MessagingException
-    {
-      return true;
-    }
+  {
+    return true;
+  }
 
   /**
    * As we're dealing with a flat namespace, the value of this is
@@ -226,9 +226,9 @@ extends Folder
    */
   public char getSeparator()
     throws MessagingException
-    {
-      return '.';
-    }
+  {
+    return '.';
+  }
 
   /**
    * This folder contains only folders.
@@ -240,23 +240,23 @@ extends Folder
 
   public void open(int mode)
     throws MessagingException
-    {
-      // Although we will never actually _be_ open,
-      // it's always good to remind people....
-      if (mode!=READ_ONLY)
-        throw new IllegalWriteException("Folder is read-only");
-    }
+  {
+    // Although we will never actually _be_ open,
+    // it's always good to remind people....
+    if (mode!=READ_ONLY)
+      throw new IllegalWriteException("Folder is read-only");
+  }
 
   public void close(boolean expunge)
     throws MessagingException
-    {
-    }
+  {
+  }
 
   public Message[] expunge()
     throws MessagingException
-    {
-      throw new IllegalWriteException("Folder is read-only");
-    }
+  {
+    throw new IllegalWriteException("Folder is read-only");
+  }
 
   public boolean isOpen()
   {
@@ -270,54 +270,54 @@ extends Folder
 
   public int getMessageCount()
     throws MessagingException
-    {
-      return -1;
-    }
+  {
+    return -1;
+  }
 
   public Message getMessage(int msgnum)
     throws MessagingException
-    {
-      throw new IllegalStateException("Folder not open");
-    }
+  {
+    throw new IllegalStateException("Folder not open");
+  }
 
   /**
    * This folder is always &quot;subscribed&quot;.
    */
   public void setSubscribed(boolean flag)
     throws MessagingException
-    {
-      if (!flag)
-        throw new IllegalWriteException("Can't unsubscribe root folder");
-    }
+  {
+    if (!flag)
+      throw new IllegalWriteException("Can't unsubscribe root folder");
+  }
 
   public boolean hasNewMessages()
     throws MessagingException
-    {
-      return false;
-    }
+  {
+    return false;
+  }
 
   public void appendMessages(Message[] messages)
     throws MessagingException
-    {
-      throw new IllegalWriteException("Folder is read-only");
-    }
+  {
+    throw new IllegalWriteException("Folder is read-only");
+  }
 
   public boolean create(int type)
     throws MessagingException
-    {
-      throw new MessagingException("Folder already exists");
-    }
+  {
+    throw new MessagingException("Folder already exists");
+  }
 
   public boolean delete(boolean flag)
     throws MessagingException
-    {
-      throw new IllegalWriteException("Folder is read-only");
-    }
+  {
+    throw new IllegalWriteException("Folder is read-only");
+  }
 
   public boolean renameTo(Folder folder)
     throws MessagingException
-    {
-      throw new IllegalWriteException("Folder is read-only");
-    }
+  {
+    throw new IllegalWriteException("Folder is read-only");
+  }
 
 }
