@@ -1,21 +1,28 @@
 // DeclHandler.java - Optional handler for DTD declaration events.
 // http://sax.sourceforge.net
 // Public Domain: no warranty.
-// $Id: DefaultHandler2.java,v 1.1 2001-11-07 02:07:11 db Exp $
+// $Id: DefaultHandler2.java,v 1.2 2001-11-13 20:46:30 db Exp $
 
 package org.xml.sax.ext;
 
+import java.io.IOException;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-// $Id: DefaultHandler2.java,v 1.1 2001-11-07 02:07:11 db Exp $
+// $Id: DefaultHandler2.java,v 1.2 2001-11-13 20:46:30 db Exp $
 
 /**
  * This class extends the SAX2 base handler class to support the
  * SAX2 {@link LexicalHandler} and {@link DeclHandler} extensions.
  * The added handler methods just return; subclassers may override
  * on a method-by-method basis.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p> <em>Note:</em> this class might yet learn that the
  * <em>ContentHandler.setDocumentLocator()</em> call might be passed a
@@ -28,13 +35,13 @@ import org.xml.sax.helpers.DefaultHandler;
  * @version TBS
  */
 public class DefaultHandler2 extends DefaultHandler
-    implements LexicalHandler, DeclHandler
+    implements LexicalHandler, DeclHandler, EntityResolver2
 {
     /** Constructs a handler which ignores all parsing events. */
     public DefaultHandler2 () { }
 
 
-    // SAX2 LexicalHandler
+    // SAX2 ext-1.0 LexicalHandler
 
     public void startCDATA ()
     throws SAXException
@@ -65,7 +72,7 @@ public class DefaultHandler2 extends DefaultHandler
 	{ }
 
 
-    // SAX2 DeclHandler
+    // SAX2 ext-1.0 DeclHandler
 
     public void attributeDecl (String eName, String aName,
 	    String type, String mode, String value)
@@ -84,4 +91,28 @@ public class DefaultHandler2 extends DefaultHandler
     public void internalEntityDecl (String name, String value)
     throws SAXException
 	{}
+
+    // SAX2 ext-1.1 EntityResolver
+
+    /**
+     * Tells the parser that if no external subset has been declared
+     * in the document text, none should be used.
+     */
+    public InputSource getExternalSubset (String name, String baseURI)
+    throws SAXException, IOException
+	{ return null; }
+
+    /**
+     * Tells the parser to resolve the systemId against the baseURI
+     * and read the entity text from that resulting absolute URI.
+     * Note that you should also override both this method and
+     * {@link DefaultHandler#resolveEntity DefaultHandler.resolveEntity()},
+     * rather than only one of them, so that no matter what kind of SAX2
+     * parser you use, it will have an appropriate entity resolution policy.
+     */
+    public InputSource resolveEntity (String name, String publicId,
+	    String baseURI, String systemId)
+    throws SAXException, IOException
+	{ return null; }
+
 }
