@@ -1,75 +1,34 @@
-WARNING: GNUJAXP is pure GPL at the moment!!!
-
-I (avdyk) am working to change license to GPL + linking exception for
-the whole project, but be aware that if you build the project with the
-libxmlj package, these classes are pure GPL!
-
 WHAT IS THIS
-    GNUJAXP includes interfaces and implementations for basic XML
-    processing in Java, and some general purpose SAX2 utilities.
 
-    The standard distribution includes "gnujaxp.jar", javadoc, and full
-    source code.  The current software is available at:
+GNUJAXP includes interfaces and implementations for basic XML processing
+in Java, some general purpose SAX2 utilities, and transformation.
 
-    	http://www.gnu.org/software/classpathx/jaxp
+The standard distribution includes the full source code.  The current
+software is available at:
+    http://www.gnu.org/software/classpathx/jaxp
 
-    This is intended only to require JDK 1.1 support to compile or run;
-    that may change at some point, but for now portability to PJava and
-    other widely used Java configurations/profiles is important.
-    
-    GCJ 3.0 has some bugs compiling this code, either to class files or
-    to native code.  Newer snapshots (GCJ 3.1) are currently needed to
-    compile this code.
+See INSTALL for installation instructions.
 
 JAVA PACKAGES
     
-    javax.xml.*		... JAXP 1.1 interfaces
-    org.xml.sax.*	... SAX2 (r2pre3, extensions 1.1beta) interfaces
-    org.w3c.dom.*	... DOM Level 2 interfaces
+. javax.xml.* ... JAXP 1.2 interfaces
+. org.xml.sax.* ... SAX2 (r2pre3, extensions 1.1beta) interfaces
+. org.w3c.dom.* ... DOM Level 2 interfaces
 
-    gnu.xml.aelfred2.*	... SAX2 parsers (+ optional validator, and JAXP glue)
-    gnu.xml.dom.*	... DOM level 2 (XML) implementation (and JAXP glue)
-    gnu.xml.pipeline.*	... SAX2 event pipeline support
-    gnu.xml.util.*	... various XML utility classes
+. gnu.xml.aelfred2.* ... SAX2 parsers (+ optional validator, and JAXP glue)
+. gnu.xml.dom.* ... DOM level 2 (XML) implementation (and JAXP glue)
+. gnu.xml.pipeline.* ... SAX2 event pipeline support
+. gnu.xml.util.* ... various XML utility classes
+. gnu.xml.libxmlj.transform.* ... JNI bindings to libxslt
 
 LICENSING
-    Briefly, most software in this package is distributed under the
-    GNU General Public License with the "library exception" that 
-    permits its usage even in statically linked environments.  That
-    licensing is more permissive than the "LGPL".
 
-    See the LICENSE file for more information.
+Briefly, most software in this package is distributed under the GNU
+General Public License with the "library exception" that  permits its
+usage even in statically linked environments.  That licensing is more
+permissive than the "LGPL".
 
-BUILDING
-    The default build tools use autoconf and GNU make.
-
-    	$ ./configure
-	...
-	$ make all
-	...
-	$
-    
-    You will need a java compiler on the PATH to build GNUJAXP. You
-    can specify one at configuration time like this:
-
-        $ JAVA_CC=javac ./configure
-	$ make all
-
-    See the file HACKING for how to build from CVS.
-
-INSTALLATION AND CONFIGURATION
-    The simplest way to use this software is to put the "gnujaxp.jar"
-    file into $JAVA_HOME/jre/lib/ext so that it's automatically part
-    of the classpath for every application.  That works for JDK 1.2
-    and later.
-
-    Otherwise, you'll need some other way to put it into $CLASSPATH,
-    such as an environment variable.
-
-    If you have multiple XML tools implementations in your environment,
-    you may need to configure software to use the implementations in 
-    the GNUJAXP distribution rather than some other one.  See the project
-    website (http://www.gnu.org/software/classpathx/jaxp) for information.
+See the LICENSE file for more information.
 
 CONFORMANCE TESTING
     The primary test resources are at http://xmlconf.sourceforge.net
@@ -126,3 +85,89 @@ CONFORMANCE TESTING
 	have no children.  Since you should as a rule avoid both these
 	node types, you probably won't run into related problems.
 
+----------------------------------------------
+
+GNU LibxmlJ
+========================================================================
+
+LibxmlJ is an effort to create a 100% JAXP-compatible Java wrapper for
+Libxml2 and Libxslt. JAXP is the Java API for XML processing, Libxml2
+is the XML C library for Gnome, and Libxslt is the XSLT C library for
+Gnome.
+
+Currently there is only an implementation for the `JAXP API for XML
+Transformations' subset - package javax.xml.transform - and only a
+partial implementation. It should be complete enough to work for a
+number of use cases, though. See below for a list of limitations and
+unsupported features.
+
+The main focus of LibxmlJ so far was support for GNU Gjdoc, which is
+now rather complete. Aside from its use in Gjdoc, It hasn't been
+tested at all, and has a number of known bugs.
+
+CAVEAT: LibxmlJ's current incarnation is incomplete and partly
+incorrect and may leak memory. Highly experimental. Not for production
+use.
+
+
+Usage
+------------------------------------------------------------------------
+
+See INSTALL for installation instructions.
+
+To enable use of LibxmlJ for JAXP transformations:
+
+ System.setProperty("javax.xml.transform.TransformerFactory",
+                    "gnu.xml.libxmlj.transform.TransformerFactoryImpl");
+
+You can also specifiy the factory by using the VM command line or one
+of the other methods described in the documentation for
+javax.xml.transform.TransformerFactory.newInstance().
+
+Make sure that `gnujaxp.jar' and `libxmlj.jar' are on your CLASSPATH
+and the shared library can be found (i.e. is configured via ldconfig
+or located on the LD_LIBRARY_PATH).
+
+
+Usage with Gcj
+------------------------------------------------------------------------
+
+You can create native executables from Java JAXP/XSLT applications
+using gcj, GNU JAXP and LibxmlJ like this:
+
+	gcj --output=./yourapplication \
+	    --main=your.MainClass \
+            --fjni \
+	    /path/to/your/application.jar \
+	    /path/to/gnujaxp.jar \
+	    /path/to/libxmlj.jar \
+	    -Djavax.xml.transform.TransformerFactory= \
+	        gnu.xml.libxmlj.transform.TransformerFactoryImpl \
+            -lxml2 -lxslt -lxmlj
+
+Note that this requires gcj 3.3.
+
+Note that you may have to specify the source codes (the .java files)
+for the classes contained in the jar files listed above in order for 
+gcj 3.3 to link stuff properly.
+
+The resulting executable will depend on libxmlj.so, which in turn
+depends on libxml2.so and libxslt.so.
+
+
+Missing Features
+------------------------------------------------------------------------ 
+
+See BUGS for known bugs.
+
+This implementation should be thread-safe, but currently all
+transformation requests are queued via Java synchronization, which
+means that it effectively performs single-threaded. Long story short,
+both Libxml2 and Libxslt are not fully reentrant.  
+
+Update: it may be possible to make LibxmlJ thread-safe nonetheless
+using thread context variables.
+
+Update: thread context variables have been introduced. This is very
+untested though, LibxmlJ therefore still has the single thread
+bottleneck.
