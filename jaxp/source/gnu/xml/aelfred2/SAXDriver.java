@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.3 2001-06-24 04:06:47 db Exp $
+ * $Id: SAXDriver.java,v 1.4 2001-07-04 16:59:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.3 2001-06-24 04:06:47 db Exp $
+// $Id: SAXDriver.java,v 1.4 2001-07-04 16:59:20 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -115,7 +115,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-24 04:06:47 $
+ * @version $Date: 2001-07-04 16:59:20 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -964,14 +964,9 @@ final public class SAXDriver
 		    case XmlParser.ATTRIBUTE_NMTOKENS:
 			type = "NMTOKENS";
 			break;
-
-			// XXX SAX2 doesn't have a way to return the
-			// enumerated list of permitted notations ... it's
-			// kluged it as NMTOKEN in startElement(),
-			// but that won't work for
-			// the sort of apps that really use the DTD info
 		    case XmlParser.ATTRIBUTE_NOTATION:
-			type = "NOTATION";
+			type = "NOTATION "
+			   +  parser.getAttributeEnumeration (ename, aname);
 			break;
 
 		    default:
@@ -1076,17 +1071,15 @@ final public class SAXDriver
 	case XmlParser.ATTRIBUTE_ENTITIES:
 	    return "ENTITIES";
 	case XmlParser.ATTRIBUTE_ENUMERATED:
-	    // XXX doesn't have a way to return permitted enum values,
-	    // though they must each be a NMTOKEN 
+	    // ... use DeclHandler.attributeDecl to see real type
+	    // FALLTHROUGH
 	case XmlParser.ATTRIBUTE_NMTOKEN:
 	    return "NMTOKEN";
 	case XmlParser.ATTRIBUTE_NMTOKENS:
 	    return "NMTOKENS";
 	case XmlParser.ATTRIBUTE_NOTATION:
-	    // XXX doesn't have a way to return the permitted values,
-	    // each of which must be name a declared notation
+	    // ... use DeclHandler.attributeDecl to see real type
 	    return "NOTATION";
-
 	}
 
 	return null;
