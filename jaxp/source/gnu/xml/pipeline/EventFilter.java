@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.2 2001-07-05 01:43:02 db Exp $
+ * $Id: EventFilter.java,v 1.3 2001-07-08 12:27:11 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,54 +29,75 @@ import gnu.xml.util.DefaultHandler;
 
 /**
  * A customizable event consumer, used to assemble various kinds of filters
- * using SAX handlers and an optional second consumer.  It can be initialized
+ * using SAX handlers and an optional second consumer.  It can be constructed
  * in two ways: <ul>
  *
  *  <li> To serve as a passthrough, sending all events to a second consumer.
+ *  The second consumer may be identified through {@link #getNext}.
  *
  *  <li> To serve as a dead end, with all handlers null;
+ *  {@link #getNext} returns null.
  *
  * </ul>
  *
- * <p> SAX handlers given to these objects will often consume events
- * completely, or chain them to the second consumer after filtering.  That
- * second consumer may be acquired through {@link #getNext}.
+ * <p> Additionally, SAX handlers may be provided, which completely replace
+ * handlers from the consumer provided through the constructor.  To make
+ * it easier to build specialized filter classes, this class implements
+ * all the standard SAX consumer handlers, and those implementations
+ * will delegate to the consumer accessed by {@link #getNext}.
  *
- * <p> The simplest way to build such handlers is to create a subclass
- * which overrides one or more handler methods, and register an instance
- * of that subclass to serve as one or more of the SAX handlers.  Methods
- * which aren't overridden will automatically chain to the appropriate
- * method in the next event consumer.  Subclass methods may invoke superclass
- * methods to do similar chaining, perhaps after modifying parameters.
- * Event filter subclasses should use the ErrorHandler to report most
- * errors.  Record and use the locator, for more useful diagnostics.
+ * <p> The simplest way to create a custom a filter class is to create a
+ * subclass which overrides one or more handler interface methods, and
+ * then itself registers as a handler (for those interfaces) to the base
+ * class using a call such as <em>setContentHandler(this)</em>.  That way,
+ * those overridden methods will intercept those event callbacks, and
+ * all other event callbacks will pass events to the next consumer.
+ * Overridden methods may invoke superclass methods (perhaps after modifying
+ * parameters) should they wish to delegate such calls.  Such subclasses
+ * should use shared ErrorHandler to report errors.
  *
  * <p> Another important technique is to construct a filter consisting
  * of only a few specific types of handler.  For example, one could easily
  * prune out lexical events or various declarations by providing handlers
- * which don't pass the events on, such as an instance of the
- * <a href="../DefaultHandler.html">DefaultHandler</a> class.
+ * which don't pass the events on, or null handlers.
  *
- * <p> This may be viewed as the consumer side analogue of the
- * {@link org.xml.sax.helpers.XMLFilterImpl XMLFilterImpl} class, introduced
- * in SAX2.  Events are pushed through an EventFilter (like normal method
- * calls), not pulled through like data through a parser.
- * Also, there is no policy that the producer must look like a SAX parser;
- * application modules can send events directly.  Implementations of that
- * "XMLFilter" interface may be used with an {@link EventProducer} on the
- * event production part of a pipeline.
+ * <hr />
+ *
+ * <p> This may be viewed as the consumer oriented analogue of the SAX2
+ * {@link org.xml.sax.helpers.XMLFilterImpl XMLFilterImpl} class.
+ * Key differences include: <ul>
+ *
+ *	<li> This fully separates consumer and producer roles:  it
+ *	does not implement the producer side <em>XMLReader</em> or
+ *	<em>EntityResolver</em> interfaces, so it can only be used
+ *	in "push" mode (it has no <em>parse()</em> methods).
+ *
+ *	<li> "Extension" handlers are fully supported, enabling a
+ *	richer set of application requirements.
+ *	And it implements {@link EventConsumer}, which groups related
+ *	consumer methods together, rather than leaving them separated.
+ *
+ *	<li> ErrorHandler support is separated, on the grounds that
+ *	pipeline stages need to share the same error handling policy.
+ *
+ *	<li> The chaining which is visible is to the next consumer,
+ *	not to the preceding producer.  It supports "fan-in", where
+ *	a consumer can be fed by several producers.  (For "fan-out",
+ *	see the {@link TeeConsumer} class.)
+ *
+ *	<li> The chaining is set up differently.  It is intended to be
+ *	set up fron terminus towards producer, during filter construction,
+ *	as described above.  This is part of an early binding model;
+ *	events don't need to pass through stages which ignore them.
+ *
+ *	</ul>
  *
  * @author David Brownell
- * @version $Date: 2001-07-05 01:43:02 $
+ * @version $Date: 2001-07-08 12:27:11 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
 	    LexicalHandler, DeclHandler
-
-    //
-    // The is-a-handler API is only provided for
-    // the convenience of filter implementors.
-    //
 {
     // SAX handlers
     private ContentHandler		docHandler, docNext;
@@ -87,10 +108,9 @@ public class EventFilter
 
     private Hashtable			properties;
 
+    private Locator			locator;
     private EventConsumer		next;
     private ErrorHandler		errHandler;
-
-    // XXX robustly support getDocumentLocator
 
     
     /** SAX2 URI prefix for standard properties (mostly for handlers). */
@@ -117,6 +137,12 @@ public class EventFilter
 	    return;
 
 	next = consumer;
+
+	// We delegate through the "xxNext" handlers, and
+	// report the "xxHandler" ones on our input side.
+
+	// Normally a subclass would both override handler
+	// methods and register itself as the "xxHandler".
 
 	docHandler = docNext = consumer.getContentHandler ();
 	dtdHandler = dtdNext = consumer.getDTDHandler ();
@@ -162,8 +188,8 @@ public class EventFilter
     /**
      * Assigns the content handler to use; a null handler indicates
      * that these events will not be forwarded.
-     * This overrides the previous settting for this handler; if that
-     * handler needs to be called, it must be separately saved.
+     * This overrides the previous settting for this handler, which was
+     * probably pointed to the next consumer by the base class constructor.
      */
     final public void setContentHandler (ContentHandler h)
     {
@@ -177,9 +203,10 @@ public class EventFilter
     }
 
     /**
-     * Assigns the dtd handler to use.
-     * This overrides the previous settting for this handler; if that
-     * handler needs to be called, it must be separately saved.
+     * Assigns the DTD handler to use; a null handler indicates
+     * that these events will not be forwarded.
+     * This overrides the previous settting for this handler, which was
+     * probably pointed to the next consumer by the base class constructor.
      */
     final public void setDTDHandler (DTDHandler h)
 	{ dtdHandler = h; }
@@ -190,14 +217,19 @@ public class EventFilter
 	return dtdHandler;
     }
 
-    /** Stores a property of unknown intent (usually a handler) */
+    /**
+     * Stores the property, normally a handler; a null handler indicates
+     * that these events will not be forwarded.
+     * This overrides the previous handler settting, which was probably
+     * pointed to the next consumer by the base class constructor.
+     */
     final public void setProperty (String id, Object o)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	try {
 	    Object	value = getProperty (id);
 
-	    if (id == o)
+	    if (value == o)
 		return;
 	    if ((PROPERTY_URI + "declaration-handler").equals (id)) {
 		declHandler = (DeclHandler) o;
@@ -237,12 +269,20 @@ public class EventFilter
 	throw new SAXNotRecognizedException (id);
     }
 
+    /**
+     * Returns any locator provided to the next consumer, if this class
+     * (or a subclass) is handling {@link ContentHandler } events.
+     */
+    public Locator getDocumentLocator ()
+	{ return locator; }
+
 
     // CONTENT HANDLER DELEGATIONS
 
     /** <b>SAX2:</b> passes this callback to the next consumer, if any */
     public void setDocumentLocator (Locator l)
     {
+	locator = l;
 	if (docNext != null)
 	    docNext.setDocumentLocator (l);
     }
@@ -322,12 +362,13 @@ public class EventFilter
     {
 	if (docNext != null)
 	    docNext.endDocument ();
+	locator = null;
     }
 
 
     // DTD HANDLER DELEGATIONS
     
-    /** <b>SAX2:</b> passes this callback to the next consumer, if any */
+    /** <b>SAX1:</b> passes this callback to the next consumer, if any */
     public void unparsedEntityDecl (String s1, String s2, String s3, String s4)
     throws SAXException
     {
@@ -335,7 +376,7 @@ public class EventFilter
 	    dtdNext.unparsedEntityDecl (s1, s2, s3, s4);
     }
     
-    /** <b>SAX2:</b> passes this callback to the next consumer, if any */
+    /** <b>SAX1:</b> passes this callback to the next consumer, if any */
     public void notationDecl (String s1, String s2, String s3)
     throws SAXException
     {
