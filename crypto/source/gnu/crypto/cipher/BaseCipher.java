@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseCipher.java,v 1.2 2001-11-21 19:44:43 raif Exp $
+// $Id: BaseCipher.java,v 1.3 2001-11-21 19:53:37 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -33,9 +33,9 @@ import java.util.Map;
 /**
  * A basic abstract class to facilitate implementing symmetric block ciphers.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public abstract class BaseCipher implements IBlockCipher {
+public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -164,57 +164,6 @@ public abstract class BaseCipher implements IBlockCipher {
 
       return true;
    }
-
-   // methods to be implemented by concrete subclasses
-   // -------------------------------------------------------------------------
-
-   public abstract Iterator blockSizes();
-
-   public abstract Iterator keySizes();
-
-   /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.
-    *
-    * @param k the user-supplied key material.
-    * @param bs the desired block size in bytes.
-    * @return an Object encapsulating the session key.
-    * @exception IllegalArgumentException if the block size is invalid.
-    * @exception InvalidKeyException if the key data is invalid.
-    */
-   public abstract Object makeKey(byte[]k, int bs) throws InvalidKeyException;
-
-   /**
-    * Encrypts exactly one block of plaintext.
-    *
-    * @param in the plaintext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
-    * @param out the ciphertext.
-    * @param outOffset index of <i>out</i> from which to store the result.
-    * @param k the session key to use.
-    * @param bs the block size to use.
-    * @exception IllegalArgumentException if the block size is invalid.
-    * @exception ArrayIndexOutOfBoundsException if there is not enough room in
-    * either the plaintext or ciphertext buffers.
-    */
-   public abstract void
-   encrypt(byte[] in, int inOffset, byte[] out, int outOffset, Object k, int bs);
-
-   /**
-    * Decrypts exactly one block of plaintext.
-    *
-    * @param in the ciphertext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
-    * @param out the plaintext.
-    * @param outOffset index of <i>out</i> from which to store the result.
-    * @param k the session key to use.
-    * @param bs the block size to use.
-    * @exception IllegalArgumentException if the block size is invalid.
-    * @exception ArrayIndexOutOfBoundsException if there is not enough room in
-    * either the plaintext or ciphertext buffers.
-    */
-   public abstract void
-   decrypt(byte[] in, int inOffset, byte[] out, int outOffset, Object k, int bs);
 
    // own methods
    // -------------------------------------------------------------------------
