@@ -166,15 +166,17 @@ public class Flags
     
   }
 
-  private int systemFlags = 0;
+  private int systemFlags;
 
-  private HashMap userFlags = null;
+  private HashMap userFlags;
   
   /**
    * Construct an empty Flags object.
    */
   public Flags()
   {
+	  systemFlags = 0;
+	  userFlags = null;
   }
 
   /**
@@ -186,6 +188,8 @@ public class Flags
     systemFlags = flags.systemFlags;
     if (flags.userFlags!=null)
       userFlags = (HashMap)flags.userFlags.clone();
+	else
+		userFlags = null;
   }
 
   /**
@@ -195,6 +199,7 @@ public class Flags
   public Flags(Flag flag)
   {
     systemFlags = systemFlags | flag.flag;
+	userFlags = null;
   }
 
   /**
@@ -203,6 +208,7 @@ public class Flags
    */
   public Flags(String flag)
   {
+	  systemFlags = 0;
     userFlags = new HashMap(1);
     userFlags.put(flag.toLowerCase(), flag);
   }
@@ -330,16 +336,14 @@ public class Flags
     {
       if (userFlags==null)
         return false;
-      synchronized (flags.userFlags)
-      {
-        synchronized (userFlags)
-        {
-          for (Iterator i = flags.userFlags.keySet().iterator(); i.hasNext(); )
+	  synchronized (userFlags)
+  	  {
+		  String[] fuf = flags.getUserFlags();
+          for (int i=0; i<fuf.length; i++)
           {
-            if (!userFlags.containsKey(i.next()))
+            if (!userFlags.containsKey(fuf[i].toLowerCase()))
               return false;
           }
-        }
       }
     }
     return true;
@@ -405,7 +409,7 @@ public class Flags
         String[] f = new String[userFlags.size()];
         int index = 0;
         for (Iterator i = userFlags.keySet().iterator(); i.hasNext(); )
-          f[index++] = (String)i.next();
+          f[index++] = (String)userFlags.get(i.next());
         return f;
       }
     }

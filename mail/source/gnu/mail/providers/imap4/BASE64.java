@@ -136,4 +136,27 @@ public final class BASE64
     return bt;
   }
 
+  public static void main(String[] args)
+  {
+    boolean decode = false;
+    for (int i=0; i<args.length; i++)
+    {
+      if (args[i].equals("-d"))
+        decode = true;
+      else
+      {
+        try
+        {
+          byte[] in = args[i].getBytes("US-ASCII");
+          byte[] out = decode ? decode(in) : encode(in);
+          System.out.println(args[i]+" = "+new String(out, "US-ASCII"));
+        }
+        catch (java.io.UnsupportedEncodingException e)
+        {
+          e.printStackTrace(System.err);
+        }
+      }
+    }
+  }
+
 }
