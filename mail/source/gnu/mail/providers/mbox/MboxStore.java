@@ -24,10 +24,14 @@ package gnu.mail.providers.mbox;
 
 import java.io.*;
 import java.net.*;
+import java.util.Vector;
 import javax.mail.*;
 import javax.mail.event.*;
 import java.util.Hashtable;
 import gnu.mail.util.*;
+import gnu.mail.treeutil.StatusEvent;
+import gnu.mail.treeutil.StatusListener;
+import gnu.mail.treeutil.StatusSource;
 
 /**
  * The storage class implementing the Mbox mailbox file format.
@@ -37,6 +41,7 @@ import gnu.mail.util.*;
  */
 public class MboxStore 
   extends Store 
+  implements StatusSource
 {
 
   private static final char separatorChar = '/';
@@ -44,6 +49,8 @@ public class MboxStore
   static int fetchsize = 1024;
   static boolean attemptFallback = true;
 
+  Vector statusListeners = new Vector();
+	
   /**
    * Constructor.
    */
@@ -210,6 +217,66 @@ public class MboxStore
   {
     if (session.getDebug())
       System.out.println("mbox: "+message);
+  }
+
+  // -- StatusSource --
+
+  /**
+   * Adds a status listener to this store.
+   * The listener will be informed of state changes during potentially
+   * lengthy procedures (opening and closing mboxes).
+   * @param l the status listener
+   * @see #removeStatusListener
+   */
+  public void addStatusListener(StatusListener l) 
+  {
+    synchronized (statusListeners) 
+    {
+      statusListeners.addElement(l);
+    }
+  }
+			
+  /**
+   * Removes a status listener from this store.
+   * @param l the status listener
+   * @see #addStatusListener
+   */
+  public void removeStatusListener(StatusListener l) 
+  {
+    synchronized (statusListeners) 
+    {
+      statusListeners.removeElement(l);
+    }
+  }
+
+  /**
+   * Processes a status event.
+   * This dispatches the event to all the registered listeners.
+   * @param event the status event
+   */
+  protected void processStatusEvent(StatusEvent event) 
+  {
+    StatusListener[] listeners;
+    synchronized (statusListeners) 
+    {
+      listeners = new StatusListener[statusListeners.size()];
+      statusListeners.copyInto(listeners);
+    }
+    switch (event.getType()) 
+    {
+      case StatusEvent.OPERATION_START:
+        for (int i=0; i<listeners.length; i++)
+          listeners[i].statusOperationStarted(event);
+        break;
+      case StatusEvent.OPERATION_UPDATE:
+        for (int i=0; i<listeners.length; i++)
+          listeners[i].statusProgressUpdate(event);
+        break;
+      case StatusEvent.OPERATION_END:
+        for (int i=0; i<listeners.length; i++)
+          listeners[i].statusOperationEnded(event);
+        break;
+    }
   }
 
 }

@@ -213,8 +213,7 @@ public class MimeMessage
     throws MessagingException
   {
     super(source.session);
-    // Don't know how Sun are copying the data more times than necessary:
-    // here I am copying it exactly once!
+    // Use a byte array for temporary storage
     try
     {
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -1641,6 +1640,8 @@ public class MimeMessage
     }
     os.flush();
   }
+
+  static int fc = 1;
 
   /**
    * Get all the headers for this header_name.

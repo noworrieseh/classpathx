@@ -69,16 +69,14 @@ public class CRLFOutputStream
     throws IOException
   {
     if (ch==CR)
-    out.write(CRLF);
+      out.write(CRLF);
     else if (ch==LF)
     {
       if (last!=CR)
-      out.write(CRLF);
+        out.write(CRLF);
     }
     else
-    {
       out.write(ch);
-    }
     last = ch;
   }
 
@@ -102,27 +100,24 @@ public class CRLFOutputStream
     int d = off;
     len += off;
     for (int i=off; i<len; i++)
-    switch (b[i])
     {
-      default:
-        break;
-      case CR:
-        if (i+1<len && b[i+1]==LF)
-        {
-          i++;
-        }
-        else
-        {
-          out.write(b, d, (i-d)+1);
-          out.write(LF);
+      switch (b[i])
+      {
+        case CR:
+          out.write(b, d, i-d);
+          out.write(CRLF, 0, 2);
           d = i+1;
-        }
-        break;
-      case LF:
-        out.write(b, d, i-d);
-        out.write(CRLF, 0, 2);
-        d = i+1;
-        break;
+          break;
+        case LF:
+          if (last!=CR)
+          {
+            out.write(b, d, i-d);
+            out.write(CRLF, 0, 2);
+          }
+          d = i+1;
+          break;
+      }
+      last = b[i];
     }
     if (len-d>0)
       out.write(b, d, len-d);

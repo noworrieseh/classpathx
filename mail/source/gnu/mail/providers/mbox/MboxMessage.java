@@ -60,43 +60,8 @@ public class MboxMessage
       int msgnum)
     throws MessagingException 
   {
-    super(folder, msgnum);
+    super(folder, in, msgnum);
     this.fromLine = fromLine;
-    
-    // buffer the stream
-    if (!(in instanceof ByteArrayInputStream) &&
-        !(in instanceof BufferedInputStream))
-    in = new BufferedInputStream(in);
-    
-    // read the headers from the stream
-    headers = new InternetHeaders(in);
-
-    // now read the content
-    try 
-    {
-      int fetchsize = MboxStore.fetchsize;
-      byte bytes[];
-      if (in instanceof ByteArrayInputStream) 
-      {
-        fetchsize = in.available();
-        bytes = new byte[fetchsize];
-        int len = in.read(bytes, 0, fetchsize);
-      }
-      else 
-      {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bytes = new byte[fetchsize];
-        int len;
-        while ((len = in.read(bytes, 0, fetchsize))!=-1)
-          out.write(bytes, 0, len);
-        bytes = out.toByteArray();
-      }
-      content = bytes;
-    } 
-    catch(IOException e) 
-    {
-      throw new MessagingException("I/O error", e);
-    }
     readStatusHeader();
   }
 
@@ -110,28 +75,10 @@ public class MboxMessage
       int msgnum) 
     throws MessagingException 
   {
-    super(folder, msgnum);
-    
-    headers = new InternetHeaders();
-    for (Enumeration e = message.getAllHeaderLines();
-        e.hasMoreElements(); )
-    headers.addHeaderLine((String)e.nextElement());
-    
-    try 
-    {
-      InputStream in = message.getInputStream();
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      byte[] bytes = new byte[1024];
-      for (int len = in.read(bytes); len>-1; len = in.read(bytes))
-      out.write(bytes, 0, len);
-      content = out.toByteArray();
-    } 
-    catch (IOException e) 
-    {
-      throw new MessagingException("I/O error", e);
-    }
+    super(message);
+    this.folder = folder;
+    this.msgnum = msgnum;
     readStatusHeader();
-    updateStatusHeader();
   }
 	
   /**
@@ -254,15 +201,16 @@ public class MboxMessage
       flags.add(flag);
     else
       flags.remove(flag);
-    updateStatusHeader();
   }
     
   /**
    * Updates the status header from the current flags.
    */
-  private void updateStatusHeader() 
+  protected void updateHeaders() 
     throws MessagingException 
   {
+    super.updateHeaders();
+
     String old = getHeader(STATUS, "\n");
     StringBuffer buffer = new StringBuffer();
     boolean seen = flags.contains(Flags.Flag.SEEN);

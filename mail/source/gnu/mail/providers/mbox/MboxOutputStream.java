@@ -32,10 +32,9 @@ import java.io.*;
 /**
  * A filter stream that can escape mbox From_ lines in message content.
  * This will only work reliably for messages with <1024 bytes in each line.
- * It will strip out any CRs in the stream.
  *
  * @author dog@dog.net.uk
- * @version 1.3.1
+ * @version 2.0
  */
 class MboxOutputStream 
   extends FilterOutputStream 
@@ -52,20 +51,37 @@ class MboxOutputStream
    * The number of valid bytes in the buffer. 
    */
   protected int count = 0;
-    
+
+  /**
+   * Constructs an mbox From_-escaping output stream with a buffer size of
+   * 1024 bytes.
+   */
   public MboxOutputStream(OutputStream out) 
   {
-    super(out);
-    buf = new byte[1024];
+    this(out, 1024);
   }
 
-  /** Flush the internal buffer */
+  /**
+   * Constructs an mbox From_-escaping output stream with the specified
+   * buffer size.
+   * @param len the buffer size
+   */
+  public MboxOutputStream(OutputStream out, int len) 
+  {
+    super(out);
+    buf = new byte[len];
+  }
+
+  /**
+   * Flush the internal buffer.
+   */
   protected void validateAndFlushBuffer() 
     throws IOException 
   {
     if (count > 0) 
     {
-      for (int i=0; i<count-5; i++) 
+      boolean done = false;
+      for (int i=0; i<count-5 && !done; i++) 
       {
         if (buf[i]=='F' &&
             buf[i+1]=='r' &&
@@ -79,11 +95,11 @@ class MboxOutputStream
           System.arraycopy(buf, i, b2, i+1, buf.length-i);
           buf = b2;
           count++;
-          break;
+          done = true;
         } 
         else if (buf[i]!=KET && buf[i]!='\n') 
         {
-          break;
+          done = true;
         }
       }
       out.write(buf, 0, count);
@@ -99,9 +115,11 @@ class MboxOutputStream
   {
     if (b=='\r')
       return;
-    if (b=='\n' || count>buf.length)
+    if (count>buf.length)
       validateAndFlushBuffer();
     buf[count++] = (byte)b;
+    if (b=='\n')
+      validateAndFlushBuffer();
   }
 
   /**
@@ -116,8 +134,8 @@ class MboxOutputStream
     {
       if (b[i]=='\r') 
       {
-        byte[] b2 = new byte[b.length];
-        System.arraycopy(b, off, b2, off, len);
+        byte[] b2 = new byte[b.length-1];
+        System.arraycopy(b, off, b2, off, len-1);
         System.arraycopy(b, i+1, b2, i, len-(i-off)-1);
         b = b2;
         len--;
@@ -143,7 +161,7 @@ class MboxOutputStream
     System.arraycopy(b, off, buf, count, len);
     count += len;
   }
-  
+
   /**
    * Flushes this output stream.
    */

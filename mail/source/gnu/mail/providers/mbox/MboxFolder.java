@@ -35,6 +35,7 @@ import javax.mail.*;
 import javax.mail.event.*;
 import javax.mail.internet.*;
 import gnu.mail.util.*;
+import gnu.mail.treeutil.StatusEvent;
 
 /**
  * The folder class implementing a UNIX mbox-format mailbox.
@@ -181,38 +182,62 @@ public class MboxFolder
       int count = 1;
       String line, fromLine = null;
       ByteArrayOutputStream buf = null;
+
+      // notify listeners
+      store.processStatusEvent(new StatusEvent(store,
+            StatusEvent.OPERATION_START,
+            "open"));
+          
       for (line = in.readLine(); line!=null; line = in.readLine()) 
       {
         if (line.indexOf(FROM)==0) 
         {
           if (buf!=null)
           {
-            ByteArrayInputStream bytes = 
-              new ByteArrayInputStream(buf.toByteArray());
-            MboxMessage m = new MboxMessage(this, fromLine, bytes, count++);
+            byte[] bytes = buf.toByteArray();
+            ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+            MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
             vm.addElement(m);
+
+            store.processStatusEvent(new StatusEvent(store,
+                  StatusEvent.OPERATION_UPDATE,
+                  "open",
+                  1,
+                  StatusEvent.UNKNOWN,
+                  count-1));
           }
           fromLine = line;
           buf = new ByteArrayOutputStream();
         }
         else if (buf!=null)
         {
-          byte[] bytes = line.getBytes();
+          byte[] bytes = decodeFrom(line).getBytes();
           buf.write(bytes, 0, bytes.length);
           buf.write(10); // LF
         }
       }
       if (buf!=null)
       {
-        ByteArrayInputStream bytes =
-          new ByteArrayInputStream(buf.toByteArray());
-        MboxMessage m = new MboxMessage(this, fromLine, bytes, count++);
+        byte[] bytes = buf.toByteArray();
+        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+        MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
         vm.addElement(m);
+
+        store.processStatusEvent(new StatusEvent(store,
+              StatusEvent.OPERATION_UPDATE,
+              "open",
+              1,
+              StatusEvent.UNKNOWN,
+              count-1));
       }
       messages = new MboxMessage[vm.size()];
       vm.copyInto(messages);
       buf = null;
       vm = null;
+
+      store.processStatusEvent(new StatusEvent(store,
+            StatusEvent.OPERATION_END,
+            "open"));
 
       // OK
       open = true;
@@ -237,6 +262,31 @@ public class MboxFolder
     }
   }
 
+  /**
+   * Returns the specified line with any From_ line encoding removed.
+   */
+  public static String decodeFrom(String line)
+  {
+    if (line!=null)
+    {
+      int len = line.length();
+      for (int i=0; i<(len-5); i++)
+      {
+        char c = line.charAt(i);
+        if (i>0 &&
+            (c=='F' &&
+             line.charAt(i+1)=='r' &&
+             line.charAt(i+2)=='o' &&
+             line.charAt(i+3)=='m' &&
+             line.charAt(i+4)==' '))
+          return line.substring(1);
+        if (c!='>')
+          break;
+      }
+    }
+    return line;
+  }
+  
   /**
    * Closes this folder.
    * @param expunge if the folder is to be expunged before it is closed
@@ -263,6 +313,10 @@ public class MboxFolder
             os = getOutputStream();
             BufferedOutputStream bos = new BufferedOutputStream(os);
             MboxOutputStream mos = new MboxOutputStream(bos);
+
+            store.processStatusEvent(new StatusEvent(store,
+                  StatusEvent.OPERATION_START,
+                  "close"));
             for (int i=0; i<messages.length; i++) 
             {
               String fromLine = fromLine(messages[i]);
@@ -271,7 +325,18 @@ public class MboxFolder
               bos.flush();
               messages[i].writeTo(mos);
               mos.flush();
+
+              store.processStatusEvent(new StatusEvent(store,
+                    StatusEvent.OPERATION_UPDATE,
+                    "close",
+                    1,
+                    messages.length,
+                    i+1));
             }
+
+            store.processStatusEvent(new StatusEvent(store,
+                  StatusEvent.OPERATION_END,
+                  "close"));
           } 
           catch (IOException e) 
           {
