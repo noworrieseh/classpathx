@@ -52,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.Function;
+import gnu.xml.xpath.Pattern;
 
 /**
  * The XSLT <code>key()</code>function.
@@ -59,7 +60,7 @@ import gnu.xml.xpath.Function;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 final class KeyFunction
-  extends Expr
+  extends Pattern
   implements XPathFunction, Function
 {
 
@@ -81,6 +82,12 @@ final class KeyFunction
   public void setArguments(List args)
   {
     this.args = args;
+  }
+
+  public boolean matches(Node context)
+  {
+    Object ret = evaluate(context, 1, 1);
+    return !((Collection) ret).isEmpty();
   }
 
   public Object evaluate(Node context, int pos, int len)
@@ -186,6 +193,24 @@ final class KeyFunction
               }
           }
       }
+  }
+
+  public Expr clone(Object context)
+  {
+    Stylesheet s = stylesheet;
+    if (context instanceof Stylesheet)
+      {
+        s = (Stylesheet) context;
+      }
+    KeyFunction f = new KeyFunction(s);
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    f.setArguments(args2);
+    return f;
   }
 
 }

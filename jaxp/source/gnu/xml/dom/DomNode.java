@@ -1853,11 +1853,6 @@ public abstract class DomNode
           {
             return 0;
           }
-        if (n1.nodeType == ATTRIBUTE_NODE ||
-            n2.nodeType == ATTRIBUTE_NODE)
-          {
-            return 0;
-          }
         int d1 = n1.depth, d2 = n2.depth;
         int delta = d1 - d2;
         while (d1 > d2)
@@ -1881,7 +1876,7 @@ public abstract class DomNode
    */
   final int compareTo2(DomNode n1, DomNode n2)
   {
-    if (n1.depth == 0 || n1 == n2)
+    if (n1.depth == 0 || n1 == n2 || n1 == null || n2 == null)
       {
         return 0;
       }

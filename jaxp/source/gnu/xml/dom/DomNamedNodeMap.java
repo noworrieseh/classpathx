@@ -229,8 +229,12 @@ public class DomNamedNodeMap
               {
                 first = node;
               }
+            reparent(node, nodeName, ctx.index);
+            ctx.parent = null;
             ctx.next = null;
             ctx.previous = null;
+            ctx.setDepth(0);
+            ctx.index = 0;
             return ctx;
           }
         last = ctx;
@@ -246,13 +250,25 @@ public class DomNamedNodeMap
         first = node;
       }
     length++;
+    reparent(node, nodeName, 0);
+    return null;
+  }
+
+  void reparent(DomNode node, String nodeName, int i)
+  {
+    node.parent = owner;
+    node.setDepth(owner.depth + 1);
+    // index renumbering
+    for (DomNode ctx = node; ctx != null; ctx = ctx.next)
+      {
+        ctx.index = i++;
+      }
     // cache xml:space
     boolean xmlSpace = "xml:space".equals(nodeName);
     if (xmlSpace && owner instanceof DomElement)
       {
         ((DomElement) owner).xmlSpace = node.getNodeValue();
       }
-    return null;
   }
 
   /**
@@ -337,9 +353,12 @@ public class DomNamedNodeMap
               {
                 ctx.next.previous = ctx.previous;
               }
+            length--;
             ctx.previous = null;
             ctx.next = null;
-            length--;
+            ctx.parent = null;
+            ctx.setDepth(0);
+            ctx.index = 0;
             return ctx;
           }
       }    

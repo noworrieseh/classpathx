@@ -68,6 +68,15 @@ final class CopyOfNode
     this.select = select;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new CopyOfNode((children == null) ? null :
+                          children.clone(stylesheet),
+                          (next == null) ? null :
+                          next.clone(stylesheet),
+                          select.clone(stylesheet));
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)

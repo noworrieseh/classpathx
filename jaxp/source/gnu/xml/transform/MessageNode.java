@@ -62,6 +62,15 @@ final class MessageNode
     this.terminate = terminate;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new MessageNode((children == null) ? null :
+                           children.clone(stylesheet),
+                           (next == null) ? null :
+                           next.clone(stylesheet),
+                           terminate);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)

@@ -68,6 +68,22 @@ final class ForEachNode
     this.sortKeys = sortKeys;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    int len = sortKeys.size();
+    List sortKeys2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        sortKeys2.add(((Key) sortKeys.get(i)).clone(stylesheet));
+      }
+    return new ForEachNode((children == null) ? null :
+                           children.clone(stylesheet),
+                           (next == null) ? null :
+                           next.clone(stylesheet),
+                           select.clone(stylesheet),
+                           sortKeys2);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
@@ -94,6 +110,7 @@ final class ForEachNode
             for (Iterator i = list.iterator(); i.hasNext(); )
               {
                 Node node = (Node) i.next();
+                stylesheet.current = node;
                 children.apply(stylesheet, mode,
                                node, p++, l,
                                parent, nextSibling);

@@ -67,6 +67,11 @@ class Predicate
     return expr._boolean(node, expr.evaluate(node, pos, len));
   }
 
+  public Test clone(Object context)
+  {
+    return new Predicate(expr.clone(context));
+  }
+  
   public String toString()
   {
     return "[" + expr + "]";

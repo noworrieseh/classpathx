@@ -78,6 +78,11 @@ final class RoundFunction
       new Double(n) : new Double(Math.round(n));
   }
 
+  public Expr clone(Object context)
+  {
+    return new RoundFunction(arg.clone(context));
+  }
+
   public String toString()
   {
     return "round(" + arg + ")";

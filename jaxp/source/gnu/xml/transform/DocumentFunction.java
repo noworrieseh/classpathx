@@ -228,5 +228,23 @@ final class DocumentFunction
         throw new RuntimeException(msg);
       }
   }
+
+  public Expr clone(Object context)
+  {
+    Stylesheet s = stylesheet;
+    if (context instanceof Stylesheet)
+      {
+        s = (Stylesheet) context;
+      }
+    DocumentFunction f = new DocumentFunction(s, base);
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    f.setArguments(args2);
+    return f;
+  }
   
 }

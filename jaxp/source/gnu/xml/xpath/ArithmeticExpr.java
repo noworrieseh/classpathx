@@ -113,6 +113,11 @@ final class ArithmeticExpr
       }
   }
 
+  public Expr clone(Object context)
+  {
+    return new ArithmeticExpr(lhs.clone(context), rhs.clone(context), op);
+  }
+
   public String toString()
   {
     StringBuffer buf = new StringBuffer();

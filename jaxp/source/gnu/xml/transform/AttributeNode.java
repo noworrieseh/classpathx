@@ -70,6 +70,17 @@ final class AttributeNode
     this.source = source;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new AttributeNode((children == null) ? null :
+                             children.clone(stylesheet),
+                             (next == null) ? null : next.clone(stylesheet),
+                             name.clone(stylesheet),
+                             (namespace == null) ? null : 
+                             namespace.clone(stylesheet),
+                             source);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)

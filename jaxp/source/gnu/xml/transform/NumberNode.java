@@ -64,6 +64,17 @@ final class NumberNode
     this.value = value;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new NumberNode((children == null) ? null :
+                          children.clone(stylesheet),
+                          (next == null) ? null :
+                          next.clone(stylesheet),
+                          value.clone(stylesheet),
+                          format, lang, letterValue,
+                          groupingSeparator, groupingSize);
+  }
+
   int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
     throws TransformerException
   {

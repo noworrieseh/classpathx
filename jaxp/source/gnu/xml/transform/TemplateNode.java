@@ -91,6 +91,8 @@ abstract class TemplateNode
                         Node parent, Node nextSibling)
     throws TransformerException;
 
+  abstract TemplateNode clone(Stylesheet stylesheet);
+
   /**
    * Debugging
    */

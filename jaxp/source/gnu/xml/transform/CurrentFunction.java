@@ -56,6 +56,13 @@ final class CurrentFunction
   implements Function, XPathFunction
 {
 
+  final Stylesheet stylesheet;
+
+  CurrentFunction(Stylesheet stylesheet)
+  {
+    this.stylesheet = stylesheet;
+  }
+
   public Object evaluate(List args)
     throws XPathFunctionException
   {
@@ -70,7 +77,22 @@ final class CurrentFunction
 
   public Object evaluate(Node context, int pos, int len)
   {
-    return Collections.singleton(context);
+    return Collections.singleton(stylesheet.current);
+  }
+
+  public Expr clone(Object context)
+  {
+    Stylesheet s = stylesheet;
+    if (context instanceof Stylesheet)
+      {
+        s = (Stylesheet) context;
+      }
+    return new CurrentFunction(s);
+  }
+
+  public String toString()
+  {
+    return "current()";
   }
 
 }

@@ -84,6 +84,21 @@ final class NodeNumberNode
     this.from = from;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new NodeNumberNode((children == null) ? null :
+                              children.clone(stylesheet),
+                              (next == null) ? null :
+                              next.clone(stylesheet),
+                              level,
+                              (count == null) ? null :
+                              (Pattern) count.clone(stylesheet),
+                              (from == null) ? from :
+                              (Pattern) from.clone(stylesheet),
+                              format, lang, letterValue,
+                              groupingSeparator, groupingSize);
+  }
+
   int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
     throws TransformerException
   {

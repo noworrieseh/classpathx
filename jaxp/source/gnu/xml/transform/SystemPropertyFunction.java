@@ -113,5 +113,18 @@ final class SystemPropertyFunction
     return System.getProperty(localName);
   }
 
+  public Expr clone(Object context)
+  {
+    SystemPropertyFunction f = new SystemPropertyFunction();
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    f.setArguments(args2);
+    return f;
+  }
+
 }
 

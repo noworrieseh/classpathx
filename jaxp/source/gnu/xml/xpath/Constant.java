@@ -61,6 +61,11 @@ public final class Constant
     return value;
   }
 
+  public Expr clone(Object context)
+  {
+    return new Constant(value);
+  }
+
   public String toString()
   {
     String ret = value.toString();

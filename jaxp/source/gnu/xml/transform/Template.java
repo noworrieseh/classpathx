@@ -62,7 +62,6 @@ class Template
 
   static final double DEFAULT_PRIORITY = 0.5d;
 
-  final Stylesheet stylesheet;
   final QName name;
   final Pattern match;
   final TemplateNode node;
@@ -70,13 +69,12 @@ class Template
   final int precedence;
   final QName mode;
 
-  Template(Stylesheet stylesheet, QName name, Pattern match, Node source,
+  Template(QName name, Pattern match, TemplateNode node,
            int precedence, double priority, QName mode)
-    throws TransformerConfigurationException
   {
-    this.stylesheet = stylesheet;
     this.name = name;
     this.match = match;
+    this.node = node;
     // adjust priority if necessary
     // see XSLT section 5.5
     Test test = getNodeTest(match);
@@ -110,12 +108,22 @@ class Template
               }
           }
       }
-    node = stylesheet.parse(source);
     this.precedence = precedence;
     this.priority = priority;
     this.mode = mode;
   }
 
+  Template clone(Stylesheet stylesheet)
+  {
+    return new Template(name,
+                        (match == null) ? null :
+                        (Pattern) match.clone(stylesheet),
+                        (node == null) ? null : node.clone(stylesheet),
+                        precedence,
+                        priority,
+                        mode);
+  }
+  
   public int compareTo(Object other)
   {
     if (other instanceof Template)

@@ -69,6 +69,11 @@ public final class Root
     return Collections.singleton(doc);
   }
 
+  public Expr clone(Object context)
+  {
+    return new Root();
+  }
+
   public String toString()
   {
     return "/";

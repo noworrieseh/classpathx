@@ -60,6 +60,13 @@ class Key
     this.match = match;
     this.use = use;
   }
+
+  Key clone(Stylesheet stylesheet)
+  {
+    return new Key(name,
+                   (Pattern) match.clone(stylesheet),
+                   use.clone(stylesheet));
+  }
   
 }
 

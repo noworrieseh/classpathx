@@ -102,6 +102,11 @@ public final class NodeTypeTest
       }
   }
 
+  public Test clone(Object context)
+  {
+    return new NodeTypeTest(type, data);
+  }
+
   public String toString()
   {
     switch (type)

@@ -110,5 +110,18 @@ final class GenerateIdFunction
     return name + "-" + index + "-" + depth;
   }
 
+  public Expr clone(Object context)
+  {
+    GenerateIdFunction f = new GenerateIdFunction();
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    f.setArguments(args2);
+    return f;
+  }
+
 }
 

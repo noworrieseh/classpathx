@@ -115,6 +115,11 @@ public final class NameTest
             s1 != null && s1.equals(s2));
   }
 
+  public Test clone(Object context)
+  {
+    return new NameTest(qName, anyLocalName, any);
+  }
+
   public String toString ()
   {
     if (any)

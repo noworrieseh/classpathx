@@ -72,6 +72,11 @@ final class ParenthesizedExpr
     return ret;
   }
 
+  public Expr clone(Object context)
+  {
+    return new ParenthesizedExpr(expr.clone(context));
+  }
+
   public String toString()
   {
     return "(" + expr + ")";

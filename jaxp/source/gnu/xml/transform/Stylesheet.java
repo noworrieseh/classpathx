@@ -173,7 +173,8 @@ class Stylesheet
   /**
    * Holds the current node while parsing.
    * Necessary to associate the document function with its declaring node,
-   * and resolve namespaces.
+   * to resolve namespaces, and to maintain the current node for the
+   * current() function.
    */
   Node current;
 
@@ -182,6 +183,14 @@ class Stylesheet
    */
   boolean terminated;
 
+  /**
+   * Functions that refer to this stylesheet.
+   */
+  DocumentFunction documentFunction;
+  KeyFunction keyFunction;
+  CurrentFunction currentFunction;
+  FormatNumberFunction formatNumberFunction;
+  
   Stylesheet(TransformerFactoryImpl factory,
              Stylesheet parent,
              Document doc,
@@ -198,6 +207,7 @@ class Stylesheet
     stripSpace = new LinkedHashSet();
     preserveSpace = new LinkedHashSet();
     outputCdataSectionElements = new LinkedHashSet();
+    xpath = (XPathImpl) factory.xpathFactory.newXPath();
     if (parent == null)
       {
         bindings = new Bindings(this);
@@ -207,6 +217,8 @@ class Stylesheet
         keys = new LinkedList();
         decimalFormats = new LinkedHashMap();
         initDefaultDecimalFormat();
+        xpath.setNamespaceContext(this);
+        xpath.setXPathFunctionResolver(this);
       }
     else
       {
@@ -220,18 +232,17 @@ class Stylesheet
               }
           }
         /* OK */
-        bindings = parent.bindings;
-        attributeSets = parent.attributeSets;
-        namespaceAliases = parent.namespaceAliases;
-        templates = parent.templates;
-        keys = parent.keys;
-        decimalFormats = parent.decimalFormats;
+        Stylesheet root = getRootStylesheet();
+        bindings = root.bindings;
+        attributeSets = root.attributeSets;
+        namespaceAliases = root.namespaceAliases;
+        templates = root.templates;
+        keys = root.keys;
+        decimalFormats = root.decimalFormats;
+        xpath.setNamespaceContext(root);
+        xpath.setXPathFunctionResolver(root);
       }
-
-    xpath = (XPathImpl) factory.xpathFactory.newXPath();
-    xpath.setNamespaceContext(this);
     xpath.setXPathVariableResolver(bindings);
-    xpath.setXPathFunctionResolver(this);
 
     Test anyNode = new NodeTypeTest((short) 0);
     List tests = Collections.singletonList(anyNode);
@@ -260,6 +271,16 @@ class Stylesheet
           }
       }
   }
+
+  Stylesheet getRootStylesheet()
+  {
+    Stylesheet stylesheet = this;
+    while (stylesheet.parent != null)
+      {
+        stylesheet = stylesheet.parent;
+      }
+    return stylesheet;
+  }
   
   void initDefaultDecimalFormat()
   {
@@ -287,6 +308,15 @@ class Stylesheet
       {
         Stylesheet clone = (Stylesheet) super.clone();
         clone.bindings = (Bindings) bindings.clone();
+
+        LinkedList templates2 = new LinkedList();
+        for (Iterator i = templates.iterator(); i.hasNext(); )
+          {
+            Template t = (Template) i.next();
+            templates2.add(t.clone(clone));
+          }
+        clone.templates = templates2;
+        
         return clone;
       }
     catch (CloneNotSupportedException e)
@@ -434,8 +464,7 @@ class Stylesheet
     QName mode = (mm == null) ? null : getQName(mm);
     double priority = (p == null) ? Template.DEFAULT_PRIORITY :
       Double.parseDouble(p);
-    return new Template(this, name, match,
-                        node.getFirstChild(),
+    return new Template(name, match, parse(node.getFirstChild()),
                         precedence, priority, mode);
   }
 
@@ -736,10 +765,7 @@ class Stylesheet
             Node rootClone = node.cloneNode(true);
             NamedNodeMap attrs = rootClone.getAttributes();
             attrs.removeNamedItemNS(XSL_NS, "version");
-            templates.add(new Template(this,
-                                       null,
-                                       new Root(),
-                                       rootClone,
+            templates.add(new Template(null, new Root(), parse(rootClone),
                                        precedence,
                                        Template.DEFAULT_PRIORITY,
                                        null));
@@ -981,20 +1007,20 @@ class Stylesheet
               {
                 throw new RuntimeException("current is null");
               }
-            return new DocumentFunction(this, current);
+            return new DocumentFunction(getRootStylesheet(), current);
           }
         else if ("key".equals(localName) && (arity == 2))
           {
-            return new KeyFunction(this);
+            return new KeyFunction(getRootStylesheet());
           }
         else if ("format-number".equals(localName) &&
                  (arity == 2 || arity == 3))
           {
-            return new FormatNumberFunction(this);
+            return new FormatNumberFunction(getRootStylesheet());
           }
         else if ("current".equals(localName) && (arity == 0))
           {
-            return new CurrentFunction();
+            return new CurrentFunction(getRootStylesheet());
           }
         else if ("unparsed-entity-uri".equals(localName) && (arity == 1))
           {

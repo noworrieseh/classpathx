@@ -196,7 +196,7 @@ public final class Selector
   }
 
   /**
-   * Filter the given list of candates according to the node tests.
+   * Filter the given list of candidates according to the node tests.
    */
   List filterCandidates(List candidates, boolean cascade)
   {
@@ -214,15 +214,19 @@ public final class Selector
                 Node node = (Node) candidates.get(i);
                 if (cascade)
                   {
-                    /*
                     short nodeType = node.getNodeType();
-                    if (nodeType == Node.DOCUMENT_NODE ||
-                        nodeType == Node.DOCUMENT_FRAGMENT_NODE)
+                    if ((nodeType == Node.DOCUMENT_NODE ||
+                         nodeType == Node.DOCUMENT_FRAGMENT_NODE) &&
+                        (axis == DESCENDANT_OR_SELF ||
+                         axis == ANCESTOR_OR_SELF ||
+                         axis == SELF) &&
+                        (tests.length == 1 &&
+                         tests[0] instanceof NodeTypeTest &&
+                         ((NodeTypeTest) tests[0]).type == (short) 0))
                       {
                         successful.add(node);
                         continue;
                       }
-                      */
                   }
                 if (test.matches(node, i + 1, len))
                   {
@@ -399,6 +403,17 @@ public final class Selector
     return (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri) ||
             XMLConstants.XMLNS_ATTRIBUTE.equals(node.getPrefix()) ||
             XMLConstants.XMLNS_ATTRIBUTE.equals(node.getNodeName()));
+  }
+
+  public Expr clone(Object context)
+  {
+    int len = tests.length;
+    List tests2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        tests2.add(tests[i].clone(context));
+      }
+    return new Selector(axis, tests2);
   }
 
   public String toString()

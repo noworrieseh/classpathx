@@ -239,6 +239,11 @@ final class EqualityExpr
     return ls.equals(rs);
   }
 
+  public Expr clone(Object context)
+  {
+    return new EqualityExpr(lhs.clone(context), rhs.clone(context), invert);
+  }
+
   public String toString()
   {
     if (invert)

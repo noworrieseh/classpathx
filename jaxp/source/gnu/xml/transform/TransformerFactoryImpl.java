@@ -73,13 +73,16 @@ public class TransformerFactoryImpl
   public TransformerFactoryImpl()
   {
     xpathFactory = new gnu.xml.xpath.XPathFactoryImpl();
-		resolver = new XSLURIResolver();
+    resolver = new XSLURIResolver();
   }
 
   public Transformer newTransformer(Source source)
     throws TransformerConfigurationException
   {
-    return newTemplates(source).newTransformer();
+    Stylesheet stylesheet = newStylesheet(source, 0, null);
+    TransformerImpl transformer = new TransformerImpl(this, stylesheet);
+    stylesheet.transformer = transformer;
+    return transformer;
   }
 
   public Transformer newTransformer()
@@ -102,32 +105,32 @@ public class TransformerFactoryImpl
     String systemId = null;
     if (source != null)
       {
-				try
-				  {
-						DOMSource ds;
-						synchronized (resolver)
-						{
-							resolver.setUserResolver(userResolver);
-							resolver.setUserListener(userListener);
-							ds = resolver.resolveDOM(source, null, null);
-						}
-						Node node = ds.getNode();
-						if (node == null)
-						{
-							throw new TransformerConfigurationException("no source document");
-						}
-						doc = (node instanceof Document) ? (Document) node :
-							node.getOwnerDocument();
-						systemId = ds.getSystemId();
-					}
-				catch (TransformerException e)
-				  {
-						throw new TransformerConfigurationException(e);
-					}
+        try
+          {
+            DOMSource ds;
+            synchronized (resolver)
+              {
+                resolver.setUserResolver(userResolver);
+                resolver.setUserListener(userListener);
+                ds = resolver.resolveDOM(source, null, null);
+              }
+            Node node = ds.getNode();
+            if (node == null)
+              {
+                throw new TransformerConfigurationException("no source document");
+              }
+            doc = (node instanceof Document) ? (Document) node :
+              node.getOwnerDocument();
+            systemId = ds.getSystemId();
+          }
+        catch (TransformerException e)
+          {
+            throw new TransformerConfigurationException(e);
+          }
       }
     return new Stylesheet(this, parent, doc, systemId, precedence);
   }
-
+  
   public Source getAssociatedStylesheet(Source source,
                                         String media,
                                         String title,

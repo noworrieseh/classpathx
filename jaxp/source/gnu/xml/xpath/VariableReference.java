@@ -71,6 +71,16 @@ public class VariableReference
     throw new IllegalStateException("no variable resolver");
   }
 
+  public Expr clone(Object context)
+  {
+    XPathVariableResolver r = resolver;
+    if (context instanceof XPathVariableResolver)
+      {
+        r = (XPathVariableResolver) context;
+      }
+    return new VariableReference(r, name);
+  }
+
   public String toString()
   {
     return "$" + name;

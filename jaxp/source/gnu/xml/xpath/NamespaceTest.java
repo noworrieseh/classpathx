@@ -102,6 +102,11 @@ public final class NamespaceTest
     return (localName.equals(node.getLocalName()));
   }
 
+  public Test clone(Object context)
+  {
+    return new NamespaceTest(qName, anyLocalName, any);
+  }
+
   public String toString ()
   {
     if (any)

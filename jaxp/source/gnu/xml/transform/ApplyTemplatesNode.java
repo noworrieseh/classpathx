@@ -76,6 +76,28 @@ final class ApplyTemplatesNode
     this.isDefault = isDefault;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    int len = sortKeys.size();
+    List sortKeys2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        sortKeys2.add(((Key) sortKeys.get(i)).clone(stylesheet));
+      }
+    len = withParams.size();
+    List withParams2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        withParams2.add(((WithParam) withParams.get(i)).clone(stylesheet));
+      }
+    return new ApplyTemplatesNode((children == null) ? null :
+                                  children.clone(stylesheet),
+                                  (next == null) ? null :
+                                  next.clone(stylesheet),
+                                  select.clone(stylesheet),
+                                  mode, sortKeys2, withParams2, isDefault);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
@@ -119,6 +141,7 @@ final class ApplyTemplatesNode
                   {
                     System.err.println("Applying " + t);
                   }
+                stylesheet.current = node;
                 t.apply(stylesheet, mode, node, i + 1, l,
                         parent, nextSibling);
               }

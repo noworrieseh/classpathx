@@ -55,6 +55,11 @@ final class PositionFunction
     return new Double((double) pos);
   }
 
+  public Expr clone(Object context)
+  {
+    return new PositionFunction();
+  }
+
   public String toString()
   {
     return "position()";

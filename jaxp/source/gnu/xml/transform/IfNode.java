@@ -60,6 +60,15 @@ final class IfNode
     this.test = test;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new IfNode((children == null) ? null :
+                      children.clone(stylesheet),
+                      (next == null) ? null :
+                      next.clone(stylesheet),
+                      test.clone(stylesheet));
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)

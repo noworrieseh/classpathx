@@ -115,6 +115,22 @@ public final class FunctionCall
                                        toString());
   }
 
+  public Expr clone(Object context)
+  {
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    XPathFunctionResolver r = resolver;
+    if (context instanceof XPathFunctionResolver)
+      {
+        r = (XPathFunctionResolver) context;
+      }
+    return new FunctionCall(r, name, args2);
+  }
+
   public String toString()
   {
     StringBuffer buf = new StringBuffer();

@@ -62,9 +62,15 @@ final class SubstringFunction
 
   SubstringFunction(List args)
   {
-    arg1 = (Expr) args.get(0);
-    arg2 = (Expr) args.get(1);
-    arg3 = (args.size() > 2) ? (Expr) args.get(2) : null;
+    this((Expr) args.get(0), (Expr) args.get(1),
+         (args.size() > 2) ? (Expr) args.get(2) : null);
+  }
+
+  SubstringFunction(Expr arg1, Expr arg2, Expr arg3)
+  {
+    this.arg1 = arg1;
+    this.arg2 = arg2;
+    this.arg3 = arg3;
   }
 
   public Object evaluate(Node context, int pos, int len)
@@ -100,6 +106,12 @@ final class SubstringFunction
       }
 
     return s.substring(p, p + l);
+  }
+
+  public Expr clone(Object context)
+  {
+    return new SubstringFunction(arg1.clone(context), arg2.clone(context),
+                                 (arg3 == null) ? null : arg3.clone(context));
   }
 
   public String toString()

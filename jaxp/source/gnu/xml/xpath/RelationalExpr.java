@@ -90,6 +90,11 @@ final class RelationalExpr
     return Boolean.FALSE;
   }
 
+  public Expr clone(Object context)
+  {
+    return new RelationalExpr(lhs.clone(context), rhs.clone(context), lt, eq);
+  }
+
   public String toString()
   {
     return lhs + " " + (lt ? "<" : ">") + (eq ? "=" : "") + " " + rhs;

@@ -94,6 +94,15 @@ final class LiteralNode
       }
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new LiteralNode((children == null) ? null :
+                           children.clone(stylesheet),
+                           (next == null) ? null :
+                           next.clone(stylesheet),
+                           source);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)

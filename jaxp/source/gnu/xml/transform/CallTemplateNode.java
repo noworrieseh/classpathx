@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -63,6 +64,21 @@ final class CallTemplateNode
     super(children, next);
     this.name = name;
     this.withParams = withParams;
+  }
+
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    int len = withParams.size();
+    List withParams2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        withParams2.add(((WithParam) withParams.get(i)).clone(stylesheet));
+      }
+    return new CallTemplateNode((children == null) ? null :
+                                children.clone(stylesheet),
+                                (next == null) ? null :
+                                next.clone(stylesheet),
+                                name, withParams2);
   }
 
   void doApply(Stylesheet stylesheet, QName mode,

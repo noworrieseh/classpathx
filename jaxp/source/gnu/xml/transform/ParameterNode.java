@@ -66,6 +66,17 @@ final class ParameterNode
     this.global = global;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new ParameterNode((children == null) ? null :
+                             children.clone(stylesheet),
+                             (next == null) ? null :
+                             next.clone(stylesheet),
+                             name,
+                             select.clone(stylesheet),
+                             global);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)

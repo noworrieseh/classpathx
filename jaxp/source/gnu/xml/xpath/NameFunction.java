@@ -81,6 +81,12 @@ final class NameFunction
     Object val = (arg == null) ? null : arg.evaluate(context, pos, len);
     return _name(context, (Collection) val);
   }
+
+  public Expr clone(Object context)
+  {
+    return new NameFunction((arg == null) ? null :
+                            arg.clone(context));
+  }
   
   public String toString()
   {

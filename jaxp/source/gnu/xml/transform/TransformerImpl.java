@@ -167,6 +167,7 @@ class TransformerImpl
             TemplateNode t = stylesheet.getTemplate(null, context);
             if (t != null)
               {
+                stylesheet.current = context;
                 t.apply(stylesheet, null, context, 1, 1, parent, nextSibling);
               }
             outputMethod = stylesheet.outputMethod;

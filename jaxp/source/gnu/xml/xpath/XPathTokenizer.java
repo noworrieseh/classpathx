@@ -388,7 +388,11 @@ implements XPathParser.yyInput
                   case XPathParser.PROCESSING_INSTRUCTION:
                     // Consume subsequent (
                     in.mark (1);
-                    c = in.read ();
+                    do
+                      {
+                        c = in.read ();
+                      }
+                    while (c == 0x20 || c == 0x09);
                     if (c != 0x28)
                       {
                         in.reset ();
@@ -410,7 +414,11 @@ implements XPathParser.yyInput
                   case XPathParser.PRECEDING_SIBLING:
                     // Check that this is an axis specifier
                     in.mark(1);
-                    c = in.read();
+                    do
+                      {
+                        c = in.read();
+                      }
+                    while (c == 0x20 || c == 0x09);
                     if (c == 0x3a)
                       {
                         c = in.read();
@@ -443,6 +451,7 @@ implements XPathParser.yyInput
                       case XPathParser.LTE:
                       case XPathParser.PLUS:
                       case XPathParser.MINUS:
+                      case XPathParser.STAR:
                       case XPathParser.AT:
                       case XPathParser.DOLLAR:
                       case XPathParser.COLON:

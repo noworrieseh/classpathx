@@ -102,5 +102,18 @@ final class UnparsedEntityUriFunction
     return "";
   }
 
+  public Expr clone(Object context)
+  {
+    UnparsedEntityUriFunction f = new UnparsedEntityUriFunction();
+    int len = args.size();
+    List args2 = new ArrayList(len);
+    for (int i = 0; i < len; i++)
+      {
+        args2.add(((Expr) args.get(i)).clone(context));
+      }
+    f.setArguments(args2);
+    return f;
+  }
+
 }
 

@@ -56,6 +56,13 @@ final class AttributeSet
     this.name = name;
     this.uas = uas;
   }
+
+  AttributeSet clone(Stylesheet stylesheet)
+  {
+    return new AttributeSet((children == null) ? null :
+                            children.clone(stylesheet),
+                            name, uas);
+  }
   
 }
 

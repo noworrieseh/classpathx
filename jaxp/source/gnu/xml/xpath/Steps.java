@@ -60,7 +60,12 @@ public final class Steps
 
   public Steps()
   {
-    path = new LinkedList();
+    this(new LinkedList());
+  }
+
+  Steps(LinkedList path)
+  {
+    this.path = path;
   }
 
   public boolean matches(Node context)
@@ -202,6 +207,17 @@ public final class Steps
         ns = rhs.evaluate(context, ns);
       }
     return ns;
+  }
+
+  public Expr clone(Object context)
+  {
+    int len = path.size();
+    LinkedList path2 = new LinkedList();
+    for (int i = 0; i < len; i++)
+      {
+        path2.add(((Expr) path.get(i)).clone(context));
+      }
+    return new Steps(path2);
   }
 
   public String toString()

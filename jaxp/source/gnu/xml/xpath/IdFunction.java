@@ -38,6 +38,7 @@
 
 package gnu.xml.xpath;
 
+import java.util.Collection;
 import java.util.List;
 import org.w3c.dom.Node;
 
@@ -56,7 +57,7 @@ import org.w3c.dom.Node;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public final class IdFunction
-  extends Expr
+  extends Pattern
 {
 
   final Expr arg;
@@ -71,10 +72,21 @@ public final class IdFunction
     this.arg = arg;
   }
 
+  public boolean matches(Node context)
+  {
+    Object ret = evaluate(context, 1, 1);
+    return !((Collection) ret).isEmpty();
+  }
+
   public Object evaluate(Node context, int pos, int len)
   {
     Object val = arg.evaluate(context, pos, len);
     return _id(context, val);
+  }
+
+  public Expr clone(Object context)
+  {
+    return new IdFunction(arg.clone(context));
   }
 
   public String toString()

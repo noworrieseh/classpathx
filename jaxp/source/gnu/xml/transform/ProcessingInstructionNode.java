@@ -65,6 +65,15 @@ final class ProcessingInstructionNode
     this.name = name;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new ProcessingInstructionNode((children == null) ? null :
+                                         children.clone(stylesheet),
+                                         (next == null) ? null :
+                                         next.clone(stylesheet),
+                                         name);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)

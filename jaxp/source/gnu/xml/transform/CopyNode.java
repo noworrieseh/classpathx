@@ -63,6 +63,15 @@ final class CopyNode
     this.uas = uas;
   }
 
+  TemplateNode clone(Stylesheet stylesheet)
+  {
+    return new CopyNode((children == null) ? null :
+                        children.clone(stylesheet),
+                        (next == null) ? null :
+                        next.clone(stylesheet),
+                        uas);
+  }
+
   void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)

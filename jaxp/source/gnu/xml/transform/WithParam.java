@@ -101,4 +101,18 @@ final class WithParam
       }
   }
 
+  WithParam clone(Stylesheet stylesheet)
+  {
+    if (content == null)
+      {
+        return new WithParam(name,
+                             select.clone(stylesheet));
+      }
+    else
+      {
+        return new WithParam(name,
+                             content.clone(stylesheet));
+      }
+  }
+
 }
