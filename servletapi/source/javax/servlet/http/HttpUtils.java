@@ -29,7 +29,9 @@ import javax.servlet.ServletInputStream;
 /**
  * A set of utility methods for http server writers.
  *
- * @version Servlet API 2.2
+ * @deprecated usefull methods have been moved to the request interfaces
+ *
+ * @version Servlet API 2.3
  * @since Servlet API 1.0
  */
 public class HttpUtils
@@ -40,7 +42,7 @@ public class HttpUtils
 
   /**
    * Creates a HttpUtils object, cool!
-   *
+   * @deprecated
    * @since Servlet API 1.0
    */
   public HttpUtils() 
@@ -63,6 +65,7 @@ public class HttpUtils
    * <P>
    * @since Servlet API 1.0
    *
+   * @deprecated
    * @param queryString The queryString to process
    * @return a Hashtable with String keys, and array of String values.
    * @exception IllegalArgumentException If the queryString contains
@@ -207,7 +210,8 @@ public class HttpUtils
    * throws an IllegalArgumentException when contentLength != amount of data in the inputstream
    *
    * @since Servlet API 1.0
-   *
+   * 
+   * @deprecated
    * @return a Hashtable with String keys, and array of String values.
    * @exception IllegalArgumentException If an IO error occurs or
    * the POST data contains an error it can't handle.
@@ -254,6 +258,7 @@ public class HttpUtils
    *
    * @since Servlet API 1.0
    *
+   * @deprecated 
    * @return a URL.
    */
   public static StringBuffer getRequestURL(HttpServletRequest request) 
