@@ -1,5 +1,5 @@
 /*
- * $Id: NSFilter.java,v 1.2 2001-07-08 12:29:03 db Exp $
+ * $Id: NSFilter.java,v 1.3 2001-07-10 22:52:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -67,10 +67,10 @@ import gnu.xml.util.DefaultHandler;
  * <p> Note that this can't possibly know whether values inside attribute
  * value or document content involve prefixed names.  If your application
  * requires using prefixed names in such locations you'll need to add some
- * appropriate logic (perhaps adding additional heuristics).
+ * appropriate logic (perhaps adding additional heuristics in a subclass).
  *
  * @author David Brownell
- * @version $Date: 2001-07-08 12:29:03 $
+ * @version $Date: 2001-07-10 22:52:42 $
  */
 public class NSFilter extends EventFilter
 {
