@@ -39,8 +39,6 @@ import java.io.OutputStream;
  */
 public abstract class ServletOutputStream extends OutputStream 
 {
-  private static String STRING_TRUE = "true";
-  private static String STRING_FALSE = "false";
 
   protected ServletOutputStream() 
   {
@@ -73,14 +71,7 @@ public abstract class ServletOutputStream extends OutputStream
   public void print(boolean value)
     throws IOException 
   {
-    if(value) 
-      {
-	print(STRING_TRUE);
-      }
-    else 
-      {
-	print(STRING_FALSE);
-      }
+	print(String.valueOf(value));
   }
 
 
