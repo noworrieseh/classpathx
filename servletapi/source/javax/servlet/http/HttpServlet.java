@@ -139,8 +139,8 @@ implements Serializable
    *
    * @since Servlet API 2.0
    *
-   * @exception ServletException if an Servlet Exception occurs
-   * @exception IOException if an IOException occurs
+   * @throws ServletException if an Servlet Exception occurs
+   * @throws IOException if an IOException occurs
    */
   protected void doOptions(HttpServletRequest request,HttpServletResponse response)
   throws ServletException, IOException 
@@ -156,7 +156,7 @@ implements Serializable
 	{
 	  Method servletMethod=methodList[i];
 	  //first check which class declared the method we're looking at
-	  if(!basicClassName.equals(servletMethod.getDeclaringClass().getName()))
+	  if(!basisClassName.equals(servletMethod.getDeclaringClass().getName()))
 	  {
 	    //if this class did not declare the method that means
 	    //the servlet is supporting is directly
@@ -193,8 +193,8 @@ implements Serializable
    *
    * @since Servlet API 1.0
    *
-   * @exception ServletException if an Servlet Exception occurs
-   * @exception IOException if an IOException occurs
+   * @throws ServletException if an Servlet Exception occurs
+   * @throws IOException if an IOException occurs
    */
   protected void doPost(HttpServletRequest request,HttpServletResponse response)
   throws ServletException, IOException 

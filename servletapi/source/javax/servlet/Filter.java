@@ -76,6 +76,8 @@ public interface Filter
    * @param request the request to be filtered
    * @param response the response to be filtered
    * @param chain the remaining filters (and the target servlet) in the request chain
+   * @throws ServletException
+   * @throws IOException
    */
   public void doFilter(ServletRequest request,ServletResponse response,FilterChain chain)
   throws ServletException,IOException;
