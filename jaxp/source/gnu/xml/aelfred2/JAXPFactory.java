@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.5 2001-10-23 17:42:24 db Exp $
+ * $Id: JAXPFactory.java,v 1.6 2001-11-03 00:50:18 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -138,6 +138,7 @@ public final class JAXPFactory extends SAXParserFactory
     private static class JaxpParser extends SAXParser
     {
 	private XmlReader	ae2 = new XmlReader ();
+	private XMLReaderAdapter parser = null;
 
 	JaxpParser () { }
 
@@ -151,7 +152,11 @@ public final class JAXPFactory extends SAXParserFactory
 
 	public Parser getParser ()
 	throws SAXException
-	    { return new XMLReaderAdapter (ae2); }
+	{ 
+	    if (parser == null)
+		parser = new XMLReaderAdapter (ae2);
+	    return parser;
+	}
 
 	public XMLReader getXMLReader ()
 	throws SAXException
