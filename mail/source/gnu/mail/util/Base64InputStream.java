@@ -174,9 +174,9 @@ public class Base64InputStream
       buffer[buflen++] = (byte)(b0<<4 & 0xf0 | b2>>>2 & 0xf);
       if (decodeBuf[3]!=EQ)
       {
-        byte b1 = b2;
+        b0 = b2;
         b2 = dst[decodeBuf[3] & 0xff];
-        buffer[buflen++] = (byte)(b1<<6 & 0xc0 | b2 & 0x3f);
+        buffer[buflen++] = (byte)(b0<<6 & 0xc0 | b2 & 0x3f);
       }
     }
   }

@@ -331,15 +331,18 @@ public class IMAPResponseTokenizer implements IMAPConstants
             {
               throw new ProtocolException("Expecting number: "+cs);
             }
+          }
+          else if (b==0x0a) // start content
+          {
             state = STATE_CONTENT;
             contentSink = new ByteArrayOutputStream();
             contentCount = 0;
           }
-          else
+          else if (b!=0x0d) // ignore CR
             genericSink.write(b);
           break;
         case STATE_CONTENT:
-          if (contentCount>contentLength)
+          if (contentCount>=contentLength)
           {
             response.content = contentSink.toByteArray();
             contentSink = null;
@@ -348,10 +351,7 @@ public class IMAPResponseTokenizer implements IMAPConstants
           }
           else
           {
-            if (!inContent && b!=0x20 && b!=0x0d && b!=0x0a)
-              inContent = true;
-            if (inContent)
-              contentSink.write(b);
+            contentSink.write(b);
             contentCount++;
           }
           break;

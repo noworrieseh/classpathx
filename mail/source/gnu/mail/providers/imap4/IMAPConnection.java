@@ -239,7 +239,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     sendCommand(tag, new StringBuffer(command)
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
     MailboxStatus ms = new MailboxStatus();
     while (true)
@@ -327,7 +327,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(CREATE)
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
   }
 
@@ -341,7 +341,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(DELETE)
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
   }
 
@@ -356,9 +356,9 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(RENAME)
         .append(' ')
-        .append(source)
+        .append(UTF7imap.encode(source))
         .append(' ')
-        .append(target)
+        .append(UTF7imap.encode(target))
         .toString());
   }
 
@@ -373,7 +373,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(SUBSCRIBE)
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
   }
 
@@ -388,7 +388,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(UNSUBSCRIBE)
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
   }
 
@@ -426,9 +426,9 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     sendCommand(tag, new StringBuffer(command)
         .append(' ')
-        .append(reference)
+        .append(UTF7imap.encode(reference))
         .append(' ')
-        .append(mailbox)
+        .append(UTF7imap.encode(mailbox))
         .toString());
     List acc = new ArrayList();
     while (true)
@@ -468,6 +468,7 @@ public class IMAPConnection implements IMAPConstants
           if (d.equalsIgnoreCase(NIL))
             delimiter = stripQuotes(d).charAt(0);
           String mbox = stripQuotes(text.substring(si+1));
+          mbox = UTF7imap.decode(mbox);
           ListEntry entry = new ListEntry(mbox, delimiter, noinferiors,
               noselect, marked, unmarked);
           acc.add(entry);
@@ -496,7 +497,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     StringBuffer buffer = new StringBuffer(STATUS)
       .append(' ')
-      .append(mailbox)
+      .append(UTF7imap.encode(mailbox))
       .append(' ')
       .append('(');
     for (int i=0; i<statusNames.length; i++)
@@ -567,7 +568,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     StringBuffer buffer = new StringBuffer(APPEND)
       .append(' ')
-      .append(mailbox)
+      .append(UTF7imap.encode(mailbox))
       .append(' ');
     if (flags!=null)
     {
@@ -846,12 +847,16 @@ public class IMAPConnection implements IMAPConstants
         buffer.append(',');
       buffer.append(messages[i]);
     }
-    buffer.append(' ').append(mailbox);
+    buffer.append(' ')
+      .append(UTF7imap.encode(mailbox));
     return invokeSimpleCommand(buffer.toString());
   }
 
   // -- Utility methods --
   
+  /**
+   * Remove the quotes from each end of a string literal.
+   */
   static String stripQuotes(String text)
   {
     if (text.charAt(0)=='"')
