@@ -43,6 +43,7 @@ import java.util.List;
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
 import gnu.mail.util.LineInputStream;
+import gnu.mail.util.Logger;
 import gnu.mail.util.MessageInputStream;
 
 /**
@@ -206,7 +207,8 @@ public class POP3Connection
 			}
 			catch (NoSuchAlgorithmException e)
 			{
-				System.err.println("MD5 algorithm not found, falling back "+
+				Logger logger = Logger.getInstance();
+				logger.log("pop3", "MD5 algorithm not found, falling back "+
 						"to plain authentication");
 			}
 		}
@@ -465,13 +467,16 @@ public class POP3Connection
   /** 
    * Send the command to the server.
    * If <code>debug</code> is <code>true</code>,
-	 * the command is echoed to <code>System.err</code>.
+	 * the command is logged.
    */
   protected void send(String command)
     throws IOException
   {
     if (debug)
-      System.err.println("pop3: > "+command);
+		{
+			Logger logger = Logger.getInstance();
+      logger.log("pop3", "> "+command);
+		}
     out.write(command);
     out.writeln();
     out.flush();
@@ -480,14 +485,17 @@ public class POP3Connection
   /**
    * Parse the response from the server.
    * If <code>debug</code> is <code>true</code>,
-	 * the response is echoed to <code>System.err</code>.
+	 * the response is logged.
    */
   protected boolean getResponse()
     throws IOException
   {
     response = in.readLine();
     if (debug)
-      System.err.println("pop3: < "+response);
+		{
+			Logger logger = Logger.getInstance();
+      logger.log("pop3", "< "+response);
+		}
     if (response.indexOf(OK)==0)
     {
       response = response.substring(3).trim();
@@ -500,9 +508,7 @@ public class POP3Connection
 		}
 		else
 		{
-			ProtocolException e = new ProtocolException("Unexpected response: "+response);
-			e.printStackTrace(System.err);
-			throw e;
+			throw new ProtocolException("Unexpected response: "+response);
 		}
   }
 

@@ -40,6 +40,8 @@ import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
 
+import gnu.mail.util.Logger;
+
 /**
  * The storage class implementing the Mbox mailbox file format.
  *
@@ -212,7 +214,10 @@ public final class MboxStore
   void log(String message)
   {
     if (session.getDebug())
-      System.out.println("mbox: "+message);
+		{
+			Logger logger = Logger.getInstance();
+      logger.log("mbox", message);
+		}
   }
 
   // -- StatusSource --

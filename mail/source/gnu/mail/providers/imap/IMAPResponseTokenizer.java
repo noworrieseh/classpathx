@@ -92,10 +92,6 @@ public class IMAPResponseTokenizer implements IMAPConstants
       len = in.read(tmp, 0, max);
     if (len==-1)
       return null; // EOF
-    //char[] chars = new char[len];
-    //for (int i=0; i<len; i++)
-    //  chars[i] = (char)tmp[i];
-    //System.out.println("<- "+new String(chars));
     int blen = (buffer==null) ? 0 : buffer.length;
     byte[] uni = new byte[blen+len];
     if (blen!=0)
@@ -129,21 +125,10 @@ public class IMAPResponseTokenizer implements IMAPConstants
     throws IOException
   {
     // Perform read
-    /*System.err.println("Perform read");*/
     byte[] buf = read(false);
     if (buf==null)
       return null; // pass EOF back up the chain
     int len = buf.length;
-    /*System.err.println("Read "+len+" bytes");
-    for (int i=0; i<len; i++) {
-      if (buf[i]==10)
-        System.err.print(" LF");
-      else if (buf[i]==13)
-        System.err.println(" CR");
-      else
-        System.err.print((char)buf[i]);
-    }
-    System.err.println();*/
     
     IMAPResponse response = new IMAPResponse();
     ByteArrayOutputStream genericSink = new ByteArrayOutputStream();

@@ -126,7 +126,8 @@ source/gnu/mail/util/QPInputStream.java \
 source/gnu/mail/util/QPOutputStream.java \
 source/gnu/mail/util/RFC2822OutputStream.java \
 source/gnu/mail/util/UUDecoderStream.java \
-source/gnu/mail/util/UUEncoderStream.java \
+source/gnu/mail/util/Logger.java \
+source/gnu/mail/util/StderrLogger.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
 # The SMTP provider

@@ -46,6 +46,7 @@ import java.util.Map;
 
 import gnu.mail.util.BASE64;
 import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.Logger;
 
 /**
  * The protocol class implementing IMAP4rev1.
@@ -175,7 +176,10 @@ public class IMAPConnection implements IMAPConstants
     throws IOException
   {
     if (debug)
-      System.err.println("imap: > "+tag+" "+command);
+		{
+			Logger logger = Logger.getInstance();
+      logger.log("imap", "> "+tag+" "+command);
+		}
     String cmd = new StringBuffer(tag)
       .append(' ')
       .append(command)
@@ -232,10 +236,11 @@ public class IMAPConnection implements IMAPConstants
     IMAPResponse response = in.next();
     if (debug)
     {
+			Logger logger = Logger.getInstance();
       if (ansiDebug)
-        System.err.println("imap: < "+response.toANSIString());
+        logger.log("imap", "< "+response.toANSIString());
       else
-        System.err.println("imap: < "+response.toString());
+        logger.log("imap", "< "+response.toString());
     }
     return response;
   }

@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import gnu.mail.util.Logger;
+
 /**
  * The Session class represents a mail session and is not subclassed.
  * It collects together properties and defaults used by the mail API's.
@@ -101,11 +103,12 @@ public final class Session
    */
   private Session(Properties props, Authenticator authenticator)
   {
+		Logger logger = Logger.getInstance();
     this.props = props;
     this.authenticator = authenticator;
     debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
     if (debug)
-      System.out.println("DEBUG: using GNU JavaMail");
+      logger.config("using GNU JavaMail");
     ClassLoader loader = null;
     if (authenticator == null)
       loader = getClass().getClassLoader();
@@ -123,14 +126,14 @@ public final class Session
     catch (FileNotFoundException e)
     {
     	if (debug)
-	      System.out.println("DEBUG: no system providers");
+	      logger.config("no system providers");
     }
     if (debug)
     {
-    	System.out.println("DEBUG: Providers by class name: "
-			   + providersByClassName.toString());
-    	System.out.println("DEBUG: Providers by protocol: "
-			   + providersByProtocol.toString());
+    	logger.config("Providers by class name: "
+					+ providersByClassName.toString());
+			logger.config("Providers by protocol: "
+					+ providersByProtocol.toString());
     }
     // Load the address map
     loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP), "default");
@@ -144,7 +147,7 @@ public final class Session
     catch (FileNotFoundException e)
     {
     	if (debug)
-	      System.out.println("DEBUG: no system address map");
+	      logger.config("no system address map");
     }
   }
 
@@ -178,10 +181,11 @@ public final class Session
    */
   private void loadProviders(InputStream in, String description)
   {
+		Logger logger = Logger.getInstance();
     if (in==null)
     {
       if (debug)
-        System.out.println("DEBUG: no "+description+" providers");
+        logger.config("no "+description+" providers");
       return;
     }
     try
@@ -225,7 +229,7 @@ public final class Session
             if (type==null || protocol==null || className==null)
             {
               if (debug)
-                System.out.println("DEBUG: Invalid provider: "+line);
+                logger.config("Invalid provider: "+line);
             }
             else
             {
@@ -240,26 +244,27 @@ public final class Session
         }
         in.close();
         if (debug)
-          System.out.println("DEBUG: loaded "+description+" providers");
+          logger.config("loaded "+description+" providers");
       }
     catch (IOException e)
     {
       if (debug)
-        System.out.println("DEBUG: "+e.getMessage());
+        logger.config(e.getMessage());
     }
     catch (SecurityException e)
     {
       if (debug)
-        System.out.println("DEBUG: can't load "+description+" providers");
+        logger.config("can't load "+description+" providers");
     }
   }
   
   private void loadAddressMap(InputStream in, String description)
   {
+		Logger logger = Logger.getInstance();
     if (in==null)
     {
       if (debug)
-        System.out.println("DEBUG: no "+description+" address map");
+        logger.config("no "+description+" address map");
       return;
     }
     try
@@ -267,17 +272,17 @@ public final class Session
       addressMap.load(in);
       in.close();
       if (debug)
-        System.out.println("DEBUG: loaded "+description+" address map");
+        logger.config("loaded "+description+" address map");
     }
     catch (IOException e)
     {
       if (debug)
-        System.out.println("DEBUG: "+e.getMessage());
+        logger.config(e.getMessage());
     }
     catch (SecurityException e)
     {
       if (debug)
-        System.out.println("DEBUG: can't load "+description+" address map");
+        logger.config("can't load "+description+" address map");
     }
   }
   
@@ -441,6 +446,7 @@ public final class Session
   {
     if (protocol==null || protocol.length() <= 0)
       throw new NoSuchProviderException("Invalid protocol: "+protocol);
+		Logger logger = Logger.getInstance();
     Provider provider = null;
     String providerClassKey = "mail."+protocol+".class";
     String providerClassName = props.getProperty(providerClassKey);
@@ -449,7 +455,7 @@ public final class Session
       if (providerClassName!=null)
       {
         if (debug)
-          System.out.println("DEBUG: "+providerClassKey+"="+providerClassName);
+          logger.config(providerClassKey+"="+providerClassName);
         provider = (Provider)providersByClassName.get(providerClassName);
       }
       if (provider==null)
@@ -458,7 +464,7 @@ public final class Session
     if (provider==null)
       throw new NoSuchProviderException("No provider for "+protocol);
     if (debug)
-      System.out.println("DEBUG: getProvider(): " + provider.toString());
+      logger.config("getProvider(): " + provider.toString());
     return provider;
   }
 

@@ -42,6 +42,7 @@ import gnu.mail.util.BASE64;
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
 import gnu.mail.util.LineInputStream;
+import gnu.mail.util.Logger;
 
 /**
  * An SMTP client.
@@ -96,7 +97,7 @@ public class SMTPConnection
   protected CRLFOutputStream out;
 
   /**
-   * If true, log events to System.err.
+   * If true, log events.
    */
   protected boolean debug;
 
@@ -578,7 +579,10 @@ public class SMTPConnection
     throws IOException
     {
       if (debug)
-        System.err.println("smtp: > "+command);
+			{
+				Logger logger = Logger.getInstance();
+        logger.log("smtp", "> "+command);
+			}
       out.write(command.getBytes("US-ASCII")); // TODO check encoding
       out.writeln();
       out.flush();
@@ -601,7 +605,10 @@ public class SMTPConnection
             .append(in.readLine())
             .toString();
         if (debug)
-          System.err.println("smtp: < "+line);
+				{
+					Logger logger = Logger.getInstance();
+          logger.log("smtp", "< "+line);
+				}
         int code = Integer.parseInt(line.substring(0, 3));
         continuation = (line.charAt(3)=='-');
         response = line.substring(4);

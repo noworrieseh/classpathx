@@ -42,6 +42,8 @@ import gnu.inet.nntp.FileNewsrc;
 import gnu.inet.nntp.Newsrc;
 import gnu.inet.nntp.NNTPConnection;
 
+import gnu.mail.util.Logger;
+
 /**
  * An NNTP store provider.
  * This uses an NNTPConnection to handle all the protocol-related
@@ -81,7 +83,8 @@ public class NNTPStore extends Store
     if (tn!=null)
     {
       // TODO implement independent way to instantiate newsrcs
-      System.err.println("ERROR: nntp: unable to instantiate newsrc");
+			Logger logger = Logger.getInstance();
+      logger.log("nntp", "ERROR: unable to instantiate newsrc");
     }
     else
     {

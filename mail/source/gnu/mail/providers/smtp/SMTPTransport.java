@@ -40,6 +40,8 @@ import javax.mail.event.TransportEvent;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import gnu.mail.util.Logger;
+
 /** 
  * This transport handles communications with an SMTP server.
  *
@@ -168,7 +170,10 @@ public class SMTPTransport
           else if (authenticationMechanisms.contains("PLAIN"))
             return connection.authPlain(username, password);
           else
-            System.err.println("smtp: No supported authentication mechanisms");
+					{
+						Logger logger = Logger.getInstance();
+            logger.log("smtp", "No supported authentication mechanisms");
+					}
         }
         return false;
       }

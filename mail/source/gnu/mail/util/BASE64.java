@@ -1,6 +1,6 @@
 /*
  * BASE64.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
