@@ -1,4 +1,4 @@
-# Makefile for GNU classpathx jaxp subproject
+# Makefile for GNU classpathx "GNUJAXP" project
 #
 # You are free to redistribute this file. NO WARRANTY or fitness 
 # for purpose is implied by this notice.
@@ -7,18 +7,8 @@
 # !!!   MAKE EDITS TO "Makefile.in", not "Makefile"    !!!
 # !!!                                                  !!!
 #
-# What goes on here?
-# The SOURCEFILES should be a list of all the sources in your project.
-# The CC-CLASSPATH should be the compilation classpath for your project.
-# 
-#   make compile
-#
-# Causes the classes that need to be compiled (because of changes against
-# the relevant .class file) to be compiled.
-#
-#   make recompile
-#
-# Causes all the source files within the project to be compiled.
+# Use the "configure" command to generate the project Makefile
+# from its "Makefile.in" template.
 #
 
 LIBNAME = gnujaxp
@@ -29,11 +19,6 @@ SRCDIR = @srcdir@
 SOURCEDIR=$(SRCDIR)/source
 
 GCJ = @GCJ@
-
-##the following variables are not meant to be edited by hand
-## use emacs JCD mode
-
-#the source files belonging to the project
 
 SOURCEFILES = \
 	$(SOURCEDIR)/javax/xml/parsers/ClassStuff.java \
@@ -181,16 +166,12 @@ SOURCEFILES = \
 
 
 #a mangling of the SOURCEFILES list above
-#This is not quite perfect, we've had to harcode the 
+#This is not quite perfect, we've had to hardcode the 
 # $(SOURCEDIR)/ directory in the swap but if we can find a
 # way around that we'll be laughing!
 CLASSESLIST=$(subst .java,.class,$(subst $(SOURCEDIR)/,$(CC-DESTDIR)/,$(foreach dir,$(SOURCEFILES),$(dir))))
 
 #the classpath for compilations
-#If the javadev emacs package is to work then the format of this
-#list must be kept broadly the same. Each file/dir should be on 
-#it's own line and the file list should begin on the same line 
-#as the 'CC-CLASSPATH = ' statement.
 CC-CLASSPATH =  bin/
 
 CPATH = $(subst $(space),:,$(CC-CLASSPATH))
@@ -199,7 +180,7 @@ CPATH = $(subst $(space),:,$(CC-CLASSPATH))
 CC-DESTDIR =	bin
 
 #
-# Compiler is set through autoconf
+# Compiler is chosen through "configure" (autoconf)
 #
 GCJ_OPTS = --encoding=8859_1 -fsyntax-only -femit-class-files 
 GCJ_COMPILE = $(GCJ) $(GCJ_OPTS) -Isource -foutput-class-dir=$(CC-DESTDIR)
@@ -226,6 +207,7 @@ all: $(LIBNAME).jar javadoc
 # must rerun "make" after this
 clean:
 	-rm -rf $(LIBNAME).jar $(CC-DESTDIR) Log apidoc apidoc.zip
+	-rm -rf gnujaxp-*.zip
 
 # must rerun configure after this
 distclean:	clean
@@ -235,7 +217,8 @@ distclean:	clean
 mrproper:	distclean
 	-rm -f configure
 
-javadoc:
+javadoc: apidoc.zip
+apidoc.zip:
 	-rm -rf apidoc
 	mkdir -p apidoc
 	javadoc -d apidoc \
@@ -270,9 +253,7 @@ javadoc:
 	    javax.xml.parsers \
 	    javax.xml.transform javax.xml.transform.dom \
 	    javax.xml.transform.sax javax.xml.transform.stream
-	zip -9qr apidoc.zip apidoc
-
-##useful rules that handle unpacking the jar files properly
+	jar cMf apidoc.zip apidoc
 
 #build the $(LIBNAME) jar file
 $(LIBNAME).jar: $(LIBNAME) $(CC-DESTDIR)
@@ -288,17 +269,8 @@ $(LIBNAME).jar: $(LIBNAME) $(CC-DESTDIR)
 		META-INF gnu org/xml org/w3c javax/xml
 
 
-#developers only: compile the classes whose .java file is
-#younger than the .class
-#This isn't a perfect compile because java dependancies can be more
-#complicated than just srcfile->classfile.... but it does work for
-#most of the time
 $(LIBNAME): compile
 
-
-##rules predefined by the Makefile.
-##These should be flexible enough for any project as long
-##as the project conforms to the structure required above.
 
 #the compilation target
 #This is intended for developers who are constantly compiling stuff
@@ -353,4 +325,36 @@ $(CC-DESTDIR)/%.class: $(SOURCEDIR)/%.java
 	@echo $? >> filelist.mak
 
 
-##End Makefile
+#
+# RELEASE ENGINEERING:
+# "full" release has source, jarfile, javadoc, and extras
+#
+# override VERSION in environment, like:
+#  $ VERSION=1.0beta1 make -e release
+#
+VERSION =	dev
+
+release: gnujaxp-$(VERSION).zip
+
+
+DIST_DIR =	gnujaxp-$(VERSION)
+
+# XXX ChangeLog
+FILES		:= \
+	LICENSE COPYING COPYRIGHT.html README \
+	gnujaxp.jar \
+	configure Makefile.in manifest.mf
+
+gnujaxp-$(VERSION).zip: $(FILES) apidoc.zip $(SOURCEFILES)
+	for F in $(FILES) $(SOURCEFILES) ;\
+	do \
+	    mkdir -p `dirname $(DIST_DIR)/$$F` ;\
+	    cp $$F $(DIST_DIR)/$$F ;\
+	done
+	cd $(DIST_DIR); jar xf ../apidoc.zip
+	chmod +x $(DIST_DIR)/configure
+	cp gnujaxp.jar $(DIST_DIR)
+	# jar cMf gnujaxp-$(VERSION).zip $(DIST_DIR)
+	zip -qr9 gnujaxp-$(VERSION).zip $(DIST_DIR)
+	rm -rf $(DIST_DIR)
+
