@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: BasePRNG.java,v 1.4 2002-01-17 11:51:15 raif Exp $
+// $Id: BasePRNG.java,v 1.5 2002-06-08 05:25:41 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,13 +30,12 @@ package gnu.crypto.prng;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import java.security.GeneralSecurityException;
 import java.util.Map;
 
 /**
- * An abstract class to facilitate implementing PRNG algorithms.
+ * <p>An abstract class to facilitate implementing PRNG algorithms.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public abstract class BasePRNG implements IRandom {
 
@@ -58,7 +57,11 @@ public abstract class BasePRNG implements IRandom {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
-   /** Trivial constructor for use by concrete subclasses. */
+   /**
+    * <p>Trivial constructor for use by concrete subclasses.</p>
+    *
+    * @param name the canonical name of this instance.
+    */
    protected BasePRNG(String name) {
       super();
 
@@ -70,8 +73,10 @@ public abstract class BasePRNG implements IRandom {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // IRandom interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // IRandom interface implementation ----------------------------------------
 
    public String name() {
       return name;
@@ -80,6 +85,7 @@ public abstract class BasePRNG implements IRandom {
    public void init(Map attributes) {
       this.setup(attributes);
 
+      ndx = 0;
       initialised = true;
    }
 
@@ -95,12 +101,15 @@ public abstract class BasePRNG implements IRandom {
       if (out == null) {
          return;
       }
+
       if (!initialised) {
          throw new IllegalStateException();
       }
+
       if (offset < 0 || offset >= out.length || length < 1) {
          return;
       }
+
       int limit = ((offset+length) > out.length ? out.length-offset : length);
       for (int i = 0; i < limit; i++) {
          out[offset++] = nextByteInternal();
@@ -116,17 +125,16 @@ public abstract class BasePRNG implements IRandom {
 
    private byte nextByteInternal() throws LimitReachedException {
       if (ndx >= buffer.length) {
-         buffer = this.nextBlock();
+         this.fillBlock();
          ndx = 0;
       }
 
       return buffer[ndx++];
    }
 
-   // abstract methods to implement by subclasses
-   // -------------------------------------------------------------------------
+   // abstract methods to implement by subclasses -----------------------------
 
    public abstract void setup(Map attributes);
 
-   public abstract byte[] nextBlock() throws LimitReachedException;
+   public abstract void fillBlock() throws LimitReachedException;
 }
