@@ -1,9 +1,9 @@
-package test;
+package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.4 2002-01-17 11:55:06 raif Exp $
+// $Id: AllTests.java,v 1.1 2002-01-17 11:54:47 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,9 +36,9 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * TestSuite that runs all tests for all packages.
+ * TestSuite that runs all tests of the jce package.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.1 $
  */
 public class AllTests extends TestCase {
 
@@ -60,15 +60,11 @@ public class AllTests extends TestCase {
    }
 
    public static Test suite() {
-      TestSuite result = new TestSuite("GNU Crypto regression tests");
+      TestSuite result = new TestSuite("GNU Crypto jce package regression tests");
 
-      result.addTest(test.cipher.AllTests.suite());
-      result.addTest(test.mode.AllTests.suite());
-      result.addTest(test.pad.AllTests.suite());
-      result.addTest(test.hash.AllTests.suite());
-      result.addTest(test.prng.AllTests.suite());
-      result.addTest(test.sig.AllTests.suite());
-      result.addTest(test.jce.AllTests.suite());
+      result.addTest(TestOfProvider.suite());
+      result.addTest(TestOfMessageDigest.suite());
+      result.addTest(TestOfKeyPairGenerator.suite());
 
       return result;
    }
