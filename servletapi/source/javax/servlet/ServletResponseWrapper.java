@@ -73,11 +73,14 @@ public class ServletResponseWrapper
   public ServletOutputStream getOutputStream ()
     throws IOException
   {
-    return _impl.getOutputStream ();;
+    return _impl.getOutputStream ();
   }
 
   /**
    * fall through to the underlying object by default.
+   * @throws IOException
+   * @throws java.io.UnsupportedEncodingException
+   * @throws IllegalStateException
    */
   public PrintWriter getWriter ()
     throws IOException
@@ -136,6 +139,7 @@ public class ServletResponseWrapper
 
   /**
    * fall through to the underlying object by default.
+   * @throws IllegalStateException 
    */
   public void reset ()
   {
@@ -165,4 +169,53 @@ public class ServletResponseWrapper
   {
     return _impl.getLocale ();
   }
+
+  /**
+   * get the response from the wrapper.
+   * @return the servlet response from the wrapper.
+   * 
+   * @since Servlet API 2.3
+   */
+  public ServletResponse getResponse()
+  {
+    return _impl;
+  }
+
+  /**
+   * set a new wrapper
+   * 
+   * @param wrappedResponse the object to be wrapped
+   * @throws java.lang.IllegalArgumentException if wrappedResponse is null
+   * 
+   * @since Servlet API 2.3
+   */
+  public void setResponse(ServletResponse wrappedResponse)
+  {
+    if (wrappedResponse == null)
+    {
+      throw new IllegalArgumentException ("constructor called with null argument");
+    }
+    _impl = wrappedResponse;
+  }
+
+  /**
+   * set the character encoding.
+   * @since Servlet API 2.3
+   * @param enc the character encoding
+   */
+  public void setCharacterEncoding (String enc)
+  {
+    _impl.setCharacterEncoding (enc);
+  }
+
+  /**
+   * get the content type
+   * @since Servlet API 2.3
+   * @return the content type
+   */
+  public String getContentType ()
+  {
+    return _impl.getContentType ();
+  }
+
 }
