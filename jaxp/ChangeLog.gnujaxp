@@ -1,3 +1,13 @@
+2004-10-31  Chris Burdess  <dog@gnu.org>
+
+	* DomNode.java: Implement Comparable using natural document order. 
+	* xpath: Use natural document ordering in DomNode.
+   	
+2004-10-30  Chris Burdess  <dog@gnu.org>
+
+   	* transform: Experimental XSLT transformer using XPath
+   	implementation.
+   	
 2004-10-28  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Implemented XPathFactory.newInstance(); added missing
