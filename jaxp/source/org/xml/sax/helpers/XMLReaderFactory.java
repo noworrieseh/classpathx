@@ -22,7 +22,7 @@
 // XMLReaderFactory.java - factory for creating a new reader.
 // Written by David Megginson, sax@megginson.com
 
-// $Id: XMLReaderFactory.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// $Id: XMLReaderFactory.java,v 1.3 2001-07-11 17:28:04 db Exp $
 
 package org.xml.sax.helpers;
 import org.xml.sax.Parser;
@@ -82,7 +82,7 @@ final public class XMLReaderFactory
      * XMLReader.</p>
      *
      * <p> If there is no such value, the GNU &AElig;lred2
-     * non-validating parser is used. </p>
+     * optionally validating parser is used if possible. </p>
      *
      * <p>Note that many Java interpreters allow system properties
      * to be specified on the command line.</p>
@@ -97,7 +97,7 @@ final public class XMLReaderFactory
 	throws SAXException
     {
 	String className = System.getProperty("org.xml.sax.driver",
-	    "gnu.xml.aelfred2.SAXDriver"
+	    "gnu.xml.aelfred2.XmlReader"
 	    );
 	if (className == null) {
 	    Parser parser;
