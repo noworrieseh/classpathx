@@ -5,8 +5,8 @@ space:=$(empty) $(empty)
 # Set by configure.
 PROJECTROOT = .
 JAVA = java
-JAVAC = jikes-sun
-JAVAC_OPTS = +E
+JAVAC = gcj
+JAVAC_OPTS = -C
 JAR = jar
 
 all: test

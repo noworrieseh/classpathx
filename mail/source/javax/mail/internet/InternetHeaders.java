@@ -135,7 +135,7 @@ public class InternetHeaders
   /*
    * The enumeration used to filter headers for the InternetHeaders object.
    */
-  class HeaderEnumeration
+  static class HeaderEnumeration
     implements Iterator, Enumeration
   {
 
