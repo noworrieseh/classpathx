@@ -1,3 +1,10 @@
+2004-04-20  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	Reported by Maarten Coene <MacBelgium@toughguy.net>:
+	* src/gnu/xml/aelfred2/JAXPFactory.java (getFeature): throws a
+	NullPointerException if you check for a feature that hasn't been
+	set at the factory level.
+
 2004-04-19  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
 	* src/xmlj_io.h, src/xmlj_io.c, src/xmlj_error.h,
