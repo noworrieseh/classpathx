@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.12 2001-11-19 22:29:47 db Exp $
+ * $Id: DomConsumer.java,v 1.13 2001-11-29 22:55:44 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +79,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-11-19 22:29:47 $
+ * @version $Date: 2001-11-29 22:55:44 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -697,6 +697,9 @@ public class DomConsumer implements EventConsumer
 		    return namespace;
 
 	    // "xmlns" is like a keyword
+	    // ... according to the Namespace REC, but DOM L2 CR2+
+	    // and Infoset violate that by assigning a namespace.
+	    // that conflict is resolved elsewhere.
 	    } else if ("xmlns".equals (prefix))
 		return null;
 
@@ -726,6 +729,7 @@ public class DomConsumer implements EventConsumer
 		if (attr != null)
 		    return attr.getNodeValue ();
 	    }
+	    // see above re "xmlns" as keyword
 	    if ("xmlns".equals (decl))
 		return null;
 
