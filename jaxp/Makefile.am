@@ -414,7 +414,7 @@ gnu.xml.libxmlj.transform \
 gnu.xml.pipeline \
 gnu.xml.util
 
-BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
+#BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
 
 # Generate header files for classes containing native code.
 #$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)

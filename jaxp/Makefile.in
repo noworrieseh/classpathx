@@ -532,8 +532,6 @@ gnu.xml.libxmlj.transform \
 gnu.xml.pipeline \
 gnu.xml.util
 
-
-BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -575,8 +573,7 @@ DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 	config/mkinstalldirs configure configure.ac mkinstalldirs
 SOURCES = $(libxmlj_la_SOURCES)
 
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -985,7 +982,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool clean-local \
@@ -1040,6 +1036,8 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
+
+#BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
 
 # Generate header files for classes containing native code.
 #$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
