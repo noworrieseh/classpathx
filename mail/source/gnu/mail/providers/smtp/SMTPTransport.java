@@ -229,6 +229,22 @@ public class SMTPTransport
   }
 
   /**
+   * Returns the greeting banner.
+   */
+  public String getGreeting ()
+    throws MessagingException
+  {
+    if (!isConnected ())
+      {
+        throw new MessagingException ("not connected");
+      }
+    synchronized (connection)
+      {
+        return connection.getGreeting ();
+      }
+  }
+
+  /**
    * Send the specified message to the server.
    */
   public void sendMessage (Message message, Address[] addresses)
