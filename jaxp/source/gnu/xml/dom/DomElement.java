@@ -1,6 +1,6 @@
 /*
- * $Id: DomElement.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomElement.java,v 1.3 2001-11-16 23:17:43 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,13 +30,13 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomElement.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomElement.java,v 1.3 2001-11-16 23:17:43 db Exp $
 
 /**
  * <p> "Element" implementation.
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-16 23:17:43 $
  */
 public class DomElement extends DomNsNode implements Element
 {
@@ -237,6 +237,11 @@ public class DomElement extends DomNsNode implements Element
      */
     public void setAttributeNS (String uri, String aname, String value)
     {
+	if (("xmlns".equals (aname) || aname.startsWith ("xmlns:"))
+		&& !DomDocument.xmlnsURI.equals (uri))
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		"setting xmlns attribute to illegal value", this, 0);
+
 	Attr attr = getAttributeNodeNS (uri, aname);
 
 	if (attr != null) {
@@ -266,7 +271,7 @@ public class DomElement extends DomNsNode implements Element
      */
     public Attr setAttributeNodeNS (Attr attr)
     {
-	return (Attr) getAttributes ().setNamedItem (attr);
+	return (Attr) getAttributes ().setNamedItemNS (attr);
     }
 
     /**

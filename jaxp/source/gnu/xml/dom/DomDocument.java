@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.5 2001-11-16 20:24:37 db Exp $
+ * $Id: DomDocument.java,v 1.6 2001-11-16 23:17:43 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import org.w3c.dom.traversal.*;
 import DomDoctype.ElementInfo;
 
 
-// $Id: DomDocument.java,v 1.5 2001-11-16 20:24:37 db Exp $
+// $Id: DomDocument.java,v 1.6 2001-11-16 23:17:43 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,7 +47,7 @@ import DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 20:24:37 $
+ * @version $Date: 2001-11-16 23:17:43 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -58,6 +58,8 @@ public class DomDocument extends DomNode
     // package private
     final static String			xmlNamespace =
 	"http://www.w3.org/XML/1998/namespace";
+    final static String			xmlnsURI =
+	"http://www.w3.org/2000/xmlns";
 
 
     /**
@@ -415,8 +417,10 @@ public class DomDocument extends DomNode
 	if (checkingCharacters)
 	    verifyNamespaceName (name);
 
+	if ("".equals (namespaceURI))
+	    namespaceURI = null;
 	if (name.startsWith ("xml:")) {
-	    if (namespaceURI == null || "".equals (namespaceURI))
+	    if (namespaceURI == null)
 		namespaceURI = xmlNamespace;
 	    else if (!xmlNamespace.equals (namespaceURI))
 		throw new DomEx (DomEx.NAMESPACE_ERR,
@@ -424,6 +428,9 @@ public class DomDocument extends DomNode
 	} else if (name.startsWith ("xmlns:"))
 	    throw new DomEx (DomEx.NAMESPACE_ERR,
 		"xmlns is reserved", this, 0);
+	else if (namespaceURI == null && name.indexOf (':') != -1)
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		"prefixed name needs a URI", this, 0);
 
 	return new DomElement (this, namespaceURI, name);
     }
@@ -520,18 +527,25 @@ public class DomDocument extends DomNode
 	if (checkingCharacters)
 	    verifyNamespaceName (name);
 
+	if ("".equals (namespaceURI))
+	    namespaceURI = null;
 	if (name.startsWith ("xml:")) {
-	    if (namespaceURI == null || "".equals (namespaceURI))
+	    if (namespaceURI == null)
 		namespaceURI = xmlNamespace;
 	    else if (!xmlNamespace.equals (namespaceURI))
 		throw new DomEx (DomEx.NAMESPACE_ERR,
 		    "xml namespace is always " + xmlNamespace, this, 0);
+	    namespaceURI = xmlNamespace;
 
-	} else if (name.startsWith ("xmlns:")) {
-	    if (!(namespaceURI == null || "".equals (namespaceURI)))
+	} else if (name.startsWith ("xmlns:") || name.equals ("xmlns")) {
+	    if (!xmlnsURI.equals (namespaceURI))
 		throw new DomEx (DomEx.NAMESPACE_ERR,
 		    "xmlns is reserved", this, 0);
-	}
+	    namespaceURI = xmlnsURI;
+
+	} else if (namespaceURI == null && name.indexOf (':') != -1)
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		"prefixed name needs a URI: " + name, this, 0);
 	
 	return new DomAttr (this, namespaceURI, name);
     }
