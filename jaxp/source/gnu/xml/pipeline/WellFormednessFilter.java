@@ -1,5 +1,5 @@
 /*
- * $Id: WellFormednessFilter.java,v 1.5 2001-10-25 07:41:40 db Exp $
+ * $Id: WellFormednessFilter.java,v 1.6 2001-11-09 22:53:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,8 +32,6 @@ import java.util.Stack;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
-
-import gnu.xml.util.DefaultHandler;
 
 
 /**
@@ -71,7 +69,7 @@ import gnu.xml.util.DefaultHandler;
  * and more.
  *
  * @author David Brownell
- * @version $Date: 2001-10-25 07:41:40 $
+ * @version $Date: 2001-11-09 22:53:17 $
  */
 public final class WellFormednessFilter extends EventFilter
 {

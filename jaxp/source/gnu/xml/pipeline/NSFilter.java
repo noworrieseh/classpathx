@@ -1,5 +1,5 @@
 /*
- * $Id: NSFilter.java,v 1.6 2001-10-25 07:06:07 db Exp $
+ * $Id: NSFilter.java,v 1.7 2001-11-09 22:53:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,7 +36,6 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import gnu.xml.util.DefaultHandler;
 
 /**
  * This filter ensures that element and attribute names are properly prefixed,
@@ -78,7 +77,7 @@ import gnu.xml.util.DefaultHandler;
  * appropriate logic (perhaps adding additional heuristics in a subclass).
  *
  * @author David Brownell
- * @version $Date: 2001-10-25 07:06:07 $
+ * @version $Date: 2001-11-09 22:53:17 $
  */
 public class NSFilter extends EventFilter
 {

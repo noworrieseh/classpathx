@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.7 2001-11-05 06:46:45 db Exp $
+ * $Id: ValidationConsumer.java,v 1.8 2001-11-09 22:53:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -39,10 +39,9 @@ import java.util.Vector;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import org.xml.sax.helpers.XMLReaderFactory;
-import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.7 2001-11-05 06:46:45 db Exp $
+// $Id: ValidationConsumer.java,v 1.8 2001-11-09 22:53:17 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -180,7 +179,7 @@ import gnu.xml.util.DefaultHandler;
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-11-05 06:46:45 $
+ * @version $Date: 2001-11-09 22:53:17 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
