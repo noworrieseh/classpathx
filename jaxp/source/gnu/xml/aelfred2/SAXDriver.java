@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.13 2001-10-07 04:04:53 db Exp $
+ * $Id: SAXDriver.java,v 1.14 2001-10-18 00:57:04 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.13 2001-10-07 04:04:53 db Exp $
+// $Id: SAXDriver.java,v 1.14 2001-10-18 00:57:04 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -89,6 +89,8 @@ import gnu.xml.util.DefaultHandler;
  *	<td>Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/string-interning</td>
  *	<td>Value is fixed at <em>true</em></td></tr>
+ * <tr><td>(URL)/use-attributes2</td>
+ *	<td>(PRELIMINARY) Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/validation</td>
  *	<td>Value is fixed at <em>false</em></td></tr>
  *
@@ -108,14 +110,13 @@ import gnu.xml.util.DefaultHandler;
  * <p>This parser currently implements the SAX1 Parser API, but
  * it may not continue to do so in the future.
  *
- * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
- *	(version 1.2a from Microstar)
+ * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-07 04:04:53 $
+ * @version $Date: 2001-10-18 00:57:04 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
-    implements Locator, Attributes, XMLReader, Parser, AttributeList
+    implements Locator, Attributes2, XMLReader, Parser, AttributeList
 {
     private final DefaultHandler	base = new DefaultHandler ();
     private XmlParser			parser;
@@ -134,6 +135,7 @@ final public class SAXDriver
     private Vector			attributeNamespaces = new Vector ();
     private Vector			attributeLocalNames = new Vector ();
     private Vector			attributeValues = new Vector ();
+    private boolean			attributeSpecified [] = new boolean[10];
 
     private boolean			namespaces = true;
     private boolean			xmlNames = false;
@@ -166,7 +168,7 @@ final public class SAXDriver
 	if ("en".equals (locale.getLanguage ()))
 	    return ;
 
-	throw new SAXException ("AElfred only supports English locales.");
+	throw new SAXException ("AElfred2 only supports English locales.");
     }
 
 
@@ -370,6 +372,12 @@ final public class SAXDriver
 
 	// always interns
 	if ((FEATURE + "string-interning").equals (featureId))
+	    return true;
+	
+	// EXTENSIONS 1.1
+
+	// always returns isSpecified info
+	if ((FEATURE + "use-attributes2").equals (featureId))
 	    return true;
 	
 	// meaningful between startDocument/endDocument
@@ -591,8 +599,6 @@ final public class SAXDriver
 	contentHandler.startPrefixMapping (prefix, uri);
     }
 
-// FIXME  SAX2 has no way to say which attributes are specified
-
     void attribute (String qname, String value, boolean isSpecified)
     throws SAXException
     {
@@ -630,6 +636,14 @@ final public class SAXDriver
 	}
 
 	// remember this attribute ...
+
+	if (attributeCount == attributeSpecified.length) { 	// grow array?
+	    boolean temp [] = new boolean [attributeSpecified.length + 5];
+	    System.arraycopy (attributeSpecified, 0, temp, 0, attributeCount);
+	    attributeSpecified = temp;
+	}
+	attributeSpecified [attributeCount] = isSpecified;
+
 	attributeCount++;
 	attributeNames.addElement (qname);
 	// attribute type comes from querying parser's DTD records
@@ -954,6 +968,47 @@ final public class SAXDriver
 	if (index < 0)
 	    return null;
 	return getValue (index);
+    }
+
+
+    //
+    // Implementation of org.xml.sax.ext.Attributes2
+    //
+
+    /**
+     * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
+     */
+    public boolean isSpecified (int index)
+    {
+	if (index < 0 || index >= attributeCount) 
+	    throw new ArrayIndexOutOfBoundsException ();
+	return attributeSpecified [index];
+    }
+
+
+    /**
+     * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
+     */
+    public boolean isSpecified (String uri, String local)
+    {
+	int index = getIndex (uri, local);
+
+	if (index < 0)
+	    throw new IllegalArgumentException ();
+	return attributeSpecified [index];
+    }
+
+
+    /**
+     * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
+     */
+    public boolean isSpecified (String xmlName)
+    {
+	int index = getIndex (xmlName);
+
+	if (index < 0)
+	    throw new IllegalArgumentException ();
+	return attributeSpecified [index];
     }
 
 
