@@ -71,7 +71,7 @@ package_names = \
 	org.w3c.dom.bootstrap \
 	org.w3c.dom.css \
 	org.w3c.dom.events \
-	org.w3c.dom.html \
+	org.w3c.dom.html2 \
 	org.w3c.dom.ls \
 	org.w3c.dom.ranges \
 	org.w3c.dom.stylesheets \
@@ -204,18 +204,7 @@ lib_org_w3c_dom_la_SOURCES = \
 	source/org/w3c/dom/Text.java \
 	source/org/w3c/dom/TypeInfo.java \
 	source/org/w3c/dom/UserDataHandler.java \
-	source/org/w3c/dom/css/CSS2Azimuth.java \
-	source/org/w3c/dom/css/CSS2BackgroundPosition.java \
-	source/org/w3c/dom/css/CSS2BorderSpacing.java \
-	source/org/w3c/dom/css/CSS2CounterIncrement.java \
-	source/org/w3c/dom/css/CSS2CounterReset.java \
-	source/org/w3c/dom/css/CSS2Cursor.java \
-	source/org/w3c/dom/css/CSS2FontFaceSrc.java \
-	source/org/w3c/dom/css/CSS2FontFaceWidths.java \
-	source/org/w3c/dom/css/CSS2PageSize.java \
-	source/org/w3c/dom/css/CSS2PlayDuring.java \
 	source/org/w3c/dom/css/CSS2Properties.java \
-	source/org/w3c/dom/css/CSS2TextShadow.java \
 	source/org/w3c/dom/css/CSSCharsetRule.java \
 	source/org/w3c/dom/css/CSSFontFaceRule.java \
 	source/org/w3c/dom/css/CSSImportRule.java \
@@ -245,62 +234,62 @@ lib_org_w3c_dom_la_SOURCES = \
 	source/org/w3c/dom/events/MouseEvent.java \
 	source/org/w3c/dom/events/MutationEvent.java \
 	source/org/w3c/dom/events/UIEvent.java \
-	source/org/w3c/dom/html/HTMLAnchorElement.java \
-	source/org/w3c/dom/html/HTMLAppletElement.java \
-	source/org/w3c/dom/html/HTMLAreaElement.java \
-	source/org/w3c/dom/html/HTMLBRElement.java \
-	source/org/w3c/dom/html/HTMLBaseElement.java \
-	source/org/w3c/dom/html/HTMLBaseFontElement.java \
-	source/org/w3c/dom/html/HTMLBodyElement.java \
-	source/org/w3c/dom/html/HTMLButtonElement.java \
-	source/org/w3c/dom/html/HTMLCollection.java \
-	source/org/w3c/dom/html/HTMLDListElement.java \
-	source/org/w3c/dom/html/HTMLDOMImplementation.java \
-	source/org/w3c/dom/html/HTMLDirectoryElement.java \
-	source/org/w3c/dom/html/HTMLDivElement.java \
-	source/org/w3c/dom/html/HTMLDocument.java \
-	source/org/w3c/dom/html/HTMLElement.java \
-	source/org/w3c/dom/html/HTMLFieldSetElement.java \
-	source/org/w3c/dom/html/HTMLFontElement.java \
-	source/org/w3c/dom/html/HTMLFormElement.java \
-	source/org/w3c/dom/html/HTMLFrameElement.java \
-	source/org/w3c/dom/html/HTMLFrameSetElement.java \
-	source/org/w3c/dom/html/HTMLHRElement.java \
-	source/org/w3c/dom/html/HTMLHeadElement.java \
-	source/org/w3c/dom/html/HTMLHeadingElement.java \
-	source/org/w3c/dom/html/HTMLHtmlElement.java \
-	source/org/w3c/dom/html/HTMLIFrameElement.java \
-	source/org/w3c/dom/html/HTMLImageElement.java \
-	source/org/w3c/dom/html/HTMLInputElement.java \
-	source/org/w3c/dom/html/HTMLIsIndexElement.java \
-	source/org/w3c/dom/html/HTMLLIElement.java \
-	source/org/w3c/dom/html/HTMLLabelElement.java \
-	source/org/w3c/dom/html/HTMLLegendElement.java \
-	source/org/w3c/dom/html/HTMLLinkElement.java \
-	source/org/w3c/dom/html/HTMLMapElement.java \
-	source/org/w3c/dom/html/HTMLMenuElement.java \
-	source/org/w3c/dom/html/HTMLMetaElement.java \
-	source/org/w3c/dom/html/HTMLModElement.java \
-	source/org/w3c/dom/html/HTMLOListElement.java \
-	source/org/w3c/dom/html/HTMLObjectElement.java \
-	source/org/w3c/dom/html/HTMLOptGroupElement.java \
-	source/org/w3c/dom/html/HTMLOptionElement.java \
-	source/org/w3c/dom/html/HTMLParagraphElement.java \
-	source/org/w3c/dom/html/HTMLParamElement.java \
-	source/org/w3c/dom/html/HTMLPreElement.java \
-	source/org/w3c/dom/html/HTMLQuoteElement.java \
-	source/org/w3c/dom/html/HTMLScriptElement.java \
-	source/org/w3c/dom/html/HTMLSelectElement.java \
-	source/org/w3c/dom/html/HTMLStyleElement.java \
-	source/org/w3c/dom/html/HTMLTableCaptionElement.java \
-	source/org/w3c/dom/html/HTMLTableCellElement.java \
-	source/org/w3c/dom/html/HTMLTableColElement.java \
-	source/org/w3c/dom/html/HTMLTableElement.java \
-	source/org/w3c/dom/html/HTMLTableRowElement.java \
-	source/org/w3c/dom/html/HTMLTableSectionElement.java \
-	source/org/w3c/dom/html/HTMLTextAreaElement.java \
-	source/org/w3c/dom/html/HTMLTitleElement.java \
-	source/org/w3c/dom/html/HTMLUListElement.java \
+	source/org/w3c/dom/html2/HTMLAnchorElement.java \
+	source/org/w3c/dom/html2/HTMLAppletElement.java \
+	source/org/w3c/dom/html2/HTMLAreaElement.java \
+	source/org/w3c/dom/html2/HTMLBRElement.java \
+	source/org/w3c/dom/html2/HTMLBaseElement.java \
+	source/org/w3c/dom/html2/HTMLBaseFontElement.java \
+	source/org/w3c/dom/html2/HTMLBodyElement.java \
+	source/org/w3c/dom/html2/HTMLButtonElement.java \
+	source/org/w3c/dom/html2/HTMLCollection.java \
+	source/org/w3c/dom/html2/HTMLDListElement.java \
+	source/org/w3c/dom/html2/HTMLDirectoryElement.java \
+	source/org/w3c/dom/html2/HTMLDivElement.java \
+	source/org/w3c/dom/html2/HTMLDocument.java \
+	source/org/w3c/dom/html2/HTMLElement.java \
+	source/org/w3c/dom/html2/HTMLFieldSetElement.java \
+	source/org/w3c/dom/html2/HTMLFontElement.java \
+	source/org/w3c/dom/html2/HTMLFormElement.java \
+	source/org/w3c/dom/html2/HTMLFrameElement.java \
+	source/org/w3c/dom/html2/HTMLFrameSetElement.java \
+	source/org/w3c/dom/html2/HTMLHRElement.java \
+	source/org/w3c/dom/html2/HTMLHeadElement.java \
+	source/org/w3c/dom/html2/HTMLHeadingElement.java \
+	source/org/w3c/dom/html2/HTMLHtmlElement.java \
+	source/org/w3c/dom/html2/HTMLIFrameElement.java \
+	source/org/w3c/dom/html2/HTMLImageElement.java \
+	source/org/w3c/dom/html2/HTMLInputElement.java \
+	source/org/w3c/dom/html2/HTMLIsIndexElement.java \
+	source/org/w3c/dom/html2/HTMLLIElement.java \
+	source/org/w3c/dom/html2/HTMLLabelElement.java \
+	source/org/w3c/dom/html2/HTMLLegendElement.java \
+	source/org/w3c/dom/html2/HTMLLinkElement.java \
+	source/org/w3c/dom/html2/HTMLMapElement.java \
+	source/org/w3c/dom/html2/HTMLMenuElement.java \
+	source/org/w3c/dom/html2/HTMLMetaElement.java \
+	source/org/w3c/dom/html2/HTMLModElement.java \
+	source/org/w3c/dom/html2/HTMLOListElement.java \
+	source/org/w3c/dom/html2/HTMLObjectElement.java \
+	source/org/w3c/dom/html2/HTMLOptGroupElement.java \
+	source/org/w3c/dom/html2/HTMLOptionElement.java \
+	source/org/w3c/dom/html2/HTMLOptionsCollection.java \
+	source/org/w3c/dom/html2/HTMLParagraphElement.java \
+	source/org/w3c/dom/html2/HTMLParamElement.java \
+	source/org/w3c/dom/html2/HTMLPreElement.java \
+	source/org/w3c/dom/html2/HTMLQuoteElement.java \
+	source/org/w3c/dom/html2/HTMLScriptElement.java \
+	source/org/w3c/dom/html2/HTMLSelectElement.java \
+	source/org/w3c/dom/html2/HTMLStyleElement.java \
+	source/org/w3c/dom/html2/HTMLTableCaptionElement.java \
+	source/org/w3c/dom/html2/HTMLTableCellElement.java \
+	source/org/w3c/dom/html2/HTMLTableColElement.java \
+	source/org/w3c/dom/html2/HTMLTableElement.java \
+	source/org/w3c/dom/html2/HTMLTableRowElement.java \
+	source/org/w3c/dom/html2/HTMLTableSectionElement.java \
+	source/org/w3c/dom/html2/HTMLTextAreaElement.java \
+	source/org/w3c/dom/html2/HTMLTitleElement.java \
+	source/org/w3c/dom/html2/HTMLUListElement.java \
 	source/org/w3c/dom/ls/DOMImplementationLS.java \
 	source/org/w3c/dom/ls/LSException.java \
 	source/org/w3c/dom/ls/LSInput.java \
