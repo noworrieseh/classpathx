@@ -1,5 +1,5 @@
 # 
-# $Id: Makefile.am,v 1.1.2.1 2004-04-07 16:05:40 avdyk Exp $
+# $Id: Makefile.am,v 1.1.2.2 2004-04-07 22:22:04 avdyk Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -338,28 +338,19 @@ javax_xml_transform_%.h:
 # Rule for compiling Java source files
 org/%.class: @srcdir@/src/org/%.java
 	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ \
-		-d . \
-		-classpath "${CLASSPATH}:@srcdir@/src:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
 
 javax/%.class: @srcdir@/src/javax/%.java
 	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ \
-		-d . \
-		-classpath "${CLASSPATH}:@srcdir@/src:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
 
-gnu/%.class: \
-		@srcdir@/src/gnu/%.java
+gnu/%.class: @srcdir@/src/gnu/%.java
 	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ \
-		-d . \
-		-classpath "${CLASSPATH}:@srcdir@/src:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
 
 # Jar file
 
-${JARFILE}: gnu \
-		javax \
-		org
+${JARFILE}: gnu javax org
 	@JAR@ cf ${JARFILE} -m manifest.mf $^
 
 # Remove classes and jar file
@@ -371,14 +362,8 @@ clean-local:
 
 # Run a simple transformation to check that the package is working
 
-check-local: \
-		gnu/xml/libxmlj/transform/TransformTest.class
-	@JAVA@  -classpath "${CLASSPATH}:${JARFILE}:." \
-		-Djava.library.path=.libs \
-		gnu.xml.libxmlj.transform.TransformTest \
-		@srcdir@/testdocs/test.xml \
-		@srcdir@/testdocs/testsheet.xsl \
-		transformed.xml
+check-local: gnu/xml/libxmlj/transform/TransformTest.class
+	@JAVA@  -classpath "${CLASSPATH}:${JARFILE}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
 	diff @srcdir@/testdocs/transformed.xml transformed.xml
 
 dist-hook:
