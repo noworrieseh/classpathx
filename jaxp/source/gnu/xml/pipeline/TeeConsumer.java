@@ -1,5 +1,5 @@
 /*
- * $Id: TeeConsumer.java,v 1.4 2001-10-23 17:42:25 db Exp $
+ * $Id: TeeConsumer.java,v 1.5 2001-10-24 22:50:33 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -52,7 +52,7 @@ import org.xml.sax.ext.*;
  * the endDocument callback, which signals state cleanup).
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-24 22:50:33 $
  */
 final public class TeeConsumer
 	implements EventConsumer,
@@ -207,11 +207,11 @@ final public class TeeConsumer
     //
     // ContentHandler
     //
-    public void setDocumentLocator (Locator l)
+    public void setDocumentLocator (Locator locator)
     {
 	// this call is not made by all parsers
-	docFirst.setDocumentLocator (l);
-	docRest.setDocumentLocator (l);
+	docFirst.setDocumentLocator (locator);
+	docRest.setDocumentLocator (locator);
     }
 
     public void startDocument ()
@@ -252,19 +252,19 @@ final public class TeeConsumer
 	docRest.skippedEntity (name);
     }
 
-    public void startElement (String uri, String local,
-	    String name, Attributes atts)
+    public void startElement (String uri, String localName,
+	    String qName, Attributes atts)
     throws SAXException
     {
-	docFirst.startElement (uri, local, name, atts);
-	docRest.startElement (uri, local, name, atts);
+	docFirst.startElement (uri, localName, qName, atts);
+	docRest.startElement (uri, localName, qName, atts);
     }
 
-    public void endElement (String uri, String local, String name)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
-	docFirst.endElement (uri, local, name);
-	docRest.endElement (uri, local, name);
+	docFirst.endElement (uri, localName, qName);
+	docRest.endElement (uri, localName, qName);
     }
 
     public void processingInstruction (String target, String data)
@@ -274,90 +274,90 @@ final public class TeeConsumer
 	docRest.processingInstruction (target, data);
     }
 
-    public void characters (char buf [], int off, int len)
+    public void characters (char ch [], int start, int length)
     throws SAXException
     {
-	docFirst.characters (buf, off, len);
-	docRest.characters (buf, off, len);
+	docFirst.characters (ch, start, length);
+	docRest.characters (ch, start, length);
     }
 
-    public void ignorableWhitespace (char buf [], int off, int len)
+    public void ignorableWhitespace (char ch [], int start, int length)
     throws SAXException
     {
-	docFirst.ignorableWhitespace (buf, off, len);
-	docRest.ignorableWhitespace (buf, off, len);
+	docFirst.ignorableWhitespace (ch, start, length);
+	docRest.ignorableWhitespace (ch, start, length);
     }
 
 
     //
     // DTDHandler
     //
-    public void notationDecl (String name, String pubid, String sysid)
+    public void notationDecl (String name, String publicId, String systemId)
     throws SAXException
     {
 	DTDHandler	l1 = first.getDTDHandler ();
 	DTDHandler	l2 = rest.getDTDHandler ();
 
-	l1.notationDecl (name, pubid, sysid);
-	l2.notationDecl (name, pubid, sysid);
+	l1.notationDecl (name, publicId, systemId);
+	l2.notationDecl (name, publicId, systemId);
     }
 
     public void unparsedEntityDecl (String name,
-	    String pubid, String sysid,
-	    String ndata
+	    String publicId, String systemId,
+	    String notationName
     ) throws SAXException
     {
 	DTDHandler	l1 = first.getDTDHandler ();
 	DTDHandler	l2 = rest.getDTDHandler ();
 
-	l1.unparsedEntityDecl (name, pubid, sysid, ndata);
-	l2.unparsedEntityDecl (name, pubid, sysid, ndata);
+	l1.unparsedEntityDecl (name, publicId, systemId, notationName);
+	l2.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
 
 
     //
     // DeclHandler
     //
-    public void attributeDecl (String element, String attribute,
+    public void attributeDecl (String eName, String aName,
 	String type,
-	String valueDefault, String value)
+	String mode, String value)
     throws SAXException
     {
-	declFirst.attributeDecl (element, attribute, type, valueDefault, value);
-	declRest.attributeDecl (element, attribute, type, valueDefault, value);
+	declFirst.attributeDecl (eName, aName, type, mode, value);
+	declRest.attributeDecl (eName, aName, type, mode, value);
     }
 
-    public void elementDecl (String element, String model)
+    public void elementDecl (String name, String model)
     throws SAXException
     {
-	declFirst.elementDecl (element, model);
-	declRest.elementDecl (element, model);
+	declFirst.elementDecl (name, model);
+	declRest.elementDecl (name, model);
     }
 
-    public void externalEntityDecl (String entity,
+    public void externalEntityDecl (String name,
 	String publicId, String systemId)
     throws SAXException
     {
-	declFirst.externalEntityDecl (entity, publicId, systemId);
-	declRest.externalEntityDecl (entity, publicId, systemId);
+	declFirst.externalEntityDecl (name, publicId, systemId);
+	declRest.externalEntityDecl (name, publicId, systemId);
     }
 
-    public void internalEntityDecl (String entity, String value)
+    public void internalEntityDecl (String name, String value)
     throws SAXException
     {
-	declFirst.internalEntityDecl (entity, value);
-	declRest.internalEntityDecl (entity, value);
+	declFirst.internalEntityDecl (name, value);
+	declRest.internalEntityDecl (name, value);
     }
 
 
     //
     // LexicalHandler
     //
-    public void comment (char buf [], int off, int len)
+    public void comment (char ch [], int start, int length)
     throws SAXException
     {
-	lexFirst.comment (buf, off, len);
-	lexRest.comment (buf, off, len);
+	lexFirst.comment (ch, start, length);
+	lexRest.comment (ch, start, length);
     }
     
     public void startCDATA ()
@@ -388,11 +388,11 @@ final public class TeeConsumer
 	lexRest.endEntity (name);
     }
     
-    public void startDTD (String name, String pubid, String sysid)
+    public void startDTD (String name, String publicId, String systemId)
     throws SAXException
     {
-	lexFirst.startDTD (name, pubid, sysid);
-	lexRest.startDTD (name, pubid, sysid);
+	lexFirst.startDTD (name, publicId, systemId);
+	lexRest.startDTD (name, publicId, systemId);
     }
     
     public void endDTD ()
