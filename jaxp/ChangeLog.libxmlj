@@ -1,3 +1,7 @@
+2004-04-29  Chris Burdess <dog@gnu.org>
+
+    * xmlj_[dom,io].c: Use Java streams for DOM input.
+
 2004-04-28  Chris Burdess <dog@gnu.org>
 
 	* xmlj_node.c et al: Implemented node cache (task #3289).

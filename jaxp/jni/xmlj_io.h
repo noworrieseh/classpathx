@@ -44,9 +44,15 @@
 #include "xmlj_error.h"
 
 xmlDocPtr 
-xmljParseJavaInputStream (JNIEnv * env, jobject inputStream,
-			  jstring inSystemId, jstring inPublicId,
-			  jobject saxErrorAdapter);
+xmljParseJavaInputStream (JNIEnv * env,
+    jobject inputStream,
+    jstring inSystemId,
+    jstring inPublicId,
+    jboolean validate,
+    jboolean coalesce,
+    jboolean expandEntities,
+    jobject saxEntityResolver,
+    jobject saxErrorAdapter);
 void xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
 					xmlDocPtr tree,
 					const char *outputEncoding);

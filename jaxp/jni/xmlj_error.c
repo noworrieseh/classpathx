@@ -46,18 +46,24 @@ static jobject xmljMakeJaxpSourceLocator (void *ctx);
 static jobject
 xmljMakeJaxpSourceLocator (void *ctx)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
+  JNIEnv *env;
+  jobject result;
+  const char *systemId;
+  const char *publicId;
+
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext =
     (SaxErrorContext *) parseContext->_private;
-  JNIEnv *env = saxErrorContext->env;
-
-  jobject result = (*env)->AllocObject (env,
+  if (saxErrorContext == NULL)
+    return NULL;
+  
+  env = saxErrorContext->env;
+  result = (*env)->AllocObject (env,
 					saxErrorContext->sourceLocatorClass);
-
-  const char *systemId =
-    (const char *) saxErrorContext->locator->getSystemId (ctx);
-  const char *publicId =
-    (const char *) saxErrorContext->locator->getPublicId (ctx);
+  systemId = (const char *) saxErrorContext->locator->getSystemId (ctx);
+  publicId = (const char *) saxErrorContext->locator->getPublicId (ctx);
 
   (*env)->CallVoidMethod (env,
 			  result,
@@ -78,41 +84,51 @@ static void
 callErrorAdapterMethod (void *ctx, const char *msg, va_list va,
 			jmethodID methodID)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
-    (SaxErrorContext *) parseContext->_private;
-  JNIEnv *env = saxErrorContext->env;
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
+  JNIEnv *env;
+  jmethodID method;
+  
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext = (SaxErrorContext *) parseContext->_private;
+  if (saxErrorContext == NULL)
+    return;
+  
+  env = saxErrorContext->env;
 
   if (!(*env)->ExceptionOccurred (env))
+  {
+    jobject jaxpSourceLocator = xmljMakeJaxpSourceLocator (ctx);
+    
+    char buffer[2048] = "[Error message too long]";
+    vsnprintf (buffer, sizeof buffer, msg, va);
+    
+    (*env)->CallVoidMethod (env,
+                            saxErrorContext->saxErrorAdapter,
+                            methodID,
+                            (*env)->NewStringUTF (env, buffer),
+                            jaxpSourceLocator);
+    
+    if ((*env)->ExceptionOccurred (env))
     {
-      jobject jaxpSourceLocator = xmljMakeJaxpSourceLocator (ctx);
-
-      char buffer[2048] = "[Error message too long]";
-      vsnprintf (buffer, sizeof buffer, msg, va);
-
-      (*env)->CallVoidMethod (env,
-			      saxErrorContext->saxErrorAdapter,
-			      methodID,
-			      (*env)->NewStringUTF (env, buffer),
-			      jaxpSourceLocator);
-
-      if ((*env)->ExceptionOccurred (env))
-	{
-	  xmlStopParser (parseContext);
-	}
+      xmlStopParser (parseContext);
     }
+  }
 }
 
 static void
 xmljErrorSAXFunc (void *ctx, const char *msg, ...)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
-    (SaxErrorContext *) parseContext->_private;
-
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
   va_list va;
+  
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext = (SaxErrorContext *) parseContext->_private;
+  if (saxErrorContext == NULL)
+    return;
+  
   va_start (va, msg);
-
   callErrorAdapterMethod (ctx, msg, va, saxErrorContext->saxErrorMethodID);
   va_end (va);
 }
@@ -120,10 +136,15 @@ xmljErrorSAXFunc (void *ctx, const char *msg, ...)
 static void
 xmljFatalErrorSAXFunc (void *ctx, const char *msg, ...)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
-    (SaxErrorContext *) parseContext->_private;
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
   va_list va;
+  
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext = (SaxErrorContext *) parseContext->_private;
+  if (saxErrorContext == NULL)
+    return;
+  
   va_start (va, msg);
   callErrorAdapterMethod (ctx, msg, va,
 			  saxErrorContext->saxFatalErrorMethodID);
@@ -133,10 +154,15 @@ xmljFatalErrorSAXFunc (void *ctx, const char *msg, ...)
 static void
 xmljWarningSAXFunc (void *ctx, const char *msg, ...)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
-    (SaxErrorContext *) parseContext->_private;
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
   va_list va;
+  
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext = (SaxErrorContext *) parseContext->_private;
+  if (saxErrorContext == NULL)
+    return;
+  
   va_start (va, msg);
   callErrorAdapterMethod (ctx, msg, va, saxErrorContext->saxWarningMethodID);
   va_end (va);
@@ -164,11 +190,15 @@ xmljGetPublicId (void *ctx)
 static void
 xmljSetDocumentLocator (void *ctx, xmlSAXLocatorPtr loc)
 {
-  xmlParserCtxtPtr parseContext = (xmlParserCtxtPtr) ctx;
-  SaxErrorContext *saxErrorContext =
-    (SaxErrorContext *) parseContext->_private;
+  xmlParserCtxtPtr parseContext;
+  SaxErrorContext *saxErrorContext;
+  
+  parseContext = (xmlParserCtxtPtr) ctx;
+  saxErrorContext = (SaxErrorContext *) parseContext->_private;
+  if (saxErrorContext == NULL)
+    return;
+  
   saxErrorContext->locator = loc;
-
   loc->getPublicId = xmljGetPublicId;
   loc->getSystemId = xmljGetSystemId;
 }
@@ -284,17 +314,22 @@ xmljCreateSaxErrorContext (JNIEnv * env, jobject saxErrorAdapter,
 void
 xmljFreeSaxErrorContext (SaxErrorContext * errorContext)
 {
-  JNIEnv *env = errorContext->env;
+  JNIEnv *env;
+  
+  if (errorContext == NULL)
+    return;
+  
+  env = errorContext->env;
   if (NULL != errorContext->systemId && NULL != errorContext->systemIdCstr)
-    {
-      (*env)->ReleaseStringUTFChars (env, errorContext->systemId,
+  {
+    (*env)->ReleaseStringUTFChars (env, errorContext->systemId,
 				     errorContext->systemIdCstr);
-    }
+  }
   if (NULL != errorContext->publicId && NULL != errorContext->publicIdCstr)
-    {
-      (*env)->ReleaseStringUTFChars (env, errorContext->publicId,
-				     errorContext->publicIdCstr);
-    }
+  {
+    (*env)->ReleaseStringUTFChars (env, errorContext->publicId,
+                                   errorContext->publicIdCstr);
+  }
   free (errorContext);
 }
 
@@ -330,3 +365,19 @@ xmljXsltErrorFunc (void *ctx, const char *msg, ...)
       va_end (va);
     }
 }
+
+void
+xmljThrowDOMException (JNIEnv* env,
+    int code,
+    const char *message)
+{
+  jclass cls;
+  jmethodID method;
+  jthrowable ex;
+
+  cls = (*env)->FindClass(env, "org/w3c/dom/DOMException");
+  method = (*env)->GetMethodID(env, cls, "<init>", "(ILjava/lang/String;)V");
+  ex = (jthrowable)(*env)->NewObject(env, cls, method, code, message);
+  (*env)->Throw(env, ex);
+}
+

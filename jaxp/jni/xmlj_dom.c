@@ -25,6 +25,8 @@
  * executable file might be covered by the GNU General Public License.
  */
 #include "xmlj_dom.h"
+#include "xmlj_error.h"
+#include "xmlj_io.h"
 #include "xmlj_node.h"
 #include "xmlj_util.h"
 
@@ -43,11 +45,6 @@ jobject dom_cb_obj;
 
 /* -- GnomeAttr -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeAttr
- * Method:    getSpecified
- * Signature: ()Z
- */
 JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeAttr_getSpecified (JNIEnv *env,
     jobject self)
@@ -58,11 +55,6 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_getSpecified (JNIEnv *env,
   return (attr->atype != 0);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeAttr
- * Method:    getValue
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeAttr_getValue (JNIEnv *env,
     jobject self)
@@ -79,11 +71,6 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_getValue (JNIEnv *env,
   return ret;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeAttr
- * Method:    setValue
- * Signature: (Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeAttr_setValue (JNIEnv *env,
     jobject self,
@@ -99,11 +86,6 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_setValue (JNIEnv *env,
 
 /* -- GnomeDocument -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    free
- * Signature: (I)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_free (JNIEnv *env,
     jobject self,
@@ -116,11 +98,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_free (JNIEnv *env,
   xmlFree(doc);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    getDoctype
- * Signature: ()Lorg/w3c/dom/DocumentType;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_getDoctype (JNIEnv *env,
     jobject self)
@@ -133,11 +110,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getDoctype (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)dtd);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    getDocumentElement
- * Signature: ()Lorg/w3c/dom/Element;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_getDocumentElement (JNIEnv *env,
     jobject self)
@@ -148,11 +120,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getDocumentElement (JNIEnv *env,
   return xmljGetNodeInstance(env, xmlDocGetRootElement(doc));
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createDocumentFragment
- * Signature: ()Lorg/w3c/dom/DocumentFragment;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createDocumentFragment (JNIEnv *env,
     jobject self)
@@ -163,11 +130,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createDocumentFragment (JNIEnv *env,
   return xmljGetNodeInstance(env, xmlNewDocFragment(doc));
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createTextNode
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Text;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createTextNode (JNIEnv *env,
     jobject self,
@@ -183,11 +145,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createTextNode (JNIEnv *env,
   return xmljGetNodeInstance(env, text);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createComment
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Comment;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createComment (JNIEnv *env,
     jobject self,
@@ -203,11 +160,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createComment (JNIEnv *env,
   return xmljGetNodeInstance(env, comment);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createCDATASection
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/CDATASection;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createCDATASection (JNIEnv *env,
     jobject self,
@@ -225,11 +177,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createCDATASection (JNIEnv *env,
   return xmljGetNodeInstance(env, cdata);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createProcessingInstruction
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/ProcessingInstruction;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createProcessingInstruction (JNIEnv *env,
     jobject self,
@@ -248,11 +195,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createProcessingInstruction (JNIEnv *env,
   return xmljGetNodeInstance(env, pi);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createEntityReference
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/EntityReference;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createEntityReference (JNIEnv *env,
     jobject self,
@@ -268,11 +210,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createEntityReference (JNIEnv *env,
   return xmljGetNodeInstance(env, ref);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    importNode
- * Signature: (Lorg/w3c/dom/Node;Z)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_importNode (JNIEnv *env,
     jobject self,
@@ -283,11 +220,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_importNode (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createElementNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv *env,
     jobject self,
@@ -318,11 +250,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv *env,
   return xmljGetNodeInstance(env, element);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    createAttributeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Attr;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv *env,
     jobject self,
@@ -353,11 +280,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv *env,
   return xmljGetNodeInstance(env, attr);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    getElementById
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Element;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementById (JNIEnv *env,
     jobject self,
@@ -369,12 +291,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementById (JNIEnv *env,
 
 /* -- GnomeDocumentBuilder -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    init
- * Signature: ()V
- */
-JNIEXPORT void JNICALL
+/*JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_init (JNIEnv *env,
     jobject self,
     jboolean validate,
@@ -389,7 +306,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_init (JNIEnv *env,
   dom_cb_env = env;
   dom_cb_obj = self;
   
-  /* Initialise context */
+  * Initialise context *
   context = xmlNewParserCtxt();
   if (context != NULL)
   {
@@ -413,20 +330,15 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_init (JNIEnv *env,
   }
   else if (validate)
   {
-    /* TODO throw exception */
+    * TODO throw exception *
   }
   
-  /* Save into field */
+  * Save into field *
   cls = (*env)->GetObjectClass(env, self);
   field = (*env)->GetFieldID(env, cls, "context", "I");
   (*env)->SetIntField(env, self, field, (jint)context);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    finalize
- * Signature: ()V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_finalize (JNIEnv *env,
     jobject self)
@@ -435,17 +347,31 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_finalize (JNIEnv *env,
   
   context = getContext(env, self);
   
-  /* Free */
+  * Free *
   if (context != NULL)
     xmlClearParserCtxt(context);
+}*/
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv *env,
+    jobject self,
+    jobject in,
+    jstring publicId,
+    jstring systemId,
+    jboolean validate,
+    jboolean coalesce,
+    jboolean expandEntities,
+    jobject entityResolver,
+    jobject errorHandler)
+{
+  xmlDocPtr doc;
+
+  doc = xmljParseJavaInputStream(env, in, systemId, publicId, 
+      validate, coalesce, expandEntities, entityResolver, errorHandler);
+  return createDocument(env, self, doc);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    parseFile
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Document;
- */
-JNIEXPORT jobject JNICALL
+/*JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseFile (JNIEnv *env,
     jobject self,
     jstring filename)
@@ -458,13 +384,13 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseFile (JNIEnv *env,
   if (filename == NULL)
     return NULL;
   
-  /* Get parser context */
+  * Get parser context *
   context = getContext(env, self);
   
   dom_cb_env = env;
   dom_cb_obj = self;
   
-  /* Parse */
+  * Parse *
   s_filename = (*env)->GetStringUTFChars(env, filename, 0);
   if (context == NULL)
     doc = xmlParseFile(s_filename);
@@ -487,11 +413,11 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseFile (JNIEnv *env,
     return createDocument(env, self, doc);
 }
 
-/*
+*
  * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
  * Method:    parseMemory
  * Signature: ([B)Lorg/w3c/dom/Document;
- */
+ *
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
     jobject self,
@@ -503,16 +429,16 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
   xmlChar *x_bytes;
   jint len;
 
-  /* Get parser context */
+  * Get parser context *
   context = getContext(env, self);
   
   dom_cb_env = env;
   dom_cb_obj = self;
   
-  /* Parse */
+  * Parse *
   len = (*env)->GetArrayLength(env, bytes);
   j_bytes = (*env)->GetByteArrayElements(env, bytes, 0);
-  x_bytes = (j_bytes == NULL) ? NULL : xmlCharStrdup(j_bytes); /* TODO */
+  x_bytes = (j_bytes == NULL) ? NULL : xmlCharStrdup(j_bytes); * TODO *
   if (context == NULL)
     doc = xmlParseMemory(x_bytes, len);
   else
@@ -527,14 +453,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
     return NULL;
   else
     return createDocument(env, self, doc);
-}
+}*/
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    setCustomEntityResolver
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
+/*JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomEntityResolver (JNIEnv *env,
     jobject self,
     jboolean flag)
@@ -551,16 +472,11 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomEntityResolver (JNIEnv *e
   }
   else
   {
-    /* TODO raise exception */
+    * TODO raise exception *
   }
-}
+}*/
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    setCustomErrorHandler
- * Signature: (Z)V
- */
-JNIEXPORT void JNICALL
+/*JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomErrorHandler (JNIEnv *env,
     jobject self,
     jboolean flag)
@@ -585,15 +501,10 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomErrorHandler (JNIEnv *env
   }
   else
   {
-    /* TODO raise exception */
+    * TODO raise exception *
   }
-}
+}*/
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    createDocument
- * Signature: (Ljava/lang/String;Ljava/lang/String;Lorg/w3c/dom/DocumentType;)Lorg/w3c/dom/Document;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv *env,
     jobject self,
@@ -614,11 +525,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv *env,
 
 /* -- GnomeDocumentType -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentType
- * Method:    getEntities
- * Signature: ()Lorg/w3c/dom/NamedNodeMap;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getEntities (JNIEnv *env,
     jobject self)
@@ -630,11 +536,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getEntities (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentType
- * Method:    getNotations
- * Signature: ()Lorg/w3c/dom/NamedNodeMap;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getNotations (JNIEnv *env,
     jobject self)
@@ -646,11 +547,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getNotations (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentType
- * Method:    getPublicId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getPublicId (JNIEnv *env,
     jobject self)
@@ -661,11 +557,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getPublicId (JNIEnv *env,
   return xmljNewString(env, dtd->ExternalID);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentType
- * Method:    getSystemId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getSystemId (JNIEnv *env,
     jobject self)
@@ -676,11 +567,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getSystemId (JNIEnv *env,
   return xmljNewString(env, dtd->SystemID);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentType
- * Method:    getInternalSubset
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getInternalSubset (JNIEnv *env,
     jobject self)
@@ -691,11 +577,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getInternalSubset (JNIEnv *env,
 
 /* -- GnomeElement -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    removeAttributeNode
- * Signature: (Lorg/w3c/dom/Attr;)Lorg/w3c/dom/Attr;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_removeAttributeNode (JNIEnv *env,
     jobject self,
@@ -705,11 +586,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_removeAttributeNode (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    getAttributeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNS (JNIEnv *env,
     jobject self,
@@ -735,11 +611,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNS (JNIEnv *env,
   return xmljNewString(env, s_value);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    setAttributeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNS (JNIEnv *env,
     jobject self,
@@ -773,11 +644,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNS (JNIEnv *env,
   }
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    removeAttributeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_removeAttributeNS (JNIEnv *env,
     jobject self,
@@ -787,11 +653,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_removeAttributeNS (JNIEnv *env,
   /* TODO */
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    getAttributeNodeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Attr;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNodeNS (JNIEnv *env,
     jobject self,
@@ -824,11 +685,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNodeNS (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)attr);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    setAttributeNodeNS
- * Signature: (Lorg/w3c/dom/Attr;)Lorg/w3c/dom/Attr;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNodeNS (JNIEnv *env,
     jobject self,
@@ -838,11 +694,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNodeNS (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    hasAttributeNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
- */
 JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttributeNS (JNIEnv *env,
     jobject self,
@@ -877,11 +728,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttributeNS (JNIEnv *env,
 
 /* -- GnomeEntity -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeEntity
- * Method:    getPublicId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeEntity_getPublicId (JNIEnv *env,
     jobject self)
@@ -890,11 +736,6 @@ Java_gnu_xml_libxmlj_dom_GnomeEntity_getPublicId (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeEntity
- * Method:    getSystemId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeEntity_getSystemId (JNIEnv *env,
     jobject self)
@@ -903,11 +744,6 @@ Java_gnu_xml_libxmlj_dom_GnomeEntity_getSystemId (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeEntity
- * Method:    getNotationName
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeEntity_getNotationName (JNIEnv *env,
     jobject self)
@@ -918,11 +754,6 @@ Java_gnu_xml_libxmlj_dom_GnomeEntity_getNotationName (JNIEnv *env,
 
 /* -- GnomeNamedNodeMap -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    getNamedItem
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItem (JNIEnv *env,
     jobject self,
@@ -934,11 +765,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItem (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)attr);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    setNamedItem
- * Signature: (Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_setNamedItem (JNIEnv *env,
     jobject self,
@@ -959,11 +785,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_setNamedItem (JNIEnv *env,
   return arg;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    removeNamedItem
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItem (JNIEnv *env,
     jobject self,
@@ -984,11 +805,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItem (JNIEnv *env,
   }
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    item
- * Signature: (I)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv *env,
     jobject self,
@@ -1007,11 +823,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)attr);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    getLength
- * Signature: ()I
- */
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getLength (JNIEnv *env,
     jobject self)
@@ -1031,11 +842,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getLength (JNIEnv *env,
   return count;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    getNamedItemNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItemNS (JNIEnv *env,
     jobject self,
@@ -1048,11 +854,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItemNS (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)attr);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    setNamedItemNS
- * Signature: (Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_setNamedItemNS (JNIEnv *env,
     jobject self,
@@ -1062,11 +863,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_setNamedItemNS (JNIEnv *env,
       arg);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNamedNodeMap
- * Method:    removeNamedItemNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItemNS (JNIEnv *env,
     jobject self,
@@ -1090,11 +886,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItemNS (JNIEnv *env,
 
 /* -- GnomeNode -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getNodeName
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeName (JNIEnv *env,
     jobject self)
@@ -1105,11 +896,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeName (JNIEnv *env,
   return xmljNewString(env, node->name);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getNodeValue
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeValue (JNIEnv *env,
     jobject self)
@@ -1134,11 +920,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeValue (JNIEnv *env,
   return ret;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    setNodeValue
- * Signature: (Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_setNodeValue (JNIEnv *env,
     jobject self,
@@ -1159,11 +940,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setNodeValue (JNIEnv *env,
   xmlNodeSetContent(node, s_nodeValue);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getNodeType
- * Signature: ()S
- */
 JNIEXPORT jshort JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeType (JNIEnv *env,
     jobject self)
@@ -1174,11 +950,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeType (JNIEnv *env,
   return node->type;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getParentNode
- * Signature: ()Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getParentNode (JNIEnv *env,
     jobject self)
@@ -1189,11 +960,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getParentNode (JNIEnv *env,
   return xmljGetNodeInstance(env, node->parent);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getFirstChild
- * Signature: ()Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getFirstChild (JNIEnv *env,
     jobject self)
@@ -1204,11 +970,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getFirstChild (JNIEnv *env,
   return xmljGetNodeInstance(env, node->children);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getLastChild
- * Signature: ()Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getLastChild (JNIEnv *env,
     jobject self)
@@ -1219,11 +980,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getLastChild (JNIEnv *env,
   return xmljGetNodeInstance(env, node->last);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getPreviousSibling
- * Signature: ()Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getPreviousSibling (JNIEnv *env,
     jobject self)
@@ -1234,11 +990,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getPreviousSibling (JNIEnv *env,
   return xmljGetNodeInstance(env, node->prev);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getNextSibling
- * Signature: ()Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNextSibling (JNIEnv *env,
     jobject self)
@@ -1249,11 +1000,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNextSibling (JNIEnv *env,
   return xmljGetNodeInstance(env, node->next);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getAttributes
- * Signature: ()Lorg/w3c/dom/NamedNodeMap;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getAttributes (JNIEnv *env,
     jobject self)
@@ -1270,11 +1016,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getAttributes (JNIEnv *env,
   return (*env)->NewObject(env, cls, method, node);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getOwnerDocument
- * Signature: ()Lorg/w3c/dom/Document;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getOwnerDocument (JNIEnv *env,
     jobject self)
@@ -1285,11 +1026,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getOwnerDocument (JNIEnv *env,
   return xmljGetNodeInstance(env, (xmlNodePtr)node->doc);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    insertBefore
- * Signature: (Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv *env,
     jobject self,
@@ -1309,11 +1045,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv *env,
   return newChild;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    replaceChild
- * Signature: (Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv *env,
     jobject self,
@@ -1333,11 +1064,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv *env,
   return newChild;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    removeChild
- * Signature: (Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_removeChild (JNIEnv *env,
     jobject self,
@@ -1355,11 +1081,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_removeChild (JNIEnv *env,
   return oldChild;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    appendChild
- * Signature: (Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv *env,
     jobject self,
@@ -1378,11 +1099,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv *env,
   return newChild;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    hasChildNodes
- * Signature: ()Z
- */
 JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_hasChildNodes (JNIEnv *env,
     jobject self)
@@ -1393,11 +1109,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_hasChildNodes (JNIEnv *env,
   return (node->children != NULL);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    cloneNode
- * Signature: (Z)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_cloneNode (JNIEnv *env,
     jobject self,
@@ -1407,11 +1118,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_cloneNode (JNIEnv *env,
   return NULL;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    normalize
- * Signature: ()V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_normalize (JNIEnv *env,
     jobject self)
@@ -1419,11 +1125,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_normalize (JNIEnv *env,
   /* TODO */
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    isSupported
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
- */
 JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_isSupported (JNIEnv *env,
     jobject self,
@@ -1434,11 +1135,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_isSupported (JNIEnv *env,
   return 0;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getNamespaceURI
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNamespaceURI (JNIEnv *env,
     jobject self)
@@ -1452,11 +1148,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNamespaceURI (JNIEnv *env,
     return xmljNewString(env, node->ns->href);	
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getPrefix
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getPrefix (JNIEnv *env,
     jobject self)
@@ -1470,11 +1161,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getPrefix (JNIEnv *env,
     return xmljNewString(env, node->ns->prefix);	
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    setPrefix
- * Signature: (Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_setPrefix (JNIEnv *env,
     jobject self,
@@ -1492,11 +1178,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setPrefix (JNIEnv *env,
   node->ns->prefix = s_prefix;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getLocalName
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getLocalName (JNIEnv *env,
     jobject self)
@@ -1510,11 +1191,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getLocalName (JNIEnv *env,
     return xmljNewString(env, node->name);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    hasAttributes
- * Signature: ()Z
- */
 JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_hasAttributes (JNIEnv *env,
     jobject self)
@@ -1527,11 +1203,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_hasAttributes (JNIEnv *env,
 
 /* -- GnomeNodeList -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNodeList
- * Method:    item
- * Signature: (I)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNodeList_item (JNIEnv *env,
     jobject self,
@@ -1548,11 +1219,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNodeList_item (JNIEnv *env,
   return xmljGetNodeInstance(env, node);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNodeList
- * Method:    getLength
- * Signature: ()I
- */
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNodeList_getLength (JNIEnv *env,
     jobject self)
@@ -1573,11 +1239,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNodeList_getLength (JNIEnv *env,
 
 /* -- GnomeNotation -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNotation
- * Method:    getPublicId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNotation_getPublicId (JNIEnv *env,
     jobject self)
@@ -1591,11 +1252,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNotation_getPublicId (JNIEnv *env,
     return xmljNewString(env, notation->PublicID);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNotation
- * Method:    getSystemId
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNotation_getSystemId (JNIEnv *env,
     jobject self)
@@ -1611,11 +1267,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNotation_getSystemId (JNIEnv *env,
 
 /* -- GnomeProcessingInstruction -- */
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeProcessingInstruction
- * Method:    getData
- * Signature: ()Ljava/lang/String;
- */
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_getData (JNIEnv *env,
     jobject self)
@@ -1632,11 +1283,6 @@ Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_getData (JNIEnv *env,
   return ret;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeProcessingInstruction
- * Method:    setData
- * Signature: (Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_setData (JNIEnv *env,
     jobject self,
@@ -1650,11 +1296,6 @@ Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_setData (JNIEnv *env,
   xmlNodeSetContent(node, s_data);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_MatchingNodeList
- * Method:    item
- * Signature: (I)Lorg/w3c/dom/Node;
- */
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv *env,
     jobject self,
@@ -1697,11 +1338,6 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv *env,
   return xmljGetNodeInstance(env, node);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_dom_MatchingNodeList
- * Method:    getLength
- * Signature: ()I
- */
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv *env,
     jobject self,
@@ -1755,6 +1391,9 @@ createDocument (JNIEnv *env,
   jclass cls;
   jfieldID field;
   jobject ret;
+
+  if (doc == NULL)
+    return NULL;
   
   /* Get document object */
   ret = xmljGetNodeInstance(env, (xmlNodePtr)doc);

@@ -58,17 +58,3 @@ xmljGetStringChars(JNIEnv *env,
   return x_text;
 }
 
-void
-xmljThrowDOMException (JNIEnv* env,
-    int code,
-    const char *message)
-{
-  jclass cls;
-  jmethodID method;
-  jthrowable ex;
-
-  cls = (*env)->FindClass(env, "org/w3c/dom/DOMException");
-  method = (*env)->GetMethodID(env, cls, "<init>", "(ILjava/lang/String;)V");
-  ex = (jthrowable)(*env)->NewObject(env, cls, method, code, message);
-  (*env)->Throw(env, ex);
-}

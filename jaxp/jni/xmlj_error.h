@@ -76,5 +76,7 @@ void xmljInitErrorHandling (xmlSAXHandler * saxHandler);
 
 void xmljXsltErrorFunc (void *ctx, const char *msg, ...);
 
+void xmljThrowDOMException (JNIEnv *, int, const char *);
+
 #endif	/* !defined XMLJ_ERROR_H */
 

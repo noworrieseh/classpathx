@@ -265,7 +265,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
 
   xsltSourceDoc
     = xmljParseJavaInputStream (env, inputStream,
-				inSystemId, inPublicId, errorAdapter);
+				inSystemId, inPublicId, 0, 0, 0, NULL, errorAdapter);
   if (!(*env)->ExceptionOccurred (env))
     {
       jclass transformerExceptionClass
@@ -716,8 +716,8 @@ Java_gnu_xml_libxmlj_transform_JavaContext_parseDocument (
   jstring inSystemId, jstring inPublicId)
 {
   xmlDocPtr tree = xmljParseJavaInputStream (env, inputStream,
-					     inSystemId, inPublicId,
-					     jthis);
+					     inSystemId, inPublicId, 0, 0, 0,
+					     NULL, jthis);
   return (jlong) (int) tree;
 }
 

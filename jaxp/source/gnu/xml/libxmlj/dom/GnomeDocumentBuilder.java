@@ -26,10 +26,12 @@
  */
 package gnu.xml.libxmlj.dom;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+//import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -58,13 +60,10 @@ implements DOMImplementation
 
   // -- DocumentBuilder --
 
-  private boolean validating;
-  
-  // xmlParserCtxt
-  private int context;
-
+  private boolean validate;
+  private boolean coalesce;
+  private boolean expandEntities;
   private EntityResolver entityResolver;
-
   private ErrorHandler errorHandler;
 
   /**
@@ -84,14 +83,10 @@ implements DOMImplementation
   public GnomeDocumentBuilder(boolean validate, boolean coalesce,
       boolean expandEntities)
   {
-    validating = validate;
-    init(validate, coalesce, expandEntities);
+    this.validate = validate;
+    this.coalesce = coalesce;
+    this.expandEntities = expandEntities;
   }
-
-  private native void init(boolean validate, boolean coalesce,
-      boolean expandEntities);
-
-  protected native void finalize();
 
   public DOMImplementation getDOMImplementation()
   {
@@ -105,7 +100,7 @@ implements DOMImplementation
 
   public boolean isValidating()
   {
-    return validating;
+    return validate;
   }
 
   public Document newDocument()
@@ -113,51 +108,39 @@ implements DOMImplementation
     return createDocument(null, null, null);
   }
 
-  public Document parse(File file)
-    throws SAXException, IOException
-  {
-    String filename = file.getPath();
-    return parseFile(filename);
-  }
-
   public Document parse(InputSource input)
     throws SAXException, IOException
   {
+    InputStream in = input.getByteStream();
+    
+    // Load entire stream into memory
+    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    byte[] buf = new byte[Math.max(1024, in.available())];
+    for (int len = in.read(buf); len != -1; len = in.read(buf))
+      bout.write(buf, 0, len);
+    
+    in = new PushbackInputStream(
+        new ByteArrayInputStream(bout.toByteArray()), 50);
+    String publicId = input.getPublicId();
     String systemId = input.getSystemId();
-    if (systemId != null)
-      return parseFile(systemId);
-    else
-    {
-      InputStream in = input.getByteStream();
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      int max = in.available();
-      byte[] buf = new byte[max];
-      for (int len = in.read(buf); len != -1; len = in.read(buf))
-        out.write(buf, 0, len);
-      buf = null;
-      return parseMemory(out.toByteArray());
-    }
+    return parseStream(in, publicId, systemId, validate, coalesce,
+        expandEntities, entityResolver, errorHandler);
   }
 
-  private native Document parseFile(String filename);
+  private native Document parseStream(InputStream in, String publicId,
+      String systemId, boolean validate, boolean coalesce,
+      boolean expandEntities, EntityResolver resolver,
+      ErrorHandler errorHandler);
   
-  private native Document parseMemory(byte[] bytes);
-
   public void setEntityResolver(EntityResolver resolver)
   {
     entityResolver = resolver;
-    setCustomEntityResolver(resolver != null);
   }
-
-  private native void setCustomEntityResolver(boolean flag);
 
   public void setErrorHandler(ErrorHandler handler)
   {
     errorHandler = handler;
-    setCustomErrorHandler(handler != null);
   }
-
-  private native void setCustomErrorHandler(boolean flag);
 
   // -- DOMImplementation --
 

@@ -35,6 +35,4 @@ jstring xmljNewString (JNIEnv *, const xmlChar *);
 
 xmlChar * xmljGetStringChars (JNIEnv *, jstring);
 
-void xmljThrowDOMException (JNIEnv *, int, const char *);
-
 #endif /* !defined XMLJ_UTIL_H */
