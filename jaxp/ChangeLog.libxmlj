@@ -1,3 +1,7 @@
+2004-11-01  Chris Burdess <dog@gnu.org>
+
+	* xmlj_sax.c: Fixed segfault with external entities in transform.
+
 2004-10-06  Chris Burdess <dog@gnu.org>
 
 	* RawData.java, RawData32.java, RawData64.java: Added copyright.
