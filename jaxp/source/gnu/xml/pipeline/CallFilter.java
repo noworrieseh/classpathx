@@ -1,5 +1,5 @@
 /*
- * $Id: CallFilter.java,v 1.3 2001-10-23 17:42:25 db Exp $
+ * $Id: CallFilter.java,v 1.4 2001-11-29 22:56:34 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,7 +38,7 @@ import gnu.xml.util.Resolver;
 import gnu.xml.util.XMLWriter;
 
 
-// $Id: CallFilter.java,v 1.3 2001-10-23 17:42:25 db Exp $
+// $Id: CallFilter.java,v 1.4 2001-11-29 22:56:34 db Exp $
 
 /**
  * Input is sent as an XML request to given URI, and the output of this
@@ -81,7 +81,7 @@ import gnu.xml.util.XMLWriter;
  * @see XmlServlet
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-29 22:56:34 $
  */
 final public class CallFilter implements EventConsumer
 {
@@ -164,6 +164,9 @@ final public class CallFilter implements EventConsumer
     }
 
 
+    // JDK 1.1 seems to need it to be done this way, sigh
+    ErrorHandler getErrorHandler () { return errHandler; }
+
     //
     // Takes input and echoes to server as POST input.
     // Then sends the POST reply to the next pipeline element.
@@ -219,7 +222,7 @@ final public class CallFilter implements EventConsumer
 
 		source = new InputSource (conn.getInputStream ());
 
-// XXX if status is anything but success, report it!!  It'd be good to
+// FIXME if status is anything but success, report it!!  It'd be good to
 // save the request data just in case we need to deal with a forward.
 
 		encoding = Resolver.getEncoding (conn.getContentType ());
@@ -227,7 +230,7 @@ final public class CallFilter implements EventConsumer
 		    source.setEncoding (encoding);
 
 		producer = XMLReaderFactory.createXMLReader ();
-		producer.setErrorHandler (errHandler);
+		producer.setErrorHandler (getErrorHandler ());
 		EventFilter.bind (producer, next);
 		producer.parse (source);
 		conn = null;

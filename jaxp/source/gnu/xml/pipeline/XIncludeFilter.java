@@ -1,5 +1,5 @@
 /*
- * $Id: XIncludeFilter.java,v 1.3 2001-10-25 07:32:04 db Exp $
+ * $Id: XIncludeFilter.java,v 1.4 2001-11-29 22:56:34 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -50,7 +50,7 @@ import gnu.xml.util.Resolver;
 
 
 
-// $Id: XIncludeFilter.java,v 1.3 2001-10-25 07:32:04 db Exp $
+// $Id: XIncludeFilter.java,v 1.4 2001-11-29 22:56:34 db Exp $
 
 /**
  * Filter to process an XPointer-free subset of
@@ -80,14 +80,14 @@ import gnu.xml.util.Resolver;
  * <p>TBD: "IURI" handling.
  *
  * @author David Brownell
- * @version $Date: 2001-10-25 07:32:04 $
+ * @version $Date: 2001-11-29 22:56:34 $
  */
 public class XIncludeFilter extends EventFilter implements Locator
 {
     private Hashtable		extEntities = new Hashtable (5, 5);
     private int			ignoreCount;
-    private Locator		locator;
     private Stack		uris = new Stack ();
+    private Locator		locator;
     private Vector		inclusions = new Vector (5, 5);
     private boolean		savingPrefixes;
 
@@ -206,9 +206,9 @@ public class XIncludeFilter extends EventFilter implements Locator
 
     public void endDocument () throws SAXException
     {
-	inclusions.clear ();
+	inclusions.setSize (0);
 	extEntities.clear ();
-	uris.clear ();
+	uris.setSize (0);
 	super.endDocument ();
     }
 
@@ -408,6 +408,11 @@ public class XIncludeFilter extends EventFilter implements Locator
 	    super.skippedEntity (name);
     }
 
+    // JDK 1.1 seems to need it to be done this way, sigh
+    void setLocator (Locator l) { locator = l; }
+    Locator getLocator () { return locator; }
+    
+
     //
     // for XIncluded entities, manage the current locator and
     // filter out events that would be incorrect to report
@@ -432,14 +437,14 @@ public class XIncludeFilter extends EventFilter implements Locator
 	// maintain proxy locator
 	// only one startDocument()/endDocument() pair per event stream
 	public void setDocumentLocator (Locator l)
-	    { locator = l; }
+	    { setLocator (l); }
 	public void startDocument ()
 	    { }
 	public void endDocument ()
 	    { }
 	
 	private void reject (String message) throws SAXException
-	    { fatal (new SAXParseException (message, locator)); }
+	    { fatal (new SAXParseException (message, getLocator ())); }
 	
 	// only the DTD from the "base document" gets reported
 	public void startDTD (String root, String publicId, String systemId)
