@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.15 2002-08-12 13:11:04 raif Exp $
+   $Id: build.xml,v 1.16 2002-08-14 16:08:17 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -132,6 +132,31 @@
    </target>
 
    <!--
+   Exercise block cipher and hash algorithms to measure their performance .....
+   -->
+   <target name="speed" depends="jar"
+           description="Exercise hash and block ciphers to measure their performance">
+      <java classname="gnu.crypto.tool.CipherSpeed"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+      <java classname="gnu.crypto.tool.HashSpeed"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+   </target>
+
+   <!--
+   Exercise PRNG algorithms to measure their randomness .......................
+   -->
+   <target name="ent" depends="jar"
+           description="Test randomness of PRNG algorithms">
+      <java classname="gnu.crypto.tool.Ent"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+   </target>
+
+   <!--
+   Test vectors ...............................................................
+   -->
+   <target name="tv" depends="kat,mct,nessie"
+           description="Output NIST-compliant Known Answer and Monte-Carlo Test vectors"/>
+   <!--
    Generating test vectors and exercising algorithms the NESSIE way ...........
 
    NOTE: To fully generate the tests, including those that take _hours_,
@@ -203,52 +228,35 @@
    </target>
 
    <!--
-   Exercise block cipher and hash algorithms to measure their performance .....
-   -->
-   <target name="speed" depends="jar"
-           description="Exercise hash and block ciphers to measure their performance">
-      <java classname="gnu.crypto.tool.CipherSpeed"
-            fork="yes" failonerror="true" classpath="${main.jar}"/>
-      <java classname="gnu.crypto.tool.HashSpeed"
-            fork="yes" failonerror="true" classpath="${main.jar}"/>
-   </target>
-
-   <!--
-   Exercise PRNG algorithms to measure their randomness .......................
-   -->
-   <target name="ent" depends="jar"
-           description="Test randomness of PRNG algorithms">
-      <java classname="gnu.crypto.tool.Ent"
-            fork="yes" failonerror="true" classpath="${main.jar}"/>
-   </target>
-
-   <!--
    Generating test vectors and exercising algorithms the NIST way .............
    -->
-   <target name="tv" depends="kat,mct"
-           description="Output NIST-compliant Known Answer and Monte-Carlo Test vectors"/>
-
    <target name="kat" depends="jar"
            description="Output test vectors in compliance with NIST's KAT">
       <parallel>
          <antcall target="nist-kat">
             <param name="cipher" value="anubis"/>
+            <param name="keysize" value=""/>
          </antcall>
          <antcall target="nist-kat">
             <param name="cipher" value="rijndael"/>
+            <param name="keysize" value=""/>
          </antcall>
          <antcall target="nist-kat">
             <param name="cipher" value="serpent"/>
+            <param name="keysize" value=""/>
          </antcall>
          <antcall target="nist-kat">
             <param name="cipher" value="twofish"/>
+            <param name="keysize" value=""/>
          </antcall>
-         <!-- NIST KAT can be applied to non NIST ciphers -->
+         <!-- KAT can be applied to non NIST ciphers for 128-bit keys only -->
          <antcall target="nist-kat">
             <param name="cipher" value="khazad"/>
+            <param name="keysize" value="128"/>
          </antcall>
          <antcall target="nist-kat">
             <param name="cipher" value="square"/>
+            <param name="keysize" value="128"/>
          </antcall>
       </parallel>
    </target>
@@ -261,6 +269,7 @@
             output="tv/nist/${cipher}/ecb_vk.txt">
          <arg value="-k"/>
          <arg value="${cipher}"/>
+         <arg value="${keysize}"/>
       </java>
       <echo message="Generating NIST Variable Text KAT vectors for ${cipher}"/>
       <java classname="gnu.crypto.tool.NistKat"
@@ -268,6 +277,7 @@
             output="tv/nist/${cipher}/ecb_vt.txt">
          <arg value="-t"/>
          <arg value="${cipher}"/>
+         <arg value="${keysize}"/>
       </java>
    </target>
 
@@ -364,7 +374,7 @@
    <!--
    Make distribution ..........................................................
    -->
-   <target name="dist" depends="dist-library,dist-tv,compute-checksum"
+   <target name="dist" depends="test,dist-library,dist-tv,compute-checksum"
            description="Package the library's Software and generated Test Vectors">
    </target>
 
@@ -435,8 +445,7 @@
       <checksum file="${deliverable2}.zip" algorithm="md5" property="zip2.md5"/>
       <checksum file="${deliverable2}.tar.gz" algorithm="md5" property="tar2.gz.md5"/>
       <checksum file="${deliverable2}.tar.bz2" algorithm="md5" property="tar2.bz2.md5"/>
-      <echo file="${deliverable1}.md5" append="false">
-${zip1.md5} *${deliverable1}.zip
+      <echo file="${deliverable1}.md5" append="false">${zip1.md5} *${deliverable1}.zip
 ${tar1.gz.md5} *${deliverable1}.tar.gz
 ${tar1.bz2.md5} *${deliverable1}.tar.bz2
 ${zip2.md5} *${deliverable2}.zip
@@ -451,6 +460,7 @@ ${tar2.bz2.md5} *${deliverable2}.tar.bz2
    <target name="distclean" depends="clean"
            description="Remove all generated files including deliverables">
       <delete file="${main.jar}"/>
+      <delete file="${test.jar}"/>
       <delete dir="${docs.dir}/api"/>
    </target>
 
