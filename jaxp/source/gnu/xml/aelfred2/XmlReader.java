@@ -1,5 +1,5 @@
 /*
- * $Id: XmlReader.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: XmlReader.java,v 1.6 2001-11-05 22:55:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -37,7 +37,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.pipeline.*;
 
 
-// $Id: XmlReader.java,v 1.5 2001-10-23 17:42:25 db Exp $
+// $Id: XmlReader.java,v 1.6 2001-11-05 22:55:20 db Exp $
 
 /**
  * This SAX2 parser optionally layers a validator over the &AElig;lfred2
@@ -61,7 +61,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.ValidationConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-05 22:55:20 $
  */
 public final class XmlReader implements XMLReader
 {
@@ -182,6 +182,20 @@ public final class XmlReader implements XMLReader
 	throw new SAXNotRecognizedException (propertyId);
     }
 
+    private void forceValidating ()
+    throws SAXNotRecognizedException, SAXNotSupportedException
+    {
+	aelfred2.setFeature (
+	    SAXDriver.FEATURE + "namespace-prefixes",
+	    true);
+	aelfred2.setFeature (
+	    SAXDriver.FEATURE + "external-general-entities",
+	    true);
+	aelfred2.setFeature (
+	    SAXDriver.FEATURE + "external-parameter-entities",
+	    true);
+    }
+
     /**
      * <b>SAX2</b>:  Sets the state of features supported in this parser.
      * Note that this parser requires reporting of namespace prefixes when
@@ -199,16 +213,8 @@ public final class XmlReader implements XMLReader
 	    if (active)
 		throw new SAXNotSupportedException ("already parsing");
 	    if (state)
-		aelfred2.setFeature (
-		    SAXDriver.FEATURE + "namespace-prefixes",
-		    true);
+		forceValidating ();
 	    isValidating = state;
-	} else if (isValidating
-		&& state == false
-		&& (SAXDriver.FEATURE + "namespace-prefixes")
-		    .equals (featureId)) {
-	    throw new SAXNotSupportedException (
-		    "validating requires namespace-prefixes");
 	} else
 	    aelfred2.setFeature (featureId, state);
     }
@@ -249,8 +255,11 @@ public final class XmlReader implements XMLReader
     }
 
     /**
-     * <b>SAX1</b>: Auxiliary API to parse an XML document, used mostly
-     * when no URI is available.
+     * <b>SAX1</b>: Underlying API to parse an XML document, used
+     * directly when no URI is available.  When this is invoked,
+     * and the parser is set to validate, some features will be
+     * automatically reset to appropriate values:  for reporting
+     * namespace prefixes, and incorporating external entities.
      *
      * @param source The XML input source.
      *
@@ -273,6 +282,7 @@ public final class XmlReader implements XMLReader
 
 	// set up the output pipeline
 	if (isValidating) {
+	    forceValidating ();
 	    next = new ValidationConsumer (filter);
 	} else
 	    next = filter;
