@@ -51,7 +51,7 @@ import gnu.inet.nntp.GroupResponse;
 import gnu.inet.nntp.HeaderEntry;
 import gnu.inet.nntp.HeaderIterator;
 import gnu.inet.nntp.NNTPConstants;
-import gnu.inet.nntp.StatusResponse;
+import gnu.inet.nntp.NNTPException;
 
 /**
  * A JavaMail folder delegate for an NNTP newsgroup.
@@ -162,9 +162,9 @@ public final class NNTPFolder
       open = true;
       notifyConnectionListeners(ConnectionEvent.OPENED);
     }
-    catch (StatusResponse e)
+    catch (NNTPException e)
     {
-      if (e.getStatus()==NNTPConstants.NO_SUCH_GROUP)
+      if (e.getResponse().getStatus()==NNTPConstants.NO_SUCH_GROUP)
         throw new FolderNotFoundException(e.getMessage(), this);
       else
         throw new MessagingException(e.getMessage(), e);
@@ -207,9 +207,9 @@ public final class NNTPFolder
       }
       return true;
     }
-    catch (StatusResponse e)
+    catch (NNTPException e)
     {
-      if (e.getStatus()==NNTPConstants.NO_SUCH_GROUP)
+      if (e.getResponse().getStatus()==NNTPConstants.NO_SUCH_GROUP)
         return false;
       else
         throw new MessagingException(e.getMessage(), e);
@@ -241,9 +241,9 @@ public final class NNTPFolder
       }
       return hasNew;
     }
-    catch (StatusResponse e)
+    catch (NNTPException e)
     {
-      if (e.getStatus()==NNTPConstants.NO_SUCH_GROUP)
+      if (e.getResponse().getStatus()==NNTPConstants.NO_SUCH_GROUP)
         throw new FolderNotFoundException(e.getMessage(), this);
       else
         throw new MessagingException(e.getMessage(), e);
@@ -297,9 +297,9 @@ public final class NNTPFolder
         return m;
       }
     }
-    catch (StatusResponse e)
+    catch (NNTPException e)
     {
-      switch (e.getStatus())
+      switch (e.getResponse().getStatus())
       {
         case NNTPConstants.NO_ARTICLE_SELECTED:
         case NNTPConstants.NO_SUCH_ARTICLE_NUMBER:
@@ -371,7 +371,7 @@ public final class NNTPFolder
           acc.add(m);
         }
       }
-      catch (StatusResponse e)
+      catch (NNTPException e)
       {
         // Perhaps the server does not understand XHDR.
         // We'll do it the slow way.
@@ -389,16 +389,16 @@ public final class NNTPFolder
               articleCache.put(key, m);
               acc.add(m);
             }
-            catch (StatusResponse se)
+            catch (NNTPException e2)
             {
-              switch (se.getStatus())
+              switch (e2.getResponse().getStatus())
               {
                 case NNTPConstants.NO_ARTICLE_SELECTED:
                 case NNTPConstants.NO_SUCH_ARTICLE_NUMBER:
                 case NNTPConstants.NO_SUCH_ARTICLE:
                   break; // article does not exist, ignore
                 default:
-                  throw new MessagingException(se.getMessage(), se);
+                  throw new MessagingException(e2.getMessage(), e2);
               }
             }
             catch (IOException ie)
@@ -484,9 +484,9 @@ public final class NNTPFolder
         }
       }
     }
-    catch (StatusResponse e)
+    catch (NNTPException e)
     {
-      switch (e.getStatus())
+      switch (e.getResponse().getStatus())
       {
         case NNTPConstants.NO_GROUP_SELECTED:
           throw new IllegalStateException(e.getMessage());

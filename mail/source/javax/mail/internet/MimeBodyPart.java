@@ -40,7 +40,6 @@ import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import gnu.mail.util.CRLFOutputStream;
 
 /**
  * This class represents a MIME body part.
@@ -830,22 +829,15 @@ public class MimeBodyPart
   public void writeTo(OutputStream os)
     throws IOException, MessagingException
   {
-    // Wrap in a CRLFOutputStream
-    CRLFOutputStream crlfos = null;
-    if (os instanceof CRLFOutputStream)
-      crlfos = (CRLFOutputStream)os;
-    else
-      crlfos = new CRLFOutputStream(os);
-    
     // Write the headers
     for (Enumeration e = getAllHeaderLines();
         e.hasMoreElements(); )
     {
-      crlfos.write((String)e.nextElement());
-      crlfos.writeln();
+      String line = (String)e.nextElement();
+      os.write(line.getBytes("US-ASCII"));
+      os.write(0x0d);
     }
-    crlfos.writeln();
-    crlfos.flush();
+    os.write(0x0d);
 
     // Write the content
     os = MimeUtility.encode(os, getEncoding());

@@ -191,8 +191,8 @@ source/gnu/mail/providers/maildir/MaildirStore.java
 # The main jar file.
 GNUMAILJAR = gnumail.jar
 
-# The NNTP client library.
-NNTPLIBJAR = lib/nntplib.jar
+# The GNU classpath inetlib library.
+INETLIBJAR = lib/inetlib.jar
 
 # The META stuff
 MAIL_META = \
@@ -252,44 +252,44 @@ MAIL_CLASSPATH = lib/activation.jar
 # Targets for the various tools
 $(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(INETLIBJAR) \
 		   JARCOMPILER_JAR=@JAR@ \
                          ./jarcompiler $(GNUMAILJAR)
 
 imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler imap.jar
 
 smtp.jar: $(GNUMAILJAR) $(SMTP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler smtp.jar
 
 pop3.jar: $(GNUMAILJAR) $(POP3_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler pop3.jar
 
 nntp.jar: $(GNUMAILJAR) $(NNTP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(NNTPLIBJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler nntp.jar
 
 maildir.jar: $(GNUMAILJAR) $(MAILDIR_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler maildir.jar
 
 mbox.jar: $(GNUMAILJAR) $(MBOX_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(INETLIBJAR) \
                          ./jarcompiler mbox.jar
 
 # Remove jar file

@@ -35,7 +35,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import javax.mail.Header;
 import javax.mail.MessagingException;
-import gnu.mail.util.LineInputStream;
+
+import gnu.inet.util.LineInputStream;
 
 /**
  * InternetHeaders is a utility class that manages RFC822 style headers.

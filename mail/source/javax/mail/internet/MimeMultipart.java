@@ -40,8 +40,9 @@ import javax.mail.MessageContext;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.MultipartDataSource;
-import gnu.mail.util.CRLFOutputStream;
-import gnu.mail.util.LineInputStream;
+
+import gnu.inet.util.CRLFOutputStream;
+import gnu.inet.util.LineInputStream;
 
 /**
  * The MimeMultipart class is an implementation of the abstract Multipart 

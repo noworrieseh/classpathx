@@ -50,7 +50,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
-import gnu.mail.util.CRLFOutputStream;
+
 import gnu.mail.util.RFC2822OutputStream;
 
 /**

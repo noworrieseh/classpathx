@@ -30,6 +30,7 @@ package gnu.mail.providers.pop3;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.List;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -37,6 +38,8 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
+
+import gnu.inet.pop3.POP3Connection;
 
 /**
  * The storage class implementing the POP3 mail protocol.
@@ -58,6 +61,11 @@ public final class POP3Store
 	 * The root folder.
 	 */
   POP3Folder root;
+
+  /**
+   * If rue, disable use of APOP.
+   */
+  boolean disableApop;
 
   /**
    * Constructor.
@@ -85,6 +93,7 @@ public final class POP3Store
       port = getIntProperty("port");
     if (host==null || username==null || password==null)
       return false;
+    disableApop = false;
     synchronized (this)
     {
       try
@@ -95,17 +104,31 @@ public final class POP3Store
 						connectionTimeout, timeout, session.getDebug());
         // Disable APOP if necessary
         if (propertyIsFalse("apop"))
-          connection.timestamp = null;
-        if (!propertyIsFalse("tls"))
+          disableApop = true;
+        // Get capabilities
+        List capa = connection.capa();
+        if (capa!=null)
         {
-          List capa = connection.capa();
-          if (capa!=null)
-          {
-            if (capa.contains(POP3Connection.STLS))
+          if (!propertyIsFalse("tls") && capa.contains("STLS"))
               connection.stls();
+          // Try SASL authentication
+          // TODO user ordering of mechanisms
+          for (Iterator i = capa.iterator(); i.hasNext(); )
+          {
+            String cap = (String)i.next();
+            if (cap.startsWith("SASL "))
+            {
+              cap = cap.substring(5);
+              if (connection.auth(cap, username, password))
+                return true;
+            }
           }
         }
-				return connection.authenticate(username, password);
+        // Fall back to APOP or login
+        if (!disableApop)
+          return connection.apop(username, password);
+        else
+          return connection.login(username, password);
       }
       catch (UnknownHostException e)
       {

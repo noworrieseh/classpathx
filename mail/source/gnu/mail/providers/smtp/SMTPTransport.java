@@ -40,7 +40,10 @@ import javax.mail.event.TransportEvent;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import gnu.mail.util.Logger;
+import gnu.inet.smtp.Parameter;
+import gnu.inet.smtp.ParameterList;
+import gnu.inet.smtp.SMTPConnection;
+import gnu.inet.util.Logger;
 
 /** 
  * This transport handles communications with an SMTP server.
@@ -120,7 +123,8 @@ public class SMTPTransport
       if (propertyIsFalse("ehlo"))
       {
         if (!connection.helo(localHostName))
-          throw new MessagingException("HELO failed: "+connection.response);
+          throw new MessagingException("HELO failed: "+
+              connection.getLastResponse());
       }
       else
       {
@@ -128,7 +132,8 @@ public class SMTPTransport
         if (extensions==null)
         {
           if (!connection.helo(localHostName))
-            throw new MessagingException("HELO failed: "+connection.response);
+            throw new MessagingException("HELO failed: "+
+                connection.getLastResponse());
         }
         else
         {
@@ -143,7 +148,7 @@ public class SMTPTransport
               while (st.hasMoreTokens())
                 authenticationMechanisms.add(st.nextToken());
             }
-            else if (SMTPConnection.STARTTLS.equals(extension))
+            else if ("STARTTLS".equals(extension))
             {
               if (!propertyIsFalse("tls"))
               {
@@ -161,19 +166,13 @@ public class SMTPTransport
       {
         if (username!=null && password!=null)
         {
-          // TODO more authentication mechanisms eg CRAM-MD5
-          if (authenticationMechanisms.contains("LOGIN"))
+          // TODO user ordering preferences for auth mechanisms
+          for (Iterator i = authenticationMechanisms.iterator(); i.hasNext(); )
           {
-            if (connection.authLogin(username, password))
-              return (connection.ehlo(localHostName)!=null);
+            String mechanism = (String)i.next();
+            if (connection.authenticate(mechanism, username, password))
+              return true;
           }
-          else if (authenticationMechanisms.contains("PLAIN"))
-            return connection.authPlain(username, password);
-          else
-					{
-						Logger logger = Logger.getInstance();
-            logger.log("smtp", "No supported authentication mechanisms");
-					}
         }
         return false;
       }
@@ -247,7 +246,7 @@ public class SMTPTransport
         }
         // MAIL FROM
         if (!connection.mailFrom(reversePath, params))
-          throw new SendFailedException(connection.response);
+          throw new SendFailedException(connection.getLastResponse());
         params = null;
        
         // DSN NOTIFY
@@ -313,7 +312,7 @@ public class SMTPTransport
         // DATA
         OutputStream dataStream = connection.data();
         if (dataStream==null)
-          throw new MessagingException(connection.response);
+          throw new MessagingException(connection.getLastResponse());
         mimeMessage.writeTo(dataStream);
         dataStream.flush();
         if (connection.finishData())

@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.4 2003-09-21 12:01:19 dog Exp $
+$Id: build.xml,v 1.5 2003-10-20 18:49:13 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -42,7 +42,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 	<property name='mbox.jar' location='mbox.jar'/>
 	<property name='maildir.jar' location='maildir.jar'/>
 	<property name='activation.jar' location='${lib}/activation.jar'/>
-	<property name='nntplib.jar' location='${lib}/nntplib.jar'/>
+	<property name='inetlib.jar' location='${lib}/inetlib.jar'/>
 	<property name='META-INF' location='${build}/META-INF'/>
 	<property name='address.map' location='${META-INF}/javamail.address.map'/>
 	<property name='providers' location='${META-INF}/javamail.providers'/>
@@ -51,16 +51,12 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 	<path id='mail.classpath'>
 		<pathelement path='${classpath}'/>
 		<pathelement path='${activation.jar}'/>
+		<pathelement path='${inetlib.jar}'/>
 	</path>
 	
 	<path id='provider.classpath'>
 		<path refid='mail.classpath'/>
 		<pathelement path='${build}'/>
-	</path>
-
-	<path id='nntp.classpath'>
-		<path refid='provider.classpath'/>
-		<pathelement path='${nntplib.jar}'/>
 	</path>
 
 	<!-- Targets -->
@@ -114,7 +110,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 
 	<target name='nntp' depends='gnumail' unless='disable-nntp'>
 		<javac srcdir='${src}' destdir='${build}'>
-			<classpath refid='nntp.classpath'/>
+			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/nntp/*.java'/>
 		</javac>
 		<echo file='${address.map}'>rfc822=nntp-post'

@@ -61,8 +61,8 @@ import javax.mail.event.FolderEvent;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import gnu.mail.util.LineInputStream;
 
+import gnu.inet.util.LineInputStream;
 import gnu.mail.treeutil.StatusEvent;
 
 /**

@@ -52,6 +52,10 @@ import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.ParameterList;
 import javax.mail.internet.MimeMessage;
 
+import gnu.inet.imap.IMAPConnection;
+import gnu.inet.imap.IMAPConstants;
+import gnu.inet.imap.MessageStatus;
+import gnu.inet.imap.Pair;
 import gnu.mail.providers.ReadOnlyMessage;
 
 /**
@@ -60,7 +64,7 @@ import gnu.mail.providers.ReadOnlyMessage;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.0
  */
-public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
+public final class IMAPMessage extends ReadOnlyMessage
 {
 
   static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
@@ -121,7 +125,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchFlags()
     throws MessagingException
   {
-    String[] commands = new String[] { FLAGS };
+    String[] commands = new String[] { IMAPConstants.FLAGS };
     fetch(commands);
   }
 
@@ -131,7 +135,8 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchHeaders()
     throws MessagingException
   {
-    String[] commands = new String[] { FETCH_HEADERS, INTERNALDATE };
+    String[] commands = new String[] { FETCH_HEADERS,
+      IMAPConstants.INTERNALDATE };
     fetch(commands);
   }
 
@@ -141,7 +146,8 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchContent()
     throws MessagingException
   {
-    String[] commands = new String[] { FETCH_CONTENT, INTERNALDATE };
+    String[] commands = new String[] { FETCH_CONTENT,
+      IMAPConstants.INTERNALDATE };
     fetch(commands);
   }
 
@@ -151,7 +157,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchMultipart()
     throws MessagingException
   {
-    String[] commands = new String[] { BODYSTRUCTURE };
+    String[] commands = new String[] { IMAPConstants.BODYSTRUCTURE };
     fetch(commands);
   }
 
@@ -209,7 +215,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       else
         throw new MessagingException("Unexpected status item: "+item);
       
-      if (key==BODY || key==RFC822)
+      if (key==IMAPConstants.BODY || key==IMAPConstants.RFC822)
       {
         byte[] literal = (byte[])code.get(i+1);
         int plen = params.size();
@@ -229,13 +235,13 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
             else
               throw new MessagingException("Unexpected status item: "+pitem);
 
-            if (pkey==HEADER)
+            if (pkey==IMAPConstants.HEADER)
             {
               InputStream in = new ByteArrayInputStream(literal);
               headers = createInternetHeaders(in);
               headersComplete = true;
             }
-            else if (pkey==HEADER_FIELDS)
+            else if (pkey==IMAPConstants.HEADER_FIELDS)
             {
               if (!headersComplete)
               {
@@ -248,52 +254,52 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
           }
         }
       }
-      else if (key==RFC822_HEADER)
+      else if (key==IMAPConstants.RFC822_HEADER)
       {
         byte[] literal = (byte[])code.get(i+1);
         InputStream in = new ByteArrayInputStream(literal);
         headers = createInternetHeaders(in);
         headersComplete = true;
       }
-      else if (key==BODYSTRUCTURE)
+      else if (key==IMAPConstants.BODYSTRUCTURE)
       {
         List mlist = (List)code.get(i+1);
         if (headers==null)
           headers = new InternetHeaders();
         multipart = parseMultipart(mlist, this, headers, null);
       }
-      else if (key==ENVELOPE)
+      else if (key==IMAPConstants.ENVELOPE)
       {
         // TODO
       }
-      else if (key==FLAGS)
+      else if (key==IMAPConstants.FLAGS)
       {
         List fl = (List)code.get(i+1);
         flags = new Flags();
         for (Iterator j = fl.iterator(); j.hasNext(); )
         {
           Object f = j.next();
-          if (f==FLAG_ANSWERED)
+          if (f==IMAPConstants.FLAG_ANSWERED)
             flags.add(Flags.Flag.ANSWERED);
-          else if (f==FLAG_DELETED)
+          else if (f==IMAPConstants.FLAG_DELETED)
             flags.add(Flags.Flag.DELETED);
-          else if (f==FLAG_DRAFT)
+          else if (f==IMAPConstants.FLAG_DRAFT)
             flags.add(Flags.Flag.DRAFT);
-          else if (f==FLAG_FLAGGED)
+          else if (f==IMAPConstants.FLAG_FLAGGED)
             flags.add(Flags.Flag.FLAGGED);
-          else if (f==FLAG_RECENT)
+          else if (f==IMAPConstants.FLAG_RECENT)
             flags.add(Flags.Flag.RECENT);
-          else if (f==FLAG_SEEN)
+          else if (f==IMAPConstants.FLAG_SEEN)
             flags.add(Flags.Flag.SEEN);
           else if (f instanceof String)
             flags.add((String)f);
         }
       }
-      else if (key==INTERNALDATE)
+      else if (key==IMAPConstants.INTERNALDATE)
       {
         internalDate = (String)code.get(i+1);
       }
-      else if (key==UID)
+      else if (key==IMAPConstants.UID)
       {
         // TODO
       }
@@ -448,7 +454,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
 
   String parseAtom(Object value)
   {
-    if (value instanceof String && !(value.equals(NIL)))
+    if (value instanceof String && !(value.equals(IMAPConstants.NIL)))
       return (String)value;
     return null;
   }
@@ -666,17 +672,17 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       {
         Flags.Flag f = sflags[i];
         if (f==Flags.Flag.ANSWERED)
-          iflags.add(FLAG_ANSWERED);
+          iflags.add(IMAPConstants.FLAG_ANSWERED);
         else if (f==Flags.Flag.DELETED)
-          iflags.add(FLAG_DELETED);
+          iflags.add(IMAPConstants.FLAG_DELETED);
         else if (f==Flags.Flag.DRAFT)
-          iflags.add(FLAG_DRAFT);
+          iflags.add(IMAPConstants.FLAG_DRAFT);
         else if (f==Flags.Flag.FLAGGED)
-          iflags.add(FLAG_FLAGGED);
+          iflags.add(IMAPConstants.FLAG_FLAGGED);
         else if (f==Flags.Flag.RECENT)
-          iflags.add(FLAG_RECENT);
+          iflags.add(IMAPConstants.FLAG_RECENT);
         else if (f==Flags.Flag.SEEN)
-          iflags.add(FLAG_SEEN);
+          iflags.add(IMAPConstants.FLAG_SEEN);
       }
       iflags.addAll(Arrays.asList(uflags));
       String[] aflags = new String[iflags.size()];
@@ -685,7 +691,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       IMAPStore store = (IMAPStore)folder.getStore();
       int[] messages = new int[] { msgnum };
       MessageStatus[] ms =
-        store.getConnection().store(messages, FLAGS, aflags);
+        store.getConnection().store(messages, IMAPConstants.FLAGS, aflags);
       for (int i=0; i<ms.length; i++)
       {
         if (ms[i].getMessageNumber()==msgnum)

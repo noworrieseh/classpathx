@@ -40,7 +40,7 @@ import javax.mail.MessagingException;
 import gnu.inet.nntp.Group;
 import gnu.inet.nntp.GroupIterator;
 import gnu.inet.nntp.NNTPConstants;
-import gnu.inet.nntp.StatusResponse;
+import gnu.inet.nntp.NNTPException;
 
 /**
  * The &quot;root&quot; folder of the NNTP newsgroup list.
@@ -104,9 +104,9 @@ extends Folder
         acc.toArray(folders);
         return folders;
       }
-      catch (StatusResponse e)
+      catch (NNTPException e)
       {
-        switch (e.getStatus())
+        switch (e.getResponse().getStatus())
         {
           case NNTPConstants.COMMAND_NOT_RECOGNIZED:
           case NNTPConstants.SYNTAX_ERROR:

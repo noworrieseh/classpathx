@@ -35,6 +35,7 @@ import javax.activation.DataHandler;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
 
+import gnu.inet.pop3.POP3Connection;
 import gnu.mail.providers.ReadOnlyMessage;
 
 /**

@@ -42,10 +42,11 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+
+import gnu.inet.util.LineInputStream;
 import gnu.mail.util.Base64InputStream;
 import gnu.mail.util.Base64OutputStream;
 import gnu.mail.util.BOutputStream;
-import gnu.mail.util.LineInputStream;
 import gnu.mail.util.QInputStream;
 import gnu.mail.util.QOutputStream;
 import gnu.mail.util.QPInputStream;

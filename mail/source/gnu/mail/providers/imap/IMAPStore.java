@@ -29,6 +29,7 @@ package gnu.mail.providers.imap;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.List;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -38,6 +39,9 @@ import javax.mail.StoreClosedException;
 import javax.mail.URLName;
 import javax.mail.event.StoreEvent;
 
+import gnu.inet.imap.IMAPConnection;
+import gnu.inet.imap.IMAPConstants;
+
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
  *
@@ -46,7 +50,6 @@ import javax.mail.event.StoreEvent;
  */
 public class IMAPStore
   extends Store
-  implements IMAPConstants
 {
 
   /**
@@ -105,12 +108,22 @@ public class IMAPStore
         List capabilities = connection.capability();
         if (!propertyIsFalse("tls"))
         {
-          if (capabilities.contains(STARTTLS))
+          if (capabilities.contains(IMAPConstants.STARTTLS))
             connection.starttls();
         }
-        if (capabilities.contains("AUTH="+CRAM_MD5))
-          return connection.authenticate_CRAM_MD5(username, password);
-        else if (!capabilities.contains(LOGINDISABLED))
+        // Try SASL authentication
+        // TODO user ordering of mechanisms
+        for (Iterator i = capabilities.iterator(); i.hasNext(); )
+        {
+          String cap = (String)i.next();
+          if (cap.startsWith("AUTH="))
+          {
+            cap = cap.substring(5);
+            if (connection.authenticate(cap, username, password))
+              return true;
+          }
+        }
+        if (!capabilities.contains(IMAPConstants.LOGINDISABLED))
           return connection.login(username, password);
         else
           return false; // sorry

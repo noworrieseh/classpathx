@@ -41,8 +41,7 @@ import javax.mail.URLName;
 import gnu.inet.nntp.FileNewsrc;
 import gnu.inet.nntp.Newsrc;
 import gnu.inet.nntp.NNTPConnection;
-
-import gnu.mail.util.Logger;
+import gnu.inet.util.Logger;
 
 /**
  * An NNTP store provider.

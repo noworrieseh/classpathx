@@ -37,6 +37,11 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 
+import gnu.inet.imap.IMAPConnection;
+import gnu.inet.imap.IMAPConstants;
+import gnu.inet.imap.MessageStatus;
+import gnu.inet.imap.Pair;
+
 /**
  * A MIME body part of an IMAP multipart message.
  *

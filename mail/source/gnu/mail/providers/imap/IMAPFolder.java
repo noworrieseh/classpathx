@@ -72,6 +72,12 @@ import javax.mail.search.SizeTerm;
 import javax.mail.search.StringTerm;
 import javax.mail.search.SubjectTerm;
 
+import gnu.inet.imap.IMAPConnection;
+import gnu.inet.imap.IMAPConstants;
+import gnu.inet.imap.ListEntry;
+import gnu.inet.imap.MailboxStatus;
+import gnu.inet.imap.MessageStatus;
+
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
  *
@@ -80,7 +86,6 @@ import javax.mail.search.SubjectTerm;
  */
 public class IMAPFolder 
   extends Folder
-  implements IMAPConstants
 {
 
   /**
@@ -172,17 +177,17 @@ public class IMAPFolder
     for (int i=0; i<len; i++)
     {
       String flag = (String)sflags.get(i);
-      if (flag==FLAG_ANSWERED)
+      if (flag==IMAPConstants.FLAG_ANSWERED)
         flags.add(Flags.Flag.ANSWERED);
-      else if (flag==FLAG_DELETED)
+      else if (flag==IMAPConstants.FLAG_DELETED)
         flags.add(Flags.Flag.DELETED);
-      else if (flag==FLAG_DRAFT)
+      else if (flag==IMAPConstants.FLAG_DRAFT)
         flags.add(Flags.Flag.DRAFT);
-      else if (flag==FLAG_FLAGGED)
+      else if (flag==IMAPConstants.FLAG_FLAGGED)
         flags.add(Flags.Flag.FLAGGED);
-      else if (flag==FLAG_RECENT)
+      else if (flag==IMAPConstants.FLAG_RECENT)
         flags.add(Flags.Flag.RECENT);
-      else if (flag==FLAG_SEEN)
+      else if (flag==IMAPConstants.FLAG_SEEN)
         flags.add(Flags.Flag.SEEN);
       // user flags?
     }
@@ -514,7 +519,7 @@ public class IMAPFolder
       if (mode==-1 || messageCount<0)
       {
         String[] items = new String[1];
-        items[0] = IMAPConnection.MESSAGES;
+        items[0] = IMAPConstants.MESSAGES;
         synchronized (connection)
         {
           ms = connection.status(path, items);
@@ -554,7 +559,7 @@ public class IMAPFolder
       if (mode==-1 || newMessageCount<0)
       {
         String[] items = new String[1];
-        items[0] = IMAPConnection.RECENT;
+        items[0] = IMAPConstants.RECENT;
         synchronized (connection)
         {
           ms = connection.status(path, items);
@@ -670,8 +675,8 @@ public class IMAPFolder
       l.add(hbuf.toString());
     }
     if (fp.contains(FetchProfile.Item.FLAGS))
-      l.add(FLAGS);
-    l.add(INTERNALDATE); // for received date
+      l.add(IMAPConstants.FLAGS);
+    l.add(IMAPConstants.INTERNALDATE); // for received date
     int llen = l.size();
     if (llen==0)
       return; // no commands to send: don't bother the server
@@ -792,14 +797,14 @@ public class IMAPFolder
     }
     else if (term instanceof OrTerm)
     {
-      list.add(SEARCH_OR);
+      list.add(IMAPConstants.SEARCH_OR);
       SearchTerm[] terms = ((OrTerm)term).getTerms();
       for (int i=0; i<terms.length; i++)
         addTerm(terms[i], list);
     }
     else if (term instanceof NotTerm)
     {
-      list.add(SEARCH_NOT);
+      list.add(IMAPConstants.SEARCH_NOT);
       addTerm(((NotTerm)term).getTerm(), list);
     }
     else if (term instanceof FlagTerm)
@@ -813,24 +818,31 @@ public class IMAPFolder
       {
         Flags.Flag ff = sf[i];
         if (ff==Flags.Flag.ANSWERED)
-          list.add(set ? SEARCH_ANSWERED : SEARCH_UNANSWERED);
+          list.add(set ? IMAPConstants.SEARCH_ANSWERED :
+              IMAPConstants.SEARCH_UNANSWERED);
         else if (ff==Flags.Flag.DELETED)
-          list.add(set ? SEARCH_DELETED : SEARCH_UNDELETED);
+          list.add(set ? IMAPConstants.SEARCH_DELETED :
+              IMAPConstants.SEARCH_UNDELETED);
         else if (ff==Flags.Flag.DRAFT)
-          list.add(set ? SEARCH_DRAFT : SEARCH_UNDRAFT);
+          list.add(set ? IMAPConstants.SEARCH_DRAFT :
+              IMAPConstants.SEARCH_UNDRAFT);
         else if (ff==Flags.Flag.FLAGGED)
-          list.add(set ? SEARCH_FLAGGED : SEARCH_UNFLAGGED);
+          list.add(set ? IMAPConstants.SEARCH_FLAGGED :
+              IMAPConstants.SEARCH_UNFLAGGED);
         else if (ff==Flags.Flag.RECENT)
-          list.add(set ? SEARCH_RECENT : SEARCH_OLD);
+          list.add(set ? IMAPConstants.SEARCH_RECENT :
+              IMAPConstants.SEARCH_OLD);
         else if (ff==Flags.Flag.SEEN)
-          list.add(set ? SEARCH_SEEN : SEARCH_UNSEEN);
+          list.add(set ? IMAPConstants.SEARCH_SEEN :
+              IMAPConstants.SEARCH_UNSEEN);
       }
       // Keywords
       String[] uf = f.getUserFlags();
       for (int i=0; i<uf.length; i++)
       {
         StringBuffer keyword = new StringBuffer();
-        keyword.append(set ? SEARCH_KEYWORD : SEARCH_UNKEYWORD);
+        keyword.append(set ? IMAPConstants.SEARCH_KEYWORD :
+            IMAPConstants.SEARCH_UNKEYWORD);
         keyword.append('"');
         keyword.append(uf[i]);
         keyword.append('"');
@@ -842,16 +854,16 @@ public class IMAPFolder
       Address address = ((AddressTerm)term).getAddress();
       StringBuffer criterion = new StringBuffer();
       if (term instanceof FromTerm)
-        criterion.append(SEARCH_FROM);
+        criterion.append(IMAPConstants.SEARCH_FROM);
       else if (term instanceof RecipientTerm)
       {
         Message.RecipientType type = ((RecipientTerm)term).getRecipientType();
         if (type==Message.RecipientType.TO)
-          criterion.append(SEARCH_TO);
+          criterion.append(IMAPConstants.SEARCH_TO);
         else if (type==Message.RecipientType.CC)
-          criterion.append(SEARCH_CC);
+          criterion.append(IMAPConstants.SEARCH_CC);
         else if (type==Message.RecipientType.BCC)
-          criterion.append(SEARCH_BCC);
+          criterion.append(IMAPConstants.SEARCH_BCC);
         else
           criterion = null;
       }
@@ -879,7 +891,7 @@ public class IMAPFolder
           case ComparisonTerm.NE:
           case ComparisonTerm.GE:
           case ComparisonTerm.LE:
-            criterion.append(SEARCH_NOT);
+            criterion.append(IMAPConstants.SEARCH_NOT);
             criterion.append(' ');
         }
         if (term instanceof SentDateTerm)
@@ -888,15 +900,15 @@ public class IMAPFolder
         {
           case ComparisonTerm.EQ:
           case ComparisonTerm.NE:
-            criterion.append(SEARCH_ON);
+            criterion.append(IMAPConstants.SEARCH_ON);
             break;
           case ComparisonTerm.LT:
           case ComparisonTerm.GE:
-            criterion.append(SEARCH_BEFORE);
+            criterion.append(IMAPConstants.SEARCH_BEFORE);
             break;
           case ComparisonTerm.GT:
           case ComparisonTerm.LE:
-            criterion.append(SEARCH_SINCE);
+            criterion.append(IMAPConstants.SEARCH_SINCE);
             break;
         }
         criterion.append(' ');
@@ -916,32 +928,32 @@ public class IMAPFolder
             case ComparisonTerm.EQ:
             case ComparisonTerm.GE:
             case ComparisonTerm.LE:
-              criterion.append(SEARCH_NOT);
+              criterion.append(IMAPConstants.SEARCH_NOT);
               criterion.append(' ');
           }
           switch (comparison)
           {
             case ComparisonTerm.EQ:
             case ComparisonTerm.NE:
-              criterion.append(SEARCH_OR);
+              criterion.append(IMAPConstants.SEARCH_OR);
               criterion.append(' ');
-              criterion.append(SEARCH_SMALLER);
+              criterion.append(IMAPConstants.SEARCH_SMALLER);
               criterion.append(' ');
               criterion.append(number);
               criterion.append(' ');
-              criterion.append(SEARCH_LARGER);
+              criterion.append(IMAPConstants.SEARCH_LARGER);
               criterion.append(' ');
               criterion.append(number);
               break;
             case ComparisonTerm.LT:
             case ComparisonTerm.GE:
-              criterion.append(SEARCH_SMALLER);
+              criterion.append(IMAPConstants.SEARCH_SMALLER);
               criterion.append(' ');
               criterion.append(number);
               break;
             case ComparisonTerm.GT:
             case ComparisonTerm.LE:
-              criterion.append(SEARCH_LARGER);
+              criterion.append(IMAPConstants.SEARCH_LARGER);
               criterion.append(' ');
               criterion.append(number);
               break;
@@ -955,18 +967,18 @@ public class IMAPFolder
       String pattern = ((StringTerm)term).getPattern();
       StringBuffer criterion = new StringBuffer();
       if (term instanceof BodyTerm)
-        criterion.append(SEARCH_BODY);
+        criterion.append(IMAPConstants.SEARCH_BODY);
       else if (term instanceof HeaderTerm)
       {
-        criterion.append(SEARCH_HEADER);
+        criterion.append(IMAPConstants.SEARCH_HEADER);
         criterion.append(' ');
         criterion.append(((HeaderTerm)term).getHeaderName());
       }
       else if (term instanceof SubjectTerm)
-        criterion.append(SEARCH_SUBJECT);
+        criterion.append(IMAPConstants.SEARCH_SUBJECT);
       else if (term instanceof MessageIDTerm)
       {
-        criterion.append(SEARCH_HEADER);
+        criterion.append(IMAPConstants.SEARCH_HEADER);
         criterion.append(' ');
         criterion.append("Message-ID");
       }

@@ -40,7 +40,7 @@ import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
 
-import gnu.mail.util.Logger;
+import gnu.inet.util.Logger;
 
 /**
  * The storage class implementing the Mbox mailbox file format.

@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 
+import gnu.inet.util.LineInputStream;
 
 /** 
  * A stream that does UU Decoding.

@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import gnu.mail.util.Logger;
+import gnu.inet.util.Logger;
 
 /**
  * The Session class represents a mail session and is not subclassed.

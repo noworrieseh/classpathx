@@ -40,6 +40,8 @@ import javax.mail.MessagingException;
 import javax.mail.Store;
 import javax.mail.event.ConnectionEvent;
 
+import gnu.inet.pop3.POP3Connection;
+
 /**
  * The folder class implementing the POP3 mail protocol.
  *

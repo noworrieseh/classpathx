@@ -28,6 +28,7 @@
 package gnu.mail.providers.nntp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
@@ -39,7 +40,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.NewsAddress;
 
 import gnu.inet.nntp.NNTPConnection;
-import gnu.inet.nntp.PostStream;
 
 /**
  * An NNTP transport provider.
@@ -164,7 +164,7 @@ public class NNTPTransport extends Transport
     {
       synchronized (connection)
       {
-        PostStream out = connection.post();
+        OutputStream out = connection.post();
         message.writeTo(out);
         out.close();
       }
