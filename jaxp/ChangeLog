@@ -1,3 +1,8 @@
+2004-05-05  Chris Burdess	<dog@gnu.org>
+
+	* Makefile.am, acinclude.m4: Added gcjh detection. Makefile will now
+	rebuild out of date JNI headers and gnujaxp.jar.
+
 2004-04-22  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
 	* source: sources directory has been moved to source directory,
