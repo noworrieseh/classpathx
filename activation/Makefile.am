@@ -89,7 +89,7 @@ javadoc:
 		-sourcepath $(src) $(package_names)
 
 clean-local:
-	rm -rf $(META_INF_FILES) $(META_INF) $(doc)
+	rm -rf $(META_INF_FILES) $(META_INF) $(doc) $(activation_jar)
 	find $(dst) -name '*.class' -exec rm -f '{}' ';'
 
 distclean-local: clean-local
