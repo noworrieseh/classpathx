@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSSignature.java,v 1.2 2002-01-11 21:34:55 raif Exp $
+// $Id: DSSSignature.java,v 1.3 2002-01-21 10:09:35 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -31,8 +31,9 @@ package gnu.crypto.sig.dss;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
+import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.hash.Sha160;
-import gnu.crypto.sig.ISignature;
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.util.PRNG;
 import java.math.BigInteger;
 import java.security.PrivateKey;
@@ -97,28 +98,19 @@ import java.util.HashMap;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class DSSSignature implements ISignature, Cloneable {
+public class DSSSignature extends BaseSignature {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   /** The public key to use when verifying signatures. */
-   private DSAPublicKey publicKey;
-
-   /** The private key to use when generating signatures (signing). */
-   private DSAPrivateKey privateKey;
-
-   /** The SHS instance to use for digesting messages when signing/verifying. */
-   private Sha160 sha;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
 
    /** Trivial 0-arguments constructor. */
    public DSSSignature() {
-      super();
+      super(Registry.DSS_SIG, new Sha160());
    }
 
    /** Private constructor for cloning purposes. */
@@ -127,66 +119,41 @@ public class DSSSignature implements ISignature, Cloneable {
 
       this.publicKey = that.publicKey;
       this.privateKey = that.privateKey;
-      this.sha = that.sha == null ? null : (Sha160) that.sha.clone();
+      this.md = (IMessageDigest) that.md.clone();
    }
 
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Cloneable interface implementation
+   // Implementation of abstract methods in superclass
    // -------------------------------------------------------------------------
 
    public Object clone() {
       return new DSSSignature(this);
    }
 
-   // gnu.crypto.sig.ISignature interface implementation
-   // -------------------------------------------------------------------------
-
-   public String name() {
-      return Registry.DSS_SIG;
-   }
-
-   public void setupVerify(PublicKey key) throws IllegalArgumentException {
-      if (!(key instanceof DSAPublicKey)) {
+   protected void setupForVerification(PublicKey k)
+   throws IllegalArgumentException {
+      if (!(k instanceof DSAPublicKey)) {
          throw new IllegalArgumentException();
       }
-      init();
-      publicKey = (DSAPublicKey) key;
+      this.publicKey = (DSAPublicKey) k;
    }
 
-   public void setupSign(PrivateKey key) throws IllegalArgumentException {
-      if (!(key instanceof DSAPrivateKey)) {
+   protected void setupForSigning(PrivateKey k)
+   throws IllegalArgumentException {
+      if (!(k instanceof DSAPrivateKey)) {
          throw new IllegalArgumentException();
       }
-      init();
-      privateKey = (DSAPrivateKey) key;
+      this.privateKey = (DSAPrivateKey) k;
    }
 
-   public void update(byte b) {
-      if (sha == null) {
-         throw new IllegalStateException();
-      }
-      sha.update(b);
-   }
-
-   public void update(byte[] b, int off, int len) {
-      if (sha == null) {
-         throw new IllegalStateException();
-      }
-      sha.update(b, off, len);
-   }
-
-   public Object sign() {
-      if (sha == null || privateKey == null) {
-         throw new IllegalStateException();
-      }
-
-      BigInteger p = privateKey.getParams().getP();
-      BigInteger q = privateKey.getParams().getQ();
-      BigInteger g = privateKey.getParams().getG();
-      BigInteger x = privateKey.getX();
-      BigInteger m = new BigInteger(1, sha.digest());
+   protected Object generateSignature() throws IllegalStateException {
+      BigInteger p = ((DSAPrivateKey) privateKey).getParams().getP();
+      BigInteger q = ((DSAPrivateKey) privateKey).getParams().getQ();
+      BigInteger g = ((DSAPrivateKey) privateKey).getParams().getG();
+      BigInteger x = ((DSAPrivateKey) privateKey).getX();
+      BigInteger m = new BigInteger(1, md.digest());
       BigInteger k, r, s;
 
       byte[] kb = new byte[20]; // we'll use 159 bits only
@@ -208,22 +175,18 @@ public class DSSSignature implements ISignature, Cloneable {
       return encodeSignature(r, s);
    }
 
-   public boolean verify(Object sig) {
-      if (sha == null || publicKey == null) {
-         throw new IllegalStateException();
-      }
-
+   protected boolean verifySignature(Object sig) throws IllegalStateException {
       BigInteger[] dsa = decodeSignature(sig);
       BigInteger r = dsa[0];
       BigInteger s = dsa[1];
 
-      BigInteger g = publicKey.getParams().getG();
-      BigInteger p = publicKey.getParams().getP();
-      BigInteger q = publicKey.getParams().getQ();
-      BigInteger y = publicKey.getY();
+      BigInteger g = ((DSAPublicKey) publicKey).getParams().getG();
+      BigInteger p = ((DSAPublicKey) publicKey).getParams().getP();
+      BigInteger q = ((DSAPublicKey) publicKey).getParams().getQ();
+      BigInteger y = ((DSAPublicKey) publicKey).getY();
       BigInteger w = s.modInverse(q);
 
-      byte bytes[] = sha.digest();
+      byte bytes[] = md.digest();
       BigInteger u1 = w.multiply(new BigInteger(1, bytes)).mod(q);
       BigInteger u2 = r.multiply(w).mod(q);
 
@@ -234,17 +197,6 @@ public class DSSSignature implements ISignature, Cloneable {
    // Other instance methods
    // -------------------------------------------------------------------------
 
-   /** Initialises the internal fields of this instance. */
-   private void init() {
-      if (sha != null) {
-         sha.reset();
-      } else {
-         sha = new Sha160();
-      }
-      publicKey = null;
-      privateKey = null;
-   }
-
    /**
     * Returns the output of a signature generation phase.<p>
     *
@@ -254,7 +206,6 @@ public class DSSSignature implements ISignature, Cloneable {
    private Object encodeSignature(BigInteger r, BigInteger s) {
       return new BigInteger[] {r, s};
    }
-
 
    /**
     * Returns the output of a previously generated signature object as a pair

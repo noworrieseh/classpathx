@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: RSAPSSSignature.java,v 1.1 2002-01-11 21:21:57 raif Exp $
+// $Id: RSAPSSSignature.java,v 1.2 2002-01-21 10:11:17 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto.sig.rsa;
 import gnu.crypto.Registry;
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
-import gnu.crypto.sig.ISignature;
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.util.Util;
 
 import java.io.PrintWriter;
@@ -62,9 +62,9 @@ import java.util.HashMap;
  * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
  * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RSAPSSSignature implements ISignature, Cloneable {
+public class RSAPSSSignature extends BaseSignature {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
@@ -80,18 +80,6 @@ public class RSAPSSSignature implements ISignature, Cloneable {
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   /** The public key to use when verifying signatures. */
-   private RSAPublicKey publicKey;
-
-   /** The private key to use when generating signatures (signing). */
-   private RSAPrivateKey privateKey;
-
-   /**
-    * The message digest algorithm instance to use for digesting messages when
-    * signing/verifying.
-    */
-   private IMessageDigest hash;
-
    /** The underlying EMSA-PSS instance for this object. */
    private EMSA_PSS pss;
 
@@ -103,7 +91,7 @@ public class RSAPSSSignature implements ISignature, Cloneable {
     * 0-octet <i>salt</i>.
     */
    public RSAPSSSignature() {
-      this(HashFactory.SHA160_HASH, 0);
+      this(Registry.SHA160_HASH, 0);
    }
 
    /**
@@ -126,70 +114,48 @@ public class RSAPSSSignature implements ISignature, Cloneable {
     * decoding signatures.
     */
    public RSAPSSSignature(String mdName, int sLen) {
-      super();
+      super(Registry.RSA_PSS_SIG, HashFactory.getInstance(mdName));
 
-      hash = HashFactory.getInstance(mdName);
       pss = EMSA_PSS.getInstance(mdName, sLen);
    }
 
    /** Private constructor for cloning purposes. */
    private RSAPSSSignature(RSAPSSSignature that) {
-      this();
+      this(that.md.name());
 
       this.publicKey = that.publicKey;
       this.privateKey = that.privateKey;
-      try {
-         this.hash = (IMessageDigest) that.hash.clone();
-      } catch (CloneNotSupportedException ignored) { // we do
-      }
+      this.md = (IMessageDigest) that.md.clone();
       this.pss = (EMSA_PSS) that.pss.clone();
    }
 
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Cloneable interface implementation
+   // Implementation of abstract methods in superclass
    // -------------------------------------------------------------------------
 
    public Object clone() {
       return new RSAPSSSignature(this);
    }
 
-   // gnu.crypto.sig.ISignature interface implementation
-   // -------------------------------------------------------------------------
-
-   public String name() {
-      return Registry.RSA_PSS_SIG;
-   }
-
-   public void setupVerify(PublicKey key) throws IllegalArgumentException {
-      if (!(key instanceof RSAPublicKey)) {
+   protected void setupForVerification(PublicKey k)
+   throws IllegalArgumentException {
+      if (!(k instanceof RSAPublicKey)) {
          throw new IllegalArgumentException();
       }
-      init();
-      publicKey = (RSAPublicKey) key;
+      publicKey = (RSAPublicKey) k;
    }
 
-   public void setupSign(PrivateKey key) throws IllegalArgumentException {
-      if (!(key instanceof RSAPrivateKey)) {
+   protected void setupForSigning(PrivateKey k)
+   throws IllegalArgumentException {
+      if (!(k instanceof RSAPrivateKey)) {
          throw new IllegalArgumentException();
       }
-      init();
-      privateKey = (RSAPrivateKey) key;
+      privateKey = (RSAPrivateKey) k;
    }
 
-   public void update(byte b) {
-      hash.update(b);
-   }
-
-   public void update(byte[] b, int off, int len) {
-      hash.update(b, off, len);
-   }
-
-   public Object sign() {
-      if (privateKey == null) {
-         throw new IllegalStateException();
-      }
+   protected Object generateSignature() throws IllegalStateException {
       // 1. Apply the EMSA-PSS encoding operation to the message M to produce an
       //    encoded message EM of length CEILING((modBits ? 1)/8) octets such
       //    that the bit length of the integer OS2IP(EM) is at most modBits ? 1:
@@ -198,8 +164,8 @@ public class RSAPSSSignature implements ISignature, Cloneable {
       //    modBits ? 1 is divisible by 8. If the encoding operation outputs
       //    'message too long' or 'encoding error,' then output 'message too
       //    long' or 'encoding error' and stop.
-      int modBits = privateKey.getModulus().bitLength();
-      byte[] EM = pss.encode(hash.digest(), modBits - 1);
+      int modBits = ((RSAPrivateKey) privateKey).getModulus().bitLength();
+      byte[] EM = pss.encode(md.digest(), modBits - 1);
       if (DEBUG && debuglevel > 8) {
          debug("EM (sign): "+Util.toString(EM));
       }
@@ -217,14 +183,14 @@ public class RSAPSSSignature implements ISignature, Cloneable {
       return encodeSignature(s, k);
    }
 
-   public boolean verify(Object sig) {
+   protected boolean verifySignature(Object sig) throws IllegalStateException {
       if (publicKey == null) {
          throw new IllegalStateException();
       }
       byte[] S = decodeSignature(sig);
       // 1. If the length of the signature S is not k octets, output 'signature
       //    invalid' and stop.
-      int modBits = publicKey.getModulus().bitLength();
+      int modBits = ((RSAPublicKey) publicKey).getModulus().bitLength();
       int k = (modBits + 7) / 8;
       if (S.length != k) {
          return false;
@@ -266,7 +232,7 @@ public class RSAPSSSignature implements ISignature, Cloneable {
       //    encoded message EM: Result = EMSA-PSS-Decode(M, EM, emBits). If
       //    Result = 'consistent,' output 'signature verified.' Otherwise,
       //    output 'signature invalid.'
-      byte[] mHash = hash.digest();
+      byte[] mHash = md.digest();
       boolean result = false;
       try {
          result = pss.decode(mHash, EM, emBits);
@@ -278,13 +244,6 @@ public class RSAPSSSignature implements ISignature, Cloneable {
 
    // Other instance methods
    // -------------------------------------------------------------------------
-
-   /** Initialises the internal fields of this instance. */
-   private void init() {
-      hash.reset();
-      publicKey = null;
-      privateKey = null;
-   }
 
    /**
     * Converts the <i>signature representative</i> <code>s</code> to a signature
