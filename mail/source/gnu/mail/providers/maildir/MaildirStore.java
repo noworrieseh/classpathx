@@ -1,6 +1,6 @@
 /*
- * MboxStore.java
- * Copyright (C) 1999 Chris Burdess <dog@gnu.org>
+ * MaildirStore.java
+ * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.mbox;
+package gnu.mail.providers.maildir;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,43 +41,25 @@ import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
 
 /**
- * The storage class implementing the Mbox mailbox file format.
+ * The storage class implementing the Maildir mailbox format.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public final class MboxStore 
+public final class MaildirStore 
   extends Store 
   implements StatusSource
 {
 
   private static final char separatorChar = '/';
   
-  static int fetchsize = 1024;
-  static boolean attemptFallback = true;
-
   private List statusListeners = new ArrayList();
 	
   /**
    * Constructor.
    */
-  public MboxStore(Session session, URLName urlname) 
+  public MaildirStore(Session session, URLName urlname) 
   {
     super(session, urlname);
-    String fs = session.getProperty("mail.mbox.fetchsize");
-    if (fs!=null) 
-    {
-      try 
-      { 
-        fetchsize = Math.max(Integer.parseInt(fs), 1024); 
-      } 
-      catch (NumberFormatException e) 
-      {
-        log("fetchsize "+fs+" is not a number");
-      }
-    }
-    String af = session.getProperty("mail.mbox.attemptFallback");
-    if (af!=null) 
-      attemptFallback = Boolean.valueOf(af).booleanValue();
   }
 	
   /**
@@ -108,25 +90,22 @@ public final class MboxStore
         return getFolder(file);
     }
     // Otherwise attempt to return a sensible root folder.
-    String mailhome = session.getProperty("mail.mbox.mailhome");
-    if (mailhome == null)
+    String home = session.getProperty("mail.maildir.home");
+    if (home==null)
     {
       try
       {
-        String userhome = System.getProperty("user.home");
-        mailhome = userhome+"/Mail"; // elm
-        if (!exists(mailhome))
-          mailhome = userhome+"/mail";
-        if (!exists(mailhome))
-          mailhome = null;
+        home = System.getProperty("user.home");
+        if (!exists(home))
+          home = null;
       } 
       catch (SecurityException e) 
       {
         log("access denied reading system properties");
-        mailhome = "/";
       }
     }
-    return getFolder(mailhome);
+    home = toFilename(home);
+    return new MaildirFolder(this, home, true, false);
   }
 
   /**
@@ -139,26 +118,16 @@ public final class MboxStore
     if ("inbox".equalsIgnoreCase(filename)) 
     {
       // First try the session property mail.mbox.inbox.
-      String inboxname = session.getProperty("mail.mbox.inbox");
-      if (!exists(inboxname))
-        inboxname = null;
-      if (inboxname==null && attemptFallback) 
+      String maildir = session.getProperty("mail.maildir.maildir");
+      if (!isMaildir(maildir))
       {
         // Try some common (UNIX) locations.
         try 
         {
-          String username = System.getProperty("user.name");
-          inboxname = "/var/mail/"+username; // GNU
-          if (!exists(inboxname))
-            inboxname = "/var/spool/mail/"+username; // common alternative
-          if (!exists(inboxname))
-          {
-            inboxname = null;
-            String userhome = System.getProperty("user.home");
-            inboxname = userhome+"/Mailbox"; // qmail etc
-          }
-          if (!exists(inboxname))
-            inboxname = null;
+          String userhome = System.getProperty("user.home");
+          maildir = userhome+"/Maildir";
+          if (!isMaildir(maildir))
+            maildir = null;
         } 
         catch (SecurityException e) 
         {
@@ -166,15 +135,22 @@ public final class MboxStore
           log("unable to access system properties");
         }
       }
-      if (inboxname!=null)
+      if (maildir!=null)
       {
-        filename = inboxname;
+        filename = maildir;
         inbox = true;
       }
       // otherwise we assume it is actually a file called "inbox"
     }
-    
-    // convert into a valid filename for this platform
+    filename = toFilename(filename);
+    return new MaildirFolder(this, filename, false, inbox);
+  }
+
+  /*
+   * Convert into a valid filename for this platform
+   */
+  String toFilename(String filename)
+  {
     StringBuffer buf = new StringBuffer();
     if (filename.length()<1 || filename.charAt(0)!=separatorChar)
       buf.append(File.separator);
@@ -182,9 +158,7 @@ public final class MboxStore
       buf.append(filename.replace(separatorChar, File.separatorChar));
     else
       buf.append(filename);
-    filename = buf.toString();
-    
-    return new MboxFolder(this, filename, inbox);
+    return buf.toString();
   }
 
   /*
@@ -200,6 +174,16 @@ public final class MboxStore
       return file.exists();
     }
     return false;
+  }
+
+  private boolean isMaildir(String path)
+  {
+    if (path==null)
+      return false;
+    File file = new File(path);
+    if (separatorChar!=File.separatorChar)
+      file = new File(path.replace(separatorChar, File.separatorChar));
+    return file.exists() && file.isDirectory();
   }
 
   /**
@@ -222,7 +206,7 @@ public final class MboxStore
   void log(String message)
   {
     if (session.getDebug())
-      System.out.println("mbox: "+message);
+      System.out.println("maildir: "+message);
   }
 
   // -- StatusSource --

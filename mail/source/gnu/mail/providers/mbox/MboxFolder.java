@@ -68,8 +68,7 @@ import gnu.mail.treeutil.StatusEvent;
 /**
  * The folder class implementing a UNIX mbox-format mailbox.
  *
- * @author dog@dog.net.uk
- * @version 2.0
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class MboxFolder 
   extends Folder 

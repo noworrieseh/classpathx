@@ -37,8 +37,7 @@ import gnu.mail.providers.ReadOnlyMessage;
 /**
  * The message class implementing the Mbox mail protocol.
  *
- * @author dog@dog.net.uk
- * @version 2.0
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class MboxMessage 
   extends ReadOnlyMessage 

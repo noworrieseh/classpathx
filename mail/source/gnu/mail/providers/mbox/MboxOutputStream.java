@@ -36,8 +36,7 @@ import java.io.OutputStream;
  * This will only work reliably for messages with &lt;4096 bytes in any one
  * line.
  *
- * @author dog@dog.net.uk
- * @version 2.0
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 class MboxOutputStream 
   extends FilterOutputStream 
