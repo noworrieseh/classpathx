@@ -1,3 +1,7 @@
+2004-11-19  Chris Burdess  <dog@gnu.org>
+
+   	* transform: OASIS XSLT conformance improvements.
+   	
 2004-11-18  Chris Burdess  <dog@gnu.org>
 
    	* ls: Implemented more of FilteredSAXEventSink.

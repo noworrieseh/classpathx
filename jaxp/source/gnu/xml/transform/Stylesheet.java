@@ -380,9 +380,37 @@ class Stylesheet
     String uas = getAttribute(attrs, "use-attribute-sets");
     if (uas != null)
       {
+        // Merge the two use-attribute-sets specifiers,
+        // ensuring that only one of each name is present
+        String oldUas = (String) usedAttributeSets.get(name);
+        if (oldUas != null)
+          {
+            Set set = new LinkedHashSet();
+            StringTokenizer st = new StringTokenizer(oldUas, " ");
+            while (st.hasMoreTokens())
+              {
+                set.add(st.nextToken());
+              }
+            st = new StringTokenizer(uas, " ");
+            while (st.hasMoreTokens())
+              {
+                set.add(st.nextToken());
+              }
+            StringBuffer buf = new StringBuffer();
+            for (Iterator i = set.iterator(); i.hasNext(); )
+              {
+                if (buf.length() != 0)
+                  {
+                    buf.append(' ');
+                  }
+                buf.append(i.next());
+              }
+            uas = buf.toString();
+          }
         usedAttributeSets.put(name, uas);
       }
-    TemplateNode last = null;
+    // Create the attribute-set template node(s)
+    TemplateNode last = (TemplateNode) attributeSets.get(name);
     for (Node ctx = node.getLastChild(); ctx != null;
          ctx = ctx.getPreviousSibling())
       {

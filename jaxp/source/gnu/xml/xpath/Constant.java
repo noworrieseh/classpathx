@@ -45,13 +45,13 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class Constant
+public final class Constant
   extends Expr
 {
 
   final Object value;
 
-  Constant(Object value)
+  public Constant(Object value)
   {
     this.value = value;
   }

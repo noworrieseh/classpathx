@@ -55,31 +55,31 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class IdFunction
+public final class IdFunction
   extends Expr
 {
 
-	final Expr arg;
+  final Expr arg;
 
-	IdFunction(List args)
-	{
-		this((Expr) args.get(0));
-	}
+  IdFunction(List args)
+  {
+    this((Expr) args.get(0));
+  }
 
-	IdFunction(Expr arg)
-	{
-		this.arg = arg;
-	}
+  public IdFunction(Expr arg)
+  {
+    this.arg = arg;
+  }
 
-	public Object evaluate(Node context, int pos, int len)
-	{
-		Object val = arg.evaluate(context, pos, len);
-		return _id(context, val);
-	}
+  public Object evaluate(Node context, int pos, int len)
+  {
+    Object val = arg.evaluate(context, pos, len);
+    return _id(context, val);
+  }
 
-	public String toString()
-	{
-		return "id(" + arg + ")";
-	}
-	
+  public String toString()
+  {
+    return "id(" + arg + ")";
+  }
+  
 }

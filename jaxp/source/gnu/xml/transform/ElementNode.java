@@ -95,6 +95,13 @@ final class ElementNode
       {
         parent.appendChild(element);
       }
+    // Children have priority over used attribute sets
+    if (children != null)
+      {
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       element, null);
+      }
     if (uas != null)
       {
         StringTokenizer st = new StringTokenizer(uas, " ");
@@ -103,12 +110,6 @@ final class ElementNode
             addAttributeSet(stylesheet, mode, context, pos, len,
                             element, null, st.nextToken());
           }
-      }
-    if (children != null)
-      {
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       element, null);
       }
     if (next != null)
       {
@@ -125,9 +126,12 @@ final class ElementNode
   {
     TemplateNode attribute =
       (TemplateNode) stylesheet.attributeSets.get(attributeSet);
-    attribute.apply(stylesheet, mode,
-                    context, pos, len,
-                    parent, nextSibling);
+    if (attribute != null)
+      {
+        attribute.apply(stylesheet, mode,
+                        context, pos, len,
+                        parent, nextSibling);
+      }
     String uas = (String) stylesheet.usedAttributeSets.get(attributeSet);
     if (uas != null)
       {

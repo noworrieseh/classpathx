@@ -81,27 +81,41 @@ final class AttributeNode
                fragment, null);
     // Use XPath string-value of fragment
     String value = Expr.stringValue(fragment);
-    // Insert attribute
-    Attr attr = (namespace != null) ?
-      doc.createAttributeNS(namespace, value) :
-      doc.createAttribute(value);
     NamedNodeMap attrs = parent.getAttributes();
-    if (attrs != null)
+    // Only insert if no existing attribute is present
+    boolean insert = (namespace != null) ?
+      (attrs.getNamedItemNS(namespace, value) == null) :
+          (attrs.getNamedItem(value) == null);
+    if ("http://www.w3.org/2000/xmlns/".equals(namespace) ||
+        "xmlns".equals(value) ||
+        value.startsWith("xmlns:"))
       {
-        if (namespace != null)
-          {
-            attrs.setNamedItemNS(attr);
-          }
-        else
-          {
-            attrs.setNamedItem(attr);
-          }
+        // Namespace declaration, do not output
+        insert = false;
       }
-    if (children != null)
+    if (insert)
       {
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       attr, null);
+        // Insert attribute
+        Attr attr = (namespace != null) ?
+          doc.createAttributeNS(namespace, value) :
+              doc.createAttribute(value);
+        if (attrs != null)
+          {
+            if (namespace != null)
+              {
+                attrs.setNamedItemNS(attr);
+              }
+            else
+              {
+                attrs.setNamedItem(attr);
+              }
+          }
+        if (children != null)
+          {
+            children.apply(stylesheet, mode,
+                           context, pos, len,
+                           attr, null);
+          }
       }
     if (next != null)
       {

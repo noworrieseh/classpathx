@@ -38,8 +38,10 @@
 
 package gnu.xml.transform;
 
+import java.util.StringTokenizer;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -51,9 +53,12 @@ final class CopyNode
   extends TemplateNode
 {
 
-  CopyNode(TemplateNode children, TemplateNode next)
+  final String uas;
+
+  CopyNode(TemplateNode children, TemplateNode next, String uas)
   {
     super(children, next);
+    this.uas = uas;
   }
 
   void doApply(Stylesheet stylesheet, String mode,
@@ -65,19 +70,40 @@ final class CopyNode
       parent.getOwnerDocument();
     Node copy = context.cloneNode(false);
     copy = doc.adoptNode(copy);
-    if (nextSibling != null)
+    if (copy.getNodeType() == Node.ATTRIBUTE_NODE)
       {
-        parent.insertBefore(copy, nextSibling);
+        NamedNodeMap attrs = parent.getAttributes();
+        if (attrs != null)
+          {
+            attrs.setNamedItemNS(copy);
+          }
       }
     else
       {
-        parent.appendChild(copy);
+        if (nextSibling != null)
+          {
+            parent.insertBefore(copy, nextSibling);
+          }
+        else
+          {
+            parent.appendChild(copy);
+          }
       }
+    // Children have priority over used attribute sets
     if (children != null)
       {
         children.apply(stylesheet, mode,
                        context, pos, len,
                        copy, null);
+      }
+    if (uas != null)
+      {
+        StringTokenizer st = new StringTokenizer(uas, " ");
+        while (st.hasMoreTokens())
+          {
+            addAttributeSet(stylesheet, mode, context, pos, len,
+                            copy, null, st.nextToken());
+          }
       }
     if (next != null)
       {
@@ -87,6 +113,31 @@ final class CopyNode
       }
   }
   
+  void addAttributeSet(Stylesheet stylesheet, String mode,
+                       Node context, int pos, int len,
+                       Node parent, Node nextSibling, String attributeSet)
+    throws TransformerException
+  {
+    TemplateNode attribute =
+      (TemplateNode) stylesheet.attributeSets.get(attributeSet);
+    if (attribute != null)
+      {
+        attribute.apply(stylesheet, mode,
+                        context, pos, len,
+                        parent, nextSibling);
+      }
+    String uas = (String) stylesheet.usedAttributeSets.get(attributeSet);
+    if (uas != null)
+      {
+        StringTokenizer st = new StringTokenizer(uas, " ");
+        while (st.hasMoreTokens())
+          {
+            addAttributeSet(stylesheet, mode, context, pos, len,
+                            parent, nextSibling, st.nextToken());
+          }
+      }
+  }
+
   public String toString()
   {
     StringBuffer buf = new StringBuffer(getClass().getName());

@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
@@ -72,6 +73,8 @@ final class CopyOfNode
     throws TransformerException
   {
     Object ret = select.evaluate(context, pos, len);
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
     if (ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
@@ -79,14 +82,27 @@ final class CopyOfNode
         Collections.sort(list, documentOrderComparator);
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
-            Node node = (Node) i.next();
-            if (nextSibling != null)
+            Node src = (Node) i.next();
+            Node node = src.cloneNode(false);
+            node = doc.adoptNode(node);
+            if (node.getNodeType() == Node.ATTRIBUTE_NODE)
               {
-                parent.insertBefore(node, nextSibling);
+                NamedNodeMap attrs = parent.getAttributes();
+                if (attrs != null)
+                  {
+                    attrs.setNamedItemNS(node);
+                  }
               }
             else
               {
-                parent.appendChild(node);
+                if (nextSibling != null)
+                  {
+                    parent.insertBefore(node, nextSibling);
+                  }
+                else
+                  {
+                    parent.appendChild(node);
+                  }
               }
           }
       }
@@ -95,8 +111,6 @@ final class CopyOfNode
         String value = Expr._string(context, ret);
         if (value != null && value.length() > 0)
           {
-            Document doc = (parent instanceof Document) ?
-              (Document) parent : parent.getOwnerDocument();
             Text textNode = doc.createTextNode(value);
             if (nextSibling != null)
               {

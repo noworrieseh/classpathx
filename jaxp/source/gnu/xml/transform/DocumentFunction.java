@@ -54,8 +54,10 @@ import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Constant;
 import gnu.xml.xpath.Expr;
-import gnu.xml.xpath.FunctionCall;
+import gnu.xml.xpath.Function;
+import gnu.xml.xpath.IdFunction;
 
 /**
  * The XSLT <code>document()</code>function.
@@ -63,11 +65,13 @@ import gnu.xml.xpath.FunctionCall;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 final class DocumentFunction
-  implements XPathFunction
+  extends Expr
+  implements Function, XPathFunction
 {
 
   final Stylesheet stylesheet;
   final Node base;
+  List values;
 
   DocumentFunction(Stylesheet stylesheet, Node base)
   {
@@ -78,10 +82,21 @@ final class DocumentFunction
   public Object evaluate(List args)
     throws XPathFunctionException
   {
-    switch (args.size())
+    values = args;
+    return evaluate(null, 1, 1);
+  }
+
+  public void setValues(List values)
+  {
+    this.values = values;
+  }
+  
+  public Object evaluate(Node context, int pos, int len)
+  {
+    switch (values.size())
       {
       case 1:
-        Object arg = args.get(0);
+        Object arg = values.get(0);
         if (arg instanceof Collection)
           {
             Collection ns = (Collection) arg;
@@ -96,15 +111,15 @@ final class DocumentFunction
           }
         else
           {
-            String s = Expr._string(null, arg);
+            String s = Expr._string(context, arg);
             return document(s, baseURI(base));
           }
       case 2:
-        Object arg1 = args.get(0);
-        Object arg2 = args.get(1);
+        Object arg1 = values.get(0);
+        Object arg2 = values.get(1);
         if (!(arg2 instanceof Collection))
           {
-            throw new XPathFunctionException("second argument is not a node-set");
+            throw new RuntimeException("second argument is not a node-set");
           }
         Collection arg2ns = (Collection) arg2;
         String base2 = arg2ns.isEmpty() ? null :
@@ -127,7 +142,7 @@ final class DocumentFunction
             return document(s, base2);
           }
       default:
-        throw new XPathFunctionException("invalid arity");
+        throw new RuntimeException("invalid arity");
       }
   }
 
@@ -158,9 +173,8 @@ final class DocumentFunction
    * @param base the base URI for relative URIs
    */
   Collection document(String uri, String base)
-    throws XPathFunctionException
   {
-    if ("".equals(uri))
+    if ("".equals(uri) || uri == null)
       {
         uri = baseURI(this.base);
       }
@@ -174,40 +188,39 @@ final class DocumentFunction
         uri = uri.substring(0, hi);
         // TODO handle xpointer() here
         // this only handles IDs
-        fragment = new FunctionCall(stylesheet, "id",
-                                    Collections.singletonList(f));
+        fragment = new IdFunction(new Constant(f));
       }
 
     // Get document source
     try
       {
-				DOMSource source;
-				XSLURIResolver resolver = stylesheet.factory.resolver;
-				synchronized (resolver)
-				  {
-						if (stylesheet.transformer != null)
-						  {
-								resolver.setUserResolver(stylesheet.transformer.uriResolver);
-								resolver.setUserListener(stylesheet.transformer.errorListener);
-							}
-						source = resolver.resolveDOM(null, base, uri);
-					}
-				Node node = source.getNode();
-				if (fragment == null)
-				  {
-						return Collections.singleton(node);
-					}
-				else
-				  {
-						Object ret = fragment.evaluate(node, 1, 1);
-						if (!(ret instanceof Collection))
-						  {
-								// XXX Report error?
-								return Collections.EMPTY_SET;
-							}
-						return (Collection) ret;
-					}
-			}
+        DOMSource source;
+        XSLURIResolver resolver = stylesheet.factory.resolver;
+        synchronized (resolver)
+          {
+            if (stylesheet.transformer != null)
+              {
+                resolver.setUserResolver(stylesheet.transformer.uriResolver);
+                resolver.setUserListener(stylesheet.transformer.errorListener);
+              }
+            source = resolver.resolveDOM(null, base, uri);
+          }
+        Node node = source.getNode();
+        if (fragment == null)
+          {
+            return Collections.singleton(node);
+          }
+        else
+          {
+            Object ret = fragment.evaluate(node, 1, 1);
+            if (!(ret instanceof Collection))
+              {
+                // XXX Report error?
+                return Collections.EMPTY_SET;
+              }
+            return (Collection) ret;
+          }
+      }
     catch (TransformerException e)
       {
         String msg = "can't open " + uri;
@@ -215,7 +228,7 @@ final class DocumentFunction
           {
             msg += " with base " + base;
           }
-        throw new XPathFunctionException(msg);
+        throw new RuntimeException(msg);
       }
   }
   

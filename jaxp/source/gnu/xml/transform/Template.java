@@ -290,7 +290,7 @@ class Template
     NamedNodeMap attrs = node.getAttributes();
     String name = getRequiredAttribute(attrs, "name", node);
     String ns = getAttribute(attrs, "namespace");
-    String uas = getAttribute(attrs, "used-attribute-sets");
+    String uas = getAttribute(attrs, "use-attribute-sets");
     TemplateNode n = stylesheet.parseAttributeValueTemplate(name, node);
     return new ElementNode(parse(children), parse(next), n, ns, uas);
   }
@@ -318,6 +318,17 @@ class Template
     String doe = getAttribute(attrs, "disable-output-escaping");
     boolean d = "yes".equals(doe);
     return new TextNode(parse(children), parse(next), d);
+  }
+  
+  /**
+   * copy
+   */
+  TemplateNode parseCopy(Node node, Node children, Node next)
+    throws TransformerConfigurationException, XPathExpressionException
+  {
+    NamedNodeMap attrs = node.getAttributes();
+    String uas = getAttribute(attrs, "use-attribute-sets");
+    return new CopyNode(parse(children), parse(next), uas);
   }
   
   /**
@@ -466,7 +477,7 @@ class Template
               }
             else if ("copy".equals(name))
               {
-                return new CopyNode(parse(children), parse(next));
+                return parseCopy(node, children, next);
               }
             else if ("processing-instruction".equals(name))
               {
@@ -563,19 +574,19 @@ class Template
                 for (int i = 0; i < len; i++)
                   {
                     Node attr = attrs.item(i);
-                    if (Stylesheet.XSL_NS.equals(attr.getNamespaceURI()) &&
+                    String ns = attr.getNamespaceURI();
+                    String aname = attr.getNodeName();
+                    if (Stylesheet.XSL_NS.equals(ns) &&
                         "use-attribute-sets".equals(attr.getLocalName()))
                       {
                         continue;
                       }
                     String value = attr.getNodeValue();
-                    String aname = attr.getNodeName();
                     TemplateNode grandchild =
                       stylesheet.parseAttributeValueTemplate(value, node);
                     TemplateNode n =
                       stylesheet.parseAttributeValueTemplate(aname, node);
-                    child = new AttributeNode(grandchild, child,
-                                              n, attr.getNamespaceURI());
+                    child = new AttributeNode(grandchild, child, n, ns);
                   }
                 String ename = node.getNodeName();
                 TemplateNode n =

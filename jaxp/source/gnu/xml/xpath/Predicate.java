@@ -58,6 +58,12 @@ class Predicate
 
   public boolean matches(Node node, int pos, int len)
   {
+    Object ret = expr.evaluate(node, pos, len);
+    if (ret instanceof Double)
+      {
+        // Same as [position() = x]
+        return ((Double) ret).intValue() == pos;
+      }
     return expr._boolean(node, expr.evaluate(node, pos, len));
   }
 

@@ -587,7 +587,7 @@ public class DomDocument
     else if (namespaceURI == null && name.indexOf(':') != -1)
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,
-                        "prefixed name needs a URI", this, 0);
+                        "prefixed name '" + name + "' needs a URI", this, 0);
       }
     
     Element  element = new DomElement(this, namespaceURI, name);

@@ -50,14 +50,14 @@ final class PositionFunction
   extends Expr
 {
 
-	public Object evaluate(Node context, int pos, int len)
-	{
-		return new Double((double) pos);
-	}
+  public Object evaluate(Node context, int pos, int len)
+  {
+    return new Double((double) pos);
+  }
 
-	public String toString()
-	{
-		return "position()";
-	}
-	
+  public String toString()
+  {
+    return "position()";
+  }
+  
 }
