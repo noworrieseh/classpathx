@@ -60,8 +60,33 @@ public abstract class TransformerFactory {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+	public abstract Source getAssociatedStylesheet(Source source, 
+		String media, String title, String charset) 
+		throws TransformerConfigurationException;
+
+	public abstract Object getAttribute(String name) 
+		throws IllegalArgumentException;
+
+	public abstract ErrorListener getErrorListener();
+
+	public abstract boolean getFeature(String name);
+
+	public abstract URIResolver getURIResolver();
+
+
+	/**
+	 * Returns a new TransformerFactory.  The name of this class
+	 * is found by checking, in order:
+	 * the <em>javax.xml.transform.TransformerFactory</em>
+	 *	system property,
+	 * <em>$JAVA_HOME/lib/jaxp.properties</em> for the key with
+	 *	that same name,
+	 * <em>JAR files in the class path with a <em>META-INF/services</em>
+	 *	file with that same name,
+	 * else the compiled-in platform default.
+	 */
 	public static TransformerFactory newInstance() 
-			throws TFactoryConfigurationError {
+			throws TransformerFactoryConfigurationError {
 
 		// Variables
 		Class			classObject;
@@ -69,7 +94,9 @@ public abstract class TransformerFactory {
 
 		// Locate Factory
 		foundFactory = findFactory(defaultPropName, 
-			"org.apache.xalan.processor.TransformerFactoryImpl");
+			"com.icl.saxon.TransformerFactoryImpl"
+			// "org.apache.xalan.processor.TransformerFactoryImpl"
+			);
 
 		try {
 
@@ -77,50 +104,43 @@ public abstract class TransformerFactory {
 			classObject = Class.forName(foundFactory);
 
 			// Instantiate Class
-			factory = (TransformerFactory) classObject.newInstance();
+			factory = (TransformerFactory)
+				    classObject.newInstance();
 
 			// Return Instance
 			return factory;
 
 		} catch (Exception e) {
-			throw new TFactoryConfigurationError(e);
+			throw new TransformerFactoryConfigurationError(e);
 		} // try		
 
-	} // newInstance()
+	}
 
-	public abstract Transformer newTransformer(Source source) 
+
+	public abstract Templates newTemplates(Source source) 
 		throws TransformerConfigurationException;
 
 	public abstract Transformer newTransformer() 
 		throws TransformerConfigurationException;
 
-	public abstract Templates newTemplates(Source source) 
+	public abstract Transformer newTransformer(Source source) 
 		throws TransformerConfigurationException;
 
-	public abstract Source getAssociatedStylesheet(Source source, 
-		String media, String title, String charset) 
-		throws TransformerConfigurationException;
-
-	public abstract void setURIResolver(URIResolver resolver);
-
-	public abstract URIResolver getURIResolver();
-
-	public abstract boolean getFeature(String name);
 
 	public abstract void setAttribute(String name, Object value)
-		throws IllegalArgumentException;
-
-	public abstract Object getAttribute(String name) 
 		throws IllegalArgumentException;
 
 	public abstract void setErrorListener(ErrorListener listener) 
 		throws IllegalArgumentException;
 
-	public abstract ErrorListener getErrorListener();
+	public abstract void setURIResolver(URIResolver resolver);
 
-	private static String findFactory(String property, String defaultValue) {
 
-		// Variables
+	// internals
+
+	private static String
+	findFactory (String property, String defaultValue)
+	{
 		String		factory;
 		String		javaHome;
 		File		file;
@@ -136,25 +156,28 @@ public abstract class TransformerFactory {
 		try {
 			if (factory == null) {
 				javaHome = System.getProperty("java.home");
-				file = new File(new File(javaHome, "lib"), "jaxp.properties");
+				file = new File (new File (javaHome, "lib"),
+						"jaxp.properties");
 				if (file.exists() == true) {
 					props = new Properties();
 					props.load(new FileInputStream(file));
 					factory = props.getProperty(property);
-				} // if
-			} // if
+				}
+			}
 		} catch (Exception e1) {
-		} // try
+		}
 
 		// Check Services API
 		try {
 			if (factory == null) {
 
 				// Get Class Loader for Accessing resources
-				loader = TransformerFactory.class.getClassLoader();
+				loader = TransformerFactory.class
+						.getClassLoader();
 				if (loader == null) {
-					loader = ClassLoader.getSystemClassLoader();
-				} // if
+					loader = ClassLoader
+						.getSystemClassLoader();
+				}
 			
 				// Get Resource Stream
 				stream = loader.getResourceAsStream(
@@ -162,25 +185,24 @@ public abstract class TransformerFactory {
 
 				// Stream Found, Read Entry
 				if (stream != null) {
-					br = new BufferedReader(new InputStreamReader(stream));
+					br = new BufferedReader (
+						new InputStreamReader(stream));
 					factory = br.readLine();
-				} // if
+				}
 
-			} // if
+			}
 		} catch (Exception e2) {
-		} // try
+		}
 
 		// Otherwise, Use default
 		if (factory == null) {
 			factory = defaultValue;
-		} // if
+		}
 
 		// Return Factory
 		return factory;
 
-	} // findFactory()
-
-
-} // TransformerFactory
+	}
+}
 
 
