@@ -1,3 +1,8 @@
+2005-03-04  Chris Burdess  <dog@bluezoo.org>
+
+	* InternetHeaders.java: Ensure input stream is always filtered for
+	CRLF pairs.
+
 2005-02-21  Chris Burdess  <dog@bluezoo.org>
 
 	* MboxStore.java,MboxFolder.java: Allow absolute filenames.
