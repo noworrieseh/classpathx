@@ -1,5 +1,4 @@
 # 
-# $Id: Makefile.am,v 1.1.2.4 2004-04-08 12:28:12 avdyk Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
