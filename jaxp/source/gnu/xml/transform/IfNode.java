@@ -59,11 +59,12 @@ final class IfNode
     this.test = test;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    Object ret = test.evaluate(context);
+    Object ret = test.evaluate(context, pos, len);
     boolean success = (ret instanceof Boolean) ?
       ((Boolean) ret).booleanValue() :
       Expr._boolean(context, ret);
@@ -71,12 +72,16 @@ final class IfNode
       {
         if (children != null)
           {
-            children.apply(stylesheet, context, mode, parent, nextSibling);
+            children.apply(stylesheet, mode,
+                           context, pos, len,
+                           parent, nextSibling);
           }
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

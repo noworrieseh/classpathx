@@ -436,6 +436,7 @@ $(src)/gnu/xml/dom/DomNamedNodeMap.java \
 $(src)/gnu/xml/dom/DomNode.java \
 $(src)/gnu/xml/dom/DomNotation.java \
 $(src)/gnu/xml/dom/DomNsNode.java \
+$(src)/gnu/xml/dom/DomNSResolverContext.java \
 $(src)/gnu/xml/dom/DomPI.java \
 $(src)/gnu/xml/dom/DomText.java \
 $(src)/gnu/xml/dom/DomXPathExpression.java \
@@ -459,21 +460,48 @@ $(src)/gnu/xml/pipeline/XIncludeFilter.java \
 $(src)/gnu/xml/pipeline/XsltFilter.java \
 $(src)/gnu/xml/xpath/AndExpr.java \
 $(src)/gnu/xml/xpath/ArithmeticExpr.java \
+$(src)/gnu/xml/xpath/BooleanFunction.java \
+$(src)/gnu/xml/xpath/CeilingFunction.java \
+$(src)/gnu/xml/xpath/ConcatFunction.java \
 $(src)/gnu/xml/xpath/Constant.java \
+$(src)/gnu/xml/xpath/ContainsFunction.java \
+$(src)/gnu/xml/xpath/CountFunction.java \
 $(src)/gnu/xml/xpath/EqualityExpr.java \
 $(src)/gnu/xml/xpath/Expr.java \
 $(src)/gnu/xml/xpath/ExpressionTest.java \
+$(src)/gnu/xml/xpath/FalseFunction.java \
+$(src)/gnu/xml/xpath/FloorFunction.java \
 $(src)/gnu/xml/xpath/FunctionCall.java \
+$(src)/gnu/xml/xpath/IdFunction.java \
+$(src)/gnu/xml/xpath/LangFunction.java \
+$(src)/gnu/xml/xpath/LastFunction.java \
+$(src)/gnu/xml/xpath/LocalNameFunction.java \
+$(src)/gnu/xml/xpath/NameFunction.java \
+$(src)/gnu/xml/xpath/NamespaceUriFunction.java \
 $(src)/gnu/xml/xpath/NameTest.java \
 $(src)/gnu/xml/xpath/NegativeExpr.java \
 $(src)/gnu/xml/xpath/NodeTypeTest.java \
+$(src)/gnu/xml/xpath/NormalizeSpaceFunction.java \
+$(src)/gnu/xml/xpath/NotFunction.java \
+$(src)/gnu/xml/xpath/NumberFunction.java \
 $(src)/gnu/xml/xpath/OrExpr.java \
 $(src)/gnu/xml/xpath/ParenthesizedExpr.java \
+$(src)/gnu/xml/xpath/Path.java \
+$(src)/gnu/xml/xpath/PositionFunction.java \
 $(src)/gnu/xml/xpath/RelationalExpr.java \
 $(src)/gnu/xml/xpath/Root.java \
+$(src)/gnu/xml/xpath/RoundFunction.java \
 $(src)/gnu/xml/xpath/Selector.java \
 $(src)/gnu/xml/xpath/Step.java \
+$(src)/gnu/xml/xpath/StartsWithFunction.java \
+$(src)/gnu/xml/xpath/StringFunction.java \
+$(src)/gnu/xml/xpath/StringLengthFunction.java \
+$(src)/gnu/xml/xpath/SubstringAfterFunction.java \
+$(src)/gnu/xml/xpath/SubstringBeforeFunction.java \
+$(src)/gnu/xml/xpath/SubstringFunction.java \
+$(src)/gnu/xml/xpath/SumFunction.java \
 $(src)/gnu/xml/xpath/Test.java \
+$(src)/gnu/xml/xpath/TrueFunction.java \
 $(src)/gnu/xml/xpath/UnionExpr.java \
 $(src)/gnu/xml/xpath/VariableReference.java \
 $(src)/gnu/xml/xpath/XPathImpl.java \
@@ -492,7 +520,6 @@ $(src)/gnu/xml/transform/CopyNode.java \
 $(src)/gnu/xml/transform/CopyOfNode.java \
 $(src)/gnu/xml/transform/DocumentFunction.java \
 $(src)/gnu/xml/transform/DOMSourceLocator.java \
-$(src)/gnu/xml/transform/DOMSourceWrapper.java \
 $(src)/gnu/xml/transform/DummyNode.java \
 $(src)/gnu/xml/transform/ElementNode.java \
 $(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
@@ -573,8 +600,6 @@ $(src)/gnu/xml/libxmlj/util/StandaloneLocator.java \
 $(src)/gnu/xml/libxmlj/util/XMLJ.java
 
 
-
-# $(src)/gnu/xml/xpath/Index.java
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 
 headers = \

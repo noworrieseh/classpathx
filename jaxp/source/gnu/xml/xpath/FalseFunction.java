@@ -1,5 +1,5 @@
 /*
- * Index.java
+ * FalseFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,53 +38,25 @@
 
 package gnu.xml.xpath;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import org.w3c.dom.Node;
 
 /**
- * Returns the specified numbered child of the context node.
+ * The <code>false</code> function returns false.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class Index
-extends Expr
+final class FalseFunction
+  extends Expr
 {
 
-  final Expr lhs;
-  final Expr rhs;
+	public Object evaluate(Node context, int pos, int len)
+	{
+		return Boolean.FALSE;
+	}
 
-  Index(Expr lhs, Expr rhs)
-  {
-    this.lhs = lhs;
-    this.rhs = rhs;
-  }
-
-  public Object evaluate(Node context)
-  {
-    Object left = lhs.evaluate(context);
-    if (left instanceof Collection)
-      {
-        Object right = rhs.evaluate(context);
-        double n = _number(context, right);
-        int index = ((int) n) - 1;
-        
-        Collection ns = (Collection) left;
-        List nodes = new ArrayList((Collection) left);
-        Collections.sort(nodes, Expr.documentOrderComparator);
-        if (index >= 0 && index < nodes.size())
-          {
-            return Collections.singleton(nodes.get(index));
-          }
-      }
-    return null;
-  }
-
-  public String toString()
-  {
-    return lhs.toString() + "[" + rhs.toString() + "]";
-  }
-  
+	public String toString()
+	{
+		return "false()";
+	}
+	
 }

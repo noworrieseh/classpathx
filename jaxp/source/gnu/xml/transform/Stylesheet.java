@@ -38,9 +38,6 @@
 
 package gnu.xml.transform;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -56,7 +53,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionResolver;
@@ -292,11 +288,16 @@ class Stylesheet
               {
                 int p = "import".equals(name) ? -1 : 0;
                 String href = element.getAttribute("href");
-                if (systemId != null)
-                  {
-                    href = getURL(systemId, href).toString();
-                  }
-                Source source = new StreamSource(href);
+								Source source;
+								synchronized (factory.resolver)
+								  {
+										if (transformer != null)
+										  {
+												factory.resolver.setUserResolver(transformer.getURIResolver());
+												factory.resolver.setUserListener(transformer.getErrorListener());
+											}
+										source = factory.resolver.resolve(systemId, href);
+									}
                 Stylesheet stylesheet =
                   factory.newStylesheet(source, precedence + p, this);
                 parse(element.getNextSibling(), false);
@@ -402,7 +403,7 @@ class Stylesheet
             parse(node.getNextSibling(), false);
           }
       }
-    catch (MalformedURLException e)
+    catch (TransformerException e)
       {
         DOMSourceLocator l = new DOMSourceLocator(node);
         throw new TransformerConfigurationException(e.getMessage(), l, e);
@@ -416,32 +417,6 @@ class Stylesheet
       {
         DOMSourceLocator l = new DOMSourceLocator(node);
         throw new TransformerConfigurationException(e.getMessage(), l, e);
-      }
-  }
-
-  URL getURL(String base, String href)
-    throws MalformedURLException
-  {
-    try
-      {
-        return new URL(getURL(base), href);
-      }
-    catch (MalformedURLException e)
-      {
-        return new File(new File(base), href).toURL();
-      }
-  }
-
-  URL getURL(String href)
-    throws MalformedURLException
-  {
-    try
-      {
-        return new URL(href);
-      }
-    catch (MalformedURLException e)
-      {
-        return new File(href).toURL();
       }
   }
 
@@ -483,13 +458,13 @@ class Stylesheet
     for (Iterator i = preserveSpace.iterator(); i.hasNext(); )
       {
         NameTest preserveTest = (NameTest) i.next();
-        if (preserveTest.matches(ctx))
+        if (preserveTest.matches(ctx, 1, 1))
           {
             boolean override = false;
             for (Iterator j = stripSpace.iterator(); j.hasNext(); )
               {
                 NameTest stripTest = (NameTest) j.next();
-                if (stripTest.matches(ctx))
+                if (stripTest.matches(ctx, 1, 1))
                   {
                     override = true;
                     break;
@@ -528,23 +503,29 @@ class Stylesheet
     return false;
   }
 
-  void applyTemplates(Node context, Expr select, String mode,
+  void applyTemplates(Expr select, String mode,
+                      Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
   {
-    Object ret = select.evaluate(context);
+    Object ret = select.evaluate(context, pos, len);
     if (ret != null && ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
+        int l = ns.size();
+        int p = 1;
         for (Iterator i = ns.iterator(); i.hasNext(); )
           {
             Node subject = (Node) i.next();
-            applyTemplates(context, subject, mode, parent, nextSibling);
+            applyTemplates(mode,
+                           context, subject, p++, l,
+                           parent, nextSibling);
           }
       }
   }
 
-  void applyTemplates(Node context, Node subject, String mode,
+  void applyTemplates(String mode,
+                      Node context, Node subject, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -554,7 +535,7 @@ class Stylesheet
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
-        boolean isMatch = t.matches(context, subject, mode);
+        boolean isMatch = t.matches(mode, context, subject, pos, len);
         //System.out.println("applyTemplates: "+subject+" "+t+"="+isMatch);
         if (isMatch)
           {
@@ -571,11 +552,15 @@ class Stylesheet
           case Node.ELEMENT_NODE:
           case Node.DOCUMENT_NODE:
           case Node.DOCUMENT_FRAGMENT_NODE:
-            builtInNodeTemplate.apply(this, subject, mode, parent, nextSibling);
+            builtInNodeTemplate.apply(this, mode,
+                                      subject, pos, len,
+                                      parent, nextSibling);
             break;
           case Node.TEXT_NODE:
           case Node.ATTRIBUTE_NODE:
-            builtInTextTemplate.apply(this, subject, mode, parent, nextSibling);
+            builtInTextTemplate.apply(this, mode,
+                                      subject, pos, len,
+                                      parent, nextSibling);
             break;
           }
       }
@@ -584,11 +569,14 @@ class Stylesheet
         Template t =
           (Template) candidates.iterator().next();
         //System.out.println("\ttemplate="+t+" subject="+subject);
-        t.apply(this, subject, mode, parent, nextSibling);
+        t.apply(this, mode,
+                subject, pos, len,
+                parent, nextSibling);
       }
   }
 
-  void callTemplate(Node context, String name, String mode,
+  void callTemplate(String name, String mode,
+                    Node context, int pos, int len,
                     Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -600,7 +588,9 @@ class Stylesheet
           {
             //System.err.println("*** calling "+t);
             //System.err.println("*** bindings="+bindings);
-            t.apply(this, context, mode, parent, nextSibling);
+            t.apply(this, mode,
+                    context, pos, len,
+                    parent, nextSibling);
             return;
           }
       }

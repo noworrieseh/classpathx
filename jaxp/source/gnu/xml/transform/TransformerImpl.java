@@ -74,17 +74,19 @@ class TransformerImpl
   extends Transformer
 {
 
-  Properties outputProperties;
+	final TransformerFactoryImpl factory;
   final Stylesheet stylesheet;
   URIResolver uriResolver;
   ErrorListener errorListener;
+  Properties outputProperties;
 
-  TransformerImpl(URIResolver resolver, ErrorListener listener,
+  TransformerImpl(TransformerFactoryImpl factory,
                   Stylesheet stylesheet)
     throws TransformerConfigurationException
   {
-    uriResolver = resolver;
-    errorListener = listener;
+    this.factory = factory;
+    uriResolver = factory.userResolver;
+    errorListener = factory.userListener;
     this.stylesheet = stylesheet;
     if (stylesheet != null)
       {
@@ -96,10 +98,14 @@ class TransformerImpl
   public void transform(Source xmlSource, Result outputTarget)
     throws TransformerException
   {
-    DOMSourceWrapper wrapper = new DOMSourceWrapper(xmlSource,
-                                                    uriResolver,
-                                                    errorListener);
-    Node context = wrapper.getNode();
+    DOMSource source;
+    synchronized (factory.resolver)
+      {
+        factory.resolver.setUserResolver(uriResolver);
+        factory.resolver.setUserListener(errorListener);
+        source = factory.resolver.resolveDOM(xmlSource, null, null);
+      }
+    Node context = source.getNode();
     Node parent = null, nextSibling = null;
     if (outputTarget instanceof DOMResult)
       {
@@ -120,7 +126,8 @@ class TransformerImpl
     if (stylesheet != null)
       {
         // XSLT transformation
-        stylesheet.applyTemplates(context, new Root(), null,
+        stylesheet.applyTemplates(new Root(), null,
+                                  context, 1, 1,
                                   parent, nextSibling);
         outputMethod = stylesheet.outputMethod;
         encoding = stylesheet.outputEncoding;

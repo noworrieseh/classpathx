@@ -56,14 +56,14 @@ public class VariableReference
     this.name = name;
   }
 
-  public Object evaluate(Node node)
+  public Object evaluate(Node context, int pos, int len)
   {
     if (resolver != null)
       {
         if (resolver instanceof Bindings)
           {
             // Needs context to operate properly
-            return ((Bindings) resolver).get(name, node);
+            return ((Bindings) resolver).get(name, context);
           }
         QName qname = QName.valueOf(name);
         return resolver.resolveVariable(qname);

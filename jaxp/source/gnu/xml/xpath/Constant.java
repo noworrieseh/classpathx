@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class Constant
+final class Constant
   extends Expr
 {
 
@@ -56,7 +56,7 @@ class Constant
     this.value = value;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
     return value;
   }

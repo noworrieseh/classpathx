@@ -293,7 +293,7 @@ public class Consumer extends DomConsumer
 	    DomDocument		doc;
 
 	    super.startDocument ();
-	    ((DomDocument) getDocument ()).setCheckingCharacters (false);
+	    ((DomDocument) getDocument ()).setStrictErrorChecking(false);
 	}
 
         /**
@@ -314,7 +314,7 @@ public class Consumer extends DomConsumer
 	throws SAXException
 	{
 	    DomDocument		doc = (DomDocument) getDocument ();
-	    doc.setCheckingCharacters (true);
+	    doc.setStrictErrorChecking(true);
 	    doc.compact ();
 	    super.endDocument ();
 	}

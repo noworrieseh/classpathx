@@ -177,7 +177,7 @@ public class DomNamedNodeMap
         DomNode element = node.parent;
         if (element != null && element != owner)
           {
-            throw new DomEx (DomEx.INUSE_ATTRIBUTE_ERR);
+            throw new DomEx(DomEx.INUSE_ATTRIBUTE_ERR);
           }
         node.parent = owner;
         node.depth = owner.depth + 1;
@@ -221,6 +221,10 @@ public class DomNamedNodeMap
             if (ctx.next != null)
               {
                 ctx.next.previous = node;
+              }
+            if (first == ctx)
+              {
+                first = node;
               }
             ctx.next = null;
             ctx.previous = null;

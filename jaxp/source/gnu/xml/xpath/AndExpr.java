@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class AndExpr
+public final class AndExpr
   extends Expr
 {
 
@@ -58,14 +58,14 @@ public class AndExpr
     this.rhs = rhs;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    Object left = lhs.evaluate(context);
+    Object left = lhs.evaluate(context, pos, len);
     if (!_boolean(context, left))
       {
         return Boolean.FALSE;
       }
-    Object right = rhs.evaluate(context);
+    Object right = rhs.evaluate(context, pos, len);
     return _boolean(context, right) ? Boolean.TRUE : Boolean.FALSE;
   }
 

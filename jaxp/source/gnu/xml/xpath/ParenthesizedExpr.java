@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class ParenthesizedExpr
+final class ParenthesizedExpr
   extends Expr
 {
 
@@ -56,9 +56,9 @@ class ParenthesizedExpr
     this.expr = expr;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    return expr.evaluate(context);
+    return expr.evaluate(context, pos, len);
   }
 
   public String toString()

@@ -38,8 +38,8 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.EntityReference;
 
 /**
  * <p> "EntityReference" implementation (reference to parsed entity).
@@ -77,34 +77,33 @@ public class DomEntityReference
   extends DomNode
   implements EntityReference
 {
-    private String	name;
 
-
-    /**
-     * Constructs an EntityReference node associated with the specified
-     * document.  The creator should populate this with whatever contents
-     * are appropriate, and then mark it as readonly.
-     *
-     * <p>This constructor should only be invoked by a Document as part of
-     * its createEntityReference functionality, or through a subclass which
-     * is similarly used in a "Sub-DOM" style layer.
-     *
-     * @see DomNode#makeReadonly
-     */
-    protected DomEntityReference (Document owner, String name)
-    {
-	super (ENTITY_REFERENCE_NODE, owner);
-	this.name = name;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the name of the referenced entity.
-     */
-    final public String getNodeName ()
-    {
-	return name;
-    }
+  private String name;
+  
+  /**
+   * Constructs an EntityReference node associated with the specified
+   * document.  The creator should populate this with whatever contents
+   * are appropriate, and then mark it as readonly.
+   *
+   * <p>This constructor should only be invoked by a Document as part of
+   * its createEntityReference functionality, or through a subclass which
+   * is similarly used in a "Sub-DOM" style layer.
+   *
+   * @see DomNode#makeReadonly
+   */
+  protected DomEntityReference(Document owner, String name)
+  {
+    super(ENTITY_REFERENCE_NODE, owner);
+    this.name = name;
+  }
+  
+  /**
+   * <b>DOM L1</b>
+   * Returns the name of the referenced entity.
+   */
+  final public String getNodeName()
+  {
+    return name;
+  }
 
 }

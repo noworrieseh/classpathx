@@ -64,7 +64,8 @@ final class LiteralNode
     this.source = source;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -87,27 +88,18 @@ final class LiteralNode
       {
         parent.appendChild(result);
       }
-    // Copy attributes
-    NamedNodeMap attrs = source.getAttributes();
-    if (attrs != null)
-      {
-        NamedNodeMap resultAttrs = result.getAttributes();
-        int len = attrs.getLength();
-        for (int i = 0; i < len; i++)
-          {
-            Node attr = attrs.item(i).cloneNode(true);
-            attr = doc.adoptNode(attr);
-            resultAttrs.setNamedItemNS(attr);
-          }
-      }
     // Process children and next sibling
     if (children != null)
       {
-        children.apply(stylesheet, context, mode, result, null);
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       result, null);
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

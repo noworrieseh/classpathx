@@ -47,7 +47,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class EqualityExpr
+final class EqualityExpr
   extends Expr
 {
 
@@ -62,9 +62,9 @@ class EqualityExpr
     this.invert = invert;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    boolean val = evaluateImpl(context);
+    boolean val = evaluateImpl(context, pos, len);
     if (invert)
       {
         return val ? Boolean.FALSE : Boolean.TRUE;
@@ -75,10 +75,11 @@ class EqualityExpr
       }
   }
 
-  private boolean evaluateImpl(Node context)
+  private boolean evaluateImpl(Node context, int pos, int len)
   {
-    Object left = lhs.evaluate(context);
-    Object right = rhs.evaluate(context);
+    Object left = lhs.evaluate(context, pos, len);
+    Object right = rhs.evaluate(context, pos, len);
+
     /*
      * If both objects to be compared are node-sets, then the comparison
      * will be true if and only if there is a node in the first node-set and

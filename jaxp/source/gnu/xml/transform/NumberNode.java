@@ -67,7 +67,7 @@ final class NumberNode
   int[] compute(Stylesheet stylesheet, Node context)
     throws TransformerException
   {
-    Object ret = value.evaluate(context);
+    Object ret = value.evaluate(context, 1, 1);
     Double d = (ret instanceof Double) ? ((Double) ret) :
       new Double(Expr._number(context, ret));
     return new int[] { d.intValue() };

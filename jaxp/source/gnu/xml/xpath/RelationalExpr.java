@@ -46,7 +46,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class RelationalExpr
+final class RelationalExpr
   extends Expr
 {
 
@@ -63,10 +63,10 @@ class RelationalExpr
     this.eq = eq;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    Object left = lhs.evaluate(context);
-    Object right = rhs.evaluate(context);
+    Object left = lhs.evaluate(context, pos, len);
+    Object right = rhs.evaluate(context, pos, len);
 
     if (!(left instanceof Collection) &&
         !(right instanceof Collection))

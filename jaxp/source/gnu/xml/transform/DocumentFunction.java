@@ -49,7 +49,7 @@ import java.util.TreeSet;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Document;
@@ -179,15 +179,36 @@ final class DocumentFunction
       }
 
     // Get document source
-    InputStream in = null;
     try
       {
-        URL url = (base != null) ? stylesheet.getURL(base, uri) : 
-          stylesheet.getURL(uri);
-        uri = url.toString();
-        in = url.openStream();
-      }
-    catch (IOException e2)
+				DOMSource source;
+				XSLURIResolver resolver = stylesheet.factory.resolver;
+				synchronized (resolver)
+				  {
+						if (stylesheet.transformer != null)
+						  {
+								resolver.setUserResolver(stylesheet.transformer.uriResolver);
+								resolver.setUserListener(stylesheet.transformer.errorListener);
+							}
+						source = resolver.resolveDOM(null, base, uri);
+					}
+				Node node = source.getNode();
+				if (fragment == null)
+				  {
+						return Collections.singleton(node);
+					}
+				else
+				  {
+						Object ret = fragment.evaluate(node, 1, 1);
+						if (!(ret instanceof Collection))
+						  {
+								// XXX Report error?
+								return Collections.EMPTY_SET;
+							}
+						return (Collection) ret;
+					}
+			}
+    catch (TransformerException e)
       {
         String msg = "can't open " + uri;
         if (base != null)
@@ -195,32 +216,6 @@ final class DocumentFunction
             msg += " with base " + base;
           }
         throw new XPathFunctionException(msg);
-      }
-    StreamSource source = new StreamSource(in);
-    source.setSystemId(uri);
-    
-    // Retrieve the document
-    URIResolver uriResolver = (stylesheet.transformer == null) ? null :
-      stylesheet.transformer.uriResolver;
-    ErrorListener errorListener = (stylesheet.transformer == null) ? null:
-      stylesheet.transformer.errorListener;
-    DOMSourceWrapper wrapper = new DOMSourceWrapper(source,
-                                                    uriResolver,
-                                                    errorListener);
-    Node node = wrapper.getNode();
-    if (fragment == null)
-      {
-        return Collections.singleton(node);
-      }
-    else
-      {
-        Object ret = fragment.evaluate(node);
-        if (!(ret instanceof Collection))
-          {
-            // XXX Report error?
-            return Collections.EMPTY_SET;
-          }
-        return (Collection) ret;
       }
   }
   

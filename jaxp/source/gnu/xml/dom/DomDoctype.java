@@ -38,10 +38,14 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
-
-import java.util.Hashtable;
-
+import java.util.HashMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Entity;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.Notation;
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -76,15 +80,14 @@ public class DomDoctype
   implements DocumentType
 {
   
-  private DomNamedNodeMap	notations;
-  private DomNamedNodeMap	entities;
-  private final DOMImplementation	implementation;
-  private String		subset;
+  private DomNamedNodeMap notations;
+  private DomNamedNodeMap entities;
+  private final DOMImplementation implementation;
+  private String subset;
   
-  private Hashtable		elements = new Hashtable ();
-  private boolean		ids;
+  private HashMap elements = new HashMap();
+  private boolean ids;
   
-
   /**
    * Constructs a DocumentType node associated with the specified
    * implementation, with the specified name.
@@ -181,19 +184,24 @@ public class DomDoctype
   {
     DomEntity entity;
     
-    if (name.charAt (0) == '%' || "[dtd]".equals (name))
-      return null;
-    if (isReadonly ())
-      throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-    getEntities ();
+    if (name.charAt(0) == '%' || "[dtd]".equals(name))
+      {
+        return null;
+      }
+    if (isReadonly())
+      {
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      }
+    getEntities();
     
-    DomDocument.verifyXmlName (name);
-    if (entities.getNamedItem (name) != null)
-      return null;
+    DomDocument.verifyXmlName(name);
+    if (entities.getNamedItem(name) != null)
+      {
+        return null;
+      }
     
-    entity = new DomEntity (getOwnerDocument (),
-                            name, publicId, systemId, notation);
-    entities.setNamedItem (entity);
+    entity = new DomEntity(owner, name, publicId, systemId, notation);
+    entities.setNamedItem(entity);
     return entity;
   }
   
@@ -235,15 +243,16 @@ public class DomDoctype
   {
     DomNotation notation;
     
-    if (isReadonly ())
-      throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-    getNotations ();
+    if (isReadonly())
+      {
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      }
+    getNotations();
     
-    DomDocument.verifyXmlName (name);
+    DomDocument.verifyXmlName(name);
     
-    notation = new DomNotation (getOwnerDocument (),
-                                name, publicId, systemId);
-    notations.setNamedItem (notation);
+    notation = new DomNotation(owner, name, publicId, systemId);
+    notations.setNamedItem(notation);
     return notation;
   }
 
@@ -273,11 +282,15 @@ public class DomDoctype
    */
   public void makeReadonly()
   {
-    super.makeReadonly ();
+    super.makeReadonly();
     if (entities != null)
-      entities.makeReadonly ();
+      {
+        entities.makeReadonly();
+      }
     if (notations != null)
-      notations.makeReadonly ();
+      {
+        notations.makeReadonly();
+      }
   }
 
   void setOwner(Document doc)
@@ -306,7 +319,7 @@ public class DomDoctype
    */
   final public boolean supports(String feature, String version)
   {
-    return implementation.hasFeature (feature, version);
+    return implementation.hasFeature(feature, version);
   }
     
   /**
@@ -323,14 +336,16 @@ public class DomDoctype
   
 
   // package private
-  ElementInfo getElementInfo (String element)
+  ElementInfo getElementInfo(String element)
   {
-    ElementInfo	info = (ElementInfo) elements.get (element);
+    ElementInfo	info = (ElementInfo) elements.get(element);
     
     if (info != null)
-      return info;
-    info = new ElementInfo (this);
-    elements.put (element, info);
+      {
+        return info;
+      }
+    info = new ElementInfo(this);
+    elements.put(element, info);
     return info;
   }
   
@@ -345,10 +360,12 @@ public class DomDoctype
   }
 
   // package private
-  static class ElementInfo extends Hashtable
+  static class ElementInfo
+    extends HashMap
   {
-    private String		idAttrName;
-    private DomDoctype	doctype;
+
+    private String idAttrName;
+    private DomDoctype doctype;
     
     // is-a vs has-a ... just to minimize number of objects.
     // keys in table are attribute names, values are defaults.
@@ -361,20 +378,24 @@ public class DomDoctype
 
     void setAttrDefault(String attName, String value)
     {
-      if (getAttrDefault (attName) == null)
-        put (attName, value);
+      if (!containsKey(attName))
+        {
+          put(attName, value);
+        }
     }
     
     String getAttrDefault(String attName)
     {
-      return (String) get (attName);
+      return (String) get(attName);
     }
 
     void setIdAttr(String attName)
     {
       if (idAttrName == null)
-        idAttrName = attName;
-      doctype.setHasIds ();
+        {
+          idAttrName = attName;
+        }
+      doctype.setHasIds();
     }
     
     String getIdAttr()
@@ -386,7 +407,7 @@ public class DomDoctype
 
   public boolean isSameNode(Node arg)
   {
-    if (equals (arg))
+    if (equals(arg))
       {
         return true;
       }
@@ -395,15 +416,15 @@ public class DomDoctype
         return false;
       }
     DocumentType doctype = (DocumentType) arg;
-    if (!equal (getPublicId (), doctype.getPublicId ()))
+    if (!equal(getPublicId(), doctype.getPublicId()))
       {
         return false;
       }
-    if (!equal (getSystemId (), doctype.getSystemId ()))
+    if (!equal(getSystemId(), doctype.getSystemId()))
       {
         return false;
       }
-    if (!equal (getInternalSubset (), doctype.getInternalSubset ()))
+    if (!equal(getInternalSubset(), doctype.getInternalSubset()))
       {
         return false;
       }

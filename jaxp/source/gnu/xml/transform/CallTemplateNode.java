@@ -64,7 +64,8 @@ final class CallTemplateNode
     this.withParams = withParams;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -76,11 +77,12 @@ final class CallTemplateNode
         for (Iterator i = withParams.iterator(); i.hasNext(); )
           {
             WithParam p = (WithParam) i.next();
-            Object value = p.getValue(stylesheet, context, mode);
+            Object value = p.getValue(stylesheet, mode, context, pos, len);
             stylesheet.bindings.set(p.name, value, false);
           }
       }
-    stylesheet.callTemplate(context, name, mode,
+    stylesheet.callTemplate(name, mode,
+                            context, pos, len,
                             parent, nextSibling);
     if (withParams != null)
       {
@@ -90,7 +92,9 @@ final class CallTemplateNode
     // call-template doesn't have processable children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

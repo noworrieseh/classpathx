@@ -33,11 +33,18 @@ public class XPathTest
         f.setNamespaceAware(true);
         DocumentBuilder b = f.newDocumentBuilder();
         Document doc = b.parse(new InputSource(in));
+        long t1, t2;
         
         XPathImpl xpath = new XPathImpl(null, null);
+        t1 = System.currentTimeMillis();
         Expr expr = (Expr) xpath.compile(expression);
-        Object ret = expr.evaluate(doc);
+        t2 = System.currentTimeMillis();
+        System.out.println("Compiled in "+(t2-t1)+"ms");
         System.out.println(">>> "+expr);
+        t1 = System.currentTimeMillis();
+        Object ret = expr.evaluate(doc, 1, 1);
+        t2 = System.currentTimeMillis();
+        System.out.println("Evaluated in "+(t2-t1)+"ms");
         if (ret instanceof Collection)
           {
             System.out.println("[");

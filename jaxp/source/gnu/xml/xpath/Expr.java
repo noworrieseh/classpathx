@@ -83,7 +83,7 @@ public abstract class Expr
     if (item instanceof Node)
       {
         context = (Node) item;
-        ret = evaluate(context);
+        ret = evaluate(context, 1, 1);
         if (XPathConstants.STRING == returnType &&
             !(ret instanceof String))
           {
@@ -169,45 +169,9 @@ public abstract class Expr
     return (String) evaluate(source, XPathConstants.STRING);
   }
 
-  public abstract Object evaluate(Node context);
+  public abstract Object evaluate(Node context, int pos, int len);
   
   /* -- 4.1 Node Set Functions -- */
-
-  /**
-   * The last function returns a number equal to the context size from the
-   * expression evaluation context.
-   */
-  public static double _last(Node context)
-  {
-    Node parent = context.getParentNode();
-    int ret = (parent == null || !parent.hasChildNodes()) ? 0 :
-      parent.getChildNodes().getLength();
-    return (double) ret;
-  }
-
-  /**
-   * The position function returns a number equal to the context position
-   * from the expression evaluation context.
-   */
-  public static double _position(Node context)
-  {
-    int count = 0;
-    while (context != null)
-      {
-        context = context.getPreviousSibling();
-        count++;
-      }
-    return (double) count;
-  }
-
-  /**
-   * The count function returns the number of nodes in the argument
-   * node-set.
-   */
-  public static double _count(Node context, Collection nodeSet)
-  {
-    return (double) nodeSet.size();
-  }
 
   /**
    * The id function selects elements by their unique ID.
@@ -364,165 +328,6 @@ public abstract class Expr
     throw new IllegalArgumentException(object.toString());
   }
 
-  /**
-   * The concat function returns the concatenation of its arguments.
-   */
-  public static String _concat(Node context, String s1, String s2)
-  {
-    return s1 + s2;
-  }
-
-  /**
-   * The starts-with function returns true if the first argument string
-   * starts with the second argument string, and otherwise returns false.
-   */
-  public static boolean _starts_with(Node context, String s1, String s2)
-  {
-    return s1.startsWith(s2);
-  }
-
-  /**
-   * The contains function returns true if the first argument string
-   * contains the second argument string, and otherwise returns false.
-   */
-  public static boolean _contains(Node context, String s1, String s2)
-  {
-    return s1.indexOf(s2) != -1;
-  }
-
-  /**
-   * The substring-before function returns the substring of the first
-   * argument string that precedes the first occurrence of the second
-   * argument string in the first argument string, or the empty string if
-   * the first argument string does not contain the second argument string.
-   * For example, substring-before("1999/04/01","/") returns 1999.
-   */
-  public static String _substring_before(Node context, String s1, String s2)
-  {
-    int index = s1.indexOf(s2);
-    return (index == -1) ? "" : s1.substring(0, index);
-  }
-
-  /**
-   * The substring-after function returns the substring of the first
-   * argument string that follows the first occurrence of the second
-   * argument string in the first argument string, or the empty string if
-   * the first argument string does not contain the second argument string.
-   * For example, substring-after("1999/04/01","/") returns 04/01, and
-   * substring-after("1999/04/01","19") returns 99/04/01.
-   */
-  public static String _substring_after(Node context, String s1, String s2)
-  {
-    int index = s1.indexOf(s2);
-    return (index == -1) ? "" : s1.substring(index + s2.length());
-  }
-
-  /**
-   * The substring function returns the substring of the first argument
-   * starting at the position specified in the second argument with length
-   * specified in the third argument. For example, substring("12345",2,3)
-   * returns "234". If the third argument is not specified, it returns the
-   * substring starting at the position specified in the second argument and
-   * continuing to the end of the string. For example, substring("12345",2)
-   * returns "2345".
-   */
-  public static String _substring(Node context, String s1,
-                                  double pos, double len)
-  {
-    int ipos = Math.max(((int) Math.round(pos)) - 1, 0);
-    int ilen = Math.min(((int) Math.round(len)) - 1, s1.length());
-    return s1.substring(ipos, ilen);
-  }
-
-  /**
-   * The string-length returns the number of characters in the string.
-   * If the argument is omitted, it defaults to the context
-   * node converted to a string, in other words the string-value of the
-   * context node.
-   */
-  public static double _string_length(Node context, String string)
-  {
-    if (string == null)
-      {
-        string = stringValue(context);
-      }
-    return (double) string.length();
-  }
-
-  /**
-   * The normalize-space function returns the argument string with
-   * whitespace normalized by stripping leading and trailing whitespace and
-   * replacing sequences of whitespace characters by a single space.
-   * Whitespace characters are the same as those allowed by the S production
-   * in XML. If the argument is omitted, it defaults to the context node
-   * converted to a string, in other words the string-value of the context
-   * node.
-   */
-  public static String _normalize_space(Node context, String string)
-  {
-    if (string == null)
-      {
-        string = stringValue(context);
-      }
-    StringTokenizer st = new StringTokenizer(string, " \t\r\n");
-    StringBuffer buf = new StringBuffer();
-    if (st.hasMoreTokens())
-      {
-        buf.append(st.nextToken());
-        while (st.hasMoreTokens())
-          {
-            buf.append(' ');
-            buf.append(st.nextToken());
-          }
-      }
-    return buf.toString();
-  }
-
-  /**
-   * The translate function returns the first argument string with
-   * occurrences of characters in the second argument string replaced by the
-   * character at the corresponding position in the third argument string.
-   * For example, translate("bar","abc","ABC") returns the string BAr. If
-   * there is a character in the second argument string with no character at
-   * a corresponding position in the third argument string (because the
-   * second argument string is longer than the third argument string), then
-   * occurrences of that character in the first argument string are removed.
-   * For example, translate("--aaa--","abc-","ABC") returns "AAA". If a
-   * character occurs more than once in the second argument string, then the
-   * first occurrence determines the replacement character. If the third
-   * argument string is longer than the second argument string, then excess
-   * characters are ignored.
-   */
-  public static String _translate(Node context, String string, String search,
-                                  String replace)
-  {
-    StringBuffer buf = new StringBuffer();
-    int l1 = string.length();
-    int l2 = search.length();
-    int l3 = replace.length();
-    for (int i = 0; i < l1; i++)
-      {
-        char c = string.charAt(i);
-        boolean replaced = false;
-        for (int j = 0; j < l2; j++)
-          {
-            if (c == search.charAt(j))
-              {
-                if (j < l3)
-                  {
-                    buf.append(replace.charAt(j));
-                  }
-                replaced = true;
-              }
-          }
-        if (!replaced)
-          {
-            buf.append(c);
-          }
-      }
-    return new String(buf);
-  }
-
   /* -- 4.3 Boolean Functions -- */
   
   /**
@@ -547,66 +352,6 @@ public abstract class Expr
         return ((Collection) object).size() != 0;
       }
     return false; // TODO user defined types
-  }
-
-  /**
-   * The not function returns true if its argument is false, and false
-   * otherwise.
-   */
-  public static boolean _not(Node context, boolean b)
-  {
-    return !b;
-  }
-
-  /**
-   * The true function returns true.
-   */
-  public static boolean _true(Node context)
-  {
-    return true;
-  }
-
-  /**
-   * The false function returns false.
-   */
-  public static boolean _false(Node context)
-  {
-    return false;
-  }
-
-  /**
-   * The lang function returns true or false depending on whether the
-   * language of the context node as specified by xml:lang attributes is the
-   * same as or is a sublanguage of the language specified by the argument
-   * string. The language of the context node is determined by the value of
-   * the xml:lang attribute on the context node, or, if the context node has
-   * no xml:lang attribute, by the value of the xml:lang attribute on the
-   * nearest ancestor of the context node that has an xml:lang attribute. If
-   * there is no such attribute, then lang returns false. If there is such
-   * an attribute, then lang returns true if the attribute value is equal to
-   * the argument ignoring case, or if there is some suffix starting with -
-   * such that the attribute value is equal to the argument ignoring that
-   * suffix of the attribute value and ignoring case.
-   */
-  public static boolean _lang(Node context, String lang)
-  {
-    String clang = getLang(context);
-    while (clang == null && context != null)
-      {
-        context = context.getParentNode();
-        clang = getLang(context);
-      }
-    return (clang == null) ? false :
-      clang.toLowerCase().startsWith(lang.toLowerCase());
-  }
-
-  static String getLang(Node node)
-  {
-    if (node instanceof Element)
-      {
-        return ((Element) node).getAttribute("xml:lang");
-      }
-    return null;
   }
 
   /* -- 4.4 Number Functions -- */
@@ -646,56 +391,6 @@ public abstract class Expr
           }
       }
     return 0.0; // TODO user-defined types
-  }
-
-  /**
-   * The sum function returns the sum, for each node in the argument
-   * node-set, of the result of converting the string-values of the node to
-   * a number.
-   */
-  public static double _sum(Node context, Collection nodeSet)
-  {
-    double ret = 0.0;
-    for (Iterator i = nodeSet.iterator(); i.hasNext(); )
-      {
-        ret += _number(context, stringValue((Node) i.next()));
-      }
-    return ret;
-  }
-
-  /**
-   * The floor function returns the largest (closest to positive infinity)
-   * number that is not greater than the argument and that is an integer.
-   */
-  public static double _floor(Node context, double number)
-  {
-    return Math.floor(number);
-  }
-
-  /**
-   * The ceiling function returns the smallest (closest to negative
-   * infinity) number that is not less than the argument and that is an
-   * integer.
-   */
-  public static double _ceiling(Node context, double number)
-  {
-    return Math.ceil(number);
-  }
-
-  /**
-   * The round function returns the number that is closest to the argument
-   * and that is an integer. If there are two such numbers, then the one
-   * that is closest to positive infinity is returned. If the argument is
-   * NaN, then NaN is returned. If the argument is positive infinity, then
-   * positive infinity is returned. If the argument is negative infinity,
-   * then negative infinity is returned. If the argument is positive zero,
-   * then positive zero is returned. If the argument is negative zero, then
-   * negative zero is returned. If the argument is less than zero, but
-   * greater than or equal to -0.5, then negative zero is returned.
-   */
-  public static double _round(Node context, double number)
-  {
-    return (double) Math.round(number);
   }
 
   /**

@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class ArithmeticExpr
+final class ArithmeticExpr
   extends Expr
 {
 
@@ -63,13 +63,24 @@ class ArithmeticExpr
   {
     this.lhs = lhs;
     this.rhs = rhs;
-    this.op = op;
+    switch (op)
+      {
+      case ADD:
+      case SUBTRACT:
+      case MULTIPLY:
+      case DIVIDE:
+      case MODULO:
+				this.op = op;
+				break;
+      default:
+        throw new IllegalArgumentException();
+      }
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    Object left = lhs.evaluate(context);
-    Object right = rhs.evaluate(context);
+    Object left = lhs.evaluate(context, pos, len);
+    Object right = rhs.evaluate(context, pos, len);
 
     double ln = _number(context, left);
     double rn = _number(context, right);

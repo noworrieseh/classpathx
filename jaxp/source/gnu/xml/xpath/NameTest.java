@@ -46,7 +46,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class NameTest
+public final class NameTest
   extends Test
 {
 
@@ -112,7 +112,7 @@ public class NameTest
     return anyLocalName;
   }
 
-  public boolean matches(Node node)
+  public boolean matches(Node node, int pos, int len)
   {
     switch (node.getNodeType())
       {

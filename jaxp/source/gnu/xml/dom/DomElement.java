@@ -38,7 +38,12 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.TypeInfo;
 
 /**
  * <p> "Element" implementation.
@@ -106,7 +111,7 @@ public class DomElement
         node.attributes = new DomNamedNodeMap(node, Node.ATTRIBUTE_NODE);
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            node.attributes.setNamedItem(ctx.cloneNode(true));
+            node.attributes.setNamedItemNS(ctx.cloneNode(true));
           }
       }
     return node;

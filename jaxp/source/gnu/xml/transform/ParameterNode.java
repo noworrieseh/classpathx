@@ -71,7 +71,8 @@ final class ParameterNode
     this.global = global;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -81,7 +82,7 @@ final class ParameterNode
         // push the variable context
         stylesheet.bindings.push(global);
         // set the variable
-        Object value = getValue(stylesheet, context, mode);
+        Object value = getValue(stylesheet, mode, context, pos, len);
         if (value != null)
           {
             stylesheet.bindings.set(name, value, global);
@@ -90,7 +91,9 @@ final class ParameterNode
     // variable and param don't process children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
     if (apply)
       {
@@ -99,19 +102,22 @@ final class ParameterNode
       }
   }
   
-  Object getValue(Stylesheet stylesheet, Node context, String mode)
+  Object getValue(Stylesheet stylesheet, String mode,
+                  Node context, int pos, int len)
     throws TransformerException
   {
     if (select != null)
       {
-        return select.evaluate(context);
+        return select.evaluate(context, pos, len);
       }
     else if (children != null)
       {
         Document doc = (context instanceof Document) ? (Document) context :
           context.getOwnerDocument();
         DocumentFragment fragment = doc.createDocumentFragment();
-        children.apply(stylesheet, context, mode, fragment, null);
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       fragment, null);
         Collection acc = new LinkedList();
         Node ctx = fragment.getFirstChild();
         for (; ctx != null; ctx = ctx.getNextSibling())
@@ -127,3 +133,4 @@ final class ParameterNode
   }
 
 }
+

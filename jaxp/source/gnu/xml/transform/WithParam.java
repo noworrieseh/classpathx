@@ -74,19 +74,22 @@ final class WithParam
     select = null;
   }
 
-  Object getValue(Stylesheet stylesheet, Node context, String mode)
+  Object getValue(Stylesheet stylesheet, String mode,
+                  Node context, int pos, int len)
     throws TransformerException
   {
     if (select != null)
       {
-        return select.evaluate(context);
+        return select.evaluate(context, pos, len);
       }
     else
       {
         Document doc = (context instanceof Document) ? (Document) context :
           context.getOwnerDocument();
         DocumentFragment fragment = doc.createDocumentFragment();
-        content.apply(stylesheet, context, mode, fragment, null);
+        content.apply(stylesheet, mode,
+                      context, pos, len,
+                      fragment, null);
         Collection acc = new LinkedList();
         Node ctx = fragment.getFirstChild();
         for (; ctx != null; ctx = ctx.getNextSibling())

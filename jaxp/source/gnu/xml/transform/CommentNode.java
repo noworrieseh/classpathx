@@ -59,7 +59,8 @@ final class CommentNode
     super(children, next);
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -71,7 +72,9 @@ final class CommentNode
         // Create a document fragment to hold the text
         DocumentFragment fragment = doc.createDocumentFragment();
         // Apply children to the fragment
-        children.apply(stylesheet, context, mode, fragment, null);
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       fragment, null);
         // Use XPath string-value of fragment
         value = Expr.stringValue(fragment);
       }
@@ -87,7 +90,9 @@ final class CommentNode
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

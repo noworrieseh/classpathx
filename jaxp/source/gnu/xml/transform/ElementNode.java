@@ -64,7 +64,8 @@ final class ElementNode
     this.namespace = namespace;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -83,11 +84,15 @@ final class ElementNode
       }
     if (children != null)
       {
-        children.apply(stylesheet, context, mode, element, null);
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       element, null);
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

@@ -67,13 +67,14 @@ final class ForEachNode
     this.sortKeys = sortKeys;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
     if (children != null)
       {
-        Object ret = select.evaluate(context);
+        Object ret = select.evaluate(context, pos, len);
         //System.out.println(toString() + ": " + context+" -> "+ret);
         if (ret instanceof Collection)
           {
@@ -87,16 +88,22 @@ final class ForEachNode
               {
                 Collections.sort(list, documentOrderComparator);
               }
+            int l = list.size();
+            int p = 1;
             for (Iterator i = list.iterator(); i.hasNext(); )
               {
                 Node node = (Node) i.next();
-                children.apply(stylesheet, node, mode, parent, nextSibling);
+                children.apply(stylesheet, mode,
+                               node, p++, l,
+                               parent, nextSibling);
               }
           }
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

@@ -56,9 +56,9 @@ class ExpressionTest
     this.expr = expr;
   }
 
-  public boolean matches(Node node)
+  public boolean matches(Node node, int pos, int len)
   {
-    return expr._boolean(node, expr.evaluate (node));
+    return expr._boolean(node, expr.evaluate(node, pos, len));
   }
 
   public String toString()

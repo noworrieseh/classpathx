@@ -175,7 +175,7 @@ class Template
     return null;
   }
 
-  boolean matches(Node context, Node node, String mode)
+  boolean matches(String mode, Node context, Node node, int pos, int len)
   {
     if (mode != null && !mode.equals(this.mode))
       {
@@ -185,7 +185,7 @@ class Template
       {
         return false;
       }
-    Object ret = match.evaluate(context);
+    Object ret = match.evaluate(context, pos, len);
     if (ret != null && ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
@@ -196,17 +196,22 @@ class Template
 
   /**
    * @param stylesheet the stylesheet
-   * @param context the context node in the source document
    * @param parent the parent of result nodes
+   * @param context the context node in the source document
+   * @param pos the context position
+   * @param len the context size
    * @param nextSibling if non-null, add result nodes before this node
    */
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
     if (node != null)
       {
-        node.apply(stylesheet, context, mode, parent, nextSibling);
+        node.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

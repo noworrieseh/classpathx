@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class NegativeExpr
+final class NegativeExpr
   extends Expr
 {
 
@@ -56,9 +56,9 @@ class NegativeExpr
     this.expr = expr;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    Object val = expr.evaluate(context);
+    Object val = expr.evaluate(context, pos, len);
     double n = _number(context, val);
     return new Double(-n);
   }

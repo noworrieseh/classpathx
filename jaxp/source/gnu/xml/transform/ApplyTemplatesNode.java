@@ -73,11 +73,12 @@ final class ApplyTemplatesNode
     this.withParams = withParams;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    Object ret = select.evaluate(context);
+    Object ret = select.evaluate(context, pos, len);
     if (ret != null && ret instanceof Collection)
       {
         if (withParams != null)
@@ -88,7 +89,7 @@ final class ApplyTemplatesNode
             for (Iterator i = withParams.iterator(); i.hasNext(); )
               {
                 WithParam p = (WithParam) i.next();
-                Object value = p.getValue(stylesheet, context, mode);
+                Object value = p.getValue(stylesheet, mode, context, pos, len);
                 stylesheet.bindings.set(p.name, value, false);
               }
           }
@@ -102,11 +103,13 @@ final class ApplyTemplatesNode
           {
             Collections.sort(list, documentOrderComparator);
           }
+        int l = list.size();
+        int p = 1;
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node subject = (Node) i.next();
-            stylesheet.applyTemplates(subject, subject,
-                                      (this.mode != null) ? this.mode : mode,
+            stylesheet.applyTemplates((this.mode != null) ? this.mode : mode,
+                                      subject, subject, p++, l,
                                       parent, nextSibling);
           }
         if (withParams != null)
@@ -118,7 +121,9 @@ final class ApplyTemplatesNode
     // apply-templates doesn't have processable children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

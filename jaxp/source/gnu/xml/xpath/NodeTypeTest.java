@@ -45,7 +45,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class NodeTypeTest
+public final class NodeTypeTest
   extends Test
 {
 
@@ -73,7 +73,7 @@ public class NodeTypeTest
     return data;
   }
 
-  public boolean matches(Node node)
+  public boolean matches(Node node, int pos, int len)
   {
     if (type > 0)
       {

@@ -38,11 +38,13 @@
 
 package gnu.xml.xpath;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -53,8 +55,8 @@ import org.w3c.dom.NodeList;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class Selector
-  extends Expr
+public final class Selector
+  extends Path
 {
 
   public static final int ANCESTOR = 0;
@@ -96,9 +98,58 @@ public class Selector
     return tests;
   }
 
-  public Object evaluate (Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    List candidates = new LinkedList();
+    Set acc = new HashSet();
+    addCandidates(context, acc);
+    List candidates = new ArrayList(acc);
+    Collections.sort(candidates, documentOrderComparator);
+    return filterCandidates(candidates);
+  }
+
+  Collection evaluate(Node context, Collection ns)
+  {
+    Set acc = new HashSet();
+    for (Iterator i = ns.iterator(); i.hasNext(); )
+      {
+        addCandidates((Node) i.next(), acc);
+      }
+    List candidates = new ArrayList(acc);
+    Collections.sort(candidates, documentOrderComparator);
+    return filterCandidates(candidates);
+  }
+
+  /**
+   * Filter the given list of candates according to the node tests.
+   */
+  List filterCandidates(List candidates)
+  {
+    int len = candidates.size();
+    int tlen = tests.length;
+    if (tlen > 0 && len > 0)
+      {
+        // Present the result of each successful generation to the next test
+        for (int j = 0; j < tlen && len > 0; j++)
+          {
+            Test test = tests[j];
+            List successful = new ArrayList();
+            for (int i = 0; i < len; i++)
+              {
+                Node node = (Node) candidates.get(i);
+                if (test.matches(node, i + 1, len))
+                  {
+                    successful.add(node);
+                  }
+              }
+            candidates = successful;
+            len = candidates.size();
+          }
+      }
+    return candidates;
+  }
+
+  void addCandidates(Node context, Collection candidates)
+  {
     // Build list of candidates
     switch (axis)
       {
@@ -144,31 +195,6 @@ public class Selector
         candidates.add(context);
         break;
       }
-    // Now filter them
-    int tlen = tests.length;
-    if (tlen > 0)
-      {
-        List successful = new LinkedList();
-        for (Iterator i = candidates.iterator(); i.hasNext(); )
-          {
-            boolean success = true;
-            Node node = (Node) i.next();
-            for (int j = 0; j < tlen; j++)
-              {
-                if (!tests[j].matches(node))
-                  {
-                    success = false;
-                    break;
-                  }
-              }
-            if (success)
-              {
-                successful.add(node);
-              }
-          }
-        return successful;
-      }
-    return candidates;
   }
 
   void addChildNodes(Node context, Collection acc, boolean recurse)

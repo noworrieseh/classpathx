@@ -64,7 +64,8 @@ abstract class TemplateNode
     this.next = next;
   }
 
-  abstract void apply(Stylesheet stylesheet, Node context, String mode,
+  abstract void apply(Stylesheet stylesheet, String mode,
+                      Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException;
 

@@ -66,11 +66,12 @@ final class CopyOfNode
     this.select = select;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    Object ret = select.evaluate(context);
+    Object ret = select.evaluate(context, pos, len);
     if (ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
@@ -110,7 +111,9 @@ final class CopyOfNode
     // copy-of doesn't process children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class UnionExpr
+public final class UnionExpr
   extends Expr
 {
 
@@ -62,10 +62,10 @@ public class UnionExpr
     this.rhs = rhs;
   }
 
-  public Object evaluate(Node context)
+  public Object evaluate(Node context, int pos, int len)
   {
-    Object left = lhs.evaluate(context);
-    Object right = rhs.evaluate(context);
+    Object left = lhs.evaluate(context, pos, len);
+    Object right = rhs.evaluate(context, pos, len);
     if (left instanceof Collection && right instanceof Collection)
       {
         Set ret = new HashSet();

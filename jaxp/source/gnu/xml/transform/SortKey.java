@@ -71,7 +71,7 @@ final class SortKey
 
   String key(Node node)
   {
-    Object ret = select.evaluate(node);
+    Object ret = select.evaluate(node, 1, 1);
     if (ret instanceof String)
       {
         return (String) ret;

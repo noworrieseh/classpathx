@@ -1,3 +1,9 @@
+2004-11-09  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: Separated functions into separate classes for efficiency.
+   	Fixes to evaluation model, notably path components.
+   	* transform: Fixes to XPath expression evaluation.
+   	
 2004-11-08  Chris Burdess  <dog@gnu.org>
 
    	* transform: Fixes to template calling in foreign stylesheets.

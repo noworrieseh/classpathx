@@ -88,7 +88,7 @@ final class NodeNumberNode
   {
     if (from != null)
       {
-        Object ret = from.evaluate(context);
+        Object ret = from.evaluate(context, 1, 1);
         if (ret instanceof Collection)
           {
             Collection ns = (Collection) ret;
@@ -139,7 +139,7 @@ final class NodeNumberNode
         Expr ancestorOrSelf = new Selector(Selector.ANCESTOR_OR_SELF,
                                            Collections.EMPTY_LIST);
         Expr any = new UnionExpr(preceding, ancestorOrSelf);
-        Object eval = any.evaluate(context);
+        Object eval = any.evaluate(context, 1, 1);
         if (eval instanceof Collection)
           {
             Collection ns = (Collection) eval;
@@ -167,7 +167,7 @@ final class NodeNumberNode
 
   boolean countMatches(Node node)
   {
-    Object ret = count.evaluate(node);
+    Object ret = count.evaluate(node, 1, 1);
     return (ret instanceof Collection) && ((Collection) ret).contains(node);
   }
 

@@ -75,7 +75,8 @@ abstract class AbstractNumberNode
     this.groupingSize = groupingSize;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -94,7 +95,9 @@ abstract class AbstractNumberNode
     // xsl:number doesn't process children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode, 
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

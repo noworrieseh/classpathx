@@ -38,7 +38,11 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.TypeInfo;
 import org.w3c.dom.events.MutationEvent;
 
 
@@ -193,7 +197,7 @@ public class DomAttr
         throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     
-    String oldValue = getValue ();
+    String oldValue = getValue();
     while (last != null)
       {
         removeChild(last);
@@ -291,3 +295,4 @@ public class DomAttr
   }
 
 }
+

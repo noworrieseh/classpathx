@@ -66,11 +66,12 @@ final class ValueOfNode
     this.disableOutputEscaping = disableOutputEscaping; // TODO
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    Object ret = select.evaluate(context);
+    Object ret = select.evaluate(context, 1, 1);
     String value = Expr._string(context, ret);
     //System.err.println("value-of: "+context+" "+ select + " -> "+ value);
     if (value != null && value.length() > 0)
@@ -90,7 +91,9 @@ final class ValueOfNode
     // value-of doesn't process children
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
 

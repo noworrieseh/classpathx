@@ -64,7 +64,8 @@ final class AttributeNode
     this.namespace = namespace;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
+  void apply(Stylesheet stylesheet, String mode,
+             Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
@@ -87,11 +88,15 @@ final class AttributeNode
       }
     if (children != null)
       {
-        children.apply(stylesheet, context, mode, attr, null);
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       attr, null);
       }
     if (next != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        next.apply(stylesheet, mode,
+                   context, pos, len,
+                   parent, nextSibling);
       }
   }
   

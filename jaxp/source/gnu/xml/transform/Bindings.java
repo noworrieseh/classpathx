@@ -146,7 +146,7 @@ public class Bindings
     if (ret instanceof Expr && context != null)
       {
         Expr expr = (Expr) ret;
-        ret = expr.evaluate(context);
+        ret = expr.evaluate(context, 1, 1);
       }
     if (ret instanceof Node)
       {
