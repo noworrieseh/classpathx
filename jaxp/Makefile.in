@@ -4,6 +4,10 @@
 # You are free to redistribute this file. NO WARRANTY or fitness 
 # for purpose is implied by this notice.
 #
+# !!!                                                  !!!
+# !!!   MAKE EDITS TO "Makefile.in", not "Makefile"    !!!
+# !!!                                                  !!!
+#
 # What goes on here?
 # The SOURCEFILES should be a list of all the sources in your project.
 # The CC-CLASSPATH should be the compilation classpath for your project.
@@ -225,6 +229,14 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/SAXDriver.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/XmlParser.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/JAXPFactory.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/DomConsumer.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/EventConsumer.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/EventFilter.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/NSFilter.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/TeeConsumer.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/TextConsumer.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/WellFormednessFilter.java \
+	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
 	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
 	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
 	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java \
@@ -248,7 +260,9 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomNotation.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomNsNode.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomPI.java \
-	$(SOURCEDIR)/gnu/xml/dom/DomText.java
+	$(SOURCEDIR)/gnu/xml/dom/DomText.java \
+	$(SOURCEDIR)/gnu/xml/dom/JAXPFactory.java \
+
 
 #a mangling of the SOURCEFILES list above
 #This is not quite perfect, we've had to harcode the 
@@ -323,7 +337,7 @@ javadoc:
 	    -group "Java API for XML (v1.1) (Sun)" \
 	    	"javax.xml.*" \
 	    \
-	    gnu.xml.aelfred2 gnu.xml.util \
+	    gnu.xml.aelfred2 gnu.xml.pipeline gnu.xml.util \
 	    gnu.xml.dom \
 	    org.xml.sax org.xml.sax.ext org.xml.sax.helpers \
 	    org.w3c.dom \
