@@ -1,28 +1,8 @@
-/*
-  GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 David Brownell
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 // ParserAdapter.java - adapt a SAX1 Parser to a SAX2 XMLReader.
 // Written by David Megginson, sax@megginson.com
+// NO WARRANTY!  This class is in the public domain.
 
-// $Id: ParserAdapter.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// $Id: ParserAdapter.java,v 1.3 2001-08-03 18:57:24 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -50,6 +30,11 @@ import org.xml.sax.SAXNotSupportedException;
 
 /**
  * Adapt a SAX1 Parser as a SAX2 XMLReader.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p>This class wraps a SAX1 {@link org.xml.sax.Parser Parser}
  * and makes it act as a SAX2 {@link org.xml.sax.XMLReader XMLReader},
@@ -511,6 +496,8 @@ public class ParserAdapter implements XMLReader, DocumentHandler
      *
      * @param qName The qualified (prefixed) name.
      * @param qAtts The XML 1.0 attribute list (with qnames).
+     * @exception org.xml.sax.SAXException The client may raise a
+     *            processing exception.
      */
     public void startElement (String qName, AttributeList qAtts)
 	throws SAXException
@@ -535,75 +522,87 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 
 				// OK, we're doing Namespace processing.
 	nsSupport.pushContext();
-	boolean seenDecl = false;
-	atts.clear();
-	
-				// Take a first pass and copy all
-				// attributes into the SAX2 attribute
-				// list, noting any Namespace 
-				// declarations.
 	int length = qAtts.getLength();
+	
+				// First pass:  handle NS decls
+	for (int i = 0; i < length; i++) {
+	    String attQName = qAtts.getName(i);
+
+	    if (!attQName.startsWith("xmlns"))
+		continue;
+				// Could be a declaration...
+	    String prefix;
+	    int n = attQName.indexOf(':');
+
+	    			// xmlns=...
+	    if (n == -1 && attQName.length () == 5) {
+		prefix = "";
+	    } else if (n != 5) {
+		// XML namespaces spec doesn't discuss "xmlnsf:oo"
+		// (and similarly named) attributes ... at most, warn
+		continue;
+	    } else 		// xmlns:foo=...
+		prefix = attQName.substring(n+1);
+
+	    String value = qAtts.getValue(i);
+	    if (!nsSupport.declarePrefix(prefix, value)) {
+		reportError("Illegal Namespace prefix: " + prefix);
+		continue;
+	    }
+	    if (contentHandler != null)
+		contentHandler.startPrefixMapping(prefix, value);
+	}
+	
+				// Second pass: copy all relevant
+				// attributes into the SAX2 AttributeList
+				// using updated prefix bindings
+	atts.clear();
 	for (int i = 0; i < length; i++) {
 	    String attQName = qAtts.getName(i);
 	    String type = qAtts.getType(i);
 	    String value = qAtts.getValue(i);
 
-				// Found a declaration...
+				// Declaration?
 	    if (attQName.startsWith("xmlns")) {
 		String prefix;
 		int n = attQName.indexOf(':');
-		if (n == -1) {
+
+		if (n == -1 && attQName.length () == 5) {
 		    prefix = "";
+		} else if (n != 5) {
+		    // XML namespaces spec doesn't discuss "xmlnsf:oo"
+		    // (and similarly named) attributes ... ignore
+		    prefix = null;
 		} else {
 		    prefix = attQName.substring(n+1);
 		}
-		if (!nsSupport.declarePrefix(prefix, value)) {
-		    reportError("Illegal Namespace prefix: " + prefix);
-		}
-		if (contentHandler != null) {
-		    contentHandler.startPrefixMapping(prefix, value);
-		}
-				// We may still have to add this to
-				// the list.
-		if (prefixes) {
-		    atts.addAttribute("", "", attQName.intern(),
+				// Yes, decl:  report or prune
+		if (prefix != null) {
+		    if (prefixes)
+			atts.addAttribute("", "", attQName.intern(),
 				      type, value);
+		    continue;
 		}
-		seenDecl = true;
+	    } 
 
-				// This isn't a declaration.
-	    } else {
-		try {
-		    String attName[] = processName(attQName, true, true);
-		    atts.addAttribute(attName[0], attName[1], attName[2],
-				      type, value);
-		} catch (SAXException e) {
-		    if (exceptions == null)
-			exceptions = new Vector();
-		    exceptions.addElement(e);
-		    atts.addAttribute("", attQName, attQName, type, value);
-		}
+				// Not a declaration -- report
+	    try {
+		String attName[] = processName(attQName, true, true);
+		atts.addAttribute(attName[0], attName[1], attName[2],
+				  type, value);
+	    } catch (SAXException e) {
+		if (exceptions == null)
+		    exceptions = new Vector();
+		exceptions.addElement(e);
+		atts.addAttribute("", attQName, attQName, type, value);
 	    }
 	}
 	
-				// If there was a Namespace declaration,
-				// we have to make a second pass just
-				// to be safe -- this will happen very
-				// rarely, possibly only once for each
-				// document.
-	if (seenDecl) {
-	    length = atts.getLength();
-	    for (int i = 0; i < length; i++) {
-		String attQName = atts.getQName(i);
-		if (!attQName.startsWith("xmlns")) {
-		    String attName[] = processName(attQName, true, false);
-		    atts.setURI(i, attName[0]);
-		    atts.setLocalName(i, attName[1]);
-		}
-	    }
-	} else if (exceptions != null && errorHandler != null) {
+	// now handle the deferred exception reports
+	if (exceptions != null && errorHandler != null) {
 	    for (int i = 0; i < exceptions.size(); i++)
-		errorHandler.error((SAXParseException)(exceptions.elementAt(i)));
+		errorHandler.error((SAXParseException)
+				(exceptions.elementAt(i)));
 	}
 
 				// OK, finally report the event.
@@ -852,6 +851,9 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 
     /**
      * Adapt a SAX1 AttributeList as a SAX2 Attributes object.
+     *
+     * <p>This class is in the Public Domain, and comes with NO
+     * WARRANTY of any kind.</p>
      *
      * <p>This wrapper class is used only when Namespace support
      * is disabled -- it provides pretty much a direct mapping
