@@ -1,7 +1,7 @@
 package gnu.crypto;
 
 // ----------------------------------------------------------------------------
-// $Id: Registry.java,v 1.3 2002-06-12 10:23:33 raif Exp $
+// $Id: Registry.java,v 1.4 2002-07-06 23:30:23 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto;
 /**
  * <p>A placeholder for <i>names</i> used throughout this library.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface Registry {
 
@@ -136,8 +136,14 @@ public interface Registry {
    /** Name prefix of every HMAC implementation. */
    String HMAC_NAME_PREFIX = "hmac-";
 
+   // Other MAC algorithms ....................................................
+
+   /** Message Authentication Code using Universal Hashing (Ted Krovetz). */
    String UHASH32 = "uhash32";
    String UMAC32 = "umac32";
+   /** The Truncated Multi-Modular Hash Function -v1 (David McGrew). */
+   String TMMH16 = "tmmh16";
+//   String TMMH32 = "tmmh32";
 
    // Methods
    // -------------------------------------------------------------------------
