@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 /**
  * DocumentBuilder
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilder.java,v 1.4 2001-07-16 16:11:59 db Exp $
+ * @version	$Id: DocumentBuilder.java,v 1.5 2001-10-26 20:50:03 db Exp $
  */
 public abstract class DocumentBuilder {
 
@@ -64,12 +64,49 @@ public abstract class DocumentBuilder {
 
 	public abstract Document newDocument();
 
-	public Document parse(File file) 
-		throws SAXException, IOException {
-// FIXME:  map the filename to a URI,
-// without relying on the jdk 1.2 API for that 
-		return parse(new InputSource(new FileInputStream(file)));
-	} // parse()
+	// we don't demand jdk 1.2 File.toURL() in the runtime
+	// keep in sync with gnu.xml.util.Resolver
+	// and javax.xml.transform.stream.StreamSource
+	private static String fileToURL (File f)
+	throws IOException
+	{
+	    String	temp;
+
+	    if (!f.exists ())
+		throw new IOException ("no such file: " + f.getName ());
+
+	    // FIXME: getAbsolutePath() seems buggy; I'm seeing components
+	    // like "/foo/../" which are clearly not "absolute"
+	    // and should have been resolved with the filesystem.
+
+	    // Substituting "/" would be wrong, "foo" may have been
+	    // symlinked ... the URL code will make that change
+	    // later, so that things can get _really_ broken!
+
+	    temp = f.getAbsolutePath ();
+
+	    if (File.separatorChar != '/')
+		temp = temp.replace (File.separatorChar, '/');
+	    if (!temp.startsWith ("/"))
+		temp = "/" + temp;
+	    if (!temp.endsWith ("/") && f.isDirectory ())
+		temp = temp + "/";
+	    return "file:" + temp;
+	}
+
+	/**
+	 * Constructs an InputSource from the file, and invokes parse ().
+	 * The InputSource includes the URI for the file.
+	 */
+	public Document parse (File file) 
+	throws SAXException, IOException
+	{
+	    InputSource	source;
+
+	    source = new InputSource (fileToURL (file));
+	    source.setByteStream (new FileInputStream(file));
+	    return parse (source);
+	}
 
 	public abstract Document parse(InputSource source) 
 		throws SAXException, IOException;

@@ -21,11 +21,12 @@
 
 package javax.xml.transform.stream;
 
-// Imports
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.File;
+import java.io.IOException;
 import javax.xml.transform.Source;
+
 
 /**
  * Stream Source
@@ -116,9 +117,8 @@ public class StreamSource implements Source {
 
 	public void setSystemId(File file) {
 	    try {
-// FIXME:  this jdk 1.2 dependency should not exist
-		this.systemId = file.toURL().toString ();
-	    } catch (java.net.MalformedURLException e) {
+		this.systemId = fileToURL (file).toString ();
+	    } catch (IOException e) {
 		// can't happen
 		throw new RuntimeException (e.getMessage ());
 	    }
@@ -126,5 +126,35 @@ public class StreamSource implements Source {
 
 	public void setSystemId(String systemID) {
 		this.systemId = systemID;
+	}
+
+	// we don't demand jdk 1.2 File.toURL() in the runtime
+	// keep in sync with gnu.xml.util.Resolver
+	// and javax.xml.parsers.DocumentBuilder
+	static String fileToURL (File f)
+	throws IOException
+	{
+	    String	temp;
+
+	    if (!f.exists ())
+		throw new IOException ("no such file: " + f.getName ());
+
+	    // FIXME: getAbsolutePath() seems buggy; I'm seeing components
+	    // like "/foo/../" which are clearly not "absolute"
+	    // and should have been resolved with the filesystem.
+
+	    // Substituting "/" would be wrong, "foo" may have been
+	    // symlinked ... the URL code will make that change
+	    // later, so that things can get _really_ broken!
+
+	    temp = f.getAbsolutePath ();
+
+	    if (File.separatorChar != '/')
+		temp = temp.replace (File.separatorChar, '/');
+	    if (!temp.startsWith ("/"))
+		temp = "/" + temp;
+	    if (!temp.endsWith ("/") && f.isDirectory ())
+		temp = temp + "/";
+	    return "file:" + temp;
 	}
 }

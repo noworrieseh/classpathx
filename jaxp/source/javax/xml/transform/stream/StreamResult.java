@@ -21,11 +21,12 @@
 
 package javax.xml.transform.stream;
 
-// Imports
 import java.io.OutputStream;
 import java.io.Writer;
 import java.io.File;
+import java.io.IOException;
 import javax.xml.transform.Result;
+
 
 /**
  * Stream Result
@@ -96,9 +97,8 @@ public class StreamResult implements Result {
 
 	public void setSystemId(File file) {
 	    try {
-// FIXME:  this jdk 1.2 dependency should not exist
-		this.systemId = file.toURL().toString ();
-	    } catch (java.net.MalformedURLException e) {
+		this.systemId = StreamSource.fileToURL (file).toString ();
+	    } catch (IOException e) {
 		// can't happen
 		throw new RuntimeException (e.getMessage ());
 	    }
