@@ -26,7 +26,11 @@
  */
 package javax.comm;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -101,7 +105,8 @@ public class CommPortIdentifier
                         try
                         {
                             Class driverClass = Class.forName(classname);
-                            CommDriver driver = driverClass.newInstance();
+                            CommDriver driver = 
+                                (CommDriver)driverClass.newInstance();
                             driver.initialize();
                         }
                         catch (ClassNotFoundException e)
@@ -213,7 +218,7 @@ public class CommPortIdentifier
             CommPortIdentifier id = new CommPortIdentifier(portName, portType,
                     driver);
             allIds.add(id);
-            idByName.put(name, id);
+            idByName.put(portName, id);
         }
     }
 
@@ -329,7 +334,7 @@ public class CommPortIdentifier
                 return null;
             }
             if (isOwned)
-                throw new PortInUseException(owner);
+                throw new PortInUseException();
         }
         port = driver.getCommPort(name, portType);
         // TODO what if driver returns null?
@@ -391,7 +396,7 @@ public class CommPortIdentifier
             listeners.toArray(l);
         }
         for (int i = 0; i < l.length; i++)
-            listeners[i].ownershipChange(type);
+            l[i].ownershipChange(type);
     }
 
     /**
