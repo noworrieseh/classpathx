@@ -429,7 +429,7 @@ public class POP3Connection
 			int ket = greeting.indexOf('>', bra);
 			if (ket!=-1)
 			{
-				String mid = greeting.substring(bra+1, ket);
+				String mid = greeting.substring(bra, ket+1);
 				int at = mid.indexOf('@');
 				if (at!=-1) // This is a valid RFC822 msg-id
 					return mid.getBytes("US-ASCII");
