@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.7 2001-07-29 18:58:08 db Exp $
+ * $Id: EventFilter.java,v 1.8 2001-08-24 21:44:45 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -118,7 +118,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-07-29 18:58:08 $
+ * @version $Date: 2001-08-24 21:44:45 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -199,7 +199,7 @@ public class EventFilter
      */
     public static void bind (XMLReader producer, EventConsumer consumer)
     {
-	for (;;) {
+	while (consumer != null) {
 
 	    // change problematic SAX2 default
 	    if (consumer instanceof NSFilter) {
@@ -233,23 +233,33 @@ public class EventFilter
 	// Some SAX parsers can't handle null handlers -- bleech
 	DefaultHandler	h = new DefaultHandler ();
 
-	if (consumer.getContentHandler () != null)
+	if (consumer != null && consumer.getContentHandler () != null)
 	    producer.setContentHandler (consumer.getContentHandler ());
 	else
 	    producer.setContentHandler (h);
-	if (consumer.getDTDHandler () != null)
+	if (consumer != null && consumer.getDTDHandler () != null)
 	    producer.setDTDHandler (consumer.getDTDHandler ());
 	else
 	    producer.setDTDHandler (h);
 
 	try {
-	    Object	dh = consumer.getProperty (DECL_HANDLER);
+	    Object	dh;
+	    
+	    if (consumer != null)
+		dh = consumer.getProperty (DECL_HANDLER);
+	    else
+		dh = null;
 	    if (dh == null)
 		dh = h;
 	    producer.setProperty (DECL_HANDLER, dh);
 	} catch (Exception e) { /* ignore */ }
 	try {
-	    Object	lh = consumer.getProperty (LEXICAL_HANDLER);
+	    Object	lh;
+	    
+	    if (consumer != null)
+		lh = consumer.getProperty (LEXICAL_HANDLER);
+	    else
+		lh = null;
 	    if (lh == null)
 		lh = h;
 	    producer.setProperty (LEXICAL_HANDLER, lh);
@@ -258,7 +268,8 @@ public class EventFilter
 	// this binding goes the other way around
 	if (producer.getErrorHandler () == null)
 	    producer.setErrorHandler (h);
-	consumer.setErrorHandler (producer.getErrorHandler ());
+	if (consumer != null)
+	    consumer.setErrorHandler (producer.getErrorHandler ());
     }
     
     /**
