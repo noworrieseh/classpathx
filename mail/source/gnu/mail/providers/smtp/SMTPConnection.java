@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import gnu.mail.util.BASE64;
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
 
@@ -64,11 +65,13 @@ public class SMTPConnection
   protected static final String VRFY = "VRFY";
   protected static final String EXPN = "EXPN";
   protected static final String HELP = "HELP";
+  protected static final String NOOP = "NOOP";
   protected static final String QUIT = "QUIT";
   protected static final String HELO = "HELO";
   protected static final String EHLO = "EHLO";
   protected static final String STARTTLS = "STARTTLS";
 
+  protected static final int INFO = 214;
   protected static final int READY = 220;
   protected static final int OK = 250;
   protected static final int OK_NOT_LOCAL = 251;
@@ -348,8 +351,49 @@ public class SMTPConnection
     return Collections.unmodifiableList(list);
   }
 
-  // TODO HELP
-  // TODO NOOP
+  /**
+   * Returns some useful information about the specified parameter.
+   * Typically this is a command.
+   * @param arg the context of the query, or null for general information
+   * @return a list of possibly useful information, or null if the command
+   * failed.
+   */
+  public List help(String arg)
+    throws IOException
+  {
+    String command = (arg==null) ? HELP :
+      new StringBuffer(HELP).append(' ').append(arg).toString();
+    send(command);
+    List list = new ArrayList();
+    do
+    {
+      switch (getResponse())
+      {
+        case INFO:
+          list.add(response);
+          break;
+        default:
+          return null;
+      }
+    }
+    while (continuation);
+    return Collections.unmodifiableList(list);
+  }
+  
+  /**
+   * Issues a NOOP command.
+   * This does nothing, but can be used to keep the connection alive.
+   */
+  public void noop()
+    throws IOException
+  {
+    send(NOOP);
+    do
+    {
+      getResponse();
+    }
+    while (!continuation);
+  }
 
   /**
    * Close the connection to the server.

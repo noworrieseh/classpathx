@@ -154,7 +154,6 @@ public class POP3Connection
 
 	/**
 	 * Authenticate the specified user.
-	 * TODO APOP
 	 * @param username the user to authenticate
 	 * @param password the user's password
 	 */

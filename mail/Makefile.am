@@ -109,6 +109,7 @@ source/gnu/mail/handler/Text.java \
 source/gnu/mail/handler/TextHtml.java \
 source/gnu/mail/handler/TextPlain.java \
 source/gnu/mail/handler/TextXml.java \
+source/gnu/mail/util/BASE64.java \
 source/gnu/mail/util/BOutputStream.java \
 source/gnu/mail/util/Base64InputStream.java \
 source/gnu/mail/util/Base64OutputStream.java \
@@ -127,8 +128,7 @@ source/gnu/mail/util/UUEncoderStream.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
 # The IMAP provider
-IMAP_JAVASRC = source/gnu/mail/providers/imap/BASE64.java \
-source/gnu/mail/providers/imap/IMAPBodyPart.java \
+IMAP_JAVASRC = source/gnu/mail/providers/imap/IMAPBodyPart.java \
 source/gnu/mail/providers/imap/IMAPCommand.java \
 source/gnu/mail/providers/imap/IMAPConnection.java \
 source/gnu/mail/providers/imap/IMAPConstants.java \
@@ -148,9 +148,11 @@ source/gnu/mail/providers/imap/Pair.java \
 source/gnu/mail/providers/imap/UTF7imap.java
 
 # The SMTP provider
-SMTP_JAVASRC = source/gnu/mail/providers/smtp/BASE64.java \
-source/gnu/mail/providers/smtp/SMTPOutputStream.java \
-source/gnu/mail/providers/smtp/SMTPTransport.java
+SMTP_JAVASRC = source/gnu/mail/providers/smtp/SMTPOutputStream.java \
+source/gnu/mail/providers/smtp/SMTPTransport.java \
+source/gnu/mail/providers/smtp/SMTPConnection.java \
+source/gnu/mail/providers/smtp/Parameter.java \
+source/gnu/mail/providers/smtp/ParameterList.java
 
 # POP3 protocol
 POP3_JAVASRC = source/gnu/mail/providers/pop3/POP3Folder.java \

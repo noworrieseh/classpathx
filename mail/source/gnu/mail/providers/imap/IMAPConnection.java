@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import gnu.mail.util.BASE64;
+
 /**
  * The protocol class implementing IMAP4rev1.
  *

@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.smtp;
+package gnu.mail.util;
 
 /**
  * Encodes and decodes text according to the BASE64 encoding.
@@ -66,7 +66,7 @@ public final class BASE64
    *
    * @param bs the source byte array
    */
-  static byte[] encode(byte[] bs)
+  public static byte[] encode(byte[] bs)
   {
     int si = 0, ti = 0; // source/target array indices
     byte[] bt = new byte[((bs.length+2)*4)/3]; // target byte array
@@ -106,7 +106,7 @@ public final class BASE64
    *
    * @param bs the source byte array
    */
-  static byte[] decode(byte[] bs)
+  public static byte[] decode(byte[] bs)
   {
     byte[] buffer = new byte[bs.length];
     int buflen = 0;
