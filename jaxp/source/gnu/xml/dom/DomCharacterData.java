@@ -1,5 +1,5 @@
 /*
- * $Id: DomCharacterData.java,v 1.3 2001-06-24 04:12:23 db Exp $
+ * $Id: DomCharacterData.java,v 1.4 2001-08-24 21:38:46 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomCharacterData.java,v 1.3 2001-06-24 04:12:23 db Exp $
+// $Id: DomCharacterData.java,v 1.4 2001-08-24 21:38:46 db Exp $
 
 /**
  * <p> Abstract "CharacterData" implementation.  This
@@ -38,7 +38,7 @@ import org.w3c.dom.events.MutationEvent;
  * (For example, it could be defined through a new "feature" module.)
  *
  * @author David Brownell
- * @version $Date: 2001-06-24 04:12:23 $
+ * @version $Date: 2001-08-24 21:38:46 $
  */
 public abstract class DomCharacterData extends DomNode
     implements CharacterData
@@ -254,7 +254,7 @@ public abstract class DomCharacterData extends DomNode
 	//	prev/new values provided
 	MutationEvent	event;
 
-	event = (MutationEvent) createEvent ("DOMCharacterDataModified");
+	event = (MutationEvent) createEvent ("MutationEvents");
 	event.initMutationEvent ("DOMCharacterDataModified",
 		true /* bubbles */, false /* nocancel */,
 		null, data, newValue, null, (short) 0);

@@ -1,5 +1,5 @@
 /*
- * $Id: DomAttr.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomAttr.java,v 1.2 2001-08-24 21:38:46 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomAttr.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomAttr.java,v 1.2 2001-08-24 21:38:46 db Exp $
 
 /**
  * <p> "Attr" implementation.  In DOM, attributes cost quite a lot of
@@ -51,7 +51,7 @@ import org.w3c.dom.events.MutationEvent;
  * nodes you work with.</em> </p>
  *
  * @author David Brownell
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-08-24 21:38:46 $
  */
 public class DomAttr extends DomNsNode implements Attr
 {
@@ -242,7 +242,7 @@ public class DomAttr extends DomNsNode implements Attr
 	//	prev/new values provided, also attr name
 	MutationEvent	event;
 
-	event = (MutationEvent) createEvent ("DOMAttrModified");
+	event = (MutationEvent) createEvent ("MutationEvents");
 	event.initMutationEvent ("DOMAttrModified",
 		true /* bubbles */, false /* nocancel */,
 		null, oldValue, newValue, getNodeName (), why);
