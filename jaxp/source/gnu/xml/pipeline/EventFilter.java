@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.11 2001-10-25 06:49:43 db Exp $
+ * $Id: EventFilter.java,v 1.12 2001-11-09 22:53:58 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,8 +32,6 @@ import java.util.Hashtable;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import org.xml.sax.helpers.XMLFilterImpl;
-
-import gnu.xml.util.DefaultHandler;
 
 
 /**
@@ -126,7 +124,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-10-25 06:49:43 $
+ * @version $Date: 2001-11-09 22:53:58 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -252,7 +250,7 @@ public class EventFilter
 	}
 
 	// Some SAX parsers can't handle null handlers -- bleech
-	DefaultHandler	h = new DefaultHandler ();
+	DefaultHandler2	h = new DefaultHandler2 ();
 
 	if (consumer != null && consumer.getContentHandler () != null)
 	    producer.setContentHandler (consumer.getContentHandler ());
