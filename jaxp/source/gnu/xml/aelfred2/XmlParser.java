@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.14 2001-10-07 03:56:13 db Exp $
+ * $Id: XmlParser.java,v 1.15 2001-10-15 02:28:02 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.14 2001-10-07 03:56:13 db Exp $
+// $Id: XmlParser.java,v 1.15 2001-10-15 02:28:02 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-07 03:56:13 $
+ * @version $Date: 2001-10-15 02:28:02 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -3601,10 +3601,12 @@ loop:
 		    return parseXMLDecl (ignoreEncoding);
 		}
 	    } else {
+		// <?xml-stylesheet ...?> or similar
 		unread ('l');
 		unread ('m');
 		unread ('x');
-		parsePI ();
+		unread ('?');
+		unread ('<');
 	    }
 	}
 	return null;
