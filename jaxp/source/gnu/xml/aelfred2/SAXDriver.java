@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.14 2001-10-18 00:57:04 db Exp $
+ * $Id: SAXDriver.java,v 1.15 2001-10-18 06:39:26 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.14 2001-10-18 00:57:04 db Exp $
+// $Id: SAXDriver.java,v 1.15 2001-10-18 06:39:26 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -98,13 +98,9 @@ import gnu.xml.util.DefaultHandler;
  * <b>http://xml.org/sax/properties/</b></em></center></td></tr>
  *
  * <tr><td>(URL)/declaration-handler</td>
- *	<td>A declaration handler may be provided.  Declaration of general
- *	entities is exposed, but not parameter entities; none of the entity
- *	names reported here will begin with "%". </td></tr>
+ *	<td>A declaration handler may be provided.  </td></tr>
  * <tr><td>(URL)/lexical-handler</td>
- *	<td>A lexical handler may be provided.  Entity boundaries and
- *	comments are not exposed; only CDATA sections and the start/end of
- *	the DTD (the internal subset is not detectible). </td></tr>
+ *	<td>A lexical handler may be provided.  </td></tr>
  * </table>
  *
  * <p>This parser currently implements the SAX1 Parser API, but
@@ -112,7 +108,7 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-18 00:57:04 $
+ * @version $Date: 2001-10-18 06:39:26 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
