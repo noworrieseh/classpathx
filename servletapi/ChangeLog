@@ -1,0 +1,5 @@
+2005-01-05  Chris Burdess  <dog@gnu.org>
+
+	* Makefile.am,configure.ac,acinclude.m4: New automake-based build
+	system.
+
