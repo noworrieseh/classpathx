@@ -1,5 +1,5 @@
 /*
- * $Id: TeeConsumer.java,v 1.2 2001-07-05 01:43:02 db Exp $
+ * $Id: TeeConsumer.java,v 1.3 2001-07-10 21:23:38 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ import org.xml.sax.ext.*;
  * the endDocument callback, which signals state cleanup).
  *
  * @author David Brownell
- * @version $Date: 2001-07-05 01:43:02 $
+ * @version $Date: 2001-07-10 21:23:38 $
  */
 final public class TeeConsumer
 	implements EventConsumer,
@@ -85,23 +85,23 @@ final public class TeeConsumer
 	try {
 	    declFirst = null;
 	    declFirst = (DeclHandler) first.getProperty (
-			EventFilter.PROPERTY_URI + "declaration-handler");
+			EventFilter.DECL_HANDLER);
 	} catch (SAXException e) {}
 	try {
 	    declRest = null;
 	    declRest = (DeclHandler) rest.getProperty (
-			EventFilter.PROPERTY_URI + "declaration-handler");
+			EventFilter.DECL_HANDLER);
 	} catch (SAXException e) {}
 
 	try {
 	    lexFirst = null;
 	    lexFirst = (LexicalHandler) first.getProperty (
-			EventFilter.PROPERTY_URI + "lexical-handler");
+			EventFilter.LEXICAL_HANDLER);
 	} catch (SAXException e) {}
 	try {
 	    lexRest = null;
 	    lexRest = (LexicalHandler) rest.getProperty (
-			EventFilter.PROPERTY_URI + "lexical-handler");
+			EventFilter.LEXICAL_HANDLER);
 	} catch (SAXException e) {}
     }
 
@@ -173,9 +173,9 @@ final public class TeeConsumer
 	//
 	// we've got work to do; handle two builtin cases.
 	//
-	if ((EventFilter.PROPERTY_URI + "declaration-handler").equals (id))
+	if (EventFilter.DECL_HANDLER.equals (id))
 	    return this;
-	if ((EventFilter.PROPERTY_URI + "lexical-handler").equals (id))
+	if (EventFilter.LEXICAL_HANDLER.equals (id))
 	    return this;
 
 	//

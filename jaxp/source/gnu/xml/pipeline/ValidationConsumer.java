@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.2 2001-07-08 12:30:27 db Exp $
+ * $Id: ValidationConsumer.java,v 1.3 2001-07-10 21:23:38 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.2 2001-07-08 12:30:27 db Exp $
+// $Id: ValidationConsumer.java,v 1.3 2001-07-10 21:23:38 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -172,7 +172,7 @@ import gnu.xml.util.DefaultHandler;
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-07-08 12:30:27 $
+ * @version $Date: 2001-07-10 21:23:38 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
@@ -246,9 +246,9 @@ public final class ValidationConsumer extends EventFilter
 
 	setContentHandler (this);
 	setDTDHandler (this);
-	try { setProperty (PROPERTY_URI + "declaration-handler", this); }
+	try { setProperty (DECL_HANDLER, this); }
 	catch (Exception e) { /* "can't happen" */ }
-	try { setProperty (PROPERTY_URI + "lexical-handler", this); }
+	try { setProperty (LEXICAL_HANDLER, this); }
 	catch (Exception e) { /* "can't happen" */ }
     }
 
@@ -351,12 +351,7 @@ public final class ValidationConsumer extends EventFilter
 	XMLReader	producer;
 
 	producer = XMLReaderFactory.createXMLReader ();
-	producer.setContentHandler (this);
-	producer.setDTDHandler (this);
-
-	// if the default parser doesn't do this, we're dead
-	producer.setProperty (PROPERTY_URI + "declaration-handler", this);
-	producer.setProperty (PROPERTY_URI + "lexical-handler", this);
+	bind (producer, this);
 
 	if (resolver != null)
 	    producer.setEntityResolver (resolver);
