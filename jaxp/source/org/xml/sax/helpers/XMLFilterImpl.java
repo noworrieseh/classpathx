@@ -3,7 +3,7 @@
 // Written by David Megginson
 // NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: XMLFilterImpl.java,v 1.5 2001-10-18 00:36:10 db Exp $
+// $Id: XMLFilterImpl.java,v 1.6 2001-11-06 05:45:55 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -105,14 +105,10 @@ public class XMLFilterImpl
      * or to set or get a feature or property will fail.</p>
      *
      * @param parent The parent XML reader.
-     * @exception java.lang.NullPointerException If the parent is null.
      * @see #getParent
      */
     public void setParent (XMLReader parent)
     {
-	if (parent == null) {
-	    throw new NullPointerException("Null parent");
-	}
 	this.parent = parent;
     }
 
@@ -136,24 +132,24 @@ public class XMLFilterImpl
 
 
     /**
-     * Set the state of a feature.
+     * Set the value of a feature.
      *
      * <p>This will always fail if the parent is null.</p>
      *
      * @param name The feature name.
-     * @param state The requested feature state.
-     * @exception org.xml.sax.SAXNotRecognizedException When the
-     *            XMLReader does not recognize the feature name.
+     * @param value The requested feature value.
+     * @exception org.xml.sax.SAXNotRecognizedException If the feature
+     *            value can't be assigned or retrieved from the parent.
      * @exception org.xml.sax.SAXNotSupportedException When the
-     *            XMLReader recognizes the feature name but 
+     *            parent recognizes the feature name but 
      *            cannot set the requested value.
      * @see org.xml.sax.XMLReader#setFeature
      */
-    public void setFeature (String name, boolean state)
+    public void setFeature (String name, boolean value)
 	throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if (parent != null) {
-	    parent.setFeature(name, state);
+	    parent.setFeature(name, value);
 	} else {
 	    throw new SAXNotRecognizedException("Feature: " + name);
 	}
@@ -161,17 +157,17 @@ public class XMLFilterImpl
 
 
     /**
-     * Look up the state of a feature.
+     * Look up the value of a feature.
      *
      * <p>This will always fail if the parent is null.</p>
      *
      * @param name The feature name.
-     * @return The current state of the feature.
-     * @exception org.xml.sax.SAXNotRecognizedException When the
-     *            XMLReader does not recognize the feature name.
+     * @return The current value of the feature.
+     * @exception org.xml.sax.SAXNotRecognizedException If the feature
+     *            value can't be assigned or retrieved from the parent.
      * @exception org.xml.sax.SAXNotSupportedException When the
-     *            XMLReader recognizes the feature name but 
-     *            cannot determine its state at this time.
+     *            parent recognizes the feature name but 
+     *            cannot determine its value at this time.
      * @see org.xml.sax.XMLReader#getFeature
      */
     public boolean getFeature (String name)
@@ -191,11 +187,11 @@ public class XMLFilterImpl
      * <p>This will always fail if the parent is null.</p>
      *
      * @param name The property name.
-     * @param state The requested property value.
-     * @exception org.xml.sax.SAXNotRecognizedException When the
-     *            XMLReader does not recognize the property name.
+     * @param value The requested property value.
+     * @exception org.xml.sax.SAXNotRecognizedException If the property
+     *            value can't be assigned or retrieved from the parent.
      * @exception org.xml.sax.SAXNotSupportedException When the
-     *            XMLReader recognizes the property name but 
+     *            parent recognizes the property name but 
      *            cannot set the requested value.
      * @see org.xml.sax.XMLReader#setProperty
      */
@@ -215,10 +211,10 @@ public class XMLFilterImpl
      *
      * @param name The property name.
      * @return The current value of the property.
-     * @exception org.xml.sax.SAXNotRecognizedException When the
-     *            XMLReader does not recognize the feature name.
+     * @exception org.xml.sax.SAXNotRecognizedException If the property
+     *            value can't be assigned or retrieved from the parent.
      * @exception org.xml.sax.SAXNotSupportedException When the
-     *            XMLReader recognizes the property name but 
+     *            parent recognizes the property name but 
      *            cannot determine its value at this time.
      * @see org.xml.sax.XMLReader#setFeature
      */
@@ -237,17 +233,11 @@ public class XMLFilterImpl
      * Set the entity resolver.
      *
      * @param resolver The new entity resolver.
-     * @exception java.lang.NullPointerException If the resolver
-     *            is null.
      * @see org.xml.sax.XMLReader#setEntityResolver
      */
     public void setEntityResolver (EntityResolver resolver)
     {
-	if (resolver == null) {
-	    throw new NullPointerException("Null entity resolver");
-	} else {
-	    entityResolver = resolver;
-	}
+	entityResolver = resolver;
     }
 
 
@@ -267,17 +257,11 @@ public class XMLFilterImpl
      * Set the DTD event handler.
      *
      * @param resolver The new DTD handler.
-     * @exception java.lang.NullPointerException If the handler
-     *            is null.
      * @see org.xml.sax.XMLReader#setDTDHandler
      */
     public void setDTDHandler (DTDHandler handler)
     {
-	if (handler == null) {
-	    throw new NullPointerException("Null DTD handler");
-	} else {
-	    dtdHandler = handler;
-	}
+	dtdHandler = handler;
     }
 
 
@@ -297,17 +281,11 @@ public class XMLFilterImpl
      * Set the content event handler.
      *
      * @param resolver The new content handler.
-     * @exception java.lang.NullPointerException If the handler
-     *            is null.
      * @see org.xml.sax.XMLReader#setContentHandler
      */
     public void setContentHandler (ContentHandler handler)
     {
-	if (handler == null) {
-	    throw new NullPointerException("Null content handler");
-	} else {
-	    contentHandler = handler;
-	}
+	contentHandler = handler;
     }
 
 
@@ -327,17 +305,11 @@ public class XMLFilterImpl
      * Set the error event handler.
      *
      * @param handle The new error handler.
-     * @exception java.lang.NullPointerException If the handler
-     *            is null.
      * @see org.xml.sax.XMLReader#setErrorHandler
      */
     public void setErrorHandler (ErrorHandler handler)
     {
-	if (handler == null) {
-	    throw new NullPointerException("Null error handler");
-	} else {
-	    errorHandler = handler;
-	}
+	errorHandler = handler;
     }
 
 
