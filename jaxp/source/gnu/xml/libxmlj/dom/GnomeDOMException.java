@@ -34,7 +34,54 @@ extends DOMException
 
   GnomeDOMException (short code, String message)
   {
-    super (code, message);
+    super (code, createMessage (code, message));
+  }
+
+  private static String createMessage (int code, String message)
+  {
+    if (message != null)
+      {
+        return message;
+      }
+    switch (code)
+      {
+      case INDEX_SIZE_ERR:
+        return "INDEX_SIZE_ERR";
+      case DOMSTRING_SIZE_ERR:
+        return "DOMSTRING_SIZE_ERR";
+      case HIERARCHY_REQUEST_ERR:
+        return "HIERARCHY_REQUEST_ERR";
+      case WRONG_DOCUMENT_ERR:
+        return "WRONG_DOCUMENT_ERR";
+      case INVALID_CHARACTER_ERR:
+        return "INVALID_CHARACTER_ERR";
+      case NO_DATA_ALLOWED_ERR:
+        return "NO_DATA_ALLOWED_ERR";
+      case NO_MODIFICATION_ALLOWED_ERR:
+        return "NO_MODIFICATION_ALLOWED_ERR";
+      case NOT_FOUND_ERR:
+        return "NOT_FOUND_ERR";
+      case NOT_SUPPORTED_ERR:
+        return "NOT_SUPPORTED_ERR";
+      case INUSE_ATTRIBUTE_ERR:
+        return "INUSE_ATTRIBUTE_ERR";
+      case INVALID_STATE_ERR:
+        return "INVALID_STATE_ERR";
+      case SYNTAX_ERR:
+        return "SYNTAX_ERR";
+      case INVALID_MODIFICATION_ERR:
+        return "INVALID_MODIFICATION_ERR";
+      case NAMESPACE_ERR:
+        return "NAMESPACE_ERR";
+      case INVALID_ACCESS_ERR:
+        return "INVALID_ACCESS_ERR";
+      case VALIDATION_ERR:
+        return "VALIDATION_ERR";
+      case TYPE_MISMATCH_ERR:
+        return "TYPE_MISMATCH_ERR";
+      default:
+        return null;
+      }
   }
   
 }

@@ -52,33 +52,25 @@ implements Element
     return getNodeName ();
   }
 
-  public String getAttribute (String name)
-  {
-    return getAttributeNS (null, name);
-  }
+  public native String getAttribute (String name);
 
-  public void setAttribute (String name, String value)
-    throws DOMException
-  {
-    setAttributeNS (null, name, value);
-  }
+  public native void setAttribute (String name, String value)
+    throws DOMException;
   
   public void removeAttribute (String name)
     throws DOMException
   {
-    removeAttributeNS (null, name);
+    Attr attr = getAttributeNode (name);
+    if (attr != null)
+      {
+        removeAttributeNode (attr);
+      }
   }
 
-  public Attr getAttributeNode (String name)
-  {
-    return getAttributeNodeNS (null, name);
-  }
+  public native Attr getAttributeNode (String name);
   
-  public Attr setAttributeNode (Attr newAttr)
-    throws DOMException
-  {
-    return setAttributeNodeNS (newAttr);
-  }
+  public native Attr setAttributeNode (Attr newAttr)
+    throws DOMException;
 
   public native Attr removeAttributeNode (Attr oldAttr)
     throws DOMException;

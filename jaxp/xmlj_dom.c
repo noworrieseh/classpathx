@@ -39,6 +39,118 @@
 JNIEnv *dom_cb_env;
 jobject dom_cb_obj;
 
+/*
+ * Determines whether a child node is suitable for insertion in the list of
+ * children for a given parent node.
+ * Returns 0 on success, a DOMException code otherwise.
+ */
+int
+xmljValidateChildNode (xmlNodePtr parent, xmlNodePtr child)
+{
+  xmlNodePtr cur;
+  
+  if (child == NULL || parent == NULL)
+    {
+      return 8;	/* NOT_FOUND_ERR */
+    }
+  if (child->doc != parent->doc)
+    {
+      return 4;	/* WRONG_DOCUMENT_ERR */
+    }
+  /* Check that new parent is of an allowed type */
+  switch (parent->type)
+    {
+    case XML_ATTRIBUTE_NODE:
+    case XML_CDATA_SECTION_NODE:
+    case XML_COMMENT_NODE:
+    case XML_TEXT_NODE:
+    case XML_ENTITY_NODE:
+    case XML_ENTITY_REF_NODE:
+    case XML_NOTATION_NODE:
+    case XML_PI_NODE:
+      /* these can't have any children */
+      return 3;	/* HIERARCHY_REQUEST_ERR */
+    case XML_DOCUMENT_FRAG_NODE:
+    case XML_ELEMENT_NODE:
+      if (child->type == XML_DTD_NODE ||
+          child->type == XML_DOCUMENT_TYPE_NODE ||
+          child->type == XML_ENTITY_NODE ||
+          child->type == XML_NOTATION_NODE ||
+          child->type == XML_PI_NODE)
+        {
+          return 3;	/* HIERARCHY_REQUEST_ERR */
+        }
+      /* fall through */
+    default:
+      if (child->type == XML_ATTRIBUTE_NODE ||
+          child->type == XML_DOCUMENT_NODE ||
+          child->type == XML_DOCUMENT_FRAG_NODE)
+        {
+          return 3;	/* HIERARCHY_REQUEST_ERR */
+        }
+      /* TODO others? */
+    }
+  /* Check that new parent is not self or an ancestor */
+  for (cur = parent; cur != NULL; cur = cur->parent)
+    {
+      if (cur == child)
+        {
+          return 3;	/* HIERARCHY_REQUEST_ERR */
+        }
+    }
+  /* Check that new parent does not add a second doctype or root element
+   * to a document parent */
+  if (parent->type == XML_DOCUMENT_NODE)
+    {
+      cur = parent->children;
+      while (cur != NULL)
+        {
+          if (cur->type == XML_DTD_NODE ||
+              cur->type == XML_DOCUMENT_TYPE_NODE ||
+              cur->type == XML_ELEMENT_NODE)
+            {
+              if (child->type == cur->type && child != cur)
+                {
+                  return 3;	/* HIERARCHY_REQUEST_ERR */
+                }
+            }
+          cur = cur->next;
+        }
+    }
+  return 0;
+}
+
+/*
+ * Adds the specified attribute node to the list of attributes for the given
+ * element.
+ */
+void
+xmljAddAttribute (xmlNodePtr node, xmlAttrPtr attr)
+{
+  xmlAttrPtr cur = node->properties;
+  
+  if (cur == NULL)
+    {
+      node->properties = attr;
+      attr->prev = NULL;
+      attr->next = NULL;
+      attr->parent = node;
+      attr->doc = node->doc;
+    }
+  else
+    {
+      while (cur->next != NULL)
+        {
+          cur = cur->next;
+        }
+      cur->next = attr;
+      attr->prev = cur;
+      attr->next = NULL;
+      attr->parent = node;
+      attr->doc = node->doc;
+    }
+}
+
 /* -- GnomeAttr -- */
 
 JNIEXPORT jboolean JNICALL
@@ -308,6 +420,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementById (JNIEnv * env,
                                                        jstring elementId)
 {
   /* TODO */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -407,12 +520,18 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_renameNode (JNIEnv * env,
                                                    jstring qName)
 {
   xmlNodePtr node;
+  xmlNsPtr ns;
   const xmlChar *s_qName;
   const xmlChar *href;
   const xmlChar *prefix;
   int *len;
 
   node = xmljGetNodeID (env, n);
+  if (node == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL); /* NOT_FOUND_ERR */
+      return NULL;
+    }
   s_qName = xmljGetStringChars (env, qName);
   if (xmlValidateQName (s_qName, 0))
     {
@@ -424,14 +543,24 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_renameNode (JNIEnv * env,
   href = xmljGetStringChars (env, namespaceURI);
   len = (int *) malloc (sizeof (int));
   prefix = xmlSplitQName3 (s_qName, len);
-  if (node->ns == NULL)
+  ns = node->ns;
+  if (ns == NULL)
     {
-      node->ns = xmlNewNs (node, href, prefix);
+      if (href != NULL)
+        {
+          ns = xmlNewNs (node, href, prefix);
+          xmlSetNs (node, ns);
+        }
     }
   else
     {
-      node->ns->href = href;
-      node->ns->prefix = prefix;
+      node->ns = NULL;
+      /*xmlFreeNs (ns); FIXME this can segfault (?) */
+      if (href != NULL)
+        {
+          ns = xmlNewNs (node, href, prefix);
+          xmlSetNs (node, ns);
+        }
     }
   free (len);
   return n;
@@ -581,6 +710,8 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
         {
           dtd = xmlCreateIntSubset (doc, name, publicId, systemId);
           /* TODO parse internal subset? */
+          xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
+          return NULL;
         }
     }
   
@@ -602,6 +733,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getEntities (JNIEnv * env,
 
   dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
   /* TODO dtd->entities */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -613,6 +745,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getNotations (JNIEnv * env,
 
   dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
   /* TODO dtd->entities */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -641,10 +774,94 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getInternalSubset (JNIEnv * env,
                                                               jobject self)
 {
   /* TODO */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
 /* -- GnomeElement -- */
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_getAttribute (JNIEnv * env,
+                                                    jobject self,
+                                                    jstring name)
+{
+  xmlNodePtr node;
+  const xmlChar *s_name;
+  
+  node = xmljGetNodeID (env, self);
+  s_name = xmljGetStringChars (env, name);
+  return xmljNewString (env, xmlGetProp (node, s_name));
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_setAttribute (JNIEnv * env,
+                                                    jobject self,
+                                                    jstring name,
+                                                    jstring value)
+{
+  xmlNodePtr node;
+  const xmlChar *s_name;
+  const xmlChar *s_value;
+  
+  node = xmljGetNodeID (env, self);
+  s_name = xmljGetStringChars (env, name);
+  if (xmlValidateName (s_name, 0))
+    {
+      xmljThrowDOMException (env, 5, NULL); /* INVALID_CHARACTER_ERR */
+      return;
+    }
+  s_value = xmljGetStringChars (env, value);
+  xmlSetProp (node, s_name, s_value);
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNode (JNIEnv * env,
+                                                        jobject self,
+                                                        jstring name)
+{
+  xmlNodePtr node;
+  const xmlChar *s_name;
+  xmlAttrPtr attr;
+
+  node = xmljGetNodeID (env, self);
+  s_name = xmljGetStringChars (env, name);
+  attr = xmlHasProp (node, s_name);
+  if (attr == NULL)
+    {
+      return NULL;
+    }
+  return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNode (JNIEnv * env,
+                                                        jobject self,
+                                                        jobject newAttr)
+{
+  xmlNodePtr node;
+  xmlAttrPtr new_attr;
+  xmlAttrPtr old_attr;
+
+  node = xmljGetNodeID (env, self);
+  new_attr = (xmlAttrPtr) xmljGetNodeID (env, newAttr);
+  if (new_attr->parent != NULL)
+    {
+      xmljThrowDOMException (env, 10, NULL); /* INUSE_ATTRIBUTE_ERR */
+      return NULL;
+    }
+  if (new_attr->doc != node->doc)
+    {
+      xmljThrowDOMException (env, 4, NULL); /* WRONG_DOCUMENT_ERR */
+      return NULL;
+    }
+  old_attr = xmlHasProp (node, new_attr->name);
+  if (old_attr)
+    {
+      xmlUnlinkNode ((xmlNodePtr) old_attr);
+    }
+  xmljAddAttribute (node, new_attr);
+  return xmljGetNodeInstance (env, (xmlNodePtr) old_attr);
+}
 
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_removeAttributeNode (JNIEnv * env,
@@ -700,6 +917,11 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNS (JNIEnv * env,
 
   node = xmljGetNodeID (env, self);
   s_qName = xmljGetStringChars (env, qName);
+  if (xmlValidateQName (s_qName, 0))
+    {
+      xmljThrowDOMException (env, 5, NULL); /* INVALID_CHARACTER_ERR */
+      return;
+    }
   s_value = xmljGetStringChars (env, value);
   if (uri == NULL)
     {
@@ -752,8 +974,31 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNodeNS (JNIEnv * env,
                                                           jobject self,
                                                           jobject newAttr)
 {
-  /* TODO */
-  return NULL;
+  xmlNodePtr node;
+  xmlAttrPtr new_attr;
+  xmlAttrPtr old_attr;
+  const xmlChar *uri;
+
+  node = xmljGetNodeID (env, self);
+  new_attr = (xmlAttrPtr) xmljGetNodeID (env, newAttr);
+  if (new_attr->parent != NULL)
+    {
+      xmljThrowDOMException (env, 10, NULL); /* INUSE_ATTRIBUTE_ERR */
+      return NULL;
+    }
+  if (new_attr->doc != node->doc)
+    {
+      xmljThrowDOMException (env, 4, NULL); /* WRONG_DOCUMENT_ERR */
+      return NULL;
+    }
+  uri = (new_attr->ns != NULL) ? new_attr->ns->href : NULL;
+  old_attr = xmlHasNsProp (node, new_attr->name, uri);
+  if (old_attr)
+    {
+      xmlUnlinkNode ((xmlNodePtr) old_attr);
+    }
+  xmljAddAttribute (node, new_attr);
+  return xmljGetNodeInstance (env, (xmlNodePtr) old_attr);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -813,6 +1058,7 @@ Java_gnu_xml_libxmlj_dom_GnomeEntity_getNotationName (JNIEnv * env,
                                                       jobject self)
 {
   /* TODO */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -982,25 +1228,34 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeName (JNIEnv * env, jobject self)
   return xmljNewString (env, node->name);
 }
 
+const xmlChar *
+xmljGetNodeValue (xmlNodePtr node)
+{
+  xmlBufferPtr buf;
+  const xmlChar *ret;
+  
+  /* If not character data, return null */
+  if (node->type != XML_TEXT_NODE &&
+      node->type != XML_CDATA_SECTION_NODE &&
+      node->type != XML_COMMENT_NODE)
+    {
+      return NULL;
+    }
+
+  buf = xmlBufferCreate ();
+  xmlNodeBufGetContent (buf, node);
+  ret = buf->content;
+  xmlFree (buf);
+  return ret;
+}
+
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeValue (JNIEnv * env, jobject self)
 {
   xmlNodePtr node;
-  xmlBufferPtr buf;
-  jstring ret;
 
   node = xmljGetNodeID (env, self);
-
-  /* If not character data, return null */
-  if (node->type != XML_TEXT_NODE &&
-      node->type != XML_CDATA_SECTION_NODE && node->type != XML_COMMENT_NODE)
-    return NULL;
-
-  buf = xmlBufferCreate ();
-  xmlNodeBufGetContent (buf, node);
-  ret = xmljNewString (env, buf->content);
-  xmlFree (buf);
-  return ret;
+  return xmljNewString (env, xmljGetNodeValue (node));
 }
 
 JNIEXPORT void JNICALL
@@ -1102,16 +1357,13 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
   xmlNodePtr node;
   xmlNodePtr newChildNode;
   xmlNodePtr refChildNode;
+  int invalid;
 
   node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
   refChildNode = xmljGetNodeID (env, refChild);
 
-  if (newChildNode == NULL)
-    {
-      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
-      return NULL;
-    }
+  /* Is refChildNode a child of this node? */
   if (refChildNode == NULL ||
       refChildNode->parent == NULL ||
       refChildNode->parent != node)
@@ -1119,15 +1371,16 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
     }
-  if (newChildNode->doc != refChildNode->doc)
+  /* Check new child */
+  invalid = xmljValidateChildNode (node, newChildNode);
+  if (invalid)
     {
-      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+      xmljThrowDOMException (env, invalid, NULL);
+      return NULL;
     }
-  if (!xmlAddPrevSibling (refChildNode, newChildNode))
-    {
-      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-    }
-  return newChild;
+
+  newChildNode = xmlAddPrevSibling (refChildNode, newChildNode);
+  return xmljGetNodeInstance (env, newChild);
 }
 
 JNIEXPORT jobject JNICALL
@@ -1139,17 +1392,13 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
   xmlNodePtr node;
   xmlNodePtr newChildNode;
   xmlNodePtr oldChildNode;
-  xmlNodePtr cur;
+  int invalid;
 
   node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
   oldChildNode = xmljGetNodeID (env, oldChild);
 
-  if (newChildNode == NULL)
-    {
-      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
-      return NULL;
-    }
+  /* Is oldChildNode a child of this node? */
   if (oldChildNode == NULL ||
       oldChildNode->parent == NULL ||
       oldChildNode->parent != node)
@@ -1157,81 +1406,14 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
     }
-  if (newChildNode->doc != oldChildNode->doc)
+  /* Check new child */
+  invalid = xmljValidateChildNode (node, newChildNode);
+  if (invalid)
     {
-      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+      xmljThrowDOMException (env, invalid, NULL);
       return NULL;
     }
-  /* Check that new node is of an allowed type */
-  switch (node->type)
-    {
-    case XML_ATTRIBUTE_NODE:
-    case XML_CDATA_SECTION_NODE:
-    case XML_COMMENT_NODE:
-    case XML_TEXT_NODE:
-    case XML_ENTITY_NODE:
-    case XML_ENTITY_REF_NODE:
-    case XML_NOTATION_NODE:
-    case XML_PI_NODE:
-      /* these can't have any children */
-      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-      return NULL;
-    case XML_DOCUMENT_FRAG_NODE:
-      if (newChildNode->type == XML_ATTRIBUTE_NODE)
-        {
-          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-          return NULL;
-        }
-      /* fall through */
-    case XML_ELEMENT_NODE:
-      if (newChildNode->type == XML_DTD_NODE ||
-          newChildNode->type == XML_DOCUMENT_TYPE_NODE ||
-          newChildNode->type == XML_ENTITY_NODE ||
-          newChildNode->type == XML_NOTATION_NODE ||
-          newChildNode->type == XML_PI_NODE)
-        {
-          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-          return NULL;
-        }
-      /* fall through */
-    default:
-      if (newChildNode->type == XML_DOCUMENT_NODE ||
-          newChildNode->type == XML_DOCUMENT_FRAG_NODE)
-        {
-          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-          return NULL;
-        }
-      /* TODO others? */
-    }
-  /* Check that new node is not self or an ancestor */
-  for (cur = node; cur != NULL; cur = cur->parent)
-    {
-      if (cur == newChildNode)
-        {
-          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-          return NULL;
-        }
-    }
-  /* Check that new node does not add a second doctype or root element
-   * to a document node */
-  if (node->type == XML_DOCUMENT_NODE)
-    {
-      cur = node->children;
-      while (cur != NULL)
-        {
-          if (cur->type == XML_DTD_NODE ||
-              cur->type == XML_DOCUMENT_TYPE_NODE ||
-              cur->type == XML_ELEMENT_NODE)
-            {
-              if (newChildNode->type == cur->type && newChildNode != cur)
-                {
-                  xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-                  return NULL;
-                }
-            }
-          cur = cur->next;
-        }
-    }
+  
   newChildNode = xmlReplaceNode (oldChildNode, newChildNode);
   return xmljGetNodeInstance (env, newChildNode);
 }
@@ -1247,12 +1429,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_removeChild (JNIEnv * env,
   node = xmljGetNodeID (env, self);
   oldChildNode = xmljGetNodeID (env, oldChild);
 
-  if (oldChildNode == NULL)
-    {
-      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
-      return NULL;
-    }
-  if (oldChildNode->parent != node)
+  if (oldChildNode == NULL ||
+      oldChildNode->parent == NULL ||
+      oldChildNode->parent != node)
     {
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
@@ -1268,24 +1447,21 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv * env,
 {
   xmlNodePtr node;
   xmlNodePtr newChildNode;
+  int invalid;
 
   node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
   
-  if (newChildNode == NULL)
+  /* Check new child */
+  invalid = xmljValidateChildNode (node, newChildNode);
+  if (invalid)
     {
-      xmljThrowDOMException (env, 8, NULL);     /* NOT_FOUND_ERR */
+      xmljThrowDOMException (env, invalid, NULL);
       return NULL;
     }
-  if (newChildNode->doc != node->doc)
-    {
-      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
-    }
-  if (!xmlAddChild (node, newChildNode))
-    {
-      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
-    }
-  return newChild;
+
+  newChildNode = xmlAddChild (node, newChildNode);
+  return xmljGetNodeInstance (env, newChild);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1302,6 +1478,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_cloneNode (JNIEnv * env,
                                               jobject self, jboolean deep)
 {
   /* TODO */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -1309,16 +1486,7 @@ JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_normalize (JNIEnv * env, jobject self)
 {
   /* TODO */
-}
-
-JNIEXPORT jboolean JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeNode_isSupported (JNIEnv * env,
-                                                jobject self,
-                                                jstring feature,
-                                                jstring version)
-{
-  /* TODO */
-  return 0;
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
 }
 
 JNIEXPORT jstring JNICALL
@@ -1328,6 +1496,11 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNamespaceURI (JNIEnv * env,
   xmlNodePtr node;
 
   node = xmljGetNodeID (env, self);
+  if (node->type != XML_ELEMENT_NODE &&
+      node->type != XML_ATTRIBUTE_NODE)
+    {
+      return NULL;
+    }
   if (node->ns == NULL)
     {
       return NULL;
@@ -1341,6 +1514,11 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getPrefix (JNIEnv * env, jobject self)
   xmlNodePtr node;
 
   node = xmljGetNodeID (env, self);
+  if (node->type != XML_ELEMENT_NODE &&
+      node->type != XML_ATTRIBUTE_NODE)
+    {
+      return NULL;
+    }
   if (node->ns == NULL)
     {
       return NULL;
@@ -1361,9 +1539,16 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setPrefix (JNIEnv * env,
       xmljThrowDOMException (env, 5, NULL);	/* INVALID_CHARACTER_ERR */
     }
   node = xmljGetNodeID (env, self);
+  if (node->type != XML_ELEMENT_NODE &&
+      node->type != XML_ATTRIBUTE_NODE)
+    {
+      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+      return;
+    }
   if (node->ns == NULL)
     {
       xmljThrowDOMException (env, 14, NULL);	/* NAMESPACE_ERR */
+      return;
     }
   node->ns->prefix = s_prefix;
 }
@@ -1466,6 +1651,116 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_lookupNamespaceURI (JNIEnv * env,
       return NULL;
     }
   return xmljNewString (env, ns->href);
+}
+
+int
+xmljIsEqualNodeList (xmlNodePtr node1, xmlNodePtr node2)
+{
+  while (node1 != NULL)
+    {
+      if (!xmljIsEqualNode (node1, node2))
+        {
+          return 0;
+        }
+      node1 = node1->next;
+      node2 = node2->next;
+    }
+  return 1;
+}
+
+int
+xmljIsEqualNode (xmlNodePtr node1, xmlNodePtr node2)
+{
+  const xmlChar *val1;
+  const xmlChar *val2;
+  
+  if (node1 == node2)
+    {
+      return 1;
+    }
+  if (node1 == NULL || node2 == NULL)
+    {
+      return 0;
+    }
+  /* Check node type */
+  if (node1->type != node2->type)
+    {
+      return 0;
+    }
+  /* Check node name */
+  if (!xmlStrEqual (node1->name, node2->name))
+    {
+      return 0;
+    }
+  /* Check node namespace */
+  if (node1->type == XML_ELEMENT_NODE ||
+      node1->type == XML_ATTRIBUTE_NODE)
+    {
+      xmlNsPtr ns1, ns2;
+      
+      ns1 = node1->ns;
+      if (ns1 != NULL)
+        {
+          ns2 = node2->ns;
+          if (ns2 == NULL)
+            {
+              return 0;
+            }
+          val1 = ns1->href;
+          val2 = ns2->href;
+          if (!xmlStrEqual (val1, val2))
+            {
+              return 0;
+            }
+        }
+    }
+  /* Check node value */
+  val1 = xmljGetNodeValue (node1);
+  val2 = xmljGetNodeValue (node2);
+  if (!xmlStrEqual (val1, val2))
+    {
+      return 0;
+    }
+  /* Check attributes */
+  if (node1->type == XML_ELEMENT_NODE &&
+      !xmljIsEqualNodeList ((xmlNodePtr) node1->properties,
+                            (xmlNodePtr) node2->properties))
+    {
+      return 0;
+    }
+  /* Check doctype */
+  if (node1->type == XML_DOCUMENT_NODE)
+    {
+      xmlDocPtr doc1 = (xmlDocPtr) node1;
+      xmlDocPtr doc2 = (xmlDocPtr) node2;
+
+      if (!xmljIsEqualNode ((xmlNodePtr) doc1->intSubset,
+                            (xmlNodePtr) doc2->intSubset) ||
+          !xmljIsEqualNode ((xmlNodePtr) doc1->extSubset,
+                            (xmlNodePtr) doc2->extSubset))
+        {
+          return 0;
+        }
+    }
+  /* Check child nodes */
+  if (!xmljIsEqualNodeList (node1->children, node2->children))
+    {
+      return 0;
+    }
+  return 1;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeNode_isEqualNode (JNIEnv * env,
+                                                jobject self,
+                                                jobject arg)
+{
+  xmlNodePtr node1;
+  xmlNodePtr node2;
+
+  node1 = xmljGetNodeID (env, self);
+  node2 = xmljGetNodeID (env, arg);
+  return xmljIsEqualNode (node1, node2);
 }
 
 /* -- GnomeNodeList -- */
@@ -1571,6 +1866,7 @@ JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_getTypeName (JNIEnv *env, jobject self)
 {
   /* TODO when XML Schema support is available */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -1579,6 +1875,7 @@ Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_getTypeNamespace (JNIEnv *env,
                                                          jobject self)
 {
   /* TODO when XML Schema support is available */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return NULL;
 }
 
@@ -1590,6 +1887,7 @@ Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_isDerivedFrom (JNIEnv *env,
                                                       jint method)
 {
   /* TODO when XML Schema support is available */
+  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
   return 0;
 }
 
@@ -1606,7 +1904,9 @@ xmljCreateDocument (JNIEnv * env, jobject self, xmlDocPtr doc)
   jobject ret;
 
   if (doc == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   /* Get document object */
   ret = xmljGetNodeInstance (env, (xmlNodePtr) doc);

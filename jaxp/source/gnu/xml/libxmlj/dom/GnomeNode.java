@@ -208,7 +208,11 @@ implements Node
 
   public native void normalize ();
 
-  public native boolean isSupported (String feature, String version);
+  public boolean isSupported (String feature, String version)
+  {
+    return getOwnerDocument ().getImplementation ()
+      .hasFeature (feature, version);
+  }
 
   public native String getNamespaceURI ();
 
@@ -323,82 +327,12 @@ implements Node
   
   public native String lookupNamespaceURI (String prefix);
   
-  public boolean isEqualNode (Node arg)
-  {
-    if (equals (arg))
-      {
-        return true;
-      }
-    if (getNodeType() != arg.getNodeType ())
-      {
-        return false;
-      }
-    if (!equal (getNodeName (), arg.getNodeName ()))
-      {
-        return false;
-      }
-    if (!equal (getLocalName (), arg.getLocalName ()))
-      {
-        return false;
-      }
-    if (!equal (getNamespaceURI (), arg.getNamespaceURI ()))
-      {
-        return false;
-      }
-    if (!equal (getPrefix (), arg.getPrefix ()))
-      {
-        return false;
-      }
-    if (!equal (getNodeValue (), arg.getNodeValue ()))
-      {
-        return false;
-      }
-    // TODO Attr NamedNodeMap
-    // TODO DocumentType
-    if (!equal (getChildNodes (), arg.getChildNodes ()))
-      {
-        return false;
-      }
-    return true;
-  }
-
-  boolean equal (String arg1, String arg2)
-  {
-    return ((arg1 == null && arg2 == null) ||
-            (arg1 != null && arg1.equals (arg2))); 
-  }
-  
-  boolean equal (NodeList arg1, NodeList arg2)
-  {
-    if (arg1 == null && arg2 == null)
-      {
-        return true;
-      }
-    if (arg1 == null || arg2 == null)
-      {
-        return false;
-      }
-    int len1 = arg1.getLength ();
-    int len2 = arg2.getLength ();
-    if (len1 != len2)
-      {
-        return false;
-      }
-    for (int i = 0; i < len1; i++)
-      {
-        Node child1 = arg1.item (i);
-        Node child2 = arg2.item (i);
-        if (child1.isSameNode (child2))
-          {
-            return false;
-          }
-      }
-    return true;
-  }
+  public native boolean isEqualNode (Node arg);
   
   public Object getFeature (String feature, String version)
   {
-    return null;
+    return getOwnerDocument ().getImplementation ()
+      .getFeature (feature, version);
   }
 
   public Object setUserData (String key, Object data, UserDataHandler handler)

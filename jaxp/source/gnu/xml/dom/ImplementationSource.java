@@ -45,7 +45,7 @@ implements DOMImplementationSource
    */
   private static final DOMImplementation[] implementations =
     {
-      new gnu.xml.dom.DomImpl (),
+      //new gnu.xml.dom.DomImpl (),
       new gnu.xml.libxmlj.dom.GnomeDocumentBuilder ()
     };
 
@@ -108,18 +108,27 @@ implements DOMImplementationSource
         if (c == ' ')
           {
             if (pos + 1 < len &&
-                DIGITS.indexOf (features.charAt (pos + 1)) != -1)
+                DIGITS.indexOf (features.charAt (pos + 1)) == -1)
               {
-                list.add (features.substring (start, pos));
+                list.add (getFeature (features, start, pos));
                 start = pos + 1;
               }
           }
       }
     if (pos > start)
       {
-        list.add (features.substring (start, pos));
+        list.add (getFeature (features, start, len));
       }
     return list;
+  }
+
+  String getFeature (String features, int start, int end)
+  {
+    if (features.length () > 0 && features.charAt (start) == '+')
+      {
+        return features.substring (start + 1, end);
+      }
+    return features.substring (start, end);
   }
 
 }
