@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha160.java,v 1.1 2001-12-08 21:34:45 raif Exp $
+// $Id: Sha160.java,v 1.2 2001-12-15 02:07:11 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -55,7 +55,7 @@ import java.io.PrintWriter;
  * STANDARD</a><br>
  * Federal Information, Processing Standards Publication 180-1, 1995 April 17.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Sha160 extends BaseHash {
 
@@ -109,6 +109,60 @@ public class Sha160 extends BaseHash {
       this.buffer = (byte[]) md.buffer.clone();
    }
 
+   // Class methods
+   // -------------------------------------------------------------------------
+
+   public static final int[] G(int h0, int h1, int h2, int h3, int h4, int[] W) {
+      int A = h0;
+      int B = h1;
+      int C = h2;
+      int D = h3;
+      int E = h4;
+      int r, T;
+
+      // rounds 0-19
+      for (r = 0; r < 20; r++) {
+         T = (A << 5 | A >>> 27) + ((B & C) | (~B & D)) + E + W[r] + 0x5A827999;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 20-39
+      for (r = 20; r < 40; r++) {
+         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[r] + 0x6ED9EBA1;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 40-59
+      for (r = 40; r < 60; r++) {
+         T = (A << 5 | A >>> 27) + (B & C | B & D | C & D) + E + W[r] + 0x8F1BBCDC;                // K_t
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 60-79
+      for (r = 60; r < 80; r++) {
+         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[r] + 0xCA62C1D6;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      return new int[] {h0+A, h1+B, h2+C, h3+D, h4+E};
+   }
+
    // Cloneable interface implementation
    // -------------------------------------------------------------------------
 
@@ -123,10 +177,10 @@ public class Sha160 extends BaseHash {
    protected void transform(byte[] in, int offset) {
       int t;
       for (t = 0; t < 16; t++) {
-         W[t] =  in[offset++]         << 24 |
-                (in[offset++] & 0xFF) << 16 |
-                (in[offset++] & 0xFF) <<  8 |
-                (in[offset++] & 0xFF);
+         W[t] = in[offset++]         << 24 |
+               (in[offset++] & 0xFF) << 16 |
+               (in[offset++] & 0xFF) <<  8 |
+               (in[offset++] & 0xFF);
       }
 
       int T;
@@ -135,57 +189,13 @@ public class Sha160 extends BaseHash {
          W[t] = T << 1 | T >>> 31;
       }
 
-      int A = h0;
-      int B = h1;
-      int C = h2;
-      int D = h3;
-      int E = h4;
+      int[] result = G(h0, h1, h2, h3, h4, W);
 
-      // rounds 0-19
-      for (t = 0; t < 20; ++ t) {
-         T = (A << 5 | A >>> 27) + ((B & C) | (~B & D)) + E + W[t] + 0x5A827999;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      // rounds 20-39
-      for (t = 20; t < 40; ++ t) {
-         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[t] + 0x6ED9EBA1;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      // rounds 40-59
-      for (t = 40; t < 60; ++ t) {
-         T = (A << 5 | A >>> 27) + (B & C | B & D | C & D) + E + W[t] + 0x8F1BBCDC;                // K_t
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      // rounds 60-79
-      for (t = 60; t < 80; ++ t) {
-         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[t] + 0xCA62C1D6;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      h0 += A;
-      h1 += B;
-      h2 += C;
-      h3 += D;
-      h4 += E;
+      h0 = result[0];
+      h1 = result[1];
+      h2 = result[2];
+      h3 = result[3];
+      h4 = result[4];
    }
 
    protected byte[] padBuffer() {
