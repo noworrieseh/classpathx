@@ -1,5 +1,5 @@
 /* 
- * $Id: libxsltj.c,v 1.1.1.1 2003-02-27 01:22:23 julian Exp $
+ * $Id: libxsltj.c,v 1.2 2003-03-07 01:52:24 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -24,9 +24,11 @@
 #include "gnu_xml_libxmlj_transform_LibxsltStylesheet.h"
 #include "gnu_xml_libxmlj_transform_TransformerFactoryImpl.h"
 #include "gnu_xml_libxmlj_transform_JavaContext.h"
+#include "gnu_xml_libxmlj_transform_LibxmlDocument.h"
 
 #include "xmlj_io.h"
 #include "xmlj_error.h"
+#include "memcheck.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -41,6 +43,7 @@
 #include <libxml/xinclude.h>
 #include <libxml/parser.h>
 #include <libxml/catalog.h>
+#include <libxslt/keys.h>
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
@@ -224,8 +227,9 @@ xmljDocumentFunction (xmlXPathParserContextPtr ctxt, int nargs)
       }
     }
   xmlXPathFreeObject (obj);
-  if (obj2 != NULL)
+  if (obj2 != NULL) {
     xmlXPathFreeObject (obj2);
+  }
 }
 
 /*
@@ -238,11 +242,11 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   JNIEnv * env, jclass clazz, jobject inputStream, jstring inSystemId,
   jstring inPublicId, jobject errorAdapter, jobject outputProperties)
 {
-
   xsltStylesheetPtr nativeStylesheetHandle = 0;
 
   xmlDocPtr xsltSourceDoc;
 
+  /* xmlMemSetup (memcheck_free, memcheck_malloc, memcheck_realloc, memcheck_strdup); */
   xmlSetExternalEntityLoader (xmljLoadExternalEntity);
 
   xsltSourceDoc
@@ -261,7 +265,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
 	    xmljCreateSaxErrorContext (env, errorAdapter,
 				       inSystemId,
 				       inPublicId);
-	  xmljSetGlobalContext (errorContext);
+	  xmljSetThreadContext (errorContext);
 
 	  if (!(*env)->ExceptionOccurred (env))
 	    {
@@ -403,7 +407,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
 		}
 	    }
 
-	  xmljClearGlobalContext ();
+	  xmljClearThreadContext ();
 	}
       else
 	{
@@ -432,10 +436,12 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_freeLibxsltStylesheet
   /* Cast Java long value to handle/address and free associated
    * libxslt resources.
    */
-  xmljFreeSaxErrorContext ((SaxErrorContext *)
-			   ((xsltStylesheetPtr) (int)
-			    nativeStylesheetHandle)->_private);
-  xsltFreeStylesheet ((xsltStylesheetPtr) (int) nativeStylesheetHandle);
+
+  xsltStylesheetPtr nativeStylesheet = (xsltStylesheetPtr) (int) nativeStylesheetHandle;
+  nativeStylesheet->_private = NULL;
+  xmlFreeDoc(nativeStylesheet->doc);
+  nativeStylesheet->doc = NULL;
+  xsltFreeStylesheet (nativeStylesheet);
 }
 
 xmlXPathFunction
@@ -468,9 +474,36 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
   xsltStylesheetPtr stylesheet = ((xsltStylesheetPtr) (int) xsltSource);
 
   {
-    xmlDocPtr xmlSourceDoc = xmljParseJavaInputStream (env, inputStream,
-						       inSystemId, inPublicId,
-						       errorAdapter);
+    jclass javaContextClassID
+      = (*env)->FindClass (env, "gnu/xml/libxmlj/transform/JavaContext");
+
+    jmethodID parseDocumentCachedMethodID
+      = (*env)->GetMethodID (env, javaContextClassID,
+                             "parseDocumentCached",
+                             "(Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/String;)Lgnu/xml/libxmlj/transform/LibxmlDocument;");
+    jclass libxmlDocumentClassID
+      = (*env)->FindClass (env, "gnu/xml/libxmlj/transform/LibxmlDocument");
+
+    jmethodID getNativeHandleMethodID
+      = (*env)->GetMethodID (env, libxmlDocumentClassID,
+                             "getNativeHandle", "()J");
+
+    jobject libxmlDocument =
+      (*env)->CallObjectMethod (env, 
+                                errorAdapter,
+                                parseDocumentCachedMethodID,
+                                inputStream,
+                                inSystemId,
+                                inPublicId);
+
+    xmlDocPtr xmlSourceDoc = 
+      (xmlDocPtr)(int) (*env)->CallLongMethod (env, 
+                                               libxmlDocument,
+                                               getNativeHandleMethodID);
+
+    (*env)->DeleteLocalRef(env, libxmlDocument);
+
+    xmlSourceDoc->_private = (void*) (*env)->NewGlobalRef(env, libxmlDocument);
 
     if (!(*env)->ExceptionOccurred (env))
       {
@@ -557,7 +590,8 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
 						  "XSL transformation failed");
 			      }
 
-			    if (!(*env)->ExceptionOccurred (env))
+			    if (!(*env)->ExceptionOccurred (env)
+                                && NULL != resultTree)
 			      {
 				xmljSaveFileToJavaOutputStream (env,
 								outputStream,
@@ -565,10 +599,38 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
 								(const char*)
                                                                 stylesheet->encoding);
 			      }
+
+                            if (NULL != resultTree)
+                              {
+                                xmlFreeDoc (resultTree);
+                              }
 			  }
 
 			  xmljFreeSaxErrorContext ((SaxErrorContext *)
 						   stylesheet->_private);
+
+                          {
+                            xsltDocumentPtr cur, doc;
+
+                            cur = transformContext->docList;
+                            while (cur != NULL) {
+                              doc = cur;
+                              cur = cur->next;
+                              xsltFreeDocumentKeys(doc);
+                              xmlFree(doc);
+                            }
+                            
+                            cur = transformContext->styleList;
+                            while (cur != NULL) {
+                              doc = cur;
+                              cur = cur->next;
+                              xsltFreeDocumentKeys(doc);
+                              xmlFree(doc);
+                            }
+                          }
+                          transformContext->docList = NULL;
+                          transformContext->styleList = NULL;
+                          xsltFreeTransformContext (transformContext);
 			}
 		      else
 			{
@@ -599,8 +661,6 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
 		(*env)->ThrowNew (env, transformerExceptionClass,
 				  "Couldn't allocate memory for parameters");
 	      }
-
-	    xmlFreeDoc (xmlSourceDoc);
 	  }
 	else
 	  {
@@ -608,6 +668,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
 			      "Couldn't parse source document");
 	  }
       }
+    (*env)->DeleteGlobalRef(env, (jobject) xmlSourceDoc->_private);
   }
 }
 
@@ -644,4 +705,16 @@ Java_gnu_xml_libxmlj_transform_JavaContext_parseDocument (
 					     inSystemId, inPublicId,
 					     jthis);
   return (jlong) (int) tree;
+}
+
+/*
+ * Class:     gnu_xml_libxmlj_transform_LibxmlDocument
+ * Method:    freeDocument
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_transform_LibxmlDocument_freeDocument (
+  JNIEnv *env, jobject jthis, jlong nativeHandle)
+{
+  xmlFreeDoc ((xmlDocPtr) (int) nativeHandle);
 }

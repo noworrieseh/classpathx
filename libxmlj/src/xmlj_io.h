@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_io.h,v 1.2 2003-02-27 13:01:16 julian Exp $
+ * $Id: xmlj_io.h,v 1.3 2003-03-07 01:52:25 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -27,7 +27,8 @@
 #include <jni.h>
 #include <libxml/xmlIO.h>
 #include "xmlj_error.h"
-  xmlDocPtr 
+
+xmlDocPtr 
 xmljParseJavaInputStream (JNIEnv * env, jobject inputStream,
 			  jstring inSystemId, jstring inPublicId,
 			  jobject saxErrorAdapter);

@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_io.c,v 1.2 2003-02-27 13:01:16 julian Exp $
+ * $Id: xmlj_io.c,v 1.3 2003-03-07 01:52:25 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -276,44 +276,32 @@ xmljEstablishParserContext (JNIEnv * env,
 
   if (NULL != inputContext)
     {
+      xmlParserCtxtPtr inputParserCtx 
+        = xmlCreateIOParserCtxt (NULL, NULL,        
+                                 /* NOTE: userdata must be NULL for DOM to work */
+                                 xmljInputReadCallback,
+                                 xmljInputCloseCallback,
+                                 inputContext, encoding);
 
-      xmlSAXHandler *saxHandler =
-	(xmlSAXHandler *) xmlMalloc (sizeof (xmlSAXHandler));
+      xmljInitErrorHandling (inputParserCtx->sax);
 
-      memset (saxHandler, 0, sizeof (xmlSAXHandler));
+      inputParserCtx->userData = inputParserCtx;
 
-      if (NULL != saxHandler)
-	{
-	  xmlParserCtxtPtr inputParserCtx;
-
-	  initxmlDefaultSAXHandler (saxHandler, 0);
-	  xmljInitErrorHandling (saxHandler);
-
-	  inputParserCtx = xmlCreateIOParserCtxt (saxHandler, NULL,        
-                                                  /* NOTE: userdata must be NULL for DOM to work */
-						  xmljInputReadCallback,
-						  xmljInputCloseCallback,
-						  inputContext, encoding);
-
-	  inputParserCtx->userData = inputParserCtx;
-
-	  if (NULL != inputParserCtx)
-	    {
-	      SaxErrorContext *saxErrorContext
-		= xmljCreateSaxErrorContext (env, saxErrorAdapter,
-					     inSystemId, inPublicId);
-
-	      if (NULL != saxErrorContext)
-		{
-		  inputParserCtx->_private = saxErrorContext;
-
-		  return inputParserCtx;
-		}
-	      xmlFreeParserCtxt (inputParserCtx);
-	      xmljFreeSaxErrorContext (saxErrorContext);
-	    }
-	  xmlFree (saxHandler);
-	}
+      if (NULL != inputParserCtx)
+        {
+          SaxErrorContext *saxErrorContext
+            = xmljCreateSaxErrorContext (env, saxErrorAdapter,
+                                         inSystemId, inPublicId);
+          
+          if (NULL != saxErrorContext)
+            {
+              inputParserCtx->_private = saxErrorContext;
+              
+              return inputParserCtx;
+            }
+          xmlFreeParserCtxt (inputParserCtx);
+          xmljFreeSaxErrorContext (saxErrorContext);
+        }
     }
 
   xmljFreeInputStreamContext (inputContext);
@@ -330,6 +318,8 @@ xmljReleaseParserContext (xmlParserCtxtPtr inputParserCtx)
     = (InputStreamContext *) inputParserCtx->input->buf->context;
 
   xmljFreeSaxErrorContext (saxErrorContext);
+
+  //xmlFreeParserI (inputParserCtx);
 
   xmlFreeParserCtxt (inputParserCtx);
 
@@ -446,12 +436,21 @@ xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
   jstring hrefString = (*env)->NewStringUTF (env, URL);
   jstring baseString = saxErrorContext->systemId;
 
-  jlong tree = (*env)->CallLongMethod (env,
-				       saxErrorContext->saxErrorAdapter,
-				       saxErrorContext->
-				       resolveURIAndOpenMethodID,
-				       hrefString,
-				       baseString);
+  jobject libxmlDocument
+    = (*env)->CallObjectMethod (env,
+                                saxErrorContext->saxErrorAdapter,
+                                saxErrorContext->
+                                resolveURIAndOpenMethodID,
+                                hrefString,
+                                baseString);
+
+  jlong tree
+    = (*env)->CallLongMethod (env,
+                              libxmlDocument,
+                              saxErrorContext->
+                              getNativeHandleMethodID);
+
+  (*env)->DeleteLocalRef(env, libxmlDocument);
 
   if ((*env)->ExceptionOccurred (env))
     {
@@ -468,7 +467,6 @@ xmlParserInputPtr
 xmljLoadExternalEntity (const char *URL, const char *ID,
 			xmlParserCtxtPtr ctxt)
 {
-
   SaxErrorContext *saxErrorContext = xmljGetThreadContext ();
 
   JNIEnv *env = saxErrorContext->env;

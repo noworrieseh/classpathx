@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_error.c,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: xmlj_error.c,v 1.2 2003-03-07 01:52:24 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -175,10 +175,16 @@ xmljCreateSaxErrorContext (JNIEnv * env, jobject saxErrorAdapter,
   SaxErrorContext *saxErrorContext
     = (SaxErrorContext *) malloc (sizeof (SaxErrorContext));
 
-  jclass saxErrorAdapterClass = (*env)->FindClass (env,
-						   "gnu/xml/libxmlj/transform/JavaContext");
-  jclass sourceWrapperClass = (*env)->FindClass (env,
-						 "gnu/xml/libxmlj/transform/SourceWrapper");
+  jclass saxErrorAdapterClass 
+    = (*env)->FindClass (env,
+                         "gnu/xml/libxmlj/transform/JavaContext");
+  jclass sourceWrapperClass 
+    = (*env)->FindClass (env,
+                         "gnu/xml/libxmlj/transform/SourceWrapper");
+  jclass libxmlDocumentClassID 
+    = (*env)->FindClass (env, 
+                         "gnu/xml/libxmlj/transform/LibxmlDocument");
+  
   saxErrorContext->saxWarningMethodID
     = (*env)->GetMethodID (env,
 			   saxErrorAdapterClass,
@@ -203,7 +209,7 @@ xmljCreateSaxErrorContext (JNIEnv * env, jobject saxErrorAdapter,
     = (*env)->GetMethodID (env,
 			   saxErrorAdapterClass,
 			   "resolveURIAndOpen",
-			   "(Ljava/lang/String;Ljava/lang/String;)J");
+			   "(Ljava/lang/String;Ljava/lang/String;)Lgnu/xml/libxmlj/transform/LibxmlDocument;");
   saxErrorContext->getInputStreamMethodID
     = (*env)->GetMethodID (env,
 			   sourceWrapperClass,
@@ -223,10 +229,14 @@ xmljCreateSaxErrorContext (JNIEnv * env, jobject saxErrorAdapter,
 			   "<init>",
 			   "(Ljava/lang/String;Ljava/lang/String;II)V");
 
+  saxErrorContext->getNativeHandleMethodID
+    = (*env)->GetMethodID (env,
+			   libxmlDocumentClassID,
+			   "getNativeHandle",
+			   "()J");
+
   saxErrorContext->env = env;
   saxErrorContext->saxErrorAdapter = saxErrorAdapter;
-
-  (*env)->NewGlobalRef (env, saxErrorAdapter);
 
   if (NULL != systemId)
     {
@@ -260,7 +270,6 @@ void
 xmljFreeSaxErrorContext (SaxErrorContext * errorContext)
 {
   JNIEnv *env = errorContext->env;
-  (*env)->DeleteGlobalRef (env, errorContext->saxErrorAdapter);
   if (NULL != errorContext->systemId && NULL != errorContext->systemIdCstr)
     {
       (*env)->ReleaseStringUTFChars (env, errorContext->systemId,

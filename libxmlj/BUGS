@@ -1,22 +1,10 @@
-LibxmlJ 0.1.1
+LibxmlJ 0.1.2
 ------------------------------------------------------------------------
 
 CAVEAT: LibxmlJ's current incarnation is incomplete and partly
-incorrect and may leak memory. Highly experimental.
-
-The shortcomings listed below partly result from architectural
-limitations in libxml/libxslt, removing which would be a time
-consuming task. This means that these problems will probably not be
-fixed anytime soon.
-
-Update: it may be possible to make LibxmlJ thread-safe nonetheless
-using thread context variables.
+incorrect. Highly experimental.
 
 - Thread-safe, but effectively runs single-threaded.
-
-- It may be possible that this version leaks memory and/or prevents
-  the garbage collector from collecting some otherwise unreachable
-  objects.
 
 - Native code passes incorrect URIs to URIResolver.resolve.
 
@@ -36,14 +24,10 @@ using thread context variables.
 
 FIXME:
 
-- Use LRU cache instead of HashMap in JavaContext.
-
-- Check that entries released from cache are freed, including native
-  part.
+- Make LRU caching configurable.
 
 - Check whether <?xml encoding="..."?> headers are honored.
 
 - DefaultURIResolver uses naive approach.
 
 - TransformerFactory.getAssociatedStyleSheet() unfinished.
-

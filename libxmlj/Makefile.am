@@ -1,5 +1,5 @@
 # 
-# $Id: Makefile.am,v 1.2 2003-02-27 13:00:37 julian Exp $
+# $Id: Makefile.am,v 1.3 2003-03-07 01:52:24 julian Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -24,13 +24,18 @@
 lib_LTLIBRARIES = libxmlj.la
 
 libxmlj_la_DEPENDENCIES = \
+	gnu/xml/libxmlj/transform/LibxsltStylesheet.class \
+	gnu/xml/libxmlj/transform/TransformerFactoryImpl.class \
+	gnu/xml/libxmlj/transform/JavaContext.class \
+	gnu/xml/libxmlj/transform/LibxmlDocument.class \
 	javax_xml_transform_OutputKeys.h \
 	gnu_xml_libxmlj_transform_LibxsltStylesheet.h \
 	gnu_xml_libxmlj_transform_TransformerFactoryImpl.h \
-	gnu_xml_libxmlj_transform_JavaContext.h
+	gnu_xml_libxmlj_transform_JavaContext.h \
+	gnu_xml_libxmlj_transform_LibxmlDocument.h
 
 libxmlj_la_SOURCES = src/libxsltj.c src/xmlj_io.c src/xmlj_error.c
-libxmlj_la_LDFLAGS = -release 0.1.1
+libxmlj_la_LDFLAGS = -release 0.1.2
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
 JARFILE = libxmlj.jar
@@ -40,8 +45,7 @@ BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES} ${JARFILE}
 
 # Generate header files for classes containing native code.
 
-gnu_xml_libxmlj_transform_%.h: \
-		gnu/xml/libxmlj/transform/%.class
+gnu_xml_libxmlj_transform_%.h:
 	@JAVAH@ -force -classpath . gnu.xml.libxmlj.transform.$*
 
 javax_xml_transform_%.h:
@@ -95,3 +99,4 @@ dist-hook:
 	cp -r $(srcdir)/src/gnu/* $(distdir)/src/gnu
 	mkdir $(distdir)/testdocs
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
+

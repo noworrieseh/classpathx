@@ -1,5 +1,5 @@
 /* 
- * $Id: TransformerImpl.java,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: TransformerImpl.java,v 1.2 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -64,7 +64,6 @@ import javax.xml.transform.stream.StreamResult;
  */
 public class TransformerImpl
   extends Transformer 
-  implements URIResolver
 {
 
   /**
@@ -81,13 +80,13 @@ public class TransformerImpl
    *  The URIResolver passed in by the {@link TransformFactory} or
    *  {@link Templates}.
    */
-  private URIResolver uriResolver;
+  private URIResolverProxy uriResolverProxy = new URIResolverProxy();
 
   /**
    *  The ErrorListener passed in by the {@link TransformFactory} or
    *  {@link Templates}.
    */
-  private ErrorListener errorListener;
+  private ErrorListenerProxy errorListenerProxy = new ErrorListenerProxy();;
 
   /**
    *  The object representing the underlying Libxslt Stylesheet.
@@ -115,8 +114,8 @@ public class TransformerImpl
                    LibxsltStylesheet stylesheet, 
                    Map attributes)
   {
-    this.uriResolver = uriResolver;
-    this.errorListener = errorListener;
+    this.uriResolverProxy.set(uriResolver);
+    this.errorListenerProxy.set(errorListener);
     this.stylesheet = stylesheet;
 
     // ignore attributes
@@ -141,10 +140,11 @@ public class TransformerImpl
                    Map attributes) 
     throws TransformerConfigurationException
   {
-    this.uriResolver = uriResolver;
-    this.errorListener = errorListener;
+    this.uriResolverProxy.set(uriResolver);
+    this.errorListenerProxy.set(errorListener);
     this.stylesheet =
-      new LibxsltStylesheet (source, new JavaContext (this, errorListener));
+      new LibxsltStylesheet (source, new JavaContext (uriResolverProxy, 
+                                                      errorListenerProxy));
 
     // ignore attributes
   }
@@ -172,24 +172,24 @@ public class TransformerImpl
 
   public void setErrorListener (ErrorListener listener)
   {
-    this.errorListener = listener;
+    this.errorListenerProxy.set(listener);
   } 
 
   public ErrorListener getErrorListener ()
   {
-    return this.errorListener;
+    return this.errorListenerProxy.get();
   }
 
   // Set and get the URIResolver to use on transformation
 
   public void setURIResolver (URIResolver uriResolver)
   {
-    this.uriResolver = uriResolver;
+    this.uriResolverProxy.set(uriResolver);
   } 
 
   public URIResolver getURIResolver ()
   {
-    return this.uriResolver;
+    return this.uriResolverProxy.get();
   }
 
   // Set the output properties to use on transformation; get default
@@ -233,12 +233,7 @@ public class TransformerImpl
     throws TransformerException
   {
     stylesheet.transform (source, result, parameters,
-			  new JavaContext (this, errorListener));
+			  new JavaContext (uriResolverProxy, errorListenerProxy));
   } 
 
-  public Source resolve (String href, String base) 
-    throws TransformerException
-  {
-    return this.uriResolver.resolve (href, base);
-  }
 }

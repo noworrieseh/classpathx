@@ -1,5 +1,5 @@
 /* 
- * $Id: xmlj_error.h,v 1.1.1.1 2003-02-27 01:22:23 julian Exp $
+ * $Id: xmlj_error.h,v 1.2 2003-03-07 01:52:24 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -47,6 +47,7 @@ typedef struct SaxErrorContext_
   jmethodID getInputStreamMethodID;
   jmethodID xsltGenericErrorMethodID;
   jobject theTransformerException;
+  jmethodID getNativeHandleMethodID;
 } SaxErrorContext;
 
 SaxErrorContext * xmljCreateSaxErrorContext (JNIEnv * env,

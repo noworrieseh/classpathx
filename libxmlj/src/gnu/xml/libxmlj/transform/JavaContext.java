@@ -1,5 +1,5 @@
 /* 
- * $Id: JavaContext.java,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: JavaContext.java,v 1.2 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -24,51 +24,84 @@
 package gnu.xml.libxmlj.transform;
 
 import javax.xml.transform.ErrorListener;
+import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+
+import javax.xml.transform.stream.StreamSource;
 
 import java.io.InputStream;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-public class JavaContext
+class JavaContext
 {
+  private static final int CACHE_SIZE = 25;
+
   private ErrorListener errorListener;
   private URIResolver uriResolver;
-  private Map cache = new HashMap ();
+  private static Map cache = new LinkedHashMap (CACHE_SIZE + 1, .75F, true) 
+    {
+      // This method is called just after a new entry has been added
+      public boolean removeEldestEntry (Map.Entry eldest) 
+      {
+        if (this.size () > CACHE_SIZE)
+          {
+            // Note: the following is a workaround for a problem in
+            // the Gcj LinkedHashMap implementation which will
+            // otherwise prevent the removed object to be finalized in
+            // some cases.
+            this.remove(eldest.getKey());
+            try {
+              eldest.setValue(null);
+            }
+            catch (Throwable ignore) {
+            }
+          }
 
-  public JavaContext (URIResolver uriResolver, ErrorListener errorListener)
+        return false;
+      }
+    };
+
+  static void cleanup ()
+  {
+    cache = null;
+  }
+
+  JavaContext (URIResolver uriResolver, ErrorListener errorListener)
   {
     this.errorListener = errorListener;
     this.uriResolver = uriResolver;
   }
-
+  
   //--- Implementation of
   //--- gnu.xml.transform.LibxsltTransformErrorAdapter follows.
-  public void saxWarning (String message, SourceLocator sourceLocator)
+
+  void saxWarning (String message, SourceLocator sourceLocator)
     throws TransformerException
   {
     errorListener.
       warning (new TransformerException (message.trim (), sourceLocator));
   } 
 
-  public void saxError (String message, SourceLocator sourceLocator) 
+  void saxError (String message, SourceLocator sourceLocator) 
     throws TransformerException
   {
     errorListener.
       error (new TransformerException (message.trim (), sourceLocator));
   } 
 
-  public void saxFatalError (String message, SourceLocator sourceLocator) 
+  void saxFatalError (String message, SourceLocator sourceLocator) 
     throws TransformerException
   {
     errorListener.
       fatalError (new TransformerException (message.trim (), sourceLocator));
   } 
 
-  public void xsltGenericError (String message) 
+  void xsltGenericError (String message) 
     throws TransformerException
   {
     TransformerException exception =
@@ -89,25 +122,56 @@ public class JavaContext
       uriResolver + "}";
   }
 
+  //--- DOM caching methods follow
+
   private native long parseDocument (InputStream in, String systemId,
 				     String publicId);
 
-  long resolveURIAndOpen (String href,
-			  String base) 
+  LibxmlDocument resolveURIAndOpen (String href,
+                                    String base) 
     throws TransformerException
   {
-    if (null != cache.get (href))
-      {
-	return ((Long) cache.get (href)).longValue ();
-      }
+    Source source = uriResolver.resolve (href, base);
 
+    return parseDocumentCached (source);
+  }
+
+  LibxmlDocument parseDocumentCached (InputStream in, String systemId, String publicId)
+    throws TransformerException
+  {
+    StreamSource source = new StreamSource ();
+
+    source.setSystemId(systemId);
+    if (null != in) 
+      {
+        source.setInputStream (in);
+      }
+    if (null != publicId) 
+      {
+        source.setPublicId (publicId);
+      }
+    return parseDocumentCached (source);
+  }
+
+  LibxmlDocument parseDocumentCached (Source source)
+    throws TransformerException
+  {
+    String systemId = source.getSystemId ();
+    LibxmlDocument cachedValue = (LibxmlDocument) cache.get (systemId);
+    if (null != cachedValue)
+      {
+        return cachedValue;
+      }
     else
       {
-	SourceWrapper sourceWrapper = resolveURI (href, base);
-	long rc = parseDocument (sourceWrapper.getInputStream (),
-				 sourceWrapper.getFilename (), null);
-	cache.put (href, new Long (rc));
-	return rc;
+        long rc 
+          = parseDocument (new SourceWrapper (source).getInputStream (),
+                           source.getSystemId (),
+                           null);
+        LibxmlDocument value = new LibxmlDocument (rc);
+        cache.remove (systemId);
+        cache.put (systemId, value);
+        return value;
       }
   }
 }

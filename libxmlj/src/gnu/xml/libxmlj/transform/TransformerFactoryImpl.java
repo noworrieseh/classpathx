@@ -1,5 +1,5 @@
 /* 
- * $Id: TransformerFactoryImpl.java,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: TransformerFactoryImpl.java,v 1.2 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -183,14 +183,17 @@ public class TransformerFactoryImpl
   static
   {
     System.loadLibrary ("xmlj");
+
     Runtime.getRuntime ().addShutdownHook (new Thread ()
       {
         public void run ()
         {          
+          JavaContext.cleanup();
+
           // Make sure finalizers are run
           System.gc ();
-
           Runtime.getRuntime ().runFinalization ();
+
           // Perform global cleanup on the native level
           freeLibxsltGlobal ();
         }

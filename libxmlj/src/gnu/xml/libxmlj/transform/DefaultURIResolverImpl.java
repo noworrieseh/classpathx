@@ -1,5 +1,5 @@
 /* 
- * $Id: DefaultURIResolverImpl.java,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: DefaultURIResolverImpl.java,v 1.2 2003-03-07 01:52:25 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -47,6 +47,11 @@ class DefaultURIResolverImpl implements URIResolver
             if (resolvedFile.exists ())
               {
                 return new StreamSource (resolvedFile.getAbsolutePath ());
+              }
+            else 
+              {
+                 System.err.println("Not found: " + href + " (in base " + base + ")");
+                 throw new TransformerException("Not found: " + href);
               }
           }
 

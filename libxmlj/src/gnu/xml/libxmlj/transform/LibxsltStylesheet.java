@@ -1,5 +1,5 @@
 /* 
- * $Id: LibxsltStylesheet.java,v 1.1.1.1 2003-02-27 01:22:24 julian Exp $
+ * $Id: LibxsltStylesheet.java,v 1.2 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -25,9 +25,11 @@ package gnu.xml.libxmlj.transform;
 
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -38,6 +40,7 @@ public class LibxsltStylesheet
 {
   private long nativeStylesheetHandle;
   private Properties outputProperties;
+  private static int unfinalized = 0;
 
   LibxsltStylesheet (Source xsltSource, JavaContext javaContext)
     throws TransformerConfigurationException
@@ -79,7 +82,6 @@ public class LibxsltStylesheet
   public void finalize ()
   {
     if (0 != nativeStylesheetHandle)
-
       {
 	freeLibxsltStylesheet (nativeStylesheetHandle);
 	nativeStylesheetHandle = 0;

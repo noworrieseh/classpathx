@@ -1,5 +1,5 @@
 /* 
- * $Id: SourceWrapper.java,v 1.2 2003-03-07 01:52:26 julian Exp $
+ * $Id: URIResolverProxy.java,v 1.1 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -23,43 +23,27 @@
 
 package gnu.xml.libxmlj.transform;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
-
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
-import javax.xml.transform.stream.StreamSource;
-
-public class SourceWrapper
+public class URIResolverProxy implements URIResolver 
 {
-  private Source source;
+  private URIResolver remote;
 
-  public SourceWrapper (Source source)
-  {
-    this.source = source;
-  }
-
-  public PushbackInputStream getInputStream () 
+  public Source resolve (String href, String base) 
     throws TransformerException
   {
-    return IOToolkit.getSourceInputStream (source);
+    return this.remote.resolve (href, base);
   }
 
-  public String getFilename ()
+  public void set (URIResolver remote)
   {
-    return new File (source.getSystemId ()).getName ();
+    this.remote = remote;
   }
 
-  public String getDirectory ()
+  public URIResolver get ()
   {
-    return new File (source.getSystemId ()).
-      getParentFile ().getAbsolutePath ();
-  }
-
-  public String getSystemId ()
-  {
-    return source.getSystemId ();
+    return this.remote;
   }
 }

@@ -1,5 +1,5 @@
 /* 
- * $Id: SourceWrapper.java,v 1.2 2003-03-07 01:52:26 julian Exp $
+ * $Id: ErrorListenerProxy.java,v 1.1 2003-03-07 01:52:26 julian Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -23,43 +23,41 @@
 
 package gnu.xml.libxmlj.transform;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
-
-import javax.xml.transform.Source;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
-import javax.xml.transform.stream.StreamSource;
-
-public class SourceWrapper
+public class ErrorListenerProxy 
+   implements ErrorListener 
 {
-  private Source source;
+  private ErrorListener remote;
 
-  public SourceWrapper (Source source)
-  {
-    this.source = source;
-  }
-
-  public PushbackInputStream getInputStream () 
+  public void error (TransformerException exception)
     throws TransformerException
   {
-    return IOToolkit.getSourceInputStream (source);
+    this.remote.error (exception);
   }
 
-  public String getFilename ()
+  public void fatalError (TransformerException exception)
+    throws TransformerException
   {
-    return new File (source.getSystemId ()).getName ();
+    this.remote.fatalError (exception);
   }
 
-  public String getDirectory ()
+  public void warning (TransformerException exception)
+    throws TransformerException
   {
-    return new File (source.getSystemId ()).
-      getParentFile ().getAbsolutePath ();
+    this.remote.warning (exception);
   }
 
-  public String getSystemId ()
+  public void set (ErrorListener remote)
   {
-    return source.getSystemId ();
+    this.remote = remote;
+  }
+
+  public ErrorListener get ()
+  {
+    return this.remote;
   }
 }
+
+
