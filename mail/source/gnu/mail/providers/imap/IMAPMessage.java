@@ -89,6 +89,11 @@ extends ReadOnlyMessage
   protected String internalDate = null;
 
   /**
+   * The UID associated with this message.
+   */
+  protected long uid = -1L;
+
+  /**
    * The date format used to parse IMAP INTERNALDATE values.
    */
   protected static final DateFormat internalDateFormat =
@@ -159,6 +164,16 @@ extends ReadOnlyMessage
     throws MessagingException
   {
     String[] commands = new String[] { IMAPConstants.BODYSTRUCTURE };
+    fetch (commands);
+  }
+
+  /**
+   * Fetches the UID.
+   */
+  void fetchUID ()
+    throws MessagingException
+  {
+    String[] commands = new String[] { IMAPConstants.UID };
     fetch (commands);
   }
 
@@ -334,7 +349,7 @@ extends ReadOnlyMessage
           }
         else if (key==IMAPConstants.UID)
           {
-            // TODO
+            uid = Long.parseLong ((String) code.get (i + 1));
           }
         else
           {

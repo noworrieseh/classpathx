@@ -1,6 +1,6 @@
 /*
  * IMAPFolder.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2004 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -86,6 +86,7 @@ import gnu.inet.imap.MessageStatus;
  */
 public class IMAPFolder 
 extends Folder
+implements UIDFolder
 {
 
   /**
@@ -105,6 +106,8 @@ extends Folder
   protected int messageCount = -1;
 
   protected int newMessageCount = -1;
+
+  protected long uidValidity = -1L;
 
   private static DateFormat searchdf = new SimpleDateFormat ("d-MMM-yyyy");
 
@@ -154,6 +157,8 @@ extends Folder
     int oldMessageCount = messageCount;
     messageCount = status.messageCount;
     newMessageCount = status.newMessageCount;
+    // uidvalidity
+    uidValidity = status.uidValidity;
     // fire events if necessary
     if (fireEvents)
       {
@@ -1300,6 +1305,173 @@ extends Folder
         return ((IMAPFolder) other).path.equals (path);
       }
     return super.equals (other);
+  }
+
+  // -- UIDFolder --
+
+  public long getUIDValidity ()
+    throws MessagingException
+  {
+    MailboxStatus ms = null;
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection ();
+    try
+      {
+        if (mode == -1 || uidValidity < 0L)
+          {
+            String[] items = new String[1];
+            items[0] = IMAPConstants.UIDVALIDITY;
+            synchronized (connection)
+              {
+                ms = connection.status (path, items);
+              }
+            update (ms, true);
+          }
+        else // NOOP
+          {
+            synchronized (connection)
+              {
+                ms = connection.noop ();
+              }
+            if (ms != null)
+              {
+                update (ms, true);
+              }
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException (e.getMessage (), e);
+      }
+    if (connection.alertsPending ())
+      {
+        s.processAlerts ();
+      }
+    return uidValidity;
+  }
+
+  public Message getMessageByUID (long uid)
+    throws MessagingException
+  {
+    if (mode == -1)
+      {
+        throw new FolderClosedException (this);
+      }
+    MessageStatus ms = null;
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection ();
+    try
+      {
+        String[] cmds = new String[] { IMAPConstants.FLAGS };
+        synchronized (connection)
+          {
+            ms = connection.uidFetch (uid, cmds);
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException (e.getMessage (), e);
+      }
+    if (connection.alertsPending ())
+      {
+        s.processAlerts ();
+      }
+    IMAPMessage message = new IMAPMessage (this, ms.getMessageNumber ());
+    message.update (ms);
+    return message;
+  }
+
+  public Message[] getMessagesByUID (long start, long end)
+    throws MessagingException
+  {
+    if (mode == -1)
+      {
+        throw new FolderClosedException (this);
+      }
+    MessageStatus[] ms = null;
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection ();
+    try
+      {
+        String[] cmds = new String[] { IMAPConstants.FLAGS };
+        synchronized (connection)
+          {
+            ms = connection.uidFetch (start, end, cmds);
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException (e.getMessage (), e);
+      }
+    if (connection.alertsPending ())
+      {
+        s.processAlerts ();
+      }
+    Message[] messages = new Message[ms.length];
+    for (int i = 0; i < messages.length; i++)
+      {
+        IMAPMessage message =
+          new IMAPMessage (this, ms[i].getMessageNumber ());
+        message.update (ms[i]);
+        messages[i] = message;
+      }
+    return messages;
+  }
+
+  public Message[] getMessagesByUID (long[] uids)
+    throws MessagingException
+  {
+    if (mode == -1)
+      {
+        throw new FolderClosedException (this);
+      }
+    MessageStatus[] ms = null;
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection ();
+    try
+      {
+        String[] cmds = new String[] { IMAPConstants.FLAGS };
+        synchronized (connection)
+          {
+            ms = connection.uidFetch (uids, cmds);
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException (e.getMessage (), e);
+      }
+    if (connection.alertsPending ())
+      {
+        s.processAlerts ();
+      }
+    Message[] messages = new Message[ms.length];
+    for (int i = 0; i < messages.length; i++)
+      {
+        IMAPMessage message =
+          new IMAPMessage (this, ms[i].getMessageNumber ());
+        message.update (ms[i]);
+        messages[i] = message;
+      }
+    return messages;
+  }
+
+  public long getUID (Message message)
+    throws MessagingException
+  {
+    if (mode == -1)
+      {
+        throw new FolderClosedException (this);
+      }
+    if (!(message instanceof IMAPMessage))
+      {
+        throw new MethodNotSupportedException ("not an IMAPMessage");
+      }
+    IMAPMessage m = (IMAPMessage) message;
+    if (m.uid == -1L)
+      {
+        m.fetchUID ();
+      }
+    return m.uid;
   }
 
 }

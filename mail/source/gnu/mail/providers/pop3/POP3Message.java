@@ -54,6 +54,11 @@ extends ReadOnlyMessage
    */
   int size;
 
+  /*
+   * The UID of this message.
+   */
+  String uid;
+
   /**
    * Create a POP3Message.
    * @param folder the parent folder
@@ -312,4 +317,43 @@ extends ReadOnlyMessage
     super.writeTo (msgStream, ignoreList);
   }
 
+  // -- UIDL --
+
+  /** 
+   * Causes the UID to be fetched.
+   */
+  void fetchUid () 
+    throws MessagingException 
+  {
+    if (headers != null)
+      {
+        return;
+      }
+    POP3Connection connection = ((POP3Store) folder.getStore ()).connection;
+    synchronized (connection)
+      {
+        try
+          {
+            uid = connection.uidl (msgnum);
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
+      }
+  }
+
+  /**
+   * Returns the unique ID for this message.
+   */
+  public String getUID ()
+    throws MessagingException
+  {
+    if (uid == null)
+      {
+        fetchUid ();
+      }
+    return uid;
+  }
+  
 }

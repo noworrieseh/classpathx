@@ -38,6 +38,7 @@ import javax.mail.IllegalWriteException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
+import javax.mail.UIDFolder;
 import javax.mail.event.ConnectionEvent;
 
 import gnu.inet.pop3.POP3Connection;
@@ -289,10 +290,15 @@ extends Folder
     // Determine whether to fetch headers or content
     boolean fetchHeaders = false;
     boolean fetchContent = false;
+    boolean fetchUid = false;
     FetchProfile.Item[] items = fp.getItems ();
     for (int i = 0; i < items.length; i++)
       {
-        if (items[i] == FetchProfile.Item.CONTENT_INFO)
+        if (items[i] == UIDFolder.FetchProfileItem.UID)
+          {
+            fetchUid = true;
+          }
+        else if (items[i] == FetchProfile.Item.CONTENT_INFO)
           {
             fetchContent = true;
           }
@@ -305,7 +311,7 @@ extends Folder
       {
         fetchHeaders = true;
       }
-    if (!fetchHeaders && !fetchContent)
+    if (!fetchHeaders && !fetchContent && !fetchUid)
       {
         return;
       }
@@ -315,6 +321,10 @@ extends Folder
         if (messages[i] instanceof POP3Message)
           {
             POP3Message m = (POP3Message) messages[i];
+            if (fetchUid)
+              {
+                m.fetchUid ();
+              }
             if (fetchContent)
               {
                 m.fetchContent ();
@@ -426,6 +436,23 @@ extends Folder
     throws MessagingException 
   {
     throw new IllegalWriteException ("Folder can't be renamed");
+  }
+
+  // -- UIDL --
+
+  /**
+   * Returns the unique ID for the given message, or <code>null</code> if
+   * not available.
+   * @param message the message
+   */
+  public String getUID (Message message)
+    throws MessagingException
+  {
+    if (message instanceof POP3Message)
+      {
+        return ((POP3Message) message).getUID ();
+      }
+    return null;
   }
 
 }
