@@ -1348,13 +1348,17 @@ public abstract class DomNode
           current.previousNode ();
           lastIndex--;
         }
-        return current.previousNode ();
+        Node ret = current.previousNode ();
+        current = null;
+        return ret;
       } 
       
       // somewhere after last node
       while (++lastIndex != index)
         current.nextNode ();
-        return current.nextNode ();
+        Node ret =  current.nextNode ();
+        current = null;
+        return ret;
     }
     
     public int getLength()
@@ -1366,6 +1370,7 @@ public abstract class DomNode
         {
           retval++;
         }
+      current = null;
       return retval;
     }
     

@@ -1750,18 +1750,18 @@ loop:
 	    value = readLiteral (flags);
 	expandPE = saved;
 	setAttribute (elementName, name, type, enumer, value, valueType);
-  if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
-    if ("ENUMERATION" == type)
-	    type = enumer;
-    else if ("NOTATION" == type)
-	    type = "NOTATION " + enumer;
-  } else {
-    if ("ENUMERATION".equals(type))
-	    type = enumer;
-    else if ("NOTATION".equals(type))
-	    type = "NOTATION " + enumer;
-  }
-	if (!skippedPE) handler.getDeclHandler ()
+        if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
+          if ("ENUMERATION" == type)
+            type = enumer;
+          else if ("NOTATION" == type)
+            type = "NOTATION " + enumer;
+        } else {
+          if ("ENUMERATION".equals(type))
+            type = enumer;
+          else if ("NOTATION".equals(type))
+            type = "NOTATION " + enumer;
+        }
+        if (!skippedPE) handler.getDeclHandler ()
 	    .attributeDecl (elementName, name, type, defaultType, value);
     }
 

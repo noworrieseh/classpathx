@@ -156,10 +156,7 @@ final public class SAXDriver
     private Stack			entityStack;
 
     // one vector (of object/struct): faster, smaller
-    private List			attributesList = Collections.synchronizedList(new ArrayList());
-  
-    private boolean			attributeSpecified [] = new boolean[10];
-    private boolean			attributeDeclared [] = new boolean[10];
+    private List			attributesList;
 
     private boolean			namespaces = true;
     private boolean			xmlNames = false;
@@ -189,8 +186,6 @@ final public class SAXDriver
       elementName = null;
       entityStack = new Stack ();
       attributesList = Collections.synchronizedList(new ArrayList());
-      attributeSpecified = new boolean[10];
-      attributeDeclared = new boolean[10];
       attributeCount = 0;
       attributes = false;
       nsTemp = new String[3];
@@ -855,17 +850,10 @@ final public class SAXDriver
   }
 	// remember this attribute ...
 
-	if (attributeCount == attributeSpecified.length) { 	// grow array?
-	    boolean temp [] = new boolean [attributeSpecified.length + 5];
-	    System.arraycopy (attributeSpecified, 0, temp, 0, attributeCount);
-	    attributeSpecified = temp;
-	}
-	attributeSpecified [attributeCount] = isSpecified;
-
 	attributeCount++;
 	
 	// attribute type comes from querying parser's DTD records
-	attributesList.add(new Attribute(qname, value));
+	attributesList.add(new Attribute(qname, value, isSpecified));
 
     }
 
@@ -1214,70 +1202,62 @@ final public class SAXDriver
      * @throws java.lang.ArrayIndexOutOfBoundsException
      *   When the supplied index does not identify an attribute.
      */    
-    public boolean isDeclared (int index)
+    public boolean isDeclared(int index)
     {
-	if (index < 0 || index >= attributeCount) 
-	    throw new ArrayIndexOutOfBoundsException ();
-	return attributeDeclared [index];
+        if (index < 0 || index >= attributeCount)
+          throw new ArrayIndexOutOfBoundsException ();
+	String type = parser.getAttributeType(elementName, getQName(index));
+    	return (type != null);
     }
 
     /** @return false unless the attribute was declared in the DTD.
      * @throws java.lang.IllegalArgumentException
      *   When the supplied names do not identify an attribute.
      */
-    public boolean isDeclared (java.lang.String qName)
+    public boolean isDeclared(String qName)
     {
-	int index = getIndex (qName);
-	if (index < 0)
-	    throw new IllegalArgumentException ();
-	return attributeDeclared [index];
+        int index = getIndex (qName);
+        if (index < 0 || index >= attributeCount)
+          throw new ArrayIndexOutOfBoundsException ();
+	String type = parser.getAttributeType(elementName, qName);
+    	return (type != null);
     }
 
     /** @return false unless the attribute was declared in the DTD.
      * @throws java.lang.IllegalArgumentException
      *   When the supplied names do not identify an attribute.
      */
-    public boolean isDeclared (java.lang.String uri, java.lang.String localName)
+    public boolean isDeclared(String uri, String localName)
     {
-	int index = getIndex (uri, localName);
-	if (index < 0)
-	    throw new IllegalArgumentException ();
-	return attributeDeclared [index];
+	int index = getIndex(uri, localName);
+        return isDeclared(index);
     }
 
 
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
      */
-    public boolean isSpecified (int index)
+    public boolean isSpecified(int index)
     {
-	if (index < 0 || index >= attributeCount) 
-	    throw new ArrayIndexOutOfBoundsException ();
-	return attributeSpecified [index];
+    	return ((Attribute) attributesList.get(index)).specified;
     }
 
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
      */
-    public boolean isSpecified (String uri, String local)
+    public boolean isSpecified(String uri, String local)
     {
-	int index = getIndex (uri, local);
-
-	if (index < 0)
-	    throw new IllegalArgumentException ();
-	return attributeSpecified [index];
+	int index = getIndex(uri, local);
+    	return isSpecified(index);
     }
 
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
      */
-    public boolean isSpecified (String xmlName)
+    public boolean isSpecified(String xmlName)
     {
-	int index = getIndex (xmlName);
-
-	if (index < 0)
-	    throw new IllegalArgumentException ();
-	return attributeSpecified [index];
+	int index = getIndex(xmlName);
+        return isSpecified(index);
     }
 
 
@@ -1288,7 +1268,7 @@ final public class SAXDriver
     /**
      * <b>SAX Locator</b> method (don't invoke on parser);
      */
-    public String getPublicId ()
+    public String getPublicId()
     {
 	return null; 		// FIXME track public IDs too
     }
@@ -1296,28 +1276,25 @@ final public class SAXDriver
     /**
      * <b>SAX Locator</b> method (don't invoke on parser);
      */
-    public String getSystemId ()
+    public String getSystemId()
     {
-	if (entityStack.empty ())
-	    return null;
-	else
-	    return (String) entityStack.peek ();
+	return entityStack.empty() ? null : (String) entityStack.peek();
     }
 
     /**
      * <b>SAX Locator</b> method (don't invoke on parser);
      */
-    public int getLineNumber ()
+    public int getLineNumber()
     {
-	return parser.getLineNumber ();
+	return parser.getLineNumber();
     }
 
     /**
      * <b>SAX Locator</b> method (don't invoke on parser);
      */
-    public int getColumnNumber ()
+    public int getColumnNumber()
     {
-	return parser.getColumnNumber ();
+	return parser.getColumnNumber();
     }
 
     // adapter between SAX2 content handler and SAX1 document handler callbacks
@@ -1380,12 +1357,14 @@ class Attribute
     String value;
     String nameSpace;
     String localName;
+    boolean specified;
 
-    Attribute(String name, String value)
+    Attribute(String name, String value, boolean specified)
     {
         this.name = name;
         this.value = value;
         this.nameSpace = "";
+        this.specified = specified;
     }
 }
 
