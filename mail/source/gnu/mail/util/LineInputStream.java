@@ -62,13 +62,13 @@ public class LineInputStream
     int c;
     for (c = in.read(); c!=-1; c = in.read()) 
     {
-      if (c==10)
+      if (c==LF)
         break;
-      if (c==13)
+      if (c==CR)
       {
         // Peek ahead
         int peek = in.read();
-        if (peek!=10)
+        if (peek!=LF)
         {
           if (!(in instanceof PushbackInputStream))
             in = new PushbackInputStream(in);
@@ -79,17 +79,18 @@ public class LineInputStream
       len--;
       if (len<0)
       {
-        chars = new char[pos+128];
-        len = chars.length-pos-1;
-        System.arraycopy(line, 0, chars, 0, len);
+        chars = new char[pos+line.length];
+        len = (chars.length-pos)-1;
+        System.arraycopy(line, 0, chars, 0, len+1);
         line = chars;
       }
-      chars[pos++] = (char)c;
+      chars[pos] = (char)c;
+      pos++;
     }
     if (c==-1 && pos==0)
       return null;
     else
       return new String(chars, 0, pos);
   }
-  
+
 }

@@ -108,7 +108,8 @@ public class MailDateFormat
 
   public MailDateFormat()
   {
-    super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ' (z)", Locale.US);
+    super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ'", Locale.US);
+    //super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ' (z)", Locale.US);
     calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
   }
 
@@ -192,10 +193,13 @@ public class MailDateFormat
     Date date = super.parse(text, pos);
     // Use the zoneOffset to compensate as raw offset
     // as there is no way to determine the DST part
-    calendar.clear();
-    calendar.setTime(date);
-    calendar.set(Calendar.ZONE_OFFSET, zoneOffset);
-    date = calendar.getTime();
+    if (date!=null)
+    {
+      calendar.clear();
+      calendar.setTime(date);
+      calendar.set(Calendar.ZONE_OFFSET, zoneOffset);
+      date = calendar.getTime();
+    }
     return date;
   }
 

@@ -18,9 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * You may retrieve the latest version of this library from
- * http://www.dog.net.uk/knife/
  */
 
 package gnu.mail.providers.mbox;
@@ -36,15 +33,16 @@ import gnu.mail.util.*;
  * The storage class implementing the Mbox mailbox file format.
  *
  * @author dog@dog.net.uk
- * @version 1.3.1
+ * @version 2.0
  */
 public class MboxStore 
-extends Store 
+  extends Store 
 {
 
+  private static final char separatorChar = '/';
+  
   static int fetchsize = 1024;
-  static boolean attemptFallback = false;
-  Hashtable folders = new Hashtable();
+  static boolean attemptFallback = true;
 
   /**
    * Constructor.
@@ -52,26 +50,32 @@ extends Store
   public MboxStore(Session session, URLName urlname) 
   {
     super(session, urlname);
-    String ccs = session.getProperty("mail.mbox.fetchsize");
-    if (ccs!=null) 
+    String fs = session.getProperty("mail.mbox.fetchsize");
+    if (fs!=null) 
     {
       try 
       { 
-	fetchsize = Math.max(Integer.parseInt(ccs), 1024); 
+        fetchsize = Math.max(Integer.parseInt(fs), 1024); 
       } 
       catch (NumberFormatException e) 
-      {}
+      {
+        log("fetchsize "+fs+" is not a number");
+      }
     }
     String af = session.getProperty("mail.mbox.attemptFallback");
     if (af!=null) 
-    attemptFallback = Boolean.valueOf(af).booleanValue();
+      attemptFallback = Boolean.valueOf(af).booleanValue();
   }
 	
   /**
    * There isn't a protocol to implement, so this method just returns.
    */
-  protected boolean protocolConnect(String host, int port, String username, String password) 
-  throws MessagingException 
+  protected boolean protocolConnect(
+      String host, 
+      int port, 
+      String username,
+      String password) 
+    throws MessagingException 
   {
     return true;
   }
@@ -80,95 +84,132 @@ extends Store
    * Returns the default folder.
    */
   public Folder getDefaultFolder() 
-  throws MessagingException 
+    throws MessagingException 
   {
-
+    // If the url used to contruct the store references a file directly,
+    // return this file.
     if (url!=null) 
     {
       String file = url.getFile();
       if (file!=null && file.length()>0) 
+        return getFolder(file);
+    }
+    // Otherwise attempt to return a sensible root folder.
+    String mailhome = session.getProperty("mail.mbox.mailhome");
+    if (mailhome == null)
+    {
+      try
       {
-	String name = File.separator+file.replace('/', File.separatorChar);
-	Folder folder = getFolder(name);
-	return folder;
+        String userhome = System.getProperty("user.home");
+        mailhome = userhome+"/Mail"; // elm
+        if (!exists(mailhome))
+          mailhome = userhome+"/mail";
+        if (!exists(mailhome))
+          mailhome = null;
+      } 
+      catch (SecurityException e) 
+      {
+        log("access denied reading system properties");
+        mailhome = "/";
       }
     }
-    try 
-    {
-      String defaultDir = session.getProperty("mail.mbox.userhome");
-      if (defaultDir == null)
-      defaultDir = System.getProperty("user.home");
-      return new MboxDefaultFolder(this, defaultDir);
-    } 
-    catch (SecurityException e) 
-    {
-      throw new MessagingException("Access denied", e);
-    }
-		    
-    /*
-      if (attemptFallback) 
-      {
-      try {
-      return getFolder(System.getProperty("user.home"));
-      } catch (SecurityException e) {
-      throw new MessagingException("Access denied", e);
-      }
-      }
-    */
-		     
+    return getFolder(mailhome);
   }
 
   /**
    * Returns the folder with the specified filename.
    */
   public Folder getFolder(String filename) 
-  throws MessagingException
+    throws MessagingException
   {
-    Folder folder = (Folder)folders.get(filename);
-    if (folder==null) 
+    boolean inbox = false;
+    if ("inbox".equalsIgnoreCase(filename)) 
     {
-      if ("inbox".equals(filename.toLowerCase())) 
+      // First try the session property mail.mbox.inbox.
+      String inboxname = session.getProperty("mail.mbox.inbox");
+      if (!exists(inboxname))
+        inboxname = null;
+      if (inboxname==null && attemptFallback) 
       {
-				// First try the session property mail.mbox.inbox.
-	String m = session.getProperty("mail.mbox.inbox");
-	if (m!=null && new File(m).exists())
-	filename = m;
-	else if (attemptFallback) 
-	{ // If that fails try some common (UNIX) locations.
-	  try 
-	  {
-	    m = File.separator+"var"+File.separator+"spool"+File.separator+"mail"+File.separator+System.getProperty("user.name");
-	    if (new File(m).exists())
-	    filename = m;
-	    else 
-	    {
-	      m = System.getProperty("user.home")+File.separator+"mbox";
-	      if (new File(m).exists())
-	      filename = m;
-	    }
-	  } 
-	  catch (SecurityException e) 
-	  { // not allowed to read system properties
-	  }
-	}
+        // Try some common (UNIX) locations.
+        try 
+        {
+          String username = System.getProperty("user.name");
+          inboxname = "/var/mail/"+username;
+          if (!exists(inboxname))
+            inboxname = "/var/spool/mail/"+username;
+          if (!exists(inboxname))
+          {
+            inboxname = null;
+            String userhome = System.getProperty("user.home");
+            inboxname = userhome+"/mbox";
+          }
+          if (!exists(inboxname))
+            inboxname = null;
+        } 
+        catch (SecurityException e) 
+        {
+          // not allowed to read system properties
+          log("unable to access system properties");
+        }
       }
-      folders.put(filename, folder = new MboxFolder(this, filename));
+      if (inboxname!=null)
+      {
+        filename = inboxname;
+        inbox = true;
+      }
+      // otherwise we assume it is actually a file called "inbox"
     }
-    return folder;
+    
+    // convert into a valid filename for this platform
+    StringBuffer buf = new StringBuffer();
+    if (filename.length()<1 || filename.charAt(0)!=separatorChar)
+      buf.append(File.separator);
+    if (separatorChar!=File.separatorChar)
+      buf.append(filename.replace(separatorChar, File.separatorChar));
+    else
+      buf.append(filename);
+    filename = buf.toString();
+    
+    return new MboxFolder(this, filename, inbox);
+  }
+
+  /*
+   * Indicates whether the file referred to by the specified filename exists.
+   */
+  private boolean exists(String filename)
+  {
+    if (filename!=null)
+    {
+      File file = new File(filename);
+      if (separatorChar!=File.separatorChar)
+        file = new File(filename.replace(separatorChar, File.separatorChar));
+      return file.exists();
+    }
+    return false;
   }
 
   /**
    * Returns the folder specified by the filename of the URLName.
    */
   public Folder getFolder(URLName urlname) 
-  throws MessagingException 
+    throws MessagingException 
   {
-    return getFolder(File.separator+urlname.getFile().replace('/', File.separatorChar));
+    return getFolder(urlname.getFile());
   }
 	
   Session getSession() 
   {
     return session;
+  }
+
+  /**
+   * Print a log message.
+   */
+  void log(String message)
+  {
+    if (session.getDebug())
+      System.out.println("mbox: "+message);
   }
 
 }

@@ -19,9 +19,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- * You may retrieve the latest version of this library from
- * http://www.dog.net.uk/knife/
- *
  * Contributor(s): Daniel Thor Kristjan <danielk@cat.nyu.edu>
  *                   close and expunge clarification.
  *                 Sverre Huseby <sverrehu@online.no> gzipped mailboxes
@@ -43,33 +40,41 @@ import gnu.mail.util.*;
  * The folder class implementing a UNIX mbox-format mailbox.
  *
  * @author dog@dog.net.uk
- * @version 1.3.5
+ * @version 2.0
  */
 public class MboxFolder 
-extends Folder 
+  extends Folder 
 {
 
   static final DateFormat df = new SimpleDateFormat("EEE MMM d H:m:s yyyy");
-  static final String KNIFE_MESSAGE_ID = "X-Knife-Message-Id";
+  static final String GNU_MESSAGE_ID = "X-GNU-Message-Id";
+  static final String FROM = "From ";
 	
   File file;
-  Vector messages;
-  boolean open = false;
-  boolean readOnly = true;
-  int type = HOLDS_MESSAGES;
-  boolean inbox = false;
-  long fileLastModified = 0;
-	
+  MboxMessage[] messages;
+  boolean open;
+  boolean readOnly;
+  int type;
+  boolean inbox;
+  
+  Flags permanentFlags = null;
+		
   /**
    * Constructor.
    */
-  protected MboxFolder(Store store, String filename, boolean isInbox) 
+  protected MboxFolder(Store store, String filename, boolean inbox) 
   {
     super(store);
+    
     file = new File(filename);
     if (file.exists() && file.isDirectory())
       type = HOLDS_FOLDERS;
-    inbox = isInbox;
+    else
+      type = HOLDS_MESSAGES;
+    this.inbox = inbox;
+    open = false;
+    readOnly = true;
+    messages = new MboxMessage[0];
   }
 	
   /**
@@ -85,10 +90,9 @@ extends Folder
    */
   public String getName() 
   {
-    if ( ! inbox)
-      return file.getName();
-    else
-      return ("INBOX");
+    if (inbox)
+      return "INBOX";
+    return file.getName();
   }
 	
   /**
@@ -96,10 +100,21 @@ extends Folder
    */
   public String getFullName() 
   {
-    if (! inbox)
-      return file.getAbsolutePath();
-    else
-      return ("INBOX");
+    if (inbox)
+      return "INBOX";
+    return file.getPath();
+  }
+
+  /**
+   * Return a URLName representing this folder.
+   */
+  public URLName getURLName()
+    throws MessagingException
+  {
+    URLName url = super.getURLName();
+    return new URLName(url.getProtocol(), 
+        null, -1, url.getFile(),
+        null, null);
   }
 
   /**
@@ -134,41 +149,92 @@ extends Folder
 
   /**
    * Opens this folder.
+   * If the folder is opened for writing, a lock must be acquired on the
+   * mbox. If this fails a MessagingException is thrown.
    * @exception MessagingException if a messaging error occurred
    */
   public void open(int mode) 
     throws MessagingException 
   {
-    switch (mode) 
+    if (mode==READ_WRITE) 
     {
-      case READ_WRITE:
-        if (!file.canWrite())
-          throw new MessagingException("Folder is read-only");
-        readOnly = false;
-        break;
-      case READ_ONLY:
+      if (!file.canWrite())
+        throw new MessagingException("Folder is read-only");
+      if (!acquireLock())
+        throw new MessagingException("Unable to acquire lock");
+      readOnly = false;
     }
-    String filename = file.getAbsolutePath();
-    boolean debug = ((MboxStore)store).getSession().getDebug();
+
     if (!file.canRead())
-      throw new MessagingException("Can't read folder: "+filename);
+      throw new MessagingException("Can't read folder: "+file.getName());
+
+    LineInputStream in = null;
+    String filename = file.getAbsolutePath();
     try 
     {
-      if (debug)
-        System.err.println("DEBUG: mbox: opening "+filename);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new CRLFInputStream(getInputStream())));
-      String line = reader.readLine();
-      if (line!=null && !line.startsWith("From "))
-        throw new MessagingException("Mailbox format error",
-            new ProtocolException());
-      reader.close();
+      // Read messages
+      MboxStore store = (MboxStore)this.store;
+      store.log("reading "+filename);
+      
+      Vector vm = new Vector(256);
+      in = new LineInputStream(getInputStream());
+      int count = 1;
+      String line, fromLine = null;
+      ByteArrayOutputStream buf = null;
+      for (line = in.readLine(); line!=null; line = in.readLine()) 
+      {
+        if (line.indexOf(FROM)==0) 
+        {
+          if (buf!=null)
+          {
+            ByteArrayInputStream bytes = 
+              new ByteArrayInputStream(buf.toByteArray());
+            MboxMessage m = new MboxMessage(this, fromLine, bytes, count++);
+            vm.addElement(m);
+          }
+          fromLine = line;
+          buf = new ByteArrayOutputStream();
+        }
+        else if (buf!=null)
+        {
+          byte[] bytes = line.getBytes();
+          buf.write(bytes, 0, bytes.length);
+          buf.write(10); // LF
+        }
+      }
+      if (buf!=null)
+      {
+        ByteArrayInputStream bytes =
+          new ByteArrayInputStream(buf.toByteArray());
+        MboxMessage m = new MboxMessage(this, fromLine, bytes, count++);
+        vm.addElement(m);
+      }
+      messages = new MboxMessage[vm.size()];
+      vm.copyInto(messages);
+      buf = null;
+      vm = null;
+
+      // OK
+      open = true;
+      notifyConnectionListeners(ConnectionEvent.OPENED);
     }
     catch (IOException e) 
     {
       throw new MessagingException("Unable to open folder: "+filename, e);
     }
-    open = true;
-    notifyConnectionListeners(ConnectionEvent.OPENED);
+    finally
+    {
+      // release any file descriptors
+      try
+      {
+        if (in!=null)
+          in.close();
+      }
+      catch (IOException e)
+      {
+        // we tried
+      }
+    }
   }
 
   /**
@@ -183,13 +249,101 @@ extends Folder
     {
       if (expunge)
         expunge();
+    
+      if (!readOnly)
+      {
+        // Save messages
+        MboxStore store = (MboxStore)this.store;
+        store.log("saving "+file.getAbsolutePath());
+        synchronized (this) 
+        {
+          OutputStream os = null;
+          try 
+          {
+            os = getOutputStream();
+            BufferedOutputStream bos = new BufferedOutputStream(os);
+            MboxOutputStream mos = new MboxOutputStream(bos);
+            for (int i=0; i<messages.length; i++) 
+            {
+              String fromLine = fromLine(messages[i]);
+              bos.write(fromLine.getBytes());
+              bos.write('\n');
+              bos.flush();
+              messages[i].writeTo(mos);
+              mos.flush();
+            }
+          } 
+          catch (IOException e) 
+          {
+            throw new MessagingException("I/O error writing mailbox", e);
+          }
+          finally
+          {
+            // close any file descriptors
+            try
+            {
+              if (os!=null)
+                os.close();
+            }
+            catch (IOException e)
+            {
+              // we tried
+            }
+          }
+        }
+        if (!releaseLock())
+          store.log("unable to clear up lock file!");
+      }
+      
       open = false;
+      messages = new MboxMessage[0]; // release memory
       notifyConnectionListeners(ConnectionEvent.CLOSED);
-      synchronizeMessages();
-      saveMessages();
     }
-    if (((MboxStore)store).getSession().getDebug())
-    System.err.println("DEBUG: mbox: closing "+file.getAbsolutePath());
+  }
+
+  /**
+   * Returns the From_ line for the specified mbox message.
+   * If this does not already exist (the message was appended to the folder
+   * since it was last opened), we will attempt to generate a suitable From_
+   * line for it.
+   */
+  protected String fromLine(MboxMessage message)
+    throws MessagingException
+  {
+    String fromLine = message.fromLine;
+    if (fromLine==null)
+    {
+      StringBuffer buf = new StringBuffer("From ");
+      
+      String from = "-";
+      try
+      {
+        Address[] f = message.getFrom();
+        if (f!=null && f.length>0) 
+        {
+          if (f[0] instanceof InternetAddress)
+            from = ((InternetAddress)f[0]).getAddress();
+          else
+            from = f[0].toString();
+        }
+      }
+      catch (AddressException e)
+      {
+        // these things happen...
+      }
+      buf.append(from);
+      buf.append(' ');
+      
+      Date date = message.getSentDate();
+      if (date==null)
+        date = message.getReceivedDate();
+      if (date==null)
+        date = new Date();
+      buf.append(df.format(date));
+      
+      fromLine = buf.toString();
+    }
+    return fromLine;
   }
 	
   /**
@@ -201,19 +355,19 @@ extends Folder
     throws MessagingException 
   {
     Vector ve = new Vector();
-    if (open && messages!=null) 
+    if (open) 
     {
       Vector vm = new Vector();
-      for (Enumeration enum = messages.elements(); enum.hasMoreElements(); ) 
+      for (int i=0; i<messages.length; i++) 
       {
-        Message message = (Message)enum.nextElement();
-        Flags flags = message.getFlags();
+        Flags flags = messages[i].getFlags();
         if (flags.contains(Flags.Flag.DELETED))
-          ve.addElement(message);
+          ve.addElement(messages[i]);
         else
-          vm.addElement(message);
+          vm.addElement(messages[i]);
       }
-      messages = vm;
+      messages = new MboxMessage[vm.size()];
+      vm.copyInto(messages);
     }
     Message[] expunged = new Message[ve.size()];
     ve.copyInto(expunged);
@@ -230,8 +384,6 @@ extends Folder
     return open;
   }
 	
-  public Flags permanentFlags = null;
-	
   /**
    * Returns the permanent flags for this folder.
    */
@@ -239,11 +391,11 @@ extends Folder
   {
     if (permanentFlags == null) 
     {
-      Flags tmpFlags = new Flags(); 
-      tmpFlags.add(Flags.Flag.DELETED);
-      tmpFlags.add(Flags.Flag.SEEN);
-      tmpFlags.add(Flags.Flag.RECENT);
-      permanentFlags = tmpFlags;
+      Flags flags = new Flags(); 
+      flags.add(Flags.Flag.DELETED);
+      flags.add(Flags.Flag.SEEN);
+      flags.add(Flags.Flag.RECENT);
+      permanentFlags = flags;
     }
     return permanentFlags;
   }
@@ -255,7 +407,7 @@ extends Folder
   public int getMessageCount() 
     throws MessagingException 
   {
-    return getMessages().length;
+    return messages.length;
   }
 
   /**
@@ -265,14 +417,10 @@ extends Folder
   public Message getMessage(int msgnum) 
     throws MessagingException 
   {
-    try 
-    {
-      return getMessages()[msgnum-1];
-    }
-    catch (ArrayIndexOutOfBoundsException e) 
-    {
-      throw new MessagingException("No such message", e);
-    }
+    int index = msgnum-1;
+    if (index<0 || index>=messages.length)
+      throw new MessagingException("No such message: "+msgnum);
+    return messages[index];
   }
 	
   /**
@@ -282,198 +430,59 @@ extends Folder
   public synchronized Message[] getMessages() 
     throws MessagingException 
   {
-    synchronizeMessages();
-    saveMessages();
-		
-    Message[] m = new Message[messages.size()]; messages.copyInto(m);
+    // Return a copy of the message array
+    Message[] m = new Message[messages.length];
+    System.arraycopy(messages, 0, m, 0, messages.length);
     return m;
-  }
-	
-  // Reads messages from the disk file.
-  private Vector readMessages() 
-    throws MessagingException 
-  {
-    synchronized (this) 
-    {
-      Vector tmpMessages = new Vector();
-      int count = 0;
-      try 
-      {
-        RandomAccessFile raf = new RandomAccessFile(file, "r");
-        String line;
-        for (line = raf.readLine(); line!=null; line = raf.readLine()) 
-        {
-          if (line.startsWith("From ")) 
-          { // new message
-            Message message = new MboxMessage(this, raf, count++);
-            tmpMessages.addElement(message);
-          }
-        }
-        raf.close();
-      } 
-      catch (IOException e) 
-      {
-        throw new MessagingException("I/O error reading mailbox", e);
-      }
-      return tmpMessages;
-    }
-  }
-
-  /**
-   * Synchronizes the source file with the current message list.
-   */
-  private void synchronizeMessages() 
-    throws MessagingException 
-  {
-    if (file.lastModified() == fileLastModified)
-      return;
-		
-    Vector tmpMessages = readMessages();
-		
-    // we should never be in the position where we've removed messages
-    // that haven't been removed from the file itself.  at least, let's
-    // hope so.  :)
-    // 
-    // it should also be the case that messages are only appended to
-    // the file, so if we find a message that doesn't correspond to a
-    // current message, then it should be both a new message, and have
-    // no old messages after it.
-    // 
-    // FIXME:  these are both really, really, really bad assumptions.
-    // 
-    if (messages == null)
-      messages = tmpMessages;
-    else 
-    {
-      Vector messagesAdded = new Vector();
-      Vector finalMessages = new Vector();
-			
-      for (int i =0,j = -1; i < tmpMessages.size(); i++) 
-      {
-        String tmpUniqueId =
-          ((MboxMessage)tmpMessages.elementAt(i)).getMessageID();
-        String uniqueId = null;
-				
-        while ( uniqueId != tmpUniqueId &&
-            ( !tmpUniqueId.equals(uniqueId)) &&
-            j < messages.size() - 1) 
-        {
-          uniqueId = ((MboxMessage)messages.elementAt(++j)).getMessageID();
-        }
-				
-        if (j < messages.size() -1) 
-        {
-          finalMessages.add(messages.elementAt(j));
-        } 
-        else 
-        {
-          Object newMessage = tmpMessages.elementAt(i);
-          finalMessages.add(newMessage);
-          messagesAdded.add(newMessage);
-        }
-        
-      }
-			
-      messages = finalMessages;
-      if (messagesAdded.size() > 0) 
-      {
-        Message[] n = new Message[messagesAdded.size()];
-        messagesAdded.copyInto(n);
-        notifyMessageAddedListeners(n);
-				
-        saveMessages();
-      }
-    }
-  }
-	
-  // Saves messages to the disk file.
-  private void saveMessages() 
-    throws MessagingException 
-  {
-    if (readOnly)
-      return;
-    synchronized (this) 
-    {
-      if (messages!=null) 
-      {
-        try 
-        {
-          Message[] m = new Message[messages.size()];
-          messages.copyInto(m);
-          // make sure content has been retrieved for all messages
-          for (int i=0; i<m.length; i++)
-            if (m[i] instanceof MboxMessage)
-              ((MboxMessage)m[i]).retrieveContent();
-          
-          OutputStream os = new BufferedOutputStream(getOutputStream());
-          MboxOutputStream mos = new MboxOutputStream(os);
-          for (int i=0; i<m.length; i++) 
-          {
-            Address[] f = m[i].getFrom();
-            String from = "-";
-            if (f!=null && f.length>0) 
-            {
-              if (f[0] instanceof InternetAddress)
-                from = ((InternetAddress)f[0]).getAddress();
-              else
-                from = f[0].toString();
-            }
-            Date date = m[i].getSentDate();
-            if (date==null)
-              date = m[i].getReceivedDate();
-            if (date==null)
-              date = new Date();
-            
-            String top = "From "+from+ " "+df.format(date)+"\n";
-            os.write(top.getBytes());
-            m[i].writeTo(mos);
-            mos.flush();
-          }
-          os.close();
-          fileLastModified = file.lastModified();
-        } 
-        catch (IOException e) 
-        {
-          throw new MessagingException("I/O error writing mailbox", e);
-        }
-      }
-    }
   }
 	
   /**
    * Appends messages to this folder.
+   * Only MimeMessages within the array will be appended, as we don't know
+   * how to retrieve internet content for other kinds.
+   * @param m an array of messages to be appended
    */
-  public synchronized void appendMessages(Message[] messages) 
+  public synchronized void appendMessages(Message[] m) 
     throws MessagingException 
   {
-    synchronizeMessages();
-
-    Vector added = new Vector();
-    for (int i=0; i<messages.length; i++) 
+    Vector appended = new Vector(m.length);
+    int count = messages.length;
+    for (int i=0; i<m.length; i++) 
     {
-      if (messages[i] instanceof MimeMessage) 
+      if (m[i] instanceof MimeMessage) 
       {
-        MboxMessage message = 
-          new MboxMessage(this, (MimeMessage)messages[i], i);
-        added.addElement(message);
-        this.messages.addElement(message);
+        MimeMessage mimem = (MimeMessage)m[i];
+        MboxMessage mboxm = new MboxMessage(this, mimem, count++);
+        if (mimem instanceof MboxMessage)
+          mboxm.fromLine = ((MboxMessage)mimem).fromLine;
+        appended.addElement(mboxm);
       }
     }
-    if (added.size()>0) 
+    int appendedLength = appended.size();
+    if (appendedLength>0) 
     {
-      Message[] n = new Message[added.size()]; added.copyInto(n);
+      MboxMessage[] n = new MboxMessage[appendedLength];
+      appended.copyInto(n);
+
+      // copy into the messages array
+      Vector accumulator = new Vector(messages.length+n.length);
+      for (int i=0; i<messages.length; i++)
+        accumulator.addElement(messages[i]);
+      for (int i=0; i<n.length; i++)
+        accumulator.addElement(n[i]);
+      messages = new MboxMessage[accumulator.size()];
+      accumulator.copyInto(messages);
+      
+      // propagate event
       notifyMessageAddedListeners(n);
     }
-    saveMessages();
   }
 
   /**
    * Does nothing.
-   * The messages <i>must</i> be fetched in their entirety by getMessages() -
-   * this is the nature of the Mbox protocol.
    * @exception MessagingException ignore
    */
-  public void fetch(Message amessage[], FetchProfile fetchprofile) 
+  public void fetch(Message[] messages, FetchProfile fetchprofile) 
     throws MessagingException 
   {
   }
@@ -567,22 +576,9 @@ extends Folder
       case HOLDS_MESSAGES:
         try 
         {
-          // save the changes
           synchronized (this) 
           {
-            if (messages==null) messages = new Vector();
-            OutputStream os = new BufferedOutputStream(getOutputStream());
-            Message[] m = new Message[messages.size()]; messages.copyInto(m);
-            for (int i=0; i<m.length; i++) 
-            {
-              Address[] f = m[i].getFrom();
-              String top = "From "+
-                ((f.length>0) ? f[0].toString() : "-")+" "+
-                df.format(m[i].getSentDate())+"\n";
-              os.write(top.getBytes());
-              m[i].writeTo(os);
-            }
-            os.close();
+            createNewFile(file);
           }
           this.type = type;
           notifyFolderListeners(FolderEvent.CREATED);
@@ -617,6 +613,8 @@ extends Folder
             if (!folders[i].delete(recurse))
               return false;
         }
+        if (!readOnly)
+          releaseLock();
         file.delete();
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
@@ -636,6 +634,8 @@ extends Folder
           if (folders.length>0)
             return false;
         }
+        if (!readOnly)
+          releaseLock();
         file.delete();
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
@@ -648,7 +648,7 @@ extends Folder
   }
 
   /**
-   * Mbox folders cannot be created, deleted, or renamed.
+   * Renames this folder.
    */
   public boolean renameTo(Folder folder) 
     throws MessagingException 
@@ -659,7 +659,6 @@ extends Folder
       if (filename!=null) 
       {
         file.renameTo(new File(filename));
-        ((MboxStore)store).folders.clear();
         notifyFolderListeners(FolderEvent.RENAMED);
         return true;
       } 
@@ -673,11 +672,23 @@ extends Folder
   }
 
   /**
-   * Mbox folders cannot contain subfolders.
+   * Returns the subfolder of this folder with the specified name.
    */
   public Folder getFolder(String filename) 
     throws MessagingException 
   {
+    String INBOX = "INBOX";
+    if (INBOX.equalsIgnoreCase(filename))
+    {
+      try
+      {
+        return store.getFolder(INBOX);
+      }
+      catch (MessagingException e)
+      {
+        // fall back to standard behaviour
+      }
+    }
     return store.getFolder(file.getAbsolutePath()+File.separator+filename);
   }
 
@@ -688,6 +699,21 @@ extends Folder
   private boolean isGzip() 
   {
     return file.getName().toLowerCase().endsWith(".gz");
+  }
+
+  /**
+   * Creates an input stream that possibly will decompress the
+   * file contents.
+   */
+  private InputStream getInputStream() 
+    throws IOException 
+  {
+    InputStream in;
+
+    in = new FileInputStream(file);
+    if (isGzip())
+      in = new GZIPInputStream(in);
+    return in;
   }
 
   /**
@@ -706,34 +732,89 @@ extends Folder
   }
 	
   /**
-   * Locks this mailbox.  Not implementented yet.
+   * Locks this mailbox.
+   * This uses a dotlock-like mechanism - see createNewFile().
+   * If the directory containing the mbox
+   * folder is not writable, we will not be able to open the mbox for
+   * writing either.
    */
   public synchronized boolean acquireLock() 
   {
-    return true;
+    try
+    {
+      String filename = file.getPath();
+      String lockFilename = filename+".lock";
+      File lock = new File(lockFilename);
+      MboxStore store = (MboxStore)this.store;
+      store.log("creating "+lock.getPath());
+      if (lock.exists())
+        return false;
+      //if (!lock.canWrite())
+      //  return false;
+      createNewFile(lock);
+      return true;
+    }
+    catch (IOException e)
+    {
+      MboxStore store = (MboxStore)this.store;
+      store.log("I/O exception acquiring lock on "+file.getPath());
+    }
+    catch (SecurityException e)
+    {
+      MboxStore store = (MboxStore)this.store;
+      store.log("Security exception acquiring lock on "+file.getPath());
+    }
+    return false;
+  }
+
+  /**
+   * This method creates a new file.
+   * Because Java cannot properly dotlock a file by creating a temporary
+   * file and hardlinking it (some platforms do not support hard links) we
+   * must use this method to create a zero-length inode.
+   * This is a replacement for File.createNewFile(), which only exists in
+   * the JDK since 1.2.
+   * The idea is simply to touch the specified file.
+   */
+  private void createNewFile(File file)
+    throws IOException
+  {
+    // there may be another, more efficient way to do this.
+    // certainly just setLastModified() does not work.
+    BufferedOutputStream out = new BufferedOutputStream(new 
+        FileOutputStream(file));
+    out.flush();
+    out.close();
+    
   }
 	
   /**
-   * Unlocks this mailbox.  Not implemented yet.
+   * Unlocks this mailbox.
+   * This deletes any associated lockfile if it exists. It returns false if
+   * an existing lockfile could not be deleted.
    */
   public synchronized boolean releaseLock() 
   {
-    return true;
-  }
-
-  /**
-   * Creates an input stream that possibly will decompress the
-   * file contents.
-   */
-  private InputStream getInputStream() 
-    throws IOException 
-  {
-    InputStream in;
-
-    in = new FileInputStream(file);
-    if (isGzip())
-      in = new GZIPInputStream(in);
-    return in;
+    try
+    {
+      String filename = file.getPath();
+      String lockFilename = filename+".lock";
+      File lock = new File(lockFilename);
+      MboxStore store = (MboxStore)this.store;
+      store.log("removing "+lock.getPath());
+      if (lock.exists())
+      {
+        if (!lock.delete())
+          return false;
+      }
+      return true;
+    }
+    catch (SecurityException e)
+    {
+      MboxStore store = (MboxStore)this.store;
+      store.log("Security exception releasing lock on "+file.getPath());
+    }
+    return false;
   }
 
   class MboxFilenameFilter 

@@ -539,6 +539,7 @@ public class InternetAddress
     for (pos = 0; pos<len; pos++)
     {
       char c = addresslist.charAt(pos);
+      //System.out.println("c="+c);
       switch (c)
       {
         case '\t':
@@ -564,6 +565,7 @@ public class InternetAddress
           while (pos<len && !gotKet)
           {
             char c2 = addresslist.charAt(pos);
+            //System.out.println("c2="+c2);
             switch (c2)
             {
               case '"':
@@ -571,7 +573,10 @@ public class InternetAddress
                 break;
               case '>':
                 if (!inQuote)
+                {
                   gotKet = true;
+                  pos--;
+                }
                 break;
               case '\\':
                 pos++;
@@ -579,11 +584,13 @@ public class InternetAddress
             }
             pos++;
           }
-          if (pos>=len)
+          if (!gotKet && pos>=len)
+          {
             if (inQuote)
               throw new AddressException("Unmatched '\"'", addresslist, pos);
             else
               throw new AddressException("Unmatched '<'", addresslist, pos);
+          }
           gotDelimiter = true;
           pEnd = pos;
           break;

@@ -38,7 +38,7 @@ import java.io.*;
  * @version 1.3.1
  */
 class MboxOutputStream 
-extends FilterOutputStream 
+  extends FilterOutputStream 
 {
 
   private static byte KET = 62;
@@ -61,26 +61,30 @@ extends FilterOutputStream
 
   /** Flush the internal buffer */
   protected void validateAndFlushBuffer() 
-  throws IOException 
+    throws IOException 
   {
     if (count > 0) 
     {
       for (int i=0; i<count-5; i++) 
       {
-	if (buf[i]=='F' && buf[i+1]=='r' && buf[i+2]=='o' && buf[i+3]=='m' && buf[i+4]==' ') 
-	{
-	  byte[] b2 = new byte[buf.length+1];
-	  System.arraycopy(buf, 0, b2, 0, buf.length);
-	  b2[i] = KET;
-	  System.arraycopy(buf, i, b2, i+1, buf.length-i);
-	  buf = b2;
-	  count++;
-	  break;
-	} 
-	else if (buf[i]!=KET && buf[i]!='\n') 
-	{
-	  break;
-	}
+        if (buf[i]=='F' &&
+            buf[i+1]=='r' &&
+            buf[i+2]=='o' &&
+            buf[i+3]=='m' &&
+            buf[i+4]==' ') 
+        {
+          byte[] b2 = new byte[buf.length+1];
+          System.arraycopy(buf, 0, b2, 0, buf.length);
+          b2[i] = KET;
+          System.arraycopy(buf, i, b2, i+1, buf.length-i);
+          buf = b2;
+          count++;
+          break;
+        } 
+        else if (buf[i]!=KET && buf[i]!='\n') 
+        {
+          break;
+        }
       }
       out.write(buf, 0, count);
       count = 0;
@@ -91,12 +95,12 @@ extends FilterOutputStream
    * Writes the specified byte to this output stream. 
    */
   public synchronized void write(int b) 
-  throws IOException 
+    throws IOException 
   {
     if (b=='\r')
-    return;
+      return;
     if (b=='\n' || count>buf.length)
-    validateAndFlushBuffer();
+      validateAndFlushBuffer();
     buf[count++] = (byte)b;
   }
 
@@ -105,19 +109,19 @@ extends FilterOutputStream
    * starting at offset <code>off</code> to this output stream.
    */
   public synchronized void write(byte b[], int off, int len) 
-  throws IOException 
+    throws IOException 
   {
     // strip any CRs in the byte array
     for (int i=off; i<off+len; i++) 
     {
       if (b[i]=='\r') 
       {
-	byte[] b2 = new byte[b.length];
-	System.arraycopy(b, off, b2, off, len);
-	System.arraycopy(b, i+1, b2, i, len-(i-off)-1);
-	b = b2;
-	len--;
-	i--;
+        byte[] b2 = new byte[b.length];
+        System.arraycopy(b, off, b2, off, len);
+        System.arraycopy(b, i+1, b2, i, len-(i-off)-1);
+        b = b2;
+        len--;
+        i--;
       }
     }
     // validate and flush a line at a time
@@ -125,29 +129,29 @@ extends FilterOutputStream
     {
       if (b[i]=='\n' || i-off>buf.length) 
       {
-	int cl = (i-off>buf.length) ? buf.length : i-off;
-	System.arraycopy(b, off, buf, count, cl);
-	count += cl;
-	validateAndFlushBuffer();
-	len = len-(i-off);
-	byte[] b2 = new byte[b.length];
-	System.arraycopy(b, i, b2, off, len);
-	b = b2;
-	i = off;
+        int cl = (i-off>buf.length) ? buf.length : i-off;
+        System.arraycopy(b, off, buf, count, cl);
+        count += cl;
+        validateAndFlushBuffer();
+        len = len-(i-off);
+        byte[] b2 = new byte[b.length];
+        System.arraycopy(b, i, b2, off, len);
+        b = b2;
+        i = off;
       }
     }
     System.arraycopy(b, off, buf, count, len);
     count += len;
   }
-
+  
   /**
    * Flushes this output stream.
    */
   public synchronized void flush() 
-  throws IOException 
+    throws IOException 
   {
     validateAndFlushBuffer();
     out.flush();
   }
-
+  
 }

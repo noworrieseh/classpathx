@@ -165,11 +165,8 @@ public abstract class Folder
   {
     URLName url = getStore().getURLName();
     String name = getFullName();
-    StringBuffer buffer = new StringBuffer();
-    if (name!=null)
-      buffer.append(name);
     return new URLName(url.getProtocol(), 
-        url.getHost(), url.getPort(), buffer.toString(),
+        url.getHost(), url.getPort(), name,
         url.getUsername(), null);
   }
 
@@ -916,7 +913,14 @@ public abstract class Folder
     if (!folder.exists())
       throw new FolderNotFoundException("Folder does not exist", folder);
     else
+    {
+      boolean isOpen = folder.isOpen();
+      if (!isOpen)
+        folder.open(Folder.READ_WRITE);
       folder.appendMessages(msgs);
+      if (!isOpen)
+        folder.close(false);
+    }
   }
 
   /**

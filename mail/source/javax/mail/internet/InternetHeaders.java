@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.util.*;
 import javax.mail.Header;
 import javax.mail.MessagingException;
-import gnu.mail.util.CRLFInputStream;
+import gnu.mail.util.LineInputStream;
 
 /**
  * InternetHeaders is a utility class that manages RFC822 style headers.
@@ -252,7 +252,7 @@ public class InternetHeaders
   public void load(InputStream is)
     throws MessagingException
   {
-    CRLFInputStream in = new CRLFInputStream(is);
+    LineInputStream in = new LineInputStream(is);
     try
     {
       for (String line = in.readLine(); line!=null; line = in.readLine()) 
@@ -437,8 +437,7 @@ public class InternetHeaders
         buffer.append(header.line);
         buffer.append("\r\n");
         buffer.append(line);
-        header.line = line;
-        return;
+        header.line = buffer.toString();
       }
       else
         headers.addElement(new InternetHeader(line));
