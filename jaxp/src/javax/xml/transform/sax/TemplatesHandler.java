@@ -1,5 +1,4 @@
 /*
- * $Id: TemplatesHandler.java,v 1.2 2004-04-14 15:40:04 avdyk Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * 
  * This file is part of GNU JAXP, a library.

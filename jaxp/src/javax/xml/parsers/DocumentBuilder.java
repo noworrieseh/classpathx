@@ -1,5 +1,4 @@
 /*
- * $Id: DocumentBuilder.java,v 1.2 2004-04-14 15:40:04 avdyk Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -46,7 +45,7 @@ import org.xml.sax.SAXException;
 /**
  * Uses an XML parser to construct a DOM document.
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilder.java,v 1.2 2004-04-14 15:40:04 avdyk Exp $
+ * @version	1.2
  */
 public abstract class DocumentBuilder
 {
