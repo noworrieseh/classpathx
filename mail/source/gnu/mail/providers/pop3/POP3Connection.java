@@ -112,40 +112,44 @@ public class POP3Connection
 	protected byte[] timestamp;
 
   /**
-   * Constructor.
-	 * This establishes the connection to the server.
+   * Creates a new connection to the server.
 	 * @param hostname the hostname of the server to connect to
 	 * @param port the port to connect to (if &lt;=0, use default POP3 port)
    */
   public POP3Connection(String hostname, int port)
 		throws UnknownHostException, IOException
+	{
+		this(hostname, port, -1, -1, false);
+	}
+	
+  /**
+   * Creates a new connection to the server.
+	 * @param hostname the hostname of the server to connect to
+	 * @param port the port to connect to (if &lt;=0, use default POP3 port)
+	 * @param connectionTimeout the connection timeout, in milliseconds
+	 * @param timeout the I/O timeout, in milliseconds
+	 * @param debug print debugging information
+   */
+  public POP3Connection(String hostname, int port,
+			int connectionTimeout, int timeout, boolean debug)
+		throws UnknownHostException, IOException
   {
-		debug = false;
+		this.debug = debug;
     if (port<=0)
       port = DEFAULT_PORT;
+
+		// Set up socket
+		// TODO connection timeout
 		socket = new Socket(hostname, port);
+		if (timeout>0)
+			socket.setSoTimeout(timeout);
+		
 		in = new CRLFInputStream(socket.getInputStream());
 		out = new CRLFOutputStream(socket.getOutputStream());
 		if (!getResponse())
 			throw new ProtocolException("Connect failed: "+response);
 		// APOP timestamp
 		timestamp = parseTimestamp(response);
-	}
-
-	/**
-	 * Indicates if debug is currently enabled.
-	 */
-	public boolean isDebug()
-	{
-		return debug;
-	}
-
-	/**
-	 * Sets debug status.
-	 */
-	public void setDebug(boolean flag)
-	{
-		debug = flag;
 	}
 
 	/**

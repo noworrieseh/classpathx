@@ -83,11 +83,14 @@ public final class POP3Store
     {
       try
       {
-				connection = new POP3Connection(host, port);
-				connection.setDebug(session.getDebug());
+				int connectionTimeout =
+					getIntProperty(session.getProperty("mail.pop3.connectiontimeout"));
+				int timeout =
+					getIntProperty(session.getProperty("mail.pop3.timeout"));
+				connection = new POP3Connection(host, port,
+						connectionTimeout, timeout, session.getDebug());
         // Disable APOP if necessary
-        String disableApop = session.getProperty("mail.pop3.disable-apop");
-        if ("true".equals(disableApop))
+        if ("false".equals(session.getProperty("mail.pop3.apop")))
           connection.timestamp = null;
         List capa = connection.capa();
         if (capa!=null)
@@ -108,6 +111,21 @@ public final class POP3Store
     }
   }
 
+	private int getIntProperty(String property)
+	{
+		if (property!=null)
+		{
+			try
+			{
+				return Integer.parseInt(property);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		return -1;
+	}
+
   /**
    * Closes the connection.
    */
@@ -116,10 +134,14 @@ public final class POP3Store
   {
     if (connection!=null)
     {
+			boolean rsetBeforeQuit =
+				"true".equals(session.getProperty("mail.pop3.rsetbeforequit"));
       synchronized (connection)
       {
         try
         {
+					if (rsetBeforeQuit)
+						connection.rset();
 					connection.quit();
         }
         catch (IOException e)
