@@ -1,7 +1,7 @@
 package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfSerpent.java,v 1.2 2002-06-12 10:27:42 raif Exp $
+// $Id: TestOfSerpent.java,v 1.3 2002-06-24 11:58:00 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -43,7 +43,7 @@ import gnu.crypto.util.Util;
  * <p>Full conformance tests for the {@link gnu.crypto.cipher.Serpent}
  * implementation.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfSerpent extends TestCase {
 
@@ -70,7 +70,6 @@ public class TestOfSerpent extends TestCase {
 
    public void testSelfTest() {
       try {
-//         IBlockCipher algorithm = new Serpent();
          IBlockCipher algorithm = serpent;
          assertTrue("selfTest()", algorithm.selfTest());
       } catch (Exception x) {
@@ -79,8 +78,7 @@ public class TestOfSerpent extends TestCase {
    }
 
    // Variable-key tests.
-   public void testKATestVK() {
-//      Serpent serpent = new Serpent();
+   public void testKatVK() {
       byte[] kb = new byte[16];
       byte[] pt = new byte[16], ct = new byte[16];
       kb[0] = (byte) 0x80;
@@ -89,8 +87,8 @@ public class TestOfSerpent extends TestCase {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVK(): ",
-               Util.areEqual(ct, hexToBytes(vk_128[i])));
+            assertTrue("KatVK(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vk_128[i])));
             i++;
          } while (shift(kb) && i < vk_128.length);
          i = 0;
@@ -99,8 +97,8 @@ public class TestOfSerpent extends TestCase {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVK(): ",
-               Util.areEqual(ct, hexToBytes(vk_192[i])));
+            assertTrue("KatVK(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vk_192[i])));
             i++;
          } while (shift(kb) && i < vk_192.length);
          i = 0;
@@ -109,27 +107,27 @@ public class TestOfSerpent extends TestCase {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVK(): ",
-               Util.areEqual(ct, hexToBytes(vk_256[i])));
+            assertTrue("KatVK(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vk_256[i])));
             i++;
          } while (shift(kb) && i < vk_256.length);
       } catch (Exception x) {
-         fail("KATestVK(): " + String.valueOf(x));
+         fail("KatVK(): " + String.valueOf(x));
       }
    }
 
-   public void testKATestVT() {
-//      Serpent serpent = new Serpent();
+   public void testKatVT() {
       byte[] kb = new byte[16];
-      byte[] pt = new byte[16], ct = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
       pt[0] = (byte) 0x80;
       int i = 0;
       try {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVT(): ",
-               Util.areEqual(ct, hexToBytes(vt_128[i])));
+            assertTrue("KatVT(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vt_128[i])));
             i++;
          } while (shift(pt) && i < vt_128.length);
          kb = new byte[24]; // all zeros
@@ -138,8 +136,8 @@ public class TestOfSerpent extends TestCase {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVT(): ",
-               Util.areEqual(ct, hexToBytes(vt_192[i])));
+            assertTrue("KatVT(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vt_192[i])));
             i++;
          } while (shift(pt) && i < vt_192.length);
          kb = new byte[32]; // all zeros
@@ -148,29 +146,30 @@ public class TestOfSerpent extends TestCase {
          do {
             Object key = serpent.makeKey(kb, 16);
             serpent.encrypt(pt, 0, ct, 0, key, 16);
-            assertTrue("KATestVT(): ",
-               Util.areEqual(ct, hexToBytes(vt_256[i])));
+            assertTrue("KatVT(): ",
+                  Util.areEqual(ct, Util.toBytesFromString(vt_256[i])));
             i++;
          } while (shift(pt) && i < vt_256.length);
       } catch (Exception e) {
-         fail("KATestVT(): " + String.valueOf(e));
+         fail("KatVT(): " + String.valueOf(e));
       }
    }
 
    public void testMCTestECBEncrypt128() {
       byte[] kb = new byte[16];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_e_128.length; i++) {
+         for (i = 0; i < mct_ecb_e_128.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                serpent.encrypt(pt, 0, ct, 0, key, 16);
                System.arraycopy(ct, 0, pt, 0, 16);
             }
             assertTrue("MCTestECBEncrypt128(): ",
-               Util.areEqual(ct, hexToBytes(mct_ecb_e_128[i])));
-            for (int j = 0; j < kb.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_ecb_e_128[i])));
+            for (j = 0; j < kb.length; j++) {
                kb[j] ^= ct[j];
             }
          }
@@ -181,12 +180,14 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestECBEncrypt192() {
       byte[] kb = new byte[24];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lct = new byte[8];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lct = new byte[8];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_e_192.length; i++) {
+         for (i = 0; i < mct_ecb_e_192.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(ct, 0, lct, 0, 8);
                }
@@ -194,11 +195,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(ct, 0, pt, 0, 16);
             }
             assertTrue("MCTestECBEncrypt192(): ",
-               Util.areEqual(ct, hexToBytes(mct_ecb_e_192[i])));
-            for (int j = 0; j < ct.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_ecb_e_192[i])));
+            for (j = 0; j < ct.length; j++) {
                kb[j] ^= ct[j];
             }
-            for (int j = 0; j < lct.length; j++) {
+            for (j = 0; j < lct.length; j++) {
                kb[j+16] ^= lct[j];
             }
          }
@@ -209,12 +210,14 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestECBEncrypt256() {
       byte[] kb = new byte[32];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lct = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lct = new byte[16];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_e_256.length; i++) {
+         for (i = 0; i < mct_ecb_e_256.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(ct, 0, lct, 0, 16);
                }
@@ -222,11 +225,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(ct, 0, pt, 0, 16);
             }
             assertTrue("MCTestECBEncrypt256(): ",
-               Util.areEqual(ct, hexToBytes(mct_ecb_e_256[i])));
-            for (int j = 0; j < ct.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_ecb_e_256[i])));
+            for (j = 0; j < ct.length; j++) {
                kb[j] ^= ct[j];
             }
-            for (int j = 0; j < lct.length; j++) {
+            for (j = 0; j < lct.length; j++) {
                kb[j+16] ^= lct[j];
             }
          }
@@ -237,18 +240,19 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestECBDecrypt128() {
       byte[] kb = new byte[16];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_d_128.length; i++) {
+         for (i = 0; i < mct_ecb_d_128.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                serpent.decrypt(ct, 0, pt, 0, key, 16);
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestECBDecrypt128(): ",
-               Util.areEqual(pt, hexToBytes(mct_ecb_d_128[i])));
-            for (int j = 0; j < kb.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_ecb_d_128[i])));
+            for (j = 0; j < kb.length; j++) {
                kb[j] ^= pt[j];
             }
          }
@@ -259,12 +263,14 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestECBDecrypt192() {
       byte[] kb = new byte[24];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lpt = new byte[8];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lpt = new byte[8];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_d_192.length; i++) {
+         for (i = 0; i < mct_ecb_d_192.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(pt, 0, lpt, 0, 8);
                }
@@ -272,11 +278,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestECBDecrypt192(): ",
-               Util.areEqual(pt, hexToBytes(mct_ecb_d_192[i])));
-            for (int j = 0; j < pt.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_ecb_d_192[i])));
+            for (j = 0; j < pt.length; j++) {
                kb[j] ^= pt[j];
             }
-            for (int j = 0; j < lpt.length; j++) {
+            for (j = 0; j < lpt.length; j++) {
                kb[j+16] ^= lpt[j];
             }
          }
@@ -287,12 +293,14 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestECBDecrypt256() {
       byte[] kb = new byte[32];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lpt = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lpt = new byte[16];
+      int i, j;
       try {
-         for (int i = 0; i < mct_ecb_d_256.length; i++) {
+         for (i = 0; i < mct_ecb_d_256.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(pt, 0, lpt, 0, 16);
                }
@@ -300,11 +308,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestECBDecrypt256(): ",
-               Util.areEqual(pt, hexToBytes(mct_ecb_d_256[i])));
-            for (int j = 0; j < pt.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_ecb_d_256[i])));
+            for (j = 0; j < pt.length; j++) {
                kb[j] ^= pt[j];
             }
-            for (int j = 0; j < lpt.length; j++) {
+            for (j = 0; j < lpt.length; j++) {
                kb[j+16] ^= lpt[j];
             }
          }
@@ -315,14 +323,16 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCEncrypt128() {
       byte[] kb = new byte[16];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lct = new byte[16],
-         iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lct = new byte[16];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_e_128.length; i++) {
+         for (i = 0; i < mct_cbc_e_128.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
-               for (int k = 0; k < pt.length; k++) {
+            for (j = 0; j < 10000; j++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, lct, 0, 16);
@@ -331,8 +341,8 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(lct, 0, pt, 0, 16);
             }
             assertTrue("MCTestCBCEncrypt128(): ",
-               Util.areEqual(ct, hexToBytes(mct_cbc_e_128[i])));
-            for (int j = 0; j < kb.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_cbc_e_128[i])));
+            for (j = 0; j < kb.length; j++) {
                kb[j] ^= ct[j];
             }
          }
@@ -343,14 +353,16 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCEncrypt192() {
       byte[] kb = new byte[24];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lct = new byte[16],
-         iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lct = new byte[16];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_e_192.length; i++) {
+         for (i = 0; i < mct_cbc_e_192.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
-               for (int k = 0; k < pt.length; k++) {
+            for (j = 0; j < 10000; j++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, lct, 0, 16);
@@ -359,11 +371,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(lct, 0, pt, 0, 16);
             }
             assertTrue("MCTestCBCEncrypt192(): ",
-               Util.areEqual(ct, hexToBytes(mct_cbc_e_192[i])));
-            for (int j = 0; j < ct.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_cbc_e_192[i])));
+            for (j = 0; j < ct.length; j++) {
                kb[j] ^= ct[j];
             }
-            for (int j = 0; j+16 < kb.length; j++) {
+            for (j = 0; j+16 < kb.length; j++) {
                kb[j+16] ^= lct[j];
             }
          }
@@ -374,14 +386,16 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCEncrypt256() {
       byte[] kb = new byte[32];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lct = new byte[16],
-         iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lct = new byte[16];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_e_256.length; i++) {
+         for (i = 0; i < mct_cbc_e_256.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
-               for (int k = 0; k < pt.length; k++) {
+            for (j = 0; j < 10000; j++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, lct, 0, 16);
@@ -390,11 +404,11 @@ public class TestOfSerpent extends TestCase {
                System.arraycopy(lct, 0, pt, 0, 16);
             }
             assertTrue("MCTestCBCEncrypt256(): ",
-               Util.areEqual(ct, hexToBytes(mct_cbc_e_256[i])));
-            for (int j = 0; j < ct.length; j++) {
+                  Util.areEqual(ct, Util.toBytesFromString(mct_cbc_e_256[i])));
+            for (j = 0; j < ct.length; j++) {
                kb[j] ^= ct[j];
             }
-            for (int j = 0; j+16 < kb.length; j++) {
+            for (j = 0; j+16 < kb.length; j++) {
                kb[j+16] ^= lct[j];
             }
          }
@@ -405,22 +419,24 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCDecrypt128() {
       byte[] kb = new byte[16];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_d_128.length; i++) {
+         for (i = 0; i < mct_cbc_d_128.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                serpent.decrypt(ct, 0, pt, 0, key, 16);
-               for (int k = 0; k < pt.length; k++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, iv, 0, 16);
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestCBCDecrypt128(): ",
-               Util.areEqual(pt, hexToBytes(mct_cbc_d_128[i])));
-            for (int j = 0; j < kb.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_cbc_d_128[i])));
+            for (j = 0; j < kb.length; j++) {
                kb[j] ^= pt[j];
             }
          }
@@ -431,29 +447,31 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCDecrypt192() {
       byte[] kb = new byte[24];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lpt = new byte[8],
-         iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lpt = new byte[8];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_d_192.length; i++) {
+         for (i = 0; i < mct_cbc_d_192.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(pt, 0, lpt, 0, 8);
                }
                serpent.decrypt(ct, 0, pt, 0, key, 16);
-               for (int k = 0; k < pt.length; k++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, iv, 0, 16);
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestCBCDecrypt192(): ",
-               Util.areEqual(pt, hexToBytes(mct_cbc_d_192[i])));
-            for (int j = 0; j < pt.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_cbc_d_192[i])));
+            for (j = 0; j < pt.length; j++) {
                kb[j] ^= pt[j];
             }
-            for (int j = 0; j+16 < kb.length; j++) {
+            for (j = 0; j+16 < kb.length; j++) {
                kb[j+16] ^= lpt[j];
             }
          }
@@ -464,29 +482,31 @@ public class TestOfSerpent extends TestCase {
 
    public void testMCTestCBCDecrypt256() {
       byte[] kb = new byte[32];
-//      Serpent serpent = new Serpent();
-      byte[] pt = new byte[16], ct = new byte[16], lpt = new byte[16],
-         iv = new byte[16];
+      byte[] pt = new byte[16];
+      byte[] ct = new byte[16];
+      byte[] lpt = new byte[16];
+      byte[] iv = new byte[16];
+      int i, j, k;
       try {
-         for (int i = 0; i < mct_cbc_d_256.length; i++) {
+         for (i = 0; i < mct_cbc_d_256.length; i++) {
             Object key = serpent.makeKey(kb, 16);
-            for (int j = 0; j < 10000; j++) {
+            for (j = 0; j < 10000; j++) {
                if (j == 9999) {
                   System.arraycopy(pt, 0, lpt, 0, 16);
                }
                serpent.decrypt(ct, 0, pt, 0, key, 16);
-               for (int k = 0; k < pt.length; k++) {
+               for (k = 0; k < pt.length; k++) {
                   pt[k] ^= iv[k];
                }
                System.arraycopy(ct, 0, iv, 0, 16);
                System.arraycopy(pt, 0, ct, 0, 16);
             }
             assertTrue("MCTestCBCDecrypt256(): ",
-               Util.areEqual(pt, hexToBytes(mct_cbc_d_256[i])));
-            for (int j = 0; j < pt.length; j++) {
+                  Util.areEqual(pt, Util.toBytesFromString(mct_cbc_d_256[i])));
+            for (j = 0; j < pt.length; j++) {
                kb[j] ^= pt[j];
             }
-            for (int j = 0; j+16 < kb.length; j++) {
+            for (j = 0; j+16 < kb.length; j++) {
                kb[j+16] ^= lpt[j];
             }
          }
@@ -516,14 +536,6 @@ public class TestOfSerpent extends TestCase {
          }
       }
       return true;
-   }
-
-   private byte[] hexToBytes(String s) {
-      byte[] b = new byte[s.length()/2];
-      for (int i = 0; i < b.length; i++) {
-         b[i] = (byte) Integer.parseInt(s.substring(i*2, i*2+2), 16);
-      }
-      return b;
    }
 
    // Constants and variables
