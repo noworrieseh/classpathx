@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.6 2001-07-07 18:15:57 db Exp $
+ * $Id: SAXDriver.java,v 1.7 2001-07-11 17:09:26 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.6 2001-07-07 18:15:57 db Exp $
+// $Id: SAXDriver.java,v 1.7 2001-07-11 17:09:26 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -112,7 +112,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-07 18:15:57 $
+ * @version $Date: 2001-07-11 17:09:26 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -302,6 +302,9 @@ final public class SAXDriver
 	    try {
 		String	systemId = source.getSystemId ();
 
+		if (source.getByteStream () != null
+			&& source.getCharacterStream () != null)
+		    fatal ("resolveEntity() returned two streams");
 		parser.doParse (systemId,
 			      source.getPublicId (),
 			      source.getCharacterStream (),
@@ -378,6 +381,9 @@ final public class SAXDriver
 
 	throw new SAXNotRecognizedException (featureId);
     }
+
+    // package private
+    DeclHandler getDeclHandler () { return declHandler; }
 
     /**
      * <b>SAX2</b>:  Returns the specified property.
@@ -522,6 +528,8 @@ final public class SAXDriver
 	if (source == null) {
 	    return null;
 	} else if (source.getCharacterStream () != null) {
+	    if (source.getByteStream () != null)
+		fatal ("resolveEntity() returned two streams");
 	    return source.getCharacterStream ();
 	} else if (source.getByteStream () != null) {
 	    if (source.getEncoding () == null)
@@ -589,12 +597,6 @@ final public class SAXDriver
     void endDoctype ()
     throws SAXException
     {
-	// NOTE:  some apps may care that comments and PIs,
-	// are stripped from their DTD declaration context,
-	// and that those declarations are themselves quite
-	// thoroughly reordered here.
-
-	deliverDTDEvents ();
 	lexicalHandler.endDTD ();
     }
 
@@ -625,6 +627,7 @@ final public class SAXDriver
 			    verror ("missing URI in namespace decl attribute: "
 					+ aname);
 			} else {
+// FIXME:  if the URI is relative, error
 			    prefixStack.declarePrefix (prefix, value);
 			    contentHandler.startPrefixMapping (prefix, value);
 			}
@@ -648,6 +651,7 @@ final public class SAXDriver
 		} else {
 		    // default declaration?
 		    if ("xmlns".equals (aname)) {
+// FIXME:  if the URI is relative, error
 			prefixStack.declarePrefix ("", value);
 			contentHandler.startPrefixMapping ("", value);
 			if (!xmlNames)
@@ -825,172 +829,6 @@ final public class SAXDriver
     //
     // Before the endDtd event, deliver all non-PE declarations.
     //
-    private void deliverDTDEvents ()
-    throws SAXException
-    {
-	String	ename;
-	String	nname;
-	String publicId;
-	String	systemId;
-
-	// First, report all notations.
-	if (dtdHandler != base) {
-	    Enumeration	notationNames = parser.declaredNotations ();
-
-	    while (notationNames.hasMoreElements ()) {
-		nname = (String) notationNames.nextElement ();
-		publicId = parser.getNotationPublicId (nname);
-		systemId = parser.getNotationSystemId (nname);
-		dtdHandler.notationDecl (nname, publicId, systemId);
-	    }
-	}
-
-	// Next, report all entities.
-	if (dtdHandler != base || declHandler != base) {
-	    Enumeration	entityNames = parser.declaredEntities ();
-	    int	type;
-
-	    while (entityNames.hasMoreElements ()) {
-		ename = (String) entityNames.nextElement ();
-		type = parser.getEntityType (ename);
-
-		if (ename.charAt (0) == '%')
-		    continue;
-
-		// unparsed
-		if (type == XmlParser.ENTITY_NDATA) {
-		    publicId = parser.getEntityPublicId (ename);
-		    systemId = parser.getEntitySystemId (ename);
-		    nname = parser.getEntityNotationName (ename);
-		    dtdHandler.unparsedEntityDecl (ename,
-						    publicId, systemId, nname);
-
-		    // external parsed
-		}
-		else if (type == XmlParser.ENTITY_TEXT) {
-		    publicId = parser.getEntityPublicId (ename);
-		    systemId = parser.getEntitySystemId (ename);
-		    declHandler.externalEntityDecl (ename,
-						     publicId, systemId);
-
-		    // internal parsed
-		}
-		else if (type == XmlParser.ENTITY_INTERNAL) {
-		    // filter out the built-ins; even if they were
-		    // declared, they didn't need to be.
-		    if ("lt".equals (ename) || "gt".equals (ename)
-			    || "quot".equals (ename)
-			    || "apos".equals (ename)
-			    || "amp".equals (ename))
-			continue;
-		    declHandler.internalEntityDecl (ename,
-				 parser.getEntityValue (ename));
-		}
-	    }
-	}
-
-	// elements, attributes
-	if (declHandler != base) {
-	    Enumeration	elementNames = parser.declaredElements ();
-	    Enumeration	attNames;
-
-	    while (elementNames.hasMoreElements ()) {
-		String model = null;
-
-		ename = (String) elementNames.nextElement ();
-		switch (parser.getElementContentType (ename)) {
-		    case XmlParser.CONTENT_ANY:
-			model = "ANY";
-			break;
-		    case XmlParser.CONTENT_EMPTY:
-			model = "EMPTY";
-			break;
-		    case XmlParser.CONTENT_MIXED:
-		    case XmlParser.CONTENT_ELEMENTS:
-			model = parser.getElementContentModel (ename);
-			break;
-		    case XmlParser.CONTENT_UNDECLARED:
-		    default:
-			model = null;
-			break;
-		}
-		if (model != null)
-		    declHandler.elementDecl (ename, model);
-
-		attNames = parser.declaredAttributes (ename);
-		while (attNames != null && attNames.hasMoreElements ()) {
-		    String aname = (String) attNames.nextElement ();
-		    String type;
-		    String valueDefault;
-		    String value;
-
-		    switch (parser.getAttributeType (ename, aname)) {
-		    case XmlParser.ATTRIBUTE_CDATA:
-			type = "CDATA";
-			break;
-		    case XmlParser.ATTRIBUTE_ENTITY:
-			type = "ENTITY";
-			break;
-		    case XmlParser.ATTRIBUTE_ENTITIES:
-			type = "ENTITIES";
-			break;
-		    case XmlParser.ATTRIBUTE_ENUMERATED:
-			type = parser.getAttributeEnumeration (ename, aname);
-			break;
-		    case XmlParser.ATTRIBUTE_ID:
-			type = "ID";
-			break;
-		    case XmlParser.ATTRIBUTE_IDREF:
-			type = "IDREF";
-			break;
-		    case XmlParser.ATTRIBUTE_IDREFS:
-			type = "IDREFS";
-			break;
-		    case XmlParser.ATTRIBUTE_NMTOKEN:
-			type = "NMTOKEN";
-			break;
-		    case XmlParser.ATTRIBUTE_NMTOKENS:
-			type = "NMTOKENS";
-			break;
-		    case XmlParser.ATTRIBUTE_NOTATION:
-			type = "NOTATION "
-			   +  parser.getAttributeEnumeration (ename, aname);
-			break;
-
-		    default:
-			fatal ("internal error, att type");
-			type = null;
-		    }
-
-		    switch (parser.getAttributeDefaultValueType (
-				 ename, aname)) {
-		    case XmlParser.ATTRIBUTE_DEFAULT_IMPLIED:
-			valueDefault = "#IMPLIED";
-			break;
-		    case XmlParser.ATTRIBUTE_DEFAULT_REQUIRED:
-			valueDefault = "#REQUIRED";
-			break;
-		    case XmlParser.ATTRIBUTE_DEFAULT_FIXED:
-			valueDefault = "#FIXED";
-			break;
-		    case XmlParser.ATTRIBUTE_DEFAULT_SPECIFIED:
-			valueDefault = null;
-			break;
-
-		    default:
-			fatal ("internal error, att default");
-			valueDefault = null;
-		    }
-
-		    value = parser.getAttributeDefaultValue (ename, aname);
-
-		    declHandler.attributeDecl (ename, aname,
-						type, valueDefault, value);
-		}
-	    }
-	}
-    }
-
 
     //
     // Implementation of org.xml.sax.Attributes.
@@ -1043,34 +881,13 @@ final public class SAXDriver
      */
     public String getType (int i)
     {
-	switch (parser.getAttributeType (elementName, getQName (i))) {
-
-	case XmlParser.ATTRIBUTE_UNDECLARED:
-	case XmlParser.ATTRIBUTE_CDATA:
+	String	type = parser.getAttributeType (elementName, getQName (i));
+	if (type == null)
 	    return "CDATA";
-	case XmlParser.ATTRIBUTE_ID:
-	    return "ID";
-	case XmlParser.ATTRIBUTE_IDREF:
-	    return "IDREF";
-	case XmlParser.ATTRIBUTE_IDREFS:
-	    return "IDREFS";
-	case XmlParser.ATTRIBUTE_ENTITY:
-	    return "ENTITY";
-	case XmlParser.ATTRIBUTE_ENTITIES:
-	    return "ENTITIES";
-	case XmlParser.ATTRIBUTE_ENUMERATED:
-	    // ... use DeclHandler.attributeDecl to see real type
-	    // FALLTHROUGH
-	case XmlParser.ATTRIBUTE_NMTOKEN:
+	// ... use DeclHandler.attributeDecl to see enumerations
+	if (type == "ENUMERATED")
 	    return "NMTOKEN";
-	case XmlParser.ATTRIBUTE_NMTOKENS:
-	    return "NMTOKENS";
-	case XmlParser.ATTRIBUTE_NOTATION:
-	    // ... use DeclHandler.attributeDecl to see real type
-	    return "NOTATION";
-	}
-
-	return null;
+	return type;
     }
 
 

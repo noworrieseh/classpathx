@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.8 2001-07-10 23:05:52 db Exp $
+ * $Id: XmlParser.java,v 1.9 2001-07-11 17:09:26 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.8 2001-07-10 23:05:52 db Exp $
+// $Id: XmlParser.java,v 1.9 2001-07-11 17:09:26 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-10 23:05:52 $
+ * @version $Date: 2001-07-11 17:09:26 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -247,98 +247,8 @@ final class XmlParser
 
 
     //
-    // Constants for attribute type.
+    // Attribute type constants are interned literal strings.
     //
-
-    /**
-     * Constant: the attribute has not been declared for this element type.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_UNDECLARED = 0;
-
-    /**
-     * Constant: the attribute value is a string value.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_CDATA = 1;
-
-    /**
-     * Constant: the attribute value is a unique identifier.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_ID = 2;
-
-    /**
-     * Constant: the attribute value is a reference to a unique identifier.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_IDREF = 3;
-
-    /**
-     * Constant: the attribute value is a list of ID references.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_IDREFS = 4;
-
-    /**
-     * Constant: the attribute value is the name of an entity.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_ENTITY = 5;
-
-    /**
-     * Constant: the attribute value is a list of entity names.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_ENTITIES = 6;
-
-    /**
-     * Constant: the attribute value is a name token.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_NMTOKEN = 7;
-
-    /**
-     * Constant: the attribute value is a list of name tokens.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_NMTOKENS = 8;
-
-    /**
-     * Constant: the attribute value is a token from an enumeration.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_ENUMERATED = 9;
-
-    /**
-     * Constant: the attribute is the name of a notation.
-     * @see #getAttributeType
-     */
-    public final static int ATTRIBUTE_NOTATION = 10;
-
-
-    //
-    // When the class is loaded, populate the hash table of
-    // attribute types.
-    //
-
-    /**
-     * Hash table of attribute types.
-     */
-    private static Hashtable attributeTypeHash;
-    static {
-	attributeTypeHash = new Hashtable (13);
-	attributeTypeHash.put ("CDATA", new Integer (ATTRIBUTE_CDATA));
-	attributeTypeHash.put ("ID", new Integer (ATTRIBUTE_ID));
-	attributeTypeHash.put ("IDREF", new Integer (ATTRIBUTE_IDREF));
-	attributeTypeHash.put ("IDREFS", new Integer (ATTRIBUTE_IDREFS));
-	attributeTypeHash.put ("ENTITY", new Integer (ATTRIBUTE_ENTITY));
-	attributeTypeHash.put ("ENTITIES", new Integer (ATTRIBUTE_ENTITIES));
-	attributeTypeHash.put ("NMTOKEN", new Integer (ATTRIBUTE_NMTOKEN));
-	attributeTypeHash.put ("NMTOKENS", new Integer (ATTRIBUTE_NMTOKENS));
-	attributeTypeHash.put ("NOTATION", new Integer (ATTRIBUTE_NOTATION));
-    }
-
 
     //
     // Constants for supported encodings.  "external" is just a flag.
@@ -512,7 +422,6 @@ final class XmlParser
     	}
     }
 
-
     /**
      * Skip a comment.
      * <pre>
@@ -533,7 +442,6 @@ final class XmlParser
 	handler.comment (dataBuffer, 0, dataBufferPos);
 	dataBufferPos = 0;
     }
-
 
     /**
      * Parse a processing instruction and do a call-back.
@@ -607,6 +515,24 @@ final class XmlParser
 	}
     }
 
+    private void checkLegalVersion (String version)
+    throws SAXException
+    {
+	int len = version.length ();
+	for (int i = 0; i < len; i++) {
+	    char c = version.charAt (i);
+	    if ('0' <= c && c <= '9')
+		continue;
+	    if (c == '_' || c == '.' || c == ':' || c == '-')
+		continue;
+	    if ('a' <= c && c <= 'z')
+		continue;
+	    if ('A' <= c && c <= 'Z')
+		continue;
+	    error ("illegal character in version", version, "1.0");
+	}
+    }
+
 
     /**
      * Parse the XML declaration.
@@ -637,7 +563,7 @@ final class XmlParser
 	// Read the version.
 	require ("version");
 	parseEq ();
-	version = readLiteral (flags);
+	checkLegalVersion (version = readLiteral (flags));
 	if (!version.equals ("1.0"))
 	    handler.warn ("expected XML version 1.0, not: " + version);
 
@@ -695,7 +621,7 @@ final class XmlParser
 	if (tryRead ("version")) {
 	    String version;
 	    parseEq ();
-	    version = readLiteral (flags);
+	    checkLegalVersion (version = readLiteral (flags));
 	    if (!version.equals ("1.0"))
 		handler.warn ("expected XML version 1.0, not: " + version);
 	    requireWhitespace ();
@@ -933,7 +859,7 @@ final class XmlParser
     throws Exception
     {
 	if (tryRead ("<!ELEMENT")) {
-	    parseElementdecl ();
+	    parseElementDecl ();
 	} else if (tryRead ("<!ATTLIST")) {
 	    parseAttlistDecl ();
 	} else if (tryRead ("<!ENTITY")) {
@@ -1053,7 +979,7 @@ loop:
     throws Exception
     {
 	String aname;
-	int type;
+	String type;
 	String value;
 	int flags = LIT_ATTRIBUTE |  LIT_ENTITY_REF;
 
@@ -1066,7 +992,7 @@ loop:
 
 	// Read the value, normalizing whitespace
 	// unless it is CDATA.
-	if (type == ATTRIBUTE_CDATA || type == ATTRIBUTE_UNDECLARED) {
+	if (type == "CDATA" || type == null) {
 	    value = readLiteral (flags);
 	} else {
 	    value = readLiteral (flags | LIT_NORMALIZE);
@@ -1211,7 +1137,7 @@ loop:
      * </pre>
      * <p> NOTE: the '&lt;!ELEMENT' has already been read.
      */
-    private void parseElementdecl ()
+    private void parseElementDecl ()
     throws Exception
     {
 	String name;
@@ -1240,27 +1166,30 @@ loop:
     {
 	if (tryRead ("EMPTY")) {
 	    setElement (name, CONTENT_EMPTY, null, null);
+	    handler.getDeclHandler ().elementDecl (name, "EMPTY");
 	    return;
 	} else if (tryRead ("ANY")) {
 	    setElement (name, CONTENT_ANY, null, null);
+	    handler.getDeclHandler ().elementDecl (name, "ANY");
 	    return;
 	} else {
+	    String model;
 	    require ('(');
 	    dataBufferAppend ('(');
 	    skipWhitespace ();
 	    if (tryRead ("#PCDATA")) {
 		dataBufferAppend ("#PCDATA");
 		parseMixed ();
-		setElement (name, CONTENT_MIXED,
-				dataBufferToString (), null);
+		model = dataBufferToString ();
+		setElement (name, CONTENT_MIXED, model, null);
 	    } else {
 		parseElements ();
-		setElement (name, CONTENT_ELEMENTS,
-				dataBufferToString (), null);
+		model = dataBufferToString ();
+		setElement (name, CONTENT_ELEMENTS, model, null);
 	    }
+	    handler.getDeclHandler ().elementDecl (name, model);
 	}
     }
-
 
     /**
      * Parse an element-content model.
@@ -1390,13 +1319,14 @@ loop:
 
 	// Parse mixed content.
 	skipWhitespace ();
-	while (!tryRead (")*")) {
+	while (!tryRead (")")) {
 	    require ('|');
 	    dataBufferAppend ('|');
 	    skipWhitespace ();
 	    dataBufferAppend (readNmtoken (true));
 	    skipWhitespace ();
 	}
+	require ('*');
 	dataBufferAppend (")*");
     }
 
@@ -1435,7 +1365,7 @@ loop:
     throws Exception
     {
 	String name;
-	int type;
+	String type;
 	String enum = null;
 
 	// Read the attribute name.
@@ -1445,11 +1375,9 @@ loop:
 	requireWhitespace ();
 	type = readAttType ();
 
-	// Get the string of enumerated values
-	// if necessary.
-	if (type == ATTRIBUTE_ENUMERATED || type == ATTRIBUTE_NOTATION) {
+	// Get the string of enumerated values if necessary.
+	if ("ENUMERATION" == type || "NOTATION" == type)
 	    enum = dataBufferToString ();
-	}
 
 	// Read the default value.
 	requireWhitespace ();
@@ -1467,24 +1395,28 @@ loop:
      * [57] EnumeratedType ::= NotationType | Enumeration
      * </pre>
      */
-    private int readAttType ()
+    private String readAttType ()
     throws Exception
     {
 	if (tryRead ('(')) {
 	    parseEnumeration (false);
-	    return ATTRIBUTE_ENUMERATED;
+	    return "ENUMERATION";
 	} else {
 	    String typeString = readNmtoken (true);
-	    if (typeString.equals ("NOTATION")) {
+	    if ("NOTATION" == typeString) {
 		parseNotationType ();
-	    }
-	    Integer type = (Integer) attributeTypeHash.get (typeString);
-	    if (type == null) {
-		error ("illegal attribute type", typeString, null);
-		return ATTRIBUTE_UNDECLARED;
-	    } else {
-		return type.intValue ();
-	    }
+		return typeString;
+	    } else if ("CDATA" == typeString
+		    || "ID" == typeString
+		    || "IDREF" == typeString
+		    || "IDREFS" == typeString
+		    || "ENTITY" == typeString
+		    || "ENTITIES" == typeString
+		    || "NMTOKEN" == typeString
+		    || "NMTOKENS" == typeString)
+		return typeString;
+	    error ("illegal attribute type", typeString, null);
+	    return null;
 	}
     }
 
@@ -1545,7 +1477,7 @@ loop:
     private void parseDefault (
 	String elementName,
 	String name,
-	int type,
+	String type,
 	String enum
     ) throws Exception
     {
@@ -1553,6 +1485,7 @@ loop:
 	String	value = null;
 	int	flags = LIT_ATTRIBUTE | LIT_DISABLE_CREF | LIT_ENTITY_CHECK;
 	boolean	saved = expandPE;
+	String	defaultType = null;
 
 	// Note: value is not normalized until we expand any entity refs.
 	
@@ -1563,12 +1496,15 @@ loop:
 	expandPE = false;
 	if (tryRead ('#')) {
 	    if (tryRead ("FIXED")) {
+		defaultType = "#FIXED";
 		valueType = ATTRIBUTE_DEFAULT_FIXED;
 		requireWhitespace ();
 		value = readLiteral (flags);
 	    } else if (tryRead ("REQUIRED")) {
+		defaultType = "#REQUIRED";
 		valueType = ATTRIBUTE_DEFAULT_REQUIRED;
 	    } else if (tryRead ("IMPLIED")) {
+		defaultType = "#IMPLIED";
 		valueType = ATTRIBUTE_DEFAULT_IMPLIED;
 	    } else {
 		error ("illegal keyword for attribute default value");
@@ -1577,6 +1513,12 @@ loop:
 	    value = readLiteral (flags);
 	expandPE = saved;
 	setAttribute (elementName, name, type, enum, value, valueType);
+	if ("ENUMERATION" == type)
+	    type = enum;
+	else if ("NOTATION" == type)
+	    type = "NOTATION " + enum;
+	handler.getDeclHandler ()
+	    .attributeDecl (elementName, name, type, defaultType, value);
     }
 
 
@@ -2875,26 +2817,16 @@ loop:
      * Retrieve the declared type of an attribute.
      * @param name The name of the associated element.
      * @param aname The name of the attribute.
-     * @return An integer constant representing the attribute type.
-     * @see #ATTRIBUTE_UNDECLARED
-     * @see #ATTRIBUTE_CDATA
-     * @see #ATTRIBUTE_ID
-     * @see #ATTRIBUTE_IDREF
-     * @see #ATTRIBUTE_IDREFS
-     * @see #ATTRIBUTE_ENTITY
-     * @see #ATTRIBUTE_ENTITIES
-     * @see #ATTRIBUTE_NMTOKEN
-     * @see #ATTRIBUTE_NMTOKENS
-     * @see #ATTRIBUTE_ENUMERATED
-     * @see #ATTRIBUTE_NOTATION
+     * @return An interend string denoting the type, or null
+     *	indicating an undeclared attribute.
      */
-    public int getAttributeType (String name, String aname)
+    public String getAttributeType (String name, String aname)
     {
 	Object attribute[] = getAttribute (name, aname);
 	if (attribute == null) {
-	    return ATTRIBUTE_UNDECLARED;
+	    return null;
 	} else {
-	    return ((Integer) attribute [0]).intValue ();
+	    return (String) attribute [0];
 	}
     }
 
@@ -2904,8 +2836,6 @@ loop:
      * @param name The name of the associated element.
      * @param aname The name of the attribute.
      * @return A string containing the token list.
-     * @see #ATTRIBUTE_ENUMERATED
-     * @see #ATTRIBUTE_NOTATION
      */
     public String getAttributeEnumeration (String name, String aname)
     {
@@ -2913,6 +2843,7 @@ loop:
 	if (attribute == null) {
 	    return null;
 	} else {
+	    // assert:  attribute [0] is "ENUMERATION" or "NOTATION"
 	    return (String) attribute [3];
 	}
     }
@@ -2958,9 +2889,9 @@ loop:
 	    // can't be properly terminated
 	    char buf [] = new char [1];
 	    int	flags = LIT_ENTITY_REF | LIT_ATTRIBUTE;
-	    int	type = getAttributeType (name, aname);
+	    String type = getAttributeType (name, aname);
 
-	    if (type != ATTRIBUTE_CDATA && type != ATTRIBUTE_UNDECLARED)
+	    if (type != "CDATA" && type != null)
 		flags |= LIT_NORMALIZE;
 	    buf [0] = '"';
 	    pushCharArray (null, buf, 0, 1);
@@ -2997,7 +2928,7 @@ loop:
      * - String default value
      * - int value type
      */
-    private void setAttribute (String elName, String name, int type,
+    private void setAttribute (String elName, String name, String type,
 			String enumeration,
 			String value, int valueType)
     throws Exception
@@ -3015,7 +2946,7 @@ loop:
 	    return;
 	} else {
 	    Object attribute [] = new Object [5];
-	    attribute [0] = new Integer (type);
+	    attribute [0] = type;
 	    attribute [1] = value;
 	    attribute [2] = new Integer (valueType);
 	    attribute [3] = enumeration;
@@ -3046,23 +2977,6 @@ loop:
     //
     // Entities
     //
-
-    /**
-     * Get declared entities.
-     * @return An Enumeration of all the entities declared for
-     *	 this XML document.  The results will be valid only
-     *	 after the DTD (if any) has been parsed.
-     * @see #getEntityType
-     * @see #getEntityPublicId
-     * @see #getEntitySystemId
-     * @see #getEntityValue
-     * @see #getEntityNotationName
-     */
-    public Enumeration declaredEntities ()
-    {
-	return entityInfo.keys ();
-    }
-
 
     /**
      * Find the type of an entity.
@@ -3163,8 +3077,14 @@ loop:
      * Register an entity declaration for later retrieval.
      */
     private void setInternalEntity (String eName, String value)
+    throws SAXException
     {
 	setEntity (eName, ENTITY_INTERNAL, null, null, value, null);
+	if ("lt" == eName || "gt" == eName || "quot" == eName
+		|| "apos" == eName || "amp" == eName)
+	    return;
+	handler.getDeclHandler ()
+	    .internalEntityDecl (eName, value);
     }
 
 
@@ -3173,8 +3093,11 @@ loop:
      */
     private void setExternalDataEntity (String eName, String pubid,
 				 String sysid, String nName)
+    throws SAXException
     {
 	setEntity (eName, ENTITY_NDATA, pubid, sysid, null, nName);
+	handler.getDTDHandler ()
+	    .unparsedEntityDecl (eName, pubid, sysid, nName);
     }
 
 
@@ -3183,8 +3106,11 @@ loop:
      */
     private void setExternalTextEntity (String eName,
 		    String pubid, String sysid)
+    throws SAXException
     {
 	setEntity (eName, ENTITY_TEXT, pubid, sysid, null, null);
+	handler.getDeclHandler ()
+	    .externalEntityDecl (eName, pubid, sysid);
     }
 
 
@@ -3213,20 +3139,6 @@ loop:
     //
     // Notations.
     //
-
-    /**
-     * Get declared notations.
-     * @return An Enumeration of all the notations declared for
-     *	 this XML document.  The results will be valid only
-     *	 after the DTD (if any) has been parsed.
-     * @see #getNotationPublicId
-     * @see #getNotationSystemId
-     */
-    public Enumeration declaredNotations ()
-    {
-	return notationInfo.keys ();
-    }
-
 
     /**
      * Look up the public identifier for a notation.
@@ -3271,15 +3183,14 @@ loop:
 
     /**
      * Register a notation declaration for later retrieval.
-     * Format:
-     * - public id
-     * - system id
      */
     private void setNotation (String nname, String pubid, String sysid)
     throws Exception
     {
 	Object notation[];
 
+	handler.getDTDHandler ()
+	    .notationDecl (nname, pubid, sysid);
 	if (notationInfo.get (nname) == null) {
 	    notation = new Object [2];
 	    notation [0] = pubid;
@@ -3971,7 +3882,7 @@ loop:
 	    reader.close ();
 	    break;
 	case INPUT_INTERNAL:
-	    if (ename != null)
+	    if (ename != null && doReport)
 		handler.endInternalEntity (ename);
 	    break;
 	}
