@@ -1,5 +1,5 @@
 /*
- * $Id: DomText.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: DomText.java,v 1.3 2001-11-19 22:23:02 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,13 +30,13 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomText.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomText.java,v 1.3 2001-11-19 22:23:02 db Exp $
 
 /**
  * <p> "Text" implementation.  </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-19 22:23:02 $
  */
 public class DomText extends DomCharacterData implements Text
 {
@@ -59,6 +59,17 @@ public class DomText extends DomCharacterData implements Text
     DomText (Document owner, short code, String value)
     {
 	super (owner, code, value);
+    }
+
+    protected DomText (Document owner, char buf [], int off, int len)
+    {
+	super (owner, TEXT_NODE, buf, off, len);
+    }
+
+    // package private
+    DomText (Document owner, short code, char buf [], int off, int len)
+    {
+	super (owner, code, buf, off, len);
     }
 
 

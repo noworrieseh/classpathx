@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.10 2001-11-19 03:27:09 db Exp $
+ * $Id: Consumer.java,v 1.11 2001-11-19 22:25:37 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -34,6 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
@@ -66,7 +67,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-19 03:27:09 $
+ * @version $Date: 2001-11-19 22:25:37 $
  */
 public class Consumer extends DomConsumer
 {
@@ -229,6 +230,21 @@ public class Consumer extends DomConsumer
 		attr.setSpecified (false);
 	    }
 	}
+
+	protected Text createText (
+	    boolean	isCDATA,
+	    char	buf [],
+	    int		off,
+	    int		len
+	) {
+	    DomDocument	doc = (DomDocument) getDocument ();
+
+	    if (isCDATA)
+		return doc.createCDATASection (buf, off, len);
+	    else
+		return doc.createTextNode (buf, off, len);
+	}
+
 
 	public void attributeDecl (
 	    String	ename,

@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.8 2001-11-19 18:49:20 db Exp $
+ * $Id: DomDocument.java,v 1.9 2001-11-19 22:25:37 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import org.w3c.dom.traversal.*;
 import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
-// $Id: DomDocument.java,v 1.8 2001-11-19 18:49:20 db Exp $
+// $Id: DomDocument.java,v 1.9 2001-11-19 22:25:37 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,7 +47,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-19 18:49:20 $
+ * @version $Date: 2001-11-19 22:25:37 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -346,6 +346,23 @@ public class DomDocument extends DomNode
 	}
     }
 
+    // package private
+    static void verifyXmlCharacters (char buf [], int off, int len)
+    {
+	for (int i = 0; i < len; i++) {
+	    char c = buf [off + i];
+
+	    // assume surrogate pairing checks out OK, for simplicity
+	    if (c >= 0x0020 && c <= 0xFFFD)
+		continue;
+	    if (c == '\n' || c == '\t' || c == '\r')
+		continue;
+
+	    throw new DomEx (DomEx.INVALID_CHARACTER_ERR,
+		new String (buf, off, len), null, c);
+	}
+    }
+
 
     /**
      * Controls whether certain expensive checks, duplicating those that
@@ -459,6 +476,16 @@ public class DomDocument extends DomNode
 	return new DomText (this, value);
     }
 
+    /**
+     * Returns a newly created text node with the specified value.
+     */
+    public Text createTextNode (char buf [], int off, int len)
+    {
+	if (checkingCharacters)
+	    verifyXmlCharacters (buf, off, len);
+	return new DomText (this, buf, off, len);
+    }
+
 
     /**
      * <b>DOM L1</b>
@@ -481,6 +508,17 @@ public class DomDocument extends DomNode
 	if (checkingCharacters)
 	    verifyXmlCharacters (value);
 	return new DomCDATA (this, value);
+    }
+
+
+    /**
+     * Returns a newly created CDATA section node with the specified value.
+     */
+    public CDATASection createCDATASection (char buf [], int off, int len)
+    {
+	if (checkingCharacters)
+	    verifyXmlCharacters (buf, off, len);
+	return new DomCDATA (this, buf, off, len);
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.11 2001-11-16 23:12:06 db Exp $
+ * $Id: DomConsumer.java,v 1.12 2001-11-19 22:29:47 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +79,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-11-16 23:12:06 $
+ * @version $Date: 2001-11-19 22:29:47 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -446,6 +446,31 @@ public class DomConsumer implements EventConsumer
 	    top.appendChild (pi);
 	}
 
+	/**
+	 * Subclasses may overrride this method to provide a more efficient
+	 * way to construct text nodes.
+	 * Typically, copying the text into a single character array will
+	 * be more efficient than doing that as well as allocating other
+	 * needed for a String, including an internal StringBuffer.
+	 * Those additional memory and CPU costs can be incurred later,
+	 * if ever needed.
+	 * Unfortunately the standard DOM factory APIs encourage those costs
+	 * to be incurred early.
+	 */
+	protected Text createText (
+	    boolean	isCDATA,
+	    char	ch [],
+	    int		start,
+	    int		length
+	) {
+	    String	value = new String (ch, start, length);
+
+	    if (isCDATA)
+		return document.createCDATASection (value);
+	    else
+		return document.createTextNode (value);
+	}
+
 	// SAX1
 	public void characters (char ch [], int start, int length)
 	throws SAXException
@@ -456,7 +481,6 @@ public class DomConsumer implements EventConsumer
 	    if (currentEntity != null)
 		return;
 
-	    String	value = new String (ch, start, length);
 	    Node	lastChild = top.getLastChild ();
 
 	    // merge consecutive text or CDATA nodes if appropriate.
@@ -470,17 +494,18 @@ public class DomConsumer implements EventConsumer
 			|| (inCDATA && mergeCDATA
 			    && lastChild instanceof CDATASection)
 			    ) {
-		    CharacterData last = (CharacterData) lastChild;
+		    CharacterData	last = (CharacterData) lastChild;
+		    String		value = new String (ch, start, length);
 		    
 		    last.appendData (value);
 		    return;
 		}
 	    }
 	    if (inCDATA && !consumer.isHidingCDATA ()) {
-		top.appendChild (document.createCDATASection (value));
+		top.appendChild (createText (true, ch, start, length));
 		mergeCDATA = true;
 	    } else
-		top.appendChild (document.createTextNode (value));
+		top.appendChild (createText (false, ch, start, length));
 	}
 
 	// SAX2
