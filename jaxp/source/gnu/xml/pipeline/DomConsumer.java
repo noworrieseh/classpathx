@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.4 2001-06-24 04:10:17 db Exp $
+ * $Id: DomConsumer.java,v 1.5 2001-07-10 22:29:04 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,12 +27,14 @@ import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
+import gnu.xml.util.DomParser;
+
 
 /**
  * This consumer builds a DOM Document from its input, acting either as a
  * pipeline terminus or as an intermediate buffer.  When a document's worth
  * of events has been delivered to this consumer, that document is read with
- * a {@link DomProducer} and sent to the next consumer.  It is also available
+ * a {@link DomParser} and sent to the next consumer.  It is also available
  * as a read-once property.
  *
  * <p>The DOM tree is constructed as faithfully as possible.  There are some
@@ -64,10 +66,10 @@ import org.xml.sax.helpers.AttributesImpl;
  * whatever DOM implementation you want.  It's possible that some revised
  * DOM API will finally resolve this problem. </em>
  *
- * @see DomProducer
+ * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-06-24 04:10:17 $
+ * @version $Date: 2001-07-10 22:29:04 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -319,7 +321,6 @@ public class DomConsumer implements EventConsumer
 
     ErrorHandler getErrorHandler () { return errHandler; }
 
-    
     /**
      * Class used to intercept various parsing events and use them to
      * populate a DOM document.  Subclasses would typically know and use
@@ -428,10 +429,12 @@ public class DomConsumer implements EventConsumer
 	throws SAXException
 	{
 	    try {
-		if (consumer.getNext () != null && document != null)
-		    // new DomProducer (document).produce (next);
-// FIXME
-throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
+		if (consumer.getNext () != null && document != null) {
+		    DomParser	parser = new DomParser (document);
+
+		    EventFilter.bind (parser, consumer.getNext ());
+		    parser.parse ("ignored");
+		}
 	    } finally {
 		top = null;
 	    }
