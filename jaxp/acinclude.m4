@@ -1178,13 +1178,22 @@ dnl @author Luc Maisonobe
 dnl @version 2004/05/05 11:27:01
 dnl
 AC_DEFUN([AC_PROG_JAVAH],[
-AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
-AC_REQUIRE([AC_PROG_CPP])dnl
 dnl AC_PATH_PROG(JAVAH,javah)
-test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah)
-test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, gcjh)
+AC_REQUIRE([AC_EXEEXT])dnl
+if test "x$JAVAPREFIX" = x; then
+	test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, gcjh$EXEEXT)
+else
+	test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, gcjh, $JAVAPREFIX)
+fi
+if test "x$JAVAPREFIX" = x; then
+	test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah$EXEEXT)
+else
+	test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, javah, $JAVAPREFIX)
+fi
 test "x$JAVAH" = x && AC_MSG_ERROR([no JNI header file generator found in \$PATH])
+dnl AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
 AC_PROVIDE([$0])
+AC_REQUIRE([AC_PROG_CPP])dnl
 if test x"`eval 'echo $ac_cv_path_JAVAH'`" != x ; then
   AC_TRY_CPP([#include <jni.h>],,[
     ac_save_CPPFLAGS="$CPPFLAGS"
@@ -1197,7 +1206,8 @@ changequote([, ])dnl
                ac_save_CPPFLAGS="$CPPFLAGS",
                AC_MSG_WARN([unable to include <jni.h>]))
     CPPFLAGS="$ac_save_CPPFLAGS"])
-fi])
+fi
+])
 dnl @synopsis AC_TRY_COMPILE_JAVA
 dnl
 dnl AC_TRY_COMPILE_JAVA attempt to compile user given source.

@@ -36,20 +36,31 @@ $(src)/org/w3c/dom/Attr.java \
 $(src)/org/w3c/dom/CDATASection.java \
 $(src)/org/w3c/dom/CharacterData.java \
 $(src)/org/w3c/dom/Comment.java \
+$(src)/org/w3c/dom/DOMConfiguration.java \
+$(src)/org/w3c/dom/DOMError.java \
+$(src)/org/w3c/dom/DOMErrorHandler.java \
 $(src)/org/w3c/dom/DOMException.java \
 $(src)/org/w3c/dom/DOMImplementation.java \
+$(src)/org/w3c/dom/DOMImplementationList.java \
+$(src)/org/w3c/dom/DOMImplementationSource.java \
+$(src)/org/w3c/dom/DOMLocator.java \
+$(src)/org/w3c/dom/DOMStringList.java \
 $(src)/org/w3c/dom/Document.java \
 $(src)/org/w3c/dom/DocumentFragment.java \
 $(src)/org/w3c/dom/DocumentType.java \
 $(src)/org/w3c/dom/Element.java \
 $(src)/org/w3c/dom/Entity.java \
 $(src)/org/w3c/dom/EntityReference.java \
+$(src)/org/w3c/dom/NameList.java \
 $(src)/org/w3c/dom/NamedNodeMap.java \
 $(src)/org/w3c/dom/Node.java \
 $(src)/org/w3c/dom/NodeList.java \
 $(src)/org/w3c/dom/Notation.java \
 $(src)/org/w3c/dom/ProcessingInstruction.java \
 $(src)/org/w3c/dom/Text.java \
+$(src)/org/w3c/dom/TypeInfo.java \
+$(src)/org/w3c/dom/UserDataHandler.java \
+$(src)/org/w3c/dom/bootstrap/DOMImplementationRegistry.java \
 $(src)/org/w3c/dom/css/CSS2Azimuth.java \
 $(src)/org/w3c/dom/css/CSS2BackgroundPosition.java \
 $(src)/org/w3c/dom/css/CSS2BorderSpacing.java \
@@ -147,6 +158,17 @@ $(src)/org/w3c/dom/html/HTMLTableSectionElement.java \
 $(src)/org/w3c/dom/html/HTMLTextAreaElement.java \
 $(src)/org/w3c/dom/html/HTMLTitleElement.java \
 $(src)/org/w3c/dom/html/HTMLUListElement.java \
+$(src)/org/w3c/dom/ls/DOMImplementationLS.java \
+$(src)/org/w3c/dom/ls/LSException.java \
+$(src)/org/w3c/dom/ls/LSInput.java \
+$(src)/org/w3c/dom/ls/LSLoadEvent.java \
+$(src)/org/w3c/dom/ls/LSOutput.java \
+$(src)/org/w3c/dom/ls/LSParser.java \
+$(src)/org/w3c/dom/ls/LSParserFilter.java \
+$(src)/org/w3c/dom/ls/LSProgressEvent.java \
+$(src)/org/w3c/dom/ls/LSResourceResolver.java \
+$(src)/org/w3c/dom/ls/LSSerializer.java \
+$(src)/org/w3c/dom/ls/LSSerializerFilter.java \
 $(src)/org/w3c/dom/ranges/DocumentRange.java \
 $(src)/org/w3c/dom/ranges/Range.java \
 $(src)/org/w3c/dom/ranges/RangeException.java \
@@ -361,9 +383,11 @@ javax.xml.transform.dom \
 javax.xml.transform.sax \
 javax.xml.transform.stream \
 org.w3c.dom \
+org.w3c.dom.bootstrap \
 org.w3c.dom.css \
 org.w3c.dom.events \
 org.w3c.dom.html \
+org.w3c.dom.ls \
 org.w3c.dom.ranges \
 org.w3c.dom.stylesheets \
 org.w3c.dom.traversal \
@@ -424,7 +448,7 @@ javadoc:
 
 clean-local:
 	rm -f $(JARFILE)
-	rm -rf $(dst)
+	rm -rf $(dst) $(doc)
 	rm -f $(headers)
 
 # Run a simple transformation to check that the package is working
