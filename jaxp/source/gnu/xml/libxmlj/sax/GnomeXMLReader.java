@@ -59,7 +59,7 @@ implements XMLReader
 
   static
   {
-    System.loadLibrary("xml2-jni");
+    System.loadLibrary("xmlj");
   }
 
   private static final String FEATURES_PREFIX = "http://xml.org/sax/features/";
@@ -271,7 +271,7 @@ implements XMLReader
     return namespaces.getURI(prefix);
   }
 
-  // Callbacks from libxml2-jni
+  // Callbacks from libxmlj
 
   private void notationDecl(String name, String publicId, String systemId)
     throws SAXException

@@ -53,7 +53,7 @@ implements DOMImplementation
 
   static
   {
-    System.loadLibrary("xml2-jni");
+    System.loadLibrary("xmlj");
   }
 
   // -- DocumentBuilder --

@@ -1041,7 +1041,7 @@ javadoc:
 clean-local:
 	rm -f ${JARFILE}
 	rm -rf gnu javax org
-	rm -f $(jni)/gnu_*.h $(jni)/javax-*.h *.o
+	rm -f $(jni)/gnu_*.h $(jni)/javax_*.h *.o
 
 # Run a simple transformation to check that the package is working
 
