@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentBuilder.java,v 1.6 2001-11-02 21:40:25 db Exp $
+ * $Id: DocumentBuilder.java,v 1.7 2001-12-05 22:48:40 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -44,18 +44,14 @@ import org.xml.sax.SAXException;
 
 
 /**
- * DocumentBuilder
+ * Uses an XML parser to construct a DOM document.
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilder.java,v 1.6 2001-11-02 21:40:25 db Exp $
+ * @version	$Id: DocumentBuilder.java,v 1.7 2001-12-05 22:48:40 db Exp $
  */
-public abstract class DocumentBuilder {
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	protected DocumentBuilder() {
-	} // DocumentBuilder()
+public abstract class DocumentBuilder
+{
+	/** Only subclasses may use the constructor. */
+	protected DocumentBuilder() { }
 
 
 	//-------------------------------------------------------------
@@ -73,7 +69,7 @@ public abstract class DocumentBuilder {
 	// we don't demand jdk 1.2 File.toURL() in the runtime
 	// keep in sync with gnu.xml.util.Resolver
 	// and javax.xml.transform.stream.StreamSource
-	private static String fileToURL (File f)
+	static String fileToURL (File f)
 	throws IOException
 	{
 	    String	temp;
