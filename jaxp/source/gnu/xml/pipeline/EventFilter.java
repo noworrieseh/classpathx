@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.3 2001-07-08 12:27:11 db Exp $
+ * $Id: EventFilter.java,v 1.4 2001-07-10 21:22:02 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@ import gnu.xml.util.DefaultHandler;
  *	</ul>
  *
  * @author David Brownell
- * @version $Date: 2001-07-08 12:27:11 $
+ * @version $Date: 2001-07-10 21:22:02 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -117,7 +117,42 @@ public class EventFilter
     public static final String		PROPERTY_URI
 	= "http://xml.org/sax/properties/";
 
+    /** SAX2 property identifier for {@link DeclHandler} events */
+    public static final String		DECL_HANDLER
+	= PROPERTY_URI + "declaration-handler";
+    /** SAX2 property identifier for {@link LexicallHandler} events */
+    public static final String		LEXICAL_HANDLER
+	= PROPERTY_URI + "lexical-handler";
 
+
+    /**
+     * Binds the standard SAX2 handlers from the specified consumer
+     * to the specified producer.  These handlers include the core
+     * {@link ContentHandler} and {@link DTDHandler}, plus the extension
+     * {@link DeclHandler} and {@link LexicalHandler}.  Any additional
+     * application-specific handlers need to be bound separately.
+     *
+     * <p> Note that this method works with any kind of event consumer,
+     * not just event filters.
+     *
+     * @param producer will deliver events to the specifid consumer 
+     * @param consumer supplies event handlers to be associated
+     *	with the producer
+     */
+    public static void bind (XMLReader producer, EventConsumer consumer)
+    {
+	producer.setContentHandler (consumer.getContentHandler ());
+	producer.setDTDHandler (consumer.getDTDHandler ());
+	try {
+	    producer.setProperty (DECL_HANDLER,
+	    	consumer.getProperty (DECL_HANDLER));
+	} catch (Exception e) { /* ignore */ }
+	try {
+	    producer.setProperty (LEXICAL_HANDLER,
+	    	consumer.getProperty (LEXICAL_HANDLER));
+	} catch (Exception e) { /* ignore */ }
+    }
+    
     /**
      * Initializes all handlers to null.
      */
@@ -148,11 +183,11 @@ public class EventFilter
 	dtdHandler = dtdNext = consumer.getDTDHandler ();
 	try {
 	    declHandler = declNext = (DeclHandler)
-		    consumer.getProperty (PROPERTY_URI + "declaration-handler");
+		    consumer.getProperty (DECL_HANDLER);
 	} catch (SAXException e) { /* leave value null */ }
 	try {
 	    lexHandler = lexNext = (LexicalHandler)
-		    consumer.getProperty (PROPERTY_URI + "lexical-handler");
+		    consumer.getProperty (LEXICAL_HANDLER);
 	} catch (SAXException e) { /* leave value null */ }
     }
 
@@ -231,11 +266,11 @@ public class EventFilter
 
 	    if (value == o)
 		return;
-	    if ((PROPERTY_URI + "declaration-handler").equals (id)) {
+	    if (DECL_HANDLER.equals (id)) {
 		declHandler = (DeclHandler) o;
 		return;
 	    }
-	    if ((PROPERTY_URI + "lexical-handler").equals (id)) {
+	    if (LEXICAL_HANDLER.equals (id)) {
 		lexHandler = (LexicalHandler) o;
 		return;
 	    }
@@ -255,9 +290,9 @@ public class EventFilter
     final public Object getProperty (String id)
     throws SAXNotRecognizedException
     {
-	if ((PROPERTY_URI + "declaration-handler").equals (id)) 
+	if (DECL_HANDLER.equals (id)) 
 	    return declHandler;
-	if ((PROPERTY_URI + "lexical-handler").equals (id))
+	if (LEXICAL_HANDLER.equals (id))
 	    return lexHandler;
 
 	Object	property = null;
