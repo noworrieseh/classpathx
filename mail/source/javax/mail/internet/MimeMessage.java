@@ -26,6 +26,7 @@ import java.util.*;
 import javax.activation.DataHandler;
 import javax.mail.*;
 import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.RFC2822OutputStream;
 
 /**
  * This class represents a MIME style email message.
@@ -1610,16 +1611,38 @@ public class MimeMessage
     for (Enumeration e = getNonMatchingHeaderLines(ignoreList);
         e.hasMoreElements(); )
     {
-      crlfos.write((String)e.nextElement());
+      String line = (String)e.nextElement();
+      /*
+       * RFC 2822, section 2.1 states that each line should be no more
+       * than 998 characters. Ensure that any headers we emit have no lines
+       * longer than this by folding the line.
+       */
+      int max = 998;
+      while (line.length()>max)
+      {
+        String left = line.substring(0, max);
+        crlfos.write(left);
+        crlfos.writeln();
+        crlfos.write('\t');
+        line = line.substring(max);
+        max = 997; // make space for the tab
+      }
+      crlfos.write(line);
       crlfos.writeln();
     }
     crlfos.writeln();
     crlfos.flush();
 
+    /*
+     * Implement the no-CR-without-LF and len(line)<=998 RFC2822 rules
+     * (section 2.3).
+     * We do this by wrapping in an RFC28222OutputStream.
+     */
+    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(crlfos);
     if (modified || content==null && contentStream==null)
     {
       // use datahandler
-      os = MimeUtility.encode(os, getEncoding());
+      os = MimeUtility.encode(rfc2822os, getEncoding());
       getDataHandler().writeTo(os);
     }
     else
@@ -1632,13 +1655,13 @@ public class MimeMessage
         int len = 8192;
         byte[] bytes = new byte[len];
         while ((len = is.read(bytes))>-1) 
-          os.write(bytes, 0, len);
+          rfc2822os.write(bytes, 0, len);
         is.close();
       }
       else
-        os.write(content);
+        rfc2822os.write(content);
     }
-    os.flush();
+    rfc2822os.flush();
   }
 
   static int fc = 1;

@@ -78,7 +78,8 @@ public class InternetHeaders
       {
         StringBuffer buffer = new StringBuffer();
         buffer.append(name);
-        buffer.append(": ");
+        buffer.append(':');
+        buffer.append(' ');
         buffer.append(value);
         line = buffer.toString();
       }
@@ -105,7 +106,8 @@ public class InternetHeaders
     {
       StringBuffer buffer = new StringBuffer();
       buffer.append(name);
-      buffer.append(": ");
+      buffer.append(':');
+      buffer.append(' ');
       buffer.append(value);
       line = buffer.toString();
     }

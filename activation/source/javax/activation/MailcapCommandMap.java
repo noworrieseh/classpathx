@@ -73,7 +73,7 @@ import java.util.Properties;
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class MailcapCommandMap
 extends CommandMap 
@@ -116,14 +116,13 @@ extends CommandMap
   {
     DB = new Hashtable[5];
     Properties properties = System.getProperties();
-    String sep = properties.getProperty("file.separator");
     //init programmatic entries
     DB[PROG] = new Hashtable();
     //the user's mime types
     try
     {
       File userHome = new File(properties.getProperty("user.home") +
-        sep + ".mailcap");
+        File.separator + ".mailcap");
       DB[HOME] = loadMailcapRegistry(new FileReader(userHome));
     }
     catch(Exception e)
@@ -134,7 +133,7 @@ extends CommandMap
     try
     {
       File javaHome = new File(properties.getProperty("java.home") +
-        sep + "lib" + sep + "mailcap");
+        File.separator + "lib" + File.separator + "mailcap");
       DB[SYS] = loadMailcapRegistry(new FileReader(javaHome));
     }
     catch(Exception e)
@@ -144,9 +143,8 @@ extends CommandMap
     //a possible jar-file local copy of the mime types
     try
     {
-      String resource = "META-INF" + sep + "mailcap";
-      InputStream str =
-        getClass().getClassLoader().getResourceAsStream(resource);
+      String resource = "/META-INF/mailcap";
+      InputStream str = getClass().getResourceAsStream(resource);
       DB[JAR] = loadMailcapRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
@@ -156,9 +154,8 @@ extends CommandMap
     //the default providers... obtained from a possible META-INF/ location
     try
     {
-      String resource = "META-INF" + sep + "mailcap.default";
-      InputStream str =
-        getClass().getClassLoader().getResourceAsStream(resource);
+      String resource = "/META-INF/mailcap.default";
+      InputStream str = getClass().getResourceAsStream(resource);
       DB[DEF] = loadMailcapRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
@@ -309,23 +306,23 @@ extends CommandMap
       int pos = 0;
       for (int i = 0; i < DB.length; i++)
       {
-	CommandInfo[] entry = (CommandInfo[]) DB[i].get(mimeType);
-	if (entry != null)
-	{
-	  System.arraycopy(entry, 0, allCommands, pos, entry.length);
-	  pos += entry.length;
-	}
-	//if the specified mimetype is not a generic type test that specifically
-	if (!mimeType.endsWith("/*"))
-	{
-	  entry = (CommandInfo[]) DB[i].get(mimeType.substring(0,
-      mimeType.indexOf("/")) + "*");
-	  if (entry != null)
-	  {
-	    System.arraycopy(entry, 0, allCommands, pos, entry.length);
-	    pos += entry.length;
-	  }
-	}
+        CommandInfo[] entry = (CommandInfo[]) DB[i].get(mimeType);
+        if (entry != null)
+        {
+          System.arraycopy(entry, 0, allCommands, pos, entry.length);
+          pos += entry.length;
+        }
+        //if the specified mimetype is not a generic type test that specifically
+        if (!mimeType.endsWith("/*"))
+        {
+          entry = (CommandInfo[]) DB[i].get(mimeType.substring(0,
+                mimeType.indexOf("/")) + "*");
+          if (entry != null)
+          {
+            System.arraycopy(entry, 0, allCommands, pos, entry.length);
+            pos += entry.length;
+          }
+        }
       }
     }
     return allCommands;
@@ -428,129 +425,129 @@ extends CommandMap
       toker.wordChars('/', '/');
       while (true)
       {
-	int token = toker.nextToken();
-	//first handle line continuations and END condition
-	switch(token)
-	{
-	  case StreamTokenizer.TT_EOF:
-	    return registry;
-	  case StreamTokenizer.TT_EOL:
-	    if (continueLine)
-	    {
-	      do {
-	        token = toker.nextToken();
-	      } while (token == StreamTokenizer.TT_EOL);
-	      continueLine = false;
-	    }
-	    break;
-	  case '\\':
-	    continueLine = true;
-	    continue;
-	}
-	//now the main state machine
-	switch(state)
-	{
-	  case READMIMETYPE:
-	    switch(token)
-	    {
-	      case StreamTokenizer.TT_EOL:
-		//the mailcap entry has finished without specifying beans
-		mtBuf.setLength(0);
-		break;
-	      case ';':
-		//the mime type has been specified
-		mimetype = mtBuf.toString();
-		mtBuf.setLength(0);
-		state = READUNIXCOMMAND;
-		break;
-	      case StreamTokenizer.TT_WORD:
-		mtBuf.append(toker.sval);
-		break;
-	      default:
-		mtBuf.append((char)token);
-	    }
-	    continue;
-	  case READUNIXCOMMAND:
-	    switch(token)
-	    {
-	      case ';':
-		//the command has been read - start reading the beans
-		state = READCOMMANDNAME;
-		break;
-	      case StreamTokenizer.TT_EOL:
-		//the mailcap entry has finished without specifying beans
-		state = READMIMETYPE;
-		break;
-	      default:
-		break;
-	    }
-	    continue;
-	  case READCOMMANDNAME:
-	    switch(token)
-	    {
-	      case StreamTokenizer.TT_EOL:
-		//the entry has finished without specifying a bean
-		state = READMIMETYPE;
-		break;
-	      case ';':
-		//the field has finished without specifying a bean...
-		//... carry on looking for one
-		nameBuf.setLength(0);
-		break;
-	      case '=':
-		//the field name has finished correctly
-		name = nameBuf.toString();
-		nameBuf.setLength(0);
-		//if we read a bean specifying field name then move on
-		if (name.startsWith("x-java-"))
-    {
-		  state = READCOMMANDVALUE;
-    }
-		else
-    {
-		  state = READUNIXCOMMAND;
-    }
-		break;
-	      case StreamTokenizer.TT_WORD:
-		nameBuf.append(toker.sval);
-		break;
-	      default:
-		nameBuf.append((char)token);
-	    }
-	    continue;
-	  case READCOMMANDVALUE:
-	    switch(token)
-	    {
-	      case StreamTokenizer.TT_EOL:
-		value = valueBuf.toString();
-		valueBuf.setLength(0);
-		addCommand(registry,mimetype,name,value);
-		state = READMIMETYPE;
-		break;
-	      case ';':
-		value = valueBuf.toString();
-		valueBuf.setLength(0);
-		addCommand(registry, mimetype, name, value);
-		state = SWALLOW;
-		break;
-	      case StreamTokenizer.TT_WORD:
-		valueBuf.append(toker.sval);
-		break;
-	      default:
-		valueBuf.append((char)token);
-	    }
-	    continue;
-	  case SWALLOW:
-	    switch(token)
-	    {
-	      case StreamTokenizer.TT_EOL:
-		state = READMIMETYPE;
-		break;
-	      default:
-		break;
-	    }
-	    continue;
-	}
+        int token = toker.nextToken();
+        //first handle line continuations and END condition
+        switch(token)
+        {
+          case StreamTokenizer.TT_EOF:
+            return registry;
+          case StreamTokenizer.TT_EOL:
+            if (continueLine)
+            {
+              do {
+                token = toker.nextToken();
+              } while (token == StreamTokenizer.TT_EOL);
+              continueLine = false;
+            }
+            break;
+          case '\\':
+            continueLine = true;
+            continue;
+        }
+        //now the main state machine
+        switch(state)
+        {
+          case READMIMETYPE:
+            switch(token)
+            {
+              case StreamTokenizer.TT_EOL:
+                //the mailcap entry has finished without specifying beans
+                mtBuf.setLength(0);
+                break;
+              case ';':
+                //the mime type has been specified
+                mimetype = mtBuf.toString();
+                mtBuf.setLength(0);
+                state = READUNIXCOMMAND;
+                break;
+              case StreamTokenizer.TT_WORD:
+                mtBuf.append(toker.sval);
+                break;
+              default:
+                mtBuf.append((char)token);
+            }
+            continue;
+          case READUNIXCOMMAND:
+            switch(token)
+            {
+              case ';':
+                //the command has been read - start reading the beans
+                state = READCOMMANDNAME;
+                break;
+              case StreamTokenizer.TT_EOL:
+                //the mailcap entry has finished without specifying beans
+                state = READMIMETYPE;
+                break;
+              default:
+                break;
+            }
+            continue;
+          case READCOMMANDNAME:
+            switch(token)
+            {
+              case StreamTokenizer.TT_EOL:
+                //the entry has finished without specifying a bean
+                state = READMIMETYPE;
+                break;
+              case ';':
+                //the field has finished without specifying a bean...
+                //... carry on looking for one
+                nameBuf.setLength(0);
+                break;
+              case '=':
+                //the field name has finished correctly
+                name = nameBuf.toString();
+                nameBuf.setLength(0);
+                //if we read a bean specifying field name then move on
+                if (name.startsWith("x-java-"))
+                {
+                  state = READCOMMANDVALUE;
+                }
+                else
+                {
+                  state = READUNIXCOMMAND;
+                }
+                break;
+              case StreamTokenizer.TT_WORD:
+                nameBuf.append(toker.sval);
+                break;
+              default:
+                nameBuf.append((char)token);
+            }
+            continue;
+          case READCOMMANDVALUE:
+            switch(token)
+            {
+              case StreamTokenizer.TT_EOL:
+                value = valueBuf.toString();
+                valueBuf.setLength(0);
+                addCommand(registry,mimetype,name,value);
+                state = READMIMETYPE;
+                break;
+              case ';':
+                value = valueBuf.toString();
+                valueBuf.setLength(0);
+                addCommand(registry, mimetype, name, value);
+                state = SWALLOW;
+                break;
+              case StreamTokenizer.TT_WORD:
+                valueBuf.append(toker.sval);
+                break;
+              default:
+                valueBuf.append((char)token);
+            }
+            continue;
+          case SWALLOW:
+            switch(token)
+            {
+              case StreamTokenizer.TT_EOL:
+                state = READMIMETYPE;
+                break;
+              default:
+                break;
+            }
+            continue;
+        }
       }
     }
     catch (Exception e) 
@@ -560,7 +557,7 @@ extends CommandMap
     }
     return null;
   }
-
+  
   /** add the specified command name and value to the registry.
    *
    * @param reg the registry of MIME types against <code>CommandInfo[]</code>
