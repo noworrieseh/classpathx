@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSSKeyGeneration.java,v 1.1 2001-12-31 22:20:55 raif Exp $
+// $Id: TestOfDSSKeyGeneration.java,v 1.2 2002-01-11 22:10:35 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,8 +36,6 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import gnu.crypto.sig.dss.DSSKeyPairGenerator;
-import gnu.crypto.sig.dss.DSSPrivateKey;
-import gnu.crypto.sig.dss.DSSPublicKey;
 import gnu.crypto.util.Prime;
 
 import java.math.BigInteger;
@@ -52,7 +50,7 @@ import java.util.HashMap;
 /**
  * Conformance tests for the DSS key-pair generation implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfDSSKeyGeneration extends TestCase {
 
@@ -109,36 +107,7 @@ public class TestOfDSSKeyGeneration extends TestCase {
       BigInteger g2 = ((DSAPrivateKey) kp.getPrivate()).getParams().getG();
       assertTrue("g1.equals(g2)", g1.equals(g2));
 
-      boolean isGnuPrime =
-            !Prime.hasSmallPrimeDivisor(q1)
-            && Prime.passEulerCriterion(q1)
-            && Prime.passMillerRabin(q1);
-      assertTrue("q is probable prime", isGnuPrime);
-
-      if (isGnuPrime != q1.isProbablePrime(100)) {
-         notifyMaintainer(q1, isGnuPrime);
-      }
-
-      isGnuPrime =
-            !Prime.hasSmallPrimeDivisor(p1)
-            && Prime.passEulerCriterion(p1)
-            && Prime.passMillerRabin(p1);
-      assertTrue("p is probable prime", isGnuPrime);
-
-      if (isGnuPrime != p1.isProbablePrime(100)) {
-         notifyMaintainer(p1, isGnuPrime);
-      }
-   }
-
-   // helper methods
-   // -------------------------------------------------------------------------
-
-   private static void notifyMaintainer(BigInteger n, boolean isGnuPrime) {
-      System.err.println("This library and the JDK disagree on whether 0x"
-         +n.toString(16)+" is a prime or not.");
-      System.err.println("While this library claims it is"
-         +(isGnuPrime ? "" : " not")+", the JDK claims the opposite.");
-      System.err.println("Please contact the maintainer of this library, and "
-         +"provide this message for further investigation. TIA");
+      assertTrue("q is probable prime", Prime.isProbablePrime(q1, true));
+      assertTrue("p is probable prime", Prime.isProbablePrime(p1, true));
    }
 }

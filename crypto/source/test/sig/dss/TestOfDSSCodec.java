@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSSCodec.java,v 1.1 2001-12-31 22:20:55 raif Exp $
+// $Id: TestOfDSSCodec.java,v 1.2 2002-01-11 22:10:35 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,10 +36,13 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import gnu.crypto.sig.IKeyPairCodec;
+import gnu.crypto.sig.ISignatureCodec;
 import gnu.crypto.sig.dss.DSSKeyPairGenerator;
 import gnu.crypto.sig.dss.DSSKeyPairRawCodec;
 import gnu.crypto.sig.dss.DSSPrivateKey;
 import gnu.crypto.sig.dss.DSSPublicKey;
+import gnu.crypto.sig.dss.DSSSignatureRawCodec;
+import gnu.crypto.sig.dss.DSSSignature;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -52,12 +55,15 @@ import java.util.HashMap;
  * Conformance tests for the DSS key/signature format encoding/decoding
  * implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfDSSCodec extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
+
+   private DSSKeyPairGenerator kpg = new DSSKeyPairGenerator();
+   private KeyPair kp;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -80,14 +86,7 @@ public class TestOfDSSCodec extends TestCase {
    // Instance methods
    // -------------------------------------------------------------------------
 
-   public void testKeyPairCodec() {
-      DSSKeyPairGenerator kpg = new DSSKeyPairGenerator();
-      HashMap map = new HashMap();
-      map.put(DSSKeyPairGenerator.MODULUS_LENGTH, new Integer(512));
-      map.put(DSSKeyPairGenerator.USE_DEFAULTS, new Boolean(false));
-      kpg.setup(map);
-      KeyPair kp = kpg.generate();
-
+   public void testKeyPairRawCodec() {
       DSAPublicKey pubK = (DSAPublicKey) kp.getPublic();
       DSAPrivateKey secK = (DSAPrivateKey) kp.getPrivate();
 
@@ -109,5 +108,41 @@ public class TestOfDSSCodec extends TestCase {
 
       assertTrue("DSS public key Raw encoder/decoder test", pubK.equals(newPubK));
       assertTrue("DSS private key Raw encoder/decoder test", secK.equals(newSecK));
+   }
+
+   public void testSignatureRawCodec() {
+      DSAPublicKey publicK = (DSAPublicKey) kp.getPublic();
+      DSAPrivateKey privateK = (DSAPrivateKey) kp.getPrivate();
+
+      DSSSignature alice = new DSSSignature();
+      DSSSignature bob = (DSSSignature) alice.clone();
+
+      byte[] message = "1 if by land, 2 if by sea...".getBytes();
+
+      alice.setupSign(privateK);
+      alice.update(message, 0, message.length);
+      Object signature = alice.sign();
+
+      ISignatureCodec codec = new DSSSignatureRawCodec();
+
+      byte[] encodedSignature = codec.encodeSignature(signature);
+      Object decodedSignature = codec.decodeSignature(encodedSignature);
+
+      bob.setupVerify(publicK);
+      bob.update(message, 0, message.length);
+
+      assertTrue("Signature Raw encoder/decoder test", bob.verify(decodedSignature));
+   }
+
+   // helper methods
+   // -------------------------------------------------------------------------
+
+   protected void setUp() {
+      HashMap map = new HashMap();
+      map.put(DSSKeyPairGenerator.MODULUS_LENGTH, new Integer(512));
+      map.put(DSSKeyPairGenerator.USE_DEFAULTS, new Boolean(false));
+
+      kpg.setup(map);
+      kp = kpg.generate();
    }
 }
