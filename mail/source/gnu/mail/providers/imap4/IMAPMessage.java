@@ -31,8 +31,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +44,7 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.MailDateFormat;
 import javax.mail.internet.MimeMessage;
 
 import gnu.mail.providers.ReadOnlyMessage;
@@ -93,7 +96,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchHeaders()
     throws MessagingException
   {
-    String[] commands = new String[] { FETCH_HEADERS };
+    String[] commands = new String[] { FETCH_HEADERS, INTERNALDATE };
     fetch(commands);
   }
 
@@ -103,7 +106,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void fetchContent()
     throws MessagingException
   {
-    String[] commands = new String[] { FETCH_CONTENT };
+    String[] commands = new String[] { FETCH_CONTENT, INTERNALDATE };
     fetch(commands);
   }
 
@@ -186,6 +189,26 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
         throw new MessagingException("Unknown message status key: "+key);
     }
     
+  }
+
+  /**
+   * Returns the date on which this message was received.
+   */
+  public Date getReceivedDate()
+    throws MessagingException
+  {
+    if (headers==null)
+      fetchHeaders(); // seems reasonable
+    if (internalDate==null)
+      return null;
+    try
+    {
+      return new MailDateFormat().parse(internalDate);
+    }
+    catch (ParseException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
   }
 
   // -- Content access --
