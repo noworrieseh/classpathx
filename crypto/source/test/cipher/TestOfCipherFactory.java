@@ -1,7 +1,7 @@
-package test.prng;
+package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfCipherFactory.java,v 1.1.1.1 2001-11-20 13:40:46 raif Exp $
+// $Id: TestOfCipherFactory.java,v 1.2 2001-11-21 19:56:09 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -36,7 +36,7 @@ import java.util.Iterator;
 /**
  * Conformance tests for the CipherFactory implementation.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfCipherFactory extends TestCase {
 
