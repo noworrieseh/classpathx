@@ -18,6 +18,7 @@ import junit.textui.TestRunner;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -225,6 +226,10 @@ public class NonFolderTest
       for (String line = r.readLine(); line!=null; line = r.readLine())
         suite.addTest(suite(line));
       r.close();
+    }
+    catch (FileNotFoundException e)
+    {
+      System.out.println("No non-folder URLs");
     }
     catch (IOException e)
     {

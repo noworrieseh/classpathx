@@ -308,7 +308,23 @@ public class SMTPTransport
           else
             invalid.add(address);
         }
-        
+      }
+      catch (IOException e)
+      {
+        try
+        {
+          // Reset connection
+          connection.rset();
+        }
+        catch (IOException e2)
+        {
+          // Possible transport-level problem
+        }
+        throw new SendFailedException(e.getMessage());
+      }
+      
+      try
+      {  
         // DATA
         OutputStream dataStream = connection.data();
         if (dataStream==null)
@@ -330,6 +346,16 @@ public class SMTPTransport
       }
       catch (IOException e)
       {
+        try
+        {
+          // Attempt to ensure that connection is in control mode
+          if (connection.finishData())
+            connection.rset();
+        }
+        catch (IOException e2)
+        {
+          // Possible transport-level problem
+        }
         throw new SendFailedException(e.getMessage());
       }
     }
