@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuCrypto.java,v 1.3 2002-06-12 10:25:59 raif Exp $
+// $Id: GnuCrypto.java,v 1.4 2002-07-27 00:24:18 raif Exp $
 //
 // Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
@@ -30,14 +30,20 @@ package gnu.crypto.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import java.security.Provider;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
- * The GNU Crypto implementation of the Java Cryptographic Extension (JCE)
- * provider.<p>
+ * <p>The GNU Crypto implementation of the Java Cryptographic Extension (JCE)
+ * Provider.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
+ * @see java.security.Provider
  */
 public final class GnuCrypto extends Provider {
 
@@ -48,29 +54,39 @@ public final class GnuCrypto extends Provider {
    // -------------------------------------------------------------------------
 
    public GnuCrypto() {
-      super("GNU", 1.0, "GNU Crypto JCE provider");
+      super("GNU", 1.0, "GNU Crypto JCE Provider");
 
       // MessageDigest
-      put("MessageDigest.WHIRLPOOL", "gnu.crypto.jce.WhirlpoolSpi");
-      put("MessageDigest.WHIRLPOOL ImplementedIn", "Software");
-      put("MessageDigest.RIPEMD160", "gnu.crypto.jce.RipeMD160Spi");
-      put("MessageDigest.RIPEMD160 ImplementedIn", "Software");
-      put("MessageDigest.RIPEMD128", "gnu.crypto.jce.RipeMD128Spi");
-      put("MessageDigest.RIPEMD128 ImplementedIn", "Software");
-      put("MessageDigest.SHA-160", "gnu.crypto.jce.Sha160Spi");
-      put("MessageDigest.SHA-160 ImplementedIn", "Software");
-      put("MessageDigest.MD5", "gnu.crypto.jce.MD5Spi");
-      put("MessageDigest.MD5 ImplementedIn", "Software");
       put("MessageDigest.MD4", "gnu.crypto.jce.MD4Spi");
       put("MessageDigest.MD4 ImplementedIn", "Software");
+      put("MessageDigest.MD5", "gnu.crypto.jce.MD5Spi");
+      put("MessageDigest.MD5 ImplementedIn", "Software");
+      put("MessageDigest.RIPEMD128", "gnu.crypto.jce.RipeMD128Spi");
+      put("MessageDigest.RIPEMD128 ImplementedIn", "Software");
+      put("MessageDigest.RIPEMD160", "gnu.crypto.jce.RipeMD160Spi");
+      put("MessageDigest.RIPEMD160 ImplementedIn", "Software");
+      put("MessageDigest.SHA-160", "gnu.crypto.jce.Sha160Spi");
+      put("MessageDigest.SHA-160 ImplementedIn", "Software");
+      put("MessageDigest.WHIRLPOOL", "gnu.crypto.jce.WhirlpoolSpi");
+      put("MessageDigest.WHIRLPOOL ImplementedIn", "Software");
 
       // SecureRandom
-      put("SecureRandom.SHAPRNG", "gnu.crypto.jce.Sha160RandomSpi");
-      put("SecureRandom.SHAPRNG ImplementedIn", "Software");
+      put("SecureRandom.MD4PRNG", "gnu.crypto.jce.MD4RandomSpi");
+      put("SecureRandom.MD4PRNG ImplementedIn", "Software");
+      put("SecureRandom.MD5PRNG", "gnu.crypto.jce.MD5RandomSpi");
+      put("SecureRandom.MD5PRNG ImplementedIn", "Software");
+      put("SecureRandom.RIPEMD128PRNG", "gnu.crypto.jce.RipeMD128RandomSpi");
+      put("SecureRandom.RIPEMD128PRNG ImplementedIn", "Software");
       put("SecureRandom.RIPEMD160PRNG", "gnu.crypto.jce.RipeMD160RandomSpi");
       put("SecureRandom.RIPEMD160PRNG ImplementedIn", "Software");
+      put("SecureRandom.SHA-160PRNG", "gnu.crypto.jce.Sha160RandomSpi");
+      put("SecureRandom.SHA-160PRNG ImplementedIn", "Software");
       put("SecureRandom.WHIRLPOOLPRNG", "gnu.crypto.jce.WhirlpoolRandomSpi");
       put("SecureRandom.WHIRLPOOLPRNG ImplementedIn", "Software");
+      put("SecureRandom.ICM", "gnu.crypto.jce.ICMRandomSpi");
+      put("SecureRandom.ICM ImplementedIn", "Software");
+      put("SecureRandom.UMAC-KDF", "gnu.crypto.jce.UMacRandomSpi");
+      put("SecureRandom.UMAC-KDF ImplementedIn", "Software");
 
       // KeyPairGenerator
       put("KeyPairGenerator.DSS", "gnu.crypto.jce.DSSKeyPairGeneratorSpi");
@@ -104,7 +120,9 @@ public final class GnuCrypto extends Provider {
       put("Alg.Alias.MessageDigest.SHA-1",             "SHA-160");
       put("Alg.Alias.MessageDigest.RIPEMD-160",        "RIPEMD160");
       put("Alg.Alias.MessageDigest.RIPEMD-128",        "RIPEMD128");
-      put("Alg.Alias.SecureRandom.SHA1PRNG",           "SHAPRNG");
+      put("Alg.Alias.SecureRandom.SHA-1PRNG",          "SHA-160PRNG");
+      put("Alg.Alias.SecureRandom.SHA1PRNG",           "SHA-160PRNG");
+      put("Alg.Alias.SecureRandom.SHAPRNG",            "SHA-160PRNG");
       put("Alg.Alias.KeyPairGenerator.DSA",            "DSS");
       put("Alg.Alias.Signature.DSA",                   "DSS/RAW");
       put("Alg.Alias.Signature.SHAwithDSA",            "DSS/RAW");
@@ -129,50 +147,60 @@ public final class GnuCrypto extends Provider {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns a {@link java.util.Set} of names of message digest algorithms
-    * available from this <i>Provider</i>.<p>
+    * Returns a {@link Set} of names of message digest algorithms available from
+    * this {@link Provider}.<p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getMessageDigestNames() {
       return gnu.crypto.hash.HashFactory.getNames();
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of secure random implementations
-    * available from this <i>Provider</i>.<p>
+    * Returns a {@link Set} of names of secure random implementations available
+    * from this {@link Provider}.<p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getSecureRandomNames() {
-      return gnu.crypto.prng.PRNGFactory.getNames();
+      Set result = new HashSet();
+      // do all the hash-based prng algorithms
+      Set md = gnu.crypto.hash.HashFactory.getNames();
+      for (Iterator it = md.iterator(); it.hasNext(); ) {
+         result.add(((String) it.next()).toUpperCase() + "PRNG");
+      }
+      // add ICM and UMAC based generators
+      result.add(Registry.ICM_PRNG.toUpperCase());
+      result.add(Registry.UMAC_PRNG.toUpperCase());
+
+      return Collections.unmodifiableSet(result);
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of keypair generator
-    * implementations available from this <i>Provider</i>.<p>
+    * Returns a {@link Set} of names of keypair generator implementations
+    * available from this {@link Provider}.<p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getKeyPairGeneratorNames() {
       return gnu.crypto.sig.KeyPairGeneratorFactory.getNames();
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of signature scheme
-    * implementations available from this <i>Provider</i>.<p>
+    * Returns a {@link Set} of names of signature scheme implementations
+    * available from this {@link Provider}.<p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getSignatureNames() {
       return gnu.crypto.sig.SignatureFactory.getNames();
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of symmetric block cipher
-    * algorithms available from this <i>Provider</i>.<p>
+    * Returns a {@link Set} of names of symmetric key block cipher algorithms
+    * available from this {@link Provider}.<p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getCipherNames() {
       return gnu.crypto.cipher.CipherFactory.getNames();
