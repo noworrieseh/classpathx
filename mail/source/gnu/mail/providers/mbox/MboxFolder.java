@@ -96,7 +96,14 @@ public class MboxFolder
   {
     super(store);
     this.name = name;
-    file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
+    if (name.startsWith("/"))
+      {
+        file = new File(canonicalNameToLocal(name));
+      }
+    else
+      {
+        file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
+      }
     if (file.exists() && file.isDirectory())
       {
         type = HOLDS_FOLDERS;

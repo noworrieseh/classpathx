@@ -1,3 +1,7 @@
+2005-02-21  Chris Burdess  <dog@bluezoo.org>
+
+	* MboxStore.java,MboxFolder.java: Allow absolute filenames.
+
 2005-02-17  Chris Burdess  <dog@bluezoo.org>
 
 	* MboxFolder.java: Clarification of canonical function.

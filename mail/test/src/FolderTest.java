@@ -49,12 +49,14 @@ public class FolderTest
   void getFolder()
     throws Exception
   {
-    folder = store.getDefaultFolder();
-    assertNotNull(folder);
     String file = url.getFile();
     if (file != null && file.length() > 0)
       {
-        folder = folder.getFolder(file);
+        folder = store.getFolder(url);
+      }
+    else
+      {
+        folder = store.getDefaultFolder();
       }
     assertNotNull(folder);
   }

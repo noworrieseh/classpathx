@@ -230,7 +230,7 @@ public final class MboxStore
   public Folder getFolder(URLName urlname) 
     throws MessagingException 
   {
-    return getFolder(urlname.getFile());
+    return getFolder("/" + urlname.getFile());
   }
 	
   Session getSession() 
