@@ -27,16 +27,15 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /** 
  * An output stream that ensures that lines of characters in the body are
  * limited to 998 octets (excluding CRLF).
  *
  * This is required by RFC 2822, section 2.3.
- *
- * In order to conform to further requirements of RFC 2822 the underlying
- * stream must be a CRLFOutputStream.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
@@ -61,10 +60,10 @@ public class RFC2822OutputStream
 
   /**
    * Constructs an RFC2822 output stream
-   * connected to the specified CRLF output stream.
-   * @param out the underlying CRLFOutputStream
+   * connected to the specified output stream.
+   * @param out the underlying OutputStream
    */
-  public RFC2822OutputStream(CRLFOutputStream out)
+  public RFC2822OutputStream(OutputStream out)
   {
     super(out);
     count = 0;

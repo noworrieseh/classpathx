@@ -1614,12 +1614,7 @@ public class MimeMessage
     if (!saved)
       saveChanges();
 
-    // Wrap in a CRLFOutputStream
-    CRLFOutputStream crlfos = null;
-    if (os instanceof CRLFOutputStream)
-      crlfos = (CRLFOutputStream)os;
-    else
-      crlfos = new CRLFOutputStream(os);
+		String charset = "UTF-8"; // TODO default charset?
 
     // Write the headers
     for (Enumeration e = getNonMatchingHeaderLines(ignoreList);
@@ -1635,24 +1630,26 @@ public class MimeMessage
       while (line.length()>max)
       {
         String left = line.substring(0, max);
-        crlfos.write(left);
-        crlfos.writeln();
-        crlfos.write('\t');
+				byte[] bytes = left.getBytes(charset);
+				byte[] sep = new byte[] { 0x0d, 0x09 };
+        os.write(bytes);
+        os.write(sep);
         line = line.substring(max);
         max = 997; // make space for the tab
       }
-      crlfos.write(line);
-      crlfos.writeln();
+			byte[] bytes = line.getBytes(charset);
+      os.write(bytes);
+      os.write(0x0d);
     }
-    crlfos.writeln();
-    crlfos.flush();
+    os.write(0x0d);
+    os.flush();
 
     /*
      * Implement the no-CR-without-LF and len(line)<=998 RFC2822 rules
      * (section 2.3).
      * We do this by wrapping in an RFC28222OutputStream.
      */
-    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(crlfos);
+    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
     if (modified || content==null && contentStream==null)
     {
       // use datahandler

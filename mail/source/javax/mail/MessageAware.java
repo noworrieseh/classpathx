@@ -40,6 +40,6 @@ public interface MessageAware
   /**
    * Return the message context.
    */
-  public MessageContext getMessageContext();
+  MessageContext getMessageContext();
   
 }

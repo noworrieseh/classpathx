@@ -41,6 +41,6 @@ public interface MessageChangedListener
   /**
    * Invoked when a message is changed.
    */
-  public void messageChanged(MessageChangedEvent e);
+  void messageChanged(MessageChangedEvent e);
 
 }

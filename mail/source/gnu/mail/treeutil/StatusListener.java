@@ -42,16 +42,16 @@ public interface StatusListener
 	/**
 	 * An operation started.
 	 */
-	public void statusOperationStarted(StatusEvent event);
+	void statusOperationStarted(StatusEvent event);
 
 	/**
 	 * A progress update occurred.
 	 */
-	public void statusProgressUpdate(StatusEvent event);
+	void statusProgressUpdate(StatusEvent event);
 
 	/**
 	 * An operation completed.
 	 */
-	public void statusOperationEnded(StatusEvent event);
+	void statusOperationEnded(StatusEvent event);
 
 }

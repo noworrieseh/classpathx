@@ -60,7 +60,7 @@ public interface UIDFolder
    * FetchProfile item types, specific to UIDFolders. The only item 
    * currently defined here is the UID item.
    */
-  public static class FetchProfileItem 
+  static class FetchProfileItem 
     extends FetchProfile.Item
   {
 
@@ -91,7 +91,7 @@ public interface UIDFolder
    * <code>getMessages(start, end)</code>, to denote the last UID 
    * in this folder.
    */
-  public static final long LASTUID = -1L;
+  long LASTUID = -1L;
 
   /**
    * Returns the UIDValidity value associated with this folder.
@@ -99,7 +99,7 @@ public interface UIDFolder
    * Clients typically compare this value against a UIDValidity value 
    * saved from a previous session to insure that any cached UIDs not stale.
    */
-  public long getUIDValidity()
+  long getUIDValidity()
     throws MessagingException;
 
   /**
@@ -107,7 +107,7 @@ public interface UIDFolder
    * If no such message exists, null is returned.
    * @param uid UID for the desired message
    */
-  public Message getMessageByUID(long uid)
+  Message getMessageByUID(long uid)
     throws MessagingException;
 
   /**
@@ -117,7 +117,7 @@ public interface UIDFolder
    * @param start start UID
    * @param end end UID
    */
-  public Message[] getMessagesByUID(long start, long end)
+  Message[] getMessagesByUID(long start, long end)
     throws MessagingException;
 
   /**
@@ -129,7 +129,7 @@ public interface UIDFolder
    * invalid UIDs.
    * @param uids array of UIDs
    */
-  public Message[] getMessagesByUID(long[] uids)
+  Message[] getMessagesByUID(long[] uids)
     throws MessagingException;
 
   /**
@@ -141,7 +141,7 @@ public interface UIDFolder
    * @exception NoSuchElementException if the given Message is not in this
    * Folder.
    */
-  public long getUID(Message message)
+  long getUID(Message message)
     throws MessagingException;
   
 }

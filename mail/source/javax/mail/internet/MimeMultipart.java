@@ -40,8 +40,8 @@ import javax.mail.MessageContext;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.MultipartDataSource;
-import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.LineInputStream;
 
 /**
  * The MimeMultipart class is an implementation of the abstract Multipart 
@@ -263,31 +263,25 @@ public class MimeMultipart
     StringBuffer buffer = new StringBuffer();
     buffer.append("--");
     buffer.append(ct.getParameter("boundary"));
-    String boundary = buffer.toString();
-    
-    CRLFOutputStream crlfos = null;
-    if (os instanceof CRLFOutputStream)
-      crlfos = (CRLFOutputStream)os;
-    else
-      crlfos = new CRLFOutputStream(os);
+    byte[] boundary = buffer.toString().getBytes("UTF-8");
     
     synchronized (parts)
     {
       for (int i = 0; i<parts.size(); i++)
       {
-        crlfos.write(boundary);
-        crlfos.writeln();
-        crlfos.flush();
+        os.write(boundary);
+        os.write(0x0d);
+        os.flush();
         ((MimeBodyPart)parts.get(i)).writeTo(os);
-        crlfos.writeln();
+        os.write(0x0d);
       }
     }
 
     buffer.append("--");
-    boundary = buffer.toString();
-    crlfos.write(boundary);
-    crlfos.writeln();
-    crlfos.flush();
+    boundary = buffer.toString().getBytes("UTF-8");
+    os.write(boundary);
+    os.write(0x0d);
+    os.flush();
   }
 
   /**

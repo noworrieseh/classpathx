@@ -41,16 +41,16 @@ public interface FolderListener
   /**
    * Invoked when a Folder is created.
    */
-  public void folderCreated(FolderEvent e);
+  void folderCreated(FolderEvent e);
 
   /**
    * Invoked when a folder is deleted.
    */
-  public void folderDeleted(FolderEvent e);
+  void folderDeleted(FolderEvent e);
 
   /**
    * Invoked when a folder is renamed.
    */
-  public void folderRenamed(FolderEvent e);
+  void folderRenamed(FolderEvent e);
   
 }

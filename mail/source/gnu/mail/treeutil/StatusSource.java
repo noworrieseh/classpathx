@@ -40,12 +40,12 @@ public interface StatusSource
 	 * Adds a status listener to this source.
 	 * @param l the listener
 	 */
-	public void addStatusListener(StatusListener l);
+	void addStatusListener(StatusListener l);
 
 	/**
 	 * Removes a status listener from this source.
 	 * @param l the listener
 	 */
-	public void removeStatusListener(StatusListener l);
+	void removeStatusListener(StatusListener l);
 
 }

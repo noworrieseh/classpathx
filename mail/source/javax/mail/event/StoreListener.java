@@ -41,6 +41,6 @@ public interface StoreListener
   /**
    * Invoked when the Store generates a notification event.
    */
-  public void notification(StoreEvent e);
+  void notification(StoreEvent e);
 
 }

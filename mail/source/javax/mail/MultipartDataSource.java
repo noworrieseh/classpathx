@@ -51,7 +51,7 @@ public interface MultipartDataSource
   /**
    * Return the number of enclosed BodyPart objects.
    */
-  public int getCount();
+  int getCount();
 
   /**
    * Get the specified Part.
@@ -59,7 +59,7 @@ public interface MultipartDataSource
    * @param index the index of the desired Part
    * @exception IndexOutOfBoundsException if the given index is out of range.
    */
-  public BodyPart getBodyPart(int index)
+  BodyPart getBodyPart(int index)
     throws MessagingException;
   
 }

@@ -41,11 +41,11 @@ public interface MessageCountListener
   /**
    * Invoked when messages are added into a folder.
    */
-  public void messagesAdded(MessageCountEvent e);
+  void messagesAdded(MessageCountEvent e);
 
   /**
    * Invoked when messages are removed (expunged) from a folder.
    */
-  public void messagesRemoved(MessageCountEvent e);
+  void messagesRemoved(MessageCountEvent e);
   
 }
