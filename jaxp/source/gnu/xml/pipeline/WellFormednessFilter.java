@@ -220,7 +220,7 @@ public final class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
-	if ("before" != dtdState)
+	if (!"before".equals (dtdState))
 	    fatalError ("two DTDs?");
 	if (!elementStack.empty ())
 	    fatalError ("DTD must precede root element");
@@ -233,7 +233,7 @@ public final class WellFormednessFilter extends EventFilter
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
-	if ("after" == dtdState)
+	if ("after".equals (dtdState))
 	    fatalError ("not inside DTD");
 	super.notationDecl (name, publicId, systemId);
     }
@@ -244,7 +244,7 @@ public final class WellFormednessFilter extends EventFilter
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
-	if ("after" == dtdState)
+	if ("after".equals (dtdState))
 	    fatalError ("not inside DTD");
 	super.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
@@ -256,7 +256,7 @@ public final class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
-	if ("inside" != dtdState)
+	if (!"inside".equals (dtdState))
 	    fatalError ("DTD ends without start?");
 	dtdState = "after";
 	super.endDTD ();
