@@ -432,7 +432,7 @@ public class DomDocument
               }
             break;
           default:
-            if (c != ':' && c != '_' && c < 0x02bb && c > 0x02c1 &&
+            if (c != ':' && c != '_' && (c < 0x02bb || c > 0x02c1) &&
                 c != 0x0559 && c != 0x06e5 && c != 0x06e6)
               {
                 throw new DomEx(DomEx.INVALID_CHARACTER_ERR, name, null, c);
@@ -495,7 +495,7 @@ public class DomDocument
                 break;
               default:
                 if (c != '-' && c != '.' && c != ':' && c != '_' &&
-                    c != 0x0387 && c < 0x02bb && c > 0x02c1 &&
+                    c != 0x0387 && (c < 0x02bb || c > 0x02c1) &&
                     c != 0x0559 && c != 0x06e5 && c != 0x06e6 && c != 0x00b7)
                   {
                     throw new DomEx(DomEx.INVALID_CHARACTER_ERR, name, null, c);
@@ -1076,12 +1076,12 @@ public class DomDocument
 
   public void setXmlVersion(String xmlVersion)
   {
-    if (version == null)
+    if (xmlVersion == null)
       {
-        version = "1.0";
+        xmlVersion = "1.0";
       }
-    if ("1.0".equals(version) ||
-        "1.1".equals(version))
+    if ("1.0".equals(xmlVersion) ||
+        "1.1".equals(xmlVersion))
       {
         version = xmlVersion;
       }
@@ -1158,11 +1158,6 @@ public class DomDocument
     if (source instanceof DomNode)
       {
         DomNode src = (DomNode) source;
-        if (src.owner == this)
-          {
-            // Already owner
-            return src;
-          }
         DomNode dst = src;
         if (dst.parent != null)
           {
@@ -1186,7 +1181,10 @@ public class DomDocument
 
   public void normalizeDocument()
   {
+    boolean save = building;
+    building = true;
     normalizeNode(this);
+    building = save;
   }
 
   void normalizeNode(DomNode node)

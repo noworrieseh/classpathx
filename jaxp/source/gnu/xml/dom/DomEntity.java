@@ -96,12 +96,12 @@ public class DomEntity
                       String systemId,
                       String notation)
   {
-	super(ENTITY_NODE, owner, name, publicId, systemId);
+    super(ENTITY_NODE, owner, name, publicId, systemId);
     this.notation = notation;
 
-	// NOTE:  if notation == null, this is a parsed entity
-	// which could reasonably be given child nodes ...
-	makeReadonly();
+    // NOTE:  if notation == null, this is a parsed entity
+    // which could reasonably be given child nodes ...
+    makeReadonly();
   }
 
   /**
@@ -134,3 +134,4 @@ public class DomEntity
   }
   
 }
+

@@ -104,6 +104,7 @@ public class DomImpl
     else if ("ls".equals(name) || "ls-async".equals(name))
       {
         return (version == null ||
+                "".equals(version) ||
                 "3.0".equals(version));
       }
     else if ("events".equals(name)
@@ -136,9 +137,6 @@ public class DomImpl
     else if (DomNode.reportMutations
              && "traversal".equals(name))
       {
-        
-        // Note:  nyet tree walker support ...
-        
         return (version == null ||
                 "".equals(version) ||
 		"2.0".equals(version));
@@ -225,15 +223,9 @@ public class DomImpl
   
   public Object getFeature(String feature, String version)
   {
-    feature = feature.toLowerCase();
-    
-    // DOM Level 3 Load and Save
-    if ("ls".equals(feature) || "ls-async".equals(feature))
+    if (hasFeature(feature, version))
       {
-        if (version == null || "3.0".equals(version))
-          {
-            return this;
-          }
+        return this;
       }
     return null;
   }

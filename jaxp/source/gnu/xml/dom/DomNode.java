@@ -850,7 +850,8 @@ public abstract class DomNode
       {
         DomNode ref = (DomNode) refChild;
 
-        if (ref == null || ref.parent != this)
+        if (ref == null ||
+            (ref.parent != this && nodeType != ENTITY_REFERENCE_NODE))
           {
             throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
           }
@@ -1154,6 +1155,7 @@ public abstract class DomNode
         node.parent = null;
         node.depth = 0;
         node.index = 0;
+        node.length = 0;
         node.first = null;
         node.last = null;
         node.previous = null;
@@ -1773,6 +1775,8 @@ public abstract class DomNode
             // Fall through
           case DOCUMENT_NODE:
           case DOCUMENT_FRAGMENT_NODE:
+          case ENTITY_REFERENCE_NODE:
+          case ATTRIBUTE_NODE:
             ctx.normalize();
             break;
           }
@@ -1881,7 +1885,7 @@ public abstract class DomNode
    */
   final int compareTo2(DomNode n1, DomNode n2)
   {
-    if (n1.depth == 0 || n1 == n2 || n1 == null || n2 == null)
+    if (n1.depth == 0 || n1 == n2)
       {
         return 0;
       }
@@ -1990,16 +1994,34 @@ public abstract class DomNode
       {
         return true;
       }
+    if (arg == null)
+      {
+        return false;
+      }
     if (nodeType != arg.getNodeType() ||
         !equal(getNodeName(), arg.getNodeName()) ||
         !equal(getLocalName(), arg.getLocalName()) ||
         !equal(getNamespaceURI(), arg.getNamespaceURI()) ||
         !equal(getPrefix(), arg.getPrefix()) ||
-        !equal(getNodeValue(), arg.getNodeValue()) ||
-        !equal(getChildNodes(), arg.getChildNodes()))
+        !equal(getNodeValue(), arg.getNodeValue()))
       {
         return false;
       }
+    // Children
+    Node argCtx = arg.getFirstChild();
+    for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+      {
+        if (!ctx.isEqualNode(argCtx))
+          {
+            return false;
+          }
+        argCtx = argCtx.getNextSibling();
+      }
+    if (argCtx != null)
+      {
+        return false;
+      }
+    
     // TODO Attr NamedNodeMap
     // TODO DocumentType
     return true;
@@ -2011,34 +2033,6 @@ public abstract class DomNode
             (arg1 != null && arg1.equals(arg2))); 
   }
   
-  boolean equal(NodeList arg1, NodeList arg2)
-  {
-    if (arg1 == null && arg2 == null)
-      {
-        return true;
-      }
-    if (arg1 == null || arg2 == null)
-      {
-        return false;
-      }
-    int len1 = arg1.getLength();
-    int len2 = arg2.getLength();
-    if (len1 != len2)
-      {
-        return false;
-      }
-    for (int i = 0; i < len1; i++)
-      {
-        Node child1 = arg1.item(i);
-        Node child2 = arg2.item(i);
-        if (!child1.isSameNode(child2))
-          {
-            return false;
-          }
-      }
-    return true;
-  }
-
   public Object getFeature(String feature, String version)
   {
     DOMImplementation impl = (nodeType == DOCUMENT_NODE) ?

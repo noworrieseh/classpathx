@@ -1,3 +1,7 @@
+2004-12-06  Chris Burdess  <dog@gnu.org>
+
+	* dom: Minor DOM Level 3 Core conformance improvements.
+
 2004-12-06  Mark Wielaard  <mark@klomp.org>
 
    	* TransformerImpl.java: Use StreamResult's Writer if no byte stream
