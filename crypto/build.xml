@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.9 2002-05-14 08:57:49 raif Exp $
+   $Id: build.xml,v 1.10 2002-06-08 05:51:15 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -37,8 +37,8 @@
    -->
 
    <!-- give user a chance to override with personal settings -->
-   <property file="${user.home}/.ant.properties" />
-   <property file=".ant.properties" />
+   <property file=".ant.properties"/>
+   <property file="${user.home}/.ant.properties"/>
 
    <property name="debug" value="true"/>
    <property name="optimize" value="false"/>
@@ -289,6 +289,11 @@
             <param name="cipher" value="anubis"/>
             <param name="keysize" value="256"/>
          </antcall>
+         <!--
+         NIST MCT test is designed for AES candidates; i.e. symmetric block
+         ciphers with user-supplied key material length between 128 and 256
+         bits only!
+
          <antcall target="nist-mct">
             <param name="cipher" value="anubis"/>
             <param name="keysize" value="288"/>
@@ -297,6 +302,7 @@
             <param name="cipher" value="anubis"/>
             <param name="keysize" value="320"/>
          </antcall>
+         -->
       </parallel>
    </target>
 
@@ -330,7 +336,7 @@
             <A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>]]>
          </header>
          <bottom>
-            <![CDATA[Copyright &copy;2001, 2002 <A HREF="mailto:classpathx-crypto@gnu.org">
+            <![CDATA[Copyright &copy;2001-2002 <A HREF="mailto:classpathx-crypto@gnu.org">
             Free Software Foundation, Inc..</A> All Rights Reserved.]]>
          </bottom>
          <classpath>
