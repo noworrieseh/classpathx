@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.4 2001-06-24 17:51:40 db Exp $
+ * $Id: XmlParser.java,v 1.5 2001-06-24 20:47:25 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.4 2001-06-24 17:51:40 db Exp $
+// $Id: XmlParser.java,v 1.5 2001-06-24 20:47:25 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-24 17:51:40 $
+ * @version $Date: 2001-06-24 20:47:25 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -1561,6 +1561,7 @@ loop:
 	int	valueType = ATTRIBUTE_DEFAULT_SPECIFIED;
 	String	value = null;
 	int	flags = LIT_ATTRIBUTE | LIT_DISABLE_CREF | LIT_ENTITY_CHECK;
+	boolean	saved = expandPE;
 
 	// Note: char refs not checked here, and input not normalized,
 	// since it's done correctly later when we actually expand any
@@ -1571,6 +1572,7 @@ loop:
 	// chars to spaces (doesn't matter when that's done if it doesn't
 	// interfere with char refs expanding to whitespace).
 
+	expandPE = false;
 	if (tryRead ('#')) {
 	    if (tryRead ("FIXED")) {
 		valueType = ATTRIBUTE_DEFAULT_FIXED;
@@ -1585,6 +1587,7 @@ loop:
 	    }
 	} else
 	    value = readLiteral (flags);
+	expandPE = saved;
 	setAttribute (elementName, name, type, enum, value, valueType);
     }
 
