@@ -1,3 +1,7 @@
+2004-10-06  Chris Burdess <dog@gnu.org>
+
+	* RawData.java, RawData32.java, RawData64.java: Added copyright.
+
 2004-10-25  Chris Burdess <dog@gnu.org>
 
 	* xmlj_transform.c: Experimental code to load external entities
