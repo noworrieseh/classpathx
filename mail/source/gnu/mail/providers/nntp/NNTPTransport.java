@@ -1,6 +1,6 @@
 /*
  * NNTPTransport.java
- * Copyright (C) 1999 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 dog <dog@gnu.org>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,65 +18,180 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * You may retrieve the latest version of this library from
- * http://www.dog.net.uk/knife/
  */
 
 package gnu.mail.providers.nntp;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.event.*;
-import javax.mail.internet.*;
-import gnu.mail.util.*;
-import gnu.mail.treeutil.StatusEvent;
-import gnu.mail.treeutil.StatusListener;
-import gnu.mail.treeutil.StatusSource;
+import java.io.IOException;
+import javax.mail.Address;
+import javax.mail.AuthenticationFailedException;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.URLName;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.NewsAddress;
+
+import gnu.inet.nntp.NNTPConnection;
+import gnu.inet.nntp.PostStream;
 
 /**
- * The transport class implementing the NNTP Usenet news protocol.
+ * An NNTP transport provider.
+ * This uses an NNTPConnection to handle all the protocol-related
+ * functionality.
  *
- * @author dog@dog.net.uk
- * @version 1.4.1
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 2.0
  */
-public class NNTPTransport 
-extends Transport 
+public class NNTPTransport extends Transport
 {
-	
-  protected NNTPStore store;
-	
-  public NNTPTransport(Session session, URLName urlname) 
+
+  NNTPConnection connection;
+
+  /**
+   * Constructor.
+   * @param session the session
+   * @param url the connection URL
+   */
+  public NNTPTransport(Session session, URLName url)
   {
-    super(session, urlname);
+    super(session, url);
   }
-	
-  public boolean protocolConnect(String host, int port, String user, String password) 
-  throws MessagingException 
+
+  /**
+   * Performs the protocol connection.
+   * @see NNTPStore.protocolConnect()
+   */
+  protected boolean protocolConnect(String host, int port, String username,
+      String password)
+    throws MessagingException
   {
-    try 
+    try
     {
-      InetAddress address = InetAddress.getByName(host);
-      store = NNTPStore.getStore(address, port);
-      if (store==null) 
+      if (port<0)
+        port = NNTPConnection.DEFAULT_PORT;
+      connection = new NNTPConnection(host, port, username, password,
+          debug);
+      if (username!=null && password!=null)
       {
-	store = new NNTPStore(session, url);
-	return store.protocolConnect(host, port, user, password);
+        // TODO decide on authentication method
+        // Original authinfo
+        return connection.authinfo(username, password);
       }
-      return true;
-    } 
-    catch (UnknownHostException e) 
+      else
+        return true;
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    catch (SecurityException e)
+    {
+      if (username!=null && password!=null)
+        throw new AuthenticationFailedException(e.getMessage());
+      else
+        return false;
+    }
+  }
+
+  /**
+   * Close the connection.
+   * @see NNTPStore.close()
+   */
+  public void close()
+    throws MessagingException
+  {
+    try
+    {
+      synchronized (connection)
+      {
+        connection.quit();
+      }
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    super.close();
+  }
+
+  /**
+   * Post an article.
+   * @param message a MimeMessage
+   * @param addresses an array of Address (ignored!)
+   */
+  public void sendMessage(Message message, Address[] addresses)
+    throws MessagingException
+  {
+    // Ensure corrent recipient type, and that all newsgroup recipients are
+    // of type NewsAddress.
+    addresses = message.getRecipients(MimeMessage.RecipientType.NEWSGROUPS);
+    boolean ok = (addresses.length>0);
+    if (!ok)
+      throw new MessagingException("No recipients specified");
+    for (int i=0; i<addresses.length; i++)
+    {
+      if (!(addresses[i] instanceof NewsAddress))
+      {
+        ok = false;
+        break;
+      }
+    }
+    if (!ok)
+      throw new MessagingException("Newsgroup recipients must be specified "+
+        "as type NewsAddress");
+    
+    try
+    {
+      synchronized (connection)
+      {
+        PostStream out = connection.post();
+        message.writeTo(out);
+        out.close();
+      }
+    }
+    catch (IOException e)
     {
       throw new MessagingException(e.getMessage(), e);
     }
   }
-	
-  public void sendMessage(Message message, Address[] addresses) 
-  throws MessagingException 
+
+  // TEST
+  public static void main(String[] args)
   {
-    store.postArticle(message, addresses);
+    try
+    {
+      // session
+      Session session = Session.getInstance(System.getProperties(), null);
+      
+      // create message
+      javax.mail.internet.MimeMessage message =
+        new javax.mail.internet.MimeMessage(session);
+      message.setFrom(new javax.mail.internet.InternetAddress("dog@gnu.org"));
+      Address[] recipients = { new NewsAddress("alt.test") };
+      message.setRecipients(MimeMessage.RecipientType.NEWSGROUPS,
+          recipients);
+      message.setSubject("Test");
+      message.setText("This is a test.", "iso-8859-1");
+      
+      // get transport
+      URLName url = new URLName("nntp-post://localhost");
+      Transport transport = session.getTransport(url);
+      transport.connect();
+      transport.sendMessage(message, message.getAllRecipients());
+      transport.close();
+    }
+    catch (MessagingException e)
+    {
+      e.printStackTrace();
+      Exception e2 = e.getNextException();
+      if (e2!=null)
+      {
+        System.out.println("Next exception:");
+        e2.printStackTrace();
+      }
+    }
   }
-	
+  
 }
