@@ -36,26 +36,26 @@ static xmlSAXHandler sax_parser = {
 	NULL /* isStandaloneSAXFunc */,
 	NULL /* hasInternalSubsetSAXFunc */,
 	NULL /* hasExternalSubsetSAXFunc */,
-	(resolveEntitySAXFunc)jaxpResolveEntity,
+	(resolveEntitySAXFunc)xmljSAXResolveEntity,
 	NULL /* getEntitySAXFunc */,
 	NULL /* entityDeclSAXFunc */,
-	(notationDeclSAXFunc)jaxpNotationDecl,
+	(notationDeclSAXFunc)xmljSAXNotationDecl,
 	NULL /* attributeDecl */,
 	NULL /* elementDecl */,
-	(unparsedEntityDeclSAXFunc)jaxpUnparsedEntityDecl,
-	(setDocumentLocatorSAXFunc)jaxpSetDocumentLocator,
-	(startDocumentSAXFunc)jaxpStartDocument,
-	(endDocumentSAXFunc)jaxpEndDocument,
-	(startElementSAXFunc)jaxpStartElement,
-	(endElementSAXFunc)jaxpEndElement,
+	(unparsedEntityDeclSAXFunc)xmljSAXUnparsedEntityDecl,
+	(setDocumentLocatorSAXFunc)xmljSAXSetDocumentLocator,
+	(startDocumentSAXFunc)xmljSAXStartDocument,
+	(endDocumentSAXFunc)xmljSAXEndDocument,
+	(startElementSAXFunc)xmljSAXStartElement,
+	(endElementSAXFunc)xmljSAXEndElement,
 	NULL /* referenceSAXFunc */,
-	(charactersSAXFunc)jaxpCharacters,
-	(ignorableWhitespaceSAXFunc)jaxpIgnorableWhitespace,
-	(processingInstructionSAXFunc)jaxpProcessingInstruction,
+	(charactersSAXFunc)xmljSAXCharacters,
+	(ignorableWhitespaceSAXFunc)xmljSAXIgnorableWhitespace,
+	(processingInstructionSAXFunc)xmljSAXProcessingInstruction,
 	NULL /* commentSAXFunc */,
-	(warningSAXFunc)jaxpWarning,
-	(errorSAXFunc)jaxpError,
-	(fatalErrorSAXFunc)jaxpFatalError,
+	(warningSAXFunc)xmljSAXWarning,
+	(errorSAXFunc)xmljSAXError,
+	(fatalErrorSAXFunc)xmljSAXFatalError,
 };
 
 /* -- GnomeLocator -- */
@@ -196,10 +196,10 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_getFeature (JNIEnv *env,
 	const char *s_name;
 	void *result;
 
-	s_name = xmljGetStringChars(env, name);
+	s_name = (*env)->GetStringUTFChars(env, name, 0);
     result = NULL; /* TODO */
 	ret = xmlGetFeature((xmlParserCtxtPtr)context, s_name, result);
-	xmljReleaseStringChars(env, name, s_name);
+	(*env)->ReleaseStringUTFChars(env, name, s_name);
 	if (ret == -1)
 		return ret;
 	else
@@ -222,10 +222,10 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_setFeature (JNIEnv *env,
 	const char *s_name;
 	void *p_value;
 
-	s_name = xmljGetStringChars(env, name);
+	s_name = (*env)->GetStringUTFChars(env, name, 0);
 	p_value = &value;
 	ret = xmlSetFeature((xmlParserCtxtPtr)context, s_name, p_value);
-	xmljReleaseStringChars(env, name, s_name);
+	(*env)->ReleaseStringUTFChars(env, name, s_name);
 	return ret;
 }
 
@@ -244,9 +244,9 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseFile (JNIEnv *env,
 	jint ret;
 
 	sax_cb_env = env;
-	s_filename = xmljGetStringChars(env, filename);
+	s_filename = (*env)->GetStringUTFChars(env, filename, 0);
 	ret = xmlSAXUserParseFile(&sax_parser, self, s_filename);
-	xmljReleaseStringChars(env, filename, s_filename);
+	(*env)->ReleaseStringUTFChars(env, filename, s_filename);
 	return ret;
 }
 
@@ -262,22 +262,24 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseMemory (JNIEnv *env,
 		jbyteArray buf)
 {
 	jint ret;
-	char *s_buf;
+	jbyte *j_buf;
+    xmlChar *s_buf;
 	jsize len;
 
 	sax_cb_env = env;
 	len = (*env)->GetArrayLength(env, buf);
-	s_buf = (*env)->GetByteArrayElements(env, buf, 0);
+	j_buf = (*env)->GetByteArrayElements(env, buf, 0);
+    s_buf = (xmlChar *)j_buf; /* FIXME */
 	ret = xmlSAXUserParseMemory(((xmlParserCtxtPtr)context)->sax, self,
 		s_buf, len);
-	(*env)->ReleaseByteArrayElements(env, buf, s_buf, 0);
+	(*env)->ReleaseByteArrayElements(env, buf, j_buf, 0);
 	return ret;
 }
 
 /* -- Callback functions -- */
 
 xmlParserInputPtr
-jaxpResolveEntity (void * ctx,
+xmljSAXResolveEntity (void * ctx,
 		const xmlChar * publicId,
 		const xmlChar * systemId)
 {
@@ -285,7 +287,7 @@ jaxpResolveEntity (void * ctx,
 }
 
 void
-jaxpNotationDecl (void * ctx, 
+xmljSAXNotationDecl (void * ctx, 
 		const xmlChar * name, 
 		const xmlChar * publicId, 
 		const xmlChar * systemId)
@@ -317,7 +319,7 @@ jaxpNotationDecl (void * ctx,
 }
 
 void
-jaxpUnparsedEntityDecl (void * ctx, 
+xmljSAXUnparsedEntityDecl (void * ctx, 
 		const xmlChar * name, 
 		const xmlChar * publicId, 
 		const xmlChar * systemId, 
@@ -353,7 +355,7 @@ jaxpUnparsedEntityDecl (void * ctx,
 }
 
 void
-jaxpSetDocumentLocator (void * ctx, 
+xmljSAXSetDocumentLocator (void * ctx, 
 		xmlSAXLocatorPtr loc)
 {
 	jobject target;
@@ -375,7 +377,7 @@ jaxpSetDocumentLocator (void * ctx,
 }
 
 void
-jaxpStartDocument (void * ctx)
+xmljSAXStartDocument (void * ctx)
 {
 	jobject target;
 	jclass cls;
@@ -395,7 +397,7 @@ jaxpStartDocument (void * ctx)
 }
 
 void
-jaxpEndDocument (void * ctx)
+xmljSAXEndDocument (void * ctx)
 {
 	jobject target;
 	jclass cls;
@@ -415,7 +417,7 @@ jaxpEndDocument (void * ctx)
 }
 
 void
-jaxpStartElement (void * ctx,
+xmljSAXStartElement (void * ctx,
 		const xmlChar * name,
 		const xmlChar ** attrs)
 {
@@ -459,7 +461,7 @@ jaxpStartElement (void * ctx,
 }
 
 void
-jaxpEndElement (void * ctx,
+xmljSAXEndElement (void * ctx,
 		const xmlChar * name)
 {
 	jobject target;
@@ -484,7 +486,7 @@ jaxpEndElement (void * ctx,
 }
 
 void
-jaxpCharacters (void * ctx,
+xmljSAXCharacters (void * ctx,
 		const xmlChar * ch,
 		int len)
 {
@@ -510,7 +512,7 @@ jaxpCharacters (void * ctx,
 }
 
 void
-jaxpIgnorableWhitespace (void * ctx,
+xmljSAXIgnorableWhitespace (void * ctx,
 		const xmlChar * ch,
 		int len)
 {
@@ -537,7 +539,7 @@ jaxpIgnorableWhitespace (void * ctx,
 }
 
 void
-jaxpProcessingInstruction (void * ctx,
+xmljSAXProcessingInstruction (void * ctx,
 		const xmlChar * targ,
 		const xmlChar * data)
 {
@@ -567,7 +569,7 @@ jaxpProcessingInstruction (void * ctx,
 }
 
 void
-jaxpWarning (void * ctx, 
+xmljSAXWarning (void * ctx, 
 		const char * msg, 
 		...)
 {
@@ -577,6 +579,7 @@ jaxpWarning (void * ctx,
 	jclass cls;
 	jmethodID method;
 
+    xmlChar *x_msg;
 	jstring j_msg;
 
 	target = (jobject)ctx;
@@ -589,7 +592,8 @@ jaxpWarning (void * ctx,
 	if (method == NULL)
 		return;
 
-	j_msg = xmljNewString(sax_cb_env, msg);
+    x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
+	j_msg = xmljNewString(sax_cb_env, x_msg);
 	
 	/* Invoke the method */
 	va_start(args, msg);
@@ -598,7 +602,7 @@ jaxpWarning (void * ctx,
 }
 
 void
-jaxpError (void * ctx, 
+xmljSAXError (void * ctx, 
 		const char * msg, 
 		...)
 {
@@ -608,6 +612,7 @@ jaxpError (void * ctx,
 	jclass cls;
 	jmethodID method;
 
+    xmlChar *x_msg;
 	jstring j_msg;
 
 	target = (jobject)ctx;
@@ -620,7 +625,8 @@ jaxpError (void * ctx,
 	if (method == NULL)
 		return;
 
-	j_msg = xmljNewString(sax_cb_env, msg);
+    x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
+	j_msg = xmljNewString(sax_cb_env, x_msg);
 	
 	/* Invoke the method */
 	va_start(args, msg);
@@ -629,7 +635,7 @@ jaxpError (void * ctx,
 }
 
 void
-jaxpFatalError (void * ctx, 
+xmljSAXFatalError (void * ctx, 
 		const char * msg, 
 		...)
 {
@@ -639,6 +645,7 @@ jaxpFatalError (void * ctx,
 	jclass cls;
 	jmethodID method;
 
+    xmlChar *x_msg;
 	jstring j_msg;
 
 	target = (jobject)ctx;
@@ -651,7 +658,8 @@ jaxpFatalError (void * ctx,
 	if (method == NULL)
 		return;
 
-	j_msg = xmljNewString(sax_cb_env, msg);
+    x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
+	j_msg = xmljNewString(sax_cb_env, x_msg);
 	
 	/* Invoke the method */
 	va_start(args, msg);

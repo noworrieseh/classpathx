@@ -49,7 +49,6 @@ xmljGetNodeID (JNIEnv *env,
 
 /*
  * Returns the Java node instanced corresponding to the specified node ID.
- * TODO cache the resulting instances
  */
 jobject
 xmljGetNodeInstance (JNIEnv *env,
@@ -61,46 +60,25 @@ xmljGetNodeInstance (JNIEnv *env,
 	if (node == NULL)
 		return NULL;
 
-	/* This method just constructs a new object of the given type */
-	cls = (*env)->FindClass(env, xmljNodeClass(node->type));
-    method = (*env)->GetMethodID(env, cls, "<init>", "(I)V");
-    return (*env)->NewObject(env, cls, method, node);
+	/* Invoke the GnomeNode.newInstance class method */
+	cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeNode");
+    method = (*env)->GetStaticMethodID(env, cls, "newInstance",
+        "(III)Lgnu/xml/libxmlj/dom/GnomeNode;");
+    return (*env)->CallStaticObjectMethod(env, cls, method,
+        (jint)node->doc, (jint)node, (jint)node->type);
 }
 
-/*
- * Returns the Java class used to instantiate the given node type.
- */
-char *
-xmljNodeClass (xmlElementType type)
+void
+xmljFreeDoc (JNIEnv *env,
+    xmlDocPtr doc)
 {
-	switch (type)
-	{
-	case XML_ELEMENT_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeElement";
-	case XML_ATTRIBUTE_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeAttr";
-	case XML_TEXT_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeText";
-	case XML_CDATA_SECTION_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeCDATASection";
-	case XML_ENTITY_REF_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeEntityReference";
-	case XML_ENTITY_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeEntity";
-	case XML_PI_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeProcessingInstruction";
-	case XML_COMMENT_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeComment";
-	case XML_DOCUMENT_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeDocument";
-	case XML_DOCUMENT_TYPE_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeDocumentType";
-	case XML_DOCUMENT_FRAG_NODE:
-		return "gnu/xml/libxmlj/dom/GnomeDocumentFragment";
-	default:
-        printf("warning: unhandled element type: %d\n", type);
-		return "gnu/xml/libxmlj/dom/GnomeNode";
-	}	
+	jclass cls;
+	jmethodID method;
+
+	/* Invoke the GnomeNode.freeDocument class method */
+	cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeNode");
+    method = (*env)->GetStaticMethodID(env, cls, "freeDocument", "(I)V");
+    (*env)->CallStaticVoidMethod(env, cls, method, (jint)doc);
 }
 
 int
@@ -116,9 +94,9 @@ xmljMatch (const xmlChar *name,
     qName = xmlStrdup(node->name);
   else
   {
-    qName = "";
+    qName = xmlCharStrdup("");
     xmlStrcat(qName, ns->prefix);
-    xmlStrcat(qName, ":");
+    xmlStrcat(qName, xmlCharStrdup(":"));
     xmlStrcat(qName, node->name);
   }
   ret = xmlStrcmp(name, qName);

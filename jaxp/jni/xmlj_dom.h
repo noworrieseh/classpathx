@@ -24,6 +24,9 @@
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
  */
+#ifndef XMLJ_DOM_H
+#define XMLJ_DOM_H
+
 #include "gnu_xml_libxmlj_dom_GnomeAttr.h"
 #include "gnu_xml_libxmlj_dom_GnomeDocument.h"
 #include "gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h"
@@ -39,11 +42,11 @@
 #include <libxml/parser.h>
 
 /* Callback functions */
-xmlParserInputPtr customResolveEntity(void *ctx, const xmlChar *publicId,
+xmlParserInputPtr xmljDOMResolveEntity(void *ctx, const xmlChar *publicId,
     const xmlChar *systemId);
-void customWarning(void *ctx, const char *msg, ...);
-void customError(void *ctx, const char *msg, ...);
-void customFatalError(void *ctx, const char *msg, ...);
+void xmljDOMWarning(void *ctx, const char *msg, ...);
+void xmljDOMError(void *ctx, const char *msg, ...);
+void xmljDOMFatalError(void *ctx, const char *msg, ...);
 void dispatchLogCallback(const char *msg, const char *methodName);
 
 /* Utility */
@@ -53,3 +56,4 @@ xmlAttrPtr getNamedItem(JNIEnv *env, jobject self, jstring name);
 xmlAttrPtr getNamedItemNS(JNIEnv *env, jobject self, jstring uri,
     jstring localName);
 
+#endif /* !defined XMLJ_DOM_H */

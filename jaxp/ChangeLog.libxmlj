@@ -1,3 +1,7 @@
+2004-04-28  Chris Burdess <dog@gnu.org>
+
+	* xmlj_node.c et al: Implemented node cache (task #3289).
+
 2004-04-27  Chris Burdess <dog@gnu.org>
 
 	* all: Added SAX and DOM libxmlj implementation.

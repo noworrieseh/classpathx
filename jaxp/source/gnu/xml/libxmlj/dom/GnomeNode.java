@@ -26,6 +26,9 @@
  */
 package gnu.xml.libxmlj.dom;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
@@ -40,6 +43,92 @@ import org.w3c.dom.NodeList;
 class GnomeNode
 implements Node
 {
+
+  /**
+   * Maps document pointers to a map of node pointers to node instances.
+   */
+  static Map instances;
+
+  /**
+   * Retrieves the node instance for the specified node pointer.
+   * This creates a new instance and adds it to the cache if required.
+   * @param doc the document pointer
+   * @param node the node pointer
+   * @param type the node type
+   */
+  static GnomeNode newInstance(int doc, int node, int type)
+  {
+    if (instances == null)
+      instances = new HashMap();
+    Integer docKey = new Integer(doc);
+    Map docNodes = (Map)instances.get(docKey);
+    if (docNodes == null)
+    {
+      docNodes = new HashMap(1024); // TODO review optimal initial capacity
+      instances.put(docKey, docNodes);
+    }
+    Integer nodeKey = new Integer(node);
+    GnomeNode nodeInstance = (GnomeNode)docNodes.get(nodeKey);
+    if (nodeInstance != null)
+      return nodeInstance; // Return cached version
+    switch (type)
+    {
+      case ELEMENT_NODE:
+        nodeInstance = new GnomeElement(node);
+        break;
+      case ATTRIBUTE_NODE:
+        nodeInstance = new GnomeAttr(node);
+        break;
+      case TEXT_NODE:
+        nodeInstance = new GnomeText(node);
+        break;
+      case CDATA_SECTION_NODE:
+        nodeInstance = new GnomeCDATASection(node);
+        break;
+      case ENTITY_REFERENCE_NODE:
+        nodeInstance = new GnomeEntityReference(node);
+        break;
+      case ENTITY_NODE:
+        nodeInstance = new GnomeEntity(node);
+        break;
+      case PROCESSING_INSTRUCTION_NODE:
+        nodeInstance = new GnomeProcessingInstruction(node);
+        break;
+      case COMMENT_NODE:
+        nodeInstance = new GnomeComment(node);
+        break;
+      case DOCUMENT_NODE:
+        nodeInstance = new GnomeDocument(node);
+        break;
+      case DOCUMENT_TYPE_NODE:
+        nodeInstance = new GnomeDocumentType(node);
+        break;
+      case DOCUMENT_FRAGMENT_NODE:
+        nodeInstance = new GnomeDocumentFragment(node);
+        break;
+      case NOTATION_NODE:
+        nodeInstance = new GnomeNotation(node);
+        break;
+      default:
+        nodeInstance = new GnomeNode(node);
+    }
+    if (type != DOCUMENT_NODE)
+      docNodes.put(nodeKey, nodeInstance);
+    return nodeInstance;
+  }
+
+  /**
+   * Frees the specified document.
+   * This removes all its nodes from the cache.
+   */
+  static void freeDocument(int doc)
+  {
+    if (instances == null)
+      return;
+    Integer docKey = new Integer(doc);
+    //instances.remove(docKey);
+    System.out.println("Freed "+instances.remove(docKey));
+  }
 
   final int id;
 

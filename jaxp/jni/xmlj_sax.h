@@ -25,6 +25,9 @@
  * executable file might be covered by the GNU General Public License.
  */
 
+#ifndef XMLJ_SAX_H
+#define XMLJ_SAX_H
+
 #include "gnu_xml_libxmlj_sax_GnomeLocator.h"
 #include "gnu_xml_libxmlj_sax_GnomeXMLReader.h"
 
@@ -33,32 +36,33 @@
 
 /* -- Function declarations for callback functions -- */
 
-xmlParserInputPtr jaxpResolveEntity(void *, const xmlChar *, const xmlChar *);
+xmlParserInputPtr xmljSAXResolveEntity(void *, const xmlChar *, const xmlChar *);
 
-void jaxpNotationDecl(void *, const xmlChar *, const xmlChar *, const xmlChar *);
+void xmljSAXNotationDecl(void *, const xmlChar *, const xmlChar *, const xmlChar *);
 
-void jaxpUnparsedEntityDecl(void *, const xmlChar *, const xmlChar *, 
+void xmljSAXUnparsedEntityDecl(void *, const xmlChar *, const xmlChar *, 
 		const xmlChar *, const xmlChar *);
 
-void jaxpSetDocumentLocator(void *, xmlSAXLocatorPtr);
+void xmljSAXSetDocumentLocator(void *, xmlSAXLocatorPtr);
 
-void jaxpStartDocument(void *);
+void xmljSAXStartDocument(void *);
 
-void jaxpEndDocument(void *);
+void xmljSAXEndDocument(void *);
 
-void jaxpStartElement(void *, const xmlChar *, const xmlChar **);
+void xmljSAXStartElement(void *, const xmlChar *, const xmlChar **);
 
-void jaxpEndElement(void *, const xmlChar *);
+void xmljSAXEndElement(void *, const xmlChar *);
 
-void jaxpCharacters(void *, const xmlChar *, int);
+void xmljSAXCharacters(void *, const xmlChar *, int);
 
-void jaxpIgnorableWhitespace(void *, const xmlChar *, int);
+void xmljSAXIgnorableWhitespace(void *, const xmlChar *, int);
 
-void jaxpProcessingInstruction(void *, const xmlChar *, const xmlChar *);
+void xmljSAXProcessingInstruction(void *, const xmlChar *, const xmlChar *);
 
-void jaxpWarning(void *, const char *, ...);
+void xmljSAXWarning(void *, const char *, ...);
 
-void jaxpError(void *, const char *, ...);
+void xmljSAXError(void *, const char *, ...);
 
-void jaxpFatalError(void *, const char *, ...);
+void xmljSAXFatalError(void *, const char *, ...);
 
+#endif /* !defined XMLJ_SAX_H */

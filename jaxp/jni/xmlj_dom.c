@@ -95,23 +95,24 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_setValue (JNIEnv *env,
   node = xmljGetNodeID(env, self);
   s_value = xmljGetStringChars(env, value);
   xmlNodeSetContent(node, s_value);
-  xmljReleaseStringChars(env, value, s_value);
 }
 
 /* -- GnomeDocument -- */
 
 /*
  * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    finalize
- * Signature: ()V
+ * Method:    free
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocument_finalize (JNIEnv *env,
-    jobject self)
+Java_gnu_xml_libxmlj_dom_GnomeDocument_free (JNIEnv *env,
+    jobject self,
+    jint id)
 {
   xmlDocPtr doc;
   
-  doc = (xmlDocPtr)xmljGetNodeID(env, self);
+  doc = (xmlDocPtr)id;
+  xmljFreeDoc(env, doc);
   xmlFree(doc);
 }
 
@@ -179,7 +180,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createTextNode (JNIEnv *env,
   doc = (xmlDocPtr)xmljGetNodeID(env, self);
   s_data = xmljGetStringChars(env, data);
   text = xmlNewDocText(doc, s_data);
-  xmljReleaseStringChars(env, data, s_data);
   return xmljGetNodeInstance(env, text);
 }
 
@@ -200,7 +200,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createComment (JNIEnv *env,
   doc = (xmlDocPtr)xmljGetNodeID(env, self);
   s_data = xmljGetStringChars(env, data);
   comment = xmlNewDocComment(doc, s_data);
-  xmljReleaseStringChars(env, data, s_data);
   return xmljGetNodeInstance(env, comment);
 }
 
@@ -223,7 +222,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createCDATASection (JNIEnv *env,
   s_data = xmljGetStringChars(env, data);
   len = xmlStrlen(s_data);
   cdata = xmlNewCDataBlock(doc, s_data, len);
-  xmljReleaseStringChars(env, data, s_data);
   return xmljGetNodeInstance(env, cdata);
 }
 
@@ -247,8 +245,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createProcessingInstruction (JNIEnv *env,
   s_target = xmljGetStringChars(env, target);
   s_data = xmljGetStringChars(env, data);
   pi = xmlNewPI(s_target, s_data);
-  xmljReleaseStringChars(env, target, s_target);
-  xmljReleaseStringChars(env, data, s_data);
   return xmljGetNodeInstance(env, pi);
 }
 
@@ -269,7 +265,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createEntityReference (JNIEnv *env,
   doc = (xmlDocPtr)xmljGetNodeID(env, self);
   s_name = xmljGetStringChars(env, name);
   ref = xmlNewReference(doc, s_name);
-  xmljReleaseStringChars(env, name, s_name);
   return xmljGetNodeInstance(env, ref);
 }
 
@@ -317,11 +312,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv *env,
     s_localName = s_qName;
     ns = NULL;
     element = xmlNewDocNode(doc, ns, s_localName, NULL);
-    xmljReleaseStringChars(env, uri, s_uri);
   }
   else
     element = xmlNewDocNode(doc, NULL, s_qName, NULL);
-  xmljReleaseStringChars(env, qName, s_qName);
   return xmljGetNodeInstance(env, element);
 }
 
@@ -354,11 +347,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv *env,
     s_localName = s_qName;
     ns = NULL;
     attr = (xmlNodePtr)xmlNewNsProp((xmlNodePtr)doc, ns, s_localName, NULL);
-    xmljReleaseStringChars(env, uri, s_uri);
   }
   else
     attr = (xmlNodePtr)xmlNewNsProp((xmlNodePtr)doc, NULL, s_qName, NULL);
-  xmljReleaseStringChars(env, qName, s_qName);
   return xmljGetNodeInstance(env, attr);
 }
 
@@ -464,6 +455,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseFile (JNIEnv *env,
   const char *s_filename;
   int fd;
 
+  if (filename == NULL)
+    return NULL;
+  
   /* Get parser context */
   context = getContext(env, self);
   
@@ -505,7 +499,8 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
 {
   xmlParserCtxtPtr context;
   xmlDocPtr doc;
-  xmlChar *s_bytes;
+  jbyte *j_bytes;
+  xmlChar *x_bytes;
   jint len;
 
   /* Get parser context */
@@ -516,16 +511,18 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
   
   /* Parse */
   len = (*env)->GetArrayLength(env, bytes);
-  s_bytes = (*env)->GetByteArrayElements(env, bytes, 0);
+  j_bytes = (*env)->GetByteArrayElements(env, bytes, 0);
+  x_bytes = (j_bytes == NULL) ? NULL : xmlCharStrdup(j_bytes); /* TODO */
   if (context == NULL)
-    doc = xmlParseMemory(s_bytes, len);
+    doc = xmlParseMemory(x_bytes, len);
   else
   {
-    doc = xmlCtxtReadDoc(context, s_bytes, NULL, NULL,
+    doc = xmlCtxtReadDoc(context, x_bytes, NULL, NULL,
         context->options);
     xmlCtxtReset(context);
   }
-  (*env)->ReleaseByteArrayElements(env, bytes, s_bytes, 0);
+  (*env)->ReleaseByteArrayElements(env, bytes, j_bytes, 0);
+  free(x_bytes);
   if (doc == NULL)
     return NULL;
   else
@@ -548,7 +545,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomEntityResolver (JNIEnv *e
   if (context != NULL)
   {
     if (flag)
-      context->sax->resolveEntity = customResolveEntity;
+      context->sax->resolveEntity = xmljDOMResolveEntity;
     else
       context->sax->resolveEntity = defaultResolveEntity;
   }
@@ -575,9 +572,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomErrorHandler (JNIEnv *env
   {
     if (flag)
     {
-      context->sax->warning = customWarning;
-      context->sax->error = customError;
-      context->sax->fatalError = customFatalError;
+      context->sax->warning = xmljDOMWarning;
+      context->sax->error = xmljDOMError;
+      context->sax->fatalError = xmljDOMFatalError;
     }
     else
     {
@@ -605,8 +602,10 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv *env,
     jobject doctype)
 {
   xmlDocPtr doc;
+  const xmlChar *version;
 
-  doc = xmlNewDoc("1.0");
+  version = xmlCharStrdup("1.0");
+  doc = xmlNewDoc(version);
   /* TODO namespaceURI
    * TODO qualifiedName
    * TODO doctype */
@@ -732,9 +731,7 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNS (JNIEnv *env,
   {
     s_uri = xmljGetStringChars(env, uri);
     s_value = xmlGetNsProp(node, s_localName, s_uri);
-    xmljReleaseStringChars(env, uri, s_uri);
   }
-  xmljReleaseStringChars(env, localName, s_localName);
   return xmljNewString(env, s_value);
 }
 
@@ -773,10 +770,7 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNS (JNIEnv *env,
     s_uri = xmljGetStringChars(env, uri);
     ns = xmlNewNs(node, s_uri, s_prefix);
     xmlSetNsProp(node, ns, s_localName, s_value);
-    xmljReleaseStringChars(env, uri, s_uri);
   }
-  xmljReleaseStringChars(env, qName, s_qName);
-  xmljReleaseStringChars(env, value, s_value);
 }
 
 /*
@@ -815,7 +809,7 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNodeNS (JNIEnv *env,
   s_localName = xmljGetStringChars(env, localName);
   while (attr != NULL)
   {
-    if (s_uri == NULL)
+    if (uri == NULL)
     {
       if (xmljMatch(s_localName, (xmlNodePtr)attr))
         break;
@@ -827,9 +821,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNodeNS (JNIEnv *env,
     }
     attr = attr->next;
   }
-  if (uri != NULL)
-    xmljReleaseStringChars(env, uri, s_uri);
-  xmljReleaseStringChars(env, localName, s_localName);
   return xmljGetNodeInstance(env, (xmlNodePtr)attr);
 }
 
@@ -869,7 +860,7 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttributeNS (JNIEnv *env,
   s_localName = xmljGetStringChars(env, localName);
   while (attr != NULL)
   {
-    if (s_uri == NULL)
+    if (uri == NULL)
     {
       if (xmljMatch(s_localName, (xmlNodePtr)attr))
         break;
@@ -881,9 +872,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttributeNS (JNIEnv *env,
     }
     attr = attr->next;
   }
-  if (uri != NULL)
-    xmljReleaseStringChars(env, uri, s_uri);
-  xmljReleaseStringChars(env, localName, s_localName);
   return (attr != NULL);
 }
 
@@ -1090,7 +1078,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItemNS (JNIEnv *env,
   attr = getNamedItemNS(env, self, uri, localName);
   if (attr == NULL)
   {
-    throwDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
+    xmljThrowDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
     return NULL;
   }
   else
@@ -1169,7 +1157,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setNodeValue (JNIEnv *env,
 
   s_nodeValue = xmljGetStringChars(env, nodeValue);
   xmlNodeSetContent(node, s_nodeValue);
-  xmljReleaseStringChars(env, nodeValue, s_nodeValue);
 }
 
 /*
@@ -1316,9 +1303,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv *env,
   refChildNode = xmljGetNodeID(env, refChild);
 
   if (newChildNode->doc != refChildNode->doc)
-    throwDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
+    xmljThrowDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
   if (!xmlAddPrevSibling(refChildNode, newChildNode))
-    throwDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
+    xmljThrowDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
   return newChild;
 }
 
@@ -1340,9 +1327,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv *env,
   oldChildNode = xmljGetNodeID(env, oldChild);
   
   if (newChildNode->doc != oldChildNode->doc)
-    throwDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
+    xmljThrowDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
   if (!xmlReplaceNode(oldChildNode, newChildNode))
-    throwDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
+    xmljThrowDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
   return newChild;
 }
 
@@ -1363,7 +1350,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_removeChild (JNIEnv *env,
   oldChildNode = xmljGetNodeID(env, oldChild);
 
   if (oldChildNode->parent != node)
-    throwDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
+    xmljThrowDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
   xmlUnlinkNode(oldChildNode);
   return oldChild;
 }
@@ -1385,9 +1372,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv *env,
   newChildNode = xmljGetNodeID(env, newChild);
 
   if (newChildNode->doc != node->doc)
-    throwDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
+    xmljThrowDOMException(env, 4, NULL); /* WRONG_DOCUMENT_ERR */
   if (!xmlAddChild(node, newChildNode))
-    throwDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
+    xmljThrowDOMException(env, 3, NULL); /* HIERARCHY_REQUEST_ERR */
   return newChild;
 }
 
@@ -1498,12 +1485,11 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setPrefix (JNIEnv *env,
   
   s_prefix = xmljGetStringChars(env, prefix);
   if (xmlValidateName(s_prefix, 0))
-    throwDOMException(env, 5, NULL); /* INVALID_CHARACTER_ERR */
+    xmljThrowDOMException(env, 5, NULL); /* INVALID_CHARACTER_ERR */
   node = xmljGetNodeID(env, self);
   if (node->ns == NULL)
-    throwDOMException(env, 14, NULL); /* NAMESPACE_ERR */
+    xmljThrowDOMException(env, 14, NULL); /* NAMESPACE_ERR */
   node->ns->prefix = s_prefix;
-  xmljReleaseStringChars(env, prefix, s_prefix);
 }
 
 /*
@@ -1662,7 +1648,6 @@ Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_setData (JNIEnv *env,
   node = xmljGetNodeID(env, self);
   s_data = xmljGetStringChars(env, data);
   xmlNodeSetContent(node, s_data);
-  xmljReleaseStringChars(env, data, s_data);
 }
 
 /*
@@ -1709,11 +1694,6 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv *env,
     }
     count++;
   }
-
-  xmljReleaseStringChars(env, name, s_name);
-  if (ns)
-    xmljReleaseStringChars(env, uri, s_uri);
-  
   return xmljGetNodeInstance(env, node);
 }
 
@@ -1759,11 +1739,6 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv *env,
     }
     count++;
   }
-
-  xmljReleaseStringChars(env, name, s_name);
-  if (ns)
-    xmljReleaseStringChars(env, uri, s_uri);
-  
   return count;
 }
 
@@ -1778,16 +1753,14 @@ createDocument (JNIEnv *env,
     xmlDocPtr doc)
 {
   jclass cls;
-  jmethodID method;
   jfieldID field;
   jobject ret;
   
-  /* Construct document object */
-  cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeDocument");
-  method = (*env)->GetMethodID(env, cls, "<init>", "(I)V");
-  ret = (*env)->NewObject(env, cls, method, doc);
+  /* Get document object */
+  ret = xmljGetNodeInstance(env, (xmlNodePtr)doc);
 
   /* Set DOM implementation field */
+  cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeDocument");
   field = (*env)->GetFieldID(env, cls, "dom",
       "Lorg/w3c/dom/DOMImplementation;");
   (*env)->SetObjectField(env, ret, field, self);
@@ -1814,7 +1787,7 @@ getContext (JNIEnv *env,
 /* -- Callback functions -- */
 
 xmlParserInputPtr
-customResolveEntity (void *ctx,
+xmljDOMResolveEntity (void *ctx,
     const xmlChar *publicId,
     const xmlChar *systemId)
 {
@@ -1823,7 +1796,7 @@ customResolveEntity (void *ctx,
 }
 
 void
-customWarning (void *ctx,
+xmljDOMWarning (void *ctx,
     const char *msg,
     ...)
 {
@@ -1835,7 +1808,7 @@ customWarning (void *ctx,
 }
 
 void
-customError (void *ctx,
+xmljDOMError (void *ctx,
     const char *msg,
     ...)
 {
@@ -1847,7 +1820,7 @@ customError (void *ctx,
 }
 
 void
-customFatalError (void *ctx,
+xmljDOMFatalError (void *ctx,
     const char *msg,
     ...)
 {
@@ -1863,6 +1836,8 @@ dispatchLogCallback(const char *msg,
     const char *methodName)
 {
   xmlParserCtxtPtr context;
+  const xmlChar *errorMsg;
+  const xmlChar *systemId;
   
   jclass cls;
   jmethodID method;
@@ -1884,14 +1859,18 @@ dispatchLogCallback(const char *msg,
     return;
   
   /* Prepare arguments */
-  j_msg = (context->lastError.message == NULL) ? NULL :
-    xmljNewString(dom_cb_env, context->lastError.message);
-  if (j_msg == NULL)
-    j_msg = (msg == NULL) ? NULL :
-      xmljNewString(dom_cb_env, msg);
+  if (context->lastError.message != NULL)
+    errorMsg = xmlCharStrdup(context->lastError.message);
+  else
+    errorMsg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
+  systemId = (context->lastError.file == NULL) ? NULL :
+    xmlCharStrdup(context->lastError.file);
+  
+  j_msg = (errorMsg == NULL) ? NULL :
+    xmljNewString(dom_cb_env, errorMsg);
   j_publicId = NULL;
-  j_systemId = (context->lastError.file == NULL) ? NULL :
-    xmljNewString(dom_cb_env, context->lastError.file);
+  j_systemId = (systemId == NULL) ? NULL :
+    xmljNewString(dom_cb_env, systemId);
   lineNumber = (jint)context->lastError.line;
   columnNumber = -1;
 
@@ -1921,7 +1900,6 @@ getNamedItem (JNIEnv *env,
     attr = attr->next;
   }
 
-  xmljReleaseStringChars(env, name, s_name);
   return attr;
 }
 
@@ -1948,8 +1926,6 @@ getNamedItemNS (JNIEnv *env,
     attr = attr->next;
   }
 
-  xmljReleaseStringChars(env, uri, s_uri);
-  xmljReleaseStringChars(env, localName, s_localName);
   return attr;
 }
 

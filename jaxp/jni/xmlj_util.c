@@ -30,24 +30,32 @@ jstring
 xmljNewString(JNIEnv *env,
 		const xmlChar *text)
 {
-	return (text == NULL) ? NULL : (*env)->NewStringUTF(env, text);
+  char *s_text;
+  
+  if (text == NULL)
+    return NULL;
+  s_text = (char *)text; /* TODO signedness? */
+  return (*env)->NewStringUTF(env, s_text);
 }
 
-const xmlChar *
+xmlChar *
 xmljGetStringChars(JNIEnv *env,
 		jstring text)
 {
-	return (text == NULL) ? NULL :
-		(xmlChar *)(*env)->GetStringUTFChars(env, text, 0);
-}
-
-void
-xmljReleaseStringChars(JNIEnv *env,
-		jstring jtext,
-		const xmlChar *xtext)
-{
-	if (jtext != NULL)
-		(*env)->ReleaseStringUTFChars(env, jtext, xtext);
+  const char *s_text;
+  xmlChar *x_text;
+  
+  if (text == NULL)
+    return NULL;
+  
+  s_text = (*env)->GetStringUTFChars(env, text, 0);
+  x_text = (s_text == NULL) ? NULL : xmlCharStrdup(s_text);
+  if (s_text != NULL && x_text == NULL)
+  {
+    /* TODO raise exception */
+  }
+  (*env)->ReleaseStringUTFChars(env, text, s_text);
+  return x_text;
 }
 
 void

@@ -58,7 +58,12 @@ implements Document
     super(id);
   }
 
-  protected native void finalize();
+  protected void finalize()
+  {
+    free(id);
+  }
+
+  private native void free(int id);
 
   public native DocumentType getDoctype();
 
