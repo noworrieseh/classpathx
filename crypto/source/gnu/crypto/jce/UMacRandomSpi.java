@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: UMacRandomSpi.java,v 1.1 2002-07-27 00:23:20 raif Exp $
+// $Id: UMacRandomSpi.java,v 1.2 2002-08-07 10:00:46 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -44,7 +44,7 @@ import java.util.Random;
  * <p>An <em>Adapter</em> class around {@link UMacGenerator} to allow using this
  * algorithm as a JCE {@link java.security.SecureRandom}.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class UMacRandomSpi extends SecureRandomSpi {
 
@@ -163,9 +163,13 @@ public class UMacRandomSpi extends SecureRandomSpi {
 
       // use AES cipher with 128-bit block size
       attributes.put(UMacGenerator.CIPHER, Registry.AES_CIPHER);
+      // specify the key
+      byte[] key = new byte[16];
+      System.arraycopy(material, 0, key, 0, 16);
+      attributes.put(IBlockCipher.KEY_MATERIAL, key);
       // use a 1-byte index
       attributes.put(UMacGenerator.INDEX, new Integer(material[16] & 0xFF));
 
-      adaptee.setup(attributes);
+      adaptee.init(attributes);
    }
 }
