@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Square.java,v 1.4 2001-12-04 12:56:08 raif Exp $
+// $Id: Square.java,v 1.5 2002-01-11 21:57:28 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,7 @@ package gnu.crypto.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.cipher.BaseCipher;
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
 import java.io.PrintWriter;
@@ -48,9 +48,9 @@ import java.util.Iterator;
  * Square</a>.<br>
  * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>,
  * <a href="mailto:lars.knudsen@esat.kuleuven.ac.be">Lars Knudsen</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.
+ * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class Square extends BaseCipher {
 
@@ -204,7 +204,7 @@ public final class Square extends BaseCipher {
 
    /** Trivial 0-arguments constructor. */
    public Square() {
-      super(CipherFactory.SQUARE_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
+      super(Registry.SQUARE_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
    // java.lang.Cloneable interface implementation

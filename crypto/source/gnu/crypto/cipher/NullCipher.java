@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: NullCipher.java,v 1.4 2001-12-04 12:56:08 raif Exp $
+// $Id: NullCipher.java,v 1.5 2002-01-11 21:57:28 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,7 @@ package gnu.crypto.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.cipher.BaseCipher;
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
 import java.io.PrintWriter;
@@ -44,9 +44,9 @@ import java.util.Iterator;
  *
  * This cipher does not alter its input at all, claims to process block sizes
  * 128-, 192- and 256-bit long, and key sizes from 64- to 512-bit in 8-bit
- * increments.
+ * increments.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class NullCipher extends BaseCipher {
 
@@ -58,7 +58,7 @@ public final class NullCipher extends BaseCipher {
 
    /** Trivial 0-arguments constructor. */
    public NullCipher() {
-      super(CipherFactory.NULL_CIPHER, 16, 16);
+      super(Registry.NULL_CIPHER, 16, 16);
    }
 
    // java.lang.Cloneable interface implementation

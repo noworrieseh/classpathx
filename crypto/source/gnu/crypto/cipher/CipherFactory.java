@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: CipherFactory.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: CipherFactory.java,v 1.3 2002-01-11 21:57:28 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,28 +30,22 @@ package gnu.crypto.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate block cipher instances.
+ * A Factory to instantiate symmetric block cipher instances.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class CipherFactory {
+public class CipherFactory implements Registry {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   static final String ANUBIS_CIPHER =   "anubis";
-   static final String KHAZAD_CIPHER =   "khazad";
-   static final String AES_CIPHER =      "aes";
-   static final String RIJNDAEL_CIPHER = "rijndael";
-   static final String SQUARE_CIPHER =   "square";
-   static final String TWOFISH_CIPHER =  "twofish";
-   static final String NULL_CIPHER =     "null";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -65,9 +59,10 @@ public class CipherFactory {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of a block cipher given its name.
+    * Returns an instance of a block cipher given its name.<p>
     *
-    * @param algorithm the case-insensitive name of the block cipher algorithm.
+    * @param algorithm the case-insensitive name of the symmetric block cipher
+    * algorithm.
     * @return an instance of the cipher algorithm, or <tt>null</tt> if none
     * found.
     * @exception InternalError if the implementation does not pass its self-
@@ -103,8 +98,8 @@ public class CipherFactory {
    }
 
    /**
-    * Returns a {@link java.util.Set} of block cipher implementation names
-    * supported by this <i>Factory</i>.
+    * Returns a {@link java.util.Set} of symmetric block cipher implementation
+    * names supported by this <i>Factory</i>.
     *
     * @return a {@link java.util.Set} of block cipher names (Strings).
     */
@@ -112,7 +107,6 @@ public class CipherFactory {
       HashSet hs = new HashSet();
       hs.add(ANUBIS_CIPHER);
       hs.add(KHAZAD_CIPHER);
-      hs.add(AES_CIPHER);
       hs.add(RIJNDAEL_CIPHER);
       hs.add(SQUARE_CIPHER);
       hs.add(TWOFISH_CIPHER);

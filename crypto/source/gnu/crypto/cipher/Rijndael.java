@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Rijndael.java,v 1.4 2001-12-04 12:56:08 raif Exp $
+// $Id: Rijndael.java,v 1.5 2002-01-11 21:57:28 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,7 @@ package gnu.crypto.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.cipher.BaseCipher;
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
 import java.io.PrintWriter;
@@ -48,9 +48,9 @@ import java.util.Iterator;
  * <a href="http://www.esat.kuleuven.ac.be/~rijmen/rijndael/">The Rijndael
  * Block Cipher - AES Proposal</a>.<br>
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a> and
- * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.
+ * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class Rijndael extends BaseCipher {
 
@@ -313,7 +313,7 @@ public final class Rijndael extends BaseCipher {
 
    /** Trivial 0-arguments constructor. */
    public Rijndael() {
-      super(CipherFactory.RIJNDAEL_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
+      super(Registry.RIJNDAEL_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
    // java.lang.Cloneable interface implementation
