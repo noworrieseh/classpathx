@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: MD4.java,v 1.1 2002-06-12 10:24:44 raif Exp $
+// $Id: MD4.java,v 1.2 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 // Copyright (C) 2001,2002  Casey Marshall <rsdio@metastatic.org>
@@ -49,7 +49,7 @@ import gnu.crypto.util.Util;
  *    R. Rivest.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MD4 extends BaseHash {
 
@@ -67,12 +67,15 @@ public class MD4 extends BaseHash {
    private static final int C = 0x98badcfe;
    private static final int D = 0x10325476;
 
-   private int a, b, c, d;
+   /** The output of this message digest when no data has been input. */
+   private static final String DIGEST0 = "31D6CFE0D16AE931B73C59D7E0C089C0";
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    private final int[] X = new int[16];
 
-   /** The output of this message digest when no data has been input. */
-   private static final String DIGEST0 = "31D6CFE0D16AE931B73C59D7E0C089C0";
+   private int a, b, c, d;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -132,7 +135,11 @@ public class MD4 extends BaseHash {
    }
 
    public boolean selfTest() {
-      return DIGEST0.equals(Util.toString(new MD4().digest()));
+      if (valid == null) {
+         valid = new Boolean(
+               DIGEST0.equals(Util.toString(new MD4().digest())));
+      }
+      return valid.booleanValue();
    }
 
    protected byte[] padBuffer() {

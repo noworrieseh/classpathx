@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Whirlpool.java,v 1.5 2002-05-14 08:50:38 raif Exp $
+// $Id: Whirlpool.java,v 1.6 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -50,7 +50,7 @@ import gnu.crypto.util.Util;
  *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.</li>
  * </ol>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class Whirlpool extends BaseHash {
 
@@ -99,6 +99,9 @@ public final class Whirlpool extends BaseHash {
    private static final long[] T6 = new long[256];
    private static final long[] T7 = new long[256];
    private static final long[] rc = new long[R];
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    /** The 512-bit context as 8 longs. */
    private long H0, H1, H2, H3, H4, H5, H6, H7;
@@ -525,6 +528,10 @@ public final class Whirlpool extends BaseHash {
    }
 
    public boolean selfTest() {
-      return DIGEST0.equals(Util.toString(new Whirlpool().digest()));
+      if (valid == null) {
+         valid = new Boolean(
+               DIGEST0.equals(Util.toString(new Whirlpool().digest())));
+      }
+      return valid.booleanValue();
    }
 }

@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD128.java,v 1.5 2002-05-14 08:50:38 raif Exp $
+// $Id: RipeMD128.java,v 1.6 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -44,7 +44,7 @@ import gnu.crypto.util.Util;
  *    Hans Dobbertin, Antoon Bosselaers and Bart Preneel.</li>
  * </ol>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RipeMD128 extends BaseHash {
 
@@ -85,6 +85,9 @@ public class RipeMD128 extends BaseHash {
        9,  7, 15, 11,  8,  6,  6, 14, 12, 13,  5, 14, 13, 13,  7,  5,
       15,  5,  8, 11, 14, 14,  6, 14,  6,  9, 12,  9, 12,  5, 15,  8
    };
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    /** 128-bit h0, h1, h2, h3 (interim result) */
    private int h0, h1, h2, h3;
@@ -236,6 +239,10 @@ public class RipeMD128 extends BaseHash {
    }
 
    public boolean selfTest() {
-      return DIGEST0.equals(Util.toString(new RipeMD128().digest()));
+      if (valid == null) {
+         valid = new Boolean(
+               DIGEST0.equals(Util.toString(new RipeMD128().digest())));
+      }
+      return valid.booleanValue();
    }
 }

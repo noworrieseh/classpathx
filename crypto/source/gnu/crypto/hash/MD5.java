@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: MD5.java,v 1.3 2002-05-14 08:50:38 raif Exp $
+// $Id: MD5.java,v 1.4 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -48,7 +48,7 @@ import gnu.crypto.util.Util;
  *    R. Rivest.</li>
  * </ol>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class MD5 extends BaseHash {
 
@@ -58,6 +58,9 @@ public class MD5 extends BaseHash {
    private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
    private static final String DIGEST0 = "D41D8CD98F00B204E9800998ECF8427E";
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    private final int[] X = new int[16];
 
@@ -248,7 +251,11 @@ public class MD5 extends BaseHash {
    }
 
    public boolean selfTest() {
-      return DIGEST0.equals(Util.toString(new MD5().digest()));
+      if (valid == null) {
+         valid = new Boolean(
+               DIGEST0.equals(Util.toString(new MD5().digest())));
+      }
+      return valid.booleanValue();
    }
 
    // helper methods ----------------------------------------------------------

@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD160.java,v 1.5 2002-05-14 08:50:38 raif Exp $
+// $Id: RipeMD160.java,v 1.6 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -44,7 +44,7 @@ import gnu.crypto.util.Util;
  *    Hans Dobbertin, Antoon Bosselaers and Bart Preneel.</li>
  * </ol>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RipeMD160 extends BaseHash {
 
@@ -88,6 +88,9 @@ public class RipeMD160 extends BaseHash {
       15,  5,  8, 11, 14, 14,  6, 14,  6,  9, 12,  9, 12,  5, 15,  8,
        8,  5, 12,  9, 12,  5, 14,  6,  8, 13,  6,  5, 15, 13, 11, 11
    };
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    /** 160-bit h0, h1, h2, h3, h4 (interim result) */
    private int h0, h1, h2, h3, h4;
@@ -263,6 +266,10 @@ public class RipeMD160 extends BaseHash {
    }
 
    public boolean selfTest() {
-      return DIGEST0.equals(Util.toString(new RipeMD160().digest()));
+      if (valid == null) {
+         valid = new Boolean(
+               DIGEST0.equals(Util.toString(new RipeMD160().digest())));
+      }
+      return valid.booleanValue();
    }
 }

@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha160.java,v 1.5 2002-05-14 08:50:38 raif Exp $
+// $Id: Sha160.java,v 1.6 2002-06-28 13:18:07 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -59,7 +59,7 @@ import gnu.crypto.util.Util;
  *    </li>
  * </ol>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class Sha160 extends BaseHash {
 
@@ -69,6 +69,9 @@ public class Sha160 extends BaseHash {
    private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
    private static final String DIGEST0 = "A9993E364706816ABA3E25717850C26C9CD0D89D";
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    private final int[] W = new int[80];
 
@@ -198,13 +201,15 @@ public class Sha160 extends BaseHash {
    }
 
    public boolean selfTest() {
-      Sha160 md = new Sha160();
-      md.update((byte) 0x61); // a
-      md.update((byte) 0x62); // b
-      md.update((byte) 0x63); // c
-      String result = Util.toString(md.digest());
-
-      return DIGEST0.equals(result);
+      if (valid == null) {
+         Sha160 md = new Sha160();
+         md.update((byte) 0x61); // a
+         md.update((byte) 0x62); // b
+         md.update((byte) 0x63); // c
+         String result = Util.toString(md.digest());
+         valid = new Boolean(DIGEST0.equals(result));
+      }
+      return valid.booleanValue();
    }
 
    // SHA specific methods ----------------------------------------------------
