@@ -156,13 +156,12 @@ final class XmlParser
 	try {
 	    // pushURL first to ensure locator is correct in startDocument
 	    // ... it might report an IO or encoding exception.
-	    // FIXME that could call endDocument without startDocument!
+	    handler.startDocument ();
 	    pushURL (false, "[document]",
 			// default baseURI: null
 		    new String [] { publicId, systemId, null},
 		    reader, stream, encoding, false);
 
-	    handler.startDocument ();
 	    parseDocument ();
 	} finally {
 	    if (reader != null)

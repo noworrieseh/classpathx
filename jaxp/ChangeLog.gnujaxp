@@ -1,5 +1,9 @@
 2004-07-11  Musachy Barroso  <musachy@gmail.com>
 
+	* XmlParser.java: Call StartDocument at the right time.
+	
+2004-07-11  Musachy Barroso  <musachy@gmail.com>
+
 	* XmlParser.java: Disable LIT_DISABLE_CREF flag on entities parsing.
 
 2004-07-11  Musachy Barroso  <musachy@gmail.com>
