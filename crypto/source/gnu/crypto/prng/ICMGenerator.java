@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.8 2002-07-14 01:45:41 raif Exp $
+// $Id: ICMGenerator.java,v 1.9 2002-08-07 10:02:01 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -59,10 +59,27 @@ import java.util.Map;
  * of {@link java.lang.Integer}) is missing or undefined in the initialisation
  * <code>Map</code>, then the cipher's <em>default</em> block size is used.</p>
  *
+ * <p>The practical limits and constraints of such generator are:</p>
+ * <ul>
+ *    <li>The number of blocks in any segment <b>MUST NOT</b> exceed <code>
+ *    256 ** BLOCK_INDEX_LENGTH</code>. The number of segments <b>MUST NOT</b>
+ *    exceed <code>256 ** SEGMENT_INDEX_LENGTH</code>. These restrictions ensure
+ *    the uniqueness of each block cipher input.</li>
+ *
+ *    <li>Each segment contains <code>SEGMENT_LENGTH</code> octets; this value
+ *    <b>MUST NOT</b> exceed the value <code>(256 ** BLOCK_INDEX_LENGTH) *
+ *    BLOCK_LENGTH</code>.</li>
+ *
+ *    <li>The sum of <code>SEGMENT_INDEX_LENGTH</code> and
+ *    <code>BLOCK_INDEX_LENGTH</code> <b>MUST NOT</b> exceed <code>BLOCK_LENGTH
+ *    / 2</code>. This requirement protects the ICM keystream generator from
+ *    potentially failing to be pseudorandom.</li>
+ * </ul>
+ *
  * <p><b>NOTE</b>: Rijndael is used as the default symmetric key block cipher
  * algorithm because, with its default block and key sizes, it is the AES. Yet
  * being Rijndael, the algorithm offers more versatile block and key sizes which
- * may prove to be useful for generating "longer" key streams.</p>
+ * may prove to be useful for generating <em>longer</em> key streams.</p>
  *
  * <p>References:</p>
  *
@@ -71,7 +88,7 @@ import java.util.Map;
  *    Integer Counter Mode</a>, David A. McGrew.</li>
  * </ol>
  *
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ICMGenerator extends BasePRNG {
 
