@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.19 2001-11-05 22:38:09 db Exp $
+ * $Id: XmlParser.java,v 1.20 2001-11-07 01:17:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.19 2001-11-05 22:38:09 db Exp $
+// $Id: XmlParser.java,v 1.20 2001-11-07 01:17:20 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-05 22:38:09 $
+ * @version $Date: 2001-11-07 01:17:20 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -809,7 +809,10 @@ ee.printStackTrace ();
 	ids = readExternalIds (false, true);
 
 	// report (a) declaration of name, (b) lexical info (ids)
-	handler.doctypeDecl (doctypeName, ids [0], ids [1]);
+	handler.doctypeDecl (doctypeName, ids [0],
+		    handler.resolveURIs ()
+			? absolutize (ids [1])
+			: ids [1]);
 
 	// Internal subset is parsed first, if present
 	skipWhitespace ();
@@ -1858,13 +1861,15 @@ loop2:
 		    setEntity (name, ENTITY_NDATA, ids [0], absolute,
 			    null, notationName);
 		    handler.getDTDHandler ()
-			.unparsedEntityDecl (name, ids [0], ids [1],
+			.unparsedEntityDecl (name, ids [0],
+				handler.resolveURIs () ? absolute : ids [1],
 				notationName);
 		}
 	    } else if (!skippedPE) {
 		setEntity (name, ENTITY_TEXT, ids [0], absolute, null, null);
 		handler.getDeclHandler ()
-		    .externalEntityDecl (name, ids [0], ids [1]);
+		    .externalEntityDecl (name, ids [0],
+			    handler.resolveURIs () ? absolute : ids [1]);
 	    }
 	}
 
@@ -2695,21 +2700,6 @@ loop:
     // Elements
     //
 
-    /**
-     * Get the declared elements for an XML document.
-     * <p>The results will be valid only after the DTD (if any) has been
-     * parsed.
-     * @return An enumeration of all element types declared for this
-     *	 document (as Strings).
-     * @see #getElementContentType
-     * @see #getElementContentModel
-     */
-    public Enumeration declaredElements ()
-    {
-	return elementInfo.keys ();
-    }
-
-
     private int getContentType (Object element [], int defaultType)
     {
 	int retval;
@@ -2727,7 +2717,6 @@ loop:
      * Look up the content type of an element.
      * @param name The element type name.
      * @return An integer constant representing the content type.
-     * @see #getElementContentModel
      * @see #CONTENT_UNDECLARED
      * @see #CONTENT_ANY
      * @see #CONTENT_EMPTY
@@ -2738,25 +2727,6 @@ loop:
     {
 	Object element [] = (Object []) elementInfo.get (name);
 	return getContentType (element, CONTENT_UNDECLARED);
-    }
-
-
-    /**
-     * Look up the content model of an element.
-     * <p>The result will always be null unless the content type is
-     * CONTENT_ELEMENTS or CONTENT_MIXED.
-     * @param name The element type name.
-     * @return The normalised content model, as a string.
-     * @see #getElementContentType
-     */
-    public String getElementContentModel (String name)
-    {
-	Object element[] = (Object[]) elementInfo.get (name);
-	if (element == null) {
-	    return null;
-	} else {
-	    return (String) element [1];
-	}
     }
 
 
@@ -3026,8 +2996,7 @@ loop:
 
 
     /**
-     * Retrieve the three-member array representing an
-     * attribute declaration.
+     * Retrieve the array representing an attribute declaration.
      */
     private Object[] getAttribute (String elName, String name)
     {
@@ -3121,25 +3090,6 @@ loop:
 
 
     /**
-     * Get the notation name associated with an NDATA entity.
-     * @param ename The NDATA entity name.
-     * @return The associated notation name, or null if the
-     *	 entity was not declared, or if it is not an
-     *	 NDATA entity.
-     * @see #getEntityType
-     */
-    public String getEntityNotationName (String eName)
-    {
-	Object entity[] = (Object[]) entityInfo.get (eName);
-	if (entity == null) {
-	    return null;
-	} else {
-	    return (String) entity [4];
-	}
-    }
-
-
-    /**
      * Register an entity declaration for later retrieval.
      */
     private void setInternalEntity (String eName, String value)
@@ -3184,68 +3134,25 @@ loop:
     //
 
     /**
-     * Look up the public identifier for a notation.
-     * You will normally use this method to look up a notation
-     * that was provided as an attribute value or for an NDATA entity.
-     * @param nname The name of the notation.
-     * @return A string containing the public identifier, or null
-     *	 if none was provided or if no such notation was
-     *	 declared.
-     * @see #getNotationSystemId
-     */
-    public String getNotationPublicId (String nname)
-    {
-	Object notation[] = (Object[]) notationInfo.get (nname);
-	if (notation == null) {
-	    return null;
-	} else {
-	    return (String) notation [0];
-	}
-    }
-
-
-    /**
-     * Look up the system identifier for a notation.
-     * You will normally use this method to look up a notation
-     * that was provided as an attribute value or for an NDATA entity.
-     * @param nname The name of the notation.
-     * @return A string containing the system identifier, or null
-     *	 if no such notation was declared.
-     * @see #getNotationPublicId
-     */
-    public String getNotationSystemId (String nname)
-    {
-	Object notation[] = (Object[]) notationInfo.get (nname);
-	if (notation == null) {
-	    return null;
-	} else {
-	    return (String) notation [1];
-	}
-    }
-
-
-    /**
-     * Register a notation declaration for later retrieval.
+     * Report a notation declaration, checking for duplicates.
      */
     private void setNotation (String nname, String pubid, String sysid)
     throws Exception
     {
-	Object notation[];
-
 	if (skippedPE)
 	    return;
 
+	if (handler.resolveURIs () && sysid != null)
+	    sysid = absolutize (sysid);
+
 	handler.getDTDHandler ()
 	    .notationDecl (nname, pubid, sysid);
-	if (notationInfo.get (nname) == null) {
-	    notation = new Object [2];
-	    notation [0] = pubid;
-	    notation [1] = sysid;
-	    notationInfo.put (nname, notation);
-	} else {
+
+	if (notationInfo.get (nname) == null)
+	    notationInfo.put (nname, nname);
+	else
 	    // VC: Unique Notation Name
 	    handler.verror ("Duplicate notation name decl: " + nname);
-	}
     }
 
 
