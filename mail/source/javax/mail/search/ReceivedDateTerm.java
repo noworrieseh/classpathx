@@ -34,6 +34,7 @@ import javax.mail.Message;
  * This class implements comparisons for the Message Received date
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class ReceivedDateTerm
   extends DateTerm

@@ -40,6 +40,7 @@ package javax.mail;
  * about the error that caused this exception.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class StoreClosedException 
   extends MessagingException

@@ -33,6 +33,7 @@ package javax.mail.search;
  * We could add comparisons (like strcmp ...).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class StringTerm
   extends SearchTerm

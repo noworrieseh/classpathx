@@ -34,6 +34,7 @@ package javax.mail;
  * <code>isExpunged()</code> and <code>getMessageNumber()</code>.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MessageRemovedException 
   extends MessagingException

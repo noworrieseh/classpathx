@@ -1,6 +1,6 @@
 /*
  * InternetAddress.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -39,6 +39,7 @@ import javax.mail.Session;
  * This class models an RFC822 address.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class InternetAddress
   extends Address
@@ -80,20 +81,29 @@ public class InternetAddress
   public InternetAddress(String address)
     throws AddressException
   {
-    InternetAddress[] addresses = parse(address, true);
+    this(address, true);
+  }
+
+  /**
+   * Parse the given string and create an InternetAddress.
+   * If <code>strict</code> is false, the detailed syntax of the address
+   * isn't checked.
+   * @param address the address in RFC822 format
+   * @param strict enforce RFC822 syntax
+   * @exception AddressException if the parse failed
+   * @since JavaMail 1.3
+   */
+  public InternetAddress(String address, boolean strict)
+    throws AddressException
+  {
+    InternetAddress[] addresses = parseHeader(address, strict);
     if (addresses.length!=1)
       throw new AddressException("Illegal address", address);
     this.address = addresses[0].address;
     this.personal = addresses[0].personal;
     this.encodedPersonal = addresses[0].encodedPersonal;
-  }
-
-  private InternetAddress(String s, boolean flag)
-    throws AddressException
-  {
-    this(s);
-    if (flag)
-      checkAddress(address, true, true);
+    if (strict)
+      validate(address, true, true);
   }
 
   /**
@@ -141,6 +151,41 @@ public class InternetAddress
   public String getType()
   {
     return RFC822;
+  }
+
+  /**
+   * Indicates whether this address is an RFC 822 group address. Note that a
+   * group address is different from the mailing list addresses supported by
+   * most mail servers. Group addresses are rarely used; see RFC 822 for
+   * details.
+   * @since JavaMail 1.3
+   */
+  public boolean isGroup()
+  {
+    int start = address.indexOf(':');
+    if (start == -1)
+      return false;
+    int end = address.length() - 1;
+    return (address.charAt(end) == ';');
+  }
+
+  /**
+   * Return the members of a group address. A group may have zero, one, or
+   * more members. If this address is not a group, null is returned. The
+   * <code>strict</code> parameter controls whether the group list is parsed
+   * using strict RFC 822 rules or not. The parsing is done using the
+   * <code>parseHeader</code> method.
+   * @exception AddressException if the group list can't be parsed
+   * @since JavaMail 1.3
+   */
+  public InternetAddress[] getGroup(boolean strict)
+    throws AddressException
+  {
+    int start = address.indexOf(':');
+    int end = address.length() - 1;
+    if (start == -1 || address.charAt(end) == ';')
+      return null;
+    return parseHeader(address.substring(start + 1, end), strict);
   }
 
   /**
@@ -222,6 +267,20 @@ public class InternetAddress
       }
     }
     return null;
+  }
+
+  /**
+   * Validate that this address conforms to the syntax rules of RFC 822.
+   * The current implementation checks many, not all, syntax rules.
+   * Note that, even though the syntax of the address may be correct,
+   * there's no guarantee that a mailbox of that name exists.
+   * @exception AddressException if the address isn't valid
+   * @since JavaMail 1.3
+   */
+  public void validate()
+    throws AddressException
+  {
+    validate(address, true, true);
   }
 
   /**
@@ -516,6 +575,37 @@ public class InternetAddress
   public static InternetAddress[] parse(String addresslist, boolean strict)
     throws AddressException
   {
+    return parse(addresslist, strict ? STRICT : NONE);
+  }
+
+  /**
+   * Parse the given sequence of addresses into InternetAddress objects. If
+   * <code>strict</code> is false, the full syntax rules for individual
+   * addresses are not enforced. If <code>strict</code> is true, many (but
+   * not all) of the RFC822 syntax rules are enforced.
+   * <p>
+   * Non-strict parsing is typically used when parsing a list of mail
+   * addresses entered by a human. Strict parsing is typically used when
+   * parsing address headers in mail messages.
+   * @param addresslist comma separated address strings
+   * @param strict enforce RFC822 syntax
+   * @since JavaMail 1.3
+   */
+  public static InternetAddress[] parseHeader(String addresslist,
+      boolean strict)
+    throws AddressException
+  {
+    return parse(addresslist, strict ? STRICT_OR_LAX : LAX);
+  }
+
+  private static final int NONE = 0x00;
+  private static final int LAX = 0x01;
+  private static final int STRICT = 0x02;
+  private static final int STRICT_OR_LAX = 0x03;
+
+  private static InternetAddress[] parse(String addresslist, int rules)
+    throws AddressException
+  {
     /*
      * address := mailbox / group ; one addressee, named list
      * group := phrase ":" [#mailbox] ";"
@@ -546,7 +636,7 @@ public class InternetAddress
     ArrayList acc = new ArrayList();
 
     int pos;
-    for (pos = 0; pos<len; pos++)
+    for (pos = 0; pos < len; pos++)
     {
       char c = addresslist.charAt(pos);
       //System.out.println("c="+c);
@@ -565,7 +655,7 @@ public class InternetAddress
           if (!inGroup)
           {
             start = pStart;
-            if (start>=0)
+            if (start >= 0)
               end = pos;
             pStart = pos + 1;
           }
@@ -594,7 +684,7 @@ public class InternetAddress
             }
             pos++;
           }
-          if (!gotKet && pos>=len)
+          if (!gotKet && pos >= len)
           {
             if (inQuote)
               throw new AddressException("Unmatched '\"'", addresslist, pos);
@@ -609,13 +699,13 @@ public class InternetAddress
           
         case '(': // paren delimited personal
           inAddress = true;
-          if (pStart>=0 && pEnd==-1)
+          if (pStart >= 0 && pEnd == -1)
             pEnd = pos;
-          if (start==-1)
+          if (start == -1)
             start = pos+1;
           pos++;
           int parenCount = 1;
-          while (pos<len && parenCount>0)
+          while (pos < len && parenCount > 0)
           {
             c = addresslist.charAt(pos);
             switch (c)
@@ -632,10 +722,10 @@ public class InternetAddress
             }
             pos++;
           }
-          if (parenCount>0)
+          if (parenCount > 0)
             throw new AddressException("Unmatched '('", addresslist, pos);
           pos--;
-          if (end==-1)
+          if (end == -1)
             end = pos;
           break;
         case ')':
@@ -643,7 +733,7 @@ public class InternetAddress
           
         case '"': // quote delimited personal
           inAddress = true;
-          if (pStart==-1)
+          if (pStart == -1)
             pStart = pos;
           pos++;
           boolean gotQuote = false;
@@ -662,7 +752,7 @@ public class InternetAddress
             }
             pos++;
           }
-          if (pos>=len)
+          if (pos >= len)
             throw new AddressException("Unmatched '\"'", addresslist, pos);
           break;
           
@@ -685,32 +775,35 @@ public class InternetAddress
             }
             pos++;
           }
-          if (pos>=len)
+          if (pos >= len)
             throw new AddressException("Unmatched '['", addresslist, pos);
           break;
           
         case ',': // address delimiter
-          if (pStart==-1)
+          if (pStart == -1)
           {
             gotDelimiter = false;
             inAddress = false;
-            pStart = pEnd = -1;
+            pEnd = -1;
             break;
           }
           if (inGroup)
             break;
-          if (pEnd==-1)
+          if (pEnd == -1)
             pEnd = pos;
           {
-            String addressText = addresslist.substring(pStart, pEnd).trim();
-            if (inAddress || strict)
+            String addressText = addresslist.substring(pStart, pEnd);
+            addressText = addressText.trim();
+            if (inAddress || (rules | STRICT_OR_LAX) != 0)
             {
-              checkAddress(addressText, gotDelimiter, strict);
+              if ((rules & STRICT) != 0 || (rules & LAX) == 0)
+                validate(addressText, gotDelimiter, false);
               InternetAddress address = new InternetAddress();
               address.setAddress(addressText);
-              if (start>=0)
+              if (start >= 0)
               {
-                String personal = addresslist.substring(start, end).trim();
+                String personal = addresslist.substring(start, end);
+                personal = personal.trim();
                 address.encodedPersonal = unquote(personal);
                 start = end = -1;
               }
@@ -722,7 +815,7 @@ public class InternetAddress
               while (st.hasMoreTokens())
               {
                 addressText = st.nextToken();
-                checkAddress(addressText, false, strict);
+                validate(addressText, false, false);
                 InternetAddress address = new InternetAddress();
                 address.setAddress(addressText);
                 acc.add(address);
@@ -731,7 +824,8 @@ public class InternetAddress
           }
           gotDelimiter = false;
           inAddress = false;
-          pStart = pEnd = -1;
+          pStart = -1;
+          pEnd = -1;
           break;
           
         case ':': // group indicator
@@ -745,9 +839,10 @@ public class InternetAddress
           if (!inGroup)
             throw new AddressException("Unexpected ';'", addresslist, pos);
           inGroup = false;
-          pEnd = pos+1;
+          pEnd = pos + 1;
           {
-            String addressText = addresslist.substring(pStart, pEnd).trim();
+            String addressText = addresslist.substring(pStart, pEnd);
+            addressText = addressText.trim();
             InternetAddress address = new InternetAddress();
             address.setAddress(addressText);
             acc.add(address);
@@ -757,25 +852,28 @@ public class InternetAddress
           break;
           
         default:
-          if (pStart==-1)
+          if (pStart == -1)
             pStart = pos;
           break;
       }
     }
     
-    if (pStart>-1)
+    if (pStart > -1)
     {
-      if (pEnd==-1)
+      if (pEnd == -1)
         pEnd = pos;
-      String addressText = addresslist.substring(pStart, pEnd).trim();
-      if (inAddress || strict)
+      String addressText = addresslist.substring(pStart, pEnd);
+      addressText = addressText.trim();
+      if (inAddress || (rules | STRICT_OR_LAX) != 0)
       {
-        checkAddress(addressText, gotDelimiter, strict);
+        if ((rules & STRICT) != 0 || (rules & LAX) == 0)
+          validate(addressText, gotDelimiter, false);
         InternetAddress address = new InternetAddress();
         address.setAddress(addressText);
-        if (start>=0)
+        if (start >= 0)
         {
-          String personal = addresslist.substring(start, end).trim();
+          String personal = addresslist.substring(start, end);
+          personal = personal.trim();
           address.encodedPersonal = unquote(personal);
         }
         acc.add(address);
@@ -786,7 +884,7 @@ public class InternetAddress
         while (st.hasMoreTokens())
         {
           addressText = st.nextToken();
-          checkAddress(addressText, false, strict);
+          validate(addressText, false, false);
           InternetAddress address = new InternetAddress();
           address.setAddress(addressText);
           acc.add(address);
@@ -799,7 +897,7 @@ public class InternetAddress
     return addresses;
   }
 
-  private static void checkAddress(String address, boolean gotDelimiter,
+  private static void validate(String address, boolean gotDelimiter,
       boolean strict)
     throws AddressException
   {
@@ -808,16 +906,16 @@ public class InternetAddress
     if (!strict || gotDelimiter)
     {
       int i = address.indexOf(',', pos);
-      if (i<0)
+      if (i < 0)
         i = address.indexOf(':', pos);
-      while (i>-1)
+      while (i > -1)
       {
-        if (address.charAt(pos)!='@')
+        if (address.charAt(pos) != '@')
           throw new AddressException("Illegal route-addr", address);
-        if (address.charAt(i)!=':')
+        if (address.charAt(i) != ':')
         {
           i = address.indexOf(',', pos);
-          if (i<0)
+          if (i < 0)
             i = address.indexOf(':', pos);
         }
         else
@@ -832,34 +930,36 @@ public class InternetAddress
     String localName = address;
     String domain = null;
     int atIndex = address.indexOf('@', pos);
-    if (atIndex>-1)
+    if (atIndex > -1)
     {
-      if (atIndex==pos)
+      if (atIndex == pos)
         throw new AddressException("Missing local name", address);
-      if (atIndex==address.length()-1)
+      if (atIndex == address.length() - 1)
         throw new AddressException("Missing domain", address);
       localName = address.substring(pos, atIndex);
-      domain = address.substring(atIndex+1);
+      domain = address.substring(atIndex + 1);
     }
-
+    else if (strict)
+        throw new AddressException("Missing final @domain", address);
+    
     // Check atomic parts
     String illegalWS = "\t\n\r ";
-    for (int i = 0; i<illegalWS.length(); i++)
+    for (int i = 0; i < illegalWS.length(); i++)
     {
-      if (address.indexOf(illegalWS.charAt(i))>-1)
+      if (address.indexOf(illegalWS.charAt(i)) > -1)
         throw new AddressException("Illegal whitespace", address);
     }
     String illegalName = "\"(),:;<>@[\\]";
-    for (int i = 0; i<illegalName.length(); i++)
+    for (int i = 0; i < illegalName.length(); i++)
     {
-      if (localName.indexOf(illegalName.charAt(i))>-1)
+      if (localName.indexOf(illegalName.charAt(i)) > -1)
         throw new AddressException("Illegal local name", address);
     }
-    if (domain!=null)
+    if (domain != null)
     {
-      for (int i = 0; i<illegalName.length(); i++)
+      for (int i = 0; i < illegalName.length(); i++)
       {
-        if (localName.indexOf(illegalName.charAt(i))>-1)
+        if (localName.indexOf(illegalName.charAt(i)) > -1)
           throw new AddressException("Illegal domain", address);
       }
     }

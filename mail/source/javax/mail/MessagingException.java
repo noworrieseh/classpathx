@@ -31,6 +31,7 @@ package javax.mail;
  * The base class for all exceptions thrown by the Messaging classes.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MessagingException 
   extends Exception

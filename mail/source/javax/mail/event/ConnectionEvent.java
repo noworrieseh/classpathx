@@ -31,6 +31,7 @@ package javax.mail.event;
  * This class models Connection events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class ConnectionEvent
   extends MailEvent

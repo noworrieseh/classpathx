@@ -1,6 +1,6 @@
 /*
  * Folder.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -94,6 +94,7 @@ import javax.mail.search.SearchTerm;
  * objects in that folder are not affected by the expunge.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class Folder
 {
@@ -605,6 +606,48 @@ public abstract class Folder
       try
       {
         if (!getMessage(i).isSet(Flags.Flag.SEEN))
+          count++;
+      }
+      catch (MessageRemovedException e)
+      {
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Get the number of deleted messages in this folder.
+   * <p>
+   * This method can be invoked on a closed folder. However, note that for
+   * some folder implementations, getting the deleted message count can be
+   * an expensive operation involving actually opening the folder. In such
+   * cases, a provider can choose not to support this functionality in the
+   * closed state, in which case this method must return -1.
+   * <p>
+   * Clients invoking this method on a closed folder must be aware that this
+   * is a potentially expensive operation. Clients must also be prepared to
+   * handle a return value of -1 in this case.
+   * <p>
+   * This implementation returns -1 if this folder is closed. Otherwise,
+   * this implementation gets each Message in the folder using
+   * <code>getMessage(int)</code> and checks whether its
+   * <code>DELETED</code> flag is set. The total number of messages that
+   * have this flag is returned.
+   * @exception FolderNotFoundException if this folder does not exist
+   * @since JavaMail 1.3
+   */
+  public synchronized int getDeletedMessageCount()
+    throws MessagingException
+  {
+    if (!isOpen())
+      return -1;
+    int count = 0;
+    int total = getMessageCount();
+    for (int i = 1; i <= total; i++)
+    {
+      try
+      {
+        if (!getMessage(i).isSet(Flags.Flag.DELETED))
           count++;
       }
       catch (MessageRemovedException e)

@@ -33,6 +33,7 @@ import java.util.EventListener;
  * This is the Listener interface for Folder events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public interface FolderListener
   extends EventListener

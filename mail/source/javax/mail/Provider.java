@@ -33,6 +33,7 @@ package javax.mail;
  * <code>javamail.default.providers</code> resource files.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class Provider
 {

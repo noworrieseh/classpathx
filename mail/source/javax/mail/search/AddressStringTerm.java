@@ -37,6 +37,7 @@ import javax.mail.internet.InternetAddress;
  * class does comparisons on address strings rather than Address objects.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class AddressStringTerm
   extends StringTerm

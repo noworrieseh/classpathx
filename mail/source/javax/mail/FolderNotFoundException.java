@@ -32,6 +32,7 @@ package javax.mail;
  * invoked on a nonexistent folder.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class FolderNotFoundException 
   extends MessagingException

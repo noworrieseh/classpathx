@@ -33,6 +33,7 @@ import javax.mail.MessagingException;
  * The exception thrown due to an error in parsing RFC822 or MIME headers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class ParseException
   extends MessagingException

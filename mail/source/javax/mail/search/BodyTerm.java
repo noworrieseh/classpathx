@@ -39,6 +39,7 @@ import javax.mail.Part;
  * In this case, the search is done on the first body-part.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class BodyTerm
   extends StringTerm

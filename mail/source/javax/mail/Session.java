@@ -1,6 +1,6 @@
 /*
  * Session.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import gnu.inet.util.Logger;
+import gnu.mail.util.PrintStreamLogger;
 
 /**
  * The Session class represents a mail session and is not subclassed.
@@ -47,6 +48,7 @@ import gnu.inet.util.Logger;
  * @author Andrew Selkirk
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @author <a href="mailto:nferrier@tapsellferrier.co.uk">Nic Ferrier</a>
+ * @version 1.3
  */
 public final class Session
 {
@@ -96,6 +98,8 @@ public final class Session
   private HashMap providersByClassName = new HashMap();
 
   private Properties addressMap = new Properties();
+
+  private PrintStreamLogger logger;
   
   private static Session defaultSession = null;
 
@@ -103,12 +107,14 @@ public final class Session
    */
   private Session(Properties props, Authenticator authenticator)
   {
-		Logger logger = Logger.getInstance();
+    logger = new PrintStreamLogger(System.out);
+    Logger.setInstance(logger);
+    
     this.props = props;
     this.authenticator = authenticator;
     debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
     if (debug)
-      logger.config("using GNU JavaMail");
+      logger.config("using GNU JavaMail 1.3");
     ClassLoader loader = null;
     if (authenticator == null)
       loader = getClass().getClassLoader();
@@ -181,7 +187,6 @@ public final class Session
    */
   private void loadProviders(InputStream in, String description)
   {
-		Logger logger = Logger.getInstance();
     if (in==null)
     {
       if (debug)
@@ -260,7 +265,6 @@ public final class Session
   
   private void loadAddressMap(InputStream in, String description)
   {
-		Logger logger = Logger.getInstance();
     if (in==null)
     {
       if (debug)
@@ -446,7 +450,6 @@ public final class Session
   {
     if (protocol==null || protocol.length() <= 0)
       throw new NoSuchProviderException("Invalid protocol: "+protocol);
-		Logger logger = Logger.getInstance();
     Provider provider = null;
     String providerClassKey = "mail."+protocol+".class";
     String providerClassName = props.getProperty(providerClassKey);
@@ -775,6 +778,32 @@ public final class Session
   public String getProperty(String name)
   {
     return props.getProperty(name);
+  }
+
+  /**
+   * Set the stream to be used for debugging output for this session.
+   * If <code>out</code> is null, <code>System.out</code> will be used. Note
+   * that debugging output that occurs before any session is created, as a
+   * result of setting the <code>mail.debug</code> property, will always be
+   * sent to <code>System.out</code>.
+   * @param out the PrintStream to use for debugging output
+   * @since JavaMail 1.3
+   */
+  public void setDebugOut(PrintStream out)
+  {
+    if (out == null)
+      out = System.out;
+    logger = new PrintStreamLogger(out);
+  }
+
+  /**
+   * Returns the stream to be used for debugging output. If no stream has
+   * been set, <code>System.out</code> is returned.
+   * @since JavaMail 1.3
+   */
+  public PrintStream getDebugOut()
+  {
+    return logger.getPrintStream();
   }
 
 }

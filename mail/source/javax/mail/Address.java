@@ -37,6 +37,7 @@ import java.io.Serializable;
  * along with the search terms.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class Address
   implements Serializable

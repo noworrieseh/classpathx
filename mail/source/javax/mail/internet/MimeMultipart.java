@@ -72,6 +72,7 @@ import gnu.inet.util.LineInputStream;
  * use <code>new MimeMultipart("alternative")</code>.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MimeMultipart
   extends Multipart

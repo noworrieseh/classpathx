@@ -54,6 +54,7 @@ import javax.mail.Part;
  * appropriate.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public interface MimePart
   extends Part

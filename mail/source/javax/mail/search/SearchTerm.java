@@ -50,6 +50,7 @@ import javax.mail.Message;
  * depends on support for the readReplace method, added in JDK 1.2.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class SearchTerm
   implements Serializable

@@ -64,6 +64,7 @@ import gnu.inet.util.LineInputStream;
  * as appropriate.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class InternetHeaders
 {

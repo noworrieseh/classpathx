@@ -32,6 +32,7 @@ package javax.mail;
  * Provider that doesn't exist.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class NoSuchProviderException
   extends MessagingException

@@ -1,6 +1,6 @@
 /*
  * MimeMessage.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -86,6 +86,7 @@ import gnu.mail.util.RFC2822OutputStream;
  * headers as appropriate.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MimeMessage
   extends Message
@@ -436,6 +437,42 @@ public class MimeMessage
     addInternetAddresses(FROM_NAME, addresses);
   }
 
+  /**
+   * Returns the value of the RFC 822 "Sender" header field.
+   * If the "Sender" header field is absent, <code>null</code> is returned.
+   * <p>
+   * This implementation uses the <code>getHeader</code> method to obtain
+   * the required header field.
+   * @since JavaMail 1.3
+   */
+  public Address getSender()
+    throws MessagingException
+  {
+    Address[] sender = getInternetAddresses(SENDER_NAME);
+    if (sender != null && sender.length > 0)
+      return sender[0];
+    else
+      return null;
+  }
+
+  /**
+   * Set the RFC 822 "Sender header field. Any existing values are replaced
+   * with the given address. If address is <code>null</code>, this header is
+   * removed.
+   * @param address the sener of this message
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification of existing values
+   * @exception IllegalStateException if this message is obtained from 
+   * a READ_ONLY folder.
+   * @since JavaMail 1.3
+   */
+  public void setSender(Address address)
+    throws MessagingException
+  {
+    Address[] addresses = new Address[] { address };
+    addInternetAddresses(SENDER_NAME, addresses);
+  }
+
   // -- To --
   
   /**
@@ -623,7 +660,10 @@ public class MimeMessage
     throws MessagingException
   {
     String value = getHeader(name, ",");
-    return (value!=null) ? InternetAddress.parse(value) : null;
+    // Use InternetAddress.parseHeader since 1.3
+    String s = session.getProperty("mail.mime.address.strict");
+    boolean strict = (s == null) || Boolean.valueOf(s).booleanValue();
+    return (value!=null) ? InternetAddress.parseHeader(value, strict) : null;
   }
 
   // convenience method

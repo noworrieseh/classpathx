@@ -36,6 +36,7 @@ import javax.mail.Store;
  * the user's attention to the message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class StoreEvent
   extends MailEvent

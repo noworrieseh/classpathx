@@ -50,6 +50,7 @@ import java.util.NoSuchElementException;
  * Refer to RFC 2060 http://www.ietf.org/rfc/rfc2060.txt for more information.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public interface UIDFolder
 {

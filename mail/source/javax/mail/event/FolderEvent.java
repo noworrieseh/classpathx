@@ -43,6 +43,7 @@ import javax.mail.Folder;
  * and are typically not supported by mail protocols (including IMAP).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class FolderEvent
   extends MailEvent

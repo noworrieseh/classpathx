@@ -41,6 +41,9 @@ import javax.mail.event.TransportListener;
  * Note that Transport extends the Service class, which provides many common
  * methods for naming transports, connecting to transports, and listening to
  * connection events.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class Transport 
   extends Service

@@ -28,12 +28,13 @@
 package javax.mail.internet;
 
 /**
- * This class represents a MIME ContentDisposition value.
- * It provides methods to parse a ContentDisposition string into 
- * individual components and to generate a MIME style ContentDisposition 
+ * This class represents a MIME Content-Disposition value.
+ * It provides methods to parse a Content-Disposition string into 
+ * individual components and to generate a MIME style Content-Disposition 
  * string.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class ContentDisposition
 {

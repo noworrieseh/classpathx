@@ -35,6 +35,7 @@ package javax.mail;
  * Thus, it contains a set of attributes and a "content".
  * 
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class BodyPart
   implements Part

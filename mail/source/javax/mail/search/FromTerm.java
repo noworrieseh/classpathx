@@ -34,6 +34,7 @@ import javax.mail.Message;
  * This class implements comparisons for the From Address header.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class FromTerm
   extends AddressTerm

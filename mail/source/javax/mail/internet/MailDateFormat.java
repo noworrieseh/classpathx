@@ -111,6 +111,7 @@ zone = (( "+" / "-" ) 4DIGIT) / obs-zone
  * be within the range -9959 through +9959.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MailDateFormat
   extends SimpleDateFormat

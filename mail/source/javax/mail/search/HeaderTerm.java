@@ -34,6 +34,7 @@ import javax.mail.Message;
  * The comparison is case-insensitive.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class HeaderTerm
   extends StringTerm

@@ -219,6 +219,7 @@ $(src)/gnu/mail/util/QInputStream.java \
 $(src)/gnu/mail/util/QOutputStream.java \
 $(src)/gnu/mail/util/QPInputStream.java \
 $(src)/gnu/mail/util/QPOutputStream.java \
+$(src)/gnu/mail/util/PrintStreamLogger.java \
 $(src)/gnu/mail/util/RFC2822OutputStream.java \
 $(src)/gnu/mail/util/UUDecoderStream.java \
 $(src)/gnu/mail/util/UUEncoderStream.java
@@ -692,6 +693,8 @@ javadoc:
 
 # Remove jar files and directories
 clean-local:
+	rm javamail.address.map javamail.providers
+	rm smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
 
 # End of Makefile.am

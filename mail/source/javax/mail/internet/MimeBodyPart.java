@@ -1,6 +1,6 @@
 /*
  * MimeBodyPart.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -68,6 +68,7 @@ import javax.mail.Multipart;
  * appropriate.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MimeBodyPart
   extends BodyPart
@@ -383,6 +384,25 @@ public class MimeBodyPart
     throws MessagingException
   {
     return getHeader(CONTENT_ID_NAME, null);
+  }
+
+  /**
+   * Set the "Content-ID" header field of this body part.
+   * If the <code>cid</code> parameter is null, any existing "Content-ID" is
+   * removed.
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification
+   * @exception IllegalStateException if this body part is obtained 
+   * from a READ_ONLY folder.
+   * @since JavaMail 1.3
+   */
+  public void setContentID(String cid)
+    throws MessagingException
+  {
+    if (cid == null)
+      removeHeader(CONTENT_ID_NAME);
+    else
+      setHeader(CONTENT_ID_NAME, cid);
   }
 
   /**

@@ -31,6 +31,7 @@ package javax.mail;
  * The Header class stores a name/value pair to represent headers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class Header
 {

@@ -83,15 +83,15 @@ public class IMAPStore
       String password)
     throws MessagingException
   {
-    if (connection!=null)
+    if (connection != null)
       return true;
-    if (host==null)
+    if (host == null)
       host = getProperty("host");
-    if (username==null)
+    if (username == null)
       username = getProperty("user");
-    if (port<0)
+    if (port < 0)
       port = getIntProperty("port");
-    if (host==null || username==null || password==null)
+    if (host == null || username == null || password == null)
       return false;
     synchronized (this)
     {

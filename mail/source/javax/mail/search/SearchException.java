@@ -33,6 +33,7 @@ import javax.mail.MessagingException;
  * The exception thrown when a Search expression could not be handled.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class SearchException
   extends MessagingException

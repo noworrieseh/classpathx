@@ -34,6 +34,7 @@ package javax.mail.event;
  * and overriding only the methods of interest.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public abstract class ConnectionAdapter
   implements ConnectionListener

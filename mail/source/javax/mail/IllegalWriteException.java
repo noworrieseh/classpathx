@@ -32,6 +32,7 @@ package javax.mail;
  * of any Messaging object.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class IllegalWriteException 
   extends MessagingException

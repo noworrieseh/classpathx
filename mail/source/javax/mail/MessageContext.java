@@ -35,6 +35,7 @@ package javax.mail;
  * information about the context in which a data content object is operating.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MessageContext
 {

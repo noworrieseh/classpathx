@@ -1,6 +1,6 @@
 /*
- * FolderAdapter.java
- * Copyright (C) 2002 The Free Software Foundation
+ * PrintStreamLogger.java
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -25,40 +25,50 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package javax.mail.event;
+package gnu.mail.util;
 
-/**
- * The adapter which receives Folder events.
- * The methods in this class are empty; this class is provided 
- * as a convenience for easily creating listeners by extending this class 
- * and overriding only the methods of interest.
+import java.io.PrintStream;
+import gnu.inet.util.Logger;
+
+/** 
+ * A logger that writes to the specified print stream.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
  */
-public abstract class FolderAdapter
-  implements FolderListener
+public class PrintStreamLogger
+  extends Logger
 {
 
+  PrintStream out;
+  
   /**
-   * Invoked when a Folder is created.
+   * Constructor.
+   * @param out the underlying print stream to write to
    */
-  public void folderCreated(FolderEvent e)
+  public PrintStreamLogger(PrintStream out)
   {
+    this.out = out;
   }
 
   /**
-   * Invoked when a folder is renamed.
+   * Returns the underlying print stream used by this logger.
    */
-  public void folderRenamed(FolderEvent e)
+  public PrintStream getPrintStream()
   {
+    return out;
   }
 
-  /**
-   * Invoked when a folder is deleted.
-   */
-  public void folderDeleted(FolderEvent e)
+  public void config(String message)
   {
+    out.print("DEBUG: ");
+    out.println(message);
   }
 
+  public void log(String protocol, String message)
+  {
+    System.err.print(protocol);
+    System.err.print(": ");
+    System.err.println(message);
+  }
+  
 }

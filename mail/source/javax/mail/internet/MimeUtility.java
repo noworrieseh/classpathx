@@ -1,6 +1,6 @@
 /*
  * MimeUtility.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -92,6 +92,7 @@ import gnu.mail.util.UUEncoderStream;
  * The methods in this class help to do this.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MimeUtility
 {
@@ -174,7 +175,8 @@ public class MimeUtility
       ContentType ct = new ContentType(dh.getContentType());
       boolean text = ct.match("text/*");
       
-      AsciiOutputStream aos = new AsciiOutputStream(!text);
+      AsciiOutputStream aos = new AsciiOutputStream(!text,
+          encodeeolStrict() && !text);
       try
       {
         dh.writeTo(aos);
@@ -407,6 +409,8 @@ public class MimeUtility
         }
         catch (ParseException e)
         {
+          if (!decodetextStrict())
+            token = decodeInnerText(token);
           if (extra.length()>0)
             buffer.append(extra);
           decoded = false;
@@ -636,7 +640,15 @@ public class MimeUtility
       len = bis.available();
       bytes = new byte[len];
       len = is.read(bytes, 0, len);
-      return new String(bytes, 0, len, charset);
+      String ret = new String(bytes, 0, len, charset);
+      if (text.length() > end + 2)
+      {
+        String extra = text.substring(end + 2);
+        if (!decodetextStrict())
+          extra = decodeInnerText(extra);
+        ret = ret + extra;
+      }
+      return ret;
     }
     catch (IOException e)
     {
@@ -646,6 +658,82 @@ public class MimeUtility
     {
       throw new UnsupportedEncodingException();
     }
+  }
+
+  /**
+   * Indicates that we should consider a lone CR or LF in a body part
+   * that's not a MIME text type to indicate that the body part
+   * needs to be encoded.
+   * @since JavaMail 1.3
+   */
+  private static boolean encodeeolStrict()
+  {
+    try
+    {
+      String encodeeolStrict =
+        System.getProperty("mail.mime.encodeeol.strict", "false");
+      return Boolean.valueOf(encodeeolStrict).booleanValue();
+    }
+    catch (SecurityException e)
+    {
+      return false;
+    }
+  }
+
+  /**
+   * Indicates if text in the middle of words should be decoded.
+   * @since JavaMail 1.3
+   */
+  private static boolean decodetextStrict()
+  {
+    try
+    {
+      String decodetextStrict =
+        System.getProperty("mail.mime.decodetext.strict", "true");
+      return Boolean.valueOf(decodetextStrict).booleanValue();
+    }
+    catch (SecurityException e)
+    {
+      return true;
+    }
+  }
+
+  /**
+   * Decodes text in the middle of the specified text.
+   * @since JavaMail 1.3
+   */
+  private static String decodeInnerText(String text)
+    throws UnsupportedEncodingException
+  {
+    final String LD = "=?", RD = "?=";
+    int pos = 0;
+    StringBuffer buffer = new StringBuffer();
+    for (int start = text.indexOf(LD, pos); start != -1;
+        start = text.indexOf(LD, pos))
+    {
+      int end = text.indexOf(RD, start + 2);
+      if (end == -1)
+        break;
+      buffer.append(text.substring(pos, start));
+      pos = end + 2;
+      String encoded = text.substring(start, pos);
+      try
+      {
+        buffer.append(decodeWord(encoded));
+      }
+      catch (ParseException e)
+      {
+        buffer.append(encoded);
+      }
+    }
+    if (buffer.length() > 0)
+    {
+      if (pos < text.length())
+        buffer.append(text.substring(pos));
+      return buffer.toString();
+    }
+    else
+      return text;
   }
 
   /**
@@ -814,7 +902,10 @@ public class MimeUtility
     {
       try
       {
-        defaultJavaCharset = System.getProperty("file.encoding", "8859_1");
+        // Use mail.mime.charset as of JavaMail 1.3
+        defaultJavaCharset = System.getProperty("mail.mime.charset");
+        if (defaultJavaCharset == null)
+          defaultJavaCharset = System.getProperty("file.encoding", "8859_1");
       }
       catch (SecurityException e)
       {
@@ -975,17 +1066,24 @@ public class MimeUtility
    */
   static class AsciiOutputStream extends OutputStream
   {
+
+    static final int LF = 0x0a;
+    static final int CR = 0x0d;
     
     private boolean strict;
+    private boolean eolStrict;
     private int asciiCount = 0;
     private int nonAsciiCount = 0;
     private int ret;
     private int len;
+    private int last = -1;
     private boolean islong = false;
+    private boolean eolCheckFailed = false;
     
-    public AsciiOutputStream(boolean strict)
+    public AsciiOutputStream(boolean strict, boolean eolStrict)
     {
       this.strict = strict;
+      this.eolStrict = eolStrict;
     }
     
     public void write(int c)
@@ -1013,15 +1111,20 @@ public class MimeUtility
       throws IOException
     {
       c &= 0xff;
-      if (c==13 || c==10)
+      if (eolStrict)
+      {
+        if (last == CR && c != LF || last != CR && c == LF)
+          eolCheckFailed = true;
+      }
+      if (c == CR || c == LF)
         len = 0;
       else
       {
         len++;
-        if (len>998)
+        if (len > 998)
           islong = true;
       }
-      if (c>127)
+      if (c > 127)
       {
         nonAsciiCount++;
         if (strict)
@@ -1032,15 +1135,18 @@ public class MimeUtility
       }
       else
         asciiCount++;
+      last = c;
     }
     
     int status()
     {
-      if (ret!=0)
+      if (ret != 0)
         return ret;
-      if (nonAsciiCount==0)
+      if (eolCheckFailed)
+        return MINORITY_ASCII;
+      if (nonAsciiCount == 0)
         return !islong ? ALL_ASCII : MAJORITY_ASCII;
-      return asciiCount<=nonAsciiCount ? MAJORITY_ASCII : MINORITY_ASCII;
+      return (asciiCount <= nonAsciiCount) ? MAJORITY_ASCII : MINORITY_ASCII;
     }
     
   }

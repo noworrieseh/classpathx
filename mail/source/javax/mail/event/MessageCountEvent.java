@@ -42,6 +42,7 @@ import javax.mail.Message;
  * to solicit any such notifications.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class MessageCountEvent
   extends MailEvent

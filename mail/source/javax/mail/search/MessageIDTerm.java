@@ -30,14 +30,15 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This term models the RFC822 "MessageId" - a message-id for Internet 
+ * This term models the RFC822 "Message-Id" - a message-id for Internet 
  * messages that is supposed to be unique per message.
  * Clients can use this term to search a folder for a message 
- * given its MessageId.
+ * given its Message-Id.
  * <p>
- * The MessageId is represented as a String.
+ * The Message-Id is represented as a String.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class MessageIDTerm
   extends StringTerm

@@ -38,6 +38,7 @@ import javax.mail.Message;
  * The string comparisons are case-insensitive.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public final class RecipientStringTerm
   extends AddressStringTerm

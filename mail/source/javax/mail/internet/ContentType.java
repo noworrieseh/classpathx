@@ -28,11 +28,12 @@
 package javax.mail.internet;
 
 /**
- * This class represents a MIME ContentType value.
- * It provides methods to parse a ContentType string into individual 
- * components and to generate a MIME style ContentType string.
+ * This class represents a MIME Content-Type value.
+ * It provides methods to parse a Content-Type string into individual 
+ * components and to generate a MIME style Content-Type string.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class ContentType
 {

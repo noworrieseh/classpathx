@@ -35,6 +35,7 @@ import java.util.Iterator;
  * This class holds MIME parameters (attribute-value pairs).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class ParameterList
 {

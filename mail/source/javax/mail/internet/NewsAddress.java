@@ -35,6 +35,7 @@ import javax.mail.Address;
  * This class models an RFC1036 newsgroup address.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.3
  */
 public class NewsAddress
   extends Address
