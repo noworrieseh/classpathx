@@ -531,14 +531,22 @@ class Template
             // Ignore comments
             return parse(next);
           case Node.ELEMENT_NODE:
-            // Check for attribute value templates
+            // Check for attribute value templates and use-attribute-sets
             NamedNodeMap attrs = node.getAttributes();
             boolean convert = false;
+            String useAttributeSets = null;
             int len = attrs.getLength();
             for (int i = 0; i < len; i++)
               {
                 Node attr = attrs.item(i);
                 String value = attr.getNodeValue();
+                if (Stylesheet.XSL_NS.equals(attr.getNamespaceURI()) &&
+                    "use-attribute-sets".equals(attr.getLocalName()))
+                  {
+                    useAttributeSets = value;
+                    convert = true;
+                    break;
+                  }
                 int start = value.indexOf('{');
                 int end = value.indexOf('}');
                 if (start != -1 && end > start)
@@ -555,6 +563,11 @@ class Template
                 for (int i = 0; i < len; i++)
                   {
                     Node attr = attrs.item(i);
+                    if (Stylesheet.XSL_NS.equals(attr.getNamespaceURI()) &&
+                        "use-attribute-sets".equals(attr.getLocalName()))
+                      {
+                        continue;
+                      }
                     String value = attr.getNodeValue();
                     String aname = attr.getNodeName();
                     TemplateNode grandchild =
@@ -568,7 +581,7 @@ class Template
                 TemplateNode n =
                   stylesheet.parseAttributeValueTemplate(ename, node);
                 return new ElementNode(child, parse(next),
-                                       n, namespaceUri, null);
+                                       n, namespaceUri, useAttributeSets);
               }
             // Otherwise fall through
             break;

@@ -1,6 +1,7 @@
 2004-11-18  Chris Burdess  <dog@gnu.org>
 
    	* ls: Implemented more of FilteredSAXEventSink.
+   	* transform: use-attribute-sets on literal result element.
    	
 2004-11-16  Chris Burdess  <dog@gnu.org>
 

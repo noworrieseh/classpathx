@@ -328,7 +328,7 @@ public class Consumer extends DomConsumer
 	    DomDocument		doc = (DomDocument) getDocument ();
 	    doc.setStrictErrorChecking(true);
 	    doc.compact ();
-            DomDoctype doctype = getDoctype();
+            DomDoctype doctype = (DomDoctype) doc.getDoctype();
             if (doctype != null)
               {
                 doctype.makeReadonly();

@@ -292,6 +292,7 @@ $(src)/javax/xml/xpath/XPathFunction.java \
 $(src)/javax/xml/xpath/XPathFunctionResolver.java \
 $(src)/javax/xml/xpath/XPathFunctionException.java \
 $(src)/javax/xml/xpath/XPathVariableResolver.java \
+$(src)/gnu/xml/aelfred2/ContentHandler2.java \
 $(src)/gnu/xml/aelfred2/JAXPFactory.java \
 $(src)/gnu/xml/aelfred2/SAXDriver.java \
 $(src)/gnu/xml/aelfred2/XmlParser.java \
@@ -358,6 +359,7 @@ $(src)/gnu/xml/xpath/ConcatFunction.java \
 $(src)/gnu/xml/xpath/Constant.java \
 $(src)/gnu/xml/xpath/ContainsFunction.java \
 $(src)/gnu/xml/xpath/CountFunction.java \
+$(src)/gnu/xml/xpath/DocumentOrderComparator.java \
 $(src)/gnu/xml/xpath/EqualityExpr.java \
 $(src)/gnu/xml/xpath/Expr.java \
 $(src)/gnu/xml/xpath/FalseFunction.java \
@@ -379,6 +381,7 @@ $(src)/gnu/xml/xpath/NumberFunction.java \
 $(src)/gnu/xml/xpath/OrExpr.java \
 $(src)/gnu/xml/xpath/ParenthesizedExpr.java \
 $(src)/gnu/xml/xpath/Path.java \
+$(src)/gnu/xml/xpath/Pattern.java \
 $(src)/gnu/xml/xpath/Predicate.java \
 $(src)/gnu/xml/xpath/PositionFunction.java \
 $(src)/gnu/xml/xpath/RelationalExpr.java \
@@ -394,6 +397,7 @@ $(src)/gnu/xml/xpath/SubstringBeforeFunction.java \
 $(src)/gnu/xml/xpath/SubstringFunction.java \
 $(src)/gnu/xml/xpath/SumFunction.java \
 $(src)/gnu/xml/xpath/Test.java \
+$(src)/gnu/xml/xpath/TranslateFunction.java \
 $(src)/gnu/xml/xpath/TrueFunction.java \
 $(src)/gnu/xml/xpath/UnionExpr.java \
 $(src)/gnu/xml/xpath/VariableReference.java \
@@ -418,6 +422,7 @@ $(src)/gnu/xml/transform/ElementNode.java \
 $(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
 $(src)/gnu/xml/transform/ForEachNode.java \
 $(src)/gnu/xml/transform/FormatNumberFunction.java \
+$(src)/gnu/xml/transform/GenerateIdFunction.java \
 $(src)/gnu/xml/transform/IfNode.java \
 $(src)/gnu/xml/transform/KeyFunction.java \
 $(src)/gnu/xml/transform/LiteralNode.java \
@@ -433,6 +438,7 @@ $(src)/gnu/xml/transform/Stylesheet.java \
 $(src)/gnu/xml/transform/SystemPropertyFunction.java \
 $(src)/gnu/xml/transform/Template.java \
 $(src)/gnu/xml/transform/TemplateNode.java \
+$(src)/gnu/xml/transform/TemplatesImpl.java \
 $(src)/gnu/xml/transform/TextNode.java \
 $(src)/gnu/xml/transform/TransformerFactoryImpl.java \
 $(src)/gnu/xml/transform/TransformerImpl.java \
@@ -442,6 +448,7 @@ $(src)/gnu/xml/transform/ValueOfNode.java \
 $(src)/gnu/xml/transform/WhenNode.java \
 $(src)/gnu/xml/transform/WithParam.java \
 $(src)/gnu/xml/transform/XSLComparator.java \
+$(src)/gnu/xml/transform/XSLURIResolver.java \
 $(src)/gnu/xml/util/DoParse.java \
 $(src)/gnu/xml/util/DomParser.java \
 $(src)/gnu/xml/util/Resolver.java \

@@ -68,6 +68,7 @@ import org.w3c.dom.xpath.XPathException;
 import org.w3c.dom.xpath.XPathExpression;
 import org.w3c.dom.xpath.XPathNSResolver;
 
+import gnu.xml.libxmlj.dom.GnomeNodeIterator;
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -979,17 +980,17 @@ public class DomDocument
                                          NodeFilter filter,
                                          boolean expandEntities)
   {
-    return new DomIterator(root, whatToShow, filter, expandEntities);
+    return new GnomeNodeIterator(root, whatToShow, filter, expandEntities,
+                                 false);
   }
 
   public TreeWalker createTreeWalker(Node root,
                                      int whatToShow,
                                      NodeFilter filter,
-                                     boolean entityReferenceExpansion)
+                                     boolean expandEntities)
   {
-    // FIXME createTreeWalker
-    throw new DomEx(DomEx.NOT_SUPPORTED_ERR,
-                    "feature not yet implemented", this, 0);
+    return new GnomeNodeIterator(root, whatToShow, filter, expandEntities,
+                                 true);
   }
 
   // DOM Level 3 methods

@@ -395,10 +395,22 @@ class Stylesheet
             String aname = getRequiredAttribute(aattrs, "name", ctx);
             String ns = getAttribute(aattrs, "namespace");
             TemplateNode n = parseAttributeValueTemplate(aname, node);
-            last = new AttributeNode(null, last, n, ns);
+            Node children = ctx.getFirstChild();
+            last = new AttributeNode(parse(children), last, n, ns);
           }
       }
     attributeSets.put(name, last);
+  }
+
+  final TemplateNode parse(Node node)
+    throws TransformerConfigurationException
+  {
+    if (node == null)
+      {
+        return null;
+      }
+    Node next = node.getNextSibling();
+    return new LiteralNode(null, parse(next), node);
   }
   
   void parse(Node node, boolean root)

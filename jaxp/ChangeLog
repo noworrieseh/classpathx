@@ -1,3 +1,7 @@
+2004-10-06  Chris Burdess	<dog@gnu.org>
+
+	* Makefile.am: Fixes to permit gcj compilation.
+
 2004-10-27  Chris Burdess	<dog@gnu.org>
 
 	* parsers, transform, dom, sax, stream: API rewritten from

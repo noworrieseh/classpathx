@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.UnknownServiceException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -249,6 +250,11 @@ class TransformerImpl
                 catch (MalformedURLException e)
                   {
                     out = new FileOutputStream(systemId);
+                  }
+                catch (UnknownServiceException e)
+                  {
+                    URL url = new URL(systemId);
+                    out = new FileOutputStream(url.getPath());
                   }
               }
             StreamSerializer serializer =
