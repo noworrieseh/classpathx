@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomDocument.java,v 1.2 2001-08-29 23:45:41 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomDocument.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomDocument.java,v 1.2 2001-08-29 23:45:41 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -35,7 +35,7 @@ import org.w3c.dom.traversal.*;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-08-29 23:45:41 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -408,6 +408,9 @@ public class DomDocument extends DomNode
 	if (checkingCharacters) {
 	    verifyXmlName (target);
 	    verifyXmlCharacters (data);
+	    if ("xml".equalsIgnoreCase (target))
+		throw new DomEx (DomEx.SYNTAX_ERR,
+		    "illegal PI target name", this, 0);
 	}
 	return new DomPI (this, target, data);
     }
