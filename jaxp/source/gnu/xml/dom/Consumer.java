@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.9 2001-11-16 20:13:37 db Exp $
+ * $Id: Consumer.java,v 1.10 2001-11-19 03:27:09 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -43,7 +43,7 @@ import org.xml.sax.ext.Attributes2;
 import gnu.xml.pipeline.DomConsumer;
 import gnu.xml.pipeline.EventConsumer;
 
-import DomDoctype.ElementInfo;
+import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
 /**
@@ -66,7 +66,7 @@ import DomDoctype.ElementInfo;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-16 20:13:37 $
+ * @version $Date: 2001-11-19 03:27:09 $
  */
 public class Consumer extends DomConsumer
 {
@@ -247,6 +247,16 @@ public class Consumer extends DomConsumer
 		info.setAttrDefault (aname, value);
 	    if ("ID".equals (type))
 		info.setIdAttr (aname);
+	}
+
+	// force duplicate name checking off while we're
+	// using parser output (don't duplicate the work)
+	public void startDocument () throws SAXException
+	{
+	    DomDocument		doc;
+
+	    super.startDocument ();
+	    ((DomDocument) getDocument ()).setCheckingCharacters (false);
 	}
 
 	public void endDocument ()
