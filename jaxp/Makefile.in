@@ -1,5 +1,4 @@
-# JCD Makefile for GNU classpathx jaxp subproject
-# (c) Nic Ferrier - Tapsell-Ferrier Limited 2001
+# Makefile for GNU classpathx jaxp subproject
 #
 # You are free to redistribute this file. NO WARRANTY or fitness 
 # for purpose is implied by this notice.
@@ -35,14 +34,9 @@ GCJ = @GCJ@
 ## use emacs JCD mode
 
 #the source files belonging to the project
-#These can be altered by Emacs JCD mode.
 
-#the list of source files which make up this project
-#If the javadev emacs package is to work then the format of this
-#list must be kept broadly the same. Each file should be on it's own 
-#line and the file list should begin on the same line as the 
-#'SOURCEFILES = ' statement.
-SOURCEFILES =	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
+SOURCEFILES = \
+	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilder.java \
 	$(SOURCEDIR)/javax/xml/parsers/FactoryConfigurationError.java \
 	$(SOURCEDIR)/javax/xml/parsers/ParserConfigurationException.java \
@@ -147,6 +141,7 @@ SOURCEFILES =	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/TextConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/ValidationConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/WellFormednessFilter.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/XIncludeFilter.java \
 	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
 	$(SOURCEDIR)/gnu/xml/util/DoParse.java \
 	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
