@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.3 2001-10-18 00:48:36 db Exp $
+ * $Id: Consumer.java,v 1.4 2001-10-18 22:08:59 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2;
 
 import gnu.xml.pipeline.DomConsumer;
+import gnu.xml.pipeline.EventConsumer;
 
 
 /**
@@ -54,17 +55,31 @@ import gnu.xml.pipeline.DomConsumer;
  * using this API.
  *
  * @author David Brownell
- * @version $Date: 2001-10-18 00:48:36 $
+ * @version $Date: 2001-10-18 22:08:59 $
  */
 public class Consumer extends DomConsumer
 {
     /**
-     * Constructs an unconfigured event consumer.
+     * Constructs an unconfigured event consumer,
+     * as a terminus in a SAX event pipeline.
      */
+    // used by PipelineFactory [terminus]
     public Consumer ()
     throws SAXException
     {
 	super (DomDocument.class);
+	setHandler (new Backdoor (this));
+    }
+
+    /**
+     * Constructs an unconfigured event consumer,
+     * as a stage in a SAX event pipeline.
+     */
+    // used by PipelineFactory [filter]
+    public Consumer (EventConsumer next)
+    throws SAXException
+    {
+	super (DomDocument.class, next);
 	setHandler (new Backdoor (this));
     }
 
