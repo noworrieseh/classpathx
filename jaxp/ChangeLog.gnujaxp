@@ -1,5 +1,10 @@
 2004-11-29  Chris Burdess  <dog@gnu.org>
 
+	* ls: Corrections to attribute namespaces.
+	* transform: element-available and function-available functions.
+
+2004-11-29  Chris Burdess  <dog@gnu.org>
+
    	* transform,xpath: Clone entire stylesheet trees for reuse of
    	stylesheets in JAXP templates. 
    	

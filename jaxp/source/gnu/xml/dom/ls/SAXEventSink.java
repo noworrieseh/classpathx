@@ -187,7 +187,7 @@ class SAXEventSink
   {
     // create element node
     Element element = namespaceAware ?
-      doc.createElementNS(uri, localName) :
+      doc.createElementNS(uri, qName) :
       doc.createElement(qName);
     NamedNodeMap attrs = element.getAttributes();
     if (namespaceAware && !pending.isEmpty())
@@ -195,7 +195,8 @@ class SAXEventSink
         // add pending namespace nodes
         for (Iterator i = pending.iterator(); i.hasNext(); )
           {
-            attrs.setNamedItemNS((Node) i.next());
+            Node ns = (Node) i.next();
+            attrs.setNamedItemNS(ns);
           }
         pending.clear();
       }
@@ -227,8 +228,8 @@ class SAXEventSink
     if (namespaceAware)
       {
         String a_uri = atts.getURI(index);
-        String a_localName = atts.getLocalName(index);
-        attr = (DomAttr) doc.createAttributeNS(a_uri, a_localName);
+        String a_qName = atts.getQName(index);
+        attr = (DomAttr) doc.createAttributeNS(a_uri, a_qName);
       }
     else
       {

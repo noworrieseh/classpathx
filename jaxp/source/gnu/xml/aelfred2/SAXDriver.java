@@ -1072,7 +1072,7 @@ final public class SAXDriver
             // XXX fix this here for now
             int ci = attr.name.indexOf(':');
             attr.localName = (ci == -1) ? attr.name :
-              attr.name.substring(0, ci);
+              attr.name.substring(ci + 1);
           }
         return attr.localName;
     }

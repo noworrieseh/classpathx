@@ -123,14 +123,20 @@ final class LiteralNode
         if (nodeType == Node.ELEMENT_NODE)
           {
             String prefix = source.getPrefix();
+            if (prefix == null)
+              {
+                prefix = "#default";
+              }
             String resultPrefix =
               (String) stylesheet.namespaceAliases.get(prefix);
             if (resultPrefix != null)
               {
+                if ("#default".equals(resultPrefix))
+                  {
+                    resultPrefix = null;
+                  }
                 String uri = source.lookupNamespaceURI(resultPrefix);
-                String name = ("".equals(resultPrefix)) ?
-                  source.getLocalName() :
-                  resultPrefix + ":" + source.getLocalName();
+                String name = source.getNodeName();
                 // Create a new element node in the result document
                 result = doc.createElementNS(uri, name);
                 // copy attributes
@@ -139,9 +145,13 @@ final class LiteralNode
                 int l = srcAttrs.getLength();
                 for (int i = 0; i < l; i++)
                   {
-                    Node attr = srcAttrs.item(i).cloneNode(true);
-                    attr = doc.adoptNode(attr);
-                    dstAttrs.setNamedItemNS(attr);
+                    Node attr = srcAttrs.item(i);
+                    if (!Stylesheet.XSL_NS.equals(attr.getNamespaceURI()))
+                      {
+                        attr = attr.cloneNode(true);
+                        attr = doc.adoptNode(attr);
+                        dstAttrs.setNamedItemNS(attr);
+                      }
                   }
               }
           }
@@ -149,6 +159,22 @@ final class LiteralNode
           {
             // Create result node
             result = source.cloneNode(false);
+            // Remove any XSL attributes
+            NamedNodeMap attrs = result.getAttributes();
+            if (attrs != null)
+              {
+                int l = attrs.getLength();
+                for (int i = 0; i < l; i++)
+                  {
+                    Node attr = attrs.item(i);
+                    if (Stylesheet.XSL_NS.equals(attr.getNamespaceURI()))
+                      {
+                        attrs.removeNamedItem(attr.getNodeName());
+                        i--;
+                        l--;
+                      }
+                  }
+              }
             result = doc.adoptNode(result);
             if (result == null)
               {

@@ -39,10 +39,12 @@
 package gnu.xml.transform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
@@ -59,14 +61,14 @@ abstract class AbstractNumberNode
   static final int ALPHABETIC = 0;
   static final int TRADITIONAL = 1;
 
-  final String format;
+  final TemplateNode format;
   final String lang;
   final int letterValue;
   final String groupingSeparator;
   final int groupingSize;
 
   AbstractNumberNode(TemplateNode children, TemplateNode next,
-                     String format, String lang,
+                     TemplateNode format, String lang,
                      int letterValue, String groupingSeparator,
                      int groupingSize)
   {
@@ -85,7 +87,10 @@ abstract class AbstractNumberNode
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
-    String value = format(compute(stylesheet, context, pos, len));
+    DocumentFragment fragment = doc.createDocumentFragment();
+    format.apply(stylesheet, mode, context, pos, len, fragment, null);
+    String f = Expr._string(context, Collections.singleton(fragment));
+    String value = format(f, compute(stylesheet, context, pos, len));
     Text text = doc.createTextNode(value);
     if (nextSibling != null)
       {
@@ -104,7 +109,7 @@ abstract class AbstractNumberNode
       }
   }
 
-  String format(int[] number)
+  String format(String format, int[] number)
   {
     if (number.length == 0)
       {

@@ -381,20 +381,13 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI
+                .equals(ctx.getNamespaceURI()))
               {
                 String value = ctx.getNodeValue();
                 if (value.equals(namespaceURI))
                   {
-                    String qName = ctx.getNodeName();
-                    if (XMLConstants.XMLNS_ATTRIBUTE.equals(qName))
-                      {
-                        return null;
-                      }
-                    else
-                      {
-                        return qName.substring(6);
-                      }
+                    return ctx.getLocalName();
                   }
               }
           }
@@ -427,7 +420,7 @@ public class DomElement
   public String lookupNamespaceURI(String prefix)
   {
     String namespace = getNamespaceURI();
-    if (equal(prefix, getPrefix()) && namespace != null)
+    if (namespace != null && equal(prefix, getPrefix()))
       {
         return namespace;
       }
@@ -438,17 +431,16 @@ public class DomElement
             if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI
                 .equals(ctx.getNamespaceURI()))
               {
-                String qName = ctx.getNodeName();
-                if (XMLConstants.XMLNS_ATTRIBUTE.equals(qName))
+                if (prefix == null)
                   {
-                    if (prefix == null)
+                    if (XMLConstants.XMLNS_ATTRIBUTE.equals(ctx.getNodeName()))
                       {
                         return ctx.getNodeValue();
                       }
                   }
                 else
                   {
-                    if (equal(prefix, qName.substring(6)))
+                    if (prefix.equals(ctx.getLocalName()))
                       {
                         return ctx.getNodeValue();
                       }

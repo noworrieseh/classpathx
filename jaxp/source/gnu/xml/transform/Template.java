@@ -171,13 +171,8 @@ class Template
     return match.matches(node);
   }
 
-  boolean matches(QName mode, QName name)
+  boolean matches(QName name)
   {
-    if ((mode == null && this.mode != null) ||
-        (mode != null && !mode.equals(this.mode)))
-      {
-        return false;
-      }
     return name.equals(this.name);
   }
 

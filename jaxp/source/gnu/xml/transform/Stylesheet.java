@@ -316,6 +316,22 @@ class Stylesheet
             templates2.add(t.clone(clone));
           }
         clone.templates = templates2;
+
+        LinkedList attributeSets2 = new LinkedList();
+        for (Iterator i = attributeSets.iterator(); i.hasNext(); )
+          {
+            AttributeSet as = (AttributeSet) i.next();
+            attributeSets2.add(as.clone(clone));
+          }
+        clone.attributeSets = attributeSets2;
+
+        LinkedList keys2 = new LinkedList();
+        for (Iterator i = keys.iterator(); i.hasNext(); )
+          {
+            Key k = (Key) i.next();
+            keys2.add(k.clone(clone));
+          }
+        clone.keys = keys2;
         
         return clone;
       }
@@ -345,27 +361,6 @@ class Stylesheet
   
   // -- Template selection --
   
-  /*void applyTemplates(Expr select, QName mode,
-                      Node context, int pos, int len,
-                      Node parent, Node nextSibling)
-    throws TransformerException
-  {
-    Object ret = select.evaluate(context, pos, len);
-    if (ret != null && ret instanceof Collection)
-      {
-        Collection ns = (Collection) ret;
-        int l = ns.size();
-        int p = 1;
-        for (Iterator i = ns.iterator(); i.hasNext(); )
-          {
-            Node node = (Node) i.next();
-            applyTemplates(mode,
-                           node, p++, l,
-                           parent, nextSibling);
-          }
-      }
-  }*/
-
   TemplateNode getTemplate(QName mode, Node context)
     throws TransformerException
   {
@@ -409,8 +404,9 @@ class Stylesheet
       }
     else
       {
-        return ((Template) candidates.iterator().next()).node;
+        Template t = (Template) candidates.iterator().next();
         //System.err.println("\ttemplate="+t+" context="+context);
+        return t.node;
       }
   }
 
@@ -422,7 +418,7 @@ class Stylesheet
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
-        boolean isMatch = t.matches(mode, name);
+        boolean isMatch = t.matches(name);
         //System.err.println("\t"+name+" "+t+"="+isMatch);
         if (isMatch)
           {
@@ -434,7 +430,9 @@ class Stylesheet
         return null;
         //throw new TransformerException("template '" + name + "' not found");
       }
-    return ((Template) candidates.iterator().next()).node;
+    Template t = (Template) candidates.iterator().next();
+    //System.err.println("\ttemplate="+t+" context="+context);
+    return t.node;
   }
 
   /**
@@ -1035,6 +1033,14 @@ class Stylesheet
           {
             return new SystemPropertyFunction();
           }
+        else if ("element-available".equals(localName) && (arity == 1))
+          {
+            return new ElementAvailableFunction(this);
+          }
+        else if ("function-available".equals(localName) && (arity == 1))
+          {
+            return new FunctionAvailableFunction(this);
+          }
       }
     return null;
   }
@@ -1203,11 +1209,12 @@ class Stylesheet
   {
     NamedNodeMap attrs = node.getAttributes();
     String v = getAttribute(attrs, "value");
-    String format = getAttribute(attrs, "format");
-    if (format == null)
+    String ff = getAttribute(attrs, "format");
+    if (ff == null)
       {
-        format = "1";
+        ff = "1";
       }
+    TemplateNode format = parseAttributeValueTemplate(ff, node);
     String lang = getAttribute(attrs, "lang");
     String lv = getAttribute(attrs, "letter-value");
     int letterValue = "traditional".equals(lv) ?
@@ -1408,6 +1415,7 @@ class Stylesheet
               }
             else
               {
+                // xsl:fallback
                 // Pass over any other XSLT nodes
                 return parse(next);
               }

@@ -56,7 +56,7 @@ final class NumberNode
   final Expr value;
 
   NumberNode(TemplateNode children, TemplateNode next,
-             Expr value, String format, String lang,
+             Expr value, TemplateNode format, String lang,
              int letterValue, String groupingSeparator, int groupingSize)
   {
     super(children, next, format, lang, letterValue, groupingSeparator,

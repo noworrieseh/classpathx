@@ -38,8 +38,7 @@
 
 package gnu.xml.transform;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
@@ -91,13 +90,7 @@ final class WithParam
         content.apply(stylesheet, mode,
                       context, pos, len,
                       fragment, null);
-        Collection acc = new LinkedList();
-        Node ctx = fragment.getFirstChild();
-        for (; ctx != null; ctx = ctx.getNextSibling())
-          {
-            acc.add(ctx);
-          }
-        return acc;
+        return Collections.singleton(fragment);
       }
   }
 

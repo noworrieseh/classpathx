@@ -538,7 +538,7 @@ public abstract class DomNode
               {
                 DomNode ctxNext = ctx.next;
                 appendChild(ctx);
-                next = ctxNext;
+                ctx = ctxNext;
               }
           }
         else

@@ -555,9 +555,11 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/CopyOfNode.java \
 	source/gnu/xml/transform/DOMSourceLocator.java \
 	source/gnu/xml/transform/DocumentFunction.java \
+	source/gnu/xml/transform/ElementAvailableFunction.java \
 	source/gnu/xml/transform/ElementNode.java \
-	source/gnu/xml/transform/ForEachNode.java \
 	source/gnu/xml/transform/ErrorListenerErrorHandler.java \
+	source/gnu/xml/transform/ForEachNode.java \
+	source/gnu/xml/transform/FunctionAvailableFunction.java \
 	source/gnu/xml/transform/IfNode.java \
 	source/gnu/xml/transform/KeyFunction.java \
 	source/gnu/xml/transform/LiteralNode.java \

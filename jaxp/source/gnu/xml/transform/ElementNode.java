@@ -147,22 +147,39 @@ final class ElementNode
       }
     else
       {
+        // Namespace aliasing
+        if (prefix == null)
+          {
+            prefix = "#default";
+          }
+        String resultPrefix =
+          (String) stylesheet.namespaceAliases.get(prefix);
+        if (resultPrefix != null)
+          {
+            if ("#default".equals(resultPrefix))
+              {
+                resultPrefix = null;
+              }
+            namespaceValue = source.lookupNamespaceURI(resultPrefix);
+          }
+        if (prefix == "#default")
+          {
+            prefix = null;
+          }
+        // Look up ordinary namespace for this prefix
         if (namespaceValue == null)
           {
-            if (prefix != null)
+            if (XMLConstants.XML_NS_PREFIX.equals(prefix))
               {
-                if (XMLConstants.XML_NS_PREFIX.equals(prefix))
-                  {
-                    namespaceValue = XMLConstants.XML_NS_URI;
-                  }
-                else
-                  {
-                    // Resolve namespace for this prefix
-                    namespaceValue = source.lookupNamespaceURI(prefix);
-                  }
+                namespaceValue = XMLConstants.XML_NS_URI;
+              }
+            else
+              {
+                // Resolve namespace for this prefix
+                namespaceValue = source.lookupNamespaceURI(prefix);
               }
           }
-        if (prefix == null)
+        /*if (prefix == null)
           {
             // Resolve prefix for this namespace
             prefix = parent.lookupPrefix(namespaceValue);
@@ -170,12 +187,12 @@ final class ElementNode
               {
                 nameValue = prefix + ":" + nameValue;
               }
-          }
+          }*/
       }
     // Create element
     Element element = (namespaceValue != null) ?
       doc.createElementNS(namespaceValue, nameValue) :
-      doc.createElement(nameValue);
+          doc.createElement(nameValue);
     if (nextSibling != null)
       {
         parent.insertBefore(element, nextSibling);

@@ -129,12 +129,11 @@ final class ApplyTemplatesNode
             Collections.sort(nodes, documentOrderComparator);
           }
         int l = nodes.size();
+        QName effectiveMode = isDefault ? mode : this.mode;
         for (int i = 0; i < l; i++)
           {
             Node node = (Node) nodes.get(i);
-            TemplateNode t =
-              stylesheet.getTemplate(isDefault ? mode : this.mode,
-                                     node);
+            TemplateNode t = stylesheet.getTemplate(effectiveMode, node);
             if (t != null)
               {
                 if (stylesheet.debug)
@@ -142,7 +141,7 @@ final class ApplyTemplatesNode
                     System.err.println("Applying " + t);
                   }
                 stylesheet.current = node;
-                t.apply(stylesheet, mode, node, i + 1, l,
+                t.apply(stylesheet, effectiveMode, node, i + 1, l,
                         parent, nextSibling);
               }
           }

@@ -278,9 +278,11 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/transform/CopyOfNode.lo \
 	source/gnu/xml/transform/DOMSourceLocator.lo \
 	source/gnu/xml/transform/DocumentFunction.lo \
+	source/gnu/xml/transform/ElementAvailableFunction.lo \
 	source/gnu/xml/transform/ElementNode.lo \
-	source/gnu/xml/transform/ForEachNode.lo \
 	source/gnu/xml/transform/ErrorListenerErrorHandler.lo \
+	source/gnu/xml/transform/ForEachNode.lo \
+	source/gnu/xml/transform/FunctionAvailableFunction.lo \
 	source/gnu/xml/transform/IfNode.lo \
 	source/gnu/xml/transform/KeyFunction.lo \
 	source/gnu/xml/transform/LiteralNode.lo \
@@ -1235,9 +1237,11 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/CopyOfNode.java \
 	source/gnu/xml/transform/DOMSourceLocator.java \
 	source/gnu/xml/transform/DocumentFunction.java \
+	source/gnu/xml/transform/ElementAvailableFunction.java \
 	source/gnu/xml/transform/ElementNode.java \
-	source/gnu/xml/transform/ForEachNode.java \
 	source/gnu/xml/transform/ErrorListenerErrorHandler.java \
+	source/gnu/xml/transform/ForEachNode.java \
+	source/gnu/xml/transform/FunctionAvailableFunction.java \
 	source/gnu/xml/transform/IfNode.java \
 	source/gnu/xml/transform/KeyFunction.java \
 	source/gnu/xml/transform/LiteralNode.java \
@@ -1951,13 +1955,19 @@ source/gnu/xml/transform/DOMSourceLocator.lo:  \
 source/gnu/xml/transform/DocumentFunction.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/transform/ElementAvailableFunction.lo:  \
+	source/gnu/xml/transform/$(am__dirstamp) \
+	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/ElementNode.lo:  \
+	source/gnu/xml/transform/$(am__dirstamp) \
+	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/transform/ErrorListenerErrorHandler.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/ForEachNode.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
-source/gnu/xml/transform/ErrorListenerErrorHandler.lo:  \
+source/gnu/xml/transform/FunctionAvailableFunction.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/IfNode.lo:  \
@@ -3166,6 +3176,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/transform/DOMSourceLocator.lo
 	-rm -f source/gnu/xml/transform/DocumentFunction.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/DocumentFunction.lo
+	-rm -f source/gnu/xml/transform/ElementAvailableFunction.$(OBJEXT)
+	-rm -f source/gnu/xml/transform/ElementAvailableFunction.lo
 	-rm -f source/gnu/xml/transform/ElementNode.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/ElementNode.lo
 	-rm -f source/gnu/xml/transform/ErrorListenerErrorHandler.$(OBJEXT)
@@ -3174,6 +3186,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/transform/ForEachNode.lo
 	-rm -f source/gnu/xml/transform/FormatNumberFunction.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/FormatNumberFunction.lo
+	-rm -f source/gnu/xml/transform/FunctionAvailableFunction.$(OBJEXT)
+	-rm -f source/gnu/xml/transform/FunctionAvailableFunction.lo
 	-rm -f source/gnu/xml/transform/GenerateIdFunction.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/GenerateIdFunction.lo
 	-rm -f source/gnu/xml/transform/IfNode.$(OBJEXT)
@@ -3980,10 +3994,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/CurrentFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/DOMSourceLocator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/DocumentFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ElementAvailableFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ElementNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ForEachNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/FormatNumberFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/FunctionAvailableFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/GenerateIdFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/IfNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/Key.Plo@am__quote@
@@ -5687,12 +5703,26 @@ source/gnu/xml/transform/DocumentFunction.lo: source/gnu/xml/transform/DocumentF
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/DocumentFunction.lo `test -f 'source/gnu/xml/transform/DocumentFunction.java' || echo '$(srcdir)/'`source/gnu/xml/transform/DocumentFunction.java
 
+source/gnu/xml/transform/ElementAvailableFunction.lo: source/gnu/xml/transform/ElementAvailableFunction.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ElementAvailableFunction.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ElementAvailableFunction.Tpo" -c -o source/gnu/xml/transform/ElementAvailableFunction.lo `test -f 'source/gnu/xml/transform/ElementAvailableFunction.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ElementAvailableFunction.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/ElementAvailableFunction.Tpo" "source/gnu/xml/transform/$(DEPDIR)/ElementAvailableFunction.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/ElementAvailableFunction.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/ElementAvailableFunction.java' object='source/gnu/xml/transform/ElementAvailableFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ElementAvailableFunction.lo `test -f 'source/gnu/xml/transform/ElementAvailableFunction.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ElementAvailableFunction.java
+
 source/gnu/xml/transform/ElementNode.lo: source/gnu/xml/transform/ElementNode.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ElementNode.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ElementNode.Tpo" -c -o source/gnu/xml/transform/ElementNode.lo `test -f 'source/gnu/xml/transform/ElementNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ElementNode.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/ElementNode.Tpo" "source/gnu/xml/transform/$(DEPDIR)/ElementNode.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/ElementNode.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/ElementNode.java' object='source/gnu/xml/transform/ElementNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ElementNode.lo `test -f 'source/gnu/xml/transform/ElementNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ElementNode.java
+
+source/gnu/xml/transform/ErrorListenerErrorHandler.lo: source/gnu/xml/transform/ErrorListenerErrorHandler.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ErrorListenerErrorHandler.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo" -c -o source/gnu/xml/transform/ErrorListenerErrorHandler.lo `test -f 'source/gnu/xml/transform/ErrorListenerErrorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ErrorListenerErrorHandler.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo" "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/ErrorListenerErrorHandler.java' object='source/gnu/xml/transform/ErrorListenerErrorHandler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ErrorListenerErrorHandler.lo `test -f 'source/gnu/xml/transform/ErrorListenerErrorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ErrorListenerErrorHandler.java
 
 source/gnu/xml/transform/ForEachNode.lo: source/gnu/xml/transform/ForEachNode.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ForEachNode.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ForEachNode.Tpo" -c -o source/gnu/xml/transform/ForEachNode.lo `test -f 'source/gnu/xml/transform/ForEachNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ForEachNode.java; \
@@ -5701,12 +5731,12 @@ source/gnu/xml/transform/ForEachNode.lo: source/gnu/xml/transform/ForEachNode.ja
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ForEachNode.lo `test -f 'source/gnu/xml/transform/ForEachNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ForEachNode.java
 
-source/gnu/xml/transform/ErrorListenerErrorHandler.lo: source/gnu/xml/transform/ErrorListenerErrorHandler.java
-@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ErrorListenerErrorHandler.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo" -c -o source/gnu/xml/transform/ErrorListenerErrorHandler.lo `test -f 'source/gnu/xml/transform/ErrorListenerErrorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ErrorListenerErrorHandler.java; \
-@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo" "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/ErrorListenerErrorHandler.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/ErrorListenerErrorHandler.java' object='source/gnu/xml/transform/ErrorListenerErrorHandler.lo' libtool=yes @AMDEPBACKSLASH@
+source/gnu/xml/transform/FunctionAvailableFunction.lo: source/gnu/xml/transform/FunctionAvailableFunction.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/FunctionAvailableFunction.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/FunctionAvailableFunction.Tpo" -c -o source/gnu/xml/transform/FunctionAvailableFunction.lo `test -f 'source/gnu/xml/transform/FunctionAvailableFunction.java' || echo '$(srcdir)/'`source/gnu/xml/transform/FunctionAvailableFunction.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/FunctionAvailableFunction.Tpo" "source/gnu/xml/transform/$(DEPDIR)/FunctionAvailableFunction.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/FunctionAvailableFunction.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/FunctionAvailableFunction.java' object='source/gnu/xml/transform/FunctionAvailableFunction.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ErrorListenerErrorHandler.lo `test -f 'source/gnu/xml/transform/ErrorListenerErrorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ErrorListenerErrorHandler.java
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/FunctionAvailableFunction.lo `test -f 'source/gnu/xml/transform/FunctionAvailableFunction.java' || echo '$(srcdir)/'`source/gnu/xml/transform/FunctionAvailableFunction.java
 
 source/gnu/xml/transform/IfNode.lo: source/gnu/xml/transform/IfNode.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/IfNode.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/IfNode.Tpo" -c -o source/gnu/xml/transform/IfNode.lo `test -f 'source/gnu/xml/transform/IfNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/IfNode.java; \

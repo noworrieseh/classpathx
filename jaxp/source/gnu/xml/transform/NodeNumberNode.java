@@ -74,7 +74,7 @@ final class NodeNumberNode
 
   NodeNumberNode(TemplateNode children, TemplateNode next,
                  int level, Pattern count, Pattern from,
-                 String format, String lang,
+                 TemplateNode format, String lang,
                  int letterValue, String groupingSeparator, int groupingSize)
   {
     super(children, next, format, lang, letterValue, groupingSeparator,
