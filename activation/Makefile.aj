@@ -21,8 +21,13 @@ all: activation.jar
 # Ensure everything generated is cleaned.
 # We could probably do with automake for this.
 clean:
-	rm activation.jar ; rm -r $(PROJECTROOT)/classes
+	-rm -rf activation.jar $(PROJECTROOT)/classes filelist
 
+distclean: clean
+	-rm -rf Makefile Makefile.in config.*
+
+mrproper: distclean
+	-rm -rf configure  
 
 
 # This is an automakejar target.
