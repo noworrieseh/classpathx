@@ -1,9 +1,9 @@
 package test.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRSAKeyGeneration.java,v 1.3 2002-07-06 07:43:49 olf Exp $
+// $Id: TestOfRSAKeyGeneration.java,v 1.4 2002-07-27 00:20:11 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -53,7 +53,7 @@ import java.util.Random;
 /**
  * Conformance tests for the RSA key-pair generation implementation.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TestOfRSAKeyGeneration extends TestCase {
 
@@ -147,8 +147,8 @@ public class TestOfRSAKeyGeneration extends TestCase {
       // satisfying
       //    e . dP = 1 (mod p?1);
       //    e . dQ = 1 (mod q?1),
-      assertTrue("e.dP == 1 (mod p?1)", e.multiply(dP).mod(p_minus_1).equals(ONE));
-      assertTrue("e.dQ == 1 (mod q?1)", e.multiply(dQ).mod(q_minus_1).equals(ONE));
+      assertTrue("e.dP == 1 (mod p-1)", e.multiply(dP).mod(p_minus_1).equals(ONE));
+      assertTrue("e.dQ == 1 (mod q-1)", e.multiply(dQ).mod(q_minus_1).equals(ONE));
 
       // and the CRT coefficient qInv is a positive integer less than p
       // satisfying
