@@ -449,9 +449,9 @@ $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeTypeInfo.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
-$(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTemplates.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformer.java \
@@ -483,9 +483,9 @@ gnu_xml_libxmlj_dom_GnomeNotation.h \
 gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
 gnu_xml_libxmlj_dom_GnomeTypeInfo.h \
 gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
+gnu_xml_libxmlj_dom_GnomeXPathNodeList.h \
 gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
 gnu_xml_libxmlj_dom_GnomeXPathResult.h \
-gnu_xml_libxmlj_dom_MatchingNodeList.h \
 javax_xml_transform_OutputKeys.h \
 gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
 gnu_xml_libxmlj_transform_JavaContext.h \

@@ -1,5 +1,6 @@
 #include "gnu_xml_libxmlj_dom_GnomeDocument.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathExpression.h"
+#include "gnu_xml_libxmlj_dom_GnomeXPathNodeList.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathResult.h"
 #include "xmlj_node.h"
@@ -17,10 +18,10 @@ xmljCreateXPathContextPtr (JNIEnv *env, xmlNodePtr node)
 }
 
 /**
- * Converts an xmlXPathObjectPtr to a Java object.
+ * Converts an xmlXPathObjectPtr to a Java XPathResult.
  */
 jobject
-xmljGetXPathObject (JNIEnv *env, xmlXPathObjectPtr obj)
+xmljGetXPathResult (JNIEnv *env, xmlXPathObjectPtr obj)
 {
   jclass cls;
   jmethodID method;
@@ -28,6 +29,33 @@ xmljGetXPathObject (JNIEnv *env, xmlXPathObjectPtr obj)
   jobject val;
   
   cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeXPathResult");
+  if (cls == NULL)
+    {
+      return NULL;
+    }
+  method = (*env)->GetMethodID (env, cls, "<init>", "(Ljava/lang/Object;)V");
+  if (method == NULL)
+    {
+      return NULL;
+    }
+  val = xmljAsField (env, obj);
+  ret = (*env)->NewObject (env, cls, method, val);
+  
+  return ret;
+}
+
+/**
+ * Converts an xmlXPathObjectPtr to a Java XPathNodeList.
+ */
+jobject
+xmljGetXPathNodeList (JNIEnv *env, xmlXPathObjectPtr obj)
+{
+  jclass cls;
+  jmethodID method;
+  jobject ret;
+  jobject val;
+  
+  cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeXPathNodeList");
   if (cls == NULL)
     {
       return NULL;
@@ -92,7 +120,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_evaluate (JNIEnv *env,
   if (ctx != NULL)
     {
       eval = xmlXPathEval (str, ctx);
-      ret = (eval == NULL) ? NULL : xmljGetXPathObject (env, eval);
+      ret = (eval == NULL) ? NULL : xmljGetXPathResult (env, eval);
       xmlXPathFreeContext (ctx);
     }
   return ret;
@@ -144,7 +172,7 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_evaluate (JNIEnv *env,
   if (ctx != NULL)
     {
       eval = xmlXPathCompiledEval (expr, ctx);
-      ret = (eval == NULL) ? NULL : xmljGetXPathObject (env, eval);
+      ret = (eval == NULL) ? NULL : xmljGetXPathResult (env, eval);
       xmlXPathFreeContext (ctx);
     }
   return ret;
@@ -293,6 +321,127 @@ JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeXPathResult_snapshotItem (JNIEnv *env,
                                                         jobject self,
                                                         jint index)
+{
+  xmlXPathObjectPtr obj;
+  
+  obj = xmljGetXPathObjectID (env, self);
+  if (obj == NULL)
+    {
+      return NULL;
+    }
+  if (obj->nodesetval == NULL)
+    {
+      return NULL;
+    }
+  if (obj->nodesetval->nodeNr > 0)
+    {
+      return xmljGetNodeInstance (env, obj->nodesetval->nodeTab[index]);
+    }
+  else
+    {
+      return NULL;
+    }
+}
+
+/* -- GnomeXPathNodeList -- */
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagName (JNIEnv *env,
+                                                             jobject self,
+                                                             jstring name)
+{
+  const xmlChar *s_name;
+  xmlChar *expr;
+  xmlNodePtr node;
+  xmlXPathContextPtr ctx;
+  xmlXPathObjectPtr eval;
+  jobject ret = NULL;
+  
+  s_name = xmljGetStringChars (env, name);
+  expr = xmlCharStrdup ("descendant-or-self::node()/");
+  expr = xmlStrcat (expr, s_name);
+  node = xmljGetNodeID (env, self);
+  if (node == NULL)
+    {
+      return NULL;
+    }
+  ctx = xmljCreateXPathContextPtr (env, node);
+  if (ctx != NULL)
+    {
+      eval = xmlXPathEval (expr, ctx);
+      ret = (eval == NULL) ? NULL : xmljGetXPathNodeList (env, eval);
+      xmlXPathFreeContext (ctx);
+    }
+  return ret;
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagNameNS (JNIEnv *env,
+                                                               jobject self,
+                                                               jstring uri,
+                                                               jstring localName)
+{
+  const xmlChar *s_uri;
+  const xmlChar *s_localName;
+  const xmlChar *format;
+  xmlChar expr[256];
+  xmlNodePtr node;
+  xmlXPathContextPtr ctx;
+  xmlXPathObjectPtr eval;
+  jobject ret = NULL;
+  
+  s_uri = xmljGetStringChars (env, uri);
+  s_localName = xmljGetStringChars (env, localName);
+  format = xmlCharStrdup ("descendant-or-self::*[namespace-uri()='%s' and local-name()='%s']");
+  if (xmlStrPrintf (expr, 256, format, s_uri, s_localName) == -1)
+    {
+      return NULL;
+    }
+  node = xmljGetNodeID (env, self);
+  if (node == NULL)
+    {
+      return NULL;
+    }
+  ctx = xmljCreateXPathContextPtr (env, node);
+  if (ctx != NULL)
+    {
+      eval = xmlXPathEval (expr, ctx);
+      ret = (eval == NULL) ? NULL : xmljGetXPathNodeList (env, eval);
+      xmlXPathFreeContext (ctx);
+    }
+  return ret;
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeXPathNodeList_free (JNIEnv *env,
+                                                  jobject self,
+                                                  jobject obj)
+{
+  xmlXPathFreeObject ((xmlXPathObjectPtr) xmljAsPointer (env, obj));
+}
+
+JNIEXPORT jint JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeXPathNodeList_getLength (JNIEnv *env,
+                                                       jobject self)
+{
+  xmlXPathObjectPtr obj;
+  
+  obj = xmljGetXPathObjectID (env, self);
+  if (obj == NULL)
+    {
+      return 0;
+    }
+  if (obj->nodesetval == NULL)
+    {
+      return 0;
+    }
+  return obj->nodesetval->nodeNr;
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeXPathNodeList_item (JNIEnv *env,
+                                                  jobject self,
+                                                  jint index)
 {
   xmlXPathObjectPtr obj;
   

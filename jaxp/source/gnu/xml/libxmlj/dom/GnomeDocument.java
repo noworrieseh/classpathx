@@ -113,10 +113,7 @@ implements Document, XPathEvaluator
   public native EntityReference createEntityReference(String name)
     throws DOMException;
 
-  public NodeList getElementsByTagName(String tagName)
-  {
-    return new MatchingNodeList(id, null, tagName, false);
-  }
+  public native NodeList getElementsByTagName(String tagName);
 
   public native Node importNode(Node importedNode, boolean deep)
     throws DOMException;
@@ -129,11 +126,8 @@ implements Document, XPathEvaluator
                                        qualifiedName)
     throws DOMException;
 
-  public NodeList getElementsByTagNameNS(String namespaceURI,
-      String localName)
-  {
-    return new MatchingNodeList(id, namespaceURI, localName, true);
-  }
+  public native NodeList getElementsByTagNameNS(String namespaceURI,
+      String localName);
 
   public native Element getElementById(String elementId);
 

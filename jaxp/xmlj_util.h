@@ -28,6 +28,10 @@
 #ifndef XMLJ_UTIL_H
 #define XMLJ_UTIL_H
 
+#if defined __64BIT__ || defined __LP64 || defined _LP64 || defined __LP64__ || defined _ADDR64
+#  define XMLJ_64BIT_POINTER 1
+#endif 
+
 #include <jni.h>
 #include <libxml/xmlstring.h>
 
