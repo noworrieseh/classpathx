@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.6 2001-11-04 00:51:52 db Exp $
+ * $Id: DomNode.java,v 1.7 2001-11-04 03:43:20 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.6 2001-11-04 00:51:52 db Exp $
+// $Id: DomNode.java,v 1.7 2001-11-04 03:43:20 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 00:51:52 $
+ * @version $Date: 2001-11-04 03:43:20 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -1372,8 +1372,8 @@ public abstract class DomNode
 		// Late in the DOM CR process (3rd or 4th CR?) the
 		// removeEventListener spec became asymmetric with respect
 		// to addEventListener ... effect is now immediate.
-		for (int j = 0; j < nListeners; j++) {
-		    if (listeners [i].equals (notificationSet [i])) {
+		for (int j = 0; j < current.nListeners; j++) {
+		    if (current.listeners [j].equals (notificationSet [i])) {
 			notificationSet [i].listener.handleEvent (e);
 			break;
 		    }
