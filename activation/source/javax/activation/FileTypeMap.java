@@ -32,7 +32,7 @@ import java.io.File;
  * activation framework uses the MimeTypeFileTypeMap.
  *
  * @author Andrew Selkirk
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public abstract class FileTypeMap 
 {
@@ -80,10 +80,10 @@ public abstract class FileTypeMap
   /**
    * Get the system default file type mapping algorithm.  Unless
    * otherwise modified, this will be an instance of the
-   * MimeTypesFileTypeMap engine.
+   * MimetypesFileTypeMap engine.
    * @return System default file type map
-   * @see javax.activation.MimeTypesFileTypeMap
-   * @see setDefaultFileTypeMap(javax.activation.FileTypeMap)
+   * @see javax.activation.MimetypesFileTypeMap
+   * @see #setDefaultFileTypeMap(javax.activation.FileTypeMap)
    */
   public static FileTypeMap getDefaultFileTypeMap()
   {
@@ -95,7 +95,7 @@ public abstract class FileTypeMap
    * @param fileTypeMap File type map to set as the system default
    * @throws SecurityException Unsufficient permission to change
    * the system default
-   * @see getDefaultFileTypeMap()
+   * @see #getDefaultFileTypeMap()
    */
   public static void setDefaultFileTypeMap(FileTypeMap fileTypeMap)
   {
