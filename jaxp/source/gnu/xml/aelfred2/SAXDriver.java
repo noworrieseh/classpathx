@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.5 2001-07-05 02:00:42 db Exp $
+ * $Id: SAXDriver.java,v 1.6 2001-07-07 18:15:57 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -39,10 +39,13 @@ package gnu.xml.aelfred2;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Stack;
+
+// maintaining 1.1 compatibility for now ...
+// Iterator, Hashmap and ArrayList ought to be faster
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.xml.sax.*;
@@ -52,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.5 2001-07-05 02:00:42 db Exp $
+// $Id: SAXDriver.java,v 1.6 2001-07-07 18:15:57 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -109,7 +112,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-05 02:00:42 $
+ * @version $Date: 2001-07-07 18:15:57 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -454,11 +457,11 @@ final public class SAXDriver
     public void setProperty (String propertyId, Object property)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
-	Object	value;
-	
 	try {
+	    // see if the property is recognized
+	    getProperty (propertyId);
+
 	    // Properties with a defined value, we just change it if we can.
-	    value = getProperty (propertyId);
 
 	    if ((PROPERTY + "declaration-handler").equals (propertyId)) {
 		if (property == null)
@@ -496,14 +499,10 @@ final public class SAXDriver
 
 
     //
-    // This is where the driver receives AElfred callbacks and translates
+    // This is where the driver receives XmlParser callbacks and translates
     // them into SAX callbacks.  Some more callbacks have been added for
     // SAX2 support.
     //
-
-    // NOTE:  in some cases, local copies of handlers are
-    // created and used, to work around codegen bugs in at
-    // least one snapshot version of GCJ.
 
     void startDocument ()
     throws SAXException
@@ -512,13 +511,6 @@ final public class SAXDriver
 	contentHandler.startDocument ();
 	attributeNames.removeAllElements ();
 	attributeValues.removeAllElements ();
-    }
-
-    void endDocument ()
-    throws SAXException
-    {
-	// SAX says endDocument _must_ be called (handy to close
-	// files etc) so it's in a "finally" clause
     }
 
     Object resolveEntity (String publicId, String systemId)
@@ -561,7 +553,7 @@ final public class SAXDriver
 	entityStack.push (systemId);
     }
 
-    void endExternalEntity (String name, String systemId)
+    void endExternalEntity (String name)
     throws SAXException
     {
 	entityStack.pop ();
@@ -606,6 +598,8 @@ final public class SAXDriver
 	lexicalHandler.endDTD ();
     }
 
+
+// FIXME  SAX2 has no way to say which attributes are specified
 
     void attribute (String aname, String value, boolean isSpecified)
     throws SAXException

@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.6 2001-07-05 02:02:51 db Exp $
+ * $Id: XmlParser.java,v 1.7 2001-07-07 18:15:57 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+
+// maintaining 1.1 compatibility for now ...
+// Iterator and Hashmap ought to be faster
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Stack;
@@ -52,7 +55,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.6 2001-07-05 02:02:51 db Exp $
+// $Id: XmlParser.java,v 1.7 2001-07-07 18:15:57 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -62,7 +65,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-05 02:02:51 $
+ * @version $Date: 2001-07-07 18:15:57 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -155,7 +158,6 @@ final class XmlParser
 
 	try {
 	    parseDocument ();
-	    handler.endDocument ();
 	} finally {
 	    if (baseReader != null)
 		try { baseReader.close ();
@@ -1143,17 +1145,8 @@ loop:
 	char c;
 
 	while (true) {
-	    switch (currentElementContent) {
-	        case CONTENT_ANY:
-	        case CONTENT_MIXED:
-	        case CONTENT_UNDECLARED:    // MHK 24 May 2000
-	        case CONTENT_EMPTY:         // MHK 8 Sept 2000
-		        parseCharData ();
-		        break;
-	        case CONTENT_ELEMENTS:
-		        parseWhitespace ();
-		        break;
-	    }
+	    // consume characters (or ignorable whitspace) until delimiter
+	    parseCharData ();
 
 	    // Handle delimiters
 	    c = readCh ();
@@ -2035,21 +2028,6 @@ loop:
 
 
     /**
-     * Parse whitespace characters, and leave them in the data buffer.
-     */
-    private void parseWhitespace ()
-    throws Exception
-    {
-	char c = readCh ();
-	while (isWhitespace (c)) {
-	    dataBufferAppend (c);
-	    c = readCh ();
-	}
-	unread (c);
-    }
-
-
-    /**
      * Skip whitespace characters.
      * <pre>
      * [3] S ::= (#x20 | #x9 | #xd | #xa)+
@@ -2294,6 +2272,10 @@ loop:
 			    break;
 			}
 			parseCharRef ();
+
+			// exotic WFness risk: this is an entity literal,
+			// dataBuffer [dataBufferPos - 1] == '&', and
+			// following chars are a _partial_ entity/char ref
 
 		    // It looks like an entity ref ...
 		    } else {
@@ -3514,6 +3496,8 @@ loop:
 	// where it may be null:  parser was invoked without providing
 	// one, e.g. since the XML data came from a memory buffer.
 
+// FIXME use the real URI reported by the last resolver call
+
 	if (systemId != null && externalEntity != null) {
 	    systemId = new URL (externalEntity.getURL (), systemId).toString ();
 	} else if (baseURI != null) {
@@ -3977,21 +3961,15 @@ loop:
     private void popInput ()
     throws SAXException, IOException
     {
-	String uri;
 	String ename = (String) entityStack.pop ();
-
-	if (externalEntity != null)
-	    uri = externalEntity.getURL ().toString ();
-	else
-	    uri = baseURI;
 
 	switch (sourceType) {
 	case INPUT_STREAM:
-	    handler.endExternalEntity (ename, uri);
+	    handler.endExternalEntity (ename);
 	    is.close ();
 	    break;
 	case INPUT_READER:
-	    handler.endExternalEntity (ename, uri);
+	    handler.endExternalEntity (ename);
 	    reader.close ();
 	    break;
 	case INPUT_INTERNAL:
@@ -4751,12 +4729,8 @@ loop:
     //
     private String	basePublicId;
     private String	baseURI;
-    private int		baseEncoding;
     private Reader	baseReader;
     private InputStream	baseInputStream;
-    private char	baseInputBuffer [];
-    private int		baseInputBufferStart;
-    private int		baseInputBufferLength;
 
     //
     // Stack of entity names, to detect recursion.
