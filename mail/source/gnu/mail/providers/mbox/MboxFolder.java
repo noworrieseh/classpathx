@@ -427,7 +427,11 @@ public class MboxFolder
       {
         Flags flags = messages[i].getFlags();
         if (flags.contains(Flags.Flag.DELETED))
+        {
           ve.addElement(messages[i]);
+          if (messages[i] instanceof MboxMessage)
+            ((MboxMessage)messages[i]).setExpunged(true);
+        }
         else
           vm.addElement(messages[i]);
       }

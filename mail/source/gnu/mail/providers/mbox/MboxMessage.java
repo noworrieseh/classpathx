@@ -80,6 +80,14 @@ public class MboxMessage
     this.msgnum = msgnum;
     readStatusHeader();
   }
+
+  /**
+   * Allow MboxFolder access to set the expunged flag after expunge.
+   */
+  protected void setExpunged(boolean expunged)
+  {
+    super.setExpunged(expunged);
+  }
 	
   /**
    * Mbox messages are read-only.
