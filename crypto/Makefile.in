@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.in,v 1.5 2002-06-22 10:09:10 raif Exp $
+## $Id: Makefile.in,v 1.6 2002-07-27 02:14:03 raif Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -64,6 +64,8 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/cipher/Square.java \
 	$(SOURCEDIR)/gnu/crypto/cipher/Twofish.java \
 	\
+	$(SOURCEDIR)/gnu/crypto/exp/ust/UST.java \
+	\
 	$(SOURCEDIR)/gnu/crypto/hash/BaseHash.java \
 	$(SOURCEDIR)/gnu/crypto/hash/HashFactory.java \
 	$(SOURCEDIR)/gnu/crypto/hash/IMessageDigest.java \
@@ -73,11 +75,35 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/hash/Sha160.java \
 	$(SOURCEDIR)/gnu/crypto/hash/Whirlpool.java \
 	\
+	$(SOURCEDIR)/gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/DSSRawSignatureSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/GnuCrypto.java \
+	$(SOURCEDIR)/gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+	$(SOURCEDIR)/gnu/crypto/jce/MD4RandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/MD4Spi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/MD5RandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/MD5Spi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/MessageDigestAdapter.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RipeMD128RandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RipeMD128Spi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RipeMD160RandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RipeMD160Spi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/SecureRandomAdapter.java \
+	$(SOURCEDIR)/gnu/crypto/jce/Sha160RandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/Sha160Spi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/SignatureAdapter.java \
+	$(SOURCEDIR)/gnu/crypto/jce/UMacRandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/WhirlpoolRandomSpi.java \
+	$(SOURCEDIR)/gnu/crypto/jce/WhirlpoolSpi.java \
+	\
 	$(SOURCEDIR)/gnu/crypto/mac/BaseMac.java \
 	$(SOURCEDIR)/gnu/crypto/mac/HMac.java \
 	$(SOURCEDIR)/gnu/crypto/mac/HMacFactory.java \
 	$(SOURCEDIR)/gnu/crypto/mac/IMac.java \
 	$(SOURCEDIR)/gnu/crypto/mac/MacFactory.java \
+	$(SOURCEDIR)/gnu/crypto/mac/TMMH16.java \
 	$(SOURCEDIR)/gnu/crypto/mac/UHash32.java \
 	$(SOURCEDIR)/gnu/crypto/mac/UMac32.java \
 	\
@@ -144,9 +170,16 @@ TESTFILES = \
 	$(SOURCEDIR)/test/hash/TestOfSha160.java \
 	$(SOURCEDIR)/test/hash/TestOfWhirlpool.java \
 	\
+	$(SOURCEDIR)/test/jce/AllTests.java \
+	$(SOURCEDIR)/test/jce/TestOfKeyPairGenerator.java \
+	$(SOURCEDIR)/test/jce/TestOfMessageDigest.java \
+	$(SOURCEDIR)/test/jce/TestOfProvider.java \
+	$(SOURCEDIR)/test/jce/TestOfSignature.java \
+	\
 	$(SOURCEDIR)/test/mac/AllTests.java \
 	$(SOURCEDIR)/test/mac/TestOfHMacFactory.java \
 	$(SOURCEDIR)/test/mac/TestOfMacFactory.java \
+	$(SOURCEDIR)/test/mac/TestOfTMMH16.java \
 	\
 	$(SOURCEDIR)/test/mode/AllTests.java \
 	$(SOURCEDIR)/test/mode/TestOfECB.java \
@@ -176,30 +209,39 @@ TESTFILES = \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSAKeyGeneration.java \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSAPSSSignature.java \
 	\
-	tv/anubis/cbc_d_m.txt \
-	tv/anubis/cbc_e_m.txt \
-	tv/anubis/ecb_d_m.txt \
-	tv/anubis/ecb_e_m.txt \
-	tv/anubis/ecb_vk.txt \
-	tv/anubis/ecb_vt.txt \
-	tv/rijndael/cbc_d_m.txt \
-	tv/rijndael/cbc_e_m.txt \
-	tv/rijndael/ecb_d_m.txt \
-	tv/rijndael/ecb_e_m.txt \
-	tv/rijndael/ecb_vk.txt \
-	tv/rijndael/ecb_vt.txt \
-	tv/serpent/cbc_d_m.txt \
-	tv/serpent/cbc_e_m.txt \
-	tv/serpent/ecb_d_m.txt \
-	tv/serpent/ecb_e_m.txt \
-	tv/serpent/ecb_vk.txt \
-	tv/serpent/ecb_vt.txt \
-	tv/twofish/cbc_d_m.txt \
-	tv/twofish/cbc_e_m.txt \
-	tv/twofish/ecb_d_m.txt \
-	tv/twofish/ecb_e_m.txt \
-	tv/twofish/ecb_vk.txt \
-	tv/twofish/ecb_vt.txt
+	tv/nist/anubis/cbc_d_m.txt \
+	tv/nist/anubis/cbc_e_m.txt \
+	tv/nist/anubis/ecb_d_m.txt \
+	tv/nist/anubis/ecb_e_m.txt \
+	tv/nist/anubis/ecb_vk.txt \
+	tv/nist/anubis/ecb_vt.txt \
+	\
+	tv/nist/khazad/ecb_vk.txt \
+	tv/nist/khazad/ecb_vt.txt \
+	\
+	tv/nist/rijndael/cbc_d_m.txt \
+	tv/nist/rijndael/cbc_e_m.txt \
+	tv/nist/rijndael/ecb_d_m.txt \
+	tv/nist/rijndael/ecb_e_m.txt \
+	tv/nist/rijndael/ecb_vk.txt \
+	tv/nist/rijndael/ecb_vt.txt \
+	\
+	tv/nist/serpent/cbc_d_m.txt \
+	tv/nist/serpent/cbc_e_m.txt \
+	tv/nist/serpent/ecb_d_m.txt \
+	tv/nist/serpent/ecb_e_m.txt \
+	tv/nist/serpent/ecb_vk.txt \
+	tv/nist/serpent/ecb_vt.txt \
+	\
+	tv/nist/square/ecb_vk.txt \
+	tv/nist/square/ecb_vt.txt \
+	\
+	tv/nist/twofish/cbc_d_m.txt \
+	tv/nist/twofish/cbc_e_m.txt \
+	tv/nist/twofish/ecb_d_m.txt \
+	tv/nist/twofish/ecb_e_m.txt \
+	tv/nist/twofish/ecb_vk.txt \
+	tv/nist/twofish/ecb_vt.txt
 
 PKGFILES =
 
@@ -288,10 +330,16 @@ lib/$(LIBNAME)-doc.zip:
 		-classpath "$(SOURCEDIR)" \
 		\
 		-group "GNU Crypto Algorithms" \
-		"gnu.crypto.cipher:gnu.crypto.hash:gnu.crypto.mode:gnu.crypto.pad:gnu.crypto.prng" \
+		"gnu.crypto.cipher:gnu.crypto.hash:gnu.crypto.mac:gnu.crypto.mode:gnu.crypto.pad:gnu.crypto.prng" \
 		\
 		-group "GNU Crypto Signature Schemes" \
 		"gnu.crypto.sig" \
+		\
+		-group "GNU Crypto JCE Adapters" \
+		"gnu.crypto.jce" \
+		\
+		-group "GNU Crypto Experimental Algorithms" \
+		"gnu.crypto.exp" \
 		\
 		-group "GNU Crypto Tools" \
 		"gnu.crypto.tool" \
@@ -299,11 +347,18 @@ lib/$(LIBNAME)-doc.zip:
 		-group "GNU Crypto utilities" \
 		"gnu.crypto.util" \
 		\
+		gnu.crypto \
 		gnu.crypto.cipher \
+		gnu.crypto.exp.ust \
 		gnu.crypto.hash \
+		gnu.crypto.jce \
+		gnu.crypto.mac \
 		gnu.crypto.mode \
 		gnu.crypto.pad \
 		gnu.crypto.prng \
+		gnu.crypto.sig \
+		gnu.crypto.sig.dss \
+		gnu.crypto.sig.rsa \
 		gnu.crypto.tool \
 		gnu.crypto.util
 	jar cMf lib/$(LIBNAME)-doc.zip -C docs api
