@@ -38,8 +38,10 @@
 
 package gnu.xml.xpath;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import org.w3c.dom.Node;
 
 /**
@@ -54,35 +56,35 @@ extends Expr
   final Expr lhs;
   final Expr rhs;
 
-  Index (Expr lhs, Expr rhs)
+  Index(Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;
   }
 
-  public Object evaluate (Node context)
+  public Object evaluate(Node context)
   {
-    Object left = lhs.evaluate (context);
+    Object left = lhs.evaluate(context);
     if (left instanceof Collection)
       {
-        Object right = rhs.evaluate (context);
-        double n = _number (context, right);
+        Object right = rhs.evaluate(context);
+        double n = _number(context, right);
         int index = ((int) n) - 1;
         
         Collection ns = (Collection) left;
-        Node[] nodes = new Node[ns.size ()];
-        ns.toArray (nodes);
-        if (index >= 0 && index < nodes.length)
+        List nodes = new ArrayList((Collection) left);
+        Collections.sort(nodes, Expr.documentOrderComparator);
+        if (index >= 0 && index < nodes.size())
           {
-            return Collections.singleton (nodes[index]);
+            return Collections.singleton(nodes.get(index));
           }
       }
     return null;
   }
 
-  public String toString ()
+  public String toString()
   {
-    return lhs.toString () + "[" + rhs.toString () + "]";
+    return lhs.toString() + "[" + rhs.toString() + "]";
   }
   
 }

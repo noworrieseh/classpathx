@@ -38,8 +38,11 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -71,7 +74,9 @@ final class CopyOfNode
     if (ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
-        for (Iterator i = ns.iterator(); i.hasNext(); )
+        List list = new ArrayList(ns);
+        Collections.sort(list, documentOrderComparator);
+        for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node node = (Node) i.next();
             if (nextSibling != null)

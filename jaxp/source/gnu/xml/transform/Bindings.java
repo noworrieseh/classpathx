@@ -113,6 +113,20 @@ public class Bindings
       }
   }
 
+  public boolean containsKey(String name, boolean global)
+  {
+    Iterator i = global ? variables.iterator() : parameters.iterator();
+    while (i.hasNext())
+      {
+        Map ctx = (Map) i.next();
+        if (ctx.containsKey(name))
+          {
+            return true;
+          }
+      }
+    return false;
+  }
+
   public Object get(String name, Node context)
   {
     Object ret = null;

@@ -78,13 +78,16 @@ final class ForEachNode
         if (ret instanceof Collection)
           {
             Collection ns = (Collection) ret;
+            List list = new ArrayList(ns);
             if (sortKeys != null)
               {
-                List list = new ArrayList(ns);
                 Collections.sort(list, new XSLComparator(sortKeys));
-                ns = list;
               }
-            for (Iterator i = ns.iterator(); i.hasNext(); )
+            else
+              {
+                Collections.sort(list, documentOrderComparator);
+              }
+            for (Iterator i = list.iterator(); i.hasNext(); )
               {
                 Node node = (Node) i.next();
                 children.apply(stylesheet, node, mode, parent, nextSibling);

@@ -54,7 +54,7 @@ import org.w3c.dom.NodeList;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class Selector
-extends Expr
+  extends Expr
 {
 
   public static final int ANCESTOR = 0;
@@ -81,11 +81,11 @@ extends Expr
    */
   final Test[] tests;
 
-  public Selector (int axis, List tests)
+  public Selector(int axis, List tests)
   {
     this.axis = axis;
-    this.tests = new Test[tests.size ()];
-    tests.toArray (this.tests);
+    this.tests = new Test[tests.size()];
+    tests.toArray(this.tests);
   }
 
   /**
@@ -98,50 +98,50 @@ extends Expr
 
   public Object evaluate (Node context)
   {
-    List candidates = new LinkedList ();
+    List candidates = new LinkedList();
     // Build list of candidates
     switch (axis)
       {
       case CHILD:
-        addChildNodes (context, candidates, false);
+        addChildNodes(context, candidates, false);
         break;
       case DESCENDANT:
-        addChildNodes (context, candidates, true);
+        addChildNodes(context, candidates, true);
         break;
       case DESCENDANT_OR_SELF:
         candidates.add (context);
-        addChildNodes (context, candidates, true);
+        addChildNodes(context, candidates, true);
         break;
       case PARENT:
-        addParentNode (context, candidates, false);
+        addParentNode(context, candidates, false);
         break;
       case ANCESTOR:
-        addParentNode (context, candidates, true);
+        addParentNode(context, candidates, true);
         break;
       case ANCESTOR_OR_SELF:
-        candidates.add (context);
-        addParentNode (context, candidates, true);
+        candidates.add(context);
+        addParentNode(context, candidates, true);
         break;
       case FOLLOWING_SIBLING:
-        addFollowingNodes (context, candidates, false);
+        addFollowingNodes(context, candidates, false);
         break;
       case PRECEDING_SIBLING:
-        addPrecedingNodes (context, candidates, false);
+        addPrecedingNodes(context, candidates, false);
         break;
       case FOLLOWING:
-        addFollowingNodes (context, candidates, true);
+        addFollowingNodes(context, candidates, true);
         break;
       case PRECEDING:
-        addPrecedingNodes (context, candidates, true);
+        addPrecedingNodes(context, candidates, true);
         break;
       case ATTRIBUTE:
-        addAttributes (context, candidates);
+        addAttributes(context, candidates);
         break;
       case NAMESPACE:
         // TODO
         break;
       case SELF:
-        candidates.add (context);
+        candidates.add(context);
         break;
       }
     // Now filter them
@@ -149,13 +149,13 @@ extends Expr
     if (tlen > 0)
       {
         List successful = new LinkedList();
-        for (Iterator i = candidates.iterator (); i.hasNext (); )
+        for (Iterator i = candidates.iterator(); i.hasNext(); )
           {
             boolean success = true;
-            Node node = (Node) i.next ();
+            Node node = (Node) i.next();
             for (int j = 0; j < tlen; j++)
               {
-                if (!tests[j].matches (node))
+                if (!tests[j].matches(node))
                   {
                     success = false;
                     break;
@@ -171,7 +171,7 @@ extends Expr
     return candidates;
   }
 
-  void addChildNodes (Node context, Collection acc, boolean recurse)
+  void addChildNodes(Node context, Collection acc, boolean recurse)
   {
     Node child = context.getFirstChild();
     while (child != null)
@@ -185,128 +185,128 @@ extends Expr
       }
   }
 
-  void addParentNode (Node context, Collection acc, boolean recurse)
+  void addParentNode(Node context, Collection acc, boolean recurse)
   {
     Node parent = (context.getNodeType() == Node.ATTRIBUTE_NODE) ?
-      ((Attr) context).getOwnerElement() : context.getParentNode ();
+      ((Attr) context).getOwnerElement() : context.getParentNode();
     if (parent != null)
       {
-        acc.add (parent);
+        acc.add(parent);
         if (recurse)
           {
-            addParentNode (parent, acc, recurse);
+            addParentNode(parent, acc, recurse);
           }
       }
   }
 
-  void addFollowingNodes (Node context, Collection acc, boolean recurse)
+  void addFollowingNodes(Node context, Collection acc, boolean recurse)
   {
-    Node cur = context.getNextSibling ();
+    Node cur = context.getNextSibling();
     while (cur != null)
       {
-        acc.add (cur);
-        cur = cur.getNextSibling ();
+        acc.add(cur);
+        cur = cur.getNextSibling();
       }
     if (recurse)
       {
-        context = context.getParentNode ();
+        context = context.getParentNode();
         if (context != null)
           {
-            addFollowingNodes (context, acc, recurse);
+            addFollowingNodes(context, acc, recurse);
           }
       }
   }
 
-  void addPrecedingNodes (Node context, Collection acc, boolean recurse)
+  void addPrecedingNodes(Node context, Collection acc, boolean recurse)
   {
-    Node cur = context.getPreviousSibling ();
+    Node cur = context.getPreviousSibling();
     while (cur != null)
       {
-        acc.add (cur);
-        cur = cur.getPreviousSibling ();
+        acc.add(cur);
+        cur = cur.getPreviousSibling();
       }
     if (recurse)
       {
         // FIXME This is probably not correct
-        context = context.getParentNode ();
+        context = context.getParentNode();
         if (context != null)
           {
-            addPrecedingNodes (context, acc, recurse);
+            addPrecedingNodes(context, acc, recurse);
           }
       }
   }
 
-  void addAttributes (Node context, Collection acc)
+  void addAttributes(Node context, Collection acc)
   {
-    NamedNodeMap attrs = context.getAttributes ();
+    NamedNodeMap attrs = context.getAttributes();
     if (attrs != null)
       {
-        int attrLen = attrs.getLength ();
+        int attrLen = attrs.getLength();
         for (int i = 0; i < attrLen; i++)
           {
-            acc.add (attrs.item (i));
+            acc.add(attrs.item(i));
           }
       }
   }
 
-  public String toString ()
+  public String toString()
   {
-    StringBuffer buf = new StringBuffer ();
+    StringBuffer buf = new StringBuffer();
     switch (axis)
       {
       case ANCESTOR:
-        buf.append ("ancestor");
+        buf.append("ancestor");
         break;
       case ANCESTOR_OR_SELF:
-        buf.append ("ancestor-or-self");
+        buf.append("ancestor-or-self");
         break;
       case ATTRIBUTE:
-        buf.append ("attribute");
+        buf.append("attribute");
         break;
       case CHILD:
-        buf.append ("child");
+        buf.append("child");
         break;
       case DESCENDANT:
-        buf.append ("descendant");
+        buf.append("descendant");
         break;
       case DESCENDANT_OR_SELF:
-        buf.append ("descendant-or-self");
+        buf.append("descendant-or-self");
         break;
       case FOLLOWING:
-        buf.append ("following");
+        buf.append("following");
         break;
       case FOLLOWING_SIBLING:
-        buf.append ("following-sibling");
+        buf.append("following-sibling");
         break;
       case NAMESPACE:
-        buf.append ("namespace");
+        buf.append("namespace");
         break;
       case PARENT:
-        buf.append ("parent");
+        buf.append("parent");
         break;
       case PRECEDING:
-        buf.append ("preceding");
+        buf.append("preceding");
         break;
       case PRECEDING_SIBLING:
-        buf.append ("preceding-sibling");
+        buf.append("preceding-sibling");
         break;
       case SELF:
-        buf.append ("self");
+        buf.append("self");
         break;
       }
-    buf.append ("::");
+    buf.append("::");
     if (tests.length == 0)
       {
-        buf.append ('*');
+        buf.append('*');
       }
     else
       {
         for (int i = 0; i < tests.length; i++)
           {
-            buf.append (tests[i]);
+            buf.append(tests[i]);
           }
       }
-    return buf.toString ();
+    return buf.toString();
   }
   
 }

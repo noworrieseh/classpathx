@@ -40,9 +40,9 @@ package gnu.xml.xpath;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 import org.w3c.dom.Node;
 
 /**
@@ -51,45 +51,45 @@ import org.w3c.dom.Node;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class Step
-extends Expr
+  extends Expr
 {
 
   final Expr lhs;
   final Expr rhs;
 
-  public Step (Expr lhs, Expr rhs)
+  public Step(Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;
   }
 
-  public Object evaluate (Node context)
+  public Object evaluate(Node context)
   {
-    Object left = lhs.evaluate (context);
+    Object left = lhs.evaluate(context);
     if (left instanceof Collection)
       {
         Collection ns = (Collection) left;
-        Set ret1 = new TreeSet ();
+        Set ret1 = new HashSet();
         Object ret2 = null;
-        for (Iterator i = ns.iterator (); i.hasNext (); )
+        for (Iterator i = ns.iterator(); i.hasNext(); )
           {
-            Node node = (Node) i.next ();
-            Object right = rhs.evaluate (node);
+            Node node = (Node) i.next();
+            Object right = rhs.evaluate(node);
             if (right instanceof Collection)
               {
-                ret1.addAll ((Collection) right);
+                ret1.addAll((Collection) right);
               }
             else if (ret2 == null)
               {
                 ret2 = right;
               }
           }
-        return (ret1.isEmpty () && ret2 != null) ? ret2 : ret1;
+        return (ret1.isEmpty() && ret2 != null) ? ret2 : ret1;
       }
     return Collections.EMPTY_SET;
   }
 
-  public String toString ()
+  public String toString()
   {
     return lhs + ((lhs instanceof Root) ? "" : "/") + rhs;
   }

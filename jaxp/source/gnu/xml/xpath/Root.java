@@ -48,17 +48,17 @@ import org.w3c.dom.Node;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class Root
-extends Expr
+  extends Expr
 {
 
-  public Object evaluate (Node context)
+  public Object evaluate(Node context)
   {
     Document doc = (context instanceof Document) ? (Document) context :
-      context.getOwnerDocument ();
-    return Collections.singleton (doc);
+      context.getOwnerDocument();
+    return Collections.singleton(doc);
   }
 
-  public String toString ()
+  public String toString()
   {
     return "/";
   }

@@ -73,7 +73,7 @@ public class VariableReference
 
   public String toString()
   {
-    return "#" + name;
+    return "$" + name;
   }
   
 }

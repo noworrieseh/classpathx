@@ -40,8 +40,10 @@ package gnu.xml.transform;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
@@ -57,15 +59,15 @@ final class ParameterNode
 {
 
   final String name;
-  final Object value;
+  final Expr select;
   final boolean global;
 
   ParameterNode(TemplateNode children, TemplateNode next,
-                String name, Object value, boolean global)
+                String name, Expr select, boolean global)
   {
     super(children, next);
     this.name = name;
-    this.value = value;
+    this.select = select;
     this.global = global;
   }
 
@@ -73,17 +75,55 @@ final class ParameterNode
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    // push the variable context
-    stylesheet.bindings.push(global);
-    // set the variable
-    stylesheet.bindings.set(name, value, global);
+    boolean apply = !stylesheet.bindings.containsKey(name, global);
+    if (apply)
+      {
+        // push the variable context
+        stylesheet.bindings.push(global);
+        // set the variable
+        Object value = getValue(stylesheet, context, mode);
+        if (value != null)
+          {
+            stylesheet.bindings.set(name, value, global);
+          }
+      }
     // variable and param don't process children
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
-    // pop the variable context
-    stylesheet.bindings.pop(global);
+    if (apply)
+      {
+        // pop the variable context
+        stylesheet.bindings.pop(global);
+      }
   }
   
+  Object getValue(Stylesheet stylesheet, Node context, String mode)
+    throws TransformerException
+  {
+    if (select != null)
+      {
+        return select.evaluate(context);
+      }
+    else if (children != null)
+      {
+        Document doc = (context instanceof Document) ? (Document) context :
+          context.getOwnerDocument();
+        DocumentFragment fragment = doc.createDocumentFragment();
+        children.apply(stylesheet, context, mode, fragment, null);
+        Collection acc = new LinkedList();
+        Node ctx = fragment.getFirstChild();
+        for (; ctx != null; ctx = ctx.getNextSibling())
+          {
+            acc.add(ctx);
+          }
+        return acc;
+      }
+    else
+      {
+        return null;
+      }
+  }
+
 }

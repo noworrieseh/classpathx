@@ -40,8 +40,8 @@ package gnu.xml.xpath;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 import org.w3c.dom.Node;
 
 /**
@@ -50,25 +50,25 @@ import org.w3c.dom.Node;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class UnionExpr
-extends Expr
+  extends Expr
 {
 
   final Expr lhs;
   final Expr rhs;
 
-  public UnionExpr (Expr lhs, Expr rhs)
+  public UnionExpr(Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;
   }
 
-  public Object evaluate (Node context)
+  public Object evaluate(Node context)
   {
-    Object left = lhs.evaluate (context);
-    Object right = rhs.evaluate (context);
+    Object left = lhs.evaluate(context);
+    Object right = rhs.evaluate(context);
     if (left instanceof Collection && right instanceof Collection)
       {
-        Set ret = new TreeSet ();
+        Set ret = new HashSet();
         ret.addAll ((Collection) left);
         ret.addAll ((Collection) right);
         return ret;
@@ -76,7 +76,7 @@ extends Expr
     return Collections.EMPTY_SET;
   }
 
-  public String toString ()
+  public String toString()
   {
     return lhs + " | " + rhs;
   }

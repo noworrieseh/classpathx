@@ -94,7 +94,9 @@ final class NodeNumberNode
             Collection ns = (Collection) ret;
             if (ns.size() > 0)
               {
-                context = (Node) ns.iterator().next();
+                List list = new ArrayList(ns);
+                Collections.sort(list, documentOrderComparator);
+                context = (Node) list.get(0);
               }
             else
               {

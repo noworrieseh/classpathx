@@ -39,8 +39,10 @@
 package gnu.xml.transform;
 
 import java.io.PrintStream;
+import java.util.Comparator;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.DocumentOrderComparator;
 
 /**
  * Wrapper for a source node in a template.
@@ -49,6 +51,9 @@ import org.w3c.dom.Node;
  */
 abstract class TemplateNode
 {
+
+  static final Comparator documentOrderComparator =
+    new DocumentOrderComparator();
 
   final TemplateNode children;
   final TemplateNode next;

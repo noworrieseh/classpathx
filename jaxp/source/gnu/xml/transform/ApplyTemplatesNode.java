@@ -93,13 +93,16 @@ final class ApplyTemplatesNode
               }
           }
         Collection ns = (Collection) ret;
+        List list = new ArrayList(ns);
         if (sortKeys != null)
           {
-            List list = new ArrayList(ns);
             Collections.sort(list, new XSLComparator(sortKeys));
-            ns = list;
           }
-        for (Iterator i = ns.iterator(); i.hasNext(); )
+        else
+          {
+            Collections.sort(list, documentOrderComparator);
+          }
+        for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node subject = (Node) i.next();
             stylesheet.applyTemplates(subject, subject,

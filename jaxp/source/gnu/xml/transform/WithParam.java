@@ -57,29 +57,36 @@ final class WithParam
 {
 
   final String name;
-  final Object value;
+  final Expr select;
+  final TemplateNode content;
 
-  WithParam(String name, Object value)
+  WithParam(String name, Expr select)
   {
     this.name = name;
-    this.value = value;
+    this.select = select;
+    content = null;
+  }
+
+  WithParam(String name, TemplateNode content)
+  {
+    this.name = name;
+    this.content = content;
+    select = null;
   }
 
   Object getValue(Stylesheet stylesheet, Node context, String mode)
     throws TransformerException
   {
-    if (value instanceof Expr)
+    if (select != null)
       {
-        Expr select = (Expr) value;
         return select.evaluate(context);
       }
-    else if (value instanceof TemplateNode)
+    else
       {
-        TemplateNode tn = (TemplateNode) value;
         Document doc = (context instanceof Document) ? (Document) context :
           context.getOwnerDocument();
         DocumentFragment fragment = doc.createDocumentFragment();
-        tn.apply(stylesheet, context, mode, fragment, null);
+        content.apply(stylesheet, context, mode, fragment, null);
         Collection acc = new LinkedList();
         Node ctx = fragment.getFirstChild();
         for (; ctx != null; ctx = ctx.getNextSibling())
@@ -87,10 +94,6 @@ final class WithParam
             acc.add(ctx);
           }
         return acc;
-      }
-    else
-      {
-        return value;
       }
   }
 

@@ -407,7 +407,7 @@ class Template
                      "variable".equals(name))
               {
                 boolean global = "variable".equals(name);
-                Object content = element.getFirstChild();
+                TemplateNode content = parse(children);
                 String paramName = element.getAttribute("name");
                 if (paramName.length() == 0)
                   {
@@ -423,14 +423,15 @@ class Template
                         DOMSourceLocator l = new DOMSourceLocator(element);
                         throw new TransformerConfigurationException(msg, l);
                       }
-                    content = stylesheet.xpath.compile(select);
+                    Expr expr = (Expr) stylesheet.xpath.compile(select);
+                    return new ParameterNode(content, parse(next),
+                                             paramName, expr, global);
                   }
-                if (content == null)
+                else
                   {
-                    content = "";
+                    return new ParameterNode(content, parse(next),
+                                             paramName, null, global);
                   }
-                return new ParameterNode(parse(children), parse(next),
-                                         paramName, content, global);
               }
             else if ("copy-of".equals(name))
               {
@@ -604,7 +605,7 @@ class Template
 
             if ("with-param".equals(name))
               {
-                Object content = parse(element.getFirstChild());
+                TemplateNode content = parse(element.getFirstChild());
                 String paramName = element.getAttribute("name");
                 if (paramName.length() == 0)
                   {
@@ -620,13 +621,13 @@ class Template
                         DOMSourceLocator l = new DOMSourceLocator(element);
                         throw new TransformerConfigurationException(msg, l);
                       }
-                    content = stylesheet.xpath.compile(select);
+                    Expr expr = (Expr) stylesheet.xpath.compile(select);
+                    ret.add(new WithParam(paramName, expr));
                   }
-                if (content == null)
+                else
                   {
-                    content = "";
+                    ret.add(new WithParam(paramName, content));
                   }
-                ret.add(new WithParam(paramName, content));
               }
           }
         node = node.getNextSibling();

@@ -149,7 +149,10 @@ class Stylesheet
    */
   transient Node current;
 
-  Stylesheet(TransformerFactoryImpl factory, Document doc, String systemId,
+  Stylesheet(TransformerFactoryImpl factory,
+             Stylesheet parent,
+             Document doc,
+             String systemId,
              int precedence)
     throws TransformerConfigurationException
   {
@@ -160,8 +163,16 @@ class Stylesheet
     preserveSpace = new LinkedHashSet();
     attributeSets = new LinkedHashMap();
     usedAttributeSets = new LinkedHashMap();
-    bindings = new Bindings();
-    templates = new LinkedList();
+    if (parent == null)
+      {
+        bindings = new Bindings();
+        templates = new LinkedList();
+      }
+    else
+      {
+        bindings = parent.bindings;
+        templates = parent.templates;
+      }
 
     factory.xpathFactory.setXPathVariableResolver(bindings);
     factory.xpathFactory.setXPathFunctionResolver(this);
@@ -287,8 +298,7 @@ class Stylesheet
                   }
                 Source source = new StreamSource(href);
                 Stylesheet stylesheet =
-                  factory.newStylesheet(source, precedence + p);
-                templates.addAll(stylesheet.templates);
+                  factory.newStylesheet(source, precedence + p, this);
                 parse(element.getNextSibling(), false);
               }
             else if ("output".equals(name))

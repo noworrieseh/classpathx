@@ -88,11 +88,11 @@ public class TransformerFactoryImpl
   public Templates newTemplates(Source source)
     throws TransformerConfigurationException
   {
-    Stylesheet stylesheet = newStylesheet(source, 0);
+    Stylesheet stylesheet = newStylesheet(source, 0, null);
     return new TemplatesImpl(uriResolver, errorListener, stylesheet);
   }
 
-  Stylesheet newStylesheet(Source source, int precedence)
+  Stylesheet newStylesheet(Source source, int precedence, Stylesheet parent)
     throws TransformerConfigurationException
   {
     Document doc = null;
@@ -110,7 +110,7 @@ public class TransformerFactoryImpl
           node.getOwnerDocument();
         systemId = source.getSystemId();
       }
-    return new Stylesheet(this, doc, systemId, precedence);
+    return new Stylesheet(this, parent, doc, systemId, precedence);
   }
 
   public Source getAssociatedStylesheet(Source source,
