@@ -71,8 +71,11 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/Filter.java \
 all: servlet.jar
 
 # Ensure the makefile can update itself.
-Makefile: Makefile.aj
-	  $(PROJECTROOT)/automakejar Makefile.in ; $(PROJECTROOT)/configure
+Makefile: Makefile.in configure.in
+	   $(SHELL) ./config.status
+
+Makefile.in: Makefile.aj
+	     $(SHELL) $(PROJECTROOT)/automakejar ./Makefile.in
 
 # This is an automakejar target. Run automakejar
 # on Makefile.aj to turn this into a Make compatible target.
@@ -83,12 +86,23 @@ servlet.jar:
 
 # Cleaning targets.
 clean:
-	-rm -rf servlet.jar classes
+	-rm -rf servlet.jar classes filelist
 
 distclean: clean
 	-rm -rf Makefile Makefile.in config.*
 
 mrproper: distclean
 	-rm -rf configure
+
+
+# Build a distribution.
+VERSION=2_3_6
+
+dist: distclean
+ifeq (${OSTYPE},linux-gnu)
+	$(TAR) cfz gnuservletapi-$(VERSION).tar.gz -C .. $(shell basename $(shell pwd))
+else
+	echo Sorry, 'make dist' only works on GNU/Linux machines.
+endif
 
 ##End Makefile
