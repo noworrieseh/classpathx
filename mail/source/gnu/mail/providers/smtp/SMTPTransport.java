@@ -168,7 +168,7 @@ public class SMTPTransport
           else if (authenticationMechanisms.contains("PLAIN"))
             return connection.authPlain(username, password);
           else
-            System.err.println("smtp: No supported authentication mechanisms");
+            Session.log("smtp: No supported authentication mechanisms");
         }
         return false;
       }
@@ -384,7 +384,7 @@ public class SMTPTransport
                                             {
                                             }
     }
-                    return -1;
+		return -1;
   }
   
   private boolean propertyIsFalse(String key)
@@ -403,7 +403,7 @@ public class SMTPTransport
    */
   private String getProperty(String key)
   {
-    String value = session.getProperty("mail.pop3."+key);
+    String value = session.getProperty("mail.smtp."+key);
     if (value==null)
       value = session.getProperty("mail."+key);
     return value;
