@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
+import javax.mail.MethodNotSupportedException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
