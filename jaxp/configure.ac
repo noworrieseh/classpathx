@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.3 2004-04-22 11:21:31 avdyk Exp $
+# $Id: configure.ac,v 1.4 2004-04-27 07:56:24 dog Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -26,7 +26,7 @@
 #AC_INIT(libxmlj, 0.1.1)
 
 AC_INIT(source/javax/xml/parsers/SAXParserFactory.java)
-AC_CONFIG_SRCDIR(source/libxsltj.c)
+AC_CONFIG_SRCDIR(jni/xmlj_util.c)
 AC_CONFIG_AUX_DIR(config)
 
 #AM_INIT_AUTOMAKE(libxmlj, 0.1.1)
