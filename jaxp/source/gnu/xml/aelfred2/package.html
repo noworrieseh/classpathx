@@ -9,15 +9,17 @@
  * Copyright (c) 1999-2001 by David Brownell.
  * This file is distributed under the GPL.
  *
- * $Id: package.html,v 1.1 2001-06-08 20:59:00 db Exp $
+ * $Id: package.html,v 1.2 2001-06-20 20:43:22 db Exp $
  */
 -->
 </head><body>
 
 <p> This package contains &AElig;lfred2, which includes an
 enhanced SAX2-compatible version of the &AElig;lfred
-non-validating XML parser and a modular (and hence optional) 
-DTD validating parser.  Use them like any other SAX2 parsers. </p>
+non-validating XML parser, a modular (and hence optional) 
+DTD validating parser, and modular (and hence optional)
+JAXP glue to those.
+Use these like any other SAX2 parsers. </p>
 
 <ul>
     <li><a href="#about">About &AElig;lfred</a><ul>
@@ -257,7 +259,11 @@ be clearly documented, as has been done here.  </p>
 
 <p> This version is Copyright (c) 1999-2001 by David Brownell,
 and all the modifications are distributed under the GNU General
-Public License (GPL). </p>
+Public License (GPL).  It is subject to the "Library Exception",
+supporting use in some environments (such as embedded systems where
+dynamic linking may not be available) by proprietary code without
+necessarily requiring all code to be licencsed under the GPL.
+</p>
 
 
 <h2><a name="changes">Changes Since the last Microstar Release</a></h2>
@@ -272,6 +278,8 @@ that most developers should not need to use another XML parser.  </p>
 all the production numbers in 
 comments, rather than some preliminary draft, for one example) and
 has been sped up a bit as well.
+JAXP support has been added, although developers are still
+strongly encouraged to use the SAX2 APIs directly.  </p>
 
 
 <h3><a name="sax2">SAX2 Support</a></h3>
@@ -313,6 +321,7 @@ can DTD-validate its output on demand. </p>
 <p> You'll have noticed that the original version of &AElig;lfred
 had small size as a top goal.  &AElig;lfred2 normally includes a
 DTD validation layer, but you can package without that.
+Similarly, JAXP factory support is available but optional.
 Then the main added cost due to this revision are for
 supporting the SAX2 API itself; DTD validation is as
 cleanly layered as allowed by SAX2.</p>
