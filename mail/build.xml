@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.1 2003-09-13 15:46:48 dog Exp $
+$Id: build.xml,v 1.2 2003-09-13 16:36:52 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -67,6 +67,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 	<target name='init'>
 		<tstamp/>
 		<mkdir dir='${build}'/>
+		<delete dir='${META-INF}'/>
 		<mkdir dir='${META-INF}'/>
 	</target>
 
@@ -87,8 +88,10 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/smtp/*.java'/>
 		</javac>
-		<echo file='${address-map}' message='rfc822=smtp'/>
-		<echo file='${providers}' append='true' message='protocol=smtp; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;'/>
+		<echo file='${address-map}'>rfc822=smtp
+		</echo>
+		<echo file='${providers}' append='true'>protocol=smtp; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;
+		</echo>
 	</target>
 
 	<target name='imap' depends='gnumail' unless='disable-imap'>
@@ -96,7 +99,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/imap/*.java'/>
 		</javac>
-		<echo file='${providers}' append='true' message='protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;'/>
+		<echo file='${providers}' append='true'>protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
+		</echo>
 	</target>
 
 	<target name='pop3' depends='gnumail' unless='disable-pop3'>
@@ -104,7 +108,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/pop3/*.java'/>
 		</javac>
-		<echo file='${providers}' append='true' message='protocol=pop3; type=store; class=gnu.mail.providers.pop3.POP3Store; vendor=dog@gnu.org;'/>
+		<echo file='${providers}' append='true'>protocol=pop3; type=store; class=gnu.mail.providers.pop3.POP3Store; vendor=dog@gnu.org;
+		</echo>
 	</target>
 
 	<target name='nntp' depends='gnumail' unless='disable-nntp'>
@@ -112,9 +117,12 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='nntp.classpath'/>
 			<include name='gnu/mail/providers/nntp/*.java'/>
 		</javac>
-		<echo file='${address-map}' message='rfc822=nntp-post'/>
-		<echo file='${providers}' append='true' message='protocol=nntp; type=store; class=gnu.mail.providers.nntp.NNTPStore; vendor=dog@gnu.org;'/>
-		<echo file='${providers}' append='true' message='protocol=nntp-post; type=transport; class=gnu.mail.providers.nntp.NNTPTransport; vendor=dog@gnu.org;'/>
+		<echo file='${address-map}'>rfc822=nntp-post'
+		</echo>
+		<echo file='${providers}' append='true'>protocol=nntp; type=store; class=gnu.mail.providers.nntp.NNTPStore; vendor=dog@gnu.org;
+		</echo>
+		<echo file='${providers}' append='true'>protocol=nntp-post; type=transport; class=gnu.mail.providers.nntp.NNTPTransport; vendor=dog@gnu.org;
+		</echo>
 	</target>
 
 	<target name='mbox' depends='gnumail' unless='disable-mbox'>
@@ -122,7 +130,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/mbox/*.java'/>
 		</javac>
-		<echo file='${providers}' append='true' message='protocol=mbox; type=store; class=gnu.mail.providers.mbox.MboxStore; vendor=dog@gnu.org;'/>
+		<echo file='${providers}' append='true'>protocol=mbox; type=store; class=gnu.mail.providers.mbox.MboxStore; vendor=dog@gnu.org;
+		</echo>
 	</target>
 
 	<target name='maildir' depends='gnumail' unless='disable-maildir'>
@@ -130,7 +139,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 			<classpath refid='provider.classpath'/>
 			<include name='gnu/mail/providers/maildir/*.java'/>
 		</javac>
-		<echo file='${providers}' append='true' message='protocol=maildir; type=store; class=gnu.mail.providers.maildir.MaildirStore; vendor=dog@gnu.org;'/>
+		<echo file='${providers}' append='true'>protocol=maildir; type=store; class=gnu.mail.providers.maildir.MaildirStore; vendor=dog@gnu.org;
+		</echo>
 	</target>
 
 	<target name='compile' depends='gnumail,smtp,imap,pop3,nntp,mbox,maildir'/>
@@ -238,7 +248,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 		<mkdir dir='${doc}'/>
 		<javadoc destdir='${doc}' use='true' author='true'
 			windowtitle='GNU JavaMail API documentation'
-			classpathref='mail.classpath'>
+			classpathref='nntp.classpath'>
 			<doctitle><![CDATA[<h3>GNU JavaMail</h3>]]></doctitle>
 			<bottom><![CDATA[&copy;]]> Copyright 2003 The Free Software Foundation,
 			all rights reserved</bottom>
@@ -250,6 +260,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 				<include name='gnu/mail/providers/smtp'/>
 				<include name='gnu/mail/providers/imap'/>
 				<include name='gnu/mail/providers/pop3'/>
+				<include name='gnu/mail/providers/nntp'/>
 			</packageset>
 		</javadoc>
 	</target>

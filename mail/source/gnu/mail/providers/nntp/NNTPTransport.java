@@ -66,14 +66,27 @@ public class NNTPTransport extends Transport
 
   /**
    * Performs the protocol connection.
-   * @see NNTPStore.protocolConnect()
+   * @see NNTPStore#protocolConnect
    */
   protected boolean protocolConnect(String host, int port, String username,
       String password)
     throws MessagingException
   {
-    try
+		if (connection!=null)
+			return true;
+		if (host==null)
+			host = getProperty("host");
+		if (username==null)
+			username = getProperty("user");
+		if (port<0)
+			port = getIntProperty("port");
+		if (host==null)
+			return false;
+		try
     {
+			int connectionTimeout = getIntProperty("connectiontimeout");
+			int timeout = getIntProperty("timeout");
+			// TODO connectionTimeout && timeout
       if (port<0)
         port = NNTPConnection.DEFAULT_PORT;
       connection = new NNTPConnection(host, port, username, password,
@@ -102,7 +115,7 @@ public class NNTPTransport extends Transport
 
   /**
    * Close the connection.
-   * @see NNTPStore.close()
+   * @see NNTPStore#close
    */
   public void close()
     throws MessagingException
@@ -162,41 +175,79 @@ public class NNTPTransport extends Transport
     }
   }
 
-  // TEST
-  public static void main(String[] args)
-  {
-    try
-    {
-      // session
-      Session session = Session.getInstance(System.getProperties(), null);
-      
-      // create message
-      javax.mail.internet.MimeMessage message =
-        new javax.mail.internet.MimeMessage(session);
-      message.setFrom(new javax.mail.internet.InternetAddress("dog@gnu.org"));
-      Address[] recipients = { new NewsAddress("alt.test") };
-      message.setRecipients(MimeMessage.RecipientType.NEWSGROUPS,
-          recipients);
-      message.setSubject("Test");
-      message.setText("This is a test.", "iso-8859-1");
-      
-      // get transport
-      URLName url = new URLName("nntp-post://localhost");
-      Transport transport = session.getTransport(url);
-      transport.connect();
-      transport.sendMessage(message, message.getAllRecipients());
-      transport.close();
-    }
-    catch (MessagingException e)
-    {
-      e.printStackTrace();
-      Exception e2 = e.getNextException();
-      if (e2!=null)
-      {
-        System.out.println("Next exception:");
-        e2.printStackTrace();
-      }
-    }
-  }
-  
+	private int getIntProperty(String key)
+	{
+		String value = getProperty(key);
+		if (value!=null)
+		{
+			try
+			{
+				return Integer.parseInt(value);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		return -1;
+	}
+
+	private boolean propertyIsFalse(String key)
+	{
+		return "false".equals(getProperty(key));
+	}
+
+	private boolean propertyIsTrue(String key)
+	{
+		return "true".equals(getProperty(key));
+	}
+
+	/*
+	 * Returns the provider-specific or general mail property corresponding to
+	 * the specified key.
+	 */
+	private String getProperty(String key)
+	{
+		String value = session.getProperty("mail.nntp."+key);
+		if (value==null)
+			value = session.getProperty("mail."+key);
+		return value;
+	}
+
+	// TEST
+	public static void main(String[] args)
+	{
+		try
+		{
+			// session
+			Session session = Session.getInstance(System.getProperties(), null);
+
+			// create message
+			javax.mail.internet.MimeMessage message =
+				new javax.mail.internet.MimeMessage(session);
+			message.setFrom(new javax.mail.internet.InternetAddress("dog@gnu.org"));
+			Address[] recipients = { new NewsAddress("alt.test") };
+			message.setRecipients(MimeMessage.RecipientType.NEWSGROUPS,
+					recipients);
+			message.setSubject("Test");
+			message.setText("This is a test.", "iso-8859-1");
+
+			// get transport
+			URLName url = new URLName("nntp-post://localhost");
+			Transport transport = session.getTransport(url);
+			transport.connect();
+			transport.sendMessage(message, message.getAllRecipients());
+			transport.close();
+		}
+		catch (MessagingException e)
+		{
+			e.printStackTrace();
+			Exception e2 = e.getNextException();
+			if (e2!=null)
+			{
+				System.out.println("Next exception:");
+				e2.printStackTrace();
+			}
+		}
+	}
+
 }

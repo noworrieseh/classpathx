@@ -77,7 +77,7 @@ public class NNTPStore extends Store
     permanentFlags.add(Flags.Flag.SEEN);
 
     // Init newsrc
-    String tn = session.getProperty("nntp.newsrc");
+    String tn = getProperty("newsrc");
     if (tn!=null)
     {
       // TODO implement independent way to instantiate newsrcs
@@ -114,12 +114,25 @@ public class NNTPStore extends Store
       String password)
     throws MessagingException
   {
+		if (connection!=null)
+			return true;
+		if (host==null)
+			host = getProperty("host");
+		if (username==null)
+			username = getProperty("user");
+		if (port<0)
+			port = getIntProperty("port");
+		if (host==null)
+			return false;
     try
     {
+			int connectionTimeout = getIntProperty("connectiontimeout");
+			int timeout = getIntProperty("timeout");
+			// TODO connectionTimeout && timeout
       if (port<0)
         port = NNTPConnection.DEFAULT_PORT;
       connection = new NNTPConnection(host, port, username, password,
-          debug);
+          session.getDebug());
       if (username!=null && password!=null)
       {
         // TODO decide on authentication method
@@ -132,13 +145,6 @@ public class NNTPStore extends Store
     catch (IOException e)
     {
       throw new MessagingException(e.getMessage(), e);
-    }
-    catch (SecurityException e)
-    {
-      if (username!=null && password!=null)
-        throw new AuthenticationFailedException(e.getMessage());
-      else
-        return false;
     }
   }
 
@@ -201,8 +207,47 @@ public class NNTPStore extends Store
    */
   boolean isListAll()
   {
-    String listAll = session.getProperty("mail.nntp.listAll");
-    return (listAll!=null && "true".equals(listAll));
+		return propertyIsTrue("mail.nntp.listall");
   }
-  
+
+	// -- Utility methods --
+
+	private int getIntProperty(String key)
+	{
+		String value = getProperty(key);
+		if (value!=null)
+		{
+			try
+			{
+				return Integer.parseInt(value);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		return -1;
+	}
+
+	private boolean propertyIsFalse(String key)
+	{
+		return "false".equals(getProperty(key));
+	}
+	
+	private boolean propertyIsTrue(String key)
+	{
+		return "true".equals(getProperty(key));
+	}
+	
+	/*
+	 * Returns the provider-specific or general mail property corresponding to
+	 * the specified key.
+	 */
+	private String getProperty(String key)
+	{
+		String value = session.getProperty("mail.nntp."+key);
+		if (value==null)
+			value = session.getProperty("mail."+key);
+		return value;
+	}
+	
 }
