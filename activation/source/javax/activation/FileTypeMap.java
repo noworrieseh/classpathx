@@ -25,9 +25,14 @@ package javax.activation;
 import java.io.File;
 
 /**
- * File Type Map.
+ * File Type Map abstract class provides an interface to the data
+ * typing of data files.  The class is designed to allow the
+ * plugging in of any algorithm as the system default engine to
+ * determine the data content type of files.  By default, the
+ * activation framework uses the MimeTypeFileTypeMap.
+ *
  * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class FileTypeMap 
 {
@@ -37,9 +42,9 @@ public abstract class FileTypeMap
   //-------------------------------------------------------------
 
   /**
-   * Create default file type map.
+   * Reference to the default engine for mapping files to data types
    */
-  private static FileTypeMap defaultMap = new MimetypesFileTypeMap();
+  private static FileTypeMap defaultFileTypeMap = new MimetypesFileTypeMap();
 
 
   //-------------------------------------------------------------
@@ -47,7 +52,7 @@ public abstract class FileTypeMap
   //-------------------------------------------------------------
 
   /**
-   * Create new file type map.
+   * Default constructor of FileTypeMap
    */
   public FileTypeMap() 
   {
@@ -59,35 +64,42 @@ public abstract class FileTypeMap
   //-------------------------------------------------------------
 
   /**
-   * Get content type.
-   * @param filename Filename
-   * @return TODO
+   * Get the MIME content type of the specified file
+   * @param filename Filename of file to query
+   * @return MIME content type of file
    */
   public abstract String getContentType(String filename);
 
   /**
-   * Get content type.
-   * @param file File source
-   * @return TODO
+   * Get the MIME content type of the specified file.
+   * @param file File to query
+   * @return MIME content type of file
    */
   public abstract String getContentType(File file);
 
   /**
-   * Get default file type map.
-   * @return Default file type map
+   * Get the system default file type mapping algorithm.  Unless
+   * otherwise modified, this will be an instance of the
+   * MimeTypesFileTypeMap engine.
+   * @return System default file type map
+   * @see javax.activation.MimeTypesFileTypeMap
+   * @see setDefaultFileTypeMap(javax.activation.FileTypeMap)
    */
   public static FileTypeMap getDefaultFileTypeMap()
   {
-    return defaultMap;
+    return defaultFileTypeMap;
   } // getDefaultFileTypeMap()
 
   /**
-   * Set default file type map.
-   * @param map New default file type map
+   * Set the system default file type mapping algorithm.
+   * @param fileTypeMap File type map to set as the system default
+   * @throws SecurityException Unsufficient permission to change
+   * the system default
+   * @see getDefaultFileTypeMap()
    */
-  public static void setDefaultFileTypeMap(FileTypeMap map)
+  public static void setDefaultFileTypeMap(FileTypeMap fileTypeMap)
   {
-    defaultMap = map;
+    defaultFileTypeMap = fileTypeMap;
   } // setDefaultFileTypeMap()
 
 
