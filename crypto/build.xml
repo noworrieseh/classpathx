@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.5 2001-12-08 22:51:26 raif Exp $
+   $Id: build.xml,v 1.6 2001-12-15 02:10:57 raif Exp $
 
    Copyright (C) 2001 Free Software Foundation, Inc.
 
@@ -209,6 +209,8 @@
    <target name="speed" depends="jar"
            description="Exercise block ciphers to measure performance">
       <java classname="gnu.crypto.tool.CipherSpeed"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+      <java classname="gnu.crypto.tool.HashSpeed"
             fork="yes" failonerror="true" classpath="${main.jar}"/>
    </target>
 
