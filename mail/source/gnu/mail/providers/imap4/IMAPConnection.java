@@ -720,7 +720,7 @@ public class IMAPConnection implements IMAPConstants
       String id = response.getID();
       if (response.isUntagged())
       {
-        if (id==LIST)
+        if (id.equals(command))
         {
           List code = response.getResponseCode();
           String text = response.getText();
