@@ -193,7 +193,7 @@ public abstract class Expr
         Collection nodeSet = (Collection) object;
         for (Iterator i = nodeSet.iterator(); i.hasNext(); )
           {
-            String string = _string(context, i.next());
+            String string = stringValue((Node) i.next());
             ret.addAll(_id (context, string));
           }
       }
@@ -273,7 +273,15 @@ public abstract class Expr
         return context.getNodeName();
       }
     Node node = firstNode(nodeSet);
-    return node.getNodeName();
+    switch (node.getNodeType())
+      {
+      case Node.ATTRIBUTE_NODE:
+      case Node.ELEMENT_NODE:
+      case Node.PROCESSING_INSTRUCTION_NODE:
+        return node.getNodeName();
+      default:
+        return "";
+      }
   }
 
   /**
@@ -422,11 +430,10 @@ public abstract class Expr
       case Node.DOCUMENT_FRAGMENT_NODE:
       case Node.ELEMENT_NODE: // 5.2 Element Nodes
         StringBuffer buf = new StringBuffer();
-        NodeList children = node.getChildNodes();
-        int len = children.getLength();
-        for (int i = 0; i < len; i++)
+        for (Node ctx = node.getFirstChild(); ctx != null;
+             ctx = ctx.getNextSibling())
           {
-            buf.append(stringValue(children.item(i), true));
+            buf.append(stringValue(ctx, true));
           }
         return buf.toString();
       case Node.TEXT_NODE: // 5.7 Text Nodes

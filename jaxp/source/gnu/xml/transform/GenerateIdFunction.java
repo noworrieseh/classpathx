@@ -82,7 +82,8 @@ final class GenerateIdFunction
         values.add(arg.evaluate(context, pos, len));
       }
     Node node;
-    Collection ns = (Collection) values.get(0);
+    Collection ns = (arity == 0) ? Collections.EMPTY_SET :
+      (Collection) values.get(0);
     if (ns.isEmpty())
       {
         node = context;

@@ -256,4 +256,14 @@ abstract class AbstractNumberNode
   abstract int[] compute(Stylesheet stylesheet, Node context)
     throws TransformerException;
 
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("format=");
+    buf.append(format);
+    buf.append(']');
+    return buf.toString();
+  }
+
 }

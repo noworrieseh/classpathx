@@ -1,5 +1,5 @@
 /*
- * DocumentOrderComparator.java
+ * NamespaceTest.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,27 +38,77 @@
 
 package gnu.xml.xpath;
 
-import java.util.Comparator;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
 /**
- * Sorts nodes into document order.
+ * Tests whether a namespace attribute has the specified name.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class DocumentOrderComparator
-  implements Comparator
+public final class NamespaceTest
+  extends Test
 {
-  
-  public int compare(Object o1, Object o2)
+
+  final QName qName;
+  final boolean anyLocalName;
+  final boolean any;
+
+  public NamespaceTest(QName qName, boolean anyLocalName, boolean any)
   {
-    if (o1 instanceof Node && o2 instanceof Node)
-      {
-        Node n1 = (Node)o1;
-        Node n2 = (Node)o2;
-        return (int) n1.compareDocumentPosition(n2);
-      }
-    return 0;
+    this.anyLocalName = anyLocalName;
+    this.any = any;
+    this.qName = qName;
   }
 
+  public boolean matchesAny()
+  {
+    return any;
+  }
+
+  public boolean matchesAnyLocalName()
+  {
+    return anyLocalName;
+  }
+
+  public boolean matches(Node node, int pos, int len)
+  {
+    switch (node.getNodeType())
+      {
+      case Node.ATTRIBUTE_NODE:
+        // Only match namespace attributes
+        String uri = node.getNamespaceURI();
+        if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri) ||
+            XMLConstants.XMLNS_ATTRIBUTE.equals(node.getPrefix()) ||
+            XMLConstants.XMLNS_ATTRIBUTE.equals(node.getNodeName()))
+          {
+            break;
+          }
+        // Fall through
+      default:
+        // Only process namespace attributes
+        return false;
+      }
+    if (any)
+      {
+        return true;
+      }
+    if (anyLocalName)
+      {
+        return true;
+      }
+    String localName = qName.getLocalName();
+    return (localName.equals(node.getLocalName()));
+  }
+
+  public String toString ()
+  {
+    if (any)
+      {
+        return "*";
+      }
+    return qName.toString();
+  }
+  
 }

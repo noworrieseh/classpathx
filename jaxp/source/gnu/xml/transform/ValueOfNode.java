@@ -40,6 +40,7 @@ package gnu.xml.transform;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.text.DecimalFormat;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -72,7 +73,17 @@ final class ValueOfNode
     throws TransformerException
   {
     Object ret = select.evaluate(context, 1, 1);
-    String value = Expr._string(context, ret);
+    String value = null;
+    if (ret instanceof Double)
+      {
+        DecimalFormat df = 
+          (DecimalFormat) stylesheet.decimalFormats.get(null);
+        value = df.format(((Double) ret).doubleValue());
+      }
+    else
+      {
+        value = Expr._string(context, ret);
+      }
     //System.err.println("value-of: "+context+" "+ select + " -> "+ value);
     if (value != null && value.length() > 0)
       {

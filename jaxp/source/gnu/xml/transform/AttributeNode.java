@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -57,13 +58,15 @@ final class AttributeNode
 
   final TemplateNode name;
   final String namespace;
+  final Node source;
   
   AttributeNode(TemplateNode children, TemplateNode next, TemplateNode name,
-                String namespace)
+                String namespace, Node source)
   {
     super(children, next);
     this.name = name;
     this.namespace = namespace;
+    this.source = source;
   }
 
   void doApply(Stylesheet stylesheet, String mode,
@@ -80,15 +83,35 @@ final class AttributeNode
                context, pos, len,
                fragment, null);
     // Use XPath string-value of fragment
-    String value = Expr.stringValue(fragment);
+    String nameValue = Expr.stringValue(fragment);
+    String prefix = getPrefix(nameValue);
+    String namespaceValue = namespace;
+    if (namespaceValue == null)
+      {
+        if (prefix != null)
+          {
+            // Resolve namespace for this prefix
+            namespaceValue = source.lookupNamespaceURI(prefix);
+          }
+      }
+    if (prefix == null)
+      {
+        // Resolve prefix for this namespace
+        prefix = source.lookupPrefix(namespaceValue);
+        if (prefix != null)
+          {
+            nameValue = prefix + ":" + nameValue;
+          }
+      }
     NamedNodeMap attrs = parent.getAttributes();
-    // Only insert if no existing attribute is present
-    boolean insert = (namespace != null) ?
-      (attrs.getNamedItemNS(namespace, value) == null) :
-          (attrs.getNamedItem(value) == null);
-    if ("http://www.w3.org/2000/xmlns/".equals(namespace) ||
-        "xmlns".equals(value) ||
-        value.startsWith("xmlns:"))
+    // Only insert if no existing attribute is present,
+    // AND there is no prefix if no namespace is present
+    boolean insert = (namespaceValue != null) ?
+      (attrs.getNamedItemNS(namespaceValue, nameValue) == null) :
+          (attrs.getNamedItem(nameValue) == null);
+    if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceValue) ||
+        XMLConstants.XMLNS_ATTRIBUTE.equals(nameValue) ||
+        nameValue.startsWith("xmlns:"))
       {
         // Namespace declaration, do not output
         insert = false;
@@ -96,9 +119,9 @@ final class AttributeNode
     if (insert)
       {
         // Insert attribute
-        Attr attr = (namespace != null) ?
-          doc.createAttributeNS(namespace, value) :
-              doc.createAttribute(value);
+        Attr attr = (namespaceValue != null) ?
+          doc.createAttributeNS(namespaceValue, nameValue) :
+              doc.createAttribute(nameValue);
         if (attrs != null)
           {
             if (namespace != null)
@@ -123,6 +146,12 @@ final class AttributeNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+
+  final String getPrefix(String name)
+  {
+    int ci = name.indexOf(':');
+    return (ci == -1) ? name : name.substring(0, ci);
   }
   
   public String toString()

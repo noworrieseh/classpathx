@@ -38,14 +38,8 @@
 
 package gnu.xml.transform;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import javax.xml.transform.TransformerException;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
 
 /**
@@ -88,7 +82,7 @@ final class ParameterNode
             stylesheet.bindings.set(name, value, global);
           }
       }
-    // variable and param don't process children
+    // variable and param don't process children as such
     if (next != null)
       {
         next.apply(stylesheet, mode,
@@ -104,31 +98,14 @@ final class ParameterNode
   
   Object getValue(Stylesheet stylesheet, String mode,
                   Node context, int pos, int len)
-    throws TransformerException
   {
     if (select != null)
       {
         return select.evaluate(context, pos, len);
       }
-    else if (children != null)
-      {
-        Document doc = (context instanceof Document) ? (Document) context :
-          context.getOwnerDocument();
-        DocumentFragment fragment = doc.createDocumentFragment();
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       fragment, null);
-        Collection acc = new LinkedList();
-        Node ctx = fragment.getFirstChild();
-        for (; ctx != null; ctx = ctx.getNextSibling())
-          {
-            acc.add(ctx);
-          }
-        return acc;
-      }
     else
       {
-        return null;
+        return children;
       }
   }
   
@@ -141,8 +118,8 @@ final class ParameterNode
     if (select != null)
       {
         buf.append(",select=");
+        buf.append(select);
       }
-    buf.append(select);
     if (global)
       {
         buf.append(",global");

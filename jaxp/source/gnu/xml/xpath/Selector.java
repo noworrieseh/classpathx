@@ -41,10 +41,11 @@ package gnu.xml.xpath;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.xml.XMLConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -88,6 +89,13 @@ public final class Selector
     this.axis = axis;
     this.tests = new Test[tests.size()];
     tests.toArray(this.tests);
+    if (axis == NAMESPACE &&
+        this.tests.length > 0 &&
+        this.tests[0] instanceof NameTest)
+      {
+        NameTest nt = (NameTest) this.tests[0];
+        this.tests[0] = new NamespaceTest(nt.qName, nt.anyLocalName, nt.any);
+      }
   }
 
   /**
@@ -110,6 +118,7 @@ public final class Selector
           }
         break;
       case ATTRIBUTE:
+      case NAMESPACE:
         if (nodeType != Node.ATTRIBUTE_NODE)
           {
             return false;
@@ -165,22 +174,22 @@ public final class Selector
 
   public Object evaluate(Node context, int pos, int len)
   {
-    Set acc = new HashSet();
+    Set acc = new LinkedHashSet();
     addCandidates(context, acc);
     List candidates = new ArrayList(acc);
-    Collections.sort(candidates, documentOrderComparator);
+    //Collections.sort(candidates, documentOrderComparator);
     return filterCandidates(candidates);
   }
 
   Collection evaluate(Node context, Collection ns)
   {
-    Set acc = new HashSet();
+    Set acc = new LinkedHashSet();
     for (Iterator i = ns.iterator(); i.hasNext(); )
       {
         addCandidates((Node) i.next(), acc);
       }
     List candidates = new ArrayList(acc);
-    Collections.sort(candidates, documentOrderComparator);
+    //Collections.sort(candidates, documentOrderComparator);
     return filterCandidates(candidates);
   }
 
@@ -197,7 +206,7 @@ public final class Selector
         for (int j = 0; j < tlen && len > 0; j++)
           {
             Test test = tests[j];
-            List successful = new ArrayList();
+            List successful = new ArrayList(len);
             for (int i = 0; i < len; i++)
               {
                 Node node = (Node) candidates.get(i);
@@ -254,7 +263,7 @@ public final class Selector
         addAttributes(context, candidates);
         break;
       case NAMESPACE:
-        // TODO
+        addNamespaceAttributes(context, candidates);
         break;
       case SELF:
         candidates.add(context);
@@ -296,11 +305,16 @@ public final class Selector
     while (cur != null)
       {
         acc.add(cur);
+        if (recurse)
+          {
+            addChildNodes(cur, acc, true);
+          }
         cur = cur.getNextSibling();
       }
     if (recurse)
       {
-        context = context.getParentNode();
+        context = (context.getNodeType() == Node.ATTRIBUTE_NODE) ?
+          ((Attr) context).getOwnerElement() : context.getParentNode();
         if (context != null)
           {
             addFollowingNodes(context, acc, recurse);
@@ -314,12 +328,16 @@ public final class Selector
     while (cur != null)
       {
         acc.add(cur);
+        if (recurse)
+          {
+            addChildNodes(cur, acc, true);
+          }
         cur = cur.getPreviousSibling();
       }
     if (recurse)
       {
-        // FIXME This is probably not correct
-        context = context.getParentNode();
+        context = (context.getNodeType() == Node.ATTRIBUTE_NODE) ?
+          ((Attr) context).getOwnerElement() : context.getParentNode();
         if (context != null)
           {
             addPrecedingNodes(context, acc, recurse);
@@ -335,9 +353,38 @@ public final class Selector
         int attrLen = attrs.getLength();
         for (int i = 0; i < attrLen; i++)
           {
-            acc.add(attrs.item(i));
+            Node attr = attrs.item(i);
+            if (!isNamespaceAttribute(attr))
+              {
+                acc.add(attr);
+              }
           }
       }
+  }
+
+  void addNamespaceAttributes(Node context, Collection acc)
+  {
+    NamedNodeMap attrs = context.getAttributes();
+    if (attrs != null)
+      {
+        int attrLen = attrs.getLength();
+        for (int i = 0; i < attrLen; i++)
+          {
+            Node attr = attrs.item(i);
+            if (isNamespaceAttribute(attr))
+              {
+                acc.add(attr);
+              }
+          }
+      }
+  }
+
+  final boolean isNamespaceAttribute(Node node)
+  {
+    String uri = node.getNamespaceURI();
+    return (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri) ||
+            XMLConstants.XMLNS_ATTRIBUTE.equals(node.getPrefix()) ||
+            XMLConstants.XMLNS_ATTRIBUTE.equals(node.getNodeName()));
   }
 
   public String toString()

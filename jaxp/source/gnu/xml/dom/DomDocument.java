@@ -90,6 +90,7 @@ public class DomDocument
 
   private final DOMImplementation implementation;
   private boolean checkingCharacters = true;
+  private boolean checkingWellformedness = true;
 
   boolean building; // if true, skip mutation events in the tree
   
@@ -140,6 +141,16 @@ public class DomDocument
   public void setBuilding(boolean flag)
   {
     building = flag;
+  }
+
+  /**
+   * Sets whether to check for document well-formedness.
+   * If true, an exception will be raised if a second doctype or root
+   * element node is added to the document.
+   */
+  public void setCheckWellformedness(boolean flag)
+  {
+    checkingWellformedness = flag;
   }
 
   /**
@@ -285,13 +296,15 @@ public class DomDocument
         && getDocumentElement() != null)
       {
         throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR,
-                         "document element already present", newChild, 0);
+                         "document element already present: " +
+                         getDocumentElement(), newChild, 0);
       }
     if (newChild.getNodeType() == DOCUMENT_TYPE_NODE
         && getDoctype() != null)
       {
         throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR,
-                         "document type already present", newChild, 0);
+                         "document type already present: " +
+                         getDoctype(), newChild, 0);
       }
   }
 
@@ -303,7 +316,10 @@ public class DomDocument
    */
   public Node appendChild(Node newChild)
   {
-    checkNewChild(newChild);
+    if (checkingWellformedness)
+      {
+        checkNewChild(newChild);
+      }
     return super.appendChild(newChild);
   }
 
@@ -315,7 +331,10 @@ public class DomDocument
    */
   public Node insertBefore(Node newChild, Node refChild)
   {
-    checkNewChild(newChild);
+    if (checkingWellformedness)
+      {
+        checkNewChild(newChild);
+      }
     return super.insertBefore(newChild, refChild);
   }
 
@@ -327,10 +346,11 @@ public class DomDocument
    */
   public Node replaceChild(Node newChild, Node refChild)
   {
-    if ((newChild.getNodeType() == ELEMENT_NODE &&
-         refChild.getNodeType() != ELEMENT_NODE) ||
-        (newChild.getNodeType() == DOCUMENT_TYPE_NODE &&
-         refChild.getNodeType() != DOCUMENT_TYPE_NODE))
+    if (checkingWellformedness &&
+        ((newChild.getNodeType() == ELEMENT_NODE &&
+          refChild.getNodeType() != ELEMENT_NODE) ||
+         (newChild.getNodeType() == DOCUMENT_TYPE_NODE &&
+          refChild.getNodeType() != DOCUMENT_TYPE_NODE)))
       {
         checkNewChild(newChild);
       }

@@ -135,14 +135,14 @@ public class StreamSerializer
             out.write(SPACE);
             out.write(nsname.getBytes(encoding));
             out.write(EQ);
-            String nsvalue = "'" + encode(uri) + "'";
+            String nsvalue = "'" + encode(uri, true) + "'";
             out.write(nsvalue.getBytes(encoding));
             defined = true;
           }
         out.write(SPACE);
         out.write(node.getNodeName().getBytes(encoding));
         out.write(EQ);
-        value = "'" + encode(node.getNodeValue()) + "'";
+        value = "'" + encode(node.getNodeValue(), true) + "'";
         out.write(value.getBytes(encoding));
         break;
       case Node.ELEMENT_NODE:
@@ -156,7 +156,7 @@ public class StreamSerializer
             out.write(SPACE);
             out.write(nsname.getBytes(encoding));
             out.write(EQ);
-            String nsvalue = "'" + encode(uri) + "'";
+            String nsvalue = "'" + encode(uri, true) + "'";
             out.write(nsvalue.getBytes(encoding));
             defined = true;
           }
@@ -198,7 +198,7 @@ public class StreamSerializer
         value = node.getNodeValue();
         if (!"yes".equals(node.getUserData("disable-output-encoding")))
           {
-            value = encode(value);
+            value = encode(value, false);
           }
         out.write(value.getBytes(encoding));
         break;
@@ -207,7 +207,7 @@ public class StreamSerializer
         out.write(value.getBytes(encoding));
         break;
       case Node.COMMENT_NODE:
-        value = "<!--" + encode(node.getNodeValue()) + "-->";
+        value = "<!--" + node.getNodeValue() + "-->";
         out.write(value.getBytes(encoding));
         Node cp = node.getParentNode();
         if (cp != null && cp.getNodeType() == Node.DOCUMENT_NODE)
@@ -339,7 +339,7 @@ public class StreamSerializer
     namespaces.remove(uri);
   }
 
-  static String encode(String text)
+  static String encode(String text, boolean encodeCtl)
   {
     int len = text.length();
     StringBuffer buf = null;
@@ -385,6 +385,24 @@ public class StreamSerializer
                 buf = new StringBuffer(text.substring(0, i));
               }
             buf.append("&quot;");
+          }
+        else if (encodeCtl)
+          {
+            if (c < 0x20)
+              {
+                if (buf == null)
+                  {
+                    buf = new StringBuffer(text.substring(0, i));
+                  }
+                buf.append('&');
+                buf.append('#');
+                buf.append((int) c);
+                buf.append(';');
+              }
+            else if (buf != null)
+              {
+                buf.append(c);
+              }
           }
         else if (buf != null)
           {

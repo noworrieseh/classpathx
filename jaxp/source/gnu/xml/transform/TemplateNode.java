@@ -69,6 +69,10 @@ abstract class TemplateNode
                    Node parent, Node nextSibling)
     throws TransformerException
   {
+    if (stylesheet.terminated)
+      {
+        return;
+      }
     if (Thread.currentThread().isInterrupted())
       {
         // Head off any infinite loops at the pass

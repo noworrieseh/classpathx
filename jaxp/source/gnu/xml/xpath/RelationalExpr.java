@@ -67,29 +67,24 @@ final class RelationalExpr
   {
     Object left = lhs.evaluate(context, pos, len);
     Object right = rhs.evaluate(context, pos, len);
-
-    if (!(left instanceof Collection) &&
-        !(right instanceof Collection))
+    double ln = _number(context, left);
+    double rn = _number(context, right);
+    if (eq && ln == rn)
       {
-        double ln = _number(context, left);
-        double rn = _number(context, right);
-        if (eq && ln == rn)
+        return Boolean.TRUE;
+      }
+    if (lt)
+      {
+        if (ln < rn)
           {
             return Boolean.TRUE;
           }
-        if (lt)
+      }
+    else
+      {
+        if (ln > rn)
           {
-            if (ln < rn)
-              {
-                return Boolean.TRUE;
-              }
-          }
-        else
-          {
-            if (ln > rn)
-              {
-                return Boolean.TRUE;
-              }
+            return Boolean.TRUE;
           }
       }
     return Boolean.FALSE;

@@ -93,8 +93,16 @@ final class ArithmeticExpr
       case MULTIPLY:
         return new Double(ln * rn);
       case DIVIDE:
+        if (rn == 0.0d)
+          {
+            return new Double(Double.NaN);
+          }
         return new Double(ln / rn);
       case MODULO:
+        if (rn == 0.0d)
+          {
+            return new Double(Double.NaN);
+          }
         return new Double(ln % rn);
       default:
         throw new IllegalStateException();

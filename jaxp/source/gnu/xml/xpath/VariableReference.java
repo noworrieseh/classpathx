@@ -63,7 +63,7 @@ public class VariableReference
         if (resolver instanceof Bindings)
           {
             // Needs context to operate properly
-            return ((Bindings) resolver).get(name, context);
+            return ((Bindings) resolver).get(name, context, pos, len);
           }
         QName qname = QName.valueOf(name);
         return resolver.resolveVariable(qname);

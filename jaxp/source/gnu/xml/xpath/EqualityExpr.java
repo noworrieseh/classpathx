@@ -141,7 +141,8 @@ final class EqualityExpr
         for (Iterator i = ns.iterator(); i.hasNext(); )
           {
             Node test = (Node) i.next();
-            if (_number(context, stringValue(test)) == n)
+            double nn = _number(context, stringValue(test));
+            if (nn == n || (nn == Double.NaN && n == Double.NaN))
               {
                 if (!invert)
                   {
@@ -226,7 +227,7 @@ final class EqualityExpr
           _number(context, left);
         double rn = frn ? ((Double) right).doubleValue() :
           _number(context, right);
-        return ln == rn;
+        return ln == rn || (ln == Double.NaN && rn == Double.NaN);
       }
     /*
      * Otherwise, both objects to be

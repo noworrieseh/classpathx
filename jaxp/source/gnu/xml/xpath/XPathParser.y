@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
@@ -56,8 +57,26 @@ import org.w3c.dom.Node;
 public class XPathParser
 {
 
+  NamespaceContext namespaceContext;
   XPathVariableResolver variableResolver;
   XPathFunctionResolver functionResolver;
+
+  QName getQName(String name)
+  {
+    QName qName = QName.valueOf(name);
+    if (namespaceContext != null)
+      {
+        String prefix = qName.getPrefix();
+        String uri = qName.getNamespaceURI();
+        if (prefix != null && (uri == null || uri.length() == 0))
+          {
+            uri = namespaceContext.getNamespaceURI(prefix);
+            String localName = qName.getLocalName();
+            qName = new QName(uri, localName, prefix);
+          }
+      }
+    return qName;
+  }
 
   Expr lookupFunction(String name, List args)
   {
@@ -722,11 +741,13 @@ name_test:
     }
   | NAME COLON STAR
     {
-      $$ = new NameTest((String) $1, true, false);
+      QName qName = getQName((String) $1);
+      $$ = new NameTest(qName, true, false);
     }
   | qname
     {
-      $$ = new NameTest((String) $1, false, false);
+      QName qName = getQName((String) $1);
+      $$ = new NameTest(qName, false, false);
     }
   ;
 

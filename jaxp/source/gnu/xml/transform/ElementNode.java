@@ -39,6 +39,7 @@
 package gnu.xml.transform;
 
 import java.util.StringTokenizer;
+import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -58,14 +59,16 @@ final class ElementNode
   final TemplateNode name;
   final String namespace;
   final String uas;
+  final Node source;
   
   ElementNode(TemplateNode children, TemplateNode next, TemplateNode name,
-              String namespace, String uas)
+              String namespace, String uas, Node source)
   {
     super(children, next);
     this.name = name;
     this.namespace = namespace;
     this.uas = uas;
+    this.source = source;
   }
 
   void doApply(Stylesheet stylesheet, String mode,
@@ -82,11 +85,38 @@ final class ElementNode
                context, pos, len,
                fragment, null);
     // Use XPath string-value of fragment
-    String value = Expr.stringValue(fragment);
+    String nameValue = Expr.stringValue(fragment);
+    String prefix = getPrefix(nameValue);
+    String namespaceValue = namespace;
+    if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix))
+      {
+        int ci = nameValue.indexOf(':');
+        nameValue = nameValue.substring(ci + 1);
+      }
+    else
+      {
+        if (namespaceValue == null)
+          {
+            if (prefix != null)
+              {
+                // Resolve namespace for this prefix
+                namespaceValue = source.lookupNamespaceURI(prefix);
+              }
+          }
+        if (prefix == null)
+          {
+            // Resolve prefix for this namespace
+            prefix = source.lookupPrefix(namespaceValue);
+            if (prefix != null)
+              {
+                nameValue = prefix + ":" + nameValue;
+              }
+          }
+      }
     // Create element
-    Element element = (namespace != null) ?
-      doc.createElementNS(namespace, value) :
-      doc.createElement(value);
+    Element element = (namespaceValue != null) ?
+      doc.createElementNS(namespaceValue, nameValue) :
+      doc.createElement(nameValue);
     if (nextSibling != null)
       {
         parent.insertBefore(element, nextSibling);
@@ -117,6 +147,12 @@ final class ElementNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+
+  final String getPrefix(String name)
+  {
+    int ci = name.indexOf(':');
+    return (ci == -1) ? name : name.substring(0, ci);
   }
 
   void addAttributeSet(Stylesheet stylesheet, String mode,

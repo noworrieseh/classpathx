@@ -64,27 +64,27 @@ final class NameFunction
   extends Expr
 {
 
-	final Expr arg;
+  final Expr arg;
 
-	NameFunction(List args)
-	{
-		this(args.size() > 0 ? (Expr) args.get(0) : null);
-	}
+  NameFunction(List args)
+  {
+    this(args.size() > 0 ? (Expr) args.get(0) : null);
+  }
 
-	NameFunction(Expr arg)
-	{
-		this.arg = arg;
-	}
+  NameFunction(Expr arg)
+  {
+    this.arg = arg;
+  }
 
-	public Object evaluate(Node context, int pos, int len)
-	{
-		Object val = (arg == null) ? null : arg.evaluate(context, pos, len);
-		return _name(context, (Collection) val);
-	}
-	
-	public String toString()
-	{
-		return (arg == null) ? "name()" : "name(" + arg + ")";
-	}
-	
+  public Object evaluate(Node context, int pos, int len)
+  {
+    Object val = (arg == null) ? null : arg.evaluate(context, pos, len);
+    return _name(context, (Collection) val);
+  }
+  
+  public String toString()
+  {
+    return (arg == null) ? "name()" : "name(" + arg + ")";
+  }
+  
 }

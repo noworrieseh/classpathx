@@ -119,6 +119,7 @@ implements XPathParser.yyInput
 
   Reader in;
   XPathToken token;
+  XPathToken lastToken;
 
   public XPathTokenizer (String expr)
   {
@@ -155,6 +156,7 @@ implements XPathParser.yyInput
   public boolean advance ()
     throws IOException
   {
+    lastToken = token;
     int c = in.read ();
     switch (c)
       {
@@ -392,6 +394,66 @@ implements XPathParser.yyInput
                         in.reset ();
                         return new XPathToken (XPathParser.NAME, name);
                       }
+                    break;
+                  case XPathParser.CHILD:
+                  case XPathParser.PARENT:
+                  case XPathParser.SELF:
+                  case XPathParser.DESCENDANT:
+                  case XPathParser.ANCESTOR:
+                  case XPathParser.DESCENDANT_OR_SELF:
+                  case XPathParser.ANCESTOR_OR_SELF:
+                  case XPathParser.ATTRIBUTE:
+                  case XPathParser.NAMESPACE:
+                  case XPathParser.FOLLOWING:
+                  case XPathParser.FOLLOWING_SIBLING:
+                  case XPathParser.PRECEDING:
+                  case XPathParser.PRECEDING_SIBLING:
+                    // Check that this is an axis specifier
+                    in.mark(1);
+                    c = in.read();
+                    if (c == 0x3a)
+                      {
+                        c = in.read();
+                        if (c == 0x3a)
+                          {
+                            in.reset();
+                            return new XPathToken(val);
+                          }
+                      }
+                    in.reset();
+                    return new XPathToken(XPathParser.NAME, name);
+                  case XPathParser.DIV:
+                  case XPathParser.MOD:
+                    // May be a name
+                    if (lastToken == null)
+                      {
+                        return new XPathToken(XPathParser.NAME, name);
+                      }
+                    switch (lastToken.type)
+                      {
+                      case XPathParser.LP:
+                      case XPathParser.LB:
+                      case XPathParser.COMMA:
+                      case XPathParser.PIPE:
+                      case XPathParser.EQ:
+                      case XPathParser.NE:
+                      case XPathParser.GT:
+                      case XPathParser.LT:
+                      case XPathParser.GTE:
+                      case XPathParser.LTE:
+                      case XPathParser.PLUS:
+                      case XPathParser.MINUS:
+                      case XPathParser.AT:
+                      case XPathParser.DOLLAR:
+                      case XPathParser.COLON:
+                      case XPathParser.DOUBLE_COLON:
+                      case XPathParser.DIV:
+                      case XPathParser.MOD:
+                      case XPathParser.OR:
+                      case XPathParser.AND:
+                        return new XPathToken(XPathParser.NAME, name);
+                      }
+                    break;
                   }
                 return new XPathToken (val);
               }

@@ -40,6 +40,7 @@ package gnu.xml.transform;
 
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 
@@ -53,11 +54,11 @@ final class CallTemplateNode
   extends TemplateNode
 {
 
-  final String name;
+  final QName name;
   final List withParams;
 
   CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+                   QName name, List withParams)
   {
     super(children, next);
     this.name = name;

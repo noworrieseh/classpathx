@@ -46,7 +46,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathVariableResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 
@@ -59,18 +62,21 @@ public class Bindings
   implements XPathVariableResolver, Cloneable
 {
 
+  final Stylesheet stylesheet;
+
   /**
    * Global variables.
    */
-  LinkedList variables;
+  final LinkedList variables;
 
   /**
    * Parameter value stack.
    */
-  LinkedList parameters;
+  final LinkedList parameters;
 
-  Bindings()
+  Bindings(Stylesheet stylesheet)
   {
+    this.stylesheet = stylesheet;
     variables = new LinkedList();
     parameters = new LinkedList();
     push(true);
@@ -127,7 +133,7 @@ public class Bindings
     return false;
   }
 
-  public Object get(String name, Node context)
+  public Object get(String name, Node context, int pos, int len)
   {
     Object ret = null;
     for (Iterator i = variables.iterator(); i.hasNext() && ret == null; )
@@ -142,6 +148,24 @@ public class Bindings
             Map pctx = (Map) i.next();
             ret = pctx.get(name);
           }
+      }
+    if (ret instanceof TemplateNode && context != null)
+      {
+        Document doc = (context instanceof Document) ? (Document) context :
+          context.getOwnerDocument();
+        DocumentFragment fragment = doc.createDocumentFragment();
+        try
+          {
+            ((TemplateNode) ret).apply(stylesheet, null,
+                                       context, pos, len,
+                                       fragment, null);
+          }
+        catch (TransformerException e)
+          {
+            // FIXME
+            e.printStackTrace(System.err);
+          }
+        ret = Expr.stringValue(fragment);
       }
     if (ret instanceof Expr && context != null)
       {
@@ -175,7 +199,7 @@ public class Bindings
 
   public Object resolveVariable(QName qName)
   {
-    return get(qName.toString(), null);
+    return get(qName.toString(), null, 1, 1);
   }
   
   public String toString()

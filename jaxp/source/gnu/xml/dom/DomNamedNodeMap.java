@@ -165,8 +165,6 @@ public class DomNamedNodeMap
     DomNode node = (DomNode) arg;
     if (node.owner != owner.owner)
       {
-        System.err.println(node+".owner="+node.owner);
-        System.err.println(owner+".owner="+owner.owner);
         throw new DomEx(DomEx.WRONG_DOCUMENT_ERR);
       }
     if (node.nodeType != type)
@@ -193,7 +191,7 @@ public class DomNamedNodeMap
       }
     
     // maybe attribute ADDITION events (?)
-    
+    DomNode last = null;
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
         boolean test = false;
@@ -235,14 +233,18 @@ public class DomNamedNodeMap
             ctx.previous = null;
             return ctx;
           }
+        last = ctx;
       }
-    // prepend
-    if (first != null)
+    // append
+    if (last != null)
       {
-        first.previous = node;
+        last.next = node;
+        node.previous = last;
       }
-    node.next = first;
-    first = node;
+    else
+      {
+        first = node;
+      }
     length++;
     return null;
   }

@@ -66,27 +66,35 @@ final class CopyNode
                Node parent, Node nextSibling)
     throws TransformerException
   {
-    Document doc = (parent instanceof Document) ? (Document) parent :
-      parent.getOwnerDocument();
-    Node copy = context.cloneNode(false);
-    copy = doc.adoptNode(copy);
-    if (copy.getNodeType() == Node.ATTRIBUTE_NODE)
+    Node copy = parent;
+    switch (context.getNodeType())
       {
-        NamedNodeMap attrs = parent.getAttributes();
-        if (attrs != null)
+      case Node.TEXT_NODE:
+      case Node.ATTRIBUTE_NODE:
+      case Node.ELEMENT_NODE:
+      case Node.PROCESSING_INSTRUCTION_NODE:
+        Document doc = (parent instanceof Document) ? (Document) parent :
+          parent.getOwnerDocument();
+        copy = context.cloneNode(false);
+        copy = doc.adoptNode(copy);
+        if (copy.getNodeType() == Node.ATTRIBUTE_NODE)
           {
-            attrs.setNamedItemNS(copy);
-          }
-      }
-    else
-      {
-        if (nextSibling != null)
-          {
-            parent.insertBefore(copy, nextSibling);
+            NamedNodeMap attrs = parent.getAttributes();
+            if (attrs != null)
+              {
+                attrs.setNamedItemNS(copy);
+              }
           }
         else
           {
-            parent.appendChild(copy);
+            if (nextSibling != null)
+              {
+                parent.insertBefore(copy, nextSibling);
+              }
+            else
+              {
+                parent.appendChild(copy);
+              }
           }
       }
     // Children have priority over used attribute sets

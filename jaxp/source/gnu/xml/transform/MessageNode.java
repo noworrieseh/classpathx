@@ -1,5 +1,5 @@
 /*
- * DocumentOrderComparator.java
+ * MessageNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,29 +36,53 @@
  * exception statement from your version. 
  */
 
-package gnu.xml.xpath;
+package gnu.xml.transform;
 
-import java.util.Comparator;
+import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * Sorts nodes into document order.
+ * An XSL <code>message</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class DocumentOrderComparator
-  implements Comparator
+final class MessageNode
+  extends TemplateNode
 {
-  
-  public int compare(Object o1, Object o2)
+
+  final boolean terminate;
+
+  MessageNode(TemplateNode children, TemplateNode next, boolean terminate)
   {
-    if (o1 instanceof Node && o2 instanceof Node)
-      {
-        Node n1 = (Node)o1;
-        Node n2 = (Node)o2;
-        return (int) n1.compareDocumentPosition(n2);
-      }
-    return 0;
+    super(children, next);
+    this.terminate = terminate;
   }
 
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
+    throws TransformerException
+  {
+    if (children != null)
+      {
+        Document doc = (parent instanceof Document) ? (Document) parent :
+          parent.getOwnerDocument();
+        DocumentFragment fragment = doc.createDocumentFragment();
+        children.apply(stylesheet, mode, context, pos, len, fragment, null);
+        String message = Expr.stringValue(fragment);
+        System.err.println(message);
+        if (terminate)
+          {
+            stylesheet.terminated = true;
+          }
+      }
+    if (next != null && !terminate)
+      {
+        next.apply(stylesheet, mode, context, pos, len, parent, nextSibling);
+      }
+  }
+  
 }

@@ -83,7 +83,7 @@ final class CopyOfNode
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node src = (Node) i.next();
-            Node node = src.cloneNode(false);
+            Node node = src.cloneNode(true);
             node = doc.adoptNode(node);
             if (node.getNodeType() == Node.ATTRIBUTE_NODE)
               {

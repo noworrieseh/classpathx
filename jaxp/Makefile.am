@@ -372,6 +372,7 @@ $(src)/gnu/xml/xpath/LastFunction.java \
 $(src)/gnu/xml/xpath/LocalNameFunction.java \
 $(src)/gnu/xml/xpath/NameFunction.java \
 $(src)/gnu/xml/xpath/NamespaceUriFunction.java \
+$(src)/gnu/xml/xpath/NamespaceTest.java \
 $(src)/gnu/xml/xpath/NameTest.java \
 $(src)/gnu/xml/xpath/NegativeExpr.java \
 $(src)/gnu/xml/xpath/NodeTypeTest.java \
@@ -426,6 +427,7 @@ $(src)/gnu/xml/transform/GenerateIdFunction.java \
 $(src)/gnu/xml/transform/IfNode.java \
 $(src)/gnu/xml/transform/KeyFunction.java \
 $(src)/gnu/xml/transform/LiteralNode.java \
+$(src)/gnu/xml/transform/MessageNode.java \
 $(src)/gnu/xml/transform/NodeNumberNode.java \
 $(src)/gnu/xml/transform/NumberNode.java \
 $(src)/gnu/xml/transform/OtherwiseNode.java \
