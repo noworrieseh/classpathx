@@ -6,6 +6,7 @@ JAVAC = @JAVAC@
 #JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGS = -g
 JAVADOC = javadoc
+JAVADOCFLAGS =
 
 src = @srcdir@/source
 dst = @srcdir@/classes
@@ -434,8 +435,8 @@ $(maildir_classes): $(dst)/%.class: $(src)/%.java $(dst)
 # Javadoc
 javadoc:
 	mkdir -p $(doc)
-	$(JAVADOC) -d $(doc) -windowtitle "GNU JavaMail API documentation" \
-		-sourcepath $(src) $(package_names)
+	$(JAVADOC) $(JAVADOCFLAGS) -d $(doc) -sourcepath $(src) \
+          -windowtitle "GNU JavaMail API documentation" $(package_names)
 
 # Remove jar files and directories
 clean-local:
@@ -444,8 +445,8 @@ clean-local:
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
 
 install-data-local:
-	@srcdir@/mkinstalldirs $(prefix)/share/java
-	$(INSTALL_DATA) $(gnumail_jar) $(prefix)/share/java
-	$(INSTALL_DATA) $(providers_jar) $(prefix)/share/java
+	@srcdir@/mkinstalldirs $(DESTDIR)/$(datadir)/java
+	$(INSTALL_DATA) $(gnumail_jar) $(DESTDIR)/$(datadir)/java
+	$(INSTALL_DATA) $(providers_jar) $(DESTDIR)/$(datadir)/java
 
 # End of Makefile.am

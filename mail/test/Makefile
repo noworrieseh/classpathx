@@ -12,7 +12,7 @@ JAR = jar
 prefix = /usr/local/share/java
 extra = /usr/share/java
 
-OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true \
+OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true -Djavax.net.debug=true \
 -Dmail.smtp.host=smtp.clara.net
 
 all: test
