@@ -1,5 +1,5 @@
 /*
- * $Id: DomImpl.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomImpl.java,v 1.2 2001-06-23 05:17:19 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import java.util.Vector;
 import org.w3c.dom.*;
 
 
-// $Id: DomImpl.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomImpl.java,v 1.2 2001-06-23 05:17:19 db Exp $
 
 /**
  * <p> "DOMImplementation" implementation. </p>
@@ -36,7 +36,7 @@ import org.w3c.dom.*;
  * Traversal).
  *
  * @author David Brownell 
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-06-23 05:17:19 $
  */
 public class DomImpl implements DOMImplementation
 {
@@ -56,7 +56,7 @@ public class DomImpl implements DOMImplementation
 	name = name.toLowerCase ();
 
 	if ("xml".equals (name) || "core".equals (name)) {
-	    if (version == null)
+	    if (version == null || version.equals (""))
 		return true;
 	    if ("1.0".equals (version))
 		return true;
@@ -69,7 +69,7 @@ public class DomImpl implements DOMImplementation
 		// || "mouseevents".equals (name)
 		|| "htmlevents".equals (name)
 		) {
-	    if (version == null)
+	    if (version == null || version.equals (""))
 		return true;
 	    if ("2.0".equals (version))
 		return true;
@@ -78,7 +78,7 @@ public class DomImpl implements DOMImplementation
 	// be created and passed through the DOM.
 
 	} else if ("user-events".equals (name)) {
-	    if (version == null)
+	    if (version == null || version.equals (""))
 		return true;
 	    if ("0.1".equals (version))
 		return true;
@@ -94,7 +94,7 @@ public class DomImpl implements DOMImplementation
 
 		// Note:  nyet tree walker support ...
 
-		if (version == null)
+		if (version == null || version.equals (""))
 		    return true;
 		if ("2.0".equals (version))
 		    return true;
