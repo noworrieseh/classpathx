@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.2 2003-09-13 14:15:39 dog Exp $
+# $Id: configure.ac,v 1.3 2004-01-11 18:10:02 dog Exp $
 # Copyright (C) 2003 Nic Ferrier
 # 
 # This file is part of GNU JavaMail.
@@ -75,6 +75,7 @@ AC_ARG_ENABLE(maildir, AC_HELP_STRING([--enable-maildir],
 AM_CONDITIONAL(ENABLE_MAILDIR, test "x$enable_maildir" = "xyes")
 
 AC_PROG_JAVAC
+AC_PROG_JAVADOC
 AC_PROG_JAR
 AC_CHECK_CLASSPATH
 

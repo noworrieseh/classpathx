@@ -373,7 +373,6 @@ public final class POP3Folder
     return '\u0000';
   }
 
-
   // -- These must be overridden to throw exceptions --
 
   /**
