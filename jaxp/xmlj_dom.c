@@ -246,7 +246,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv * env,
 {
   xmlDocPtr doc;
   xmlNodePtr element;
-  xmlNsPtr ns;
+  xmlNsPtr ns = NULL;
   const xmlChar *s_uri;
   const xmlChar *s_qName;
   const xmlChar *s_prefix;
@@ -254,16 +254,19 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv * env,
 
   doc = (xmlDocPtr) xmljGetNodeID (env, self);
   s_qName = xmljGetStringChars (env, qName);
+  if (xmlValidateQName (s_qName, 0))
+    {
+      xmljThrowDOMException (env, 5, NULL); /* INVALID_CHARACTER_ERR */
+      return NULL;
+    }
   if (uri != NULL)
     {
       s_uri = xmljGetStringChars (env, uri);
       s_prefix = xmljGetPrefix (s_qName);
       s_localName = xmljGetLocalName (s_qName);
       ns = xmlNewNs ((xmlNodePtr) doc, s_uri, s_prefix);
-      element = xmlNewDocNode (doc, ns, s_localName, NULL);
     }
-  else
-    element = xmlNewDocNode (doc, NULL, s_qName, NULL);
+  element = xmlNewDocNode (doc, ns, s_qName, NULL);
   return xmljGetNodeInstance (env, element);
 }
 
@@ -275,7 +278,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv * env,
 {
   xmlDocPtr doc;
   xmlNodePtr attr;
-  xmlNsPtr ns;
+  xmlNsPtr ns = NULL;
   const xmlChar *s_uri;
   const xmlChar *s_qName;
   const xmlChar *s_prefix;
@@ -283,17 +286,19 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv * env,
 
   doc = (xmlDocPtr) xmljGetNodeID (env, self);
   s_qName = xmljGetStringChars (env, qName);
+  if (xmlValidateQName (s_qName, 0))
+    {
+      xmljThrowDOMException (env, 5, NULL); /* INVALID_CHARACTER_ERR */
+      return NULL;
+    }
   if (uri != NULL)
     {
       s_uri = xmljGetStringChars (env, uri);
       s_prefix = xmljGetPrefix (s_qName);
       s_localName = xmljGetLocalName (s_qName);
       ns = xmlNewNs ((xmlNodePtr) doc, s_uri, s_prefix);
-      attr =
-        (xmlNodePtr) xmlNewNsProp ((xmlNodePtr) doc, ns, s_localName, NULL);
     }
-  else
-    attr = (xmlNodePtr) xmlNewNsProp ((xmlNodePtr) doc, NULL, s_qName, NULL);
+    attr = (xmlNodePtr) xmlNewNsProp ((xmlNodePtr) doc, ns, s_qName, NULL);
   return xmljGetNodeInstance (env, attr);
 }
 
@@ -399,16 +404,26 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_renameNode (JNIEnv * env,
                                                    jobject self,
                                                    jobject n,
                                                    jstring namespaceURI,
-                                                   jstring qualifiedName)
+                                                   jstring qName)
 {
   xmlNodePtr node;
+  const xmlChar *s_qName;
   const xmlChar *href;
   const xmlChar *prefix;
+  int *len;
 
   node = xmljGetNodeID (env, n);
-  xmlNodeSetName (node, xmljGetStringChars (env, qualifiedName));
+  s_qName = xmljGetStringChars (env, qName);
+  if (xmlValidateQName (s_qName, 0))
+    {
+      xmljThrowDOMException (env, 5, NULL); /* INVALID_CHARACTER_ERR */
+      return NULL;
+    }
+  xmlNodeSetName (node, s_qName);
+  
   href = xmljGetStringChars (env, namespaceURI);
-  prefix = xmlSplitQName3 (node->name, NULL);
+  len = (int *) malloc (sizeof (int));
+  prefix = xmlSplitQName3 (s_qName, len);
   if (node->ns == NULL)
     {
       node->ns = xmlNewNs (node, href, prefix);
@@ -418,6 +433,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_renameNode (JNIEnv * env,
       node->ns->href = href;
       node->ns->prefix = prefix;
     }
+  free (len);
   return n;
 }
 
@@ -520,7 +536,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
         {
           return NULL;
         }
-      printf("createDocument:1\n");
       ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
       name = xmljGetStringChars (env, ret);
       
@@ -531,7 +546,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
         {
           return NULL;
         }
-      printf("createDocument:2\n");
       ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
       publicId = xmljGetStringChars (env, ret);
 
@@ -542,7 +556,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
         {
           return NULL;
         }
-      printf("createDocument:3\n");
       ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
       systemId = xmljGetStringChars (env, ret);
 
@@ -553,7 +566,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
         {
           return NULL;
         }
-      printf("createDocument:4\n");
       ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
       internalSubset = xmljGetStringChars (env, ret);
 
