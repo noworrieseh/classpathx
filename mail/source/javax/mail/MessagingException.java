@@ -27,6 +27,9 @@
 
 package javax.mail;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
 /**
  * The base class for all exceptions thrown by the Messaging classes.
  *
@@ -120,5 +123,25 @@ public class MessagingException
     }
     return message;
   }
+
+  public void printStackTrace(PrintStream out)
+    {
+      super.printStackTrace(out);
+      if (nextException != null)
+        {
+          out.println("nested exception is:");
+          nextException.printStackTrace(out);
+        }
+    }
+  
+  public void printStackTrace(PrintWriter out)
+    {
+      super.printStackTrace(out);
+      if (nextException != null)
+        {
+          out.println("nested exception is:");
+          nextException.printStackTrace(out);
+        }
+    }
   
 }

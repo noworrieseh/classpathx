@@ -9,7 +9,8 @@ JAVAC = gcj
 JAVAC_OPTS = -C
 JAR = jar
 
-SHARED = /usr/share/java
+prefix = /usr/local/share/java
+extra = /usr/share/java
 
 OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true \
 -Dmail.smtp.host=smtp.clara.net
@@ -18,9 +19,12 @@ all: test
 
 test_sourcedir=$(PROJECTROOT)/src
 test_sourcefiles=$(shell find $(test_sourcedir) -name "*.java" -print)
-test_classpath=../gnumail.jar ../providers.jar ../lib/activation.jar \
-../lib/inetlib.jar $(SHARED)/junit.jar $(SHARED)/jsse.jar \
-$(SHARED)/javax-security.jar $(SHARED)/jsse.jar
+test_classpath=$(prefix)/gnumail.jar $(prefix)/gnumail-providers.jar \
+$(prefix)/activation.jar $(prefix)/inetlib.jar \
+$(prefix)/jsse.jar $(prefix)/jessie.jar \
+$(prefix)/javax-security.jar $(prefix)/gnu-crypto.jar \
+$(prefix)/javax-crypto.jar\
+$(extra)/junit.jar
 test_classesdest=$(PROJECTROOT)/classes
 test_otherfiles=
 test_debugclasses=$(test_sourcefiles:.java=.class)

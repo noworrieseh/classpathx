@@ -218,6 +218,7 @@ util_sources = \
 $(src)/gnu/mail/util/BOutputStream.java \
 $(src)/gnu/mail/util/Base64InputStream.java \
 $(src)/gnu/mail/util/Base64OutputStream.java \
+$(src)/gnu/mail/util/MailboxURLConnection.java \
 $(src)/gnu/mail/util/QInputStream.java \
 $(src)/gnu/mail/util/QOutputStream.java \
 $(src)/gnu/mail/util/QPInputStream.java \

@@ -45,5 +45,5 @@ The following session properties may be set:
 mail.pop3.apop            boolean  if false, disable all attempts at
                                    APOP authentication
 
-
-Chris Burdess, September 2003
+The provider supports TLS. For further information, refer to the Javadoc for
+the gnu.mail.providers.pop3 package.

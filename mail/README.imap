@@ -1,80 +1,21 @@
-The provider only works with reads at the moment. No update 
-or write functionality is implemented.
+The IMAP provider is a complete store provider for IMAP4rev1, written from
+scratch for performance and to remove the Scheme-interpreter dependency in
+the previous provider. It uses GNU inetlib to manage the IMAP protocol level.
 
-The provider uses a simple architecture:
+Features:
+- all IMAP4rev1 commands except UID
+- BODYSTRUCTURE fetches for remote MIME body part handling
+- authentication via SASL
+- TLS
+- ANSI coloured debug output! (set session property mail.debug.ansi=true)
+- currently tested against UW imapd and GNU mailutils imapd
 
-  the class IMAPConnection is used to create a connection
-  to an IMAP server. Commands can be issued to the IMAP
-  server by calling methods on IMAPConnection. The methods
-  return data, possibly complex data. Some of the command
-  methods have side effects on data inside IMAPConnection.
-  The data inside IMAPConnection is package private but
-  can be examined through well named methods.
+For more information, see the Javadoc for the gnu.mail.providers.imap
+package.
 
+Todo:
+- implement message/* body parts
+- write the UID code and make IMAPFolder implement UIDFolder
+- test against as many IMAP servers as possible
 
-What does "possibly complex data" mean?
-IMAP is a complex protocol. Some commands return non-simple 
-responses, ie: not a simple string, boolean or number 
-result. 
-
-For example the command:
-  FETCH 1 (BODYSTRUCTURE)
-
-returns an s-expression containing the body structure.
-
-Complex responses such as these are returned directly by
-the command methods. That means that when you call a method
-called something like:
-
-  IMAPConnection.fetchBodyStructure(msgNum)
-
-you will recieve a body structure representation in return.
-
-The complex objects that are returned are:
-
-  linked list (or s-expression)
-  This is represented by a gnu kawa object called a Pair.
-  A Pair extends an LList. Pairs are implementations of
-  LISP/Scheme like linked lists and have the usual car/cdr
-  data members.
-
-  InputStream
-  This is used to return large amounts of data, for example
-  in a fetch response. Be aware that the stream returned
-  is inlined. That is it is simply a layer over the current
-  socket stream - THERE IS NO BUFFERING! You just read the
-  extent of the message (till the returned stream returns -1
-  from read()) before issuing and reading from the 
-  connection in other ways.
-
-
-
-Dependancies of the provider
-
-In order to provide the parsing of IMAP responses in a 
-clear and simple way the code relies upon the GNU Kawa
-library (written by Per Bothner). This provides the IMAP
-s-expression support. 
-
-Note: you must use the version that is in the OJE CVS. The
-version of Kawa available over the web is broken (the 
-version in OJE CVS is the latest semi-stable branch of the
-Kawa CVS tree).
-
-
-
-Pitfalls and things to watch out for
-
-The IMAPConnection class is highly complex. It uses 
-exceptions to perform branches across the stack (ie: long
-jmps). Following it is a bit of a pain because some response
-handler methods simply set state within the class and
-others return state to the caller.
-
-
-
-Nic Ferrier - March 2001
-
-PS If I should die think only this of me, I did write some
-of this down, instead of letting you work it out for 
-yourselves.
+If you want to help with this provider, please contact dog@gnu.org
