@@ -1,5 +1,5 @@
 /*
- * $Id: SAXParser.java,v 1.3 2001-11-02 21:39:57 db Exp $
+ * $Id: SAXParser.java,v 1.4 2001-12-05 23:16:55 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -37,17 +37,22 @@ import org.xml.sax.helpers.*;
 
 /**
  * Wraps a SAX2 (or SAX1) parser.
+ *
+ * <p>Note that parsing with methods on this interface requires use of one
+ * of the optional SAX base classes.  It's usually preferable to use the
+ * SAX parser APIs directly.  SAX gives much more flexibility about how
+ * application classes are organized, and about how the document entity is
+ * packaged for delivery to the parser.  And JAXP doesn't otherwise provide
+ * access to the SAX2 extension handlers for lexical or declaration events.
+ *
  * @author	Andrew Selkirk
+ * @author	David Brownell
  * @version	1.0
  */
-public abstract class SAXParser {
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	protected SAXParser() {
-	} // SAXParser()
+public abstract class SAXParser
+{
+	/** Only subclasses may use the constructor. */
+	protected SAXParser() { }
 
 
 	//-------------------------------------------------------------
@@ -60,18 +65,27 @@ public abstract class SAXParser {
 	public abstract Object getProperty (String id) 
 		throws SAXNotRecognizedException, SAXNotSupportedException;
 
+	/**
+	 * Parse using (deprecated) SAX1 style handlers,
+	 * and a byte stream (with no URI).
+	 * Avoid using this API, since relative URIs in the document need
+	 * to be resolved against the document entity's URI, and good
+	 * diagnostics also need that URI.
+	 */
 	public void parse(InputStream stream, HandlerBase handler) 
-		throws SAXException, IOException {
-		parse(new InputSource(stream), handler);
-	} // parse()
+	throws SAXException, IOException
+	    { parse (new InputSource (stream), handler); }
 
+	/**
+	 * Parse using (deprecated) SAX1 style handlers,
+	 * and a byte stream with a specified URI.
+	 */
 	public void parse (
 		InputStream stream,
 		HandlerBase handler,
 		String systemID
-	) throws SAXException, IOException {
-
-		// Variables
+	) throws SAXException, IOException
+	{
 		InputSource	source;
 
 		// Prepare Source
@@ -80,20 +94,29 @@ public abstract class SAXParser {
 
 		parse(source, handler);
 
-	} // parse()
+	}
 
+	/**
+	 * Parse using SAX2 style handlers,
+	 * and a byte stream (with no URI).
+	 * Avoid using this API, since relative URIs in the document need
+	 * to be resolved against the document entity's URI, and good
+	 * diagnostics also need that URI.
+	 */
 	public void parse(InputStream stream, DefaultHandler def) 
-		throws SAXException, IOException {
-		parse(new InputSource(stream), def);
-	} // parse()
+	throws SAXException, IOException
+	    { parse (new InputSource (stream), def); }
 
+	/**
+	 * Parse using SAX2 style handlers,
+	 * and a byte stream with a specified URI.
+	 */
 	public void parse (
 		InputStream stream,
 		DefaultHandler def,
 		String systemID
-	) throws SAXException, IOException {
-
-		// Variables
+	) throws SAXException, IOException
+	{
 		InputSource	source;
 
 		// Prepare Source
@@ -102,34 +125,56 @@ public abstract class SAXParser {
 
 		parse(source, def);
 
-	} // parse()
+	}
 
+	/**
+	 * Parse using (deprecated) SAX1 style handlers,
+	 * and a URI for the document entity.
+	 */
 	public void parse(String uri, HandlerBase handler) 
-		throws SAXException, IOException {
-		parse(new InputSource(uri), handler);
-	} // parse()
+	throws SAXException, IOException
+	    { parse (new InputSource (uri), handler); }
 
+	/**
+	 * Parse using SAX2 style handlers,
+	 * and a URI for the document entity.
+	 */
 	public void parse(String uri, DefaultHandler def) 
-		throws SAXException, IOException {
-		parse(new InputSource(uri), def);
-	} // parse()
+	throws SAXException, IOException
+	    { parse (new InputSource (uri), def); }
 
+	/**
+	 * Parse using (deprecated) SAX1 style handlers,
+	 * turning a file name into the document URI.
+	 */
 	public void parse(File file, HandlerBase handler) 
-		throws SAXException, IOException {
-// FIXME:  never discard the uri!  fileToURI()
-		parse(new InputSource(new FileInputStream(file)), handler);
-	} // parse()
+	throws SAXException, IOException
+	{
+		InputSource	in;
+		
+		in = new InputSource (DocumentBuilder.fileToURL (file));
+		parse (in, handler);
+	}
 
+	/**
+	 * Parse using SAX2 style handlers,
+	 * turning a file name into the document URI.
+	 */
 	public void parse(File file, DefaultHandler def) 
-		throws SAXException, IOException {
-// FIXME:  never discard the uri!  fileToURI()
-		parse(new InputSource(new FileInputStream(file)), def);
-	} // parse()
+	throws SAXException, IOException
+	{
+		InputSource	in;
+		
+		in = new InputSource (DocumentBuilder.fileToURL (file));
+		parse (in, def);
+	}
 
+	/**
+	 * Parse using (deprecated) SAX1 style handlers.
+	 */
 	public void parse(InputSource source, HandlerBase handler) 
-		throws SAXException, IOException {
-
-		// Variables
+	throws SAXException, IOException
+	{
 		Parser	parser;
 
 		// Prepare Parser
@@ -142,12 +187,14 @@ public abstract class SAXParser {
 		// Parse
 		parser.parse(source);
 
-	} // parse()
+	}
 
+	/**
+	 * Parse using SAX2 style handlers.
+	 */
 	public void parse(InputSource source, DefaultHandler def) 
-		throws SAXException, IOException {
-
-		// Variables
+	throws SAXException, IOException
+	{
 		XMLReader	reader;
 
 		// Prepare XML Reader
@@ -157,16 +204,20 @@ public abstract class SAXParser {
 		reader.setEntityResolver(def);
 		reader.setErrorHandler(def);
 
-		// FIXME: if "def" implements lexical or decl handler,
-		// set those properties ...
+		// NOTE:  this should NOT understand the
+		// extension handlers (lexical, decl).
 
-		// Parse
 		reader.parse(source);
+	}
 
-	} // parse()
-
+	/**
+	 * Get a (deprecated) SAX1 driver for the underlying parser.
+	 */
 	public abstract Parser getParser() throws SAXException;
 
+	/**
+	 * Get a SAX2 driver for the underlying parser.
+	 */
 	public abstract XMLReader getXMLReader() throws SAXException;
 
 	public abstract boolean isNamespaceAware();
