@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.4 2002-01-11 21:47:44 raif Exp $
+// $Id: ICMGenerator.java,v 1.5 2002-01-17 11:51:15 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,7 +35,7 @@ import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
 
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,7 +54,7 @@ import java.util.Map;
  * <a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
  * Integer Counter Mode</a>, David A. McGrew.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ICMGenerator extends BasePRNG {
 
@@ -137,8 +137,7 @@ public class ICMGenerator extends BasePRNG {
    // An ICM key consists of the block cipher key and an Offset.  The
    // Offset is an integer with BLOCK_LENGTH octets...
    //
-   public void setup(Map attributes)
-   throws GeneralSecurityException, IllegalStateException {
+   public void setup(Map attributes) {
       // find out which cipher algorithm to use
       String underlyingCipher = (String) attributes.get(CIPHER);
       if (underlyingCipher == null)
@@ -258,7 +257,11 @@ public class ICMGenerator extends BasePRNG {
       HashMap map = new HashMap();
       map.put(IBlockCipher.CIPHER_BLOCK_SIZE, new Integer(cipherBlockSize));
       map.put(IBlockCipher.KEY_MATERIAL, key);
-      cipher.init(map);
+      try {
+         cipher.init(map);
+      } catch (InvalidKeyException x) {
+         throw new IllegalArgumentException(KEY_MATERIAL);
+      }
    }
 
    public byte[] nextBlock() throws LimitReachedException {

@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: MDGenerator.java,v 1.2 2002-01-11 21:47:13 raif Exp $
+// $Id: MDGenerator.java,v 1.3 2002-01-17 11:51:15 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -71,8 +71,7 @@ public class MDGenerator extends BasePRNG {
    // Implementation of abstract methods in BaseRandom
    // -------------------------------------------------------------------------
 
-   public void setup(Map attributes)
-   throws GeneralSecurityException, IllegalStateException {
+   public void setup(Map attributes) {
       // find out which hash to use
       String underlyingMD = (String) attributes.get(MD_NAME);
       if (underlyingMD == null) {

@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: IRandom.java,v 1.3 2002-01-11 21:48:42 raif Exp $
+// $Id: IRandom.java,v 1.4 2002-01-17 11:51:15 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * The basic visible methods of any pseudo-random number generator.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface IRandom {
 
@@ -58,7 +58,7 @@ public interface IRandom {
     * @exception IllegalArgumentException if at least one of the defined name/
     * value pairs contains invalid data.
     */
-   void init(Map attributes) throws GeneralSecurityException;
+   void init(Map attributes);
 
    /**
     * Returns the next 8 bits of random data generated from this instance.

@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: BasePRNG.java,v 1.3 2002-01-11 21:49:29 raif Exp $
+// $Id: BasePRNG.java,v 1.4 2002-01-17 11:51:15 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * An abstract class to facilitate implementing PRNG algorithms.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class BasePRNG implements IRandom {
 
@@ -77,7 +77,7 @@ public abstract class BasePRNG implements IRandom {
       return name;
    }
 
-   public void init(Map attributes) throws GeneralSecurityException {
+   public void init(Map attributes) {
       this.setup(attributes);
 
       initialised = true;
@@ -92,6 +92,9 @@ public abstract class BasePRNG implements IRandom {
 
    public void nextBytes(byte[] out, int offset, int length)
    throws IllegalStateException, LimitReachedException {
+      if (out == null) {
+         return;
+      }
       if (!initialised) {
          throw new IllegalStateException();
       }
@@ -107,6 +110,10 @@ public abstract class BasePRNG implements IRandom {
    // Instance methods
    // -------------------------------------------------------------------------
 
+   public boolean isInitialised() {
+      return initialised;
+   }
+
    private byte nextByteInternal() throws LimitReachedException {
       if (ndx >= buffer.length) {
          buffer = this.nextBlock();
@@ -119,7 +126,7 @@ public abstract class BasePRNG implements IRandom {
    // abstract methods to implement by subclasses
    // -------------------------------------------------------------------------
 
-   public abstract void setup(Map attributes) throws GeneralSecurityException;
+   public abstract void setup(Map attributes);
 
    public abstract byte[] nextBlock() throws LimitReachedException;
 }
