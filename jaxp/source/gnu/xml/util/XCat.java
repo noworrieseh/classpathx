@@ -1258,7 +1258,7 @@ System.err.println ("nyet unhexing public id: " + publicId);
 		local = local.intern ();
 	    if (!started) {
 		started = true;
-		if ("catalog" != local)
+		if (!"catalog".equals (local))
 		    fatal ("root element not 'catalog': " + local);
 	    }
 
@@ -1319,7 +1319,7 @@ System.err.println ("nyet unhexing public id: " + publicId);
 // FIXME stack "prefer" settings (two elements only!) and use
 // them to populate different public mapping/delegation tables
 
-	    if ("catalog" == local || "group" == local) {
+	    if ("catalog".equals (local) || "group".equals (local)) {
 		String	prefer = atts.getValue ("prefer");
 
 		if (prefer != null && !"public".equals (prefer)) {
@@ -1330,7 +1330,7 @@ System.err.println ("nyet unhexing public id: " + publicId);
 		    }
 		}
 		if (prefer != null) {
-		    if ("catalog" == local) {
+		    if ("catalog".equals (local)) {
 			cat.hasPreference = true;
 			cat.usingPublic = "public".equals (prefer);
 		    } else {
@@ -1339,14 +1339,14 @@ System.err.println ("nyet unhexing public id: " + publicId);
 fatal ("<group prefer=...> case not handled");
 			}
 		    }
-		} else if ("group" == local && cat.hasPreference) {
+		} else if ("group".equals (local) && cat.hasPreference) {
 fatal ("<group prefer=...> case not handled");
 		}
 
 	    //
 	    // PUBLIC ids:  cleanly set up for id substitution
 	    //
-	    } else if ("public" == local) {
+	    } else if ("public".equals (local)) {
 		String	publicId = atts.getValue ("publicId");
 		String	value = null;
 
@@ -1366,7 +1366,7 @@ fatal ("<group prefer=...> case not handled");
 		} else
 		    cat.publicIds.put (publicId, uri);
 
-	    } else if ("delegatePublic" == local) {
+	    } else if ("delegatePublic".equals (local)) {
 		String	publicIdStartString;
 		Object	value = null;
 
@@ -1393,7 +1393,7 @@ fatal ("<group prefer=...> case not handled");
 	    //
 	    // SYSTEM ids:  need substitution due to operational issues
 	    //
-	    } else if ("system" == local) {
+	    } else if ("system".equals (local)) {
 		String	systemId = atts.getValue ("systemId");
 		String	value = null;
 
@@ -1419,7 +1419,7 @@ fatal ("<group prefer=...> case not handled");
 		} else
 		    cat.systemIds.put (systemId, uri);
 
-	    } else if ("rewriteSystem" == local) {
+	    } else if ("rewriteSystem".equals (local)) {
 		String	value = null;
 
 		if (systemIdStartString == null || rewritePrefix == null
@@ -1445,7 +1445,7 @@ fatal ("<group prefer=...> case not handled");
 		    cat.systemRewrites.put (systemIdStartString,
 		    		rewritePrefix);
 
-	    } else if ("delegateSystem" == local) {
+	    } else if ("delegateSystem".equals (local)) {
 		Object	value = null;
 
 		if (systemIdStartString == null || catalog == null) {
@@ -1471,7 +1471,7 @@ fatal ("<group prefer=...> case not handled");
 	    // URI:  just like "system" ID support, except that
 	    // fragment IDs are disallowed in "system" elements.
 	    //
-	    } else if ("uri" == local) {
+	    } else if ("uri".equals (local)) {
 		String	name = atts.getValue ("name");
 		String	value = null;
 
@@ -1496,7 +1496,7 @@ fatal ("<group prefer=...> case not handled");
 		} else
 		    cat.uris.put (name, uri);
 
-	    } else if ("rewriteURI" == local) {
+	    } else if ("rewriteURI".equals (local)) {
 		String value = null;
 
 		if (uriStartString == null || rewritePrefix == null
@@ -1520,7 +1520,7 @@ fatal ("<group prefer=...> case not handled");
 		} else
 		    cat.uriRewrites.put (uriStartString, rewritePrefix);
 
-	    } else if ("delegateURI" == local) {
+	    } else if ("delegateURI".equals (local)) {
 		Object	value = null;
 
 		if (uriStartString == null || catalog == null) {
@@ -1544,7 +1544,7 @@ fatal ("<group prefer=...> case not handled");
 	    //
 	    // NON-DELEGATING approach to modularity
 	    //
-	    } else if ("nextCatalog" == local) {
+	    } else if ("nextCatalog".equals (local)) {
 		if (catalog == null) {
 		    error ("expecting <nextCatalog catalog=.../>");
 		    return;
@@ -1556,7 +1556,7 @@ fatal ("<group prefer=...> case not handled");
 	    //
 	    // EXTENSIONS from appendix E
 	    //
-	    } else if ("doctype" == local) {
+	    } else if ("doctype".equals (local)) {
 		String	name = atts.getValue ("name");
 		String	value = null;
 
