@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.8 2001-11-04 03:58:48 db Exp $
+ * $Id: Consumer.java,v 1.9 2001-11-16 20:13:37 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -43,6 +43,8 @@ import org.xml.sax.ext.Attributes2;
 import gnu.xml.pipeline.DomConsumer;
 import gnu.xml.pipeline.EventConsumer;
 
+import DomDoctype.ElementInfo;
+
 
 /**
  * Event consumer which constructs DOM documents using the implementation
@@ -64,7 +66,7 @@ import gnu.xml.pipeline.EventConsumer;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 03:58:48 $
+ * @version $Date: 2001-11-16 20:13:37 $
  */
 public class Consumer extends DomConsumer
 {
@@ -226,16 +228,26 @@ public class Consumer extends DomConsumer
 		// DOM L2 can't write this flag, only read it
 		attr.setSpecified (false);
 	    }
-
-	    // FIXME: associate with the list of attributes that
-	    // DOM may have to default later (by hand)
 	}
 
-	// FIXME:  remember attributes declared with default values,
-	// and arrange to recreate them if they're ever deleted 
-	// from a NamedNodeMap of attributes.
-	// DOM L2 has no way to create or access such declarations,
-	// except implicitly.
+	public void attributeDecl (
+	    String	ename,
+	    String	aname,
+	    String	type,
+	    String	mode,
+	    String	value
+	) throws SAXException
+	{
+	    if (value == null && !"ID".equals (type))
+		return;
+	    
+	    ElementInfo	info = getDoctype ().getElementInfo (ename);
+
+	    if (value != null)
+		info.setAttrDefault (aname, value);
+	    if ("ID".equals (type))
+		info.setIdAttr (aname);
+	}
 
 	public void endDocument ()
 	throws SAXException
