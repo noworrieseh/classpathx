@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.11 2001-11-19 22:25:37 db Exp $
+ * $Id: Consumer.java,v 1.12 2001-11-20 01:20:13 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -67,7 +67,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-19 22:25:37 $
+ * @version $Date: 2001-11-20 01:20:13 $
  */
 public class Consumer extends DomConsumer
 {
@@ -231,6 +231,17 @@ public class Consumer extends DomConsumer
 	    }
 	}
 
+	public void endElement (
+	    String uri,
+	    String localName,
+	    String qName
+	) throws SAXException
+	{
+	    DomNode	top = (DomNode) getTop ();
+	    top.compact ();
+	    super.endElement (uri, localName, qName);
+	}
+
 	protected Text createText (
 	    boolean	isCDATA,
 	    char	buf [],
@@ -280,6 +291,7 @@ public class Consumer extends DomConsumer
 	{
 	    DomDocument		doc = (DomDocument) getDocument ();
 	    doc.setCheckingCharacters (true);
+	    doc.compact ();
 	    super.endDocument ();
 	}
 
@@ -309,8 +321,10 @@ public class Consumer extends DomConsumer
 		return;
 	    DomNode	top = (DomNode) getTop ();
 
-	    if (top.getNodeType () == Node.ENTITY_REFERENCE_NODE)
+	    if (top.getNodeType () == Node.ENTITY_REFERENCE_NODE) {
+		top.compact ();
 		top.makeReadonly ();
+	    }
 	    super.endEntity (name);
 	}
     }

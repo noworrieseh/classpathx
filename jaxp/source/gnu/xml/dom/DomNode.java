@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.9 2001-11-17 02:38:18 db Exp $
+ * $Id: DomNode.java,v 1.10 2001-11-20 01:20:13 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.9 2001-11-17 02:38:18 db Exp $
+// $Id: DomNode.java,v 1.10 2001-11-20 01:20:13 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-17 02:38:18 $
+ * @version $Date: 2001-11-20 01:20:13 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -120,6 +120,9 @@ public abstract class DomNode
     private static boolean		eventDataLock;
     private static DomEvent.DomMutationEvent	mutationEvent
 		    = new DomEvent.DomMutationEvent (null);
+    
+    // optimize space to share what we can
+    final private static DomNode	noKids [] = new DomNode [0];
 
 	//
 	// Some of the methods here are declared 'final' because
@@ -134,6 +137,30 @@ public abstract class DomNode
 		"feature not yet implemented", this, 0);
     }
 
+    /**
+     * Reduces space utilization for this node.
+     */
+    public void compact ()
+    {
+	if (children != null && children != noKids) {
+	    if (length == 0)
+		children = noKids;
+	    else if (children.length != length) {
+		DomNode	newKids [] = new DomNode [length];
+		System.arraycopy (children, 0, newKids, 0, length);
+		children = newKids;
+	    }
+	}
+	if (listeners != null && listeners.length != nListeners) {
+	    if (nListeners == 0)
+		listeners = null;
+	    else {
+		ListenerRecord	l [] = new ListenerRecord [nListeners];
+		System.arraycopy (listeners, 0, l, 0, nListeners);
+		listeners = l;
+	    }
+	}
+    }
 
     /**
      * Constructs a node and associates it with its owner.  Only
@@ -161,9 +188,15 @@ public abstract class DomNode
 	    case DOCUMENT_FRAGMENT_NODE:
 	    case ENTITY_REFERENCE_NODE:
 	    case ELEMENT_NODE:
-	    case ATTRIBUTE_NODE:
-	    case ENTITY_NODE:
 		children = new DomNode [NKIDS_INIT];
+		break;
+	    // no sane app wants the attributes-with-children model
+	    case ATTRIBUTE_NODE:
+		children = new DomNode [1];
+		break;
+	    // we don't currently build children with entities
+	    case ENTITY_NODE:
+		children = noKids;
 
 	    // no other kinds of nodes may have children; so for
 	    // such nodes, length stays zero, children stays null
@@ -928,7 +961,7 @@ public abstract class DomNode
 	    retval.parent = null;
 	    retval.readonly = false;
 	    if (retval.children != null) {
-		retval.children = new DomNode [NKIDS_INIT];
+		retval.children = noKids;
 		retval.length = 0;
 	    }
 	    retval.listeners = null;
@@ -1182,7 +1215,7 @@ public abstract class DomNode
 	boolean		useCapture
     ) {
 	if (listeners == null)
-	    listeners = new ListenerRecord [NKIDS_INIT];
+	    listeners = new ListenerRecord [1];
 	else if (nListeners == listeners.length) {
 	    ListenerRecord newListeners [];
 	    newListeners =
