@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.7 2001-11-19 04:48:35 db Exp $
+ * $Id: DomDocument.java,v 1.8 2001-11-19 18:49:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import org.w3c.dom.traversal.*;
 import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
-// $Id: DomDocument.java,v 1.7 2001-11-19 04:48:35 db Exp $
+// $Id: DomDocument.java,v 1.8 2001-11-19 18:49:20 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,13 +47,13 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-19 04:48:35 $
+ * @version $Date: 2001-11-19 18:49:20 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
 {
     private final DOMImplementation	implementation;
-    private boolean			checkingCharacters;
+    private boolean			checkingCharacters = true;
 
     // package private
     final static String			xmlNamespace =
