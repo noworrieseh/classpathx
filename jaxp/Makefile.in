@@ -68,39 +68,6 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/javax/xml/transform/sax/TransformerHandler.java \
 	$(SOURCEDIR)/javax/xml/transform/stream/StreamResult.java \
 	$(SOURCEDIR)/javax/xml/transform/stream/StreamSource.java \
-	$(SOURCEDIR)/org/w3c/dom/css/Counter.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2Azimuth.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2BackgroundPosition.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2BorderSpacing.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2CounterIncrement.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2CounterReset.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2Cursor.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2FontFaceSrc.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2FontFaceWidths.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2PageSize.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2PlayDuring.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2Properties.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSS2TextShadow.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSCharsetRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSFontFaceRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSImportRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSMediaRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSPageRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSPrimitiveValue.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSRuleList.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSStyleDeclaration.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSStyleRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSStyleSheet.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSUnknownRule.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSValue.java \
-	$(SOURCEDIR)/org/w3c/dom/css/CSSValueList.java \
-	$(SOURCEDIR)/org/w3c/dom/css/DocumentCSS.java \
-	$(SOURCEDIR)/org/w3c/dom/css/DOMImplementationCSS.java \
-	$(SOURCEDIR)/org/w3c/dom/css/ElementCSSInlineStyle.java \
-	$(SOURCEDIR)/org/w3c/dom/css/Rect.java \
-	$(SOURCEDIR)/org/w3c/dom/css/RGBColor.java \
-	$(SOURCEDIR)/org/w3c/dom/css/ViewCSS.java \
 	$(SOURCEDIR)/org/w3c/dom/events/DocumentEvent.java \
 	$(SOURCEDIR)/org/w3c/dom/events/EventException.java \
 	$(SOURCEDIR)/org/w3c/dom/events/Event.java \
@@ -109,70 +76,6 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/org/w3c/dom/events/MouseEvent.java \
 	$(SOURCEDIR)/org/w3c/dom/events/MutationEvent.java \
 	$(SOURCEDIR)/org/w3c/dom/events/UIEvent.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLAnchorElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLAppletElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLAreaElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLBaseElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLBaseFontElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLBodyElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLBRElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLButtonElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLCollection.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLDirectoryElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLDivElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLDListElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLDocument.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLDOMImplementation.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLFieldSetElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLFontElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLFormElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLFrameElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLFrameSetElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLHeadElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLHeadingElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLHRElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLHtmlElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLIFrameElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLImageElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLInputElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLIsIndexElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLLabelElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLLegendElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLLIElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLLinkElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLMapElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLMenuElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLMetaElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLModElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLObjectElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLOListElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLOptGroupElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLOptionElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLParagraphElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLParamElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLPreElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLQuoteElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLScriptElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLSelectElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLStyleElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableCaptionElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableCellElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableColElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableRowElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTableSectionElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTextAreaElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLTitleElement.java \
-	$(SOURCEDIR)/org/w3c/dom/html/HTMLUListElement.java \
-	$(SOURCEDIR)/org/w3c/dom/ranges/DocumentRange.java \
-	$(SOURCEDIR)/org/w3c/dom/ranges/RangeException.java \
-	$(SOURCEDIR)/org/w3c/dom/ranges/Range.java \
-	$(SOURCEDIR)/org/w3c/dom/stylesheets/DocumentStyle.java \
-	$(SOURCEDIR)/org/w3c/dom/stylesheets/LinkStyle.java \
-	$(SOURCEDIR)/org/w3c/dom/stylesheets/MediaList.java \
-	$(SOURCEDIR)/org/w3c/dom/stylesheets/StyleSheet.java \
-	$(SOURCEDIR)/org/w3c/dom/stylesheets/StyleSheetList.java \
 	$(SOURCEDIR)/org/w3c/dom/traversal/DocumentTraversal.java \
 	$(SOURCEDIR)/org/w3c/dom/traversal/NodeFilter.java \
 	$(SOURCEDIR)/org/w3c/dom/traversal/NodeIterator.java \
@@ -285,9 +188,13 @@ CLASSESLIST=$(subst .java,.class,$(subst $(SOURCEDIR)/,$(CC-DESTDIR)/,$(foreach 
 #as the 'CC-CLASSPATH = ' statement.
 CC-CLASSPATH =  bin/
 
-#the desination directory for compilations
-CC-DESTDIR =	bin/
+CPATH = $(subst $(space),:,$(CC-CLASSPATH))
 
+#the desination directory for compilations
+CC-DESTDIR =	bin
+
+# FIXME: use autoconf to make this use gcj 3.x when it's available
+JAVAC = javac -classpath  $(CPATH) -d $(CC-DESTDIR)
 
 ##variables which define some useful constants
 
@@ -348,7 +255,7 @@ javadoc:
 	    gnu.xml.aelfred2 gnu.xml.pipeline gnu.xml.util \
 	    gnu.xml.dom \
 	    org.xml.sax org.xml.sax.ext org.xml.sax.helpers \
-	    org.w3c.dom \
+	    org.w3c.dom org.w3c.dom.events \
 	    javax.xml.parsers \
 	    javax.xml.transform javax.xml.transform.dom \
 	    javax.xml.transform.sax javax.xml.transform.stream
@@ -358,7 +265,13 @@ javadoc:
 
 #build the $(LIBNAME) jar file
 $(LIBNAME).jar: $(LIBNAME) $(CC-DESTDIR)
-	cd $(CC-DESTDIR); jar cf ../$(LIBNAME).jar *
+	mkdir -p $(CC-DESTDIR)/META-INF/services
+	echo -n gnu.xml.aelfred2.JAXPFactory > \
+	$(CC-DESTDIR)/META-INF/services/javax.xml.parsers.SAXParserFactory
+	echo -n gnu.xml.dom.JAXPFactory > \
+	$(CC-DESTDIR)/META-INF/services/javax.xml.parsers.DocumentBuilderFactory
+	cd $(CC-DESTDIR); jar cmf ../manifest.mf ../$(LIBNAME).jar \
+		META-INF gnu org/xml org/w3c javax/xml
 
 
 #developers only: compile the classes whose .java file is
@@ -381,7 +294,7 @@ $(LIBNAME): compile
 #
 #  compile: $(CLASSLIST)
 #  ifeq "$(wildcard filelist.mak)" "filelist.mak"
-#	javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak
+#	$(JAVAC) @filelist.mak
 #	@rm filelist.mak
 #  else
 #	@echo Nothing to be done for compile.
@@ -391,19 +304,19 @@ $(LIBNAME): compile
 #the $(wildcard) function to bug-make@gnu.org.
 #The problem is that it does not recognise the existance of files created
 #within commands caused by pre-requisites.
+
 compile: $(CLASSESLIST)
 	mkdir -p $(CC-DESTDIR)
 	if [ -e filelist.mak ] ; then \
-	  javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak  ; \
+	  $(JAVAC) @filelist.mak  ; \
 	  rm filelist.mak ; \
-	else echo Nothing to be done for compile ; \
 	fi
 
 #recompile all the source files
 .PHONY: recompile
 
 recompile: clean-filelist all-source-files
-	javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak
+	$(JAVAC) @filelist.mak
 	rm filelist.mak
 
 
