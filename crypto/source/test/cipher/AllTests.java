@@ -1,9 +1,9 @@
 package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: AllTests.java,v 1.3 2002-06-09 00:09:09 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,21 +36,22 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * TestSuite that runs all tests of the cipher package.
+ * <p>A {@link junit.framework.TestSuite} that runs all tests of the cipher
+ * package.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AllTests extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
+   // Constructor(s)
+   // -------------------------------------------------------------------------
+
    public AllTests(String name) {
       super(name);
    }
-
-   // Constructor(s)
-   // -------------------------------------------------------------------------
 
    // Class methods
    // -------------------------------------------------------------------------
@@ -68,6 +69,7 @@ public class AllTests extends TestCase {
       result.addTest(TestOfKhazad.suite());
       result.addTest(TestOfNullCipher.suite());
       result.addTest(TestOfRijndael.suite());
+      result.addTest(TestOfSerpent.suite());
       result.addTest(TestOfSquare.suite());
       result.addTest(TestOfTwofish.suite());
 
