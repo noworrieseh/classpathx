@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: IMessageDigest.java,v 1.5 2001-12-08 21:39:41 raif Exp $
+// $Id: IMessageDigest.java,v 1.6 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -33,7 +33,7 @@ package gnu.crypto.hash;
 /**
  * The basic visible methods of any hash algorithm.
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public interface IMessageDigest extends Cloneable {
 
@@ -83,6 +83,12 @@ public interface IMessageDigest extends Cloneable {
     * @return the array of bytes representing the hash value.
     */
    byte[] digest();
+
+   /**
+    * Resets the current context of this instance clearing any eventually cached
+    * intermediary values.<p>
+    */
+   void reset();
 
    /**
     * A basic test. Ensures that the digest of a pre-determined message is equal

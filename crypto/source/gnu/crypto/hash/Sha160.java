@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha160.java,v 1.3 2001-12-30 15:53:10 raif Exp $
+// $Id: Sha160.java,v 1.4 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,9 @@ package gnu.crypto.hash;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
@@ -43,19 +45,19 @@ import java.io.PrintWriter;
  * message. The SHA-1 is also used to compute a message digest for the received
  * version of the message during the process of verifying the signature. Any
  * change to the message in transit will, with very high probability, result in
- * a different message digest, and the signature will fail to verify.
+ * a different message digest, and the signature will fail to verify.<p>
  *
  * The SHA-1 is designed to have the following properties: it is
  * computationally infeasible to find a message which corresponds to a given
  * message digest, or to find two different messages which produce the same
- * message digest.
+ * message digest.<p>
  *
  * References:<br>
  * <a href="http://www.itl.nist.gov/fipspubs/fip180-1.htm">SECURE HASH
  * STANDARD</a><br>
- * Federal Information, Processing Standards Publication 180-1, 1995 April 17.
+ * Federal Information, Processing Standards Publication 180-1, 1995 April 17.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Sha160 extends BaseHash {
 
@@ -87,13 +89,13 @@ public class Sha160 extends BaseHash {
 
    /** Trivial 0-arguments constructor. */
    public Sha160() {
-      super(HashFactory.SHA160_HASH, 20, BLOCK_SIZE);
+      super(Registry.SHA160_HASH, 20, BLOCK_SIZE);
 
       resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.
+    * private constructor for cloning purposes.<p>
     *
     * @param md the instance to clone.
     */

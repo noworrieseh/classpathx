@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD160.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: RipeMD160.java,v 1.4 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,9 @@ package gnu.crypto.hash;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
@@ -39,16 +41,16 @@ import java.io.PrintWriter;
  * References:<br>
  * <a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html">RIPEMD160</a>
  * : A Strengthened Version of RIPEMD.<br>
- * Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
+ * Hans Dobbertin, Antoon Bosselaers and Bart Preneel.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RipeMD160 extends BaseHash {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
 
-   private static final String NAME = "ripemd-160";
+   private static final String NAME = "ripemd160";
    private static final boolean DEBUG = false;
    private static final int debuglevel = 9;
    private static final PrintWriter err = new PrintWriter(System.out, true);
@@ -108,13 +110,13 @@ public class RipeMD160 extends BaseHash {
 
    /** Trivial 0-arguments constructor. */
    public RipeMD160() {
-      super(HashFactory.RIPEMD160_HASH, 20, BLOCK_SIZE);
+      super(Registry.RIPEMD160_HASH, 20, BLOCK_SIZE);
 
       resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.
+    * private constructor for cloning purposes.<p>
     *
     * @param md the instance to clone.
     */

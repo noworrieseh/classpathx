@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: MD5.java,v 1.1 2001-12-08 21:34:45 raif Exp $
+// $Id: MD5.java,v 1.2 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,9 @@ package gnu.crypto.hash;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
@@ -38,14 +40,14 @@ import java.io.PrintWriter;
  * length and produces as output a 128-bit "fingerprint" or "message digest" of
  * the input. It is conjectured that it is computationally infeasible to
  * produce two messages having the same message digest, or to produce any
- * message having a given prespecified target message digest.
+ * message having a given prespecified target message digest.<p>
  *
  * References:<br>
  * The <a href="http://www.ietf.org/rfc/rfc1321.txt">MD5</a> Message-Digest
  * Algorithm.<br>
- * R. Rivest.
+ * R. Rivest.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MD5 extends BaseHash {
 
@@ -77,13 +79,13 @@ public class MD5 extends BaseHash {
 
    /** Trivial 0-arguments constructor. */
    public MD5() {
-      super(HashFactory.MD5_HASH, 16, BLOCK_SIZE);
+      super(Registry.MD5_HASH, 16, BLOCK_SIZE);
 
       resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.
+    * private constructor for cloning purposes.<p>
     *
     * @param md the instance to clone.
     */

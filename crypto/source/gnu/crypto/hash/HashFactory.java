@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: HashFactory.java,v 1.4 2001-12-08 21:37:17 raif Exp $
+// $Id: HashFactory.java,v 1.5 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,28 +30,22 @@ package gnu.crypto.hash;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate hash algorithm instances.
+ * A Factory to instantiate message digest algorithm instances.<p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
-public class HashFactory {
+public class HashFactory implements Registry {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   public static final String WHIRLPOOL_HASH = "whirlpool";
-   public static final String RIPEMD128_HASH = "ripemd-128";
-   public static final String RIPEMD160_HASH = "ripemd-160";
-   public static final String SHA160_HASH =    "sha-160";
-   public static final String SHA1_HASH =      "sha1";
-   public static final String SHA_HASH =       "sha";
-   public static final String MD5_HASH =       "md5";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -65,7 +59,7 @@ public class HashFactory {
    // -------------------------------------------------------------------------
 
    /**
-    * Return an instance of a hash algorithm given its name.
+    * Return an instance of a hash algorithm given its name.<p>
     *
     * @param algorithm the name of the hash algorithm.
     * @return an instance of the hash algorithm, or null if none found.
@@ -81,12 +75,16 @@ public class HashFactory {
       IMessageDigest result = null;
       if (name.equalsIgnoreCase(WHIRLPOOL_HASH)) {
          result = new Whirlpool();
-      } else if (name.equalsIgnoreCase(RIPEMD128_HASH)) {
+      } else if (name.equalsIgnoreCase(RIPEMD128_HASH)
+            || name.equalsIgnoreCase(RIPEMD_128_HASH)) {
          result = new RipeMD128();
-      } else if (name.equalsIgnoreCase(RIPEMD160_HASH)) {
+      } else if (name.equalsIgnoreCase(RIPEMD160_HASH)
+            || name.equalsIgnoreCase(RIPEMD_160_HASH)) {
          result = new RipeMD160();
       } else if (name.equalsIgnoreCase(SHA160_HASH)
-            || name.equals(SHA1_HASH) || name.equals(SHA_HASH)) {
+            || name.equalsIgnoreCase(SHA_1_HASH)
+            || name.equalsIgnoreCase(SHA1_HASH)
+            || name.equalsIgnoreCase(SHA_HASH)) {
          result = new Sha160();
       } else if (name.equalsIgnoreCase(MD5_HASH)) {
          result = new MD5();
@@ -101,7 +99,7 @@ public class HashFactory {
 
    /**
     * Returns a {@link java.util.Set} of names of hash algorithms supported by
-    * this <i>Factory</i>.
+    * this <i>Factory</i>.<p>
     *
     * @return a {@link java.util.Set} of hash names (Strings).
     */

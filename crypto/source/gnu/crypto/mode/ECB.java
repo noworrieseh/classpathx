@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: ECB.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: ECB.java,v 1.3 2002-01-11 21:53:00 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,17 +30,18 @@ package gnu.crypto.mode;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.cipher.IBlockCipher;
 
 /**
- * The implementation of the Electronic Codebook mode.
+ * The implementation of the Electronic Codebook mode.<p>
  *
  * References:<br>
  * <a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
  * Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
- * Morris Dworkin.
+ * Morris Dworkin.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ECB extends BaseMode implements Cloneable {
 
@@ -51,13 +52,13 @@ public class ECB extends BaseMode implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the Factory class.
+    * Trivial package-private constructor for use by the Factory class.<p>
     *
     * @param underlyingCipher the underlying cipher implementation.
     * @param cipherBlockSize the underlying cipher block size to use.
     */
    ECB(IBlockCipher underlyingCipher, int cipherBlockSize) {
-      super(ModeFactory.ECB_MODE, underlyingCipher, cipherBlockSize);
+      super(Registry.ECB_MODE, underlyingCipher, cipherBlockSize);
    }
 
    /** Private constructor for cloning purposes. */

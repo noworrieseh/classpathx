@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Whirlpool.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: Whirlpool.java,v 1.4 2002-01-11 21:55:08 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,14 +30,15 @@ package gnu.crypto.hash;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
  * Whirlpool, a new 512-bit hashing function operating on messages less than
  * 2 ** 256 bits in length. The function structure is designed according to the
- * Wide Trail strategy and permits a wide variety of implementation trade-offs.
- * <p>
+ * Wide Trail strategy and permits a wide variety of implementation trade-offs.<p>
  *
  * IMPORTANT: This implementation is not thread-safe.<p>
  *
@@ -45,9 +46,9 @@ import java.io.PrintWriter;
  * <a href="http://planeta.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html">
  * The WHIRLPOOL Hashing Function</a>.<br>
  * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>
+ * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Whirlpool extends BaseHash {
 
@@ -255,7 +256,7 @@ public final class Whirlpool extends BaseHash {
 
    /** Trivial 0-arguments constructor. */
    public Whirlpool() {
-      super(HashFactory.WHIRLPOOL_HASH, 20, BLOCK_SIZE);
+      super(Registry.WHIRLPOOL_HASH, 20, BLOCK_SIZE);
    }
 
    /**

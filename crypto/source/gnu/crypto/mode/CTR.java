@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: CTR.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: CTR.java,v 1.3 2002-01-11 21:53:00 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,9 @@ package gnu.crypto.mode;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.cipher.IBlockCipher;
+
 import java.math.BigInteger;
 
 /**
@@ -48,14 +50,14 @@ import java.math.BigInteger;
  * session key <tt>K</tt>, and <tt>T</tt> is the Counter.<p>
  *
  * This implementation, uses a standard incrementing function with a step of 1,
- * and an initial value similar to that described in the NIST document.
+ * and an initial value similar to that described in the NIST document.<p>
  *
  * References:<br>
  * <a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
  * Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
- * Morris Dworkin.
+ * Morris Dworkin.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class CTR extends BaseMode implements Cloneable {
 
@@ -69,13 +71,13 @@ public class CTR extends BaseMode implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the Factory class.
+    * Trivial package-private constructor for use by the Factory class.<p>
     *
     * @param underlyingCipher the underlying cipher implementation.
     * @param cipherBlockSize the underlying cipher block size to use.
     */
    CTR(IBlockCipher underlyingCipher, int cipherBlockSize) {
-      super(ModeFactory.CTR_MODE, underlyingCipher, cipherBlockSize);
+      super(Registry.CTR_MODE, underlyingCipher, cipherBlockSize);
    }
 
    /** Private constructor for cloning purposes. */

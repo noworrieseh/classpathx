@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: ModeFactory.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: ModeFactory.java,v 1.3 2002-01-11 21:53:00 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,6 +30,7 @@ package gnu.crypto.mode;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
 
@@ -39,22 +40,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate block cipher modes of operations.
+ * A Factory to instantiate block cipher modes of operations.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class ModeFactory {
+public class ModeFactory implements Registry {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   static final String ECB_MODE = "ecb";
-   static final String CTR_MODE = "ctr";
-   static final String ICM_MODE = "icm";
-
-   static final String CBC_MODE = "cbc";
-   static final String CFB_MODE = "cfb";
-   static final String OFB_MODE = "ofb";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -69,7 +62,7 @@ public class ModeFactory {
 
    /**
     * Returns an instance of a block cipher mode of operations given its name
-    * and characteristics of the underlying block cipher.
+    * and characteristics of the underlying block cipher.<p>
     *
     * @param mode the case-insensitive name of the mode of operations.
     * @param cipher the case-insensitive name of the block cipher.
@@ -135,7 +128,7 @@ public class ModeFactory {
 
    /**
     * Returns a {@link java.util.Set} of names of mode supported by this
-    * <i>Factory</i>.
+    * <i>Factory</i>.<p>
     *
     * @return a {@link java.util.Set} of mode names (Strings).
     */
