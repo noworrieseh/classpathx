@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSKey.java,v 1.1 2001-12-30 15:57:53 raif Exp $
+// $Id: DSSKey.java,v 1.2 2002-01-11 21:25:29 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -37,7 +37,7 @@ import java.security.interfaces.DSAParams;
 import java.security.spec.DSAParameterSpec;
 
 /**
- * A base asbtract class for both public and private DSS (Digital Signature 
+ * A base asbtract class for both public and private DSS (Digital Signature
  * Standard) keys. It encapsulates the three DSS numbers: <code>p</code>,
  * <code>q</code> and <code>g</code>.<p>
  *
@@ -45,10 +45,10 @@ import java.security.spec.DSAParameterSpec;
  * The format used in this implementation is called <i>Raw</i>, and basically
  * consists of the raw byte sequences of algorithm parameters. The exact order
  * of the byte sequences and the implementation details are given in each of
- * the relevant <code>getEncoded()</code> methods of each of the private and 
- * public keys.<p> 
+ * the relevant <code>getEncoded()</code> methods of each of the private and
+ * public keys.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * @see gnu.crypto.sig.dss.DSSPrivateKey#getEncoded
  * @see gnu.crypto.sig.dss.DSSPublicKey#getEncoded
  */
@@ -121,9 +121,9 @@ public abstract class DSSKey implements Key, DSAKey {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns <code>true</code> if the designated object is an instance of this
-    * class and has the same DSS (Digital Signature Standard) parameter values
-    * as this one.<p>
+    * Returns <code>true</code> if the designated object is an instance of
+    * {@link java.security.interfaces.DSAKey} and has the same DSS (Digital
+    * Signature Standard) parameter values as this one.<p>
     *
     * @param obj the other non-null DSS key to compare to.
     * @return <code>true</code> if the designated object is of the same type and
@@ -133,10 +133,12 @@ public abstract class DSSKey implements Key, DSAKey {
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof DSSKey)) {
+      if (!(obj instanceof DSAKey)) {
          return false;
       }
-      DSSKey that = (DSSKey) obj;
-      return this.p.equals(that.p) && this.q.equals(that.q) && this.g.equals(that.g);
+      DSAKey that = (DSAKey) obj;
+      return   p.equals(that.getParams().getP())
+            && q.equals(that.getParams().getQ())
+            && g.equals(that.getParams().getG());
    }
 }
