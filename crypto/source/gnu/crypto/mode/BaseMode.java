@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseMode.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: BaseMode.java,v 1.3 2002-06-08 05:08:35 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -41,10 +41,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * A basic abstract class to facilitate implementing block cipher modes of
- * operations.
+ * <p>A basic abstract class to facilitate implementing block cipher modes of
+ * operations.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public abstract class BaseMode implements IMode {
 
@@ -76,7 +76,7 @@ public abstract class BaseMode implements IMode {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial constructor for use by concrete subclasses.
+    * <p>Trivial constructor for use by concrete subclasses.</p>
     *
     * @param name the canonical name prefix of this mode.
     * @param underlyingCipher the implementation of the underlying cipher.
@@ -96,8 +96,10 @@ public abstract class BaseMode implements IMode {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // IMode interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // IMode interface implementation ------------------------------------------
 
    public void update(byte[] in, int inOffset, byte[] out, int outOffset)
    throws IllegalStateException {
@@ -115,8 +117,7 @@ public abstract class BaseMode implements IMode {
       }
    }
 
-   // IBlockCipher interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipher interface implementation -----------------------------------
 
    public String name() {
       return new StringBuffer()
@@ -125,13 +126,13 @@ public abstract class BaseMode implements IMode {
    }
 
    /**
-    * Returns the default value, in bytes, of the mode's block size. This value
-    * is part of the construction arguments passed to the Factory methods in
-    * {@link gnu.crypto.mode.ModeFactory}. Unless changed by an invocation of
-    * any of the <tt>init()</tt> methods, a <i>Mode</i> instance would operate
-    * with the same block size as its underlying block cipher. As mentioned
-    * earlier, the block size of the underlying block cipher itself is specified
-    * in one of the method(s) available in the factory class.
+    * <p>Returns the default value, in bytes, of the mode's block size. This
+    * value is part of the construction arguments passed to the Factory methods
+    * in {@link ModeFactory}. Unless changed by an invocation of any of the
+    * <code>init()</code> methods, a <i>Mode</i> instance would operate with
+    * the same block size as its underlying block cipher. As mentioned earlier,
+    * the block size of the underlying block cipher itself is specified in one
+    * of the method(s) available in the factory class.</p>
     *
     * @return the default value, in bytes, of the mode's block size.
     * @see gnu.crypto.mode.ModeFactory
@@ -141,6 +142,9 @@ public abstract class BaseMode implements IMode {
    }
 
    /**
+    * <p>Returns the default value, in bytes, of the underlying block cipher
+    * key size.</p>
+    *
     * @return the default value, in bytes, of the underlying cipher's key size.
     */
    public int defaultKeySize() {
@@ -148,15 +152,15 @@ public abstract class BaseMode implements IMode {
    }
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported block sizes. Each
-    * element returned by this object is a <tt>java.lang.Integet</tt>.<p>
+    * <p>Returns an {@link Iterator} over the supported block sizes. Each
+    * element returned by this object is an {@link Integer}.</p>
     *
-    * The default behaviour is to return an iterator with just one value, which
-    * is that currently configured for the underlying block cipher. Concrete
-    * implementations may override this behaviour to signal their ability to
-    * support other values.
+    * <p>The default behaviour is to return an iterator with just one value,
+    * which is that currently configured for the underlying block cipher.
+    * Concrete implementations may override this behaviour to signal their
+    * ability to support other values.</p>
     *
-    * @return an {@link java.util.Iterator} over the supported block sizes.
+    * @return an {@link Iterator} over the supported block sizes.
     */
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -166,11 +170,11 @@ public abstract class BaseMode implements IMode {
    }
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported underlying block
-    * cipher key sizes. Each element returned by this object is an instance of
-    * <tt>java.lang.Integet</tt>.
+    * <p>Returns an {@link Iterator} over the supported underlying block cipher
+    * key sizes. Each element returned by this object is an instance of
+    * {@link Integer}.</p>
     *
-    * @return an {@link java.util.Iterator} over the supported key sizes.
+    * @return an {@link Iterator} over the supported key sizes.
     */
    public Iterator keySizes() {
       return cipher.keySizes();
@@ -239,8 +243,9 @@ public abstract class BaseMode implements IMode {
       return true;
    }
 
-   // methods to be implemented by concrete subclasses
-   // -------------------------------------------------------------------------
+   // methods to be implemented by concrete subclasses ------------------------
+
+   public abstract Object clone();
 
    /** The initialisation phase of the concrete mode implementation. */
    public abstract void setup();
@@ -252,8 +257,7 @@ public abstract class BaseMode implements IMode {
 
    public abstract void decryptBlock(byte[] in, int i, byte[] out, int o);
 
-   // own methods
-   // -------------------------------------------------------------------------
+   // own methods -------------------------------------------------------------
 
    private boolean testSymmetry(int ks, int bs) {
       try {
