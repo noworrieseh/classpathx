@@ -489,6 +489,8 @@ final class XmlParser
 
     static final char	endDelimCDATA [] = { ']', ']', '>' };
 
+	private boolean isDirtyCurrentElement;
+
     /**
      * Parse a CDATA section.
      * <pre>
@@ -1208,6 +1210,7 @@ loop:
 		    unread (c);
 		    parseEntityRef (true);
 		}
+		isDirtyCurrentElement = true;
 		break;
 
 	      case '<': 			// Found "<"
@@ -1219,9 +1222,11 @@ loop:
 		    switch (c) {
 		      case '-': 		// Found "<!-"
 			require ('-');
+			isDirtyCurrentElement = false;
 			parseComment ();
 			break;
 		      case '[': 		// Found "<!["
+		      	isDirtyCurrentElement = false;
 			require ("CDATA[");
 			handler.startCDATA ();
 			inCDATA = true;
@@ -1231,25 +1236,29 @@ loop:
 			break;
 		      default:
 			error ("expected comment or CDATA section", c, null);
-			break;
+	                break;
 		    }
 		    break;
 
 		  case '?': 		// Found "<?"
+		    isDirtyCurrentElement = false;
 		    parsePI ();
 		    break;
 
 		  case '/': 		// Found "</"
+		    isDirtyCurrentElement = false;
 		    parseETag ();
 		    return;
 
 		  default: 		// Found "<" followed by something else
+		    isDirtyCurrentElement = false;
 		    unread (c);
 		    parseElement (false);
 		    break;
 		}
 	    }
 	}
+	
     }
 
 
@@ -2198,7 +2207,7 @@ loop2:
 	// assert (dataBufferPos == 0);
 
 	// are we expecting pure whitespace?  it might be dirty...
-	if (currentElementContent == CONTENT_ELEMENTS);
+	if ((currentElementContent == CONTENT_ELEMENTS) && !isDirtyCurrentElement)
 	    pureWhite = true;
 
 	// always report right out of readBuffer
@@ -2282,7 +2291,8 @@ loop:
 	    // pop stack and continue with previous entity
 	    unread (readCh ());
 	}
-
+        if (!pureWhite)
+           isDirtyCurrentElement = true;
 	// finish, maybe with error
 	if (state != 1)	// finish, no error
 	    error ("character data may not contain ']]>'");
