@@ -1,3 +1,140 @@
+2003-07-09  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* http/HttpServletResponseWrapper.java (encodeUrl): deprecated
+	(encodeRedirectUrl): deprecated
+	(setStatus): deprecated
+
+	* ServletRequestWrapper.java (getRealPath): deprecated
+
+	* http/HttpServletRequestWrapper.java (isRequestedSessionIdFromUrl): deprecated
+
+2003-07-03  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* http/HttpServletResponseWrapper.java (HttpServletResponseWrapper): added
+
+	* ServletResponseWrapper.java (getOutputStream): typo (;; -> ;)
+
+	* http/HttpServlet.java (setCharacterEncoding): added
+	(getContentType): added
+
+2003-04-21  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* jsp/SkipPageException.java: added
+
+	* jsp/JspTagException.java (JspTagException): added two constructors.
+
+	* jsp/JspException.java (getRootCause): added. Also added two constructors.
+
+	* jsp/PageContext.java (include): IllegalArgumentException,
+	SecurityException do not need to be in the signature, only in the
+	documentation
+	(forward): IllegalArgumentException, IllegalStateException,
+	SecurityException do not need to be in the signature, only in the
+	documentation.
+	(include): String path, boolean flush: new in JSP 2.0
+	(handlePageException): Exception: [javadoc] throws
+	NullPointerException, SecurityException
+	(handlePageException): Throwable: [javadoc] throws
+	NullPointerException, SecurityException
+	(popBody): new in JSP 2.0 but don't know if the implementation is
+	good!
+	(PageContext): removed a lot of methods that I did not see in the
+	current specifications.
+	NOTE: This class is NOT usable for now!
+
+2003-04-20  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* jsp/PageContext.java (PageContext): extends JspContext (JSP 2.0)
+	(PAGE_SCOPE): 1 
+	(REQUEST_SCOPE): 2
+	(SESSION_SCOPE): 3
+	(APPLICATION_SCOPE): 4
+	NOTE: I don't know if we must keep the same values as the original
+	jsp api. If we do, we have to replace the values in the sources by
+	these ones. BUT: these values are defined in the parent class, so
+	we can also just erase the four properties in this (PageContext)
+	class.
+	(getSession): is an abstract method!
+	(getPage): new abstract method
+	(getRequest): new abstract method
+	(getResponse): new abstract method
+	(getException): is an abstract method!
+	(getServletConfig): is an abstract method!
+
+	* jsp/JspWriter.java (getRemaining): added
+
+2003-04-19  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* jsp/JspFactory.java (getEngineInfo): added
+
+	* jsp/JspContext.java: new in the 2.0 JSP spec.
+
+	* jsp/ErrorData.java: new in the 2.0 JSP spec.
+
+2003-04-18  Arnaud Vandyck  <arnaud.vandyck@ulg.ac.be>
+
+	* http/HttpUtils.java: this class is now deprecated (and all the methods)
+
+	* http/HttpSessionBindingEvent.java: extends HttpSessionEvent, not
+	java.util.EventObject
+	(HttpSessionBindingEvent): new constructor to match with the 2.3 spec.
+	(getValue): new in the 2.3 spec.
+
+	* http/HttpSessionListener.java: extends java.util.Eventistener
+
+	* http/HttpSessionAttributeListener.java: extends java.util.Eventistener
+
+	* http/HttpSessionActivationListener.java: extends java.util.Eventistener
+
+	* http/HttpSession.java (logout): new in the 2.4 spec.
+
+	* http/HttpServletResponse.java (SC_FOUND): added (value 302
+	also!) This is the recommended way of using the 302 value.
+	(SC_TEMPORARY_REDIRECT): added (307)
+
+	* UnavailableException.java: added deprecation reasons
+
+	* ServletResponseWrapper.java (getWriter): [javadoc] throws IOException,
+	UnsupportedEncodingException, IllegalStateException.
+	(setCharacterEncoding): added - 2.3
+	(setResponse): added - 2.3
+	(getResponse): added - 2.3
+	(setContentType): added - 2.3
+	(reset): [javadoc] throws IllegalStateException
+
+	* ServletRequestWrapper.java (setRequest): added
+	(getInputStream): [javadoc] throws IllegalStateException,
+	IOException
+	(ServletRequestWrapper): [javadoc] throws IOException,
+	UnsupportedEncodingException, IllegalStateException
+
+	* ServletRequestEvent.java: new in the 2.4 spec.
+
+	* ServletRequestAttributeEvent.java: new in the 2.4 spec.
+
+	* ServletOutputStream.java (print(boolean)): modified this method
+	to match with others java.lang.String#valueOf(boolean). I also did
+	delete the two private static String STRING_TRUE and STRING_FALSE.
+
+	* ServletContextAttributeEvent.java: Does not extends
+	java.util.EventObject but ServletContextEvent; we don't need the
+	servlet context instance variable (it's already in the parent).
+
+	* ServletResponse.java (getContentType): new in the 2.4 spec.
+	(setCharacterEncoding): new in the 2.4 spec.
+	(setBufferSize): [javadoc] throws IllegalStateException
+	(reset): [javadoc] throws IllegalStateException
+
+	* ServletRequestListener.java: new in the 2.4 spec.
+
+	* ServletRequestAttributeListener.java: new in the 2.4 spec.
+
+	* ServletRequest.java (getReader): [javadoc] throws a
+	java.io.UnsupportedEncodingException.
+
+	* ServletContext.java (getServletContextName): added to be
+	uptodate with the 2.3 spec.
+
 2001-06-15    <cowboyd@LOWELL>
 
 	* ServletResponseWrapper.java: Made the cornstructor throw and
