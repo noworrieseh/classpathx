@@ -33,7 +33,9 @@ import org.w3c.dom.*;
 import org.xml.sax.*;
 
 /**
- * DocumentBuilderFactory
+ * DocumentBuilderFactory is used to resolve the problem that the
+ * W3C DOM APIs don't include portable bootstrapping.
+ *
  * @author	Andrew Selkirk
  * @version	1.0
  */
@@ -77,7 +79,7 @@ public abstract class DocumentBuilderFactory {
 
 		// Locate Factory
 		foundFactory = findFactory(defaultPropName, 
-			"org.apache.crimson.jaxp.DocumentBuilderFactoryImpl");
+			"gnu.xml.dom.JAXPFactory");
 
 		try {
 
@@ -147,10 +149,10 @@ public abstract class DocumentBuilderFactory {
 		return coalescing;
 	} // isCoalescing()
 
-	public abstract void setAttribute(String value1, Object value2) 
+	public abstract void setAttribute(String name, Object value) 
 		throws IllegalArgumentException;
 
-	public abstract Object getAttribute(String value) 
+	public abstract Object getAttribute(String name) 
 		throws IllegalArgumentException;
 
 	private static String findFactory(String property, String defaultValue) {
@@ -165,9 +167,13 @@ public abstract class DocumentBuilderFactory {
 		InputStream	stream;
 
 		// Check System Property
-		factory = System.getProperty(property);
+		try {
+		    factory = System.getProperty(property);
+		} catch (SecurityException e) {
+		    factory = null;
+		}
 
-		// Check JAVA_HOME
+		// Check in $JAVA_HOME/lib/jaxp.properties
 		try {
 			if (factory == null) {
 				javaHome = System.getProperty("java.home");

@@ -46,6 +46,11 @@ public abstract class DocumentBuilder {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * Avoid using this call; provide the system ID wherever possible.
+	 * System IDs are essential when parsers resolve relative URIs,
+	 * or provide diagnostics.
+	 */
 	public Document parse(InputStream stream) 
 		throws SAXException, IOException {
 		return parse(new InputSource(stream));
@@ -68,11 +73,13 @@ public abstract class DocumentBuilder {
 
 	public Document parse(String uri) 
 		throws SAXException, IOException {
-		return parse(new InputSource(new URL(uri).openStream()));
+		return parse(new InputSource(uri));
 	} // parse()
 
 	public Document parse(File file) 
 		throws SAXException, IOException {
+// FIXME:  map the filename to a URI,
+// without relying on the jdk 1.2 API for that 
 		return parse(new InputSource(new FileInputStream(file)));
 	} // parse()
 
