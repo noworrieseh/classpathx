@@ -1,0 +1,7 @@
+2004-02-05  Arnaud Vandyck  <avdyk@users.sourceforge.net>
+
+	* ChangeLog.libxmlj, source/*.c, source/*h,
+	source/gnu/xml/libxmlj/transform/*.*: imported from libxmlj
+
+	* ChangeLog.gnujaxp: added to have some history of the project
+
