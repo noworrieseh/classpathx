@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.25 2001-12-05 20:33:45 db Exp $
+ * $Id: SAXDriver.java,v 1.26 2002-03-07 19:10:00 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -67,7 +67,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.25 2001-12-05 20:33:45 db Exp $
+// $Id: SAXDriver.java,v 1.26 2002-03-07 19:10:00 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -124,7 +124,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-12-05 20:33:45 $
+ * @version $Date: 2002-03-07 19:10:00 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -495,7 +495,7 @@ final public class SAXDriver
 	    return;
 	}
 
-	throw new SAXNotSupportedException (featureId);
+	throw new SAXNotRecognizedException (featureId);
     }
 
     /**
@@ -556,8 +556,6 @@ final public class SAXDriver
     InputSource getExternalSubset (String name, String baseURI)
     throws SAXException, IOException
     {
-	InputSource	source;
-
 	if (resolver2 == null || !useResolver2 || !extPE)
 	    return null;
 	return resolver2.getExternalSubset (name, baseURI);
@@ -748,7 +746,7 @@ final public class SAXDriver
 	    // NS prefix declaration?
 	    else if ((index = qname.indexOf (':')) == 5
 		    && qname.startsWith ("xmlns")) {
-		String		prefix = qname.substring (index + 1);
+		String		prefix = qname.substring (6);
 
 		if (value.length () == 0) {
 		    verror ("missing URI in namespace decl attribute: "
@@ -995,7 +993,7 @@ final public class SAXDriver
 	if (type == null)
 	    return "CDATA";
 	// ... use DeclHandler.attributeDecl to see enumerations
-	if (type == "ENUMERATED")
+	if (type == "ENUMERATION")
 	    return "NMTOKEN";
 	return type;
     }
