@@ -335,10 +335,11 @@ public final class POP3Store
         throw new MessagingException("Retrieve failed.", e);
       }
     }
-    //get the message and create an object for it
-    if (size>-1)
-      return new POP3Message(folder, new MessageInputStream(in), msgnum, size);
-    return new POP3Message(folder, new MessageInputStream(in), msgnum);
+    // get the message and create an object for it
+		InputStream min = new MessageInputStream(in, debug);
+    return (size>-1) ?
+      new POP3Message(folder, min, msgnum, size) :
+			new POP3Message(folder, min, msgnum);
   }
 
   synchronized void delete(int msgnum)
