@@ -1,0 +1,15 @@
+Authors of GNU Crypto.
+
+Barreto, Paulo S. L. M. <sao19677@terra.com.br>
+   + designing and reviewing the implementations of Anubis, Khazad and
+     Whirlpool.
+   + co-authoring Rijndael and Square.
+
+Louchart-Fletcher, Olivier <olivier@zipworld.com.au>
+   + enabling the build process with the GNU tools.
+
+Naffah, Raif S. <raif@fl.net.au>
+   + starting the project.
+   + designing the basic API.
+   + implementing the original library and tools.
+

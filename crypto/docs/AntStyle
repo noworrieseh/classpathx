@@ -1,0 +1,77 @@
+Apache ANT Coding Style
+========================
+
+ANT xml source files in the repository must be written in conformance to the
+following Code Conventions:
+
+
+1. Source files
+   ANT source files should begin with the xml directorive <?xml version="1.0"?>,
+   followed by the project standard copyright notice:
+
+<!--
+   $Id: AntStyle,v 1.1.1.1 2001-11-20 13:26:40 raif Exp $
+
+   Copyright (C) 2001 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify it under
+   the terms of the GNU Library General Public License as published by the Free
+   Software Foundation; either version 2 of the License or (at your option) any
+   later version.
+
+   This program is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more
+   details.
+
+   You should have received a copy of the GNU Library General Public License
+   along with this program; see the file COPYING. If not, write to the
+
+      Free Software Foundation Inc.,
+      59 Temple Place - Suite 330,
+      Boston, MA 02111-1307
+      USA
+-->
+
+2. Names
+   Always use lowercase names.
+
+   Use hyphens to compose target names, dots to compose property names and
+   finally underscores to compose idref names.  For example:
+
+   <target name="amoun-ra">...</target>
+   <target ... if="install.dir">...</target>
+   <patternset id="toplevel_files">...</patternset>
+
+
+3. Indentation
+   Do not use tabs.  Always use spaces.  Three spaces should be used as the
+   unit of indentation.
+
+3.1. Line length
+   Avoid lines longer than 80 characters, since they're not handled well by many
+   terminals and tools.
+
+3.2. Wrapping lines
+   When an ANT xml element will not fit on a single line, break it on an
+   attribute basis and align all attribute names.  For example:
+
+      <javac destdir="classes"
+             debug="${debug}"
+             optimize="${optimize}"
+             srcdir="src"
+             includes="gnu/crypto/**/*.java"/>
+
+
+4. Comments
+   Target group comments help separate visually blocks of related targets.  Use
+   the following before each group:
+
+   <!--
+   Minimal tests to pass before release .......................................
+   -->
+   <target ... />
+
+5. Example
+   Refer to the project's build.xml as an example of these recommendations.
+
