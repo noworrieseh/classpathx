@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.3 2001-06-24 04:06:47 db Exp $
+ * $Id: XmlParser.java,v 1.4 2001-06-24 17:51:40 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.3 2001-06-24 04:06:47 db Exp $
+// $Id: XmlParser.java,v 1.4 2001-06-24 17:51:40 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-24 04:06:47 $
+ * @version $Date: 2001-06-24 17:51:40 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -785,6 +785,7 @@ final class XmlParser
 		|| encoding == ENCODING_UCS_4_4321
 		|| encoding == ENCODING_UCS_4_2143
 		|| encoding == ENCODING_UCS_4_3412) {
+	    // Strictly:  "UCS-4" == "UTF-32BE"; also, "UTF-32LE" exists
 	    if (!encodingName.equals ("ISO-10646-UCS-4"))
 		error ("unsupported 32-bit encoding",
 		       encodingName,
@@ -2142,6 +2143,16 @@ loop:
 		    return intern (readBuffer, start, i - start);
 
 		  default:
+// FIXME ... per IBM's OASIS test submission, these:
+//   ?		U+06dd 
+// REJECT
+//   BaseChar	U+0132 U+0133 U+013F U+0140 U+0149 U+017F U+01C4 U+01CC
+//		U+01F1 U+01F3 U+0E46 U+1011 U+1104 U+1108 U+110A U+110D
+//		U+113B U+113F U+1141 U+114D U+114F U+1151 U+1156 U+1162
+//		U+1164 U+1166 U+116B U+116F U+1174 U+119F U+11AC U+11B6
+//		U+11B9 U+11BB U+11C3 U+11F1 U+212F U+0587
+//   Combining	U+309B
+
 		    // punt on exact tests from Appendix A; approximate
 		    // them using the Unicode ID start/part rules
 		    if (i == readBufferPos && isName) {
@@ -2303,6 +2314,7 @@ loop:
 				    + name
 				    + "' must be declared before use";
 
+// FIXME
 				// XML 2nd Ed is no less confusing on
 				// the distinction here ... the rule
 				// is far too complex to be useful.
@@ -3721,11 +3733,13 @@ loop:
 			  (byte) 0x00, (byte) 0x3c)) {
 	    // UCS-4 must begin with "<?xml"
 	    // 0x00 0x00 0x00 0x3c: UCS-4, big-endian (1234)
+	    // "UTF-32BE"
 	    encoding = ENCODING_UCS_4_1234;
 
 	} else if (tryEncoding (signature, (byte) 0x3c, (byte) 0x00,
 				 (byte) 0x00, (byte) 0x00)) {
 	    // 0x3c 0x00 0x00 0x00: UCS-4, little-endian (4321)
+	    // "UTF-32LE"
 	    encoding = ENCODING_UCS_4_4321;
 
 	} else if (tryEncoding (signature, (byte) 0x00, (byte) 0x00,
@@ -3762,14 +3776,14 @@ loop:
 
 	} else if (tryEncoding (signature, (byte) 0x00, (byte) 0x3c,
 				 (byte) 0x00, (byte) 0x3f)) {
-	    // UTF-16-BE (otherwise, malformed UTF-16)
+	    // UTF-16BE (otherwise, malformed UTF-16)
 	    // 0x00 0x3c 0x00 0x3f: UCS-2, big-endian, no byte-order mark
 	    encoding = ENCODING_UCS_2_12;
 	    error ("no byte-order mark for UCS-2 entity");
 
 	} else if (tryEncoding (signature, (byte) 0x3c, (byte) 0x00,
 				 (byte) 0x3f, (byte) 0x00)) {
-	    // UTF-16-LE (otherwise, malformed UTF-16)
+	    // UTF-16LE (otherwise, malformed UTF-16)
 	    // 0x3c 0x00 0x3f 0x00: UCS-2, little-endian, no byte-order mark
 	    encoding = ENCODING_UCS_2_21;
 	    error ("no byte-order mark for UCS-2 entity");
@@ -4310,6 +4324,8 @@ loop:
      * <p>When readDataChunk () calls this method, the raw bytes are in 
      * rawReadBuffer, and the final characters will appear in 
      * readBuffer.
+     * <p>Note that as of Unicode 3.1, good practice became a requirement,
+     * so that each Unicode character has exactly one UTF-8 representation.
      * @param count The number of bytes to convert.
      * @see #readDataChunk
      * @see #rawReadBuffer
@@ -4341,6 +4357,9 @@ loop:
 		    // 2-byte sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
 		    c = (char) (((b1 & 0x1f) << 6)
 				| getNextUtf8Byte (i++, count));
+		    if (c < 0x0080)
+			encodingError ("Illegal two byte UTF-8 sequence",
+				c, 0);
 		} else if ((b1 & 0xf0) == 0xe0) {
 		    // 3-byte sequence:
 		    // zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
@@ -4348,18 +4367,23 @@ loop:
 		    c = (char) (((b1 & 0x0f) << 12) |
 				   (getNextUtf8Byte (i++, count) << 6) |
 				   getNextUtf8Byte (i++, count));
+		    if (c < 0x0800 || (c >= 0xd800 && c <= 0xdfff))
+			encodingError ("Illegal three byte UTF-8 sequence",
+				c, 0);
 		} else if ((b1 & 0xf8) == 0xf0) {
 		    // 4-byte sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx
 		    //     = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
 		    // (uuuuu = wwww + 1)
 		    // "Surrogate Pairs" ... from the "Astral Planes"
+		    // Unicode 3.1 assigned the first characters there
 		    int iso646 = b1 & 07;
 		    iso646 = (iso646 << 6) + getNextUtf8Byte (i++, count);
 		    iso646 = (iso646 << 6) + getNextUtf8Byte (i++, count);
 		    iso646 = (iso646 << 6) + getNextUtf8Byte (i++, count);
 
 		    if (iso646 <= 0xffff) {
-			c = (char) iso646;
+			encodingError ("Illegal four byte UTF-8 sequence",
+				iso646, 0);
 		    } else {
 			if (iso646 > 0x0010ffff)
 			    encodingError (
