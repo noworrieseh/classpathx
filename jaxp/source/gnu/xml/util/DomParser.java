@@ -1,5 +1,5 @@
 /*
- * $Id: DomParser.java,v 1.3 2001-10-29 21:49:10 db Exp $
+ * $Id: DomParser.java,v 1.4 2001-11-07 02:03:37 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -99,7 +99,7 @@ import org.w3c.dom.*;
  * by this "parser" are unspecified; don't do it! </P>
  *
  * @author David Brownell
- * @version $Date: 2001-10-29 21:49:10 $
+ * @version $Date: 2001-11-07 02:03:37 $
  */
 final public class DomParser implements XMLReader
 {
@@ -345,9 +345,9 @@ final public class DomParser implements XMLReader
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if ((HANDLERS + "declaration-handler").equals (name))
-	    return declHandler;
+	    return declHandler == defaultHandler ? null : declHandler;
 	if ((HANDLERS + "lexical-handler").equals (name))
-	    return lexicalHandler;
+	    return lexicalHandler == defaultHandler ? null : lexicalHandler;
 
 	if ((HANDLERS + "dom-node").equals (name))
 	    return current;
@@ -400,25 +400,22 @@ final public class DomParser implements XMLReader
     public void setProperty (String name, Object state)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
-	if (current != null)
-	    throw new IllegalStateException ("feature change midparse");
-
 	if ((HANDLERS + "declaration-handler").equals (name)) {
-	    if (!(state instanceof DeclHandler))
+	    if (!(state instanceof DeclHandler || state == null))
 		throw new SAXNotSupportedException (name);
 	    declHandler = (DeclHandler) state;
 	    return;
 	}
 
 	if ((HANDLERS + "lexical-handler").equals (name)) {
-	    if (!(state instanceof LexicalHandler))
+	    if (!(state instanceof LexicalHandler || state == null))
 		throw new SAXNotSupportedException (name);
 	    lexicalHandler = (LexicalHandler) state;
 	    return;
 	}
 
 	if ((HANDLERS + "dom-node").equals (name)) {
-	    if (state instanceof Node) {
+	    if (state == null || state instanceof Node) {
 		if (current != null)
 		    throw new SAXNotSupportedException (
 			"property is readonly during parse:  " + name);
