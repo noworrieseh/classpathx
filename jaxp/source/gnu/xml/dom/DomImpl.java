@@ -169,4 +169,12 @@ public class DomImpl implements DOMImplementation
 	doc.appendChild (root);
 	return doc;
     }
+
+    // DOM Level 3
+
+    public Object getFeature (String feature, String version)
+      {
+        // TODO
+        return null;
+      }
 }

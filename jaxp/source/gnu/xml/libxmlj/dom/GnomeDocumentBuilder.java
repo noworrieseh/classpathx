@@ -28,10 +28,11 @@ package gnu.xml.libxmlj.dom;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-//import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -54,9 +55,9 @@ implements DOMImplementation
 {
 
   static
-  {
-    System.loadLibrary("xmlj");
-  }
+    {
+      System.loadLibrary("xmlj");
+    }
 
   // -- DocumentBuilder --
 
@@ -70,9 +71,9 @@ implements DOMImplementation
    * Constructs a new validating document builder.
    */
   public GnomeDocumentBuilder()
-  {
-    this(true, false, false);
-  }
+    {
+      this(true, false, false);
+    }
 
   /**
    * Constructs a new document builder.
@@ -80,113 +81,129 @@ implements DOMImplementation
    * @param coalesce whether to merge CDATA as text nodes
    * @param expandEntities whether to expand entity references
    */
-  public GnomeDocumentBuilder(boolean validate, boolean coalesce,
-      boolean expandEntities)
-  {
-    this.validate = validate;
-    this.coalesce = coalesce;
-    this.expandEntities = expandEntities;
-  }
+  public GnomeDocumentBuilder(boolean validate,
+                              boolean coalesce,
+                              boolean expandEntities)
+    {
+      this.validate = validate;
+      this.coalesce = coalesce;
+      this.expandEntities = expandEntities;
+    }
 
   public DOMImplementation getDOMImplementation()
-  {
-    return this;
-  }
+    {
+      return this;
+    }
 
   public boolean isNamespaceAware()
-  {
-    return true;
-  }
+    {
+      return true;
+    }
 
   public boolean isValidating()
-  {
-    return validate;
-  }
+    {
+      return validate;
+    }
 
   public Document newDocument()
-  {
-    return createDocument(null, null, null);
-  }
+    {
+      return createDocument(null, null, null);
+    }
 
-  public Document parse(InputSource input)
-    throws SAXException, IOException
-  {
-    InputStream in = input.getByteStream();
-    
-    // Load entire stream into memory
-    /*ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    byte[] buf = new byte[Math.max(1024, in.available())];
-    for (int len = in.read(buf); len != -1; len = in.read(buf))
-      bout.write(buf, 0, len);
-    in = new PushbackInputStream(
-        new ByteArrayInputStream(bout.toByteArray()), 50);*/
+  public Document parse(InputSource input) throws SAXException, IOException
+    {
+      InputStream in = getInputStream (input);
+      String publicId = input.getPublicId();
+      String systemId = input.getSystemId();
+      return parseStream(in, publicId, systemId, validate, coalesce,
+                         expandEntities, entityResolver, errorHandler);
+    }
 
-    in = new PushbackInputStream(in, 50);
-    String publicId = input.getPublicId();
-    String systemId = input.getSystemId();
-    return parseStream(in, publicId, systemId, validate, coalesce,
-        expandEntities, entityResolver, errorHandler);
-  }
-
-  private native Document parseStream(InputStream in, String publicId,
-      String systemId, boolean validate, boolean coalesce,
-      boolean expandEntities, EntityResolver resolver,
-      ErrorHandler errorHandler);
+  InputStream getInputStream(InputSource input) throws IOException
+    {
+      InputStream in = input.getByteStream();
+      if (in == null)
+        {
+          String systemId = input.getSystemId();
+          if (systemId != null)
+            in = new URL(systemId).openStream();
+          else
+            throw new IOException("Unable to locate input source");
+        }
+      return new PushbackInputStream(in, 50);
+    }
   
+  private native Document parseStream(InputStream in,
+                                      String publicId,
+                                      String systemId,
+                                      boolean validate,
+                                      boolean coalesce,
+                                      boolean expandEntities,
+                                      EntityResolver resolver,
+                                      ErrorHandler errorHandler);
+
   public void setEntityResolver(EntityResolver resolver)
-  {
-    entityResolver = resolver;
-  }
+    {
+      entityResolver = resolver;
+    }
 
   public void setErrorHandler(ErrorHandler handler)
-  {
-    errorHandler = handler;
-  }
+    {
+      errorHandler = handler;
+    }
 
   // -- DOMImplementation --
 
   public boolean hasFeature(String feature, String version)
-  {
-    // TODO
-    throw new UnsupportedOperationException();
-  }
-  
+    {
+      // TODO
+      throw new UnsupportedOperationException();
+    }
+
+  // DOM Level 3
+
+  public Object getFeature (String feature, String version)
+    {
+      // TODO
+      return null;
+    }
+
   public native Document createDocument(String namespaceURI,
-      String qualifiedName, DocumentType doctype);
+                                        String qualifiedName, DocumentType doctype);
 
   public DocumentType createDocumentType(String qualifiedName,
-      String publicId, String systemId)
-  {
-    return new StandaloneDocumentType(qualifiedName, publicId, systemId);
-  }
+                                         String publicId, String systemId)
+    {
+      return new StandaloneDocumentType(qualifiedName, publicId, systemId);
+    }
 
   // Callback hooks from JNI
 
   private void warning(String message, String publicId, String systemId,
-      int lineNumber, int columnNumber)
+                       int lineNumber, int columnNumber)
     throws SAXException
-  {
-    SAXParseException e = new SAXParseException(message, publicId, systemId,
-        lineNumber, columnNumber);
-    errorHandler.warning(e);
-  }
+      {
+        SAXParseException e = new SAXParseException(message, publicId, systemId,
+                                                    lineNumber, columnNumber);
+        errorHandler.warning(e);
+      }
 
   private void error(String message, String publicId, String systemId,
-      int lineNumber, int columnNumber)
+                     int lineNumber, int columnNumber)
     throws SAXException
-  {
-    SAXParseException e = new SAXParseException(message, publicId, systemId,
-        lineNumber, columnNumber);
-    errorHandler.error(e);
-  }
+      {
+        SAXParseException e = new SAXParseException(message, publicId, systemId,
+                                                    lineNumber, columnNumber);
+        errorHandler.error(e);
+      }
 
   private void fatalError(String message, String publicId, String systemId,
-      int lineNumber, int columnNumber)
+                          int lineNumber, int columnNumber)
     throws SAXException
-  {
-    SAXParseException e = new SAXParseException(message, publicId, systemId,
-        lineNumber, columnNumber);
-    errorHandler.fatalError(e);
-  }
+      {
+        SAXParseException e = new SAXParseException(message, publicId, systemId,
+                                                    lineNumber, columnNumber);
+        errorHandler.fatalError(e);
+      }
 
 }

@@ -42,25 +42,39 @@ implements Attr
 {
 
   GnomeAttr(int id)
-  {
-    super(id);
-  }
-
+    {
+      super(id);
+    }
+  
   public String getName()
-  {
-    return getNodeName();
-  }
-
+    {
+      return getNodeName();
+    }
+  
   public native boolean getSpecified();
-
+  
   public native String getValue();
-
+  
   public native void setValue(String value)
     throws DOMException;
-
+  
   public Element getOwnerElement()
-  {
-    return (Element)getParentNode();
-  }
+    {
+      return (Element)getParentNode();
+    }
+  
+  // DOM Level 3 methods
+  
+  public TypeInfo getSchemaTypeInfo ()
+    {
+      // TODO
+      return null;
+    }
+  
+  public boolean isId ()
+    {
+      // TODO
+      return false;
+    }
   
 }

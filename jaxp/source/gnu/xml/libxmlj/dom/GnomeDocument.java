@@ -126,4 +126,85 @@ implements Document
 
   public native Element getElementById(String elementId);
 
+  // DOM Level 3 methods
+
+  public String getInputEncoding ()
+    {
+      // TODO
+      return null;
+    }
+
+  public String getXmlEncoding ()
+    {
+      // TODO
+      return null;
+    }
+
+  public boolean getXmlStandalone ()
+    {
+      // TODO
+      return false;
+    }
+
+  public void setXmlStandalone (boolean xmlStandalone)
+    {
+      // TODO
+    }
+
+  public String getXmlVersion ()
+    {
+      // TODO
+      return null;
+    }
+
+  public void setXmlVersion (String xmlVersion)
+    {
+      // TODO
+    }
+
+  public boolean getStrictErrorChecking ()
+    {
+      // TODO
+      return false;
+    }
+
+  public void setStrictErrorChecking (boolean strictErrorChecking)
+    {
+      // TODO
+    }
+
+  public String getDocumentURI ()
+    {
+      // TODO
+      return null;
+    }
+
+  public void setDocumentURI (String documentURI)
+    {
+      // TODO
+    }
+
+  public Node adoptNode (Node source)
+    {
+      // TODO
+      return null;
+    }
+
+  public DOMConfiguration getDomConfig ()
+    {
+      // TODO
+      return null;
+    }
+
+  public void normalizeDocument ()
+    {
+      // TODO
+    }
+
+  public Node renameNode (Node n, String namespaceURI, String qualifiedName)
+    {
+      // TODO
+      return null;
+    }
+
 }

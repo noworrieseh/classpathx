@@ -117,4 +117,27 @@ implements Element
   public native boolean hasAttributeNS(String namespaceURI, String
       localName);
 
+  // DOM Level 3 methods
+
+  public TypeInfo getSchemaTypeInfo ()
+    {
+      // TODO
+      return null;
+    }
+
+  public void setIdAttribute (String name, boolean isId)
+    {
+      // TODO
+    }
+
+  public void setIdAttributeNode (Attr isAddr, boolean isId)
+    {
+      // TODO
+    }
+
+  public void setIdAttributeNS (String namespaceURI, String localName,
+                                boolean isId)
+    {
+      // TODO
+    }
 }

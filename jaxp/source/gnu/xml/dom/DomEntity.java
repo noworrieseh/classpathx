@@ -108,4 +108,25 @@ public class DomEntity extends DomExtern implements Entity
      */
     final public short getNodeType ()
 	{ return ENTITY_NODE; }
+
+    // DOM Level 3 methods
+    
+    public String getInputEncoding ()
+      {
+        // TODO
+        return null;    
+      }
+
+    public String getXmlEncoding ()
+      {
+        // TODO
+        return null;
+      }
+
+    public String getXmlVersion ()
+      {
+        // TODO
+        return null;
+      }
+
 }

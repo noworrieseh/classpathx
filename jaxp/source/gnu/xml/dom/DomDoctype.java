@@ -354,4 +354,33 @@ public class DomDoctype extends DomExtern implements DocumentType
 	String getIdAttr ()
 	    { return idAttrName; }
     }
+
+    public boolean isSameNode (Node arg)
+      {
+        if (equals (arg))
+          {
+            return true;
+          }
+        if (!(arg instanceof DocumentType))
+          {
+            return false;
+          }
+        DocumentType doctype = (DocumentType) arg;
+        if (!equal (getPublicId (), doctype.getPublicId ()))
+          {
+            return false;
+          }
+        if (!equal (getSystemId (), doctype.getSystemId ()))
+          {
+            return false;
+          }
+        if (!equal (getInternalSubset (), doctype.getInternalSubset ()))
+          {
+            return false;
+          }
+        // TODO entities
+        // TODO notations
+        return true;
+      }
+
 }

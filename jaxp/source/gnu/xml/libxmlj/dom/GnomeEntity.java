@@ -49,4 +49,24 @@ implements Entity
 
   public native String getNotationName();
 
+  // DOM Level 3 methods
+  
+  public String getInputEncoding ()
+    {
+      // TODO
+      return null;    
+    }
+  
+  public String getXmlEncoding ()
+    {
+      // TODO
+      return null;
+    }
+  
+  public String getXmlVersion ()
+    {
+      // TODO
+      return null;
+    }
+  
 }

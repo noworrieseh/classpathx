@@ -260,4 +260,19 @@ public class DomAttr extends DomNsNode implements Attr
 		null, oldValue, newValue, getNodeName (), why);
 	element.dispatchEvent (event);
     }
+
+    // DOM Level 3 methods
+
+    public TypeInfo getSchemaTypeInfo ()
+      {
+        // TODO
+        return null;
+      }
+
+    public boolean isId ()
+      {
+        // TODO
+        return false;
+      }
+
 }

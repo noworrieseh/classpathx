@@ -40,58 +40,52 @@ implements CharacterData
 {
 
   GnomeCharacterData(int id)
-  {
-    super(id);
-  }
+    {
+      super(id);
+    }
 
-  public String getData()
-    throws DOMException
-  {
-    return getNodeValue();
-  }
+  public String getData() throws DOMException
+    {
+      return getNodeValue();
+    }
 
-  public void setData(String data)
-    throws DOMException
-  {
-    setNodeValue(data);
-  }
+  public void setData(String data) throws DOMException
+    {
+      setNodeValue(data);
+    }
 
   public int getLength()
-  {
-    return getData().length();
-  }
+    {
+      return getData().length();
+    }
 
-  public String substringData(int offset, int count)
-    throws DOMException
-  {
-    return getData().substring(offset, offset + count);
-  }
+  public String substringData(int offset, int count) throws DOMException
+    {
+      return getData().substring(offset, offset + count);
+    }
 
-  public void appendData(String arg)
-    throws DOMException
-  {
-    setData(getData() + arg);
-  }
+  public void appendData(String arg) throws DOMException
+    {
+      setData(getData() + arg);
+    }
 
-  public void insertData(int offset, String arg)
-    throws DOMException
-  {
-    String data = getData();
-    setData(data.substring(0, offset) + arg + data.substring(offset));
-  }
+  public void insertData(int offset, String arg) throws DOMException
+    {
+      String data = getData();
+      setData(data.substring(0, offset) + arg + data.substring(offset));
+    }
 
-  public void deleteData(int offset, int count)
-    throws DOMException
-  {
-    String data = getData();
-    setData(data.substring(0, offset) + data.substring(offset + count));
-  }
+  public void deleteData(int offset, int count) throws DOMException
+    {
+      String data = getData();
+      setData(data.substring(0, offset) + data.substring(offset + count));
+    }
 
   public void replaceData(int offset, int count, String arg)
-  {
-    String data = getData();
-    setData(data.substring(0, offset) + arg + data.substring(offset +
-          count));
-  }
+    {
+      String data = getData();
+      setData(data.substring(0, offset) + arg + data.substring(offset +
+                                                               count));
+    }
 
 }

@@ -81,4 +81,5 @@ public class DomCDATA extends DomText implements CDATASection
      */
     final public short getNodeType ()
 	{ return CDATA_SECTION_NODE; }
+    
 }
