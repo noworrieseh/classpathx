@@ -311,6 +311,9 @@ source/gnu/mail/providers/mbox/MboxOutputStream.java \
 source/gnu/mail/providers/mbox/MboxStore.java
 
 
+# The main jar file.
+GNUMAILJAR = gnumail.jar
+
 # The META stuff
 MAIL_META = META-INF/COPYING \
 	META-INF/mime.types \
@@ -318,7 +321,7 @@ MAIL_META = META-INF/COPYING \
 
 
 # Tell automake that we're specifying rules for these ourselves.
-BUILT_SOURCES = gnumail.jar imap.jar
+BUILT_SOURCES = $(GNUMAILJAR) imap.jar smtp.jar pop2.jar nntp.jar maildir.jar mbox.jar
 
 MAIL_CLASSPATH = lib/activation.jar
 subdir = .
@@ -571,34 +574,52 @@ META-INF/mailcap: mailcap
 	cp mailcap META-INF/
 
 # Targets for the various tools
-gnumail.jar: $(API_JAVASRC) $(GNU_SRC)
+$(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH) \
 		   JARCOMPILER_JAR=@JAR@ \
-                         ./jarcompiler gnumail.jar
+                         ./jarcompiler $(GNUMAILJAR)
 
-imap.jar: gnumail.jar $(IMAP_JAVASRC) $(MAIL_META)
+imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):gnumail.jar \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
                          ./jarcompiler imap.jar
 
-smtp.jar: gnumail.jar $(SMTP_JAVASRC) $(MAIL_META)
+smtp.jar: $(GNUMAILJAR) $(SMTP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):gnumail.jar \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
                          ./jarcompiler smtp.jar
 
-pop3.jar: gnumail.jar $(POP3_JAVASRC) $(MAIL_META)
+pop3.jar: $(GNUMAILJAR) $(POP3_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):gnumail.jar \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
                          ./jarcompiler pop3.jar
+
+nntp.jar: $(GNUMAILJAR) $(NNTP_JAVASRC) $(MAIL_META)
+	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
+		   JARCOMPILER_JAR=@JAR@ \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+                         ./jarcompiler nntp.jar
+
+maildir.jar: $(GNUMAILJAR) $(MAILDIR_JAVASRC) $(MAIL_META)
+	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
+		   JARCOMPILER_JAR=@JAR@ \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+                         ./jarcompiler maildir.jar
+
+mbox.jar: $(GNUMAILJAR) $(MBOX_JAVASRC) $(MAIL_META)
+	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
+		   JARCOMPILER_JAR=@JAR@ \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+                         ./jarcompiler mbox.jar
 
 # Remove jar file
 clean-local:
-	rm -f gnumail.jar 
-	rm -f imap.jar smtp.jar pop3.jar
+	rm -f $(GNUMAILJAR) 
+	rm -f imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
 	rm -f META-INF/COPYING META-INF/mime.types META-INF/mailcap
 	rmdir META-INF
 
