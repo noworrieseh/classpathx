@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: ValidationConsumer.java,v 1.6 2001-10-25 07:25:55 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -42,7 +42,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.5 2001-10-23 17:42:25 db Exp $
+// $Id: ValidationConsumer.java,v 1.6 2001-10-25 07:25:55 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -180,7 +180,7 @@ import gnu.xml.util.DefaultHandler;
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 07:25:55 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
@@ -618,8 +618,8 @@ public final class ValidationConsumer extends EventFilter
      * preloaded with a particular DTD.
      */
     public void attributeDecl (
-	String element,
-	String attribute,
+	String eName,
+	String aName,
 	String type,
 	String mode,
 	String value
@@ -628,7 +628,7 @@ public final class ValidationConsumer extends EventFilter
 	if (disableDeclarations)
 	    return;
 
-	ElementInfo	info = (ElementInfo) elements.get (element);
+	ElementInfo	info = (ElementInfo) elements.get (eName);
 	AttributeInfo	ainfo = new AttributeInfo ();
 	boolean		checkOne = false;
 	boolean		interned = false;
@@ -653,14 +653,14 @@ public final class ValidationConsumer extends EventFilter
 
 	// we might not have seen the content model yet
 	if (info == null) {
-	    info = new ElementInfo (element);
-	    elements.put (element, info);
+	    info = new ElementInfo (eName);
+	    elements.put (eName, info);
 	}
 	if ("ID" == type) {
 	    checkOne = true;
 	    if (!("#REQUIRED" == mode || "#IMPLIED".equals (mode))) {
 		// VC: ID Attribute Default
-		error ("ID attribute '" + attribute
+		error ("ID attribute '" + aName
 		    + "' must be #IMPLIED or #REQUIRED");
 	    }
 
@@ -689,11 +689,11 @@ public final class ValidationConsumer extends EventFilter
 		if (type == ainfo2.type || !interned /* NOTATION */) {
 		    // VC: One ID per Element Type
 		    // VC: One Notation per Element TYpe
-		    error ("Element '" + element
+		    error ("Element '" + eName
 			+ "' already has an attribute of type "
 			+ (interned ? "NOTATION" : type)
 			+ " ('" + name
-			+ "') so '" + attribute 
+			+ "') so '" + aName 
 			+ "' is a validity error");
 		}
 	    }
@@ -707,23 +707,23 @@ public final class ValidationConsumer extends EventFilter
 
 	    } else if ("NMTOKEN" == type) {
 		// VC: Name Token (is a nmtoken)
-		isNmtoken (value, "attribute default", attribute);
+		isNmtoken (value, "attribute default", aName);
 
 	    } else if ("NMTOKENS" == type) {
 		// VC: Name Token (is a nmtoken; at least one value)
 		StringTokenizer	tokens = new StringTokenizer (value);
 		if (!tokens.hasMoreTokens ())
-		    error ("Default for attribute '" + attribute
+		    error ("Default for attribute '" + aName
 			+ "' must have at least one name token.");
 		else do {
 		    String token = tokens.nextToken ();
-		    isNmtoken (token, "attribute default", attribute);
+		    isNmtoken (token, "attribute default", aName);
 		} while (tokens.hasMoreTokens ());
 
 	    } else if ("IDREF" == type || "ENTITY" == type) {
 		// VC: Entity Name (is a name)
 		// VC: IDREF (is a name) (is declared)
-		isName (value, "attribute default", attribute);
+		isName (value, "attribute default", aName);
 		if ("ENTITY" == type && !unparsed.contains (value))
 		    uDeferred.addElement (value);
 
@@ -732,43 +732,43 @@ public final class ValidationConsumer extends EventFilter
 		// VC: IDREF (is a name; at least one value)
 		StringTokenizer	names = new StringTokenizer (value);
 		if (!names.hasMoreTokens ())
-		    error ("Default for attribute '" + attribute
+		    error ("Default for attribute '" + aName
 			+ "' must have at least one name.");
 		else do {
 		    String name = names.nextToken ();
-		    isName (name, "attribute default", attribute);
+		    isName (name, "attribute default", aName);
 		    if ("ENTITIES" == type && !unparsed.contains (name))
 			uDeferred.addElement (value);
 		} while (names.hasMoreTokens ());
 	    
 	    } else if (type.charAt (0) == '(' /*)*/ ) {
 		// VC: Enumeration (must match)
-		checkEnumeration (value, type, attribute);
+		checkEnumeration (value, type, aName);
 
 	    } else if (!interned && checkOne) {	/* NOTATION */
 		// VC: Notation attributes (must be names)
-		isName (value, "attribute default", attribute);
+		isName (value, "attribute default", aName);
 
 		// VC: Notation attributes (must be declared)
 		if (!notations.contains (value))
 		    nDeferred.addElement (value);
 		
 		// VC: Enumeration (must match)
-		checkEnumeration (value, type, attribute);
+		checkEnumeration (value, type, aName);
 
 	    } else if ("ID" != type)
 		throw new RuntimeException ("illegal attribute type: " + type);
 	}
 
-	if (info.attributes.get (attribute) == null)
-	    info.attributes.put (attribute, ainfo);
+	if (info.attributes.get (aName) == null)
+	    info.attributes.put (aName, ainfo);
 	/*
 	else
-	    warning ("Element '" + element
-		+ "' already has an attribute named '" + attribute + "'");
+	    warning ("Element '" + eName
+		+ "' already has an attribute named '" + aName + "'");
 	*/
 
-	if ("xml:space".equals (attribute)) {
+	if ("xml:space".equals (aName)) {
 	    if (!("(default|preserve)".equals (type)
 		    || "(preserve|default)".equals (type)
 			// these next two are arguable; XHTML's DTD doesn't
@@ -783,7 +783,7 @@ public final class ValidationConsumer extends EventFilter
 		    );
 
 	}
-	super.attributeDecl (element, attribute, type, mode, value);
+	super.attributeDecl (eName, aName, type, mode, value);
     }
 
     /**
@@ -835,11 +835,12 @@ public final class ValidationConsumer extends EventFilter
      * <b>DecllHandler</b> passed to the next consumer, unless this
      * one was preloaded with a particular DTD
      */
-    public void externalEntityDecl (String name, String pubId, String sysId)
+    public void externalEntityDecl (String name,
+    	String publicId, String systemId)
     throws SAXException
     {
 	if (!disableDeclarations)
-	    super.externalEntityDecl (name, pubId, sysId);
+	    super.externalEntityDecl (name, publicId, systemId);
     }
 
 
@@ -869,16 +870,16 @@ public final class ValidationConsumer extends EventFilter
 	String name,
 	String publicId,
 	String systemId,
-	String notation
+	String notationName
     ) throws SAXException
     {
 	if (disableDeclarations)
 	    return;
 
 	unparsed.addElement (name);
-	if (!notations.contains (notation))
-	    nDeferred.addElement (notation);
-	super.unparsedEntityDecl (name, publicId, systemId, notation);
+	if (!notations.contains (notationName))
+	    nDeferred.addElement (notationName);
+	super.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
     
     
@@ -934,9 +935,9 @@ public final class ValidationConsumer extends EventFilter
      */
     public void startElement (
 	String		uri,
-	String		local,
-	String		name,
-	Attributes	attributes
+	String		localName,
+	String		qName,
+	Attributes	atts
     ) throws SAXException
     {
 	//
@@ -944,21 +945,21 @@ public final class ValidationConsumer extends EventFilter
 	//
 	if (contentStack.isEmpty ()) {
 	    // VC:  Root Element Type
-	    if (!name.equals (rootName)) {
+	    if (!qName.equals (rootName)) {
 		if (rootName == null)
 		    warning ("This document has no DTD, can't be valid");
 		else
-		    error ("Root element type '" + name
+		    error ("Root element type '" + qName
 			+ "' was declared to be '" + rootName + "'");
 	    }
 	} else {
 	    Recognizer state = (Recognizer) contentStack.peek ();
 
 	    if (state != null) {
-		Recognizer newstate = state.acceptElement (name);
+		Recognizer newstate = state.acceptElement (qName);
 
 		if (newstate == null)
-		    error ("Element type '" + name
+		    error ("Element type '" + qName
 			+ "' in element '" + state.type.name
 			+ "' violates content model " + state.type.model
 			);
@@ -980,14 +981,14 @@ public final class ValidationConsumer extends EventFilter
 	//
 	ElementInfo		info;
 
-	info = (ElementInfo) elements.get (name);
+	info = (ElementInfo) elements.get (qName);
 	if (info == null || info.model == null) {
 	    // VC: Element Valid (base clause)
-	    error ("Element type '" + name + "' was not declared");
+	    error ("Element type '" + qName + "' was not declared");
 	    contentStack.push (null);
 
 	    // for less diagnostic noise, fake a declaration.
-	    elementDecl (name, "ANY");
+	    elementDecl (qName, "ANY");
 	} else
 	    contentStack.push (info.getRecognizer (this));
 
@@ -998,24 +999,24 @@ public final class ValidationConsumer extends EventFilter
 	String			aname;
 	AttributeInfo		ainfo;
 
-	if (attributes != null)
-	    len = attributes.getLength ();
+	if (atts != null)
+	    len = atts.getLength ();
 	else
 	    len = 0;
 	
 	for (int i = 0; i < len; i++) {
-	    aname = attributes.getQName (i);
+	    aname = atts.getQName (i);
 
 	    if (info == null
 		    || (ainfo = (AttributeInfo) info.attributes.get (aname))
 			    == null) {
 		// VC: Attribute Value Type
 		error ("Attribute '" + aname
-		    + "' was not declared for element type " + name);
+		    + "' was not declared for element type " + qName);
 		continue;
 	    }
 
-	    String value = attributes.getValue (i);
+	    String value = atts.getValue (i);
 
 	    // note that "==" for type names and "#FIXED" is correct
 	    // (and fast) since we've interned those literals.
@@ -1166,15 +1167,15 @@ public final class ValidationConsumer extends EventFilter
 
 		    // "#REQUIRED" mode was interned in attributeDecl
 		    if ("#REQUIRED" == ainfo.mode
-			    && attributes.getValue (aname) == null) {
+			    && atts.getValue (aname) == null) {
 			// VC: Required Attribute
 			error ("Attribute '" + aname + "' must be specified "
-			    + "for element type " + name);
+			    + "for element type " + qName);
 		    }
 		}
 	    }
 	}
-	super.startElement (uri, local, name, attributes);
+	super.startElement (uri, localName, qName, atts);
     }
 
     /**
@@ -1182,7 +1183,7 @@ public final class ValidationConsumer extends EventFilter
      * model does not permit character data.
      * Passed to the next consumer.
      */
-    public void characters (char buf [], int offset, int length)
+    public void characters (char ch [], int start, int length)
     throws SAXException
     {
 	Recognizer state;
@@ -1201,7 +1202,7 @@ public final class ValidationConsumer extends EventFilter
 	    error ("Character content not allowed in element "
 		+ state.type.name);
 	
-	super.characters (buf, offset, length);
+	super.characters (ch, start, length);
     }
 	
 
@@ -1211,7 +1212,7 @@ public final class ValidationConsumer extends EventFilter
      * if there was no matching startElement call.
      * Passed to the next consumer.
      */
-    public void endElement (String uri, String local, String name)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
 	try {
@@ -1228,12 +1229,12 @@ public final class ValidationConsumer extends EventFilter
 	    // something the input stream must to guarantee.
 
 	} catch (EmptyStackException e) {
-	    fatalError ("endElement without startElement: " + name
+	    fatalError ("endElement without startElement: " + qName
 		+ ((uri == null)
 		    ? ""
-		    : ( " { '" + uri + "', " + local + " }")));
+		    : ( " { '" + uri + "', " + localName + " }")));
 	}
-	super.endElement (uri, local, name);
+	super.endElement (uri, localName, qName);
     }
 
     /**
