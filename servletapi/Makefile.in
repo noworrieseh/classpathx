@@ -42,6 +42,8 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/http/Cookie.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionBindingListener.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionContext.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpUtils.java \
+                $(SOURCEDIR)/javax/servlet/http/HttpSessionEvent.java \
+                $(SOURCEDIR)/javax/servlet/http/HttpSessionListener.java \
 		$(SOURCEDIR)/javax/servlet/GenericServlet.java \
 		$(SOURCEDIR)/javax/servlet/RequestDispatcher.java \
 		$(SOURCEDIR)/javax/servlet/Servlet.java \
@@ -53,7 +55,14 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/http/Cookie.java \
 		$(SOURCEDIR)/javax/servlet/ServletRequest.java \
 		$(SOURCEDIR)/javax/servlet/ServletResponse.java \
 		$(SOURCEDIR)/javax/servlet/SingleThreadModel.java \
-		$(SOURCEDIR)/javax/servlet/UnavailableException.java
+		$(SOURCEDIR)/javax/servlet/UnavailableException.java \
+	        $(SOURCEDIR)/javax/servlet/Filter.java \
+                $(SOURCEDIR)/javax/servlet/FilterChain.java \
+                $(SOURCEDIR)/javax/servlet/FilterConfig.java \
+                $(SOURCEDIR)/javax/servlet/ServletContextAttributeEvent.java \
+                $(SOURCEDIR)/javax/servlet/ServletContextAttributeListener.java \
+                $(SOURCEDIR)/javax/servlet/ServletContextEvent.java \
+                $(SOURCEDIR)/javax/servlet/ServletContextListener.java
 
 #a mangling of the SOURCEFILES list above
 #This is not quite perfect, we've had to harcode the 
