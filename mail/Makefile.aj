@@ -44,7 +44,9 @@ META-INF/mailcap: META-INF $(PROJECTROOT)/mailcap
 
 SUPPORTFILES = \
 	META-INF/javamail.default.address.map \
-	META-INF/javamail.default.providers
+	META-INF/javamail.default.providers \
+	META-INF/mailcap \
+	META-INF/mime.types
 
 # This is an automakejar target.
 mail.jar:

@@ -93,11 +93,6 @@ public class IMAPFolder
    */
   protected int type;
 
-  /**
-   * The open state of this folder (READ_ONLY, READ_WRITE, or -1).
-   */
-  protected int mode = -1;
-
   protected Flags permanentFlags = new Flags();
 
   protected char delimiter;
@@ -1079,12 +1074,13 @@ public class IMAPFolder
   protected IMAPFolder getFolder(String name, int type, char delimiter)
     throws MessagingException
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
-    StringBuffer path = new StringBuffer(this.path);
-    if (path.length()>0)
-        path.append(delimiter);
-    path.append(name);
-    return new IMAPFolder(store, path.toString(), type, delimiter);
+    StringBuffer pathBuffer = new StringBuffer();
+    if (path!=null)
+      pathBuffer.append(path);
+    if (pathBuffer.length()>0)
+        pathBuffer.append(delimiter);
+    pathBuffer.append(name);
+    return new IMAPFolder(store, pathBuffer.toString(), type, delimiter);
   }
 
   /**

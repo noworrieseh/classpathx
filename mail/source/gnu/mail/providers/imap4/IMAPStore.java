@@ -56,17 +56,17 @@ public class IMAPStore
   /**
    * The connection to the IMAP server.
    */
-  protected IMAPConnection connection;
+  protected IMAPConnection connection = null;
 
   /**
    * Folder representing the root namespace of the IMAP connection.
    */
-  protected IMAPFolder root;
+  protected IMAPFolder root = null;
 
   /**
    * The currently selected folder.
    */
-  protected IMAPFolder selected;
+  protected IMAPFolder selected = null;
 
   /**
    * Constructor.
@@ -151,7 +151,9 @@ public class IMAPStore
   public Folder getDefaultFolder()
     throws MessagingException
   {
-    return getFolder("");
+    if (root==null)
+      root = new IMAPFolder(this, "");
+    return root;
   }
 
   /**

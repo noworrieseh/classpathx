@@ -302,7 +302,7 @@ public class IMAPConnection implements IMAPConstants
       String id = response.getID();
       if (response.isUntagged())
       {
-        changed = changed | updateMailboxStatus(ms, id, response);
+        changed = changed || updateMailboxStatus(ms, id, response);
       }
       else if (tag.equals(response.getTag()))
       {
@@ -531,8 +531,9 @@ public class IMAPConnection implements IMAPConstants
   {
     if (id==OK)
     {
+      boolean changed = false;
       List rc = response.getResponseCode();
-      int len = rc.size();
+      int len = (rc==null) ? 0 : rc.size();
       for (int i=0; i<len; i++)
       {
         Object ocmd = rc.get(i);
@@ -551,11 +552,13 @@ public class IMAPConnection implements IMAPConstants
                 {
                   ms.firstUnreadMessage = Integer.parseInt(param);
                   i++;
+                  changed = true;
                 }
                 else if (cmd==UIDVALIDITY)
                 {
                   ms.uidValidity = Integer.parseInt(param);
                   i++;
+                  changed = true;
                 }
               }
               catch (NumberFormatException e)
@@ -570,12 +573,13 @@ public class IMAPConnection implements IMAPConstants
               {
                 ms.permanentFlags = (List)oparam;
                 i++;
+                changed = true;
               }
             }
           }
         }
       }
-      return true;
+      return changed;
     }
     else if (id==EXISTS)
     {

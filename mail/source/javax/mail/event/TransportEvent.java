@@ -27,7 +27,9 @@
 
 package javax.mail.event;
 
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.Transport;
 
 /**
  * This class models Transport events.

@@ -73,21 +73,30 @@ public class IMAPTest
       Properties properties = System.getProperties();
       Session session = Session.getDefaultInstance(properties);
       URLName url = new URLName(args[0]);
+      System.out.println("Test:getStore");
       Store store = session.getStore(url);
       store.addConnectionListener(test);
       store.addStoreListener(test);
       store.addFolderListener(test);
+      System.out.println("Test:connect");
       store.connect();
+      System.out.println("Test:getDefaultFolder");
       Folder root = store.getDefaultFolder();
+      System.out.println("Test:getFolder");
       Folder inbox = root.getFolder("INBOX");
+      System.out.println("Test:open");
       inbox.open(Folder.READ_ONLY);
+      System.out.println("Test:getMessages");
       Message[] messages = inbox.getMessages();
       FetchProfile fp = new FetchProfile();
       fp.add(FetchProfile.Item.ENVELOPE);
+      System.out.println("Test:fetch");
       inbox.fetch(messages, fp);
       for (int i=0; i<messages.length; i++)
       {
+        System.out.println("Test:getMessageNumber");
         int msgnum = messages[i].getMessageNumber();
+        System.out.println("Test:getSubject");
         String subject = messages[i].getSubject();
         System.out.println("Message "+msgnum+": Subject: "+subject);
         if (messages[i] instanceof Part)

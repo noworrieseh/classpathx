@@ -27,10 +27,14 @@
 
 package javax.mail.internet;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.UnknownServiceException;
 import javax.activation.DataSource;
-import javax.mail.*;
+import javax.mail.MessageAware;
+import javax.mail.MessageContext;
+import javax.mail.MessagingException;
 
 /**
  * A utility class that implements a DataSource out of a MimePart.

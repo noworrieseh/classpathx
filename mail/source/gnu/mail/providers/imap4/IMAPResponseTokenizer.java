@@ -50,7 +50,7 @@ public class IMAPResponseTokenizer implements IMAPConstants
    */
   protected InputStream in;
 
-  private byte[] buffer;
+  private byte[] buffer = null;
 
   private static final int BUFFER_SIZE = 4096; // TODO review
   private static final String DEFAULT_ENCODING = "US-ASCII";
@@ -129,10 +129,21 @@ public class IMAPResponseTokenizer implements IMAPConstants
     throws IOException
   {
     // Perform read
+    /*System.err.println("Perform read");*/
     byte[] buf = read(false);
     if (buf==null)
       return null; // pass EOF back up the chain
     int len = buf.length;
+    /*System.err.println("Read "+len+" bytes");
+    for (int i=0; i<len; i++) {
+      if (buf[i]==10)
+        System.err.print(" LF");
+      else if (buf[i]==13)
+        System.err.println(" CR");
+      else
+        System.err.print((char)buf[i]);
+    }
+    System.err.println();*/
     
     IMAPResponse response = new IMAPResponse();
     ByteArrayOutputStream genericSink = new ByteArrayOutputStream();

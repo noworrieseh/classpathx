@@ -27,9 +27,19 @@
 
 package javax.mail.internet;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import javax.activation.DataSource;
-import javax.mail.*;
+import javax.mail.BodyPart;
+import javax.mail.MessageAware;
+import javax.mail.MessageContext;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.MultipartDataSource;
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
 

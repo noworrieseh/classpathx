@@ -27,11 +27,19 @@
 
 package javax.mail.internet;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import javax.activation.DataHandler;
-import javax.mail.*;
+import javax.mail.BodyPart;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import gnu.mail.util.CRLFOutputStream;
 
 /**

@@ -71,7 +71,7 @@ public class IMAPBodyPart
   /*
    * Multipart content.
    */
-  IMAPMultipart multipart;
+  IMAPMultipart multipart = null;
   
   /**
    * Called by the IMAPMessage.

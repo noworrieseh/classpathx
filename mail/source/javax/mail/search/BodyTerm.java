@@ -27,7 +27,9 @@
 
 package javax.mail.search;
 
-import javax.mail.*;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Part;
 
 /**
  * This class implements searches on Message Body.

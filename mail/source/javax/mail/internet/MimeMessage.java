@@ -27,12 +27,28 @@
 
 package javax.mail.internet;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
 import javax.activation.DataHandler;
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
 import gnu.mail.util.CRLFOutputStream;
 import gnu.mail.util.RFC2822OutputStream;
 

@@ -81,7 +81,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   /**
    * If set, this contains the string value of the received date.
    */
-  protected String internalDate;
+  protected String internalDate = null;
 
   /**
    * The date format used to parse IMAP INTERNALDATE values.
@@ -94,12 +94,12 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
    * If false, and a header is requested but returns null, all headers will
    * be requested from the server.
    */
-  protected boolean headersComplete;
+  protected boolean headersComplete = false;
 
   /*
    * Parsed multipart object representing this message's content.
    */
-  private IMAPMultipart multipart;
+  private IMAPMultipart multipart = null;
 
   IMAPMessage(IMAPFolder folder, InputStream in, int msgnum) 
     throws MessagingException 

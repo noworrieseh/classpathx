@@ -51,12 +51,12 @@ public class IMAPResponse
   /**
    * The tag for this response.
    */
-  protected String tag;
+  protected String tag = null;
   
   /**
    * The response ID.
    */
-  protected String id;
+  protected String id = null;
 
   /**
    * The message count (for responses returning counts).
@@ -66,17 +66,12 @@ public class IMAPResponse
   /**
    * The mailbox (for STATUS responses).
    */
-  protected String mailbox;
+  protected String mailbox = null;
 
   /**
    * The response code.
    */
-  protected List code;
-
-  /**
-   * The content of a FETCH response.
-   */
-  protected byte[] content;
+  protected List code = null;
 
   /**
    * The human-readable text.
@@ -118,11 +113,6 @@ public class IMAPResponse
     return code;
   }
 
-  public byte[] getContent()
-  {
-    return content;
-  }
-  
   public String getText()
   {
     return text;
@@ -159,12 +149,6 @@ public class IMAPResponse
       buffer.append(code);
       buffer.append("\u001b[00m");
     }
-    if (content!=null)
-    {
-      buffer.append(" \u001b[00;31m{");
-      buffer.append(content.length);
-      buffer.append("}\u001b[00m");
-    }
     if (text!=null)
     {
       buffer.append(" \u001b[00;33m");
@@ -197,13 +181,6 @@ public class IMAPResponse
     {
       buffer.append(' ');
       buffer.append(code);
-    }
-    if (content!=null)
-    {
-      buffer.append(' ');
-      buffer.append('{');
-      buffer.append(content.length);
-      buffer.append('}');
     }
     if (text!=null)
     {

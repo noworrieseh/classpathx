@@ -69,7 +69,7 @@ __JARFILENAME__-init:\
 	echo > filelist\
 \
 __JARFILENAME__-compilation: $(__JARFILENAME___jar_classesdest)\
-	$(if $(shell cat filelist),$(JAVAC) $(JAVAC_OPTS) -d $(__JARFILENAME___jar_classesdest) -classpath $(call PATHMK,$(__JARFILENAME___jar_sourcedir) $(call PATHMK,$(__JARFILENAME___jar_classpath))) @filelist)\
+	$(if $(shell cat filelist),$(JAVAC) $(JAVAC_OPTS) -d $(__JARFILENAME___jar_classesdest) -classpath $(call PATHMK,$(__JARFILENAME___jar_classesdest) $(call PATHMK,$(__JARFILENAME___jar_classpath))) @filelist)\
 \
 $(__JARFILENAME___jar_classesdest):\
 	mkdir $@\
