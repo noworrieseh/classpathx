@@ -261,6 +261,12 @@ public abstract class JspWriter extends Writer
    */
   public abstract  void println(String s) throws IOException;
 
-}
+  /**
+   * XXX
+   * 
+   * @return XXX
+   */
+  public abstract int getRemaining();
 
+}
 
