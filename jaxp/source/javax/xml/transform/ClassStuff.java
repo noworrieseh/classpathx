@@ -1,5 +1,5 @@
 /*
- * $Id: ClassStuff.java,v 1.3 2001-10-26 20:47:03 db Exp $
+ * $Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -25,7 +25,7 @@
  * executable file might be covered by the GNU General Public License. 
  */
 
-package javax.xml.parsers;
+package javax.xml.transform;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,17 +35,17 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 
-// $Id: ClassStuff.java,v 1.3 2001-10-26 20:47:03 db Exp $
+// $Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
 
 /**
  * Package-private utility methods for sharing
  * magic related to class loading.
- * NOTE:  This is cloned in javax.xml.transform,
+ * NOTE:  This is cloned in javax.xml.parsers,
  * where a different exception is thrown (bleech).
  * Keep changes to the two copies in sync.
  *
  * @author David Brownell
- * @version	$Id: ClassStuff.java,v 1.3 2001-10-26 20:47:03 db Exp $
+ * @version	$Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
  */
 final class ClassStuff
 {
@@ -57,7 +57,7 @@ final class ClassStuff
      */
     static Object
     createFactory (String label, String defaultClass)
-    throws FactoryConfigurationError
+    throws TransformerFactoryConfigurationError
     {
 	String		name = null;
 	ClassLoader	loader = null;
@@ -138,15 +138,15 @@ final class ClassStuff
 	    return klass.newInstance ();
 
 	} catch (ClassNotFoundException e) {
-	    throw new FactoryConfigurationError (e,
+	    throw new TransformerFactoryConfigurationError (e,
 		"Factory class " + name
 		    + " not found");
 	} catch (IllegalAccessException e) {
-	    throw new FactoryConfigurationError (e,
+	    throw new TransformerFactoryConfigurationError (e,
 		"Factory class " + name
 		    + " found but cannot be loaded");
 	} catch (InstantiationException e) {
-	    throw new FactoryConfigurationError (e,
+	    throw new TransformerFactoryConfigurationError (e,
 		"Factory class " + name
 		    + " loaded but cannot be instantiated"
 		    + " ((no default constructor?)");
