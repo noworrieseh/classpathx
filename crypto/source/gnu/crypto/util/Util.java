@@ -1,9 +1,9 @@
 package gnu.crypto.util;
 
 // ----------------------------------------------------------------------------
-// $Id: Util.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: Util.java,v 1.3 2002-06-08 05:29:22 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,9 +31,9 @@ package gnu.crypto.util;
 // ----------------------------------------------------------------------------
 
 /**
- * A collection of utility methods used throughout this project.
+ * <p>A collection of utility methods used throughout this project.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Util {
 
@@ -56,13 +56,13 @@ public class Util {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns <tt>true</tt> if the two designated byte arrays are (a) non-null,
-    * (b) of the same length, and (c) contain the same values.
+    * <p>Returns <code>true</code> if the two designated byte arrays are
+    * (a) non-null, (b) of the same length, and (c) contain the same values.</p>
     *
     * @param a the first byte array.
     * @param b the second byte array.
-    * @return <tt>true</tt> if the two designated arrays contain the same
-    * values. Returns <tt>false</tt> otherwise.
+    * @return <code>true</code> if the two designated arrays contain the same
+    * values. Returns <code>false</code> otherwise.
     */
    public static boolean areEqual(byte[] a, byte[] b) {
       if (a == null || b == null) {
@@ -81,10 +81,11 @@ public class Util {
    }
 
    /**
-    * Returns a string of hexadecimal digits from a byte array. Each byte is
-    * converted to 2 hex symbols; zero(es) included.<p>
+    * <p>Returns a string of hexadecimal digits from a byte array. Each byte is
+    * converted to 2 hex symbols; zero(es) included.</p>
     *
-    * This method calls the method with same name and three arguments as:
+    * <p>This method calls the method with same name and three arguments as:</p>
+    *
     * <pre>
     *    toString(ba, 0, ba.length);
     * </pre>
@@ -98,9 +99,9 @@ public class Util {
    }
 
    /**
-    * Returns a string of hexadecimal digits from a byte array, starting at
-    * <i>offset</i> and consisting of <i>length</i> bytes. Each byte is
-    * converted to 2 hex symbols; zero(es) included.
+    * <p>Returns a string of hexadecimal digits from a byte array, starting at
+    * <code>offset</code> and consisting of <code>length</code> bytes. Each byte
+    * is converted to 2 hex symbols; zero(es) included.
     *
     * @param ba the byte array to convert.
     * @param offset the index from which to start considering the bytes to
@@ -121,8 +122,8 @@ public class Util {
    }
 
    /**
-    * Returns a string of 8 hexadecimal digits (most significant digit first)
-    * corresponding to the unsigned integer <i>n</i>.
+    * <p>Returns a string of 8 hexadecimal digits (most significant digit first)
+    * corresponding to the unsigned integer <code>n</code>.</p>
     *
     * @param n the unsigned integer to convert.
     * @return a hexadecimal string 8-character long.
@@ -137,8 +138,8 @@ public class Util {
    }
 
    /**
-    * Returns a string of hexadecimal digits from an integer array. Each int is
-    * converted to 4 hex symbols.
+    * <p>Returns a string of hexadecimal digits from an integer array. Each int
+    * is converted to 4 hex symbols.</p>
     */
    public static String toString(int[] ia) {
       int length = ia.length;
@@ -158,8 +159,8 @@ public class Util {
    }
 
    /**
-    * Returns a string of 16 hexadecimal digits (most significant digit first)
-    * corresponding to the unsigned long <i>n</i>.
+    * <p>Returns a string of 16 hexadecimal digits (most significant digit
+    * first) corresponding to the unsigned long <code>n</code>.</p>
     *
     * @param n the unsigned long to convert.
     * @return a hexadecimal string 16-character long.
@@ -174,10 +175,10 @@ public class Util {
    }
 
    /**
-    * Similar to the <tt>toString()</tt> method except that the Unicode escape
-    * character is inserted before every pair of bytes. Useful to externalise
-    * byte arrays that will be constructed later from such strings; eg. s-box
-    * values.
+    * <p>Similar to the <code>toString()</code> method except that the Unicode
+    * escape character is inserted before every pair of bytes. Useful to
+    * externalise byte arrays that will be constructed later from such strings;
+    * eg. s-box values.</p>
     *
     * @exception ArrayIndexOutOfBoundsException if the length is odd.
     */
@@ -186,10 +187,10 @@ public class Util {
    }
 
    /**
-    * Similar to the <tt>toString()</tt> method except that the Unicode escape
-    * character is inserted before every pair of bytes. Useful to externalise
-    * byte arrays that will be constructed later from such strings; eg. s-box
-    * values.
+    * <p>Similar to the <code>toString()</code> method except that the Unicode
+    * escape character is inserted before every pair of bytes. Useful to
+    * externalise byte arrays that will be constructed later from such strings;
+    * eg. s-box values.</p>
     *
     * @exception ArrayIndexOutOfBoundsException if the length is odd.
     */
@@ -219,11 +220,11 @@ public class Util {
       return sb.toString();
    }
 
-   /*
-    * Similar to the <tt>toString()</tt> method except that the Unicode escape
-    * character is inserted before every pair of bytes. Useful to externalise
-    * int arrays that will be constructed later from such strings; eg. s-box
-    * values.
+   /**
+    * <p>Similar to the <code>toString()</code> method except that the Unicode
+    * escape character is inserted before every pair of bytes. Useful to
+    * externalise integer arrays that will be constructed later from such
+    * strings; eg. s-box values.</p>
     *
     * @exception ArrayIndexOutOfBoundsException if the length is not a multiple
     * of 4.
@@ -253,6 +254,18 @@ public class Util {
       }
       sb.append("\"").append('\n');
       return sb.toString();
+   }
+
+   public static byte[] toBytesFromUnicode(String s) {
+      int limit = s.length() * 2;
+      byte[] result = new byte[limit];
+      char c;
+      for (int i = 0; i < limit; i++) {
+         c = s.charAt(i >>> 1);
+         result[i] = (byte)(((i & 1) == 0) ? c >>> 8 : c);
+      }
+
+      return result;
    }
 
    // Instance methods
