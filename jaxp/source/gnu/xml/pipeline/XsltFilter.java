@@ -1,5 +1,5 @@
 /*
- * $Id: XsltFilter.java,v 1.1 2001-10-23 18:00:26 db Exp $
+ * $Id: XsltFilter.java,v 1.2 2001-10-23 23:12:58 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -52,7 +52,7 @@ import org.xml.sax.ext.LexicalHandler;
  * @see TransformerFactory
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 18:00:26 $
+ * @version $Date: 2001-10-23 23:12:58 $
  */
 final public class XsltFilter extends EventFilter
 {
@@ -77,7 +77,7 @@ final public class XsltFilter extends EventFilter
     {
 	// First, get a transformer with the stylesheet preloaded
 	TransformerFactory	tf = null;
-	TransformerHandler	t;
+	TransformerHandler	th;
 
 	try {
 	    SAXTransformerFactory	stf;
