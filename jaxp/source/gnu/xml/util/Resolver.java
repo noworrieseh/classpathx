@@ -1,5 +1,5 @@
 /*
- * $Id: Resolver.java,v 1.1 2001-07-11 17:26:41 db Exp $
+ * $Id: Resolver.java,v 1.2 2001-09-29 06:23:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import java.util.Hashtable;
 import org.xml.sax.*;
 
 
-// $Id: Resolver.java,v 1.1 2001-07-11 17:26:41 db Exp $
+// $Id: Resolver.java,v 1.2 2001-09-29 06:23:42 db Exp $
 
 /**
  * Utility implementation of a SAX resolver, which can be used to improve
@@ -37,7 +37,7 @@ import org.xml.sax.*;
  *
  * <p><b>FIXME:</b> This needs to leverage a catalog facility.
  *
- * @version $Date: 2001-07-11 17:26:41 $
+ * @version $Date: 2001-09-29 06:23:42 $
  */
 public class Resolver implements EntityResolver, Cloneable
 {
@@ -174,6 +174,8 @@ public class Resolver implements EntityResolver, Cloneable
      *
      * @param contentType the MIME content type that will be parsed; must
      *	not be null.
+     * @return the appropriate encoding, or null if the content type is
+     *	not text and there's no <code>charset=...</code> attribute
      */
     static public String getEncoding (String contentType)
     {
