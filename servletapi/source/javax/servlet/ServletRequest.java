@@ -281,6 +281,8 @@ public interface ServletRequest
    * @exception IOException if an i/o related error occured
    * @exception IllegalStateException if <code>getInputStream</code> was
    * already called on this request.
+   * @exception java.io.UnsupportedEncodingException if the character
+   * encoding cannot be decoded.
    */
   BufferedReader getReader() throws IOException;
 
