@@ -128,6 +128,7 @@ extends Store
               }
             // Get capabilities
             List capa = connection.capa ();
+            boolean tls = false;
             if (capa != null)
               {
                 if (capa.contains ("STLS"))
@@ -138,7 +139,7 @@ extends Store
                         String tmt = getProperty ("trustmanager");
                         if (tmt == null)
                           {
-                            connection.stls ();
+                            tls = connection.stls ();
                           }
                         else
                           {
@@ -147,7 +148,7 @@ extends Store
                                 Class t = Class.forName (tmt);
                                 TrustManager tm =
                                   (TrustManager) t.newInstance ();
-                                connection.stls (tm);
+                                tls = connection.stls (tm);
                               }
                             catch (Exception e)
                               {
@@ -156,8 +157,15 @@ extends Store
                               }
                           }
                         // Capabilities may have changed since STLS
-                        capa = connection.capa ();
+                        if (tls)
+                          {
+                            capa = connection.capa ();
+                          }
                       }
+                  }
+                if (!tls && "required".equals (getProperty ("tls")))
+                  {
+                    throw new MessagingException ("TLS not available");
                   }
                 // Build list of SASL mechanisms
                 List authenticationMechanisms = null;

@@ -73,7 +73,9 @@ This provider supports the following properties:
 <tr>
 <td>mail.pop3.tls</td>
 <td>boolean</td>
-<td>If set to false, TLS negotiation will not be attempted.</td>
+<td>If set to false, TLS negotiation will not be attempted. Exceptionally,
+you may set this to <code>required</code> to throw an exception on
+connect when TLS is not available.</td>
 </tr>
 
 <tr>

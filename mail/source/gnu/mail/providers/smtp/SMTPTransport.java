@@ -152,6 +152,7 @@ public class SMTPTransport
               }
             else
               {
+                boolean tls = false;
                 if (extensions.contains ("STARTTLS"))
                   {
                     if (!propertyIsFalse ("tls"))
@@ -160,7 +161,7 @@ public class SMTPTransport
                         String tmt = getProperty ("trustmanager");
                         if (tmt == null)
                           {
-                            connection.starttls ();
+                            tls = connection.starttls ();
                           }
                         else
                           {
@@ -168,17 +169,20 @@ public class SMTPTransport
                               {
                                 Class t = Class.forName (tmt);
                                 TrustManager tm = (TrustManager) t.newInstance ();
-                                connection.starttls (tm);
+                                tls = connection.starttls (tm);
                               }
                             catch (Exception e)
                               {
                                 throw new MessagingException (e.getMessage (), e);
                               }
                           }
-                        extensions = connection.ehlo (localHostName);
+                        if (tls)
+                          {
+                            extensions = connection.ehlo (localHostName);
+                          }
                       }
                   }
-                else if ("required".equals (getProperty ("tls")))
+                if (!tls && "required".equals (getProperty ("tls")))
                   {
                     throw new MessagingException ("TLS not available");
                   }

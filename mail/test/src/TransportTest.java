@@ -69,6 +69,7 @@ public class TransportTest
     }
     catch (MessagingException e)
     {
+      e.printStackTrace(System.err);
       fail(e.getMessage());
     }
 	}

@@ -123,6 +123,7 @@ public class IMAPStore
               }
         
             List capabilities = connection.capability ();
+            boolean tls = false;
             if (capabilities.contains (IMAPConstants.STARTTLS))
               {
                 if (!propertyIsFalse ("tls"))
@@ -131,17 +132,20 @@ public class IMAPStore
                     TrustManager tm = getTrustManager ();
                     if (tm == null)
                       {
-                        connection.starttls ();
+                        tls = connection.starttls ();
                       }
                     else
                       {
-                        connection.starttls (tm);
+                        tls = connection.starttls (tm);
                       }
                     // Capabilities may have changed since STARTTLS
-                    capabilities = connection.capability ();
+                    if (tls)
+                      {
+                        capabilities = connection.capability ();
+                      }
                   }
               }
-            else if ("required".equals (getProperty ("tls")))
+            if (!tls && "required".equals (getProperty ("tls")))
               {
                 throw new MessagingException ("TLS not available");
               }
