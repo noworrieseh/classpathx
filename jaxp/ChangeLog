@@ -1,3 +1,7 @@
+2004-12-03  Andrew Overholt  <overholt@redhat.com>
+
+	* autogen.sh: New file.
+
 2004-11-27  Chris Burdess	<dog@gnu.org>
 
 	* Makefile.am: Removed redundant 'sources' and 'classes' makefile
