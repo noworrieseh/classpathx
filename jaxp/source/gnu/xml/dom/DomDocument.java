@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.11 2001-11-29 22:48:11 db Exp $
+ * $Id: DomDocument.java,v 1.12 2002-05-31 16:09:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -33,7 +33,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomDocument.java,v 1.11 2001-11-29 22:48:11 db Exp $
+// $Id: DomDocument.java,v 1.12 2002-05-31 16:09:20 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -45,7 +45,7 @@ import org.w3c.dom.traversal.*;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-29 22:48:11 $
+ * @version $Date: 2002-05-31 16:09:20 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -57,7 +57,7 @@ public class DomDocument extends DomNode
     final static String			xmlNamespace =
 	"http://www.w3.org/XML/1998/namespace";
     final static String			xmlnsURI =
-	"http://www.w3.org/2000/xmlns";
+	"http://www.w3.org/2000/xmlns/";
 
 
     /**

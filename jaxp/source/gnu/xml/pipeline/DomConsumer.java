@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.13 2001-11-29 22:55:44 db Exp $
+ * $Id: DomConsumer.java,v 1.14 2002-05-31 16:09:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +79,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-11-29 22:55:44 $
+ * @version $Date: 2002-05-31 16:09:20 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -613,7 +613,7 @@ public class DomConsumer implements EventConsumer
 	    top = element;
 	}
 
-	final static String	xmlnsURI = "http://www.w3.org/2000/xmlns";
+	final static String	xmlnsURI = "http://www.w3.org/2000/xmlns/";
 
 	private void populateAttributes (Element element, Attributes attrs)
 	throws SAXParseException
