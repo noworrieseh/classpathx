@@ -346,8 +346,14 @@ BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES} ${JARFILE}
 
 # Generate header files for classes containing native code.
 # I did remove the -force argument (not available in gcjh nor in kaffe)
-$(jni)/gnu_xml_libxmlj_%.h:
+$(jni)/gnu_xml_libxmlj_dom_%.h:
+	@JAVAH@ -jni -d $(jni) -classpath . gnu.xml.libxmlj.dom.$*
+
+$(jni)/gnu_xml_libxmlj_sax_%.h:
 	@JAVAH@ -jni -d $(jni) -classpath . gnu.xml.libxmlj.sax.$*
+
+$(jni)/gnu_xml_libxmlj_transform_%.h:
+	@JAVAH@ -jni -d $(jni) -classpath . gnu.xml.libxmlj.transform.$*
 
 $(jni)/javax_xml_transform_%.h:
 	@JAVAH@ -jni -d $(jni) javax.xml.transform.$*
