@@ -1,28 +1,8 @@
-/*
-  GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 David Brownell
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 // NamespaceSupport.java - generic Namespace support for SAX.
 // Written by David Megginson, sax@megginson.com
+// This class is in the Public Domain.  NO WARRANTY!
 
-// $Id: NamespaceSupport.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// $Id: NamespaceSupport.java,v 1.3 2001-08-03 18:56:13 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -34,6 +14,11 @@ import java.util.Vector;
 
 /**
  * Encapsulate Namespace logic for use by SAX drivers.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p>This class encapsulates the logic of Namespace processing:
  * it tracks the declarations currently in force for each context
@@ -54,16 +39,16 @@ import java.util.Vector;
  * support.declarePrefix("", "http://www.w3.org/1999/xhtml");
  * support.declarePrefix("dc", "http://www.purl.org/dc#");
  *
- * String parts[] = support.processName("p", parts, false);
+ * parts = support.processName("p", parts, false);
  * System.out.println("Namespace URI: " + parts[0]);
  * System.out.println("Local name: " + parts[1]);
  * System.out.println("Raw name: " + parts[2]);
-
- * String parts[] = support.processName("dc:title", parts, false);
+ *
+ * parts = support.processName("dc:title", parts, false);
  * System.out.println("Namespace URI: " + parts[0]);
  * System.out.println("Local name: " + parts[1]);
  * System.out.println("Raw name: " + parts[2]);
-
+ *
  * support.popContext();
  * </pre>
  *
@@ -75,7 +60,7 @@ import java.util.Vector;
  * @since SAX 2.0
  * @author David Megginson, 
  *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0
+ * @version 2.0r2pre
  */
 public class NamespaceSupport
 {
@@ -193,6 +178,7 @@ public class NamespaceSupport
      */
     public void popContext ()
     {
+	contexts[contextPos].clear();
 	contextPos--;
 	if (contextPos < 0) {
 	    throw new EmptyStackException();
@@ -208,7 +194,11 @@ public class NamespaceSupport
 
 
     /**
-     * Declare a Namespace prefix.
+     * Declare a Namespace prefix.  All prefixes must be declared
+     * before they are referenced.  For example, an element's attributes
+     * should be scanned in two passes:  first for namespace declarations,
+     * then a second pass using {@link #processName processName()} to
+     * interpret prefixes against (potentially redefined) prefixes.
      *
      * <p>This method declares a prefix in the current Namespace
      * context; the prefix will remain in force until this context
@@ -247,7 +237,8 @@ public class NamespaceSupport
 
 
     /**
-     * Process a raw XML 1.0 name.
+     * Process a raw XML 1.0 name, after all declarations in the current
+     * context have been handled by {@link #declarePrefix declarePrefix()}.
      *
      * <p>This method processes a raw XML 1.0 name in the current
      * context by removing the prefix and looking it up among the
@@ -270,7 +261,7 @@ public class NamespaceSupport
      *
      * <p>Note that attribute names are processed differently than
      * element names: an unprefixed element name will received the
-     * default Namespace (if any), while an unprefixed element name
+     * default Namespace (if any), while an unprefixed attribute name
      * will not.</p>
      *
      * @param qName The raw XML 1.0 name to be processed.
@@ -434,9 +425,14 @@ public class NamespaceSupport
     /**
      * Internal class for a single Namespace context.
      *
-     * <p>This module caches and reuses Namespace contexts, so the number allocated
+     * <p>This module caches and reuses Namespace contexts,
+     * so the number allocated
      * will be equal to the element depth of the document, not to the total
-     * number of elements (i.e. 5-10 rather than tens of thousands).</p>
+     * number of elements (i.e. 5-10 rather than tens of thousands).
+     * Also, data structures used to represent contexts are shared when
+     * possible (child contexts without declarations) to further reduce
+     * the amount of memory that's consumed.
+     * </p>
      */
     final class Context {
 
@@ -451,6 +447,8 @@ public class NamespaceSupport
 	
 	/**
 	 * (Re)set the parent of this Namespace context.
+	 * The context must either have been freshly constructed,
+	 * or must have been cleared.
 	 *
 	 * @param context The parent Namespace context object.
 	 */
@@ -464,6 +462,22 @@ public class NamespaceSupport
 	    attributeNameTable = parent.attributeNameTable;
 	    defaultNS = parent.defaultNS;
 	    tablesDirty = false;
+	}
+
+	/**
+	 * Makes associated state become collectible,
+	 * invalidating this context.
+	 * {@link #setParent} must be called before
+	 * this context may be used again.
+	 */
+	void clear ()
+	{
+	    parent = null;
+	    prefixTable = null;
+	    uriTable = null;
+	    elementNameTable = null;
+	    attributeNameTable = null;
+	    defaultNS = null;
 	}
 	
 	
@@ -532,8 +546,11 @@ public class NamespaceSupport
 	    }
 	    
 				// We haven't seen this name in this
-				// context before.
+				// context before.  Maybe in the parent
+				// context, but we can't assume prefix
+				// bindings are the same.
 	    name = new String[3];
+	    name[2] = qName.intern();
 	    int index = qName.indexOf(':');
 	    
 	    
@@ -544,8 +561,7 @@ public class NamespaceSupport
 		} else {
 		    name[0] = defaultNS;
 		}
-		name[1] = qName.intern();
-		name[2] = name[1];
+		name[1] = name[2];
 	    }
 	    
 				// Prefix
@@ -563,10 +579,10 @@ public class NamespaceSupport
 		}
 		name[0] = uri;
 		name[1] = local.intern();
-		name[2] = qName.intern();
 	    }
 	    
 				// Save in the cache for future use.
+				// (Could be shared with parent context...)
 	    table.put(name[2], name);
 	    tablesDirty = true;
 	    return name;
