@@ -62,6 +62,10 @@ public final class NNTPMessage
         {
           flags.add (Flags.Flag.SEEN);
         }
+      else
+        {
+          flags.remove (Flags.Flag.SEEN);
+        }
     }
 
   public String getMessageId ()
