@@ -1,5 +1,5 @@
 /*
- * TemplatesImpl.java
+ * KeyFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,45 +38,51 @@
 
 package gnu.xml.transform;
 
-import java.util.Properties;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.URIResolver;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Function;
 
 /**
- * GNU precompiled stylesheet implementation.
+ * The XSLT <code>key()</code>function.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class TemplatesImpl
-  implements Templates
+final class KeyFunction
+  extends Expr
+  implements XPathFunction, Function
 {
 
-  final TransformerFactoryImpl factory;
   final Stylesheet stylesheet;
+  List values;
 
-  TemplatesImpl(TransformerFactoryImpl factory, Stylesheet stylesheet)
+  KeyFunction(Stylesheet stylesheet)
   {
-    this.factory = factory;
     this.stylesheet = stylesheet;
   }
 
-  public Transformer newTransformer()
-    throws TransformerConfigurationException
+  public Object evaluate(List args)
+    throws XPathFunctionException
   {
-    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
-    TransformerImpl transformer = new TransformerImpl(factory, stylesheet);
-    stylesheet.transformer = transformer;
-    return transformer;
+    // Useless...
+    return Collections.EMPTY_SET;
   }
 
-  public Properties getOutputProperties()
+  public void setValues(List values)
   {
-    // TODO
-    return null;
+    this.values = values;
   }
-  
+
+  public Object evaluate(Node context, int pos, int len)
+  {
+    String keyName = _string(context, values.get(0));
+    Object arg = values.get(1);
+    // TODO
+    throw new UnsupportedOperationException();
+  }
+
 }
+

@@ -1,5 +1,5 @@
 /*
- * TemplatesImpl.java
+ * CurrentFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,45 +38,35 @@
 
 package gnu.xml.transform;
 
-import java.util.Properties;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.URIResolver;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * GNU precompiled stylesheet implementation.
+ * The XSLT <code>current()</code>function.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class TemplatesImpl
-  implements Templates
+final class CurrentFunction
+  extends Expr
+  implements XPathFunction
 {
 
-  final TransformerFactoryImpl factory;
-  final Stylesheet stylesheet;
-
-  TemplatesImpl(TransformerFactoryImpl factory, Stylesheet stylesheet)
+  public Object evaluate(List args)
+    throws XPathFunctionException
   {
-    this.factory = factory;
-    this.stylesheet = stylesheet;
+    // We can't do anything useful here.
+    // So much for the JAXP API...
+    return Collections.EMPTY_SET;
   }
 
-  public Transformer newTransformer()
-    throws TransformerConfigurationException
+  public Object evaluate(Node context, int pos, int len)
   {
-    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
-    TransformerImpl transformer = new TransformerImpl(factory, stylesheet);
-    stylesheet.transformer = transformer;
-    return transformer;
+    return Collections.singleton(context);
   }
 
-  public Properties getOutputProperties()
-  {
-    // TODO
-    return null;
-  }
-  
 }
+

@@ -72,7 +72,7 @@ public abstract class Expr
   implements XPathExpression
 {
 
-  static final Comparator documentOrderComparator =
+  protected static final Comparator documentOrderComparator =
     new DocumentOrderComparator();
 
   public Object evaluate(Object item, QName returnType)

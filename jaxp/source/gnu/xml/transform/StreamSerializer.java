@@ -148,7 +148,12 @@ public class StreamSerializer
           }
         break;
       case Node.TEXT_NODE:
-        out.write(encode(node.getNodeValue()).getBytes(encoding));
+        value = node.getNodeValue();
+        if (!"yes".equals(node.getUserData("disable-output-encoding")))
+          {
+            value = encode(value);
+          }
+        out.write(value.getBytes(encoding));
         break;
       case Node.CDATA_SECTION_NODE:
         value = "<![CDATA[" + node.getNodeValue() + "]]>";
@@ -162,18 +167,32 @@ public class StreamSerializer
       case Node.DOCUMENT_FRAGMENT_NODE:
         if (mode == Stylesheet.OUTPUT_XML)
           {
-            out.write(BRA);
-            out.write(0x3f);
-            out.write("xml version='1.0'".getBytes(encoding));
-            if (!("UTF-8".equalsIgnoreCase(encoding)))
+            if (!"yes".equals(node.getUserData("omit-xml-declaration")))
               {
-                out.write(" encoding='".getBytes(encoding));
-                out.write(encoding.getBytes(encoding));
+                String version = (String) node.getUserData("version");
+                if (version == null)
+                  {
+                    version = "1.0";
+                  }
+                out.write(BRA);
+                out.write(0x3f);
+                out.write("xml version='".getBytes("US-ASCII"));
+                out.write(version.getBytes("US-ASCII"));
                 out.write(APOS);
+                if (!("UTF-8".equalsIgnoreCase(encoding)))
+                  {
+                    out.write(" encoding='".getBytes("US-ASCII"));
+                    out.write(encoding.getBytes("US-ASCII"));
+                    out.write(APOS);
+                  }
+                if ("yes".equals(node.getUserData("standalone")))
+                  {
+                    out.write(" standalone='yes'".getBytes("US-ASCII"));
+                  }
+                out.write(0x3f);
+                out.write(KET);
+                out.write(0x0a);
               }
-            out.write(0x3f);
-            out.write(KET);
-            out.write(0x0a);
           }
         children = node.getFirstChild();
         if (children != null)

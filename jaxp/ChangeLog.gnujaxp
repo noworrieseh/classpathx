@@ -1,3 +1,9 @@
+2004-11-10  Chris Burdess  <dog@gnu.org>
+
+   	* transform: Additional XSLT XPath extension functions. More output
+ 	parameters taken into account. Attribute-sets and namespace aliases
+	implemented.
+   	
 2004-11-09  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Separated functions into separate classes for efficiency.

@@ -89,14 +89,25 @@ public final class FunctionCall
                 values.add(arg.evaluate(context, pos, len));
               }
             //System.err.println("Calling "+toString()+" with "+values);
-            try
+            if (function instanceof Expr)
               {
-                return function.evaluate(values);
+                if (function instanceof Function)
+                  {
+                    ((Function) function).setValues(values);
+                  }
+                return ((Expr) function).evaluate(context, pos, len);
               }
-            catch (XPathFunctionException e)
+            else
               {
-                e.printStackTrace(System.err); // FIXME
-                throw new RuntimeException(e.getMessage(), e);
+                try
+                  {
+                    return function.evaluate(values);
+                  }
+                catch (XPathFunctionException e)
+                  {
+                    e.printStackTrace(System.err); // FIXME
+                    throw new RuntimeException(e.getMessage(), e);
+                  }
               }
           }
       }

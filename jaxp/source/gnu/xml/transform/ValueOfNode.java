@@ -63,7 +63,7 @@ final class ValueOfNode
   {
     super(children, next);
     this.select = select;
-    this.disableOutputEscaping = disableOutputEscaping; // TODO
+    this.disableOutputEscaping = disableOutputEscaping;
   }
 
   void apply(Stylesheet stylesheet, String mode,
@@ -79,6 +79,10 @@ final class ValueOfNode
         Document doc = (parent instanceof Document) ?
           (Document) parent : parent.getOwnerDocument();
         Text textNode = doc.createTextNode(value);
+        if (disableOutputEscaping)
+          {
+            textNode.setUserData("disable-output-escaping", "yes", null);
+          }
         if (nextSibling != null)
           {
             parent.insertBefore(textNode, nextSibling);

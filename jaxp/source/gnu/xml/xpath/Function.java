@@ -1,5 +1,5 @@
 /*
- * TemplatesImpl.java
+ * Function.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,47 +36,20 @@
  * exception statement from your version. 
  */
 
-package gnu.xml.transform;
+package gnu.xml.xpath;
 
-import java.util.Properties;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.URIResolver;
+import java.util.List;
 
 /**
- * GNU precompiled stylesheet implementation.
+ * Interface to be implemented by external functions that need to receive
+ * parameter values.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class TemplatesImpl
-  implements Templates
+public interface Function
 {
 
-  final TransformerFactoryImpl factory;
-  final Stylesheet stylesheet;
+  void setValues(List values);
 
-  TemplatesImpl(TransformerFactoryImpl factory, Stylesheet stylesheet)
-  {
-    this.factory = factory;
-    this.stylesheet = stylesheet;
-  }
-
-  public Transformer newTransformer()
-    throws TransformerConfigurationException
-  {
-    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
-    TransformerImpl transformer = new TransformerImpl(factory, stylesheet);
-    stylesheet.transformer = transformer;
-    return transformer;
-  }
-
-  public Properties getOutputProperties()
-  {
-    // TODO
-    return null;
-  }
-  
 }
+

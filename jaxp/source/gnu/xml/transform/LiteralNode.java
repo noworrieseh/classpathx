@@ -69,16 +69,44 @@ final class LiteralNode
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    // Insert result node
-    Node result = source.cloneNode(false);
+    Node result = null;
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
-    result = doc.adoptNode(result);
+    // Namespace aliasing
+    if (source.getNodeType() ==  Node.ELEMENT_NODE)
+      {
+        String prefix = source.getPrefix();
+        String resultPrefix = (String) stylesheet.namespaceAliases.get(prefix);
+        if (resultPrefix != null)
+          {
+            String uri = source.lookupNamespaceURI(resultPrefix);
+            String name = ("".equals(resultPrefix)) ? source.getLocalName() :
+              resultPrefix + ":" + source.getLocalName();
+            // Create a new element node in the result document
+            result = doc.createElementNS(uri, name);
+            // copy attributes
+            NamedNodeMap srcAttrs = source.getAttributes();
+            NamedNodeMap dstAttrs = result.getAttributes();
+            int l = srcAttrs.getLength();
+            for (int i = 0; i < l; i++)
+              {
+                Node attr = srcAttrs.item(i).cloneNode(true);
+                attr = doc.adoptNode(attr);
+                dstAttrs.setNamedItemNS(attr);
+              }
+          }
+      }
     if (result == null)
       {
-        String msg = "Error adopting node to result tree";
-        DOMSourceLocator l = new DOMSourceLocator(context);
-        throw new TransformerException(msg, l);
+        // Create result node
+        result = source.cloneNode(false);
+        result = doc.adoptNode(result);
+        if (result == null)
+          {
+            String msg = "Error adopting node to result tree";
+            DOMSourceLocator l = new DOMSourceLocator(context);
+            throw new TransformerException(msg, l);
+          }
       }
     if (nextSibling != null)
       {

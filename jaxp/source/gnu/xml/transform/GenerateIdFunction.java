@@ -1,5 +1,5 @@
 /*
- * TemplatesImpl.java
+ * GenerateIdFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,45 +38,69 @@
 
 package gnu.xml.transform;
 
-import java.util.Properties;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.URIResolver;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Function;
 
 /**
- * GNU precompiled stylesheet implementation.
+ * The XSLT <code>generate-id()</code>function.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class TemplatesImpl
-  implements Templates
+final class GenerateIdFunction
+  extends Expr
+  implements XPathFunction, Function
 {
 
-  final TransformerFactoryImpl factory;
-  final Stylesheet stylesheet;
+  List values;
 
-  TemplatesImpl(TransformerFactoryImpl factory, Stylesheet stylesheet)
+  public Object evaluate(List args)
+    throws XPathFunctionException
   {
-    this.factory = factory;
-    this.stylesheet = stylesheet;
+    // Useless...
+    return Collections.EMPTY_SET;
   }
 
-  public Transformer newTransformer()
-    throws TransformerConfigurationException
+  public void setValues(List values)
   {
-    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
-    TransformerImpl transformer = new TransformerImpl(factory, stylesheet);
-    stylesheet.transformer = transformer;
-    return transformer;
+    this.values = values;
   }
 
-  public Properties getOutputProperties()
+  public Object evaluate(Node context, int pos, int len)
   {
-    // TODO
-    return null;
+    Node node;
+    Collection ns = (Collection) values.get(0);
+    if (ns.isEmpty())
+      {
+        node = context;
+      }
+    else
+      {
+        List list = new ArrayList(ns);
+        Collections.sort(list, documentOrderComparator);
+        node = (Node) list.get(0);
+      }
+
+    String name = node.getNodeName();
+    int index = 0, depth = 0;
+    for (Node ctx = node.getPreviousSibling(); ctx != null;
+         ctx = ctx.getPreviousSibling())
+      {
+        index++;
+      }
+    for (Node ctx = node.getParentNode(); ctx != null;
+         ctx = ctx.getParentNode())
+      {
+        depth++;
+      }
+    return name + "-" + index + "-" + depth;
   }
-  
+
 }
+

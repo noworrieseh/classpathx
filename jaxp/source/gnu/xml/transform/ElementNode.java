@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.util.StringTokenizer;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,14 +55,15 @@ final class ElementNode
 
   final String name;
   final String namespace;
-  // TODO use-attribute-sets
+  final String uas;
   
   ElementNode(TemplateNode children, TemplateNode next, String name,
-              String namespace)
+              String namespace, String uas)
   {
     super(children, next);
     this.name = name;
     this.namespace = namespace;
+    this.uas = uas;
   }
 
   void apply(Stylesheet stylesheet, String mode,
@@ -82,6 +84,15 @@ final class ElementNode
       {
         parent.appendChild(element);
       }
+    if (uas != null)
+      {
+        StringTokenizer st = new StringTokenizer(uas, " ");
+        while (st.hasMoreTokens())
+          {
+            addAttributeSet(stylesheet, mode, context, pos, len,
+                            element, null, st.nextToken());
+          }
+      }
     if (children != null)
       {
         children.apply(stylesheet, mode,
@@ -96,12 +107,39 @@ final class ElementNode
       }
   }
 
+  void addAttributeSet(Stylesheet stylesheet, String mode,
+                       Node context, int pos, int len,
+                       Node parent, Node nextSibling, String attributeSet)
+    throws TransformerException
+  {
+    TemplateNode attribute =
+      (TemplateNode) stylesheet.attributeSets.get(attributeSet);
+    attribute.apply(stylesheet, mode,
+                    context, pos, len,
+                    parent, nextSibling);
+    String uas = (String) stylesheet.usedAttributeSets.get(attributeSet);
+    if (uas != null)
+      {
+        StringTokenizer st = new StringTokenizer(uas, " ");
+        while (st.hasMoreTokens())
+          {
+            addAttributeSet(stylesheet, mode, context, pos, len,
+                            parent, nextSibling, st.nextToken());
+          }
+      }
+  }
+
   public String toString()
   {
     StringBuffer buf = new StringBuffer(getClass().getName());
     buf.append('[');
     buf.append("name=");
     buf.append(name);
+    if (uas != null)
+      {
+        buf.append(",uas=");
+        buf.append(uas);
+      }
     buf.append(']');
     return buf.toString();
   }

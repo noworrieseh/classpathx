@@ -68,7 +68,6 @@ final class TextNode
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    // TODO output escaping
     String value = "";
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
@@ -84,6 +83,10 @@ final class TextNode
         value = Expr.stringValue(fragment);
       }
     Text text = doc.createTextNode(value);
+    if (disableOutputEscaping)
+      {
+        text.setUserData("disable-output-escaping", "yes", null);
+      }
     // Insert into result tree
     if (nextSibling != null)
       {

@@ -1,5 +1,5 @@
 /*
- * TemplatesImpl.java
+ * UnparsedEntityUriFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,45 +38,61 @@
 
 package gnu.xml.transform;
 
-import java.util.Properties;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.URIResolver;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.Notation;
+import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Function;
 
 /**
- * GNU precompiled stylesheet implementation.
+ * The XSLT <code>unparsed-entity-uri()</code>function.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class TemplatesImpl
-  implements Templates
+final class UnparsedEntityUriFunction
+  extends Expr
+  implements XPathFunction, Function
 {
 
-  final TransformerFactoryImpl factory;
-  final Stylesheet stylesheet;
+  List values;
 
-  TemplatesImpl(TransformerFactoryImpl factory, Stylesheet stylesheet)
+  public Object evaluate(List args)
+    throws XPathFunctionException
   {
-    this.factory = factory;
-    this.stylesheet = stylesheet;
+    // Useless...
+    return Collections.EMPTY_SET;
   }
 
-  public Transformer newTransformer()
-    throws TransformerConfigurationException
+  public void setValues(List values)
   {
-    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
-    TransformerImpl transformer = new TransformerImpl(factory, stylesheet);
-    stylesheet.transformer = transformer;
-    return transformer;
+    this.values = values;
   }
 
-  public Properties getOutputProperties()
+  public Object evaluate(Node context, int pos, int len)
   {
-    // TODO
-    return null;
+    String name = _string(context, values.get(0));
+    DocumentType doctype = context.getOwnerDocument().getDoctype();
+    if (doctype != null)
+      {
+        NamedNodeMap notations = doctype.getNotations();
+        Notation notation = (Notation) notations.getNamedItem(name);
+        if (notation != null)
+          {
+            String systemId = notation.getSystemId();
+            // XXX absolutize?
+            if (systemId != null)
+              {
+                return systemId;
+              }
+          }
+      }
+    return "";
   }
-  
+
 }
+

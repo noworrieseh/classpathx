@@ -108,17 +108,26 @@ class Stylesheet
   Set preserveSpace;
 
   /**
-   * Output method.
+   * Output options.
    */
   int outputMethod;
+  String outputVersion;
+  String outputEncoding;
+  boolean outputOmitXmlDeclaration;
+  boolean outputStandalone;
   String outputPublicId;
   String outputSystemId;
-  String outputEncoding;
+  Collection outputCdataSectionElements;
   boolean outputIndent;
+  String outputMediaType;
 
   // TODO keys
   // TODO decimal-format
-  // TODO namespace-alias
+  
+  /**
+   * Namespace aliases.
+   */
+  Map namespaceAliases;
 
   /**
    * Attribute-sets.
@@ -159,6 +168,8 @@ class Stylesheet
     preserveSpace = new LinkedHashSet();
     attributeSets = new LinkedHashMap();
     usedAttributeSets = new LinkedHashMap();
+    namespaceAliases = new LinkedHashMap();
+    outputCdataSectionElements = new LinkedHashSet();
     if (parent == null)
       {
         bindings = new Bindings();
@@ -322,14 +333,45 @@ class Stylesheet
                     throw new TransformerConfigurationException("unsupported output method: " + method, new DOMSourceLocator(element));
                   }
                 outputPublicId = element.getAttribute("public-id");
+                if (outputPublicId != null && outputPublicId.length() == 0)
+                  {
+                    outputPublicId = null;
+                  }
                 outputSystemId = element.getAttribute("system-id");
+                if (outputSystemId != null && outputSystemId.length() == 0)
+                  {
+                    outputSystemId = null;
+                  }
                 outputEncoding = element.getAttribute("encoding");
-                if (outputEncoding.length() == 0)
+                if (outputEncoding!= null && outputEncoding.length() == 0)
                   {
                     outputEncoding = null;
                   }
                 String indent = element.getAttribute("indent");
                 outputIndent = "yes".equals(indent);
+                outputVersion = element.getAttribute("version");
+                if (outputVersion != null && outputVersion.length() == 0)
+                  {
+                    outputVersion = null;
+                  }
+                String omitXmlDecl =
+                  element.getAttribute("omit-xml-declaration");
+                outputOmitXmlDeclaration = "yes".equals(omitXmlDecl);
+                String standalone = element.getAttribute("standalone");
+                outputStandalone = "yes".equals(standalone);
+                outputMediaType = element.getAttribute("media-type");
+                if (outputMediaType != null && outputMediaType.length() == 0)
+                  {
+                    outputMediaType = null;
+                  }
+                String cdataSectionElements =
+                  element.getAttribute("cdata-section-elements");
+                StringTokenizer st = new StringTokenizer(cdataSectionElements,
+                                                         " ");
+                while (st.hasMoreTokens())
+                  {
+                    outputCdataSectionElements.add(st.nextToken());
+                  }
                 parse(element.getNextSibling(), false);
               }
             else if ("preserve-space".equals(name))
@@ -356,16 +398,37 @@ class Stylesheet
               }
             // TODO keys
             // TODO decimal-format
-            // TODO namespace-alias
+            else if ("namespace-alias".equals(name))
+              {
+                String sp = element.getAttribute("stylesheet-prefix");
+                String rp = element.getAttribute("result-prefix");
+                namespaceAliases.put(sp, rp);
+              }
             else if ("attribute-set".equals(name))
               {
                 String asName = element.getAttribute("name");
                 String uas = element.getAttribute("use-attribute-sets");
-                attributeSets.put(asName, element.getFirstChild());
-                if (uas != null)
+                if (uas != null && uas.length() > 0)
                   {
                     usedAttributeSets.put(asName, uas);
                   }
+                TemplateNode last = null;
+                for (Node ctx = element.getLastChild(); ctx != null;
+                     ctx = ctx.getPreviousSibling())
+                  {
+                    String ctxNamespaceUri = ctx.getNamespaceURI();
+                    String ctxName = ctx.getLocalName();
+                    if (XSL_NS.equals(ctxNamespaceUri) &&
+                        ctx.getNodeType() == Node.ELEMENT_NODE &&
+                        "attribute".equals(ctxName))
+                      {
+                        String aname = element.getAttribute("name");
+                        String ns = element.getAttribute("namespace");
+                        last = new AttributeNode(null, last,
+                                                 aname, ns);
+                      }
+                  }
+                attributeSets.put(asName, last);
               }
             else
               {
@@ -607,8 +670,35 @@ class Stylesheet
           {
             return new DocumentFunction(this, current);
           }
+        else if ("key".equals(localName) && (arity == 2))
+          {
+            return new KeyFunction(this);
+          }
+        else if ("format-number".equals(localName) &&
+                 (arity == 2 || arity == 3))
+          {
+            return new FormatNumberFunction(this);
+          }
+        else if ("current".equals(localName) && (arity == 0))
+          {
+            return new CurrentFunction();
+          }
+        else if ("unparsed-entity-uri".equals(localName) && (arity == 1))
+          {
+            return new UnparsedEntityUriFunction();
+          }
+        else if ("generate-id".equals(localName) &&
+                 (arity == 1 || arity == 0))
+          {
+            return new GenerateIdFunction();
+          }
+        else if ("system-property".equals(localName) && (arity == 1))
+          {
+            return new SystemPropertyFunction();
+          }
       }
     return null;
   }
-    
+  
 }
+

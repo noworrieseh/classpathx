@@ -325,9 +325,12 @@ class Template
                 String ename = element.getAttribute("name");
                 String ns = element.getAttribute("namespace");
                 String uas = element.getAttribute("used-attribute-sets");
-                // TODO uas
+                if (uas != null && uas.length() == 0)
+                  {
+                    uas = null;
+                  }
                 return new ElementNode(parse(children), parse(next),
-                                       ename, ns);
+                                       ename, ns, uas);
               }
             else if ("attribute".equals(name))
               {
@@ -546,7 +549,7 @@ class Template
                   }
                 return new ElementNode(child, parse(next),
                                        source.getNodeName(),
-                                       namespaceUri);
+                                       namespaceUri, null);
               }
             // Otherwise fall through
             break;

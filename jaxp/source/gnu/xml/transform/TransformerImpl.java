@@ -74,7 +74,7 @@ class TransformerImpl
   extends Transformer
 {
 
-	final TransformerFactoryImpl factory;
+  final TransformerFactoryImpl factory;
   final Stylesheet stylesheet;
   URIResolver uriResolver;
   ErrorListener errorListener;
@@ -131,18 +131,8 @@ class TransformerImpl
                                   parent, nextSibling);
         outputMethod = stylesheet.outputMethod;
         encoding = stylesheet.outputEncoding;
-        // TODO stylesheet.outputIndent
         String publicId = stylesheet.outputPublicId;
-        if (publicId.length() == 0)
-          {
-            publicId = null;
-          }
         String systemId = stylesheet.outputSystemId;
-        if (systemId.length() == 0)
-          {
-            systemId = null;
-          }
-        
         if (created)
           {
             Node root = parent.getFirstChild();
@@ -172,6 +162,53 @@ class TransformerImpl
                 parent = newDoc;
               }
           }
+        /*
+        else if (publicId != null || systemId != null)
+          {
+            switch (parent.getNodeType())
+              {
+              case Node.DOCUMENT_NODE:
+              case Node.DOCUMENT_FRAGMENT_NODE:
+                Document doc = (parent instanceof Document) ?
+                  (Document) parent :
+                  parent.getOwnerDocument();
+                DOMImplementation impl = doc.getImplementation();
+                DocumentType doctype =
+                  impl.createDocumentType(doc.getNodeName(),
+                                          publicId,
+                                          systemId);
+                // Try to insert doctype before first element
+                Node ctx = parent.getFirstChild();
+                for (; ctx != null && ctx.getNodeType() != Node.ELEMENT_NODE;
+                     ctx = ctx.getNextSibling())
+                  {
+                  }
+                if (ctx != null)
+                  {
+                    parent.insertBefore(doctype, ctx);
+                  }
+                else
+                  {
+                    parent.appendChild(doctype);
+                  }
+              }
+          }
+          */
+        if (stylesheet.outputVersion != null)
+          {
+            parent.setUserData("version", stylesheet.outputVersion, null);
+          }
+        if (stylesheet.outputOmitXmlDeclaration)
+          {
+            parent.setUserData("omit-xml-declaration", "yes", null);
+          }
+        if (stylesheet.outputStandalone)
+          {
+            parent.setUserData("standalone", "yes", null);
+          }
+        // TODO cdata-section-elements
+        // TODO indent
+        // TODO media-type
       }
     else
       {
