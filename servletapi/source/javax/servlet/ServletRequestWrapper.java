@@ -133,6 +133,8 @@ public class ServletRequestWrapper
   }
   /**
    * Calls the underlying request object's method
+   * @throws IOException
+   * @throws IllegalStateException
    */
   public ServletInputStream getInputStream ()
   throws IOException
@@ -197,6 +199,9 @@ public class ServletRequestWrapper
   }
   /**
    * Calls the underlying request object's method
+   * @throws IOException
+   * @throws java.io.UnsupportedEncodingException
+   * @throws IllegalStateException
    */
   public BufferedReader getReader ()
   throws IOException
@@ -261,9 +266,30 @@ public class ServletRequestWrapper
   }
   /**
    * Calls the underlying request object's method
+   * @deprecated Should use getRealPath from the current ServletContext.
+   * @see javax.servlet.ServletContext#getRealPath(java.lang.String)
    */
   public String getRealPath (String path)
   {
     return _impl.getRealPath (path);
   }
+
+  /**
+   * Sets a new wrapper
+   *
+   * @since Servlet API 2.3
+   *
+   * @param wrappedRequest the request that will be wrapped
+   * by this object 
+   * @throws java.lang.IllegalArgumentException if wrappedRequest is null
+   */
+  public void setRequest (ServletRequest wrappedRequest)
+  {
+    if (wrappedRequest == null) 
+    {
+      throw new IllegalArgumentException ("setRequest called with null argument");
+    }
+    _impl  = wrappedRequest;
+  }
+  
 }
