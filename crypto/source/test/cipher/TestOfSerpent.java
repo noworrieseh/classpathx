@@ -1,7 +1,7 @@
 package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfSerpent.java,v 1.1 2002-06-09 00:09:09 raif Exp $
+// $Id: TestOfSerpent.java,v 1.2 2002-06-12 10:27:42 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -43,7 +43,7 @@ import gnu.crypto.util.Util;
  * <p>Full conformance tests for the {@link gnu.crypto.cipher.Serpent}
  * implementation.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfSerpent extends TestCase {
 
@@ -498,6 +498,7 @@ public class TestOfSerpent extends TestCase {
    // over-ridden methods from junit.framework.TestCase -----------------------
 
    protected void setUp() throws Exception {
+      serpent = new Serpent();
    }
 
    // own methods -------------------------------------------------------------
@@ -529,7 +530,7 @@ public class TestOfSerpent extends TestCase {
    // -------------------------------------------------------------------------
 
    /** The local reference to a serpent. */
-   private Serpent serpent = new Serpent();
+   private Serpent serpent;
 
    /** Variable-key known-answer test for 128-bit keys. */
    private static final String[] vk_128 = {
