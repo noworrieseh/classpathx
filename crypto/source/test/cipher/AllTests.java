@@ -1,7 +1,7 @@
 package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.3 2002-06-09 00:09:09 raif Exp $
+// $Id: AllTests.java,v 1.4 2002-06-22 09:57:20 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -30,6 +30,8 @@ package test.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -39,7 +41,7 @@ import junit.textui.TestRunner;
  * <p>A {@link junit.framework.TestSuite} that runs all tests of the cipher
  * package.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AllTests extends TestCase {
 
@@ -72,6 +74,11 @@ public class AllTests extends TestCase {
       result.addTest(TestOfSerpent.suite());
       result.addTest(TestOfSquare.suite());
       result.addTest(TestOfTwofish.suite());
+
+      result.addTest(new TestOfNistVectors(Registry.ANUBIS_CIPHER, 16));
+      result.addTest(new TestOfNistVectors(Registry.RIJNDAEL_CIPHER, 16));
+      result.addTest(new TestOfNistVectors(Registry.SERPENT_CIPHER, 16));
+      result.addTest(new TestOfNistVectors(Registry.TWOFISH_CIPHER, 16));
 
       return result;
    }
