@@ -69,22 +69,22 @@ public class URLName
    * Specifying a port number of -1 indicates that the URL should 
    * use the default port for the protocol.
    */
-  public URLName(String protocol, String host, int port,
-      String file, String username, String password)
+  public URLName (String protocol, String host, int port,
+                  String file, String username, String password)
   {
     this.protocol = protocol;
     this.host = host;
     this.port = port;
     this.file = file;
-    if (file!=null)
-    {
-      int hashIndex = file.indexOf('#');
-      if (hashIndex!=-1)
+    if (file != null)
       {
-        this.file = file.substring(0, hashIndex);
-        ref = file.substring(hashIndex+1);
+        int hashIndex = file.indexOf ('#');
+        if (hashIndex != -1)
+          {
+            this.file = file.substring (0, hashIndex);
+            ref = file.substring (hashIndex + 1);
+          }
       }
-    }
     this.username = username;
     this.password = password;
   }
@@ -92,25 +92,25 @@ public class URLName
   /**
    * Construct a URLName from a java.net.URL object.
    */
-  public URLName(URL url)
+  public URLName (URL url)
   {
-    this(url.toString());
+    this (url.toString ());
   }
 
   /**
    * Construct a URLName from the string. Parses out all the possible
    * information (protocol, host, port, file, username, password).
    */
-  public URLName(String url)
+  public URLName (String url)
   {
-    parseString(url);
+    parseString (url);
   }
 
   /**
    * Returns the port number of this URLName.
    * Returns -1 if the port is not set.
    */
-  public int getPort()
+  public int getPort ()
   {
     return port;
   }
@@ -119,7 +119,7 @@ public class URLName
    * Returns the protocol of this URLName. 
    * Returns null if this URLName has no protocol.
    */
-  public String getProtocol()
+  public String getProtocol ()
   {
     return protocol;
   }
@@ -128,7 +128,7 @@ public class URLName
    * Returns the file name of this URLName.
    * Returns null if this URLName has no file name.
    */
-  public String getFile()
+  public String getFile ()
   {
     return file;
   }
@@ -137,7 +137,7 @@ public class URLName
    * Returns the reference of this URLName.
    * Returns null if this URLName has no reference.
    */
-  public String getRef()
+  public String getRef ()
   {
     return ref;
   }
@@ -146,7 +146,7 @@ public class URLName
    * Returns the host of this URLName.
    * Returns null if this URLName has no host.
    */
-  public String getHost()
+  public String getHost ()
   {
     return host;
   }
@@ -155,7 +155,7 @@ public class URLName
    * Returns the user name of this URLName.
    * Returns null if this URLName has no user name.
    */
-  public String getUsername()
+  public String getUsername ()
   {
     return username;
   }
@@ -164,7 +164,7 @@ public class URLName
    * Returns the password of this URLName.
    * Returns null if this URLName has no password.
    */
-  public String getPassword()
+  public String getPassword ()
   {
     return password;
   }
@@ -172,10 +172,10 @@ public class URLName
   /**
    * Constructs a URL from the URLName.
    */
-  public URL getURL()
+  public URL getURL ()
     throws MalformedURLException
   {
-    return new URL(getProtocol(), getHost(), getPort(), getFile());
+    return new URL (getProtocol (), getHost (), getPort (), getFile ());
   }
 
   // -- Utility methods --
@@ -183,51 +183,57 @@ public class URLName
   /**
    * Constructs a string representation of this URLName.
    */
-  public String toString()
+  public String toString ()
   {
-    if (fullURL==null)
-    {
-      StringBuffer buffer = new StringBuffer();
-      if (protocol!=null)
+    if (fullURL == null)
       {
-        buffer.append(protocol);
-        buffer.append(":");
-      }
-      if (username!=null || host!=null)
-      {
-        buffer.append("//");
-        if (username!=null)
-        {
-          buffer.append(username);
-          if (password!=null)
+        StringBuffer buffer = new StringBuffer ();
+        if (protocol != null)
           {
-            buffer.append(":");
-            buffer.append(password);
+            buffer.append (protocol);
+            buffer.append (":");
           }
-          buffer.append("@");
-        }
-        if (host!=null)
-          buffer.append(host);
-        if (port!=-1)
-        {
-          buffer.append(":");
-          buffer.append(Integer.toString(port));
-        }
-        if (file!=null)
-          buffer.append("/");
+        if (username != null || host != null)
+          {
+            buffer.append ("//");
+            if (username != null)
+              {
+                buffer.append (username);
+                if (password != null)
+                  {
+                    buffer.append (":");
+                    buffer.append (password);
+                  }
+                buffer.append ("@");
+              }
+            if (host != null)
+              {
+                buffer.append (host);
+              }
+            if (port != -1)
+              {
+                buffer.append (":");
+                buffer.append (Integer.toString (port));
+              }
+            if (file != null)
+              {
+                buffer.append ("/");
+              }
+          }
+        if (file != null)
+          {
+            buffer.append (file);
+          }
+        if (ref != null)
+          {
+            buffer.append ("#");
+            buffer.append (ref);
+          }
+        fullURL = buffer.toString ();
       }
-      if (file!=null)
-        buffer.append(file);
-      if (ref!=null)
-      {
-        buffer.append("#");
-        buffer.append(ref);
-      }
-      fullURL = buffer.toString();
-    }
     return fullURL;
   }
-
+  
   /**
    * Compares two URLNames. The result is true if and only if the argument is
    * not null and is a URLName object that represents the same URLName as this
@@ -237,74 +243,103 @@ public class URLName
    * username, password, file) are also considered the same if they are both
    * null.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
+    if (other == this)
+      {
+        return true;
+      }
     if (!(other instanceof URLName))
-      return false;
-    URLName url = (URLName)other;
-    if (url.protocol==null || !url.protocol.equals(protocol))
-      return false;
-    InetAddress address = getHostAddress();
-    InetAddress otherAddress = url.getHostAddress();
-    if (address!=null && otherAddress!=null)
-    {
-      if (!address.equals(otherAddress))
+      {
         return false;
-    }
-    else if (host!=null && url.host!=null)
-    {
-      if (!host.equalsIgnoreCase(url.host))
+      }
+    URLName url = (URLName) other;
+    if (url.protocol == null || !url.protocol.equals (protocol))
+      {
         return false;
-    }
-    else if (host!=url.host)
-      return false;
-    if (username!=url.username && 
-        (username==null || !username.equals(url.username)))
-      return false;
-    String file = this.file!=null ? this.file : "";
-    String otherFile = url.file!=null ? url.file : "";
-    if (!file.equals(otherFile))
-      return false;
-    return port==url.port;
+      }
+    InetAddress address = getHostAddress ();
+    InetAddress otherAddress = url.getHostAddress ();
+    if (address != null && otherAddress != null)
+      {
+        if (!address.equals (otherAddress))
+          {
+            return false;
+          }
+      }
+    else if (host != null)
+      {
+        if (!host.equalsIgnoreCase (url.host))
+          {
+            return false;
+          }
+      }
+    if (username != url.username && 
+        (username==null || !username.equals (url.username)))
+      {
+        return false;
+      }
+    String file = (this.file != null) ? this.file : "";
+    String otherFile = (url.file != null) ? url.file : "";
+    if (!file.equals (otherFile))
+      {
+        return false;
+      }
+    return port == url.port;
   }
 
   /**
    * Compute the hash code for this URLName.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    if (hashCode!=0)
-      return hashCode;
-    if (protocol!=null)
-      hashCode += protocol.hashCode();
-    InetAddress address = getHostAddress();
-    if (address!=null)
-      hashCode += address.hashCode();
-    else
-    if (host!=null)
-      hashCode += host.toLowerCase().hashCode();
-    if (username!=null)
-      hashCode += username.hashCode();
-    if (file!=null)
-      hashCode += file.hashCode();
+    if (hashCode != 0)
+      {
+        return hashCode;
+      }
+    if (protocol != null)
+      {
+        hashCode += protocol.hashCode ();
+      }
+    InetAddress address = getHostAddress ();
+    if (address != null)
+      {
+        hashCode += address.hashCode ();
+      }
+    else if (host != null)
+      {
+        hashCode += host.toLowerCase ().hashCode ();
+      }
+    if (username != null)
+      {
+        hashCode += username.hashCode ();
+      }
+    if (file != null)
+      {
+        hashCode += file.hashCode ();
+      }
     hashCode += port;
     return hashCode;
   }
 
-  private synchronized InetAddress getHostAddress()
+  private synchronized InetAddress getHostAddress ()
   {
     if (gotHostAddress)
-      return hostAddress;
-    if (host==null)
-      return null;
+      {
+        return hostAddress;
+      }
+    if (host == null)
+      {
+        return null;
+      }
     try
-    {
-      hostAddress = InetAddress.getByName(host);
-    }
+      {
+        hostAddress = InetAddress.getByName (host);
+      }
     catch (UnknownHostException e)
-    {
-      hostAddress = null;
-    }
+      {
+        hostAddress = null;
+      }
     gotHostAddress = true;
     return hostAddress;
   }
@@ -312,78 +347,96 @@ public class URLName
   /**
    * Method which does all of the work of parsing the string.
    */
-  protected void parseString(String url)
+  protected void parseString (String url)
   {
     protocol = file = ref = host = username = password = null;
     port = -1;
-    int len = url.length();
-    int colonIndex = url.indexOf(':');
-    if (colonIndex!=-1)
-      protocol = url.substring(0, colonIndex);
-    if (url.regionMatches(colonIndex+1, "//", 0, 2))
-    {
-      String hostPart;
-      int slashIndex = url.indexOf('/', colonIndex+3);
-      if (slashIndex!=-1)
+    int len = url.length ();
+    int colonIndex = url.indexOf (':');
+    if (colonIndex != -1)
       {
-        hostPart = url.substring(colonIndex+3, slashIndex);
-        if ((slashIndex+1)<len)
-          file = url.substring(slashIndex+1);
-        else
-          file = "";
+        protocol = url.substring (0, colonIndex);
       }
-      else
-        hostPart = url.substring(colonIndex+3);
-
-      // user:password@host?
-      int atIndex = hostPart.indexOf('@');
-      if (atIndex!=-1)
+    if (url.regionMatches (colonIndex + 1, "//", 0, 2))
       {
-        String userPart = hostPart.substring(0, atIndex);
-        hostPart = hostPart.substring(atIndex+1);
-        colonIndex = userPart.indexOf(':');
-        if (colonIndex!=-1)
-        {
-          username = userPart.substring(0, colonIndex);
-          password = userPart.substring(colonIndex+1);
-        }
-        else
-          username = userPart;
-      }
-
-      // host:port?
-      if (hostPart.length()>0 && hostPart.charAt(0)=='[')
-        colonIndex = hostPart.indexOf(':', hostPart.indexOf(']'));
-      else
-        colonIndex = hostPart.indexOf(':');
-      if (colonIndex!=-1)
-      {
-        String portPart = hostPart.substring(colonIndex + 1);
-        if (portPart.length()>0)
-        {
-          try
+        String hostPart;
+        int slashIndex = url.indexOf ('/', colonIndex + 3);
+        if (slashIndex != -1)
           {
-            port = Integer.parseInt(portPart);
+            hostPart = url.substring (colonIndex + 3, slashIndex);
+            if ((slashIndex + 1) < len)
+              {
+                file = url.substring (slashIndex + 1);
+              }
+            else
+              {
+                file = "";
+              }
           }
-          catch (NumberFormatException e)
+        else
           {
-            port = -1;
+            hostPart = url.substring (colonIndex + 3);
           }
-        }
-        host = hostPart.substring(0, colonIndex);
+        
+        // user:password@host?
+        int atIndex = hostPart.indexOf ('@');
+        if (atIndex != -1)
+          {
+            String userPart = hostPart.substring (0, atIndex);
+            hostPart = hostPart.substring (atIndex + 1);
+            colonIndex = userPart.indexOf (':');
+            if (colonIndex != -1)
+              {
+                username = userPart.substring (0, colonIndex);
+                password = userPart.substring (colonIndex + 1);
+              }
+            else
+              {
+                username = userPart;
+              }
+          }
+        
+        // host:port?
+        if (hostPart.length () > 0 && hostPart.charAt (0) == '[')
+          {
+            colonIndex = hostPart.indexOf (':', hostPart.indexOf (']'));
+          }
+        else
+          {
+            colonIndex = hostPart.indexOf (':');
+          }
+        if (colonIndex != -1)
+          {
+            String portPart = hostPart.substring (colonIndex + 1);
+            if (portPart.length () > 0)
+              {
+                try
+                  {
+                    port = Integer.parseInt (portPart);
+                  }
+                catch (NumberFormatException e)
+                  {
+                    port = -1;
+                  }
+              }
+            host = hostPart.substring (0, colonIndex);
+          }
+        else
+          {
+            host = hostPart;
+          }
       }
-      else
-        host = hostPart;
-    }
-    else if ((colonIndex+1)<len)
-      file = url.substring(colonIndex+1);
+    else if ((colonIndex + 1) < len)
+      {
+        file = url.substring (colonIndex + 1);
+      }
     
-    int hashIndex = (file!=null) ? file.indexOf('#') : -1;
-    if (hashIndex!=-1)
-    {
-      ref = file.substring(hashIndex+1);
-      file = file.substring(0, hashIndex);
-    }
+    int hashIndex = (file != null) ? file.indexOf ('#') : -1;
+    if (hashIndex != -1)
+      {
+        ref = file.substring (hashIndex + 1);
+        file = file.substring (0, hashIndex);
+      }
   }
-
+  
 }

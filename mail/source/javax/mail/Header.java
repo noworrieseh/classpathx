@@ -51,7 +51,7 @@ public class Header
    * @param name name of the header
    * @param value value of the header
    */
-  public Header(String name, String value)
+  public Header (String name, String value)
   {
     this.name = name;
     this.value = value;
@@ -60,7 +60,7 @@ public class Header
   /**
    * Returns the name of this header.
    */
-  public String getName()
+  public String getName ()
   {
     return name;
   }
@@ -68,7 +68,7 @@ public class Header
   /**
    * Returns the value of this header.
    */
-  public String getValue()
+  public String getValue ()
   {
     return value;
   }

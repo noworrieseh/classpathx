@@ -42,18 +42,18 @@ public interface ConnectionListener
   /**
    * Invoked when a Store/Folder/Transport is opened.
    */
-  void opened(ConnectionEvent e);
+  void opened (ConnectionEvent e);
 
   /**
    * Invoked when a Store is disconnected.
    * Note that a folder cannot be disconnected, so a folder will not fire 
    * this event.
    */
-  void disconnected(ConnectionEvent e);
+  void disconnected (ConnectionEvent e);
 
   /**
    * Invoked when a Store/Folder/Transport is closed.
    */
-  void closed(ConnectionEvent e);
+  void closed (ConnectionEvent e);
 
 }

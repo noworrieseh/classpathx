@@ -69,13 +69,13 @@ public abstract class Authenticator
     this.requestingProtocol = requestingProtocol;
     this.requestingPrompt = requestingPrompt;
     this.defaultUserName = defaultUserName;
-    return getPasswordAuthentication();
+    return getPasswordAuthentication ();
   }
 
   /**
    * Returns the default user name given by the requestor.
    */
-  protected final String getDefaultUserName()
+  protected final String getDefaultUserName ()
   {
     return defaultUserName;
   }
@@ -88,7 +88,7 @@ public abstract class Authenticator
    * information, the dialog needs to block until the user supplies the
    * information. This method can not simply return after showing the dialog.
    */
-  protected PasswordAuthentication getPasswordAuthentication()
+  protected PasswordAuthentication getPasswordAuthentication ()
   {
     return null;
   }
@@ -96,7 +96,7 @@ public abstract class Authenticator
   /**
    * Returns the port for the requested connection.
    */
-  protected final int getRequestingPort()
+  protected final int getRequestingPort ()
   {
     return requestingPort;
   }
@@ -104,7 +104,7 @@ public abstract class Authenticator
   /**
    * Returns the prompt string given by the requestor.
    */
-  protected final String getRequestingPrompt()
+  protected final String getRequestingPrompt ()
   {
     return requestingPrompt;
   }
@@ -113,7 +113,7 @@ public abstract class Authenticator
    * Returns the protocol requesting the connection.
    * Often this will be based on a URLName.
    */
-  protected final String getRequestingProtocol()
+  protected final String getRequestingProtocol ()
   {
     return requestingProtocol;
   }
@@ -122,7 +122,7 @@ public abstract class Authenticator
    * Returns the address of the site requesting authorization,
    * or null if not available.
    */
-  protected final InetAddress getRequestingSite()
+  protected final InetAddress getRequestingSite ()
   {
     return requestingSite;
   }

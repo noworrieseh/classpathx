@@ -52,7 +52,7 @@ public class ContentDisposition
   /**
    * No-arg constructor.
    */
-  public ContentDisposition()
+  public ContentDisposition ()
   {
   }
 
@@ -61,7 +61,7 @@ public class ContentDisposition
    * @param disposition disposition
    * @param list ParameterList
    */
-  public ContentDisposition(String disposition, ParameterList list)
+  public ContentDisposition (String disposition, ParameterList list)
   {
     this.disposition = disposition;
     this.list = list;
@@ -74,26 +74,30 @@ public class ContentDisposition
    * @param s the ContentDisposition string.
    * @exception ParseException if the parse fails.
    */
-  public ContentDisposition(String s)
+  public ContentDisposition (String s)
     throws ParseException
   {
-    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
-    HeaderTokenizer.Token token = ht.next();
-    if (token.getType()!=HeaderTokenizer.Token.ATOM)
-      throw new ParseException();
+    HeaderTokenizer ht = new HeaderTokenizer (s, HeaderTokenizer.MIME);
+    HeaderTokenizer.Token token = ht.next ();
+    if (token.getType () != HeaderTokenizer.Token.ATOM)
+      {
+        throw new ParseException ();
+      }
     
-    disposition = token.getValue();
+    disposition = token.getValue ();
     
-    s = ht.getRemainder();
-    if (s!=null)
-      list = new ParameterList(s);
+    s = ht.getRemainder ();
+    if (s != null)
+      {
+        list = new ParameterList (s);
+      }
   }
 
   /**
    * Return the disposition value.
    * @return the disposition
    */
-  public String getDisposition()
+  public String getDisposition ()
   {
     return disposition;
   }
@@ -104,16 +108,16 @@ public class ContentDisposition
    * @param name the name of the parameter
    * @return the parameter value
    */
-  public String getParameter(String name)
+  public String getParameter (String name)
   {
-    return (list!=null) ? list.get(name) : null;
+    return (list != null) ? list.get (name) : null;
   }
 
   /**
    * Return a ParameterList object that holds all the available parameters.
    * Returns null if no parameters are available.
    */
-  public ParameterList getParameterList()
+  public ParameterList getParameterList ()
   {
     return list;
   }
@@ -122,7 +126,7 @@ public class ContentDisposition
    * Set the primary type. Overrides existing primary type.
    * @param primaryType the primary type
    */
-  public void setDisposition(String disposition)
+  public void setDisposition (String disposition)
   {
     this.disposition = disposition;
   }
@@ -133,18 +137,20 @@ public class ContentDisposition
    * @param name the parameter name
    * @param value the parameter value
    */
-  public void setParameter(String name, String value)
+  public void setParameter (String name, String value)
   {
     if (list == null)
-      list = new ParameterList();
-    list.set(name, value);
+      {
+        list = new ParameterList ();
+      }
+    list.set (name, value);
   }
 
   /**
    * Set a new ParameterList.
    * @param list the ParameterList
    */
-  public void setParameterList(ParameterList list)
+  public void setParameterList (ParameterList list)
   {
     this.list = list;
   }
@@ -155,24 +161,28 @@ public class ContentDisposition
    * Returns null if the conversion failed.
    * @return RFC2045 style string
    */
-  public String toString()
+  public String toString ()
   {
-    if (disposition==null)
-      return null;
-    if (list==null)
-      return disposition;
+    if (disposition == null)
+      {
+        return null;
+      }
+    if (list == null)
+      {
+        return disposition;
+      }
     else
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(disposition);
-      
-      // Add the parameters, using the toString(int) method
-      // which allows the resulting string to fold properly onto the next
-      // header line.
-      int used = buffer.length()+21; // "Content-Disposition: ".length()
-      buffer.append(list.toString(used));
-      return buffer.toString();
-    }
+      {
+        StringBuffer buffer = new StringBuffer ();
+        buffer.append (disposition);
+        
+        // Add the parameters, using the toString(int) method
+        // which allows the resulting string to fold properly onto the next
+        // header line.
+        int used = buffer.length () + 21; // "Content-Disposition: ".length()
+        buffer.append (list.toString (used));
+        return buffer.toString ();
+      }
   }
   
 }

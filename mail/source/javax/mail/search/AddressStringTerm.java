@@ -47,9 +47,9 @@ public abstract class AddressStringTerm
    * Constructor.
    * @param pattern the address pattern to be compared.
    */
-  protected AddressStringTerm(String pattern)
+  protected AddressStringTerm (String pattern)
   {
-    super(pattern, true);
+    super (pattern, true);
   }
 
   /**
@@ -62,20 +62,24 @@ public abstract class AddressStringTerm
    * @param a The comparison is applied to this Address object.
    * @return true if the match succeeds, otherwise false.
    */
-  protected boolean match(Address a)
+  protected boolean match (Address a)
   {
     if (a instanceof InternetAddress)
-      return super.match(((InternetAddress)a).toUnicodeString());
+      {
+        return super.match (((InternetAddress) a).toUnicodeString ());
+      }
     else
-      return super.match(a.toString());
+      {
+        return super.match (a.toString ());
+      }
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return ((other instanceof AddressStringTerm) && super.equals(other));
+    return ((other instanceof AddressStringTerm) && super.equals (other));
   }
 
 }

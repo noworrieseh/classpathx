@@ -45,9 +45,9 @@ public final class SentDateTerm
    * @param comparison the Comparison type
    * @param date the date to be compared
    */
-  public SentDateTerm(int comparison, Date date)
+  public SentDateTerm (int comparison, Date date)
   {
-    super(comparison, date);
+    super (comparison, date);
   }
 
   /**
@@ -55,26 +55,28 @@ public final class SentDateTerm
    * @param msg the date comparator is applied to this Message's sent date
    * @return true if the comparison succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      Date date = msg.getSentDate();
-      if (date!=null)
-        return super.match(date);
-    }
+      {
+        Date date = msg.getSentDate ();
+        if (date != null)
+          {
+            return super.match (date);
+          }
+      }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof SentDateTerm && super.equals(other));
+    return (other instanceof SentDateTerm && super.equals (other));
   }
   
 }

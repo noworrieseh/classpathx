@@ -53,7 +53,7 @@ public final class PasswordAuthentication
    * @param userName the user name
    * @param password The user's password
    */
-  public PasswordAuthentication(String userName, String password)
+  public PasswordAuthentication (String userName, String password)
   {
     this.userName = userName;
     this.password = password;
@@ -62,7 +62,7 @@ public final class PasswordAuthentication
   /**
    * @return the user name
    */
-  public String getUserName()
+  public String getUserName ()
   {
     return userName;
   }
@@ -70,7 +70,7 @@ public final class PasswordAuthentication
   /**
    * @return the password
    */
-  public String getPassword()
+  public String getPassword ()
   {
     return password;
   }

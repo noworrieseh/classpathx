@@ -51,21 +51,21 @@ public class FolderClosedException
    */
   private Folder folder;
 
-  public FolderClosedException(Folder folder)
+  public FolderClosedException (Folder folder)
   {
-    this(folder, null);
+    this (folder, null);
   }
 
-  public FolderClosedException(Folder folder, String message)
+  public FolderClosedException (Folder folder, String message)
   {
-    super(message);
+    super (message);
     this.folder = folder;
   }
 
   /**
    * Returns the dead Folder object
    */
-  public Folder getFolder()
+  public Folder getFolder ()
   {
     return folder;
   }

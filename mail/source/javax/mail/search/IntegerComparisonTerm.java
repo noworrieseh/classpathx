@@ -42,7 +42,7 @@ public abstract class IntegerComparisonTerm
    */
   protected int number;
 
-  protected IntegerComparisonTerm(int comparison, int number)
+  protected IntegerComparisonTerm (int comparison, int number)
   {
     this.comparison = comparison;
     this.number = number;
@@ -51,7 +51,7 @@ public abstract class IntegerComparisonTerm
   /**
    * Return the number to compare with.
    */
-  public int getNumber()
+  public int getNumber ()
   {
     return number;
   }
@@ -59,46 +59,46 @@ public abstract class IntegerComparisonTerm
   /** 
    * Return the type of comparison.
    */
-  public int getComparison()
+  public int getComparison ()
   {
     return super.comparison;
   }
 
-  protected boolean match(int i)
+  protected boolean match (int i)
   {
     switch (comparison)
-    {
+      {
       case LE:
-        return i<=number;
+        return i <= number;
       case LT:
-        return i<number;
+        return i < number;
       case EQ:
-        return i==number;
+        return i == number;
       case NE:
-        return i!=number;
+        return i != number;
       case GT:
-        return i>number;
+        return i > number;
       case GE:
-        return i>=number;
-    }
+        return i >= number;
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     return (other instanceof IntegerComparisonTerm &&
-        ((IntegerComparisonTerm)other).number==number &&
-        super.equals(other));
+        ((IntegerComparisonTerm) other).number == number &&
+        super.equals (other));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    return number + super.hashCode();
+    return number + super.hashCode ();
   }
 }

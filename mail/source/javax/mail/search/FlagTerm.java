@@ -57,7 +57,7 @@ public final class FlagTerm
    * @param flags Flags object containing the flags to check for
    * @param set the flag setting to check for
    */
-  public FlagTerm(Flags flags, boolean set)
+  public FlagTerm (Flags flags, boolean set)
   {
     this.flags = flags;
     this.set = set;
@@ -66,15 +66,15 @@ public final class FlagTerm
   /**
    * Return the Flags to test.
    */
-  public Flags getFlags()
+  public Flags getFlags ()
   {
-    return (Flags)flags.clone();
+    return (Flags) flags.clone ();
   }
 
   /**
    * Return true if testing whether the flags are set.
    */
-  public boolean getTestSet()
+  public boolean getTestSet ()
   {
     return set;
   }
@@ -84,52 +84,58 @@ public final class FlagTerm
    * @param msg The flag comparison is applied to this Message
    * @return true if the comparson succeeds, otherwise false.
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      Flags messageFlags = msg.getFlags();
-      if (set)
-        return messageFlags.contains(flags);
-      Flags.Flag[] systemFlags = flags.getSystemFlags();
-      for (int i = 0; i<systemFlags.length; i++)
       {
-        if (messageFlags.contains(systemFlags[i]))
-          return false;
+        Flags messageFlags = msg.getFlags ();
+        if (set)
+          {
+            return messageFlags.contains (flags);
+          }
+        Flags.Flag[] systemFlags = flags.getSystemFlags ();
+        for (int i = 0; i < systemFlags.length; i++)
+          {
+            if (messageFlags.contains (systemFlags[i]))
+              {
+                return false;
+              }
+          }
+        String[] userFlags = flags.getUserFlags ();
+        for (int i = 0; i < userFlags.length; i++)
+          {
+            if (messageFlags.contains(userFlags[i]))
+              {
+                return false;
+              }
+          }
+        return true;
       }
-      String[] userFlags = flags.getUserFlags();
-      for (int i = 0; i<userFlags.length; i++)
-      {
-        if (messageFlags.contains(userFlags[i]))
-          return false;
-      }
-      return true;
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     if (other instanceof FlagTerm)
-    {
-      FlagTerm ft = (FlagTerm)other;
-      return (ft.set==set && ft.flags.equals(flags));
-    }
+      {
+        FlagTerm ft = (FlagTerm) other;
+        return (ft.set == set && ft.flags.equals (flags));
+      }
     return false;
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    return set ?  flags.hashCode() : ~flags.hashCode();
+    return set ?  flags.hashCode () : ~flags.hashCode ();
   }
   
 }

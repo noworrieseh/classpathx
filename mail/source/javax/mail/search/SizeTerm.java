@@ -44,9 +44,9 @@ public final class SizeTerm
    * @param comparison the Comparison type
    * @param size the size
    */
-  public SizeTerm(int comparison, int size)
+  public SizeTerm (int comparison, int size)
   {
-    super(comparison, size);
+    super (comparison, size);
   }
 
   /**
@@ -54,26 +54,28 @@ public final class SizeTerm
    * @param msg the size comparator is applied to this Message's size
    * @return true if the size is equal, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      int size = msg.getSize();
-      if (size!=-1)
-        return super.match(size);
-    }
+      {
+        int size = msg.getSize ();
+        if (size != -1)
+          {
+            return super.match (size);
+          }
+      }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof SizeTerm && super.equals(other));
+    return (other instanceof SizeTerm && super.equals (other));
   }
   
 }

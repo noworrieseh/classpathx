@@ -50,12 +50,12 @@ public abstract class BodyPart
   /**
    * Return the containing Multipart object, or null if not known.
    */
-  public Multipart getParent()
+  public Multipart getParent ()
   {
     return parent;
   }
 
-  void setParent(Multipart multipart)
+  void setParent (Multipart multipart)
   {
     parent = multipart;
   }

@@ -73,9 +73,9 @@ public abstract class Multipart
   /**
    * Default constructor. An empty Multipart object is created.
    */
-  protected Multipart()
+  protected Multipart ()
   {
-    parts = new ArrayList();
+    parts = new ArrayList ();
     contentType = "multipart/mixed";
     parent = null;
   }
@@ -94,13 +94,15 @@ public abstract class Multipart
    * subtype.
    * @param mp Multipart datasource
    */
-  protected void setMultipartDataSource(MultipartDataSource mp)
+  protected void setMultipartDataSource (MultipartDataSource mp)
     throws MessagingException
   {
-    contentType = mp.getContentType();
-    int count = mp.getCount();
-    for (int i = 0; i<count; i++)
-      addBodyPart(mp.getBodyPart(i));
+    contentType = mp.getContentType ();
+    int count = mp.getCount ();
+    for (int i = 0; i < count; i++)
+      {
+        addBodyPart (mp.getBodyPart (i));
+      }
   }
 
   /**
@@ -109,7 +111,7 @@ public abstract class Multipart
    * This implementation just returns the value of the 
    * <code>contentType</code> field.
    */
-  public String getContentType()
+  public String getContentType ()
   {
     return contentType;
   }
@@ -117,10 +119,10 @@ public abstract class Multipart
   /**
    * Return the number of enclosed BodyPart objects.
    */
-  public int getCount()
+  public int getCount ()
     throws MessagingException
   {
-    return (parts==null) ? 0 : parts.size();
+    return (parts == null) ? 0 : parts.size ();
   }
 
   /**
@@ -129,12 +131,14 @@ public abstract class Multipart
    * @param index the index of the desired Part
    * @exception IndexOutOfBoundsException if the given index is out of range.
    */
-  public BodyPart getBodyPart(int index)
+  public BodyPart getBodyPart (int index)
     throws MessagingException
   {
-    if (parts==null)
-      throw new IndexOutOfBoundsException();
-    return (BodyPart)parts.get(index);
+    if (parts == null)
+      {
+        throw new IndexOutOfBoundsException ();
+      }
+    return (BodyPart) parts.get (index);
   }
 
   /**
@@ -146,18 +150,22 @@ public abstract class Multipart
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public boolean removeBodyPart(BodyPart part)
+  public boolean removeBodyPart (BodyPart part)
     throws MessagingException
   {
-    if (parts==null)
-      throw new MessagingException("No such BodyPart");
+    if (parts == null)
+      {
+        throw new MessagingException ("No such BodyPart");
+      }
     synchronized (parts)
-    {
-      boolean success = parts.remove(part);
-      if (success)
-        part.setParent(null);
-      return success;
-    }
+      {
+        boolean success = parts.remove (part);
+        if (success)
+          {
+            part.setParent (null);
+          }
+        return success;
+      }
   }
 
   /**
@@ -168,17 +176,19 @@ public abstract class Multipart
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public void removeBodyPart(int index)
+  public void removeBodyPart (int index)
     throws MessagingException
   {
-    if (parts==null)
-      throw new IndexOutOfBoundsException("No such BodyPart");
+    if (parts == null)
+      {
+        throw new IndexOutOfBoundsException ("No such BodyPart");
+      }
     synchronized (parts)
-    {
-      BodyPart part = (BodyPart)parts.get(index);
-      parts.remove(index);
-      part.setParent(null);
-    }
+      {
+        BodyPart part = (BodyPart) parts.get (index);
+        parts.remove (index);
+        part.setParent (null);
+      }
   }
 
   /**
@@ -188,16 +198,18 @@ public abstract class Multipart
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public synchronized void addBodyPart(BodyPart part)
+  public synchronized void addBodyPart (BodyPart part)
     throws MessagingException
   {
-    if (parts==null)
-      parts = new ArrayList();
+    if (parts == null)
+      {
+        parts = new ArrayList ();
+      }
     synchronized (parts)
-    {
-      parts.add(part);
-      part.setParent(this);
-    }
+      {
+        parts.add (part);
+        part.setParent (this);
+      }
   }
 
   /**
@@ -210,16 +222,18 @@ public abstract class Multipart
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public synchronized void addBodyPart(BodyPart part, int index)
+  public synchronized void addBodyPart (BodyPart part, int index)
     throws MessagingException
   {
-    if (parts==null)
-      parts = new ArrayList();
+    if (parts == null)
+      {
+        parts = new ArrayList ();
+      }
     synchronized (parts)
-    {
-      parts.add(index, part);
-      part.setParent(this);
-    }
+      {
+        parts.add (index, part);
+        part.setParent (this);
+      }
   }
 
   /**
@@ -227,13 +241,13 @@ public abstract class Multipart
    * The implementation subclass decides the appropriate encoding algorithm 
    * to be used. The bytestream is typically used for sending.
    */
-  public abstract void writeTo(OutputStream os)
+  public abstract void writeTo (OutputStream os)
     throws IOException, MessagingException;
 
   /**
    * Return the Part that contains this Multipart object, or null if not known.
    */
-  public Part getParent()
+  public Part getParent ()
   {
     return parent;
   }
@@ -244,7 +258,7 @@ public abstract class Multipart
    * <code>setContent(Multipart)</code> method. parent may be null if 
    * the Multipart is being removed from its containing Part.
    */
-  public void setParent(Part part)
+  public void setParent (Part part)
   {
     parent = part;
   }

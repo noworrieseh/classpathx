@@ -44,9 +44,9 @@ public final class SubjectTerm
    * Constructor.
    * @param pattern the pattern to search for
    */
-  public SubjectTerm(String pattern)
+  public SubjectTerm (String pattern)
   {
-    super(pattern);
+    super (pattern);
   }
 
   /**
@@ -54,26 +54,28 @@ public final class SubjectTerm
    * @param msg the pattern match is applied to this Message's subject header
    * @return true if the pattern match succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      String subject = msg.getSubject();
-      if (subject!=null)
-        return super.match(subject);
-    }
+      {
+        String subject = msg.getSubject ();
+        if (subject != null)
+          {
+            return super.match (subject);
+          }
+      }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof SubjectTerm && super.equals(other));
+    return (other instanceof SubjectTerm && super.equals (other));
   }
 
 }

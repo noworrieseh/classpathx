@@ -43,30 +43,30 @@ public class FolderNotFoundException
    */
   private Folder folder;
 
-  public FolderNotFoundException()
+  public FolderNotFoundException ()
   {
   }
 
-  public FolderNotFoundException(Folder folder)
+  public FolderNotFoundException (Folder folder)
   {
     this.folder = folder;
   }
 
-  public FolderNotFoundException(Folder folder, String message)
+  public FolderNotFoundException (Folder folder, String message)
   {
-    super(message);
+    super (message);
     this.folder = folder;
   }
 
-  public FolderNotFoundException(String message, Folder folder)
+  public FolderNotFoundException (String message, Folder folder)
   {
-    this(folder, message);
+    this (folder, message);
   }
 
   /**
    * Returns the offending Folder object.
    */
-  public Folder getFolder()
+  public Folder getFolder ()
   {
     return folder;
   }

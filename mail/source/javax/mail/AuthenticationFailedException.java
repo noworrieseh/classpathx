@@ -39,12 +39,12 @@ public class AuthenticationFailedException
   extends MessagingException
 {
 
-  public AuthenticationFailedException()
+  public AuthenticationFailedException ()
   {
   }
 
-  public AuthenticationFailedException(String message)
+  public AuthenticationFailedException (String message)
   {
-    super(message);
+    super (message);
   }
 }

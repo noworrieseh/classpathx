@@ -46,21 +46,21 @@ public class ReadOnlyFolderException
    */
   private Folder folder;
 
-  public ReadOnlyFolderException(Folder folder)
+  public ReadOnlyFolderException (Folder folder)
   {
-    this(folder, null);
+    this (folder, null);
   }
 
-  public ReadOnlyFolderException(Folder folder, String message)
+  public ReadOnlyFolderException (Folder folder, String message)
   {
-    super(message);
+    super (message);
     this.folder = folder;
   }
 
   /**
    * Returns the dead Folder object.
    */
-  public Folder getFolder()
+  public Folder getFolder ()
   {
     return folder;
   }

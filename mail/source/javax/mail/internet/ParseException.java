@@ -42,7 +42,7 @@ public class ParseException
   /**
    * Constructs a ParseException with no detail message.
    */
-  public ParseException()
+  public ParseException ()
   {
   }
 
@@ -50,9 +50,9 @@ public class ParseException
    * Constructs a ParseException with the specified detail message.
    * @param s the detail message
    */
-  public ParseException(String s)
+  public ParseException (String s)
   {
-    super(s);
+    super (s);
   }
 
 }

@@ -38,13 +38,13 @@ public class NoSuchProviderException
   extends MessagingException
 {
 
-  public NoSuchProviderException()
+  public NoSuchProviderException ()
   {
   }
 
-  public NoSuchProviderException(String message)
+  public NoSuchProviderException (String message)
   {
-    super(message);
+    super (message);
   }
 
 }

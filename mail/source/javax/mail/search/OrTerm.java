@@ -49,7 +49,7 @@ public final class OrTerm
    * @param t1 first term
    * @param t2 second term
    */
-  public OrTerm(SearchTerm t1, SearchTerm t2)
+  public OrTerm (SearchTerm t1, SearchTerm t2)
   {
     terms = new SearchTerm[2];
     terms[0] = t1;
@@ -59,18 +59,18 @@ public final class OrTerm
   /**
    * Constructor that takes an array of SearchTerms.
    */
-  public OrTerm(SearchTerm[] t)
+  public OrTerm (SearchTerm[] t)
   {
     terms = new SearchTerm[t.length];
-    System.arraycopy(t, 0, terms, 0, t.length);
+    System.arraycopy (t, 0, terms, 0, t.length);
   }
 
   /**
    * Return the search terms.
    */
-  public SearchTerm[] getTerms()
+  public SearchTerm[] getTerms ()
   {
-    return (SearchTerm[])terms.clone();
+    return (SearchTerm[]) terms.clone ();
   }
 
   /**
@@ -82,44 +82,52 @@ public final class OrTerm
    * and the OR operator is applied to their results.
    * @return true if the OR succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
-    for (int i = 0; i<terms.length; i++)
-    {
-      if (terms[i].match(msg))
-        return true;
-    }
+    for (int i = 0; i < terms.length; i++)
+      {
+        if (terms[i].match (msg))
+          {
+            return true;
+          }
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     if (other instanceof OrTerm)
-    {
-      OrTerm orterm = (OrTerm)other;
-      if (orterm.terms.length!=terms.length)
-        return false;
-      for (int i = 0; i<terms.length; i++)
       {
-        if (!terms[i].equals(orterm.terms[i]))
-          return false;
+        OrTerm orterm = (OrTerm) other;
+        if (orterm.terms.length != terms.length)
+          {
+            return false;
+          }
+        for (int i = 0; i < terms.length; i++)
+          {
+            if (!terms[i].equals (orterm.terms[i]))
+              {
+                return false;
+              }
+          }
+        return true;
       }
-      return true;
-    }
     return false;
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
     int acc = 0;
-    for (int i = 0; i<terms.length; i++)
-      acc += terms[i].hashCode();
+    for (int i = 0; i < terms.length; i++)
+      {
+        acc += terms[i].hashCode ();
+      }
     return acc;
   }
   

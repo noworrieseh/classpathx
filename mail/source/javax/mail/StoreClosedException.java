@@ -51,21 +51,21 @@ public class StoreClosedException
    */
   private Store store;
 
-  public StoreClosedException(Store store)
+  public StoreClosedException (Store store)
   {
-    this(store, null);
+    this (store, null);
   }
 
-  public StoreClosedException(Store store, String message)
+  public StoreClosedException (Store store, String message)
   {
-    super(message);
+    super (message);
     this.store = store;
   }
 
   /**
    * Returns the dead Store object.
    */
-  public Store getStore()
+  public Store getStore ()
   {
     return store;
   }

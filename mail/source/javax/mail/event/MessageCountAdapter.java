@@ -43,14 +43,14 @@ public abstract class MessageCountAdapter
   /**
    * Invoked when messages are added into a folder.
    */
-  public void messagesAdded(MessageCountEvent e)
+  public void messagesAdded (MessageCountEvent e)
   {
   }
 
   /**
    * Invoked when messages are removed (expunged) from a folder.
    */
-  public void messagesRemoved(MessageCountEvent e)
+  public void messagesRemoved (MessageCountEvent e)
   {
   }
 

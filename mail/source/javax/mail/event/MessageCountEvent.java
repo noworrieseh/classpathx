@@ -85,10 +85,10 @@ public class MessageCountEvent
    * external sources.
    * @param msgs The messages added/removed
    */
-  public MessageCountEvent(Folder source, int type, boolean removed, 
-      Message[] msgs)
+  public MessageCountEvent (Folder source, int type, boolean removed, 
+                            Message[] msgs)
   {
-    super(source);
+    super (source);
     this.type = type;
     this.removed = removed;
     this.msgs = msgs;
@@ -97,7 +97,7 @@ public class MessageCountEvent
   /**
    * Return the type of this event.
    */
-  public int getType()
+  public int getType ()
   {
     return type;
   }
@@ -110,7 +110,7 @@ public class MessageCountEvent
    * <p>
    * Note that this method is valid only if the type of this event is REMOVED
    */
-  public boolean isRemoved()
+  public boolean isRemoved ()
   {
     return removed;
   }
@@ -118,7 +118,7 @@ public class MessageCountEvent
   /**
    * Return the array of messages added or removed.
    */
-  public Message[] getMessages()
+  public Message[] getMessages ()
   {
     return msgs;
   }
@@ -126,16 +126,16 @@ public class MessageCountEvent
   /**
    * Invokes the appropriate MessageCountListener method.
    */
-  public void dispatch(Object listener)
+  public void dispatch (Object listener)
   {
-    MessageCountListener l = (MessageCountListener)listener;
+    MessageCountListener l = (MessageCountListener) listener;
     switch (type)
     {
       case ADDED:
-        l.messagesAdded(this);
+        l.messagesAdded (this);
         break;
       case REMOVED:
-        l.messagesRemoved(this);
+        l.messagesRemoved (this);
         break;
     }
   }

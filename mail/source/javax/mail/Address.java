@@ -46,16 +46,16 @@ public abstract class Address
   /**
    * Return a type string that identifies this address type.
    */
-  public abstract String getType();
+  public abstract String getType ();
 
   /**
    * Return a String representation of this address object.
    */
-  public abstract String toString();
+  public abstract String toString ();
 
   /**
    * The equality operator.
    */
-  public abstract boolean equals(Object obj);
+  public abstract boolean equals (Object obj);
 
 }

@@ -43,7 +43,7 @@ public final class MessageNumberTerm
    * Constructor.
    * @param number the Message number
    */
-  public MessageNumberTerm(int number)
+  public MessageNumberTerm (int number)
   {
     super(EQ, number);
   }
@@ -53,24 +53,24 @@ public final class MessageNumberTerm
    * @param msg the Message number is matched with this Message
    * @param true if the match succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      return super.match(msg.getMessageNumber());
-    }
+      {
+        return super.match (msg.getMessageNumber ());
+      }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof MessageNumberTerm && super.equals(other));
+    return (other instanceof MessageNumberTerm && super.equals (other));
   }
 
 }

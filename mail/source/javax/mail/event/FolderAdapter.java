@@ -43,21 +43,21 @@ public abstract class FolderAdapter
   /**
    * Invoked when a Folder is created.
    */
-  public void folderCreated(FolderEvent e)
+  public void folderCreated (FolderEvent e)
   {
   }
 
   /**
    * Invoked when a folder is renamed.
    */
-  public void folderRenamed(FolderEvent e)
+  public void folderRenamed (FolderEvent e)
   {
   }
 
   /**
    * Invoked when a folder is deleted.
    */
-  public void folderDeleted(FolderEvent e)
+  public void folderDeleted (FolderEvent e)
   {
   }
 

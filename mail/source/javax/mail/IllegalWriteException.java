@@ -38,13 +38,13 @@ public class IllegalWriteException
   extends MessagingException
 {
 
-  public IllegalWriteException()
+  public IllegalWriteException ()
   {
   }
 
-  public IllegalWriteException(String message)
+  public IllegalWriteException (String message)
   {
-    super(message);
+    super (message);
   }
 
 }

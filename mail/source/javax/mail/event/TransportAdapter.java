@@ -43,21 +43,21 @@ public abstract class TransportAdapter
   /**
    * Invoked when a Message is succesfully delivered.
    */
-  public void messageDelivered(TransportEvent e)
+  public void messageDelivered (TransportEvent e)
   {
   }
 
   /**
    * Invoked when a Message is not delivered.
    */
-  public void messageNotDelivered(TransportEvent e)
+  public void messageNotDelivered (TransportEvent e)
   {
   }
 
   /**
    * Invoked when a Message is partially delivered.
    */
-  public void messagePartiallyDelivered(TransportEvent e)
+  public void messagePartiallyDelivered (TransportEvent e)
   {
   }
 

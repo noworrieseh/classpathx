@@ -65,9 +65,9 @@ public class MessageChangedEvent
    * @param type The change type
    * @param msg The changed message
    */
-  public MessageChangedEvent(Object source, int type, Message msg)
+  public MessageChangedEvent (Object source, int type, Message msg)
   {
-    super(source);
+    super (source);
     this.msg = msg;
     this.type = type;
   }
@@ -75,7 +75,7 @@ public class MessageChangedEvent
   /**
    * Return the type of this event.
    */
-  public int getMessageChangeType()
+  public int getMessageChangeType ()
   {
     return type;
   }
@@ -83,7 +83,7 @@ public class MessageChangedEvent
   /**
    * Return the changed Message.
    */
-  public Message getMessage()
+  public Message getMessage ()
   {
     return msg;
   }
@@ -91,9 +91,9 @@ public class MessageChangedEvent
   /**
    * Invokes the appropriate MessageChangedListener method.
    */
-  public void dispatch(Object listener)
+  public void dispatch (Object listener)
   {
-    ((MessageChangedListener)listener).messageChanged(this);
+    ((MessageChangedListener) listener).messageChanged (this);
   }
   
 }

@@ -106,7 +106,7 @@ public class MimeMessage
      * The "Newsgroup" (Usenet news) recipients.
      */
     public static final RecipientType NEWSGROUPS =
-      new RecipientType("Newsgroups");
+      new RecipientType ("Newsgroups");
 
     /**
      * When deserializing a RecipientType, we need to make sure to return
@@ -114,19 +114,20 @@ public class MimeMessage
      * Subclasses must implement their own readResolve method that checks
      * for their known instances before calling this super method.
      */
-    protected Object readResolve()
+    protected Object readResolve ()
       throws ObjectStreamException
     {
-      if (type.equals("Newsgroups"))
-        return NEWSGROUPS;
-      else
-        return super.readResolve();
+      if (type.equals ("Newsgroups"))
+        {
+          return NEWSGROUPS;
+        }  
+      return super.readResolve ();
     }
 
     // super :-)
-    protected RecipientType(String type)
+    protected RecipientType (String type)
     {
-      super(type);
+      super (type);
     }
     
   }
@@ -182,7 +183,7 @@ public class MimeMessage
   /*
    * This is used to parse and format values for the RFC822 Date header.
    */
-  private static MailDateFormat dateFormat = new MailDateFormat();
+  private static MailDateFormat dateFormat = new MailDateFormat ();
 
   // Header constants.
   static final String TO_NAME = "To";
@@ -203,11 +204,11 @@ public class MimeMessage
    * The flags field is set to an empty Flags object.
    * The <code>modified</code> flag is set to true.
    */
-  public MimeMessage(Session session)
+  public MimeMessage (Session session)
   {
-    super(session);
-    headers = new InternetHeaders();
-    flags = new Flags();
+    super (session);
+    headers = new InternetHeaders ();
+    flags = new Flags ();
     modified = true;
   }
 
@@ -220,12 +221,12 @@ public class MimeMessage
    * @param session Session object for this message
    * @param is the message input stream
    */
-  public MimeMessage(Session session, InputStream is)
+  public MimeMessage (Session session, InputStream is)
     throws MessagingException
   {
-    super(session);
-    flags = new Flags();
-    parse(is);
+    super (session);
+    flags = new Flags ();
+    parse (is);
     saved = true;
   }
 
@@ -238,25 +239,26 @@ public class MimeMessage
    * more times than strictly necessary.
    * @param source the message to copy content from
    */
-  public MimeMessage(MimeMessage source)
+  public MimeMessage (MimeMessage source)
     throws MessagingException
   {
-    super(source.session);
+    super (source.session);
     // Use a byte array for temporary storage
     try
-    {
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      source.writeTo(bos);
-      bos.close();
-      ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-      parse(bis);
-      bis.close();
-      saved = true;
-    }
+      {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+        source.writeTo (bos);
+        bos.close ();
+        ByteArrayInputStream bis =
+          new ByteArrayInputStream (bos.toByteArray ());
+        parse (bis);
+        bis.close ();
+        saved = true;
+      }
     catch (IOException e)
-    {
-      throw new MessagingException("I/O error", e);
-    }
+      {
+        throw new MessagingException ("I/O error", e);
+      }
   }
 
   /**
@@ -265,10 +267,10 @@ public class MimeMessage
    * <p>
    * This method is for providers subclassing MimeMessage.
    */
-  protected MimeMessage(Folder folder, int msgnum)
+  protected MimeMessage (Folder folder, int msgnum)
   {
-    super(folder, msgnum);
-    flags = new Flags();
+    super (folder, msgnum);
+    flags = new Flags ();
     saved = true;
   }
 
@@ -284,11 +286,11 @@ public class MimeMessage
    * @param is the message input stream
    * @param msgnum Message number of this message within its folder
    */
-  protected MimeMessage(Folder folder, InputStream is, int msgnum)
+  protected MimeMessage (Folder folder, InputStream is, int msgnum)
     throws MessagingException
   {
-    this(folder, msgnum);
-    parse(is);
+    this (folder, msgnum);
+    parse (is);
   }
 
   /**
@@ -300,11 +302,11 @@ public class MimeMessage
    * @param content the content as an array of bytes
    * @param msgnum Message number of this message within its folder
    */
-  protected MimeMessage(Folder folder, InternetHeaders headers, 
-      byte[] content, int msgnum)
+  protected MimeMessage (Folder folder, InternetHeaders headers, 
+                         byte[] content, int msgnum)
     throws MessagingException
   {
-    this(folder, msgnum);
+    this (folder, msgnum);
     this.headers = headers;
     this.content = content;
   }
@@ -318,50 +320,52 @@ public class MimeMessage
    * when the InputStream is parsed.
    * @param is The message input stream
    */
-  protected void parse(InputStream is)
+  protected void parse (InputStream is)
     throws MessagingException
   {
     if (is instanceof SharedInputStream)
-    {
-      headers = createInternetHeaders(is);
-      SharedInputStream sis = (SharedInputStream)is;
-      contentStream = sis.newStream(sis.getPosition(), -1L);
-    }
+      {
+        headers = createInternetHeaders (is);
+        SharedInputStream sis = (SharedInputStream) is;
+        contentStream = sis.newStream (sis.getPosition (), -1L);
+      }
     else
-    {
-      // buffer it
-      if (!(is instanceof ByteArrayInputStream) && 
-          !(is instanceof BufferedInputStream))
-        is = new BufferedInputStream(is);
-      // headers
-      headers = createInternetHeaders(is);
-      // Read stream into byte array
-      try
       {
-        // TODO Make buffer size configurable
-        int len = 1024;
-        if (is instanceof ByteArrayInputStream)
-        {
-          len = is.available();
-          content = new byte[len];
-          is.read(content, 0, len);
-        }
-        else
-        {
-          ByteArrayOutputStream bos = new ByteArrayOutputStream(len);
-          content = new byte[len]; // it's just a buffer!
-          for (int l = is.read(content, 0, len); 
-              l!=-1;
-              l = is.read(content, 0, len)) 
-            bos.write(content, 0, l);
-          content = bos.toByteArray();
-        }
+        // buffer it
+        if (!(is instanceof ByteArrayInputStream) && 
+            !(is instanceof BufferedInputStream))
+          {
+            is = new BufferedInputStream (is);
+          }
+        // headers
+        headers = createInternetHeaders (is);
+        // Read stream into byte array
+        try
+          {
+            // TODO Make buffer size configurable
+            int len = 1024;
+            if (is instanceof ByteArrayInputStream)
+              {
+                len = is.available ();
+                content = new byte[len];
+                is.read (content, 0, len);
+              }
+            else
+              {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream (len);
+                byte[] b = new byte[len];
+                for (int l = is.read (b); l != -1; l = is.read (b)) 
+                  {
+                    bos.write (b, 0, l);
+                  }
+                content = bos.toByteArray ();
+              }
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException ("I/O error", e);
+          }
       }
-      catch (IOException e)
-      {
-        throw new MessagingException("I/O error", e);
-      }
-    }
     modified = false;
   }
 
@@ -375,12 +379,14 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method 
    * to obtain the requisite header field.
    */
-  public Address[] getFrom()
+  public Address[] getFrom ()
     throws MessagingException
   {
-    Address[] from = getInternetAddresses(FROM_NAME);
-    if (from==null)
-      from = getInternetAddresses(SENDER_NAME);
+    Address[] from = getInternetAddresses (FROM_NAME);
+    if (from == null)
+      {
+        from = getInternetAddresses (SENDER_NAME);
+      }
     return from;
   }
 
@@ -394,13 +400,17 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setFrom(Address address)
+  public void setFrom (Address address)
     throws MessagingException
   {
-    if (address==null)
-      removeHeader(FROM_NAME);
+    if (address == null)
+      {
+        removeHeader (FROM_NAME);
+      }
     else
-      setHeader(FROM_NAME, address.toString());
+      {
+        setHeader (FROM_NAME, address.toString ());
+      }
   }
 
   /**
@@ -411,15 +421,19 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setFrom()
+  public void setFrom ()
     throws MessagingException
   {
     InternetAddress localAddress = 
-      InternetAddress.getLocalAddress(session);
-    if (localAddress!=null)
-      setFrom(localAddress);
+      InternetAddress.getLocalAddress (session);
+    if (localAddress != null)
+      {
+        setFrom (localAddress);
+      }
     else
-      throw new MessagingException("No local address");
+      {
+        throw new MessagingException ("No local address");
+      }
   }
 
   /**
@@ -431,10 +445,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void addFrom(Address[] addresses)
+  public void addFrom (Address[] addresses)
     throws MessagingException
   {
-    addInternetAddresses(FROM_NAME, addresses);
+    addInternetAddresses (FROM_NAME, addresses);
   }
 
   /**
@@ -445,14 +459,18 @@ public class MimeMessage
    * the required header field.
    * @since JavaMail 1.3
    */
-  public Address getSender()
+  public Address getSender ()
     throws MessagingException
   {
-    Address[] sender = getInternetAddresses(SENDER_NAME);
+    Address[] sender = getInternetAddresses (SENDER_NAME);
     if (sender != null && sender.length > 0)
-      return sender[0];
+      {
+        return sender[0];
+      }
     else
-      return null;
+      {
+        return null;
+      }
   }
 
   /**
@@ -466,11 +484,11 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @since JavaMail 1.3
    */
-  public void setSender(Address address)
+  public void setSender (Address address)
     throws MessagingException
   {
     Address[] addresses = new Address[] { address };
-    addInternetAddresses(SENDER_NAME, addresses);
+    addInternetAddresses (SENDER_NAME, addresses);
   }
 
   // -- To --
@@ -493,40 +511,44 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @param type the type of recipient
    */
-  public Address[] getRecipients(Message.RecipientType type)
+  public Address[] getRecipients (Message.RecipientType type)
     throws MessagingException
   {
-    if (type==RecipientType.NEWSGROUPS)
-    {
-      // Can't use getInternetAddresses here
-      // and it's not worth a getNewsAddresses method
-      String header = getHeader(NEWSGROUPS_NAME, ",");
-      return (header!=null) ? NewsAddress.parse(header) : null;
-    }
-    return getInternetAddresses(getHeader(type));
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        // Can't use getInternetAddresses here
+        // and it's not worth a getNewsAddresses method
+        String header = getHeader (NEWSGROUPS_NAME, ",");
+        return (header != null) ? NewsAddress.parse (header) : null;
+      }
+    return getInternetAddresses (getHeader (type));
   }
 
   /**
    * Get all the recipient addresses for the message.
    * Extracts the TO, CC, BCC, and NEWSGROUPS recipients.
    */
-  public Address[] getAllRecipients()
+  public Address[] getAllRecipients ()
     throws MessagingException
   {
-    Address[] recipients = super.getAllRecipients();
-    Address[] newsgroups = getRecipients(RecipientType.NEWSGROUPS);
-    if (newsgroups==null)
-      return recipients;
-    else if (recipients==null)
-      return newsgroups;
+    Address[] recipients = super.getAllRecipients ();
+    Address[] newsgroups = getRecipients (RecipientType.NEWSGROUPS);
+    if (newsgroups == null)
+      {
+        return recipients;
+      }
+    else if (recipients == null)
+      {
+        return newsgroups;
+      }
     else
-    {
-      Address[] both = new Address[recipients.length+newsgroups.length];
-      System.arraycopy(recipients, 0, both, 0, recipients.length);
-      System.arraycopy(newsgroups, 0, both, recipients.length, 
-          newsgroups.length);
-      return both;
-    }
+      {
+        Address[] both = new Address[recipients.length + newsgroups.length];
+        System.arraycopy (recipients, 0, both, 0, recipients.length);
+        System.arraycopy (newsgroups, 0, both, recipients.length, 
+                          newsgroups.length);
+        return both;
+      }
   }
 
   /**
@@ -540,18 +562,24 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setRecipients(Message.RecipientType type, Address[] addresses)
+  public void setRecipients (Message.RecipientType type, Address[] addresses)
     throws MessagingException
   {
-    if (type==RecipientType.NEWSGROUPS)
-    {
-      if (addresses==null || addresses.length==0)
-        removeHeader(NEWSGROUPS_NAME);
-      else
-        setHeader(NEWSGROUPS_NAME, NewsAddress.toString(addresses));
-    }
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        if (addresses == null || addresses.length == 0)
+          {
+            removeHeader (NEWSGROUPS_NAME);
+          }
+        else
+          {
+            setHeader (NEWSGROUPS_NAME, NewsAddress.toString (addresses));
+          }
+      }
     else
-      setInternetAddresses(getHeader(type), addresses);
+      {
+        setInternetAddresses (getHeader (type), addresses);
+      }
   }
 
   /**
@@ -565,19 +593,25 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setRecipients(Message.RecipientType type, String addresses)
+  public void setRecipients (Message.RecipientType type, String addresses)
     throws MessagingException
   {
-    if (type==RecipientType.NEWSGROUPS)
-    {
-      if (addresses==null || addresses.length()==0)
-        removeHeader(NEWSGROUPS_NAME);
-      else
-        setHeader(NEWSGROUPS_NAME, addresses);
-    }
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        if (addresses == null || addresses.length () == 0)
+          {
+            removeHeader (NEWSGROUPS_NAME);
+          }
+        else
+          {
+            setHeader (NEWSGROUPS_NAME, addresses);
+          }
+      }
     else
-      setInternetAddresses(getHeader(type),
-          InternetAddress.parse(addresses));
+      {
+        setInternetAddresses (getHeader (type),
+                              InternetAddress.parse (addresses));
+      }
   }
 
   /**
@@ -589,17 +623,21 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void addRecipients(Message.RecipientType type, Address[] addresses)
+  public void addRecipients (Message.RecipientType type, Address[] addresses)
     throws MessagingException
   {
-    if (type==RecipientType.NEWSGROUPS)
-    {
-      String value = NewsAddress.toString(addresses);
-      if (value!=null)
-        addHeader(NEWSGROUPS_NAME, value);
-    }
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        String value = NewsAddress.toString (addresses);
+        if (value != null)
+          {
+            addHeader (NEWSGROUPS_NAME, value);
+          }
+      }
     else
-      addInternetAddresses(getHeader(type), addresses);
+      {
+        addInternetAddresses (getHeader (type), addresses);
+      }
   }
 
   /**
@@ -611,17 +649,21 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void addRecipients(Message.RecipientType type, String addresses)
+  public void addRecipients (Message.RecipientType type, String addresses)
     throws MessagingException
   {
-    if (type==RecipientType.NEWSGROUPS)
-    {
-      if (addresses!=null && addresses.length()!=0)
-        addHeader(NEWSGROUPS_NAME, addresses);
-    }
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        if (addresses != null && addresses.length () != 0)
+          {
+            addHeader (NEWSGROUPS_NAME, addresses);
+          }
+      }
     else
-      addInternetAddresses(getHeader(type),
-          InternetAddress.parse(addresses));
+      {
+        addInternetAddresses (getHeader (type),
+                              InternetAddress.parse (addresses));
+      }
   }
 
   /**
@@ -631,12 +673,14 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method
    * to obtain the requisite header field.
    */
-  public Address[] getReplyTo()
+  public Address[] getReplyTo ()
     throws MessagingException
   {
-    Address[] replyTo = getInternetAddresses(REPLY_TO_NAME);
-    if (replyTo==null)
-      replyTo = getFrom();
+    Address[] replyTo = getInternetAddresses (REPLY_TO_NAME);
+    if (replyTo == null)
+      {
+        replyTo = getFrom ();
+      }
     return replyTo;
   }
 
@@ -649,41 +693,47 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setReplyTo(Address[] addresses)
+  public void setReplyTo (Address[] addresses)
     throws MessagingException
   {
-    setInternetAddresses(REPLY_TO_NAME, addresses);
+    setInternetAddresses (REPLY_TO_NAME, addresses);
   }
 
   // convenience method
-  private Address[] getInternetAddresses(String name)
+  private Address[] getInternetAddresses (String name)
     throws MessagingException
   {
-    String value = getHeader(name, ",");
+    String value = getHeader (name, ",");
     // Use InternetAddress.parseHeader since 1.3
-    String s = session.getProperty("mail.mime.address.strict");
-    boolean strict = (s == null) || Boolean.valueOf(s).booleanValue();
-    return (value!=null) ? InternetAddress.parseHeader(value, strict) : null;
+    String s = session.getProperty ("mail.mime.address.strict");
+    boolean strict = (s == null) || Boolean.valueOf (s).booleanValue ();
+    return (value != null) ? InternetAddress.parseHeader (value, strict) : null;
   }
 
   // convenience method
-  private void setInternetAddresses(String name, Address[] addresses)
+  private void setInternetAddresses (String name, Address[] addresses)
     throws MessagingException
   {
-    String line = InternetAddress.toString(addresses);
-    if (line==null)
-      removeHeader(line);
+    String line = InternetAddress.toString (addresses);
+    if (line == null)
+      {
+        removeHeader (line);
+      }
     else
-      setHeader(name, line);
+      {
+        setHeader (name, line);
+      }
   }
 
   // convenience method
-  private void addInternetAddresses(String name, Address[] addresses)
+  private void addInternetAddresses (String name, Address[] addresses)
     throws MessagingException
   {
-    String line = InternetAddress.toString(addresses);
-    if (line!=null)
-      addHeader(name, line);
+    String line = InternetAddress.toString (addresses);
+    if (line != null)
+      {
+        addHeader (name, line);
+      }
   }
 
   /*
@@ -691,18 +741,26 @@ public class MimeMessage
    * type. This should be faster than keeping a hash of recipient types to
    * names.
    */
-  private String getHeader(Message.RecipientType type)
+  private String getHeader (Message.RecipientType type)
     throws MessagingException
   {
-    if (type==Message.RecipientType.TO)
-      return TO_NAME;
-    if (type==Message.RecipientType.CC)
-      return CC_NAME;
-    if (type==Message.RecipientType.BCC)
-      return BCC_NAME;
-    if (type==RecipientType.NEWSGROUPS)
-      return NEWSGROUPS_NAME;
-    throw new MessagingException("Invalid recipient type");
+    if (type == Message.RecipientType.TO)
+      {
+        return TO_NAME;
+      }
+    if (type == Message.RecipientType.CC)
+      {
+        return CC_NAME;
+      }
+    if (type == Message.RecipientType.BCC)
+      {
+        return BCC_NAME;
+      }
+    if (type == RecipientType.NEWSGROUPS)
+      {
+        return NEWSGROUPS_NAME;
+      }
+    throw new MessagingException ("Invalid recipient type");
   }
 
   /**
@@ -716,19 +774,21 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method
    * to obtain the requisite header field.
    */
-  public String getSubject()
+  public String getSubject ()
     throws MessagingException
   {
-    String subject = getHeader(SUBJECT_NAME, null);
-    if (subject==null)
-      return null;
+    String subject = getHeader (SUBJECT_NAME, null);
+    if (subject == null)
+      {
+        return null;
+      }
     try
-    {
-      subject = MimeUtility.decodeText(subject);
-    }
+      {
+        subject = MimeUtility.decodeText (subject);
+      }
     catch (UnsupportedEncodingException e)
-    {
-    }
+      {
+      }
     return subject;
   }
 
@@ -748,10 +808,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setSubject(String subject)
+  public void setSubject (String subject)
     throws MessagingException
   {
-    setSubject(subject, null);
+    setSubject (subject, null);
   }
 
   /**
@@ -771,19 +831,22 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setSubject(String subject, String charset)
+  public void setSubject (String subject, String charset)
     throws MessagingException
   {
-    if (subject==null)
-      removeHeader(SUBJECT_NAME);
+    if (subject == null)
+      {
+        removeHeader (SUBJECT_NAME);
+      }
     try
-    {
-      setHeader(SUBJECT_NAME, MimeUtility.encodeText(subject, charset, null));
-    }
+      {
+        setHeader (SUBJECT_NAME,
+                   MimeUtility.encodeText (subject, charset, null));
+      }
     catch (UnsupportedEncodingException e)
-    {
-      throw new MessagingException("Encoding error", e);
-    }
+      {
+        throw new MessagingException ("Encoding error", e);
+      }
   }
 
   /**
@@ -794,20 +857,20 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method 
    * to obtain the requisite header field.
    */
-  public Date getSentDate()
+  public Date getSentDate ()
     throws MessagingException
   {
-    String value = getHeader(DATE_NAME, null);
-    if (value!=null)
-    {
-      try
+    String value = getHeader (DATE_NAME, null);
+    if (value != null)
       {
-        return dateFormat.parse(value);
+        try
+          {
+            return dateFormat.parse (value);
+          }
+        catch (ParseException e)
+          {
+          }
       }
-      catch (ParseException e)
-      {
-      }
-    }
     return null;
   }
 
@@ -823,13 +886,17 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setSentDate(Date date)
+  public void setSentDate (Date date)
     throws MessagingException
   {
-    if (date==null)
-      removeHeader(DATE_NAME);
+    if (date == null)
+      {
+        removeHeader (DATE_NAME);
+      }
     else
-      setHeader(DATE_NAME, dateFormat.format(date));
+      {
+        setHeader (DATE_NAME, dateFormat.format (date));
+      }
   }
 
   /**
@@ -840,7 +907,7 @@ public class MimeMessage
    * Hence only implementations that can provide this date need return 
    * a valid value.
    */
-  public Date getReceivedDate()
+  public Date getReceivedDate ()
     throws MessagingException
   {
     // hence...
@@ -859,23 +926,27 @@ public class MimeMessage
    * <code>available</code> method returns a positive number, it returns 
    * that number as the size. Otherwise, it returns -1.
    */
-  public int getSize()
+  public int getSize ()
     throws MessagingException
   {
-    if (content!=null)
-      return content.length;
-    if (contentStream!=null)
-    {
-      try
+    if (content != null)
       {
-        int available = contentStream.available();
-        if (available>0)
-          return available;
+        return content.length;
       }
-      catch (IOException e)
+    if (contentStream != null)
       {
+        try
+          {
+            int available = contentStream.available ();
+            if (available > 0)
+              {
+                return available;
+              }
+          }
+        catch (IOException e)
+          {
+          }
       }
-    }
     return -1;
   }
 
@@ -888,7 +959,7 @@ public class MimeMessage
    * <p>
    * This implementation returns -1.
    */
-  public int getLineCount()
+  public int getLineCount ()
     throws MessagingException
   {
     return -1;
@@ -903,12 +974,14 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method 
    * to obtain the requisite header field.
    */
-  public String getContentType()
+  public String getContentType ()
     throws MessagingException
   {
-    String contentType = getHeader(MimeBodyPart.CONTENT_TYPE_NAME, null);
-    if (contentType==null)
-      return MimeBodyPart.TEXT_PLAIN;
+    String contentType = getHeader (MimeBodyPart.CONTENT_TYPE_NAME, null);
+    if (contentType == null)
+      {
+        return MimeBodyPart.TEXT_PLAIN;
+      }
     return contentType;
   }
 
@@ -924,10 +997,10 @@ public class MimeMessage
    * the subtype is ignored during the comparison.
    * @see MimeBodyPart#isMimeType
    */
-  public boolean isMimeType(String mimeType)
+  public boolean isMimeType (String mimeType)
     throws MessagingException
   {
-    return (new ContentType(getContentType()).match(mimeType));
+    return (new ContentType (getContentType ()).match (mimeType));
   }
 
   /**
@@ -941,13 +1014,15 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getDisposition
    */
-  public String getDisposition()
+  public String getDisposition ()
     throws MessagingException
   {
     String disposition = 
-      getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
-    if (disposition!=null)
-      return new ContentDisposition(disposition).getDisposition();
+      getHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
+    if (disposition != null)
+      {
+        return new ContentDisposition (disposition).getDisposition ();
+      }
     return null;
   }
 
@@ -962,22 +1037,24 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setDisposition
    */
-  public void setDisposition(String disposition)
+  public void setDisposition (String disposition)
     throws MessagingException
   {
-    if (disposition==null)
-      removeHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME);
-    else
-    {
-      String value = getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
-      if (value!=null)
+    if (disposition == null)
       {
-        ContentDisposition cd = new ContentDisposition(value);
-        cd.setDisposition(disposition);
-        disposition = cd.toString();
+        removeHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME);
       }
-      setHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, disposition);
-    }
+    else
+      {
+        String value = getHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
+        if (value != null)
+          {
+            ContentDisposition cd = new ContentDisposition (value);
+            cd.setDisposition (disposition);
+            disposition = cd.toString ();
+          }
+        setHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, disposition);
+      }
   }
 
   /**
@@ -989,34 +1066,37 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getEncoding
    */
-  public String getEncoding()
+  public String getEncoding ()
     throws MessagingException
   {
     String encoding = 
-      getHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME, null);
-    if (encoding!=null)
-    {
-      encoding = encoding.trim();
-      if (encoding.equalsIgnoreCase("7bit") || 
-          encoding.equalsIgnoreCase("8bit") || 
-          encoding.equalsIgnoreCase("quoted-printable") ||
-          encoding.equalsIgnoreCase("base64"))
-        return encoding;
-      HeaderTokenizer ht = new HeaderTokenizer(encoding, HeaderTokenizer.MIME);
-      for (boolean done = false; !done; )
+      getHeader (MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME, null);
+    if (encoding != null)
       {
-        HeaderTokenizer.Token token = ht.next();
-        switch (token.getType())
-        {
-          case HeaderTokenizer.Token.EOF:
-            done = true;
-            break;
-          case HeaderTokenizer.Token.ATOM:
-            return token.getValue();
-        }
+        encoding = encoding.trim ();
+        if (encoding.equalsIgnoreCase ("7bit") || 
+            encoding.equalsIgnoreCase ("8bit") || 
+            encoding.equalsIgnoreCase ("quoted-printable") ||
+            encoding.equalsIgnoreCase ("base64"))
+          {
+            return encoding;
+          }
+        HeaderTokenizer ht = new HeaderTokenizer (encoding,
+                                                  HeaderTokenizer.MIME);
+        for (boolean done = false; !done; )
+          {
+            HeaderTokenizer.Token token = ht.next ();
+            switch (token.getType ())
+              {
+              case HeaderTokenizer.Token.EOF:
+                done = true;
+                break;
+              case HeaderTokenizer.Token.ATOM:
+                return token.getValue ();
+              }
+          }
+        return encoding;
       }
-      return encoding;
-    }
     return null;
   }
 
@@ -1028,10 +1108,10 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getContentID
    */
-  public String getContentID()
+  public String getContentID ()
     throws MessagingException
   {
-    return getHeader(MimeBodyPart.CONTENT_ID_NAME, null);
+    return getHeader (MimeBodyPart.CONTENT_ID_NAME, null);
   }
 
   /**
@@ -1043,13 +1123,17 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setContentID(String cid)
+  public void setContentID (String cid)
     throws MessagingException
   {
-    if (cid==null)
-      removeHeader(MimeBodyPart.CONTENT_ID_NAME);
+    if (cid == null)
+      {
+        removeHeader (MimeBodyPart.CONTENT_ID_NAME);
+      }
     else
-      setHeader(MimeBodyPart.CONTENT_ID_NAME, cid);
+      {
+        setHeader (MimeBodyPart.CONTENT_ID_NAME, cid);
+      }
   }
 
   /**
@@ -1060,10 +1144,10 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getContentMD5
    */
-  public String getContentMD5()
+  public String getContentMD5 ()
     throws MessagingException
   {
-    return getHeader(MimeBodyPart.CONTENT_MD5_NAME, null);
+    return getHeader (MimeBodyPart.CONTENT_MD5_NAME, null);
   }
 
   /**
@@ -1075,10 +1159,10 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setContentMD5
    */
-  public void setContentMD5(String md5)
+  public void setContentMD5 (String md5)
     throws MessagingException
   {
-    setHeader(MimeBodyPart.CONTENT_MD5_NAME, md5);
+    setHeader (MimeBodyPart.CONTENT_MD5_NAME, md5);
   }
 
   /**
@@ -1094,21 +1178,21 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getDescription
    */
-  public String getDescription()
+  public String getDescription ()
     throws MessagingException
   {
-    String header = getHeader(MimeBodyPart.CONTENT_DESCRIPTION_NAME, null);
-    if (header!=null)
-    {
-      try
+    String header = getHeader (MimeBodyPart.CONTENT_DESCRIPTION_NAME, null);
+    if (header != null)
       {
-        return MimeUtility.decodeText(header);
+        try
+          {
+            return MimeUtility.decodeText (header);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            return header;
+          }
       }
-      catch (UnsupportedEncodingException e)
-      {
-        return header;
-      }
-    }
     return null;
   }
 
@@ -1131,10 +1215,10 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setDescription
    */
-  public void setDescription(String description)
+  public void setDescription (String description)
     throws MessagingException
   {
-    setDescription(description, null);
+    setDescription (description, null);
   }
 
   /**
@@ -1157,23 +1241,25 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setDescription
    */
-  public void setDescription(String description, String charset)
+  public void setDescription (String description, String charset)
     throws MessagingException
   {
-    if (description!=null)
-    {
-      try
+    if (description != null)
       {
-        setHeader(MimeBodyPart.CONTENT_DESCRIPTION_NAME,
-            MimeUtility.encodeText(description, charset, null));
+        try
+          {
+            setHeader (MimeBodyPart.CONTENT_DESCRIPTION_NAME,
+                       MimeUtility.encodeText (description, charset, null));
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException ("Encode error", e);
+          }
       }
-      catch (UnsupportedEncodingException e)
-      {
-        throw new MessagingException("Encode error", e);
-      }
-    }
     else
-      removeHeader(MimeBodyPart.CONTENT_DESCRIPTION_NAME);
+      {
+        removeHeader (MimeBodyPart.CONTENT_DESCRIPTION_NAME);
+      }
   }
 
   /**
@@ -1186,34 +1272,34 @@ public class MimeMessage
    * to obtain the requisite header field.
    * @see MimeBodyPart#getContentLanguage
    */
-  public String[] getContentLanguage()
+  public String[] getContentLanguage ()
     throws MessagingException
   {
-    String header = getHeader(MimeBodyPart.CONTENT_LANGUAGE_NAME, null);
-    if (header!=null)
-    {
-      HeaderTokenizer ht = new HeaderTokenizer(header, HeaderTokenizer.MIME);
-      ArrayList acc = new ArrayList();
-      for (boolean done = false; !done; )
+    String header = getHeader (MimeBodyPart.CONTENT_LANGUAGE_NAME, null);
+    if (header != null)
       {
-        HeaderTokenizer.Token token = ht.next();
-        switch (token.getType())
-        {
-          case HeaderTokenizer.Token.EOF:
-            done = true;
-            break;
-          case HeaderTokenizer.Token.ATOM:
-            acc.add(token.getValue());
-            break;
-        }
-      } 
-      if (acc.size()>0)
-      {
-        String[] languages = new String[acc.size()];
-        acc.toArray(languages);
-        return languages;
+        HeaderTokenizer ht = new HeaderTokenizer (header, HeaderTokenizer.MIME);
+        ArrayList acc = new ArrayList ();
+        for (boolean done = false; !done; )
+          {
+            HeaderTokenizer.Token token = ht.next ();
+            switch (token.getType ())
+              {
+              case HeaderTokenizer.Token.EOF:
+                done = true;
+                break;
+              case HeaderTokenizer.Token.ATOM:
+                acc.add (token.getValue ());
+                break;
+              }
+          } 
+        if (acc.size () > 0)
+          {
+            String[] languages = new String[acc.size ()];
+            acc.toArray (languages);
+            return languages;
+          }
       }
-    }
     return null;
   }
 
@@ -1227,22 +1313,24 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setContentLanguage
    */
-  public void setContentLanguage(String[] languages)
+  public void setContentLanguage (String[] languages)
     throws MessagingException
   {
-    if (languages!=null && languages.length>0)
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(languages[0]);
-      for (int i = 1; i<languages.length; i++)
+    if (languages != null && languages.length > 0)
       {
-        buffer.append(',');
-        buffer.append(languages[i]);
+        StringBuffer buffer = new StringBuffer ();
+        buffer.append (languages[0]);
+        for (int i = 1; i < languages.length; i++)
+          {
+            buffer.append (',');
+            buffer.append (languages[i]);
+          }
+        setHeader (MimeBodyPart.CONTENT_LANGUAGE_NAME, buffer.toString ());
       }
-      setHeader(MimeBodyPart.CONTENT_LANGUAGE_NAME, buffer.toString());
-    }
     else
-      setHeader(MimeBodyPart.CONTENT_LANGUAGE_NAME, null);
+      {
+        setHeader (MimeBodyPart.CONTENT_LANGUAGE_NAME, null);
+      }
   }
 
   /**
@@ -1252,10 +1340,10 @@ public class MimeMessage
    * This implementation uses the <code>getHeader</code> method 
    * to obtain the requisite header field.
    */
-  public String getMessageID()
+  public String getMessageID ()
     throws MessagingException
   {
-    return getHeader(MESSAGE_ID_NAME, null);
+    return getHeader (MESSAGE_ID_NAME, null);
   }
 
   /**
@@ -1268,25 +1356,25 @@ public class MimeMessage
    * Returns null if both are absent.
    * @see MimeBodyPart#getFileName
    */
-  public String getFileName()
+  public String getFileName ()
     throws MessagingException
   {
     String filename = null;
-    String header = getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
-    if (header!=null)
-    {
-      ContentDisposition cd = new ContentDisposition(header);
-      filename = cd.getParameter("filename");
-    }
-    if (filename==null)
-    {
-      header = getHeader(MimeBodyPart.CONTENT_TYPE_NAME, null);
-      if (header!=null)
+    String header = getHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
+    if (header != null)
       {
-        ContentType contentType = new ContentType(header);
-        filename = contentType.getParameter("name");
+        ContentDisposition cd = new ContentDisposition (header);
+        filename = cd.getParameter ("filename");
       }
-    }
+    if (filename == null)
+      {
+        header = getHeader (MimeBodyPart.CONTENT_TYPE_NAME, null);
+        if (header != null)
+          {
+            ContentType contentType = new ContentType (header);
+            filename = contentType.getParameter ("name");
+          }
+      }
     return filename;
   }
 
@@ -1301,22 +1389,24 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setFileName
    */
-  public void setFileName(String filename)
+  public void setFileName (String filename)
     throws MessagingException
   {
-    String header = getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
-    if (header==null)
-      header = "attachment";
-    ContentDisposition cd = new ContentDisposition(header);
-    cd.setParameter("filename", filename);
-    setHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, cd.toString());
+    String header = getHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
+    if (header == null)
+      {
+        header = "attachment";
+      }
+    ContentDisposition cd = new ContentDisposition (header);
+    cd.setParameter ("filename", filename);
+    setHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, cd.toString ());
 
     // We will also set the "name" parameter of the Content-Type field
     // to preserve compatibility with nonconformant MUAs
-    header = getContentType(); // not valid for this to be null
-    ContentType contentType = new ContentType(header);
-    contentType.setParameter("name", filename);
-    setHeader(MimeBodyPart.CONTENT_TYPE_NAME, contentType.toString());
+    header = getContentType (); // not valid for this to be null
+    ContentType contentType = new ContentType (header);
+    contentType.setParameter ("name", filename);
+    setHeader (MimeBodyPart.CONTENT_TYPE_NAME, contentType.toString ());
   }
 
   /**
@@ -1329,10 +1419,10 @@ public class MimeMessage
    * details.
    * @see MimeBodyPart#getInputStream
    */
-  public InputStream getInputStream()
+  public InputStream getInputStream ()
     throws IOException, MessagingException
   {
-    return getDataHandler().getInputStream();
+    return getDataHandler ().getInputStream ();
   }
 
   /**
@@ -1345,15 +1435,21 @@ public class MimeMessage
    * out of the content byte array.
    * @see MimeBodyPart#getContentStream
    */
-  protected InputStream getContentStream()
+  protected InputStream getContentStream ()
     throws MessagingException
   {
-    if (contentStream!=null)
-      return ((SharedInputStream)contentStream).newStream(0L, -1L);
-    if (content!=null)
-      return new ByteArrayInputStream(content);
+    if (contentStream != null)
+      {
+        return ((SharedInputStream) contentStream).newStream (0L, -1L);
+      }
+    if (content != null)
+      {
+        return new ByteArrayInputStream (content);
+      }
     else
-      throw new MessagingException("No content");
+      {
+        throw new MessagingException ("No content");
+      }
   }
 
   /**
@@ -1369,10 +1465,10 @@ public class MimeMessage
    * method.
    * @see MimeBodyPart#getRawInputStream
    */
-  public InputStream getRawInputStream()
+  public InputStream getRawInputStream ()
     throws MessagingException
   {
-    return getContentStream();
+    return getContentStream ();
   }
 
   /**
@@ -1400,11 +1496,13 @@ public class MimeMessage
     }
     </pre>
    */
-  public synchronized DataHandler getDataHandler()
+  public synchronized DataHandler getDataHandler ()
     throws MessagingException
   {
-    if (dh==null)
-      dh = new DataHandler(new MimePartDataSource(this));
+    if (dh == null)
+      {
+        dh = new DataHandler (new MimePartDataSource (this));
+      }
     return dh;
   }
 
@@ -1422,10 +1520,10 @@ public class MimeMessage
    * Refer to the documentation for javax.activation.DataHandler for more
    * details.
    */
-  public Object getContent()
+  public Object getContent ()
     throws IOException, MessagingException
   {
-    return getDataHandler().getContent();
+    return getDataHandler ().getContent ();
   }
 
   /**
@@ -1438,14 +1536,14 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setDataHandler
    */
-  public void setDataHandler(DataHandler datahandler)
+  public void setDataHandler (DataHandler datahandler)
     throws MessagingException
   {
     dh = datahandler;
     // The Content-Type and Content-Transfer-Encoding headers may need to be
     // recalculated by the new DataHandler - see updateHeaders()
-    removeHeader(MimeBodyPart.CONTENT_TYPE_NAME);
-    removeHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME);
+    removeHeader (MimeBodyPart.CONTENT_TYPE_NAME);
+    removeHeader (MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME);
   }
 
   /**
@@ -1465,10 +1563,10 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setContent
    */
-  public void setContent(Object o, String type)
+  public void setContent (Object o, String type)
     throws MessagingException
   {
-    setDataHandler(new DataHandler(o, type));
+    setDataHandler (new DataHandler (o, type));
   }
 
   /**
@@ -1486,10 +1584,10 @@ public class MimeMessage
    * that takes the <code>charset</code> parameter.
    * @see MimeBodyPart#setText
    */
-  public void setText(String text)
+  public void setText (String text)
     throws MessagingException
   {
-    setText(text, null);
+    setText (text, null);
   }
 
   /**
@@ -1498,21 +1596,22 @@ public class MimeMessage
    * The given Unicode string will be charset-encoded using the specified 
    * charset. The charset is also used to set the "charset" parameter.
    */
-  public void setText(String text, String charset)
+  public void setText (String text, String charset)
     throws MessagingException
   {
-    if (charset==null)
-    {
-      // According to the API doc for getText(String), we may have to scan
-      // the characters to determine the charset.
-      // However this should work just as well and is hopefully relatively
-      // cheap.
-      charset = MimeUtility.mimeCharset(MimeUtility.getDefaultJavaCharset());
-    }
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("text/plain; charset=");
-    buffer.append(MimeUtility.quote(charset, HeaderTokenizer.MIME));
-    setContent(text, buffer.toString());
+    if (charset == null)
+      {
+        // According to the API doc for getText(String), we may have to scan
+        // the characters to determine the charset.
+        // However this should work just as well and is hopefully relatively
+        // cheap.
+        charset =
+          MimeUtility.mimeCharset (MimeUtility.getDefaultJavaCharset ());
+      }
+    StringBuffer buffer = new StringBuffer ();
+    buffer.append ("text/plain; charset=");
+    buffer.append (MimeUtility.quote (charset, HeaderTokenizer.MIME));
+    setContent (text, buffer.toString ());
   }
 
   /**
@@ -1524,12 +1623,12 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#setContent(Multipart)
    */
-  public void setContent(Multipart mp)
+  public void setContent (Multipart mp)
     throws MessagingException
   {
-    setDataHandler(new DataHandler(mp, mp.getContentType()));
+    setDataHandler (new DataHandler(mp, mp.getContentType ()));
     // Ensure component hierarchy
-    mp.setParent(this);
+    mp.setParent (this);
   }
 
   /**
@@ -1551,69 +1650,89 @@ public class MimeMessage
    * @param replyToAll reply should be sent to all recipients of this message
    * @return the reply Message
    */
-  public Message reply(boolean replyToAll)
+  public Message reply (boolean replyToAll)
     throws MessagingException
   {
-    MimeMessage message = new MimeMessage(session);
-    String subject = getHeader(SUBJECT_NAME, null);
-    if (subject!=null)
-    {
-      if (!subject.startsWith("Re: "))
-        subject = "Re: "+subject;
-      message.setHeader(SUBJECT_NAME, subject);
-    }
-    Address[] addresses = getReplyTo();
-    message.setRecipients(Message.RecipientType.TO, addresses);
+    MimeMessage message = new MimeMessage (session);
+    String subject = getHeader (SUBJECT_NAME, null);
+    if (subject != null)
+      {
+        if (!subject.startsWith ("Re: "))
+          {
+            subject = "Re: " + subject;
+          }
+        message.setHeader (SUBJECT_NAME, subject);
+      }
+    Address[] addresses = getReplyTo ();
+    message.setRecipients (Message.RecipientType.TO, addresses);
     if (replyToAll)
-    {
-      // We use a Set to store the addresses in order to ensure no address
-      // duplication.
-      HashSet set = new HashSet();
-      set.addAll(Arrays.asList(addresses));
-
-      InternetAddress localAddress = InternetAddress.getLocalAddress(session);
-      if (localAddress!=null)
-        set.add(localAddress);
-      String alternates = session.getProperty("mail.alternates");
-      if (alternates!=null)
-        set.addAll(Arrays.asList(InternetAddress.parse(alternates, false)));
+      {
+        // We use a Set to store the addresses in order to ensure no address
+        // duplication.
+        HashSet set = new HashSet ();
+        set.addAll (Arrays.asList (addresses));
+        
+        InternetAddress localAddress =
+          InternetAddress.getLocalAddress (session);
+        if (localAddress != null)
+          {
+            set.add (localAddress);
+          }
+        String alternates = session.getProperty ("mail.alternates");
+        if (alternates != null)
+          {
+            set.addAll( Arrays.asList( InternetAddress.parse (alternates,
+                                                              false)));
+          }
+        
+        set.addAll (Arrays.asList (getRecipients (Message.RecipientType.TO)));
+        addresses = new Address[set.size ()];
+        set.toArray (addresses);
+        
+        boolean replyAllCC = 
+          new Boolean (session.getProperty ("mail.replyallcc")).booleanValue ();
+        if (addresses.length > 0)
+          {
+            if (replyAllCC)
+              {
+                message.addRecipients (Message.RecipientType.CC, addresses);
+              }
+            else
+              {
+                message.addRecipients (Message.RecipientType.TO, addresses);
+              }
+          }
       
-      set.addAll(Arrays.asList(getRecipients(Message.RecipientType.TO)));
-      addresses = new Address[set.size()];
-      set.toArray(addresses);
+        set.clear ();
+        set.addAll (Arrays.asList (getRecipients (Message.RecipientType.CC)));
+        addresses = new Address[set.size ()];
+        set.toArray (addresses);
+        
+        if (addresses != null && addresses.length > 0)
+          {
+            message.addRecipients (Message.RecipientType.CC, addresses);
+          }
       
-      boolean replyAllCC = 
-        new Boolean(session.getProperty("mail.replyallcc")).booleanValue();
-      if (addresses.length>0)
-        if (replyAllCC)
-          message.addRecipients(Message.RecipientType.CC, addresses);
-        else
-          message.addRecipients(Message.RecipientType.TO, addresses);
-      
-      set.clear();
-      set.addAll(Arrays.asList(getRecipients(Message.RecipientType.CC)));
-      addresses = new Address[set.size()];
-      set.toArray(addresses);
-      
-      if (addresses!=null && addresses.length>0)
-        message.addRecipients(Message.RecipientType.CC, addresses);
-      
-      addresses = getRecipients(RecipientType.NEWSGROUPS);
-      if (addresses!=null && addresses.length>0)
-        message.setRecipients(RecipientType.NEWSGROUPS, addresses);
-    }
-
+        addresses = getRecipients (RecipientType.NEWSGROUPS);
+        if (addresses != null && addresses.length > 0)
+          {
+            message.setRecipients (RecipientType.NEWSGROUPS, addresses);
+          }
+      }
+    
     // Set In-Reply-To (will be replaced by References for NNTP)
-    String mid = getHeader(MESSAGE_ID_NAME, null);
-    if (mid!=null)
-      message.setHeader("In-Reply-To", mid);
+    String mid = getHeader (MESSAGE_ID_NAME, null);
+    if (mid != null)
+      {
+        message.setHeader ("In-Reply-To", mid);
+      }
     try
-    {
-      setFlag(Flags.Flag.ANSWERED, true);
-    }
+      {
+        setFlag (Flags.Flag.ANSWERED, true);
+      }
     catch (MessagingException e)
-    {
-    }
+      {
+      }
     return message;
   }
 
@@ -1633,10 +1752,10 @@ public class MimeMessage
    * @exception IOException if an error occurs writing to the stream or if an
    * error is generated by the javax.activation layer.
    */
-  public void writeTo(OutputStream os)
+  public void writeTo (OutputStream os)
     throws IOException, MessagingException
   {
-    writeTo(os, null);
+    writeTo (os, null);
   }
 
   /**
@@ -1648,71 +1767,78 @@ public class MimeMessage
    * @exception IOException if an error occurs writing to the stream or if an
    * error is generated by the javax.activation layer.
    */
-  public void writeTo(OutputStream os, String[] ignoreList)
+  public void writeTo (OutputStream os, String[] ignoreList)
     throws IOException, MessagingException
   {
     if (!saved)
-      saveChanges();
+      {
+        saveChanges ();
+      }
 
-    String charset = "UTF-8"; // TODO default charset?
+    String charset = "US-ASCII"; // MIME default charset
     byte[] sep = new byte[] { 0x0d, 0x0a };
 
     // Write the headers
-    for (Enumeration e = getNonMatchingHeaderLines(ignoreList);
-        e.hasMoreElements(); )
-    {
-      String line = (String)e.nextElement();
-      /*
-       * RFC 2822, section 2.1 states that each line should be no more
-       * than 998 characters. Ensure that any headers we emit have no lines
-       * longer than this by folding the line.
-       */
-      int max = 998;
-      while (line.length()>max)
+    for (Enumeration e = getNonMatchingHeaderLines (ignoreList);
+         e.hasMoreElements (); )
       {
-        String left = line.substring(0, max);
-        byte[] bytes = left.getBytes(charset);
-        os.write(bytes);
-        os.write(sep);
-        line = line.substring(max);
-        max = 997; // make space for the tab
+        String line = (String) e.nextElement ();
+        /*
+         * RFC 2822, section 2.1 states that each line should be no more
+         * than 998 characters. Ensure that any headers we emit have no lines
+         * longer than this by folding the line.
+         */
+        int max = 998;
+        while (line.length () > max)
+          {
+            String left = line.substring (0, max);
+            byte[] bytes = left.getBytes (charset);
+            os.write (bytes);
+            os.write (sep);
+            line = line.substring (max);
+            max = 997; // make space for the tab
+          }
+        byte[] bytes = line.getBytes (charset);
+        os.write (bytes);
+        os.write (sep);
       }
-			byte[] bytes = line.getBytes(charset);
-      os.write(bytes);
-      os.write(sep);
-    }
-    os.write(sep);
-    os.flush();
+    os.write (sep);
+    os.flush ();
 
     /*
      * Implement the no-CR-without-LF and len(line)<=998 RFC2822 rules
      * (section 2.3).
      * We do this by wrapping in an RFC2822OutputStream.
      */
-    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
-    if (modified || content==null && contentStream==null)
-    {
-      // use datahandler
-      os = MimeUtility.encode(rfc2822os, getEncoding());
-      getDataHandler().writeTo(os);
-    }
-    else
-    {
-      // write content directly
-      if (contentStream!=null)
+    RFC2822OutputStream rfc2822os = new RFC2822OutputStream (os);
+    if (modified || content == null && contentStream == null)
       {
-        InputStream is = ((SharedInputStream)contentStream).newStream(0L, -1L);
-        // TODO make buffer size configurable
-        int len = 8192;
-        byte[] bytes = new byte[len];
-        while ((len = is.read(bytes))>-1) 
-          rfc2822os.write(bytes, 0, len);
-        is.close();
+        // use datahandler
+        os = MimeUtility.encode (rfc2822os, getEncoding ());
+        getDataHandler ().writeTo (os);
       }
-      else
-        rfc2822os.write(content);
-    }
-    rfc2822os.flush();
+    else
+      {
+        // write content directly
+        if (contentStream != null)
+          {
+            InputStream is =
+              ((SharedInputStream) contentStream).newStream (0L, -1L);
+            // TODO make buffer size configurable
+            int len = 8192;
+            byte[] bytes = new byte[len];
+            while ((len = is.read (bytes)) > -1) 
+              {
+                rfc2822os.write (bytes, 0, len);
+              }
+            is.close ();
+          }
+        else
+          {
+            rfc2822os.write (content);
+          }
+      }
+    rfc2822os.flush ();
   }
 
   static int fc = 1;
@@ -1727,10 +1853,10 @@ public class MimeMessage
    * @param name name of header
    * @return array of headers
    */
-  public String[] getHeader(String name)
+  public String[] getHeader (String name)
     throws MessagingException
   {
-    return headers.getHeader(name);
+    return headers.getHeader (name);
   }
 
   /**
@@ -1741,10 +1867,10 @@ public class MimeMessage
    * @param delimiter the delimiter
    * @return the value fields for all headers with this name
    */
-  public String getHeader(String name, String delimiter)
+  public String getHeader (String name, String delimiter)
     throws MessagingException
   {
-    return headers.getHeader(name, delimiter);
+    return headers.getHeader (name, delimiter);
   }
 
   /**
@@ -1760,10 +1886,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setHeader(String name, String value)
+  public void setHeader (String name, String value)
     throws MessagingException
   {
-    headers.setHeader(name, value);
+    headers.setHeader (name, value);
   }
 
   /**
@@ -1778,10 +1904,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void addHeader(String name, String value)
+  public void addHeader (String name, String value)
     throws MessagingException
   {
-    headers.addHeader(name, value);
+    headers.addHeader (name, value);
   }
 
   /**
@@ -1792,10 +1918,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void removeHeader(String name)
+  public void removeHeader (String name)
     throws MessagingException
   {
-    headers.removeHeader(name);
+    headers.removeHeader (name);
   }
 
   /**
@@ -1809,10 +1935,10 @@ public class MimeMessage
    * InternetHeaders object.
    * @return array of header objects
    */
-  public Enumeration getAllHeaders()
+  public Enumeration getAllHeaders ()
     throws MessagingException
   {
-    return headers.getAllHeaders();
+    return headers.getAllHeaders ();
   }
 
   /**
@@ -1822,10 +1948,10 @@ public class MimeMessage
    * This implementation obtains the headers from the <code>headers</code>
    * InternetHeaders object.
    */
-  public Enumeration getMatchingHeaders(String[] names)
+  public Enumeration getMatchingHeaders (String[] names)
     throws MessagingException
   {
-    return headers.getMatchingHeaders(names);
+    return headers.getMatchingHeaders (names);
   }
 
   /**
@@ -1835,10 +1961,10 @@ public class MimeMessage
    * This implementation obtains the headers from the <code>headers</code>
    * InternetHeaders object.
    */
-  public Enumeration getNonMatchingHeaders(String[] names)
+  public Enumeration getNonMatchingHeaders (String[] names)
     throws MessagingException
   {
-    return headers.getNonMatchingHeaders(names);
+    return headers.getNonMatchingHeaders (names);
   }
 
   /**
@@ -1849,10 +1975,10 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void addHeaderLine(String line)
+  public void addHeaderLine (String line)
     throws MessagingException
   {
-    headers.addHeaderLine(line);
+    headers.addHeaderLine (line);
   }
 
   /**
@@ -1860,10 +1986,10 @@ public class MimeMessage
    * A Header line is a raw RFC 822 header-line, containing both the "name"
    * and "value" field.
    */
-  public Enumeration getAllHeaderLines()
+  public Enumeration getAllHeaderLines ()
     throws MessagingException
   {
-    return headers.getAllHeaderLines();
+    return headers.getAllHeaderLines ();
   }
 
   /**
@@ -1871,10 +1997,10 @@ public class MimeMessage
    * A Header line is a raw RFC 822 header-line, containing both the "name"
    * and "value" field.
    */
-  public Enumeration getMatchingHeaderLines(String[] names)
+  public Enumeration getMatchingHeaderLines (String[] names)
     throws MessagingException
   {
-    return headers.getMatchingHeaderLines(names);
+    return headers.getMatchingHeaderLines (names);
   }
 
   /**
@@ -1882,10 +2008,10 @@ public class MimeMessage
    * A Header line is a raw RFC 822 header-line, containing both the "name"
    * and "value" field.
    */
-  public Enumeration getNonMatchingHeaderLines(String[] names)
+  public Enumeration getNonMatchingHeaderLines (String[] names)
     throws MessagingException
   {
-    return headers.getNonMatchingHeaderLines(names);
+    return headers.getNonMatchingHeaderLines (names);
   }
 
   /**
@@ -1895,10 +2021,10 @@ public class MimeMessage
    * the returned Flags object will not affect the flags of this message.
    * @return Flags object containing the flags for this message
    */
-  public Flags getFlags()
+  public Flags getFlags ()
     throws MessagingException
   {
-    return (Flags)flags.clone();
+    return (Flags) flags.clone ();
   }
 
   /**
@@ -1909,10 +2035,10 @@ public class MimeMessage
    * @param flag - the flag
    * @return value of the specified flag for this message
    */
-  public boolean isSet(Flags.Flag flag)
+  public boolean isSet (Flags.Flag flag)
     throws MessagingException
   {
-    return flags.contains(flag);
+    return flags.contains (flag);
   }
 
   /**
@@ -1924,13 +2050,17 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setFlags(Flags flag, boolean set)
+  public void setFlags (Flags flag, boolean set)
     throws MessagingException
   {
     if (set)
-      flags.add(flag);
+      {
+        flags.add (flag);
+      }
     else
-      flags.remove(flag);
+      {
+        flags.remove (flag);
+      }
   }
 
   /**
@@ -1955,12 +2085,12 @@ public class MimeMessage
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void saveChanges()
+  public void saveChanges ()
     throws MessagingException
   {
     modified = true;
     saved = true;
-    updateHeaders();
+    updateHeaders ();
   }
 
   /**
@@ -1977,74 +2107,76 @@ public class MimeMessage
    * a READ_ONLY folder.
    * @see MimeBodyPart#updateHeaders
    */
-  protected void updateHeaders()
+  protected void updateHeaders ()
     throws MessagingException
   {
     // This code is from MimeBodyPart
-    if (getDataHandler()!=null)
-    {
-      try
+    if (getDataHandler () != null)
       {
-        String contentType = dh.getContentType();
-        ContentType ct = new ContentType(contentType);
-        if (ct.match("multipart/*"))
-        {
-          MimeMultipart mmp = (MimeMultipart)dh.getContent();
-          mmp.updateHeaders();
-        } 
-        else if (ct.match("message/rfc822"))
-        {
-        }
-        else
-        {
-          // Update Content-Transfer-Encoding
-          if (getHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME)==null)
+        try
           {
-            setHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME,
-                MimeUtility.getEncoding(dh));
-          }
-        }
+            String contentType = dh.getContentType ();
+            ContentType ct = new ContentType (contentType);
+            if (ct.match ("multipart/*"))
+              {
+                MimeMultipart mmp = (MimeMultipart) dh.getContent ();
+                mmp.updateHeaders ();
+              } 
+            else if (ct.match ("message/rfc822"))
+              {
+              }
+            else
+              {
+                // Update Content-Transfer-Encoding
+                if (getHeader (MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME)
+                    == null)
+                  {
+                    setHeader (MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME,
+                               MimeUtility.getEncoding (dh));
+                  }
+              }
 
-        // Update Content-Type if nonexistent,
-        // and Content-Type "name" with Content-Disposition "filename"
-        // parameter (see setFilename())
-        if (getHeader(MimeBodyPart.CONTENT_TYPE_NAME)==null)
-        {
-          String disposition =
-            getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
-          if (disposition!=null)
-          {
-            ContentDisposition cd = new ContentDisposition(disposition);
-            String filename = cd.getParameter("filename");
-            if (filename!=null)
-            {
-              ct.setParameter("name", filename);
-              contentType = ct.toString();
-            }
+            // Update Content-Type if nonexistent,
+            // and Content-Type "name" with Content-Disposition "filename"
+            // parameter (see setFilename())
+            if (getHeader (MimeBodyPart.CONTENT_TYPE_NAME) == null)
+              {
+                String disposition =
+                  getHeader (MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
+                if (disposition != null)
+                  {
+                    ContentDisposition cd =
+                      new ContentDisposition (disposition);
+                    String filename = cd.getParameter ("filename");
+                    if (filename != null)
+                      {
+                        ct.setParameter ("name", filename);
+                        contentType = ct.toString ();
+                      }
+                  }
+                setHeader (MimeBodyPart.CONTENT_TYPE_NAME, contentType);
+              }
           }
-          setHeader(MimeBodyPart.CONTENT_TYPE_NAME, contentType);
-        }
+        catch (IOException e)
+          {
+            throw new MessagingException ("I/O error", e);
+          }
       }
-      catch (IOException e)
-      {
-        throw new MessagingException("I/O error", e);
-      }
-    }
     
     // Below is MimeMessage-specific.
     // set mime version
-    setHeader("Mime-Version", "1.0");
+    setHeader ("Mime-Version", "1.0");
     // set new message-id if necessary
-    String mid = getHeader(MESSAGE_ID_NAME, null);
-    if (mid==null)
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append('<');
-      buffer.append(MimeUtility.getUniqueMessageIDValue(session));
-      buffer.append('>');
-      mid = buffer.toString();
-      setHeader(MESSAGE_ID_NAME, mid);
-    }
+    String mid = getHeader (MESSAGE_ID_NAME, null);
+    if (mid == null)
+      {
+        StringBuffer buffer = new StringBuffer ();
+        buffer.append ('<');
+        buffer.append (MimeUtility.getUniqueMessageIDValue (session));
+        buffer.append ('>');
+        mid = buffer.toString ();
+        setHeader (MESSAGE_ID_NAME, mid);
+      }
   }
 
   /**
@@ -2056,10 +2188,10 @@ public class MimeMessage
    * object.
    * @param is the InputStream to read the headers from
    */
-  protected InternetHeaders createInternetHeaders(InputStream is)
+  protected InternetHeaders createInternetHeaders (InputStream is)
     throws MessagingException
   {
-    return new InternetHeaders(is);
+    return new InternetHeaders (is);
   }
 
 }

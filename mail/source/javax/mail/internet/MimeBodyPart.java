@@ -117,9 +117,9 @@ public class MimeBodyPart
    * This body part maybe filled in by a client 
    * constructing a multipart message.
    */
-  public MimeBodyPart()
+  public MimeBodyPart ()
   {
-    headers = new InternetHeaders();
+    headers = new InternetHeaders ();
   }
 
   /**
@@ -135,51 +135,53 @@ public class MimeBodyPart
    * them into this constructor, without the delimiter strings.
    * @param is the body part Input Stream
    */
-  public MimeBodyPart(InputStream is)
+  public MimeBodyPart (InputStream is)
     throws MessagingException
   {
     if (is instanceof SharedInputStream)
-    {
-      headers = new InternetHeaders(is);
-      SharedInputStream sis = (SharedInputStream)is;
-      contentStream = sis.newStream(sis.getPosition(), -1L);
-      return;
-    }
+      {
+        headers = new InternetHeaders (is);
+        SharedInputStream sis = (SharedInputStream) is;
+        contentStream = sis.newStream (sis.getPosition (), -1L);
+        return;
+      }
     
     // Buffer the stream if necessary
     if (!(is instanceof ByteArrayInputStream) &&
         !(is instanceof BufferedInputStream))
-      is = new BufferedInputStream(is);
+      {
+        is = new BufferedInputStream (is);
+      }
     
     // Read the headers
-    headers = new InternetHeaders(is);
+    headers = new InternetHeaders (is);
     
     // Read stream into byte array (see MimeMessage.parse())
     try
-    {
-      // TODO Make buffer size configurable
-      int len = 1024;
-      if (is instanceof ByteArrayInputStream)
       {
-        len = is.available();
-        content = new byte[len];
-        is.read(content, 0, len);
+        // TODO Make buffer size configurable
+        int len = 1024;
+        if (is instanceof ByteArrayInputStream)
+          {
+            len = is.available ();
+            content = new byte[len];
+            is.read (content, 0, len);
+          }
+        else
+          {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream (len);
+            byte[] b = new byte[len];
+            for (int l = is.read (b); l != -1; l = is.read (b))
+              {
+                bos.write (b, 0, l);
+              }
+            content = bos.toByteArray ();
+          }
       }
-      else
-      {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(len);
-        content = new byte[len]; // it's just a buffer!
-        for (int l = is.read(content, 0, len); 
-            l!=-1;
-            l = is.read(content, 0, len)) 
-          bos.write(content, 0, l);
-        content = bos.toByteArray();
-      }
-    }
     catch (IOException e)
-    {
-      throw new MessagingException("I/O error", e);
-    }
+      {
+        throw new MessagingException ("I/O error", e);
+      }
   }
 
   /**
@@ -189,7 +191,7 @@ public class MimeBodyPart
    * @param headers The header of this part
    * @param content bytes representing the body of this part.
    */
-  public MimeBodyPart(InternetHeaders headers, byte[] content)
+  public MimeBodyPart (InternetHeaders headers, byte[] content)
     throws MessagingException
   {
     this.headers = headers;
@@ -209,23 +211,27 @@ public class MimeBodyPart
    * returns -1.
    * @return size in bytes, or -1 if not known
    */
-  public int getSize()
+  public int getSize ()
     throws MessagingException
   {
-    if (content!=null)
-      return content.length;
-    if (contentStream!=null)
-    {
-      try
+    if (content != null)
       {
-        int len = contentStream.available();
-        if (len>0)
-          return len;
+        return content.length;
       }
-      catch (IOException e)
+    if (contentStream != null)
       {
+        try
+          {
+            int len = contentStream.available ();
+            if (len > 0)
+              {
+                return len;
+              }
+          }
+        catch (IOException e)
+          {
+          }
       }
-    }
     return -1;
   }
 
@@ -239,7 +245,7 @@ public class MimeBodyPart
    * This implementation returns -1.
    * @return number of lines, or -1 if not known
    */
-  public int getLineCount()
+  public int getLineCount ()
     throws MessagingException
   {
     return -1;
@@ -255,12 +261,14 @@ public class MimeBodyPart
    * the requisite header field.
    * @return Content-Type of this body part
    */
-  public String getContentType()
+  public String getContentType ()
     throws MessagingException
   {
-    String contentType = getHeader(CONTENT_TYPE_NAME, null);
-    if (contentType==null)
-      contentType = TEXT_PLAIN;
+    String contentType = getHeader (CONTENT_TYPE_NAME, null);
+    if (contentType == null)
+      {
+        contentType = TEXT_PLAIN;
+      }
     return contentType;
   }
 
@@ -275,18 +283,18 @@ public class MimeBodyPart
    * If the subType of <code>mimeType</code> is the special character '*',
    * then the subtype is ignored during the comparison.
    */
-  public boolean isMimeType(String mimeType)
+  public boolean isMimeType (String mimeType)
     throws MessagingException
   {
-    String contentType = getContentType();
+    String contentType = getContentType ();
     try
-    {
-      return (new ContentType(contentType).match(mimeType));
-    }
+      {
+        return (new ContentType (contentType).match (mimeType));
+      }
     catch (ParseException e)
-    {
-      return (getContentType().equalsIgnoreCase(mimeType));
-    }
+      {
+        return (getContentType ().equalsIgnoreCase (mimeType));
+      }
   }
 
   /**
@@ -299,12 +307,14 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain the 
    * requisite header field.
    */
-  public String getDisposition()
+  public String getDisposition ()
     throws MessagingException
   {
-    String disposition = getHeader(CONTENT_DISPOSITION_NAME, null);
-    if (disposition!=null)
-      return new ContentDisposition(disposition).getDisposition();
+    String disposition = getHeader (CONTENT_DISPOSITION_NAME, null);
+    if (disposition != null)
+      {
+        return new ContentDisposition (disposition).getDisposition ();
+      }
     return null;
   }
 
@@ -317,22 +327,24 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setDisposition(String disposition)
+  public void setDisposition (String disposition)
     throws MessagingException
   {
-    if (disposition==null)
-      removeHeader(CONTENT_DISPOSITION_NAME);
-    else
-    {
-      String value = getHeader(CONTENT_DISPOSITION_NAME, null);
-      if (value!=null)
+    if (disposition == null)
       {
-        ContentDisposition cd = new ContentDisposition(value);
-        cd.setDisposition(disposition);
-        disposition = cd.toString();
+        removeHeader (CONTENT_DISPOSITION_NAME);
       }
-      setHeader(CONTENT_DISPOSITION_NAME, disposition);
-    }
+    else
+      {
+        String value = getHeader (CONTENT_DISPOSITION_NAME, null);
+        if (value != null)
+          {
+            ContentDisposition cd = new ContentDisposition (value);
+            cd.setDisposition (disposition);
+            disposition = cd.toString ();
+          }
+        setHeader (CONTENT_DISPOSITION_NAME, disposition);
+      }
   }
 
   /**
@@ -343,33 +355,36 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain 
    * the requisite header field.
    */
-  public String getEncoding()
+  public String getEncoding ()
     throws MessagingException
   {
-    String encoding = getHeader(CONTENT_TRANSFER_ENCODING_NAME, null);
-    if (encoding!=null)
-    {
-      encoding = encoding.trim();
-      if (encoding.equalsIgnoreCase("7bit") || 
-          encoding.equalsIgnoreCase("8bit") || 
-          encoding.equalsIgnoreCase("quoted-printable") ||
-          encoding.equalsIgnoreCase("base64"))
-        return encoding;
-      HeaderTokenizer ht = new HeaderTokenizer(encoding, HeaderTokenizer.MIME);
-      for (boolean done = false; !done; )
+    String encoding = getHeader (CONTENT_TRANSFER_ENCODING_NAME, null);
+    if (encoding != null)
       {
-        HeaderTokenizer.Token token = ht.next();
-        switch (token.getType())
-        {
-          case HeaderTokenizer.Token.EOF:
-            done = true;
-            break;
-          case HeaderTokenizer.Token.ATOM:
-            return token.getValue();
-        }
+        encoding = encoding.trim ();
+        if (encoding.equalsIgnoreCase ("7bit") || 
+            encoding.equalsIgnoreCase ("8bit") || 
+            encoding.equalsIgnoreCase ("quoted-printable") ||
+            encoding.equalsIgnoreCase ("base64"))
+          {
+            return encoding;
+          }
+        HeaderTokenizer ht =
+          new HeaderTokenizer (encoding, HeaderTokenizer.MIME);
+        for (boolean done = false; !done; )
+          {
+            HeaderTokenizer.Token token = ht.next ();
+            switch (token.getType ())
+              {
+              case HeaderTokenizer.Token.EOF:
+                done = true;
+                break;
+              case HeaderTokenizer.Token.ATOM:
+                return token.getValue ();
+              }
+          }
+        return encoding;
       }
-      return encoding;
-    }
     return null;
   }
 
@@ -380,10 +395,10 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain 
    * the requisite header field.
    */
-  public String getContentID()
+  public String getContentID ()
     throws MessagingException
   {
-    return getHeader(CONTENT_ID_NAME, null);
+    return getHeader (CONTENT_ID_NAME, null);
   }
 
   /**
@@ -396,13 +411,17 @@ public class MimeBodyPart
    * from a READ_ONLY folder.
    * @since JavaMail 1.3
    */
-  public void setContentID(String cid)
+  public void setContentID (String cid)
     throws MessagingException
   {
     if (cid == null)
-      removeHeader(CONTENT_ID_NAME);
+      {
+        removeHeader (CONTENT_ID_NAME);
+      }
     else
-      setHeader(CONTENT_ID_NAME, cid);
+      {
+        setHeader (CONTENT_ID_NAME, cid);
+      }
   }
 
   /**
@@ -412,10 +431,10 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain 
    * the requisite header field.
    */
-  public String getContentMD5()
+  public String getContentMD5 ()
     throws MessagingException
   {
-    return getHeader(CONTENT_MD5_NAME, null);
+    return getHeader (CONTENT_MD5_NAME, null);
   }
 
   /**
@@ -425,10 +444,10 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setContentMD5(String md5)
+  public void setContentMD5 (String md5)
     throws MessagingException
   {
-    setHeader(CONTENT_MD5_NAME, md5);
+    setHeader (CONTENT_MD5_NAME, md5);
   }
 
   /**
@@ -440,34 +459,34 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain 
    * the requisite header field.
    */
-  public String[] getContentLanguage()
+  public String[] getContentLanguage ()
     throws MessagingException
   {
-    String header = getHeader(CONTENT_LANGUAGE_NAME, null);
-    if (header!=null)
-    {
-      HeaderTokenizer ht = new HeaderTokenizer(header, HeaderTokenizer.MIME);
-      ArrayList acc = new ArrayList();
-      for (boolean done = false; !done; )
+    String header = getHeader (CONTENT_LANGUAGE_NAME, null);
+    if (header != null)
       {
-        HeaderTokenizer.Token token = ht.next();
-        switch (token.getType())
-        {
-          case HeaderTokenizer.Token.EOF:
-            done = true;
-            break;
-          case HeaderTokenizer.Token.ATOM:
-            acc.add(token.getValue());
-            break;
-        }
-      } 
-      if (acc.size()>0)
-      {
-        String[] languages = new String[acc.size()];
-        acc.toArray(languages);
-        return languages;
+        HeaderTokenizer ht = new HeaderTokenizer (header, HeaderTokenizer.MIME);
+        ArrayList acc = new ArrayList ();
+        for (boolean done = false; !done; )
+          {
+            HeaderTokenizer.Token token = ht.next ();
+            switch (token.getType ())
+              {
+              case HeaderTokenizer.Token.EOF:
+                done = true;
+                break;
+              case HeaderTokenizer.Token.ATOM:
+                acc.add (token.getValue ());
+                break;
+              }
+          } 
+        if (acc.size () > 0)
+          {
+            String[] languages = new String[acc.size ()];
+            acc.toArray (languages);
+            return languages;
+          }
       }
-    }
     return null;
   }
 
@@ -476,22 +495,24 @@ public class MimeBodyPart
    * The Content-Language header is defined by RFC 1766.
    * @param languages array of language tags
    */
-  public void setContentLanguage(String[] languages)
+  public void setContentLanguage (String[] languages)
     throws MessagingException
   {
-    if (languages!=null && languages.length>0)
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(languages[0]);
-      for (int i = 1; i<languages.length; i++)
+    if (languages != null && languages.length > 0)
       {
-        buffer.append(',');
-        buffer.append(languages[i]);
+        StringBuffer buffer = new StringBuffer ();
+        buffer.append (languages[0]);
+        for (int i = 1; i < languages.length; i++)
+          {
+            buffer.append (',');
+            buffer.append (languages[i]);
+          }
+        setHeader (CONTENT_LANGUAGE_NAME, buffer.toString ());
       }
-      setHeader(CONTENT_LANGUAGE_NAME, buffer.toString());
-    }
     else
-      setHeader(CONTENT_LANGUAGE_NAME, null);
+      {
+        setHeader (CONTENT_LANGUAGE_NAME, null);
+      }
   }
 
   /**
@@ -506,21 +527,21 @@ public class MimeBodyPart
    * This implementation uses <code>getHeader(name)</code> to obtain 
    * the requisite header field.
    */
-  public String getDescription()
+  public String getDescription ()
     throws MessagingException
   {
-    String header = getHeader(CONTENT_DESCRIPTION_NAME, null);
-    if (header!=null)
-    {
-      try
+    String header = getHeader (CONTENT_DESCRIPTION_NAME, null);
+    if (header != null)
       {
-        return MimeUtility.decodeText(header);
+        try
+          {
+            return MimeUtility.decodeText (header);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            return header;
+          }
       }
-      catch (UnsupportedEncodingException e)
-      {
-        return header;
-      }
-    }
     return null;
   }
 
@@ -542,10 +563,10 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setDescription(String description)
+  public void setDescription (String description)
     throws MessagingException
   {
-    setDescription(description, null);
+    setDescription (description, null);
   }
 
   /**
@@ -567,23 +588,25 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setDescription(String description, String charset)
+  public void setDescription (String description, String charset)
     throws MessagingException
   {
-    if (description!=null)
-    {
-      try
+    if (description != null)
       {
-        setHeader(CONTENT_DESCRIPTION_NAME,
-            MimeUtility.encodeText(description, charset, null));
+        try
+          {
+            setHeader (CONTENT_DESCRIPTION_NAME,
+                       MimeUtility.encodeText (description, charset, null));
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException ("Encode error", e);
+          }
       }
-      catch (UnsupportedEncodingException e)
-      {
-        throw new MessagingException("Encode error", e);
-      }
-    }
     else
-      removeHeader(CONTENT_DESCRIPTION_NAME);
+      {
+        removeHeader (CONTENT_DESCRIPTION_NAME);
+      }
   }
 
   /**
@@ -595,31 +618,31 @@ public class MimeBodyPart
    * from the "Content-Type" header field of this body part.
    * Returns null if both are absent.
    */
-  public String getFileName()
+  public String getFileName ()
     throws MessagingException
   {
     String filename = null;
-    String header = getHeader(CONTENT_DISPOSITION_NAME, null);
-    if (header!=null)
-    {
-      ContentDisposition cd = new ContentDisposition(header);
-      filename = cd.getParameter("filename");
-    }
-    if (filename==null)
-    {
-      header = getHeader(CONTENT_TYPE_NAME, null);
-      if (header!=null)
+    String header = getHeader (CONTENT_DISPOSITION_NAME, null);
+    if (header != null)
       {
-        try
-        {
-          ContentType contentType = new ContentType(header);
-          filename = contentType.getParameter("name");
-        }
-        catch (ParseException e)
-        {
-        }
+        ContentDisposition cd = new ContentDisposition (header);
+        filename = cd.getParameter ("filename");
       }
-    }
+    if (filename == null)
+      {
+        header = getHeader (CONTENT_TYPE_NAME, null);
+        if (header != null)
+          {
+            try
+              {
+                ContentType contentType = new ContentType (header);
+                filename = contentType.getParameter ("name");
+              }
+            catch (ParseException e)
+              {
+              }
+          }
+      }
     return filename;
   }
 
@@ -633,28 +656,30 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setFileName(String filename)
+  public void setFileName (String filename)
     throws MessagingException
   {
-    String header = getHeader(CONTENT_DISPOSITION_NAME, null);
-    if (header==null)
-      header = "attachment";
-    ContentDisposition cd = new ContentDisposition(header);
-    cd.setParameter("filename", filename);
-    setHeader(CONTENT_DISPOSITION_NAME, cd.toString());
+    String header = getHeader (CONTENT_DISPOSITION_NAME, null);
+    if (header == null)
+      {
+        header = "attachment";
+      }
+    ContentDisposition cd = new ContentDisposition (header);
+    cd.setParameter ("filename", filename);
+    setHeader (CONTENT_DISPOSITION_NAME, cd.toString ());
 
     // We will also set the "name" parameter of the Content-Type field
     // to preserve compatibility with nonconformant MUAs
-    header = getContentType(); // not valid for this to be null
+    header = getContentType (); // not valid for this to be null
     try
-    {
-      ContentType contentType = new ContentType(header);
-      contentType.setParameter("name", filename);
-      setHeader(CONTENT_TYPE_NAME, contentType.toString());
-    }
+      {
+        ContentType contentType = new ContentType (header);
+        contentType.setParameter ("name", filename);
+        setHeader (CONTENT_TYPE_NAME, contentType.toString ());
+      }
     catch (ParseException e)
-    {
-    }
+      {
+      }
   }
 
   /**
@@ -666,10 +691,10 @@ public class MimeBodyPart
    * Refer to the documentation for javax.activation.DataHandler for more
    * details.
    */
-  public InputStream getInputStream()
+  public InputStream getInputStream ()
     throws IOException, MessagingException
   {
-    return getDataHandler().getInputStream();
+    return getDataHandler ().getInputStream ();
   }
 
   /**
@@ -678,14 +703,18 @@ public class MimeBodyPart
    * Subclasses that can provide a separate input stream for just the Part 
    * content might want to override this method.
    */
-  protected InputStream getContentStream()
+  protected InputStream getContentStream ()
     throws MessagingException
   {
-    if (contentStream!=null)
-      return ((SharedInputStream)contentStream).newStream(0L, -1L);
-    if (content!=null)
-      return new ByteArrayInputStream(content);
-    throw new MessagingException("No content");
+    if (contentStream != null)
+      {
+        return ((SharedInputStream) contentStream).newStream (0L, -1L);
+      }
+    if (content != null)
+      {
+        return new ByteArrayInputStream (content);
+      }
+    throw new MessagingException ("No content");
   }
 
   /**
@@ -699,10 +728,10 @@ public class MimeBodyPart
    * <p>
    * This implementation simply calls the <code>getContentStream</code> method.
    */
-  public InputStream getRawInputStream()
+  public InputStream getRawInputStream ()
     throws MessagingException
   {
-    return getContentStream();
+    return getContentStream ();
   }
 
   /**
@@ -711,11 +740,13 @@ public class MimeBodyPart
    * The implementation provided here works just like the the implementation
    * in MimeMessage.
    */
-  public DataHandler getDataHandler()
+  public DataHandler getDataHandler ()
     throws MessagingException
   {
-    if (dh==null)
-      dh = new DataHandler(new MimePartDataSource(this));
+    if (dh == null)
+      {
+        dh = new DataHandler (new MimePartDataSource (this));
+      }
     return dh;
   }
 
@@ -733,10 +764,10 @@ public class MimeBodyPart
    * Refer to the documentation for javax.activation.DataHandler for more 
    * details.
    */
-  public Object getContent()
+  public Object getContent ()
     throws IOException, MessagingException
   {
-    return getDataHandler().getContent();
+    return getDataHandler ().getContent ();
   }
 
   /**
@@ -747,14 +778,14 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setDataHandler(DataHandler dh)
+  public void setDataHandler (DataHandler dh)
     throws MessagingException
   {
     this.dh = dh;
     // The Content-Type and Content-Transfer-Encoding headers may need to be
     // recalculated by the new DataHandler - see updateHeaders()
-    removeHeader(CONTENT_TYPE_NAME);
-    removeHeader(CONTENT_TRANSFER_ENCODING_NAME);
+    removeHeader (CONTENT_TYPE_NAME);
+    removeHeader (CONTENT_TRANSFER_ENCODING_NAME);
   }
 
   /**
@@ -773,13 +804,17 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setContent(Object o, String type)
+  public void setContent (Object o, String type)
     throws MessagingException
   {
     if (o instanceof Multipart)
-      setContent((Multipart)o);
+      {
+        setContent ((Multipart) o);
+      }
     else
-      setDataHandler(new DataHandler(o, type));
+      {
+        setDataHandler (new DataHandler (o, type));
+      }
   }
 
   /**
@@ -796,10 +831,10 @@ public class MimeBodyPart
    * If the charset is already known, use the <code>setText()</code> version
    * that takes the <code>charset</code> parameter.
    */
-  public void setText(String text)
+  public void setText (String text)
     throws MessagingException
   {
-    setText(text, null);
+    setText (text, null);
   }
 
   /**
@@ -808,21 +843,22 @@ public class MimeBodyPart
    * The given Unicode string will be charset-encoded using the specified 
    * charset. The charset is also used to set the "charset" parameter.
    */
-  public void setText(String text, String charset)
+  public void setText (String text, String charset)
     throws MessagingException
   {
-    if (charset==null)
-    {
-      // According to the API doc for getText(String), we may have to scan
-      // the characters to determine the charset.
-      // However this should work just as well and is hopefully relatively
-      // cheap.
-      charset = MimeUtility.mimeCharset(MimeUtility.getDefaultJavaCharset());
-    }
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("text/plain; charset=");
-    buffer.append(MimeUtility.quote(charset, HeaderTokenizer.MIME));
-    setContent(text, buffer.toString());
+    if (charset == null)
+      {
+        // According to the API doc for getText(String), we may have to scan
+        // the characters to determine the charset.
+        // However this should work just as well and is hopefully relatively
+        // cheap.
+        charset =
+          MimeUtility.mimeCharset (MimeUtility.getDefaultJavaCharset ());
+      }
+    StringBuffer buffer = new StringBuffer ();
+    buffer.append ("text/plain; charset=");
+    buffer.append (MimeUtility.quote (charset, HeaderTokenizer.MIME));
+    setContent (text, buffer.toString ());
   }
 
   /**
@@ -833,12 +869,12 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void setContent(Multipart mp)
+  public void setContent (Multipart mp)
     throws MessagingException
   {
-    setDataHandler(new DataHandler(mp, mp.getContentType()));
+    setDataHandler (new DataHandler (mp, mp.getContentType ()));
     // Ensure component hierarchy
-    mp.setParent(this);
+    mp.setParent (this);
   }
 
   /**
@@ -846,23 +882,26 @@ public class MimeBodyPart
    * @exception IOException if an error occurs writing to the stream or if an
    * error is generated by the javax.activation layer.
    */
-  public void writeTo(OutputStream os)
+  public void writeTo (OutputStream os)
     throws IOException, MessagingException
   {
+    final String charset = "US-ASCII";
+    final byte[] sep = { 0x0d, 0x0a };
+    
     // Write the headers
-    for (Enumeration e = getAllHeaderLines();
-        e.hasMoreElements(); )
-    {
-      String line = (String)e.nextElement();
-      os.write(line.getBytes("US-ASCII"));
-      os.write(0x0d);
-    }
-    os.write(0x0d);
+    for (Enumeration e = getAllHeaderLines ();
+        e.hasMoreElements (); )
+      {
+        String line = (String)e.nextElement ();
+        os.write (line.getBytes (charset));
+        os.write (sep);
+      }
+    os.write (sep);
 
     // Write the content
-    os = MimeUtility.encode(os, getEncoding());
-    getDataHandler().writeTo(os);
-    os.flush();
+    os = MimeUtility.encode (os, getEncoding ());
+    getDataHandler ().writeTo (os);
+    os.flush ();
   }
 
   /**
@@ -871,10 +910,10 @@ public class MimeBodyPart
    * if they contain non US-ASCII characters and these should be decoded.
    * @param name name of header
    */
-  public String[] getHeader(String name)
+  public String[] getHeader (String name)
     throws MessagingException
   {
-    return headers.getHeader(name);
+    return headers.getHeader (name);
   }
 
   /**
@@ -884,10 +923,10 @@ public class MimeBodyPart
    * @param name the name of this header
    * @param delimiter the delimiter to use
    */
-  public String getHeader(String name, String delimiter)
+  public String getHeader (String name, String delimiter)
     throws MessagingException
   {
-    return headers.getHeader(name, delimiter);
+    return headers.getHeader (name, delimiter);
   }
 
   /**
@@ -898,10 +937,10 @@ public class MimeBodyPart
    * @param name the header name
    * @param value the header value
    */
-  public void setHeader(String name, String value)
+  public void setHeader (String name, String value)
     throws MessagingException
   {
-    headers.setHeader(name, value);
+    headers.setHeader (name, value);
   }
 
   /**
@@ -912,10 +951,10 @@ public class MimeBodyPart
    * @param name the header name
    * @param value the header value
    */
-  public void addHeader(String name, String value)
+  public void addHeader (String name, String value)
     throws MessagingException
   {
-    headers.addHeader(name, value);
+    headers.addHeader (name, value);
   }
 
   /**
@@ -926,40 +965,40 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void removeHeader(String name)
+  public void removeHeader (String name)
     throws MessagingException
   {
-    headers.removeHeader(name);
+    headers.removeHeader (name);
   }
 
   /**
    * Return all the headers from this Message as an Enumeration of Header
    * objects.
    */
-  public Enumeration getAllHeaders()
+  public Enumeration getAllHeaders ()
     throws MessagingException
   {
-    return headers.getAllHeaders();
+    return headers.getAllHeaders ();
   }
 
   /**
    * Return matching headers from this Message as an Enumeration of Header
    * objects.
    */
-  public Enumeration getMatchingHeaders(String[] names)
+  public Enumeration getMatchingHeaders (String[] names)
     throws MessagingException
   {
-    return headers.getMatchingHeaders(names);
+    return headers.getMatchingHeaders (names);
   }
 
   /**
    * Return non-matching headers from this Message as an Enumeration of Header
    * objects.
    */
-  public Enumeration getNonMatchingHeaders(String[] names)
+  public Enumeration getNonMatchingHeaders (String[] names)
     throws MessagingException
   {
-    return headers.getNonMatchingHeaders(names);
+    return headers.getNonMatchingHeaders (names);
   }
 
   /**
@@ -969,10 +1008,10 @@ public class MimeBodyPart
    * @exception IllegalStateException if this body part is obtained 
    * from a READ_ONLY folder.
    */
-  public void addHeaderLine(String line)
+  public void addHeaderLine (String line)
     throws MessagingException
   {
-    headers.addHeaderLine(line);
+    headers.addHeaderLine (line);
   }
 
   /**
@@ -980,10 +1019,10 @@ public class MimeBodyPart
    * A Header line is a raw RFC 822 header line,
    * containing both the "name" and "value" field.
    */
-  public Enumeration getAllHeaderLines()
+  public Enumeration getAllHeaderLines ()
     throws MessagingException
   {
-    return headers.getAllHeaderLines();
+    return headers.getAllHeaderLines ();
   }
 
   /**
@@ -991,10 +1030,10 @@ public class MimeBodyPart
    * A Header line is a raw RFC 822 header line,
    * containing both the "name" and "value" field.
    */
-  public Enumeration getMatchingHeaderLines(String[] names)
+  public Enumeration getMatchingHeaderLines (String[] names)
     throws MessagingException
   {
-    return headers.getMatchingHeaderLines(names);
+    return headers.getMatchingHeaderLines (names);
   }
 
   /**
@@ -1002,10 +1041,10 @@ public class MimeBodyPart
    * A Header line is a raw RFC 822 header line,
    * containing both the "name" and "value" field.
    */
-  public Enumeration getNonMatchingHeaderLines(String[] names)
+  public Enumeration getNonMatchingHeaderLines (String[] names)
     throws MessagingException
   {
-    return headers.getNonMatchingHeaderLines(names);
+    return headers.getNonMatchingHeaderLines (names);
   }
 
   /**
@@ -1025,57 +1064,58 @@ public class MimeBodyPart
    * In both cases this method is typically called by the 
    * <code>Message.saveChanges</code> method.
    */
-  protected void updateHeaders()
+  protected void updateHeaders ()
     throws MessagingException
   {
-    if (getDataHandler()!=null)
-    {
-      try
+    if (getDataHandler () != null)
       {
-        String contentType = dh.getContentType();
-        ContentType ct = new ContentType(contentType);
-        if (ct.match("multipart/*"))
-        {
-          MimeMultipart mmp = (MimeMultipart)dh.getContent();
-          mmp.updateHeaders();
-        } 
-        else if (ct.match("message/rfc822"))
-        {
-        }
-        else
-        {
-          // Update Content-Transfer-Encoding
-          if (getHeader(CONTENT_TRANSFER_ENCODING_NAME)==null)
+        try
           {
-            setHeader(CONTENT_TRANSFER_ENCODING_NAME,
-                MimeUtility.getEncoding(dh));
+            String contentType = dh.getContentType ();
+            ContentType ct = new ContentType (contentType);
+            if (ct.match ("multipart/*"))
+              {
+                MimeMultipart mmp = (MimeMultipart) dh.getContent ();
+                mmp.updateHeaders ();
+              } 
+            else if (ct.match ("message/rfc822"))
+              {
+              }
+            else
+              {
+                // Update Content-Transfer-Encoding
+                if (getHeader (CONTENT_TRANSFER_ENCODING_NAME) == null)
+                  {
+                    setHeader (CONTENT_TRANSFER_ENCODING_NAME,
+                               MimeUtility.getEncoding (dh));
+                  }
+              }
+            
+            // Update Content-Type if nonexistent,
+            // and Content-Type "name" with Content-Disposition "filename"
+            // parameter (see setFilename())
+            if (getHeader (CONTENT_TYPE_NAME) == null)
+              {
+                String disposition = getHeader (CONTENT_DISPOSITION_NAME, null);
+                if (disposition != null)
+                  {
+                    ContentDisposition cd =
+                      new ContentDisposition (disposition);
+                    String filename = cd.getParameter ("filename");
+                    if (filename != null)
+                      {
+                        ct.setParameter ("name", filename);
+                        contentType = ct.toString ();
+                      }
+                  }
+                setHeader (CONTENT_TYPE_NAME, contentType);
+              }
           }
-        }
-
-        // Update Content-Type if nonexistent,
-        // and Content-Type "name" with Content-Disposition "filename"
-        // parameter (see setFilename())
-        if (getHeader(CONTENT_TYPE_NAME)==null)
-        {
-          String disposition = getHeader(CONTENT_DISPOSITION_NAME, null);
-          if (disposition!=null)
+        catch (IOException e)
           {
-            ContentDisposition cd = new ContentDisposition(disposition);
-            String filename = cd.getParameter("filename");
-            if (filename!=null)
-            {
-              ct.setParameter("name", filename);
-              contentType = ct.toString();
-            }
+            throw new MessagingException ("I/O error", e);
           }
-          setHeader(CONTENT_TYPE_NAME, contentType);
-        }
       }
-      catch (IOException e)
-      {
-        throw new MessagingException("I/O error", e);
-      }
-    }
   }
 
 }

@@ -61,16 +61,16 @@ public class ConnectionEvent
    * Constructor
    * @param source The source object
    */
-  public ConnectionEvent(Object source, int type)
+  public ConnectionEvent (Object source, int type)
   {
-    super(source);
+    super (source);
     this.type = type;
   }
 
   /**
    * Return the type of this event
    */
-  public int getType()
+  public int getType ()
   {
     return type;
   }
@@ -78,19 +78,19 @@ public class ConnectionEvent
   /**
    * Invokes the appropriate ConnectionListener method
    */
-  public void dispatch(Object listener)
+  public void dispatch (Object listener)
   {
-    ConnectionListener l = (ConnectionListener)listener;
+    ConnectionListener l = (ConnectionListener) listener;
     switch (type)
     {
       case OPENED:
-        l.opened(this);
+        l.opened (this);
         break;
       case DISCONNECTED:
-        l.disconnected(this);
+        l.disconnected (this);
         break;
       case CLOSED:
-        l.closed(this);
+        l.closed (this);
         break;
     }
   }

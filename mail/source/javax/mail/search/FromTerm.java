@@ -44,9 +44,9 @@ public final class FromTerm
    * Constructor
    * @param address The Address to be compared
    */
-  public FromTerm(Address address)
+  public FromTerm (Address address)
   {
-    super(address);
+    super (address);
   }
 
   /**
@@ -54,32 +54,34 @@ public final class FromTerm
    * @param msg The address comparison is applied to this Message
    * @return true if the comparison succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      Address[] addresses = msg.getFrom();
-      if (addresses!=null)
       {
-        for (int i = 0; i<addresses.length; i++)
-        {
-          if (super.match(addresses[i]))
-            return true;
-        }
+        Address[] addresses = msg.getFrom ();
+        if (addresses != null)
+          {
+            for (int i = 0; i < addresses.length; i++)
+              {
+                if (super.match (addresses[i]))
+                  {
+                    return true;
+                  }
+              }
+          }
       }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof FromTerm && super.equals(other));
+    return (other instanceof FromTerm && super.equals (other));
   }
 
 }

@@ -62,6 +62,6 @@ public abstract class SearchTerm
    * @param msg The match criterion is applied on this message
    * @return true, it the match succeeds, false if the match fails
    */
-  public abstract boolean match(Message msg);
+  public abstract boolean match (Message msg);
 
 }

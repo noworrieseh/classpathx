@@ -50,16 +50,16 @@ public final class HeaderTerm
    * @param headerName The name of the header
    * @param pattern The pattern to search for
    */
-  public HeaderTerm(String headerName, String pattern)
+  public HeaderTerm (String headerName, String pattern)
   {
-    super(pattern);
+    super (pattern);
     this.headerName = headerName;
   }
 
   /**
    * Return the name of the header to compare with.
    */
-  public String getHeaderName()
+  public String getHeaderName ()
   {
     return headerName;
   }
@@ -69,37 +69,39 @@ public final class HeaderTerm
    * @param msg The match is applied to this Message's header
    * @return true if the match succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      String[] headers = msg.getHeader(headerName);
-      if (headers!=null)
       {
-        for (int i = 0; i<headers.length; i++)
-        {
-          if (super.match(headers[i]))
-            return true;
-        }
+        String[] headers = msg.getHeader (headerName);
+        if (headers != null)
+          {
+            for (int i = 0; i < headers.length; i++)
+              {
+                if (super.match (headers[i]))
+                  {
+                    return true;
+                  }
+              }
+          }
       }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     if (other instanceof HeaderTerm)
-    {
-      HeaderTerm ht = (HeaderTerm)other;
-      return ht.headerName.equalsIgnoreCase(headerName) &&
-        super.equals(ht);
-    }
+      {
+        HeaderTerm ht = (HeaderTerm) other;
+        return ht.headerName.equalsIgnoreCase (headerName) &&
+          super.equals (ht);
+      }
     return false;
   }
 

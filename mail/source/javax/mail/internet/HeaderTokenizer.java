@@ -85,7 +85,7 @@ public class HeaderTokenizer
      * @param type Token type
      * @param value Token value
      */
-    public Token(int type, String value)
+    public Token (int type, String value)
     {
       this.type = type;
       this.value = value;
@@ -103,7 +103,7 @@ public class HeaderTokenizer
      * <li>COMMENT A sequence of ASCII characters within '(' and ')'.
      * <li>EOF End of header
      */
-    public int getType()
+    public int getType ()
     {
       return type;
     }
@@ -115,7 +115,7 @@ public class HeaderTokenizer
      * When the current token is a comment, this field contains the body
      * of the comment.
      */
-    public String getValue()
+    public String getValue ()
     {
       return value;
     }
@@ -135,7 +135,7 @@ public class HeaderTokenizer
   /*
    * The EOF token.
    */
-  private static final Token EOF = new Token(Token.EOF, null);
+  private static final Token EOF = new Token (Token.EOF, null);
 
   /*
    * The header string to parse.
@@ -180,14 +180,14 @@ public class HeaderTokenizer
    * @param skipComments If true, comments are skipped and not returned 
    * as tokens
    */
-  public HeaderTokenizer(String header, String delimiters,
-      boolean skipComments)
+  public HeaderTokenizer (String header, String delimiters,
+                          boolean skipComments)
   {
-    this.header = (header==null) ? "" : header;
+    this.header = (header == null) ? "" : header;
     this.delimiters = delimiters;
     this.skipComments = skipComments;
     pos = next = peek = 0;
-    maxPos = header.length();
+    maxPos = header.length ();
   }
 
   /**
@@ -196,9 +196,9 @@ public class HeaderTokenizer
    * @param header The header that is tokenized
    * @param delimiters The delimiters to be used
    */
-  public HeaderTokenizer(String header, String delimiters)
+  public HeaderTokenizer (String header, String delimiters)
   {
-    this(header, delimiters, true);
+    this (header, delimiters, true);
   }
 
   /**
@@ -206,9 +206,9 @@ public class HeaderTokenizer
    * The RFC822 defined delimiters - RFC822 - are used to delimit ATOMS.
    * Also comments are skipped and not returned as tokens
    */
-  public HeaderTokenizer(String header)
+  public HeaderTokenizer (String header)
   {
-    this(header, RFC822, true);
+    this (header, RFC822, true);
   }
 
   /**
@@ -219,11 +219,11 @@ public class HeaderTokenizer
    * @return the next token
    * @exception ParseException if the parse fails
    */
-  public Token next()
+  public Token next ()
     throws ParseException
   {
     pos = next;
-    Token token = token();
+    Token token = token ();
     next = pos;
     peek = next;
     return token;
@@ -237,11 +237,11 @@ public class HeaderTokenizer
    * @return the next peek token
    * @param ParseException if the parse fails
    */
-  public Token peek()
+  public Token peek ()
     throws ParseException
   {
     pos = peek;
-    Token token = token();
+    Token token = token ();
     peek = pos;
     return token;
   }
@@ -249,161 +249,191 @@ public class HeaderTokenizer
   /**
    * Return the rest of the header.
    */
-  public String getRemainder()
+  public String getRemainder ()
   {
-    return header.substring(next);
+    return header.substring (next);
   }
 
   /*
    * Returns the next token.
    */
-  private Token token()
+  private Token token ()
     throws ParseException
   {
-    if (pos>=maxPos)
-      return EOF;
-    if (skipWhitespace()==Token.EOF)
-      return EOF;
+    if (pos >= maxPos)
+      {
+        return EOF;
+      }
+    if (skipWhitespace () == Token.EOF)
+      {
+        return EOF;
+      }
     
     boolean needsFilter = false;
     char c;
     
     // comment
-    for (c = header.charAt(pos); c=='('; c = header.charAt(pos))
-    {
-      int start = ++pos;
-      int parenCount = 1;
-      while (parenCount>0 && pos<maxPos)
+    for (c = header.charAt (pos); c == '('; c = header.charAt (pos))
       {
-        c = header.charAt(pos);
-        if (c == '\\')
-        {
-          pos++;
-          needsFilter = true;
-        }
-        else if (c=='\r')
-          needsFilter = true;
-        else if (c=='(')
-          parenCount++;
-        else if (c==')')
-          parenCount--;
-        pos++;
+        int start = ++pos;
+        int parenCount = 1;
+        while (parenCount > 0 && pos < maxPos)
+          {
+            c = header.charAt (pos);
+            if (c == '\\')
+              {
+                pos++;
+                needsFilter = true;
+              }
+            else if (c == '\r')
+              {
+                needsFilter = true;
+              }
+            else if (c == '(')
+              {
+                parenCount++;
+              }
+            else if (c == ')')
+              {
+                parenCount--;
+              }
+            pos++;
+          }
+        
+        if (parenCount != 0)
+          {
+            throw new ParseException ("Illegal comment");
+          }
+        
+        if (!skipComments)
+          {
+            if (needsFilter)
+              {
+                return new Token (Token.COMMENT,
+                                  filter (header, start, pos - 1));
+              }
+            return new Token (Token.COMMENT, header.substring (start, pos - 1));
+          }
+        
+        if (skipWhitespace () == Token.EOF)
+          {
+            return EOF;
+          }
       }
-
-      if (parenCount!=0)
-        throw new ParseException("Illegal comment");
-      
-      if (!skipComments)
-      {
-        if (needsFilter)
-          return new Token(Token.COMMENT, filter(header, start, pos-1));
-        else
-          return new Token(Token.COMMENT, header.substring(start, pos-1));
-      }
-      
-      if (skipWhitespace()==Token.EOF)
-        return EOF;
-    }
-
+    
     // quotedstring
-    if (c=='"')
-    {
-      int start = ++pos;
-      while (pos<maxPos)
+    if (c == '"')
       {
-        c = header.charAt(pos);
-        if (c=='\\')
-        {
-          pos++;
-          needsFilter = true;
-        }
-        else if (c=='\r')
-          needsFilter = true;
-        else if (c=='"')
-        {
-          pos++;
-          if (needsFilter)
-            return new Token(Token.QUOTEDSTRING, 
-                filter(header, start, pos-1));
-          else
-            return new Token(Token.QUOTEDSTRING, 
-                header.substring(start, pos-1));
-        }
-        pos++;
+        int start = ++pos;
+        while (pos < maxPos)
+          {
+            c = header.charAt (pos);
+            if (c == '\\')
+              {
+                pos++;
+                needsFilter = true;
+              }
+            else if (c == '\r')
+              {
+                needsFilter = true;
+              }
+            else if (c == '"')
+              {
+                pos++;
+                if (needsFilter)
+                  {
+                    return new Token (Token.QUOTEDSTRING, 
+                                      filter (header, start, pos - 1));
+                  }
+                return new Token (Token.QUOTEDSTRING, 
+                                  header.substring (start, pos - 1));
+              }
+            pos++;
+          }
+        throw new ParseException ("Illegal quoted string");
       }
-      throw new ParseException("Illegal quoted string");
-    }
-
+    
     // delimiter
-    if (c<' ' || c>='\177' || delimiters.indexOf(c)>=0)
-    {
-      pos++;
-      char[] chars = new char[1];
-      chars[0] = c;
-      return new Token(c, new String(chars));
-    }
+    if (c < ' ' || c >= '\177' || delimiters.indexOf (c) >= 0)
+      {
+        pos++;
+        char[] chars = new char[] { c };
+        return new Token (c, new String (chars));
+      }
     
     // atom
     int start = pos;
-    while (pos<maxPos)
-    {
-      c = header.charAt(pos);
-      if (c<' ' || c>='\177' || c=='(' || c==' ' || c=='"' || 
-          delimiters.indexOf(c)>=0)
-        break;
-      pos++;
-    }
-    return new Token(Token.ATOM, header.substring(start, pos));
+    while (pos < maxPos)
+      {
+        c = header.charAt (pos);
+        if (c < ' ' || c >= '\177' || c == '(' || c == ' ' || c == '"' || 
+            delimiters.indexOf (c) >= 0)
+          {
+            break;
+          }
+        pos++;
+      }
+    return new Token (Token.ATOM, header.substring (start, pos));
   }
-
+  
   /*
    * Advance pos over any whitespace delimiters.
    */
-  private int skipWhitespace()
+  private int skipWhitespace ()
   {
-    while (pos<maxPos)
-    {
-      char c = header.charAt(pos);
-      if (c!=' ' && c!='\t' && c!='\r' && c!='\n')
-        return pos;
-      pos++;
-    }
+    while (pos < maxPos)
+      {
+        char c = header.charAt (pos);
+        if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+          {
+            return pos;
+          }
+        pos++;
+      }
     return Token.EOF;
   }
 
   /*
    * Process out CR and backslash (line continuation) bytes.
    */
-  private String filter(String s, int start, int end)
+  private String filter (String s, int start, int end)
   {
-    StringBuffer buffer = new StringBuffer();
+    StringBuffer buffer = new StringBuffer ();
     boolean backslash = false;
     boolean cr = false;
-    for (int i = start; i<end; i++)
-    {
-      char c = s.charAt(i);
-      if (c=='\n' && cr)
-        cr = false;
-      else
+    for (int i = start; i < end; i++)
       {
-        cr = false;
-        if (!backslash)
-        {
-          if (c=='\\')
-            backslash = true;
-          else if (c=='\r')
-            cr = true;
-          else
-            buffer.append(c);
-        }
+        char c = s.charAt (i);
+        if (c == '\n' && cr)
+          {
+            cr = false;
+          }
         else
-        {
-          buffer.append(c);
-          backslash = false;
-        }
+          {
+            cr = false;
+            if (!backslash)
+              {
+                if (c == '\\')
+                  {
+                    backslash = true;
+                  }
+                else if (c == '\r')
+                  {
+                    cr = true;
+                  }
+                else
+                  {
+                    buffer.append (c);
+                  }
+              }
+            else
+              {
+                buffer.append (c);
+                backslash = false;
+              }
+          }
       }
-    }
-    return buffer.toString();
+    return buffer.toString ();
   }
 
 }

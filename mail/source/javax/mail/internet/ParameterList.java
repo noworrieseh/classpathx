@@ -43,12 +43,12 @@ public class ParameterList
   /*
    * The underlying storage.
    */
-  private HashMap list = new HashMap();
+  private HashMap list = new HashMap ();
 
   /**
    * No-arg Constructor.
    */
-  public ParameterList()
+  public ParameterList ()
   {
   }
 
@@ -61,48 +61,56 @@ public class ParameterList
    * @param s the parameter-list string.
    * @exception ParseException if the parse fails.
    */
-  public ParameterList(String s)
+  public ParameterList (String s)
     throws ParseException
   {
-    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
-    for (int type = 0; type!=HeaderTokenizer.Token.EOF; )
-    {
-      HeaderTokenizer.Token token = ht.next();
-      type = token.getType();
-
-      if (type!=HeaderTokenizer.Token.EOF)
+    HeaderTokenizer ht = new HeaderTokenizer (s, HeaderTokenizer.MIME);
+    for (int type = 0; type != HeaderTokenizer.Token.EOF; )
       {
-        if (type!=0x3b) // ';'
-          throw new ParseException();
+        HeaderTokenizer.Token token = ht.next ();
+        type = token.getType ();
         
-        token = ht.next();
-        type = token.getType();
-        if (type!=HeaderTokenizer.Token.ATOM)
-          throw new ParseException();
-        String key = token.getValue().toLowerCase();
-        
-        token = ht.next();
-        type = token.getType();
-        if (type!=0x3d) // '='
-          throw new ParseException();
-
-        token = ht.next();
-        type = token.getType();
-        if (type!=HeaderTokenizer.Token.ATOM && 
-            type!=HeaderTokenizer.Token.QUOTEDSTRING)
-          throw new ParseException();
-
-        list.put(key, token.getValue());
+        if (type != HeaderTokenizer.Token.EOF)
+          {
+            if (type != 0x3b) // ';'
+              {
+                throw new ParseException ();
+              }
+            
+            token = ht.next ();
+            type = token.getType ();
+            if (type != HeaderTokenizer.Token.ATOM)
+              {
+                throw new ParseException ();
+              }
+            String key = token.getValue ().toLowerCase ();
+            
+            token = ht.next ();
+            type = token.getType ();
+            if (type != 0x3d) // '='
+              {
+                throw new ParseException ();
+              }
+            
+            token = ht.next ();
+            type = token.getType ();
+            if (type != HeaderTokenizer.Token.ATOM && 
+                type != HeaderTokenizer.Token.QUOTEDSTRING)
+              {
+                throw new ParseException ();
+              }
+            
+            list.put (key, token.getValue ());
+          }
       }
-    }
   }
 
   /**
    * Return the number of parameters in this list.
    */
-  public int size()
+  public int size ()
   {
-    return list.size();
+    return list.size ();
   }
 
   /**
@@ -112,9 +120,9 @@ public class ParameterList
    * @return Value of the parameter. 
    * Returns null if the parameter is not present.
    */
-  public String get(String name)
+  public String get (String name)
   {
-    return (String)list.get(name.toLowerCase().trim());
+    return (String) list.get (name.toLowerCase ().trim ());
   }
 
   /**
@@ -123,9 +131,9 @@ public class ParameterList
    * @param name name of the parameter.
    * @param value value of the parameter.
    */
-  public void set(String name, String value)
+  public void set (String name, String value)
   {
-    list.put(name.toLowerCase().trim(), value);
+    list.put (name.toLowerCase ().trim (), value);
   }
 
   /**
@@ -133,27 +141,27 @@ public class ParameterList
    * This method does nothing if the parameter is not present.
    * @param name name of the parameter.
    */
-  public void remove(String name)
+  public void remove (String name)
   {
-    list.remove(name.toLowerCase().trim());
+    list.remove (name.toLowerCase ().trim ());
   }
 
   /**
    * Return an enumeration of the names of all parameters in this list.
    */
-  public Enumeration getNames()
+  public Enumeration getNames ()
   {
-    return new ParameterEnumeration(list.keySet().iterator());
+    return new ParameterEnumeration (list.keySet ().iterator ());
   }
 
   /**
    * Convert this ParameterList into a MIME String.
    * If this is an empty list, an empty string is returned.
    */
-  public String toString()
+  public String toString ()
   {
     // Simply calls toString(int) with a used value of 0.
-    return toString(0);
+    return toString (0);
   }
 
   /**
@@ -166,33 +174,33 @@ public class ParameterList
    * @param used number of character positions already used, in the field into
    * which the parameter list is to be inserted.
    */
-  public String toString(int used)
+  public String toString (int used)
   {
-    StringBuffer buffer = new StringBuffer();
-    for (Iterator i = list.keySet().iterator(); i.hasNext(); )
-    {
-      String key = (String)i.next();
-      String value = MimeUtility.quote((String)list.get(key), 
-          HeaderTokenizer.MIME);
-      
-      // delimiter
-      buffer.append("; ");
-      used += 2;
-      
-      // wrap to next line if necessary
-      int len = key.length()+value.length()+1;
-      if ((used+len)>76)
+    StringBuffer buffer = new StringBuffer ();
+    for (Iterator i = list.keySet ().iterator (); i.hasNext (); )
       {
-        buffer.append("\r\n\t");
-        used = 8;
+        String key = (String) i.next ();
+        String value = MimeUtility.quote ((String) list.get (key), 
+                                          HeaderTokenizer.MIME);
+        
+        // delimiter
+        buffer.append ("; ");
+        used += 2;
+        
+        // wrap to next line if necessary
+        int len = key.length () + value.length () + 1;
+        if ((used + len) > 76)
+          {
+            buffer.append ("\r\n\t");
+            used = 8;
+          }
+        
+        // append key=value
+        buffer.append (key);
+        buffer.append ('=');
+        buffer.append (value);
       }
-      
-      // append key=value
-      buffer.append(key);
-      buffer.append('=');
-      buffer.append(value);
-    }
-    return buffer.toString();
+    return buffer.toString ();
   }
   
   /*
@@ -204,19 +212,19 @@ public class ParameterList
 
     Iterator source;
 
-    ParameterEnumeration(Iterator source)
+    ParameterEnumeration (Iterator source)
     {
       this.source = source;
     }
 
-    public boolean hasMoreElements()
+    public boolean hasMoreElements ()
     {
-      return source.hasNext();
+      return source.hasNext ();
     }
 
-    public Object nextElement()
+    public Object nextElement ()
     {
-      return source.next();
+      return source.next ();
     }
     
   }

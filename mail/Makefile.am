@@ -110,6 +110,7 @@ $(src)/javax/mail/search/SubjectTerm.java \
 $(src)/gnu/mail/handler/Application.java \
 $(src)/gnu/mail/handler/ApplicationOctetStream.java \
 $(src)/gnu/mail/handler/Message.java \
+$(src)/gnu/mail/handler/MessageDeliveryStatus.java \
 $(src)/gnu/mail/handler/MessageRFC822.java \
 $(src)/gnu/mail/handler/Multipart.java \
 $(src)/gnu/mail/handler/MultipartAlternative.java \
@@ -362,11 +363,9 @@ javamail.address.map:
 if ENABLE_SMTP
 	echo "rfc822=smtp" > javamail.address.map
 endif
-#if ENABLE_NNTP
-#	if [[ ! -f javamail.address.map]]; then \
-#	  echo "rfc822=nntp-post" > javamail.address.map \
-#	fi
-#endif
+if ENABLE_NNTP
+	echo "news=nntp-post" > javamail.address.map
+endif
 
 $(dst):
 	test ! -d $(dst) && mkdir $(dst)

@@ -54,16 +54,16 @@ public abstract class ComparisonTerm
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     return ((other instanceof ComparisonTerm) && 
-        ((ComparisonTerm)other).comparison==comparison);
+        ((ComparisonTerm)other).comparison == comparison);
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
     return comparison;
   }

@@ -40,13 +40,13 @@ public class MessageRemovedException
   extends MessagingException
 {
 
-  public MessageRemovedException()
+  public MessageRemovedException ()
   {
   }
 
-  public MessageRemovedException(String message)
+  public MessageRemovedException (String message)
   {
-    super(message);
+    super (message);
   }
 
 }

@@ -38,13 +38,13 @@ public class MethodNotSupportedException
   extends MessagingException
 {
 
-  public MethodNotSupportedException()
+  public MethodNotSupportedException ()
   {
   }
 
-  public MethodNotSupportedException(String message)
+  public MethodNotSupportedException (String message)
   {
-    super(message);
+    super (message);
   }
 
 }

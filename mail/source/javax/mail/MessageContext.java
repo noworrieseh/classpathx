@@ -48,7 +48,7 @@ public class MessageContext
   /**
    * Create a MessageContext object describing the context of the given Part.
    */
-  public MessageContext(Part part)
+  public MessageContext (Part part)
   {
     this.part = part;
   }
@@ -56,7 +56,7 @@ public class MessageContext
   /**
    * Return the Part that contains the content. May be null.
    */
-  public Part getPart()
+  public Part getPart ()
   {
     return part;
   }
@@ -66,33 +66,39 @@ public class MessageContext
    * Follows the parent chain up through containing Multipart objects 
    * until it comes to a Message object, or null.
    */
-  public Message getMessage()
+  public Message getMessage ()
   {
     Part p = part;
-    while (p!=null)
-    {
-      if (p instanceof Message)
-        return (Message)p;
-      if (p instanceof BodyPart)
+    while (p != null)
       {
-        BodyPart bp = (BodyPart)p;
-        Multipart mp = bp.getParent();
-        p = mp.getParent();
+        if (p instanceof Message)
+          {
+            return (Message) p;
+          }
+        if (p instanceof BodyPart)
+          {
+            BodyPart bp = (BodyPart) p;
+            Multipart mp = bp.getParent ();
+            p = mp.getParent ();
+          }
+        else
+          {
+            p = null;
+          }
       }
-      else
-        p = null;
-    }
     return null;
   }
 
   /**
    * Return the Session we're operating in.
    */
-  public Session getSession()
+  public Session getSession ()
   {
-    Message message = getMessage();
-    if (message!=null)
-      return message.session;
+    Message message = getMessage ();
+    if (message != null)
+      {
+        return message.session;
+      }
     return null;
   }
 

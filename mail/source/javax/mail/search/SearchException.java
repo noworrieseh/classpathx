@@ -42,7 +42,7 @@ public class SearchException
   /**
    * Constructs a SearchException with no detail message.
    */
-  public SearchException()
+  public SearchException ()
   {
   }
 
@@ -50,9 +50,9 @@ public class SearchException
    * Constructs a SearchException with the specified detail message.
    * @param s the detail message
    */
-  public SearchException(String s)
+  public SearchException (String s)
   {
-    super(s);
+    super (s);
   }
 
 }

@@ -76,11 +76,11 @@ public abstract class Service
    * @param session Session object for this service
    * @param url URLName object to be used for this service
    */
-  protected Service(Session session, URLName url)
+  protected Service (Session session, URLName url)
   {
     this.session = session;
     this.url = url;
-    debug = session.getDebug();
+    debug = session.getDebug ();
   }
 
   /**
@@ -102,10 +102,10 @@ public abstract class Service
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
-  public void connect()
+  public void connect ()
     throws MessagingException
   {
-    connect(null, null, null);
+    connect (null, null, null);
   }
 
   /**
@@ -148,10 +148,10 @@ public abstract class Service
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
-  public void connect(String host, String user, String password)
+  public void connect (String host, String user, String password)
     throws MessagingException
   {
-    connect(host, -1, user, password);
+    connect (host, -1, user, password);
   }
 
   /**
@@ -165,118 +165,146 @@ public abstract class Service
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
-  public void connect(String host, int port, String user, String password)
+  public void connect (String host, int port, String user, String password)
     throws MessagingException
   {
-    if (isConnected())
-      throw new MessagingException("already connected");
+    if (isConnected ())
+      {
+        throw new MessagingException ("already connected");
+      }
     
     boolean connected = false;
     boolean authenticated = false;
     String protocol = null;
     String file = null;
-    if (url!=null)
-    {
-      protocol = url.getProtocol();
-      if (host==null)
-        host = url.getHost();
-      if (port==-1)
-        port = url.getPort();
-      if (user==null)
+    if (url != null)
       {
-        user = url.getUsername();
-        if (password==null)
-          password = url.getPassword();
+        protocol = url.getProtocol ();
+        if (host == null)
+          {
+            host = url.getHost ();
+          }
+        if (port == -1)
+          {
+            port = url.getPort ();
+          }
+        if (user == null)
+          {
+            user = url.getUsername ();
+            if (password == null)
+              {
+                password = url.getPassword ();
+              }
+          }
+        else if (password == null && user.equals (url.getUsername ()))
+          {
+            password = url.getPassword ();
+          }
+        file = url.getFile ();
       }
-      else if (password==null && user.equals(url.getUsername()))
-        password = url.getPassword();
-      file = url.getFile();
-    }
-    if (protocol!=null)
-    {
-      if (host==null)
-        host = session.getProperty("mail." + protocol + ".host");
-      if (user==null)
-        user = session.getProperty("mail." + protocol + ".user");
-    }
-    if (host==null)
-      host = session.getProperty("mail.host");
-    if (user==null)
-      user = session.getProperty("mail.user");
-    if (user==null)
-    {
-      try
+    if (protocol != null)
       {
-        user = System.getProperty("user.name");
+        if (host == null)
+          {
+            host = session.getProperty ("mail." + protocol + ".host");
+          }
+        if (user == null)
+          {
+            user = session.getProperty ("mail." + protocol + ".user");
+          }
       }
-      catch (SecurityException e)
+    if (host == null)
       {
-        if (debug)
-          e.printStackTrace();
+        host = session.getProperty ("mail.host");
       }
-    }
-    if (password==null && url!=null)
-    {
-      setURLName(new URLName(protocol, host, port, file, user, password));
-      PasswordAuthentication auth = 
-        session.getPasswordAuthentication(getURLName());
-      if (auth!=null)
+    if (user == null)
       {
-        if (user==null)
-        {
-          user = auth.getUserName();
-          password = auth.getPassword();
-        }
-        else if (user.equals(auth.getUserName()))
-          password = auth.getPassword();
+        user = session.getProperty ("mail.user");
       }
-      else
-        authenticated = true;
-    }
+    if (user == null)
+      {
+        try
+          {
+            user = System.getProperty ("user.name");
+          }
+        catch (SecurityException e)
+          {
+            if (debug)
+              {
+                e.printStackTrace ();
+              }
+          }
+      }
+    if (password == null && url != null)
+      {
+        setURLName (new URLName (protocol, host, port, file, user, password));
+        PasswordAuthentication auth = 
+          session.getPasswordAuthentication (getURLName ());
+        if (auth != null)
+          {
+            if (user == null)
+              {
+                user = auth.getUserName ();
+                password = auth.getPassword ();
+              }
+            else if (user.equals (auth.getUserName ()))
+              {
+                password = auth.getPassword ();
+              }
+          }
+        else
+          {
+            authenticated = true;
+          }
+      }
     AuthenticationFailedException afex = null;
     try
-    {
-      connected = protocolConnect(host, port, user, password);
-    }
+      {
+        connected = protocolConnect (host, port, user, password);
+      }
     catch (AuthenticationFailedException afex2)
-    {
-      afex = afex2;
-    }
+      {
+        afex = afex2;
+      }
     if (!connected)
-    {
-      InetAddress address = null;
-      try
       {
-        address = InetAddress.getByName(host);
+        InetAddress address = null;
+        try
+          {
+            address = InetAddress.getByName (host);
+          }
+        catch (UnknownHostException e)
+          {
+          }
+        PasswordAuthentication auth = 
+          session.requestPasswordAuthentication (address, port, protocol,
+                                                 null, user);
+        if (auth != null)
+          {
+            user = auth.getUserName ();
+            password = auth.getPassword ();
+            connected = protocolConnect (host, port, user, password);
+          }
       }
-      catch (UnknownHostException e)
-      {
-      }
-      PasswordAuthentication auth = 
-        session.requestPasswordAuthentication(address, port, protocol,
-            null, user);
-      if (auth!=null)
-      {
-        user = auth.getUserName();
-        password = auth.getPassword();
-        connected = protocolConnect(host, port, user, password);
-      }
-    }
     if (!connected)
-    {
-      if (afex!=null)
-        throw afex;
-      else
-        throw new AuthenticationFailedException();
-    }
-    setURLName(new URLName(protocol, host, port, file, user, password));
+      {
+        if (afex!=null)
+          {
+            throw afex;
+          }
+        throw new AuthenticationFailedException ();
+      }
+    setURLName (new URLName (protocol, host, port, file, user, password));
     if (authenticated)
-      session.setPasswordAuthentication(getURLName(), 
-          new PasswordAuthentication(user, password));
-    setConnected(true);
-    notifyConnectionListeners(ConnectionEvent.OPENED);
+      {
+        PasswordAuthentication auth =
+          new PasswordAuthentication(user, password);
+        session.setPasswordAuthentication (getURLName (), auth);
+      }
+    setConnected (true);
+    notifyConnectionListeners (ConnectionEvent.OPENED);
   }
-
+  
   /**
    * The service implementation should override this method to perform the
    * actual protocol-specific connection attempt. 
@@ -304,8 +332,8 @@ public abstract class Service
    * @exception AuthenticationFailedException for authentication failures
    * @exception MessagingException for non-authentication failures
    */
-  protected boolean protocolConnect(String host, int port, 
-      String user, String password)
+  protected boolean protocolConnect (String host, int port, 
+                                     String user, String password)
     throws MessagingException
   {
     return false;
@@ -320,7 +348,7 @@ public abstract class Service
    * Subclasses may want to override this method to verify that any connection
    * to the message store is still alive.
    */
-  public boolean isConnected()
+  public boolean isConnected ()
   {
     return connected;
   }
@@ -335,7 +363,7 @@ public abstract class Service
    * The implementation in this class merely sets the private field 
    * returned by the <code>isConnected</code> method.
    */
-  protected void setConnected(boolean connected)
+  protected void setConnected (boolean connected)
   {
     this.connected = connected;
   }
@@ -356,11 +384,11 @@ public abstract class Service
    * probably by including a call to <code>super.close()</code> in
    * a finally clause.
    */
-  public synchronized void close()
+  public synchronized void close ()
     throws MessagingException
   {
-    setConnected(false);
-    notifyConnectionListeners(ConnectionEvent.CLOSED);
+    setConnected (false);
+    notifyConnectionListeners (ConnectionEvent.CLOSED);
   }
 
   /**
@@ -373,11 +401,13 @@ public abstract class Service
    * The implementation in the Service class returns (usually a copy of)
    * the url field with the password and file information stripped out.
    */
-  public URLName getURLName()
+  public URLName getURLName ()
   {
-    if (url!=null && (url.getPassword()!=null || url.getFile()!=null))
-      return new URLName(url.getProtocol(), url.getHost(), url.getPort(),
-          null, url.getUsername(), null);
+    if (url != null && (url.getPassword () != null || url.getFile () != null))
+      {
+        return new URLName(url.getProtocol (), url.getHost (), url.getPort (),
+                           null, url.getUsername (), null);
+      }
     return url;
   }
 
@@ -394,7 +424,7 @@ public abstract class Service
    * <p>
    * The implementation in the Service class simply sets the url field.
    */
-  protected void setURLName(URLName url)
+  protected void setURLName (URLName url)
   {
     this.url = url;
   }
@@ -421,28 +451,30 @@ public abstract class Service
   /**
    * Add a listener for Connection events on this service.
    */
-  public void addConnectionListener(ConnectionListener l)
+  public void addConnectionListener (ConnectionListener l)
   {
-    if (connectionListeners==null)
-      connectionListeners = new ArrayList();
+    if (connectionListeners == null)
+      {
+        connectionListeners = new ArrayList ();
+      }
     synchronized (connectionListeners)
-    {
-      connectionListeners.add(l);
-    }
+      {
+        connectionListeners.add (l);
+      }
   }
 
   /**
    * Remove a Connection event listener.
    */
-  public void removeConnectionListener(ConnectionListener l)
+  public void removeConnectionListener (ConnectionListener l)
   {
-    if (connectionListeners!=null)
-    {
-      synchronized (connectionListeners)
+    if (connectionListeners != null)
       {
-        connectionListeners.remove(l);
+        synchronized (connectionListeners)
+          {
+            connectionListeners.remove (l);
+          }
       }
-    }
   }
 
   /**
@@ -450,85 +482,91 @@ public abstract class Service
    * Service implementations are expected to use this method 
    * to broadcast connection events.
    */
-  protected void notifyConnectionListeners(int type)
+  protected void notifyConnectionListeners (int type)
   {
-    ConnectionEvent event = new ConnectionEvent(this, type);
+    ConnectionEvent event = new ConnectionEvent (this, type);
     switch (type)
-    {
+      {
       case ConnectionEvent.OPENED:
-        fireOpened(event);
+        fireOpened (event);
         break;
       case ConnectionEvent.DISCONNECTED:
-        fireDisconnected(event);
+        fireDisconnected (event);
         break;
       case ConnectionEvent.CLOSED:
-        fireClosed(event);
+        fireClosed (event);
         break;
-    }
+      }
   }
 
   /*
    * Propagates an OPENED ConnectionEvent to all registered listeners.
    */
-  void fireOpened(ConnectionEvent event)
+  void fireOpened (ConnectionEvent event)
   {
-    if (connectionListeners!=null)
-    {
-      ConnectionListener[] l = null;
-      synchronized (connectionListeners)
+    if (connectionListeners != null)
       {
-        l = new ConnectionListener[connectionListeners.size()];
-        connectionListeners.toArray(l);
+        ConnectionListener[] l = null;
+        synchronized (connectionListeners)
+          {
+            l = new ConnectionListener[connectionListeners.size ()];
+            connectionListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].opened (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].opened(event);
-    }
   }
 
   /*
    * Propagates a DISCONNECTED ConnectionEvent to all registered listeners.
    */
-  void fireDisconnected(ConnectionEvent event)
+  void fireDisconnected (ConnectionEvent event)
   {
-    if (connectionListeners!=null)
-    {
-      ConnectionListener[] l = null;
-      synchronized (connectionListeners)
+    if (connectionListeners != null)
       {
-        l = new ConnectionListener[connectionListeners.size()];
-        connectionListeners.toArray(l);
+        ConnectionListener[] l = null;
+        synchronized (connectionListeners)
+          {
+            l = new ConnectionListener[connectionListeners.size ()];
+            connectionListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].disconnected (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].disconnected(event);
-    }
   }
 
   /*
    * Propagates a CLOSED ConnectionEvent to all registered listeners.
    */
-  void fireClosed(ConnectionEvent event)
+  void fireClosed (ConnectionEvent event)
   {
-    if (connectionListeners!=null)
-    {
-      ConnectionListener[] l = null;
-      synchronized (connectionListeners)
+    if (connectionListeners != null)
       {
-        l = new ConnectionListener[connectionListeners.size()];
-        connectionListeners.toArray(l);
+        ConnectionListener[] l = null;
+        synchronized (connectionListeners)
+          {
+            l = new ConnectionListener[connectionListeners.size ()];
+            connectionListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].closed (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].closed(event);
-    }
   }
 
   /**
    * Return getURLName.toString() if this service has a URLName,
    * otherwise it will return the default toString.
    */
-  public String toString()
+  public String toString ()
   {
-    URLName url = getURLName();
-    return (url!=null) ? url.toString() : super.toString();
+    URLName url = getURLName ();
+    return (url != null) ? url.toString () : super.toString ();
   }
 
 }

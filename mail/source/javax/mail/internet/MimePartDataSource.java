@@ -61,7 +61,7 @@ public class MimePartDataSource
   /**
    * Constructor, that constructs a DataSource from a MimePart.
    */
-  public MimePartDataSource(MimePart part)
+  public MimePartDataSource (MimePart part)
   {
     this.part = part;
   }
@@ -78,26 +78,32 @@ public class MimePartDataSource
    * <code>MimeUtility.decode()</code> method.
    * @return decoded input stream
    */
-  public InputStream getInputStream()
+  public InputStream getInputStream ()
     throws IOException
   {
     try
-    {
-      InputStream is;
-      if (part instanceof MimeBodyPart)
-        is = ((MimeBodyPart)part).getContentStream();
-      else if (part instanceof MimeMessage)
-        is = ((MimeMessage)part).getContentStream();
-      else
-        throw new MessagingException("Unknown part type");
-      
-      String encoding = part.getEncoding();
-      return (encoding!=null) ? MimeUtility.decode(is, encoding) : is;
-    }
+      {
+        InputStream is;
+        if (part instanceof MimeBodyPart)
+          {
+            is = ((MimeBodyPart) part).getContentStream ();
+          }
+        else if (part instanceof MimeMessage)
+          {
+            is = ((MimeMessage) part).getContentStream ();
+          }
+        else
+          {
+            throw new MessagingException ("Unknown part type");
+          }
+        
+        String encoding = part.getEncoding ();
+        return (encoding != null) ? MimeUtility.decode (is, encoding) : is;
+      }
     catch (MessagingException e)
-    {
-      throw new IOException(e.getMessage());
-    }
+      {
+        throw new IOException (e.getMessage ());
+      }
   }
 
   /**
@@ -105,10 +111,10 @@ public class MimePartDataSource
    * <p>
    * This implementation throws the UnknownServiceException.
    */
-  public OutputStream getOutputStream()
+  public OutputStream getOutputStream ()
     throws IOException
   {
-    throw new UnknownServiceException();
+    throw new UnknownServiceException ();
   }
 
   /**
@@ -117,16 +123,16 @@ public class MimePartDataSource
    * This implementation just invokes the getContentType method on the 
    * MimePart.
    */
-  public String getContentType()
+  public String getContentType ()
   {
     try
-    {
-      return part.getContentType();
-    }
+      {
+        return part.getContentType ();
+      }
     catch (MessagingException e)
-    {
-      return null;
-    }
+      {
+        return null;
+      }
   }
 
   /**
@@ -134,7 +140,7 @@ public class MimePartDataSource
    * <p>
    * This implementation just returns an empty string.
    */
-  public String getName()
+  public String getName ()
   {
     // Shouldn't this return the filename parameter of the
     // Content-Disposition of a MimeBodyPart, if available?
@@ -144,10 +150,12 @@ public class MimePartDataSource
   /**
    * Return the MessageContext for the current part.
    */
-  public MessageContext getMessageContext()
+  public MessageContext getMessageContext ()
   {
-    if (context==null)
-      context = new MessageContext(part);
+    if (context == null)
+      {
+        context = new MessageContext (part);
+      }
     return context;
   }
   

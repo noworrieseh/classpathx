@@ -57,9 +57,9 @@ public abstract class Store
    * @param session Session object for this Store.
    * @param url URLName object to be used for this Store
    */
-  protected Store(Session session, URLName url)
+  protected Store (Session session, URLName url)
   {
-    super(session, url);
+    super (session, url);
   }
 
   /**
@@ -67,7 +67,7 @@ public abstract class Store
    * namespace presented to the user by the Store.
    * @exception IllegalStateException if this Store is not connected.
    */
-  public abstract Folder getDefaultFolder()
+  public abstract Folder getDefaultFolder ()
     throws MessagingException;
 
   /**
@@ -84,7 +84,7 @@ public abstract class Store
    * Else it is interpreted relative to the 'root' of this namespace.
    * @exception IllegalStateException if this Store is not connected.
    */
-  public abstract Folder getFolder(String name)
+  public abstract Folder getFolder (String name)
     throws MessagingException;
 
   /**
@@ -98,7 +98,7 @@ public abstract class Store
    * @param url URLName that denotes a folder
    * @exception IllegalStateException if this Store is not connected.
    */
-  public abstract Folder getFolder(URLName url)
+  public abstract Folder getFolder (URLName url)
     throws MessagingException;
 
   /**
@@ -114,11 +114,11 @@ public abstract class Store
    * return value of the getDefaultFolder method. Subclasses should override
    * this method to return appropriate information.
    */
-  public Folder[] getPersonalNamespaces()
+  public Folder[] getPersonalNamespaces ()
     throws MessagingException
   {
     Folder[] folders = new Folder[1];
-    folders[0] = getDefaultFolder();
+    folders[0] = getDefaultFolder ();
     return folders;
   }
 
@@ -133,7 +133,7 @@ public abstract class Store
    * This implementation returns an empty array. Subclasses should override 
    * this method to return appropriate information.
    */
-  public Folder[] getUserNamespaces(String user)
+  public Folder[] getUserNamespaces (String user)
     throws MessagingException
   {
     return new Folder[0];
@@ -148,7 +148,7 @@ public abstract class Store
    * This implementation returns an empty array. Subclasses should override 
    * this method to return appropriate information.
    */
-  public Folder[] getSharedNamespaces()
+  public Folder[] getSharedNamespaces ()
     throws MessagingException
   {
     return new Folder[0];
@@ -176,28 +176,30 @@ public abstract class Store
   /**
    * Add a listener for StoreEvents on this Store.
    */
-  public void addStoreListener(StoreListener l)
+  public void addStoreListener (StoreListener l)
   {
-    if (storeListeners==null)
-      storeListeners = new ArrayList();
+    if (storeListeners == null)
+      {
+        storeListeners = new ArrayList ();
+      }
     synchronized (storeListeners)
-    {
-      storeListeners.add(l);
-    }
+      {
+        storeListeners.add (l);
+      }
   }
 
   /**
    * Remove a listener for Store events.
    */
-  public void removeStoreListener(StoreListener l)
+  public void removeStoreListener (StoreListener l)
   {
-    if (storeListeners!=null)
-    {
-      synchronized (storeListeners)
+    if (storeListeners != null)
       {
-        storeListeners.remove(l);
+        synchronized (storeListeners)
+          {
+            storeListeners.remove (l);
+          }
       }
-    }
   }
 
   /**
@@ -205,28 +207,30 @@ public abstract class Store
    * Store implementations are expected to use this method to broadcast 
    * StoreEvents.
    */
-  protected void notifyStoreListeners(int type, String message)
+  protected void notifyStoreListeners (int type, String message)
   {
-    StoreEvent event = new StoreEvent(this, type, message);
-    fireNotification(event);
+    StoreEvent event = new StoreEvent (this, type, message);
+    fireNotification (event);
   }
 
   /*
    * Propagates a StoreEvent to all registered listeners.
    */
-  void fireNotification(StoreEvent event)
+  void fireNotification (StoreEvent event)
   {
-    if (storeListeners!=null)
-    {
-      StoreListener[] l = null;
-      synchronized (storeListeners)
+    if (storeListeners != null)
       {
-        l = new StoreListener[storeListeners.size()];
-        storeListeners.toArray(l);
+        StoreListener[] l = null;
+        synchronized (storeListeners)
+          {
+            l = new StoreListener[storeListeners.size ()];
+            storeListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].notification (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].notification(event);
-    }
   }
 
   // -- Folder events --
@@ -236,46 +240,48 @@ public abstract class Store
    * Store. FolderEvents are delivered to FolderListeners on the affected 
    * Folder as well as to FolderListeners on the containing Store.
    */
-  public void addFolderListener(FolderListener l)
+  public void addFolderListener (FolderListener l)
   {
-    if (folderListeners==null)
-      folderListeners = new ArrayList();
+    if (folderListeners == null)
+      {
+        folderListeners = new ArrayList ();
+      }
     synchronized (folderListeners)
-    {
-      folderListeners.add(l);
-    }
+      {
+        folderListeners.add (l);
+      }
   }
 
   /**
    * Remove a listener for Folder events.
    */
-  public void removeFolderListener(FolderListener l)
+  public void removeFolderListener (FolderListener l)
   {
-    if (folderListeners!=null)
-    {
-      synchronized (folderListeners)
+    if (folderListeners != null)
       {
-        folderListeners.remove(l);
+        synchronized (folderListeners)
+          {
+            folderListeners.remove (l);
+          }
       }
-    }
   }
 
   /**
    * Notify all FolderListeners. Store implementations are expected to use 
    * this method to broadcast Folder events.
    */
-  protected void notifyFolderListeners(int type, Folder folder)
+  protected void notifyFolderListeners (int type, Folder folder)
   {
-    FolderEvent event = new FolderEvent(this, folder, type);
+    FolderEvent event = new FolderEvent (this, folder, type);
     switch (type)
-    {
+      {
       case FolderEvent.CREATED:
-        fireFolderCreated(event);
+        fireFolderCreated (event);
         break;
       case FolderEvent.DELETED:
-        fireFolderDeleted(event);
+        fireFolderDeleted (event);
         break;
-    }
+      }
   }
 
   /**
@@ -283,66 +289,72 @@ public abstract class Store
    * implementations are expected to use this method to broadcast Folder 
    * events indicating the renaming of folders.
    */
-  protected void notifyFolderRenamedListeners(Folder oldFolder, 
-      Folder newFolder)
+  protected void notifyFolderRenamedListeners (Folder oldFolder, 
+                                               Folder newFolder)
   {
-    FolderEvent event = new FolderEvent(this, oldFolder, newFolder, 
-        FolderEvent.RENAMED);
-    fireFolderRenamed(event);
+    FolderEvent event = new FolderEvent (this, oldFolder, newFolder, 
+                                         FolderEvent.RENAMED);
+    fireFolderRenamed (event);
   }
 
   /*
    * Propagates a CREATED FolderEvent to all registered listeners.
    */
-  void fireFolderCreated(FolderEvent event)
+  void fireFolderCreated (FolderEvent event)
   {
-    if (folderListeners!=null)
-    {
-      FolderListener[] l = null;
-      synchronized (folderListeners)
+    if (folderListeners != null)
       {
-        l = new FolderListener[folderListeners.size()];
-        folderListeners.toArray(l);
+        FolderListener[] l = null;
+        synchronized (folderListeners)
+          {
+            l = new FolderListener[folderListeners.size ()];
+            folderListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].folderCreated (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].folderCreated(event);
-    }
   }
 
   /*
    * Propagates a DELETED FolderEvent to all registered listeners.
    */
-  void fireFolderDeleted(FolderEvent event)
+  void fireFolderDeleted (FolderEvent event)
   {
-    if (folderListeners!=null)
-    {
-      FolderListener[] l = null;
-      synchronized (folderListeners)
+    if (folderListeners != null)
       {
-        l = new FolderListener[folderListeners.size()];
-        folderListeners.toArray(l);
+        FolderListener[] l = null;
+        synchronized (folderListeners)
+          {
+            l = new FolderListener[folderListeners.size ()];
+            folderListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].folderDeleted (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].folderDeleted(event);
-    }
   }
 
   /*
    * Propagates a RENAMED FolderEvent to all registered listeners.
    */
-  void fireFolderRenamed(FolderEvent event)
+  void fireFolderRenamed (FolderEvent event)
   {
-    if (folderListeners!=null)
-    {
-      FolderListener[] l = null;
-      synchronized (folderListeners)
+    if (folderListeners != null)
       {
-        l = new FolderListener[folderListeners.size()];
-        folderListeners.toArray(l);
+        FolderListener[] l = null;
+        synchronized (folderListeners)
+          {
+            l = new FolderListener[folderListeners.size ()];
+            folderListeners.toArray (l);
+          }
+        for (int i = 0; i < l.length; i++)
+          {
+            l[i].folderRenamed (event);
+          }
       }
-      for (int i=0; i<l.length; i++)
-        l[i].folderRenamed(event);
-    }
   }
 
 }

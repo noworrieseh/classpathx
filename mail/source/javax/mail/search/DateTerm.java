@@ -48,7 +48,7 @@ public abstract class DateTerm
    * Constructor.
    * @param comparison the comparison type
    */
-  protected DateTerm(int comparison, Date date)
+  protected DateTerm (int comparison, Date date)
   {
     this.comparison = comparison;
     this.date = date;
@@ -57,15 +57,15 @@ public abstract class DateTerm
   /**
    * Return the Date to compare with.
    */
-  public Date getDate()
+  public Date getDate ()
   {
-    return new Date(date.getTime());
+    return new Date (date.getTime ());
   }
 
   /**
    * Return the type of comparison.
    */
-  public int getComparison()
+  public int getComparison ()
   {
     return comparison;
   }
@@ -75,22 +75,22 @@ public abstract class DateTerm
    * @param d the date in the constructor is compared with this date
    * @return true if the dates match, otherwise false
    */
-  protected boolean match(Date d)
+  protected boolean match (Date d)
   {
     switch (comparison)
-    {
+      {
       case LE:
-        return d.before(date) || d.equals(date);
+        return d.before (date) || d.equals (date);
       case LT:
-        return d.before(date);
+        return d.before (date);
       case EQ:
-        return d.equals(date);
+        return d.equals (date);
       case NE:
-        return !d.equals(date);
+        return !d.equals (date);
       case GT:
-        return d.after(date);
+        return d.after (date);
       case GE:
-        return d.after(date) || d.equals(date);
+        return d.after (date) || d.equals (date);
     }
     return false;
   }
@@ -98,19 +98,19 @@ public abstract class DateTerm
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     return ((other instanceof DateTerm) &&
-        ((DateTerm)other).date.equals(date) &&
-        super.equals(other));
+            ((DateTerm)other).date.equals (date) &&
+            super.equals (other));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    return date.hashCode() + super.hashCode();
+    return date.hashCode () + super.hashCode ();
   }
 
 }

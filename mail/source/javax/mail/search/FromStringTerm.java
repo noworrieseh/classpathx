@@ -48,9 +48,9 @@ public final class FromStringTerm
    * Constructor.
    * @param address the address pattern to be compared.
    */
-  public FromStringTerm(String pattern)
+  public FromStringTerm (String pattern)
   {
-    super(pattern);
+    super (pattern);
   }
 
   /**
@@ -59,32 +59,34 @@ public final class FromStringTerm
    * @param msg The comparison is applied to this Message's From address.
    * @return true if the match succeeds, otherwise false.
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      Address[] addresses = msg.getFrom();
-      if (addresses!=null)
       {
-        for (int i = 0; i<addresses.length; i++)
-        {
-          if (super.match(addresses[i]))
-            return true;
-        }
+        Address[] addresses = msg.getFrom ();
+        if (addresses != null)
+          {
+            for (int i = 0; i < addresses.length; i++)
+              {
+                if (super.match (addresses[i]))
+                  {
+                    return true;
+                  }
+              }
+          }
       }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof FromStringTerm && super.equals(other));
+    return (other instanceof FromStringTerm && super.equals (other));
   }
 
 }

@@ -50,18 +50,18 @@ public class AddressException
   /**
    * Constructs an AddressException with no detail message.
    */
-  public AddressException()
+  public AddressException ()
   {
-    this(null, null, -1);
+    this (null, null, -1);
   }
 
   /**
    * Constructs an AddressException with the specified detail message.
    * @param s the detail message
    */
-  public AddressException(String s)
+  public AddressException (String s)
   {
-    this(s, null, -1);
+    this (s, null, -1);
   }
 
   /**
@@ -70,9 +70,9 @@ public class AddressException
    * @param s the detail message
    * @param ref the reference info
    */
-  public AddressException(String s, String ref)
+  public AddressException (String s, String ref)
   {
-    this(s, ref, -1);
+    this (s, ref, -1);
   }
 
   /**
@@ -82,9 +82,9 @@ public class AddressException
    * @param ref the reference info
    * @param pos the index in the string where the error occurred
    */
-  public AddressException(String s, String ref, int pos)
+  public AddressException (String s, String ref, int pos)
   {
-    super(s);
+    super (s);
     this.ref = ref;
     this.pos = pos;
   }
@@ -93,7 +93,7 @@ public class AddressException
    * Get the string that was being parsed when the error was detected
    * (null if not relevant).
    */
-  public String getRef()
+  public String getRef ()
   {
     return ref;
   }
@@ -102,26 +102,26 @@ public class AddressException
    * Get the position with the reference string where the error was detected 
    * (-1 if not relevant).
    */
-  public int getPos()
+  public int getPos ()
   {
     return pos;
   }
 
-  public String toString()
+  public String toString ()
   {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append(super.toString());
-    if (ref!=null)
-    {
-      buffer.append(" in string ");
-      buffer.append(ref);
-      if (pos>-1)
+    StringBuffer buffer = new StringBuffer ();
+    buffer.append (super.toString ());
+    if (ref != null)
       {
-        buffer.append(" at position ");
-        buffer.append(pos);
+        buffer.append (" in string ");
+        buffer.append (ref);
+        if (pos > -1)
+          {
+            buffer.append (" at position ");
+            buffer.append (pos);
+          }
       }
-    }
-    return buffer.toString();
+    return buffer.toString ();
   }
   
 }

@@ -78,11 +78,11 @@ public interface UIDFolder
      folder.fetch(msgs, fp);
      </pre>
      */
-    public static final FetchProfileItem UID = new FetchProfileItem("UID");
+    public static final FetchProfileItem UID = new FetchProfileItem ("UID");
 
-    protected FetchProfileItem(String name)
+    protected FetchProfileItem (String name)
     {
-      super(name);
+      super (name);
     }
     
   }
@@ -100,7 +100,7 @@ public interface UIDFolder
    * Clients typically compare this value against a UIDValidity value 
    * saved from a previous session to insure that any cached UIDs not stale.
    */
-  long getUIDValidity()
+  long getUIDValidity ()
     throws MessagingException;
 
   /**
@@ -108,7 +108,7 @@ public interface UIDFolder
    * If no such message exists, null is returned.
    * @param uid UID for the desired message
    */
-  Message getMessageByUID(long uid)
+  Message getMessageByUID (long uid)
     throws MessagingException;
 
   /**
@@ -118,7 +118,7 @@ public interface UIDFolder
    * @param start start UID
    * @param end end UID
    */
-  Message[] getMessagesByUID(long start, long end)
+  Message[] getMessagesByUID (long start, long end)
     throws MessagingException;
 
   /**
@@ -130,7 +130,7 @@ public interface UIDFolder
    * invalid UIDs.
    * @param uids array of UIDs
    */
-  Message[] getMessagesByUID(long[] uids)
+  Message[] getMessagesByUID (long[] uids)
     throws MessagingException;
 
   /**
@@ -142,7 +142,7 @@ public interface UIDFolder
    * @exception NoSuchElementException if the given Message is not in this
    * Folder.
    */
-  long getUID(Message message)
+  long getUID (Message message)
     throws MessagingException;
   
 }

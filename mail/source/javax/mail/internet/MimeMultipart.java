@@ -99,9 +99,9 @@ public class MimeMultipart
    * <p>
    * MimeBodyParts may be added later.
    */
-  public MimeMultipart()
+  public MimeMultipart ()
   {
-    this("mixed");
+    this ("mixed");
   }
 
   /**
@@ -111,12 +111,12 @@ public class MimeMultipart
    * <p>
    * MimeBodyParts may be added later.
    */
-  public MimeMultipart(String subtype)
+  public MimeMultipart (String subtype)
   {
-    String boundary = MimeUtility.getUniqueBoundaryValue();
-    ContentType ct = new ContentType("multipart", subtype, null);
-    ct.setParameter("boundary", boundary);
-    contentType = ct.toString();
+    String boundary = MimeUtility.getUniqueBoundaryValue ();
+    ContentType ct = new ContentType ("multipart", subtype, null);
+    ct.setParameter ("boundary", boundary);
+    contentType = ct.toString ();
     parsed = true;
   }
 
@@ -137,25 +137,25 @@ public class MimeMultipart
    * stream.
    * @param ds DataSource, can be a MultipartDataSource
    */
-  public MimeMultipart(DataSource ds)
+  public MimeMultipart (DataSource ds)
     throws MessagingException
   {
     if (ds instanceof MessageAware)
-    {
-      MessageContext mc = ((MessageAware)ds).getMessageContext();
-      setParent(mc.getPart());
-    }
+      {
+        MessageContext mc = ((MessageAware) ds).getMessageContext ();
+        setParent (mc.getPart ());
+      }
     if (ds instanceof MultipartDataSource)
-    {
-      setMultipartDataSource((MultipartDataSource)ds);
-      parsed = true;
-    }
+      {
+        setMultipartDataSource ((MultipartDataSource) ds);
+        parsed = true;
+      }
     else
-    {
-      this.ds = ds;
-      contentType = ds.getContentType();
-      parsed = false;
-    }
+      {
+        this.ds = ds;
+        contentType = ds.getContentType ();
+        parsed = false;
+      }
   }
 
   /**
@@ -165,25 +165,25 @@ public class MimeMultipart
    * is "mixed".
    * @param subtype Subtype
    */
-  public void setSubType(String subtype)
+  public void setSubType (String subtype)
     throws MessagingException
   {
-    ContentType ct = new ContentType(contentType);
-    ct.setSubType(subtype);
-    contentType = ct.toString();
+    ContentType ct = new ContentType (contentType);
+    ct.setSubType (subtype);
+    contentType = ct.toString ();
   }
 
   /**
    * * Return the number of enclosed BodyPart objects.
    */
-  public int getCount()
+  public int getCount ()
     throws MessagingException
   {
     synchronized (this)
-    {
-      parse();
-      return super.getCount();
-    }
+      {
+        parse ();
+        return super.getCount ();
+      }
   }
 
   /**
@@ -192,14 +192,14 @@ public class MimeMultipart
    * @param index the index of the desired BodyPart
    * @exception MessagingException if no such BodyPart exists
    */
-  public BodyPart getBodyPart(int index)
+  public BodyPart getBodyPart (int index)
     throws MessagingException
   {
     synchronized (this)
-    {
-      parse();
-      return super.getBodyPart(index);
-    }
+      {
+        parse ();
+        return super.getBodyPart (index);
+      }
   }
 
   /**
@@ -207,22 +207,24 @@ public class MimeMultipart
    * Returns null if the part is not found.
    * @param CID the ContentID of the desired part
    */
-  public BodyPart getBodyPart(String CID)
+  public BodyPart getBodyPart (String CID)
     throws MessagingException
   {
     synchronized (this)
-    {
-      parse();
-      int count = getCount();
-      for (int i = 0; i<count; i++)
       {
-        MimeBodyPart bp = (MimeBodyPart)getBodyPart(i);
-        String contentID = bp.getContentID();
-        if (contentID!=null && contentID.equals(CID))
-          return bp;
+        parse ();
+        int count = getCount ();
+        for (int i = 0; i < count; i++)
+          {
+            MimeBodyPart bp = (MimeBodyPart) getBodyPart (i);
+            String contentID = bp.getContentID ();
+            if (contentID != null && contentID.equals (CID))
+              {
+                return bp;
+              }
+          }
+        return null;
       }
-      return null;
-    }
   }
 
   /**
@@ -242,13 +244,16 @@ public class MimeMultipart
    * its internal state actually did change,
    * and do the header updating only if necessary.
    */
-  protected void updateHeaders()
+  protected void updateHeaders ()
     throws MessagingException
   {
     synchronized (parts)
     {
-      for (int i = 0; i<parts.size(); i++)
-        ((MimeBodyPart)parts.get(i)).updateHeaders();
+      int len = parts.size ();
+      for (int i = 0; i < len; i++)
+        {
+          ((MimeBodyPart) parts.get (i)).updateHeaders ();
+        }
     }
   }
 
@@ -257,33 +262,37 @@ public class MimeMultipart
    * separated by a boundary.
    * @exception IOException if an IO related exception occurs
    */
-  public void writeTo(OutputStream os)
+  public void writeTo (OutputStream os)
     throws IOException, MessagingException
   {
-    parse();
-    ContentType ct = new ContentType(contentType);
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("--");
-    buffer.append(ct.getParameter("boundary"));
-    byte[] boundary = buffer.toString().getBytes("UTF-8");
+    final String charset = "US-ASCII";
+    final byte[] sep = { 0x0d, 0x0a };
+    
+    parse ();
+    ContentType ct = new ContentType (contentType);
+    StringBuffer buffer = new StringBuffer ();
+    buffer.append ("--");
+    buffer.append (ct.getParameter ("boundary"));
+    byte[] boundary = buffer.toString ().getBytes (charset);
     
     synchronized (parts)
     {
-      for (int i = 0; i<parts.size(); i++)
+      int len = parts.size ();
+      for (int i = 0; i < len; i++)
       {
-        os.write(boundary);
-        os.write(0x0d);
-        os.flush();
-        ((MimeBodyPart)parts.get(i)).writeTo(os);
-        os.write(0x0d);
+        os.write (boundary);
+        os.write (sep);
+        os.flush ();
+        ((MimeBodyPart) parts.get (i)).writeTo (os);
+        os.write (sep);
       }
     }
 
-    buffer.append("--");
-    boundary = buffer.toString().getBytes("UTF-8");
-    os.write(boundary);
-    os.write(0x0d);
-    os.flush();
+    buffer.append ("--");
+    boundary = buffer.toString ().getBytes (charset);
+    os.write (boundary);
+    os.write (sep);
+    os.flush ();
   }
 
   /**
@@ -293,159 +302,201 @@ public class MimeMultipart
    * This method is called by all other methods that need data for the body 
    * parts, to make sure the data has been parsed.
    */
-  protected void parse()
+  protected void parse ()
     throws MessagingException
   {
     if (parsed)
-      return;
+      {
+        return;
+      }
     synchronized (this)
-    {
-      InputStream is = null;
-      SharedInputStream sis = null;
-      try
       {
-        is = ds.getInputStream();
-        if (is instanceof SharedInputStream)
-          sis = (SharedInputStream)is;
-        // buffer it
-        if (!(is instanceof ByteArrayInputStream) && 
-            !(is instanceof BufferedInputStream))
-          is = new BufferedInputStream(is);
-        
-        ContentType ct = new ContentType(contentType);
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("--");
-        buffer.append(ct.getParameter("boundary"));
-        String boundary = buffer.toString();
-        
-        byte[] bbytes = boundary.getBytes();
-        int blen = bbytes.length;
-        
-        LineInputStream lis = new LineInputStream(is);
-        String line;
-        while ((line = lis.readLine())!=null)
-        {
-          if (line.trim().equals(boundary))
-            break;
-        }
-        if (line==null)
-          throw new MessagingException("No start boundary");
-        
-        long start = 0L, end = 0L;
-        for (boolean done = false; !done;)
-        {
-          InternetHeaders headers = null;
-          if (sis!=null)
+        InputStream is = null;
+        SharedInputStream sis = null;
+        try
           {
-            start = sis.getPosition();
-            while ((line = lis.readLine())!=null && line.length()>0);
-            if (line==null)
-              throw new IOException("EOF before content body");
-          }
-          else
-          {
-            headers = createInternetHeaders(is);
-          }
-          ByteArrayOutputStream bos = null;
-          if (sis==null)
-            bos = new ByteArrayOutputStream();
-
-          // NB this routine uses the InputStream.mark() method
-          // if it is not supported by the underlying stream we will run into
-          // problems
-					if (!is.markSupported())
-						throw new MessagingException("FIXME: mark not supported on underlying input stream: "+is.getClass().getName());
-          boolean eol = true;
-          int last = -1;
-          int afterLast = -1;
-          while (true)
-          {
-            int c;
-            if (eol)
-            {
-              is.mark(blen+1024);
-              int pos = 0;
-              while (pos<blen)
+            is = ds.getInputStream ();
+            if (is instanceof SharedInputStream)
               {
-                if (is.read()!=bbytes[pos])
-                  break;
-                pos++;
+                sis = (SharedInputStream) is;
               }
-              
-              if (pos==blen)
+            // buffer it
+            if (!(is instanceof ByteArrayInputStream) && 
+                !(is instanceof BufferedInputStream))
               {
-                c = is.read();
-                if (c=='-' && is.read()=='-')
-                {
-                  done = true;
-                  break;
-                }
-                while (c==' ' || c=='\t')
-                  c = is.read();
-                if (c=='\r')
-                {
-                  is.mark(1);
-                  if (is.read()!='\n')
-                    is.reset();
-                  break;
-                }
-                if (c=='\n')
-                  break;
+                is = new BufferedInputStream (is);
               }
-              if (bos!=null && last!=-1)
+            
+            ContentType ct = new ContentType (contentType);
+            StringBuffer buffer = new StringBuffer ();
+            buffer.append ("--");
+            buffer.append (ct.getParameter ("boundary"));
+            String boundary = buffer.toString ();
+            
+            byte[] bbytes = boundary.getBytes ();
+            int blen = bbytes.length;
+            
+            LineInputStream lis = new LineInputStream (is);
+            String line;
+            while ((line = lis.readLine ()) != null)
               {
-                bos.write(last);
-                if (afterLast!=-1)
-                  bos.write(afterLast);
-                last = afterLast = -1;
+                if (line.trim () .equals (boundary))
+                  {
+                    break;
+                  }
               }
-              is.reset();
-            }
-            c = is.read();
-            if (c<0)
-            {
-              done = true;
-              break;
-            }
-            else if (c=='\r' || c=='\n')
-            {
-              eol = true;
-              if (sis!=null)
-                end = sis.getPosition()-1L;
-              last = c;
-              if (c=='\r')
+            if (line == null)
               {
-                is.mark(1);
-                if ((c = is.read())=='\n')
-                  afterLast = c;
+                throw new MessagingException ("No start boundary");
+              }
+            
+            long start = 0L, end = 0L;
+            for (boolean done = false; !done;)
+              {
+                InternetHeaders headers = null;
+                if (sis != null)
+                  {
+                    start = sis.getPosition ();
+                    while ((line = lis.readLine ()) != null &&
+                           line.length () > 0);
+                    if (line == null)
+                      {
+                        throw new IOException ("EOF before content body");
+                      }
+                  }
                 else
-                  is.reset();
+                  {
+                    headers = createInternetHeaders (is);
+                  }
+                ByteArrayOutputStream bos = null;
+                if (sis == null)
+                  {
+                    bos = new ByteArrayOutputStream ();
+                  }
+                
+                // NB this routine uses the InputStream.mark() method
+                // if it is not supported by the underlying stream
+                // we will run into problems
+                if (!is.markSupported ())
+                  {
+                    String cn = is.getClass ().getName ();
+                    throw new MessagingException ("FIXME: mark not supported" +
+                                                  " on underlying input stre" +
+                                                  "am: " + cn);
+                  }
+                boolean eol = true;
+                int last = -1;
+                int afterLast = -1;
+                while (true)
+                  {
+                    int c;
+                    if (eol)
+                      {
+                        is.mark (blen + 1024);
+                        int pos = 0;
+                        while (pos < blen)
+                          {
+                            if (is.read () != bbytes[pos])
+                              {
+                                break;
+                              }
+                            pos++;
+                          }
+                        
+                        if (pos == blen)
+                          {
+                            c = is.read ();
+                            if (c == '-' && is.read () == '-')
+                              {
+                                done = true;
+                                break;
+                              }
+                            while (c == ' ' || c == '\t')
+                              {
+                                c = is.read ();
+                              }
+                            if (c == '\r')
+                              {
+                                is.mark (1);
+                                if (is.read () != '\n')
+                                  {
+                                    is.reset ();
+                                  }
+                                break;
+                              }
+                            if (c == '\n')
+                              {
+                                break;
+                              }
+                          }
+                        if (bos != null && last != -1)
+                          {
+                            bos.write (last);
+                            if (afterLast != -1)
+                              {
+                                bos.write (afterLast);
+                              }
+                            last = afterLast = -1;
+                          }
+                        is.reset ();
+                      }
+                    c = is.read ();
+                    if (c < 0)
+                      {
+                        done = true;
+                        break;
+                      }
+                    else if (c == '\r' || c == '\n')
+                      {
+                        eol = true;
+                        if (sis != null)
+                          {
+                            end = sis.getPosition () - 1L;
+                          }
+                        last = c;
+                        if (c == '\r')
+                          {
+                            is.mark (1);
+                            if ((c = is.read ()) == '\n')
+                              {
+                                afterLast = c;
+                              }
+                            else
+                              {
+                                is.reset ();
+                              }
+                          }
+                      }
+                    else
+                      {
+                        eol = false;
+                        if (bos != null)
+                          {
+                            bos.write (c);
+                          }
+                      }
+                  }
+                
+                // Create a body part from the stream
+                MimeBodyPart bp;
+                if (sis != null)
+                  {
+                    bp = createMimeBodyPart (sis.newStream (start, end));
+                  }
+                else
+                  {
+                    bp = createMimeBodyPart (headers, bos.toByteArray ());
+                  }
+                addBodyPart (bp);
               }
-            }
-            else
-            {
-              eol = false;
-              if (bos!=null)
-                bos.write(c);
-            }
+            
           }
-          
-          // Create a body part from the stream
-          MimeBodyPart bp;
-          if (sis!=null)
-            bp = createMimeBodyPart(sis.newStream(start, end));
-          else
-            bp = createMimeBodyPart(headers, bos.toByteArray());
-          addBodyPart(bp);
-        }
-        
+        catch (IOException e)
+          {
+            throw new MessagingException ("I/O error", e);
+          }
+        parsed = true;
       }
-      catch (IOException e)
-      {
-        throw new MessagingException("I/O error", e);
-      }
-      parsed = true;
-    }
   }
   
   /**
@@ -457,10 +508,10 @@ public class MimeMultipart
    * object.
    * @param is the InputStream to read the headers from
    */
-  protected InternetHeaders createInternetHeaders(InputStream is)
+  protected InternetHeaders createInternetHeaders (InputStream is)
     throws MessagingException
   {
-    return new InternetHeaders(is);
+    return new InternetHeaders (is);
   }
   
   /**
@@ -472,11 +523,11 @@ public class MimeMultipart
    * @param headers the headers for the body part
    * @param content the content of the body part
    */
-  protected MimeBodyPart createMimeBodyPart(InternetHeaders headers,
-      byte[] content)
+  protected MimeBodyPart createMimeBodyPart (InternetHeaders headers,
+                                             byte[] content)
     throws MessagingException
   {
-    return new MimeBodyPart(headers, content);
+    return new MimeBodyPart (headers, content);
   }
   
   /**
@@ -487,10 +538,10 @@ public class MimeMultipart
    * returns a MimeBodyPart object.
    * @param is InputStream containing the body part
    */
-  protected MimeBodyPart createMimeBodyPart(InputStream is)
+  protected MimeBodyPart createMimeBodyPart (InputStream is)
     throws MessagingException
   {
-    return new MimeBodyPart(is);
+    return new MimeBodyPart (is);
   }
   
 }

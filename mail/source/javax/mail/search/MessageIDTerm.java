@@ -48,9 +48,9 @@ public final class MessageIDTerm
    * Constructor.
    * @param msgid the msgid to search for
    */
-  public MessageIDTerm(String msgid)
+  public MessageIDTerm (String msgid)
   {
-    super(msgid);
+    super (msgid);
   }
 
   /**
@@ -61,29 +61,31 @@ public final class MessageIDTerm
   public boolean match(Message msg)
   {
     try
-    {
-      String[] messageIDs = msg.getHeader("Message-ID");
-      if (messageIDs!=null)
       {
-        for (int i = 0; i<messageIDs.length; i++)
-        {
-          if (super.match(messageIDs[i]))
-            return true;
-        }
+        String[] messageIDs = msg.getHeader ("Message-ID");
+        if (messageIDs != null)
+          {
+            for (int i = 0; i < messageIDs.length; i++)
+              {
+                if (super.match (messageIDs[i]))
+                  {
+                    return true;
+                  }
+              }
+          }
       }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return (other instanceof MessageIDTerm && super.equals(other));
+    return (other instanceof MessageIDTerm && super.equals (other));
   }
   
 }

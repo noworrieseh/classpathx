@@ -49,9 +49,9 @@ public final class BodyTerm
    * Constructor
    * @param pattern The String to search for
    */
-  public BodyTerm(String pattern)
+  public BodyTerm (String pattern)
   {
-    super(pattern);
+    super (pattern);
   }
 
   /**
@@ -59,36 +59,38 @@ public final class BodyTerm
    * @param msg The pattern search is applied on this Message's body
    * @return true if the pattern is found; otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     try
-    {
-      Part part = msg;
-      String contentType = part.getContentType();
-      if (contentType.regionMatches(true, 0, "text/", 0, 5))
       {
-        return super.match((String)part.getContent());
+        Part part = msg;
+        String contentType = part.getContentType ();
+        if (contentType.regionMatches (true, 0, "text/", 0, 5))
+          {
+            return super.match ((String) part.getContent ());
+          }
+        else if (contentType.regionMatches (true, 0, "multipart/mixed", 0, 15))
+          {
+            part = ((Multipart) part.getContent ()).getBodyPart (0);
+            contentType = part.getContentType ();
+            if (contentType.regionMatches (true, 0, "text/", 0, 5))
+              {
+                return super.match ((String) part.getContent ());
+              }
+          }
       }
-      else if (contentType.regionMatches(true, 0, "multipart/mixed", 0, 15))
-      {
-        part = ((Multipart)part.getContent()).getBodyPart(0);
-        contentType = part.getContentType();
-        if (contentType.regionMatches(true, 0, "text/", 0, 5))
-          return super.match((String)part.getContent());
-      }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
-    return ((other instanceof BodyTerm) && super.equals(other));
+    return ((other instanceof BodyTerm) && super.equals (other));
   }
   
 }

@@ -50,16 +50,16 @@ public final class RecipientTerm
    * @param type the recipient type
    * @param address the address to match for
    */
-  public RecipientTerm(Message.RecipientType type, Address address)
+  public RecipientTerm (Message.RecipientType type, Address address)
   {
-    super(address);
+    super (address);
     this.type = type;
   }
 
   /**
    * Return the type of recipient to match with.
    */
-  public Message.RecipientType getRecipientType()
+  public Message.RecipientType getRecipientType ()
   {
     return type;
   }
@@ -69,43 +69,45 @@ public final class RecipientTerm
    * @param msg The address match is applied to this Message's recepient address
    * @param true if the match succeeds, otherwise false
    */
-  public boolean match(Message msg)
+  public boolean match (Message msg)
   {
     Address aaddress[];
     try
-    {
-      Address[] addresses = msg.getRecipients(type);
-      if (addresses!=null)
       {
-        for (int i = 0; i<addresses.length; i++)
-        {
-          if (super.match(addresses[i]))
-            return true;
-        }
+        Address[] addresses = msg.getRecipients (type);
+        if (addresses != null)
+          {
+            for (int i = 0; i < addresses.length; i++)
+              {
+                if (super.match (addresses[i]))
+                  {
+                    return true;
+                  }
+              }
+          }
       }
-    }
     catch (Exception e)
-    {
-    }
+      {
+      }
     return false;
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     return (other instanceof RecipientTerm &&
-        ((RecipientTerm)other).type.equals(type) &&
-        super.equals(other));
+            ((RecipientTerm) other).type.equals (type) &&
+            super.equals (other));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    return type.hashCode() + super.hashCode();
+    return type.hashCode () + super.hashCode ();
   }
 
 }

@@ -85,9 +85,9 @@ public class FolderEvent
    * @param folder The affected folder
    * @param type The event type
    */
-  public FolderEvent(Object source, Folder folder, int type)
+  public FolderEvent (Object source, Folder folder, int type)
   {
-    this(source, folder, folder, type);
+    this (source, folder, folder, type);
   }
 
   /**
@@ -97,10 +97,10 @@ public class FolderEvent
    * @param newFolder The folder that represents the new name
    * @param type The event type
    */
-  public FolderEvent(Object source, Folder oldFolder, Folder newFolder, 
-      int type)
+  public FolderEvent (Object source, Folder oldFolder, Folder newFolder, 
+                      int type)
   {
-    super(source);
+    super (source);
     folder = oldFolder;
     this.newFolder = newFolder;
     this.type = type;
@@ -109,7 +109,7 @@ public class FolderEvent
   /**
    * Return the type of this event.
    */
-  public int getType()
+  public int getType ()
   {
     return type;
   }
@@ -118,7 +118,7 @@ public class FolderEvent
    * Return the affected folder.
    * @see #getNewFolder
    */
-  public Folder getFolder()
+  public Folder getFolder ()
   {
     return folder;
   }
@@ -129,7 +129,7 @@ public class FolderEvent
    * name. The getFolder() method returns the folder that is renamed.
    * @see #getFolder
    */
-  public Folder getNewFolder()
+  public Folder getNewFolder ()
   {
     return newFolder;
   }
@@ -137,19 +137,19 @@ public class FolderEvent
   /**
    * Invokes the appropriate FolderListener method.
    */
-  public void dispatch(Object listener)
+  public void dispatch (Object listener)
   {
-    FolderListener l = (FolderListener)listener;
+    FolderListener l = (FolderListener) listener;
     switch (type)
     {
       case CREATED:
-        l.folderCreated(this);
+        l.folderCreated (this);
         break;
       case DELETED:
-        l.folderDeleted(this);
+        l.folderDeleted (this);
         break;
       case RENAMED:
-        l.folderRenamed(this);
+        l.folderRenamed (this);
         break;
     }
   }

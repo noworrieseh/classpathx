@@ -42,16 +42,16 @@ public interface TransportListener
   /**
    * Invoked when a Message is succesfully delivered.
    */
-  void messageDelivered(TransportEvent e);
+  void messageDelivered (TransportEvent e);
 
   /**
    * Invoked when a Message is not delivered.
    */
-  void messageNotDelivered(TransportEvent e);
+  void messageNotDelivered (TransportEvent e);
 
   /**
    * Invoked when a Message is partially delivered.
    */
-  void messagePartiallyDelivered(TransportEvent e);
+  void messagePartiallyDelivered (TransportEvent e);
   
 }

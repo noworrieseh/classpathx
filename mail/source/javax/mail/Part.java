@@ -101,7 +101,7 @@ public interface Part
    * The size is appropriate for display in a user interface to give the 
    * user a rough idea of the size of this part.
    */
-  int getSize()
+  int getSize ()
     throws MessagingException;
 
   /**
@@ -111,7 +111,7 @@ public interface Part
    * length and may or may not account for any transfer encoding 
    * of the content.
    */
-  int getLineCount()
+  int getLineCount ()
     throws MessagingException;
 
   /**
@@ -120,7 +120,7 @@ public interface Part
    * <p>
    * The MIME typing system is used to name Content-types.
    */
-  String getContentType()
+  String getContentType ()
     throws MessagingException;
 
   /**
@@ -134,7 +134,7 @@ public interface Part
    * If the subType of mimeType is the special character '*', 
    * then the subtype is ignored during the comparison.
    */
-  boolean isMimeType(String mimeType)
+  boolean isMimeType (String mimeType)
     throws MessagingException;
 
   /**
@@ -148,7 +148,7 @@ public interface Part
             // treat as attachment if not first part
      </pre>
    */
-  String getDisposition()
+  String getDisposition ()
     throws MessagingException;
 
   /**
@@ -159,7 +159,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setDisposition(String disposition)
+  void setDisposition (String disposition)
     throws MessagingException;
 
   /**
@@ -167,7 +167,7 @@ public interface Part
    * This typically associates some descriptive information with this part.
    * Returns null if none is available.
    */
-  String getDescription()
+  String getDescription ()
     throws MessagingException;
 
   /**
@@ -179,7 +179,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setDescription(String description)
+  void setDescription (String description)
     throws MessagingException;
 
   /**
@@ -188,7 +188,7 @@ public interface Part
    * from a file. The filename will usually be a simple name, not 
    * including directory components.
    */
-  String getFileName()
+  String getFileName ()
     throws MessagingException;
 
   /**
@@ -202,7 +202,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setFileName(String filename)
+  void setFileName (String filename)
     throws MessagingException;
 
   /**
@@ -216,7 +216,7 @@ public interface Part
    * Refer to the documentation for javax.activation.DataHandler for more
    * details.
    */
-  InputStream getInputStream()
+  InputStream getInputStream ()
     throws IOException, MessagingException;
 
   /**
@@ -224,7 +224,7 @@ public interface Part
    * The DataHandler allows clients to operate on as well as retrieve 
    * the content.
    */
-  DataHandler getDataHandler()
+  DataHandler getDataHandler ()
     throws MessagingException;
 
   /**
@@ -242,7 +242,7 @@ public interface Part
    * Refer to the documentation for javax.activation.DataHandler for more
    * details.
    */
-  Object getContent()
+  Object getContent ()
     throws IOException, MessagingException;
 
   /**
@@ -254,7 +254,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setDataHandler(DataHandler dh)
+  void setDataHandler (DataHandler dh)
     throws MessagingException;
 
   /**
@@ -273,7 +273,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setContent(Object obj, String type)
+  void setContent (Object obj, String type)
     throws MessagingException;
 
   /**
@@ -285,7 +285,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setText(String text)
+  void setText (String text)
     throws MessagingException;
 
   /**
@@ -296,7 +296,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setContent(Multipart mp)
+  void setContent (Multipart mp)
     throws MessagingException;
 
   /**
@@ -313,7 +313,7 @@ public interface Part
    * @exception MessagingException if an error occurs fetching the data 
    * to be written
    */
-  void writeTo(OutputStream os)
+  void writeTo (OutputStream os)
     throws IOException, MessagingException;
 
   /**
@@ -321,7 +321,7 @@ public interface Part
    * Returns null if no headers for this header name are available.
    * @param name the name of this header
    */
-  String[] getHeader(String name)
+  String[] getHeader (String name)
     throws MessagingException;
 
   /**
@@ -334,7 +334,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void setHeader(String name, String value)
+  void setHeader (String name, String value)
     throws MessagingException;
 
   /**
@@ -346,7 +346,7 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void addHeader(String name, String value)
+  void addHeader (String name, String value)
     throws MessagingException;
 
   /**
@@ -357,28 +357,28 @@ public interface Part
    * @exception IllegalStateException if this Part is obtained from 
    * a READ_ONLY folder
    */
-  void removeHeader(String name)
+  void removeHeader (String name)
     throws MessagingException;
 
   /**
    * Return all the headers from this part as an Enumeration of Header 
    * objects.
    */
-  Enumeration getAllHeaders()
+  Enumeration getAllHeaders ()
     throws MessagingException;
 
   /**
    * Return matching headers from this part as an Enumeration of Header 
    * objects.
    */
-  Enumeration getMatchingHeaders(String[] names)
+  Enumeration getMatchingHeaders (String[] names)
     throws MessagingException;
 
   /**
    * Return non-matching headers from this envelope as an Enumeration of 
    * Header objects.
    */
-  Enumeration getNonMatchingHeaders(String[] names)
+  Enumeration getNonMatchingHeaders (String[] names)
     throws MessagingException;
   
 }

@@ -43,7 +43,7 @@ public abstract class ConnectionAdapter
   /**
    * Invoked when a Store/Folder/Transport is opened.
    */
-  public void opened(ConnectionEvent e)
+  public void opened (ConnectionEvent e)
   {
   }
 
@@ -52,14 +52,14 @@ public abstract class ConnectionAdapter
    * Note that a folder cannot be disconnected, so a folder will not fire 
    * this event.
    */
-  public void disconnected(ConnectionEvent e)
+  public void disconnected (ConnectionEvent e)
   {
   }
 
   /**
    * Invoked when a Store/Folder/Transport is closed.
    */
-  public void closed(ConnectionEvent e)
+  public void closed (ConnectionEvent e)
   {
   }
 

@@ -44,7 +44,7 @@ public abstract class AddressTerm
    */
   protected Address address;
 
-  protected AddressTerm(Address address)
+  protected AddressTerm (Address address)
   {
     this.address = address;
   }
@@ -52,7 +52,7 @@ public abstract class AddressTerm
   /**
    * Return the address to match with.
    */
-  public Address getAddress()
+  public Address getAddress ()
   {
     return address;
   }
@@ -60,26 +60,26 @@ public abstract class AddressTerm
   /**
    * Match against the argument Address.
    */
-  protected boolean match(Address address)
+  protected boolean match (Address address)
   {
-    return address.equals(this.address);
+    return address.equals (this.address);
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals(Object other)
+  public boolean equals (Object other)
   {
     return ((other instanceof AddressTerm) && 
-        ((AddressTerm)other).address.equals(address));
+        ((AddressTerm) other).address.equals (address));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode()
+  public int hashCode ()
   {
-    return address.hashCode();
+    return address.hashCode ();
   }
   
 }

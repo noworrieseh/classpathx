@@ -48,7 +48,7 @@ public interface SharedInputStream
    * beginning of the InputStream.
    * @return the current position
    */
-  long getPosition();
+  long getPosition ();
 
   /**
    * Return a new InputStream representing a subset of the data from this
@@ -61,6 +61,6 @@ public interface SharedInputStream
    * @param end the ending position + 1
    * @return the new stream
    */
-  InputStream newStream(long start, long end);
+  InputStream newStream (long start, long end);
   
 }
