@@ -185,6 +185,7 @@ crypto_sources = \
  gnu/crypto/hash/BaseHash.java \
  gnu/crypto/hash/HashFactory.java \
  gnu/crypto/hash/IMessageDigest.java \
+ gnu/crypto/hash/MD4.java \
  gnu/crypto/hash/MD5.java \
  gnu/crypto/hash/RipeMD128.java \
  gnu/crypto/hash/RipeMD160.java \
@@ -194,6 +195,7 @@ crypto_sources = \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
  gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+ gnu/crypto/jce/MD4Spi.java \
  gnu/crypto/jce/MD5Spi.java \
  gnu/crypto/jce/MessageDigestAdapter.java \
  gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
@@ -282,14 +284,16 @@ am__objects_1 = gnu/crypto/Registry.lo gnu/crypto/cipher/Anubis.lo \
 	gnu/crypto/cipher/Rijndael.lo gnu/crypto/cipher/Serpent.lo \
 	gnu/crypto/cipher/Square.lo gnu/crypto/cipher/Twofish.lo \
 	gnu/crypto/hash/BaseHash.lo gnu/crypto/hash/HashFactory.lo \
-	gnu/crypto/hash/IMessageDigest.lo gnu/crypto/hash/MD5.lo \
-	gnu/crypto/hash/RipeMD128.lo gnu/crypto/hash/RipeMD160.lo \
-	gnu/crypto/hash/Sha160.lo gnu/crypto/hash/Whirlpool.lo \
+	gnu/crypto/hash/IMessageDigest.lo gnu/crypto/hash/MD4.lo \
+	gnu/crypto/hash/MD5.lo gnu/crypto/hash/RipeMD128.lo \
+	gnu/crypto/hash/RipeMD160.lo gnu/crypto/hash/Sha160.lo \
+	gnu/crypto/hash/Whirlpool.lo \
 	gnu/crypto/jce/DSSKeyPairGeneratorSpi.lo \
 	gnu/crypto/jce/DSSRawSignatureSpi.lo \
 	gnu/crypto/jce/GnuCrypto.lo \
 	gnu/crypto/jce/KeyPairGeneratorAdapter.lo \
-	gnu/crypto/jce/MD5Spi.lo gnu/crypto/jce/MessageDigestAdapter.lo \
+	gnu/crypto/jce/MD4Spi.lo gnu/crypto/jce/MD5Spi.lo \
+	gnu/crypto/jce/MessageDigestAdapter.lo \
 	gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo \
 	gnu/crypto/jce/RSAPSSRawSignatureSpi.lo \
 	gnu/crypto/jce/RipeMD128Spi.lo \
@@ -382,6 +386,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/BaseHash.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/HashFactory.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/IMessageDigest.Plo \
+@AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/MD4.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/MD5.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/RipeMD128.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/RipeMD160.Plo \
@@ -391,6 +396,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/DSSRawSignatureSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/GnuCrypto.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.Plo \
+@AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD5Spi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MessageDigestAdapter.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo \
@@ -570,6 +576,8 @@ gnu/crypto/hash/HashFactory.lo: gnu/crypto/hash/HashFactory.java \
 	gnu/crypto/hash/.dirstamp gnu/crypto/hash/$(DEPDIR)/.dirstamp
 gnu/crypto/hash/IMessageDigest.lo: gnu/crypto/hash/IMessageDigest.java \
 	gnu/crypto/hash/.dirstamp gnu/crypto/hash/$(DEPDIR)/.dirstamp
+gnu/crypto/hash/MD4.lo: gnu/crypto/hash/MD4.java \
+	gnu/crypto/hash/.dirstamp gnu/crypto/hash/$(DEPDIR)/.dirstamp
 gnu/crypto/hash/MD5.lo: gnu/crypto/hash/MD5.java \
 	gnu/crypto/hash/.dirstamp gnu/crypto/hash/$(DEPDIR)/.dirstamp
 gnu/crypto/hash/RipeMD128.lo: gnu/crypto/hash/RipeMD128.java \
@@ -596,6 +604,8 @@ gnu/crypto/jce/GnuCrypto.lo: gnu/crypto/jce/GnuCrypto.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/KeyPairGeneratorAdapter.lo: \
 	gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/MD4Spi.lo: gnu/crypto/jce/MD4Spi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/MD5Spi.lo: gnu/crypto/jce/MD5Spi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
@@ -893,6 +903,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/hash/HashFactory.lo
 	-rm -f gnu/crypto/hash/IMessageDigest.$(OBJEXT)
 	-rm -f gnu/crypto/hash/IMessageDigest.lo
+	-rm -f gnu/crypto/hash/MD4.$(OBJEXT)
+	-rm -f gnu/crypto/hash/MD4.lo
 	-rm -f gnu/crypto/hash/MD5.$(OBJEXT)
 	-rm -f gnu/crypto/hash/MD5.lo
 	-rm -f gnu/crypto/hash/RipeMD128.$(OBJEXT)
@@ -911,6 +923,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/jce/GnuCrypto.lo
 	-rm -f gnu/crypto/jce/KeyPairGeneratorAdapter.$(OBJEXT)
 	-rm -f gnu/crypto/jce/KeyPairGeneratorAdapter.lo
+	-rm -f gnu/crypto/jce/MD4Spi.$(OBJEXT)
+	-rm -f gnu/crypto/jce/MD4Spi.lo
 	-rm -f gnu/crypto/jce/MD5Spi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/MD5Spi.lo
 	-rm -f gnu/crypto/jce/MessageDigestAdapter.$(OBJEXT)
@@ -1094,6 +1108,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/BaseHash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/HashFactory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/IMessageDigest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/MD4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/MD5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/RipeMD128.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/RipeMD160.Plo@am__quote@
@@ -1103,6 +1118,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/DSSRawSignatureSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/GnuCrypto.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD5Spi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MessageDigestAdapter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo@am__quote@
@@ -1467,6 +1483,24 @@ gnu/crypto/hash/IMessageDigest.lo: gnu/crypto/hash/IMessageDigest.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/hash/IMessageDigest.lo `test -f 'gnu/crypto/hash/IMessageDigest.java' || echo '$(srcdir)/'`gnu/crypto/hash/IMessageDigest.java
 
+gnu/crypto/hash/MD4.o: gnu/crypto/hash/MD4.java
+@AMDEP_TRUE@	source='gnu/crypto/hash/MD4.java' object='gnu/crypto/hash/MD4.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/hash/$(DEPDIR)/MD4.Po' tmpdepfile='gnu/crypto/hash/$(DEPDIR)/MD4.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/hash/MD4.o `test -f 'gnu/crypto/hash/MD4.java' || echo '$(srcdir)/'`gnu/crypto/hash/MD4.java
+
+gnu/crypto/hash/MD4.obj: gnu/crypto/hash/MD4.java
+@AMDEP_TRUE@	source='gnu/crypto/hash/MD4.java' object='gnu/crypto/hash/MD4.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/hash/$(DEPDIR)/MD4.Po' tmpdepfile='gnu/crypto/hash/$(DEPDIR)/MD4.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/hash/MD4.obj `cygpath -w gnu/crypto/hash/MD4.java`
+
+gnu/crypto/hash/MD4.lo: gnu/crypto/hash/MD4.java
+@AMDEP_TRUE@	source='gnu/crypto/hash/MD4.java' object='gnu/crypto/hash/MD4.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/hash/$(DEPDIR)/MD4.Plo' tmpdepfile='gnu/crypto/hash/$(DEPDIR)/MD4.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/hash/MD4.lo `test -f 'gnu/crypto/hash/MD4.java' || echo '$(srcdir)/'`gnu/crypto/hash/MD4.java
+
 gnu/crypto/hash/MD5.o: gnu/crypto/hash/MD5.java
 @AMDEP_TRUE@	source='gnu/crypto/hash/MD5.java' object='gnu/crypto/hash/MD5.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='gnu/crypto/hash/$(DEPDIR)/MD5.Po' tmpdepfile='gnu/crypto/hash/$(DEPDIR)/MD5.TPo' @AMDEPBACKSLASH@
@@ -1628,6 +1662,24 @@ gnu/crypto/jce/KeyPairGeneratorAdapter.lo: gnu/crypto/jce/KeyPairGeneratorAdapte
 @AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/KeyPairGeneratorAdapter.lo `test -f 'gnu/crypto/jce/KeyPairGeneratorAdapter.java' || echo '$(srcdir)/'`gnu/crypto/jce/KeyPairGeneratorAdapter.java
+
+gnu/crypto/jce/MD4Spi.o: gnu/crypto/jce/MD4Spi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4Spi.java' object='gnu/crypto/jce/MD4Spi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4Spi.o `test -f 'gnu/crypto/jce/MD4Spi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD4Spi.java
+
+gnu/crypto/jce/MD4Spi.obj: gnu/crypto/jce/MD4Spi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4Spi.java' object='gnu/crypto/jce/MD4Spi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4Spi.obj `cygpath -w gnu/crypto/jce/MD4Spi.java`
+
+gnu/crypto/jce/MD4Spi.lo: gnu/crypto/jce/MD4Spi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4Spi.java' object='gnu/crypto/jce/MD4Spi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4Spi.lo `test -f 'gnu/crypto/jce/MD4Spi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD4Spi.java
 
 gnu/crypto/jce/MD5Spi.o: gnu/crypto/jce/MD5Spi.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/MD5Spi.java' object='gnu/crypto/jce/MD5Spi.o' libtool=no @AMDEPBACKSLASH@

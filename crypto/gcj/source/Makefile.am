@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.2 2002-06-08 05:47:20 raif Exp $
+## $Id: Makefile.am,v 1.3 2002-06-12 10:21:46 raif Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -123,6 +123,7 @@ crypto_sources = \
  gnu/crypto/hash/BaseHash.java \
  gnu/crypto/hash/HashFactory.java \
  gnu/crypto/hash/IMessageDigest.java \
+ gnu/crypto/hash/MD4.java \
  gnu/crypto/hash/MD5.java \
  gnu/crypto/hash/RipeMD128.java \
  gnu/crypto/hash/RipeMD160.java \
@@ -132,6 +133,7 @@ crypto_sources = \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
  gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+ gnu/crypto/jce/MD4Spi.java \
  gnu/crypto/jce/MD5Spi.java \
  gnu/crypto/jce/MessageDigestAdapter.java \
  gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
