@@ -133,8 +133,8 @@ $(src)/gnu/mail/util/QPInputStream.java \
 $(src)/gnu/mail/util/QPOutputStream.java \
 $(src)/gnu/mail/util/PrintStreamLogger.java \
 $(src)/gnu/mail/util/RFC2822OutputStream.java \
-$(src)/gnu/mail/util/UUDecoderStream.java \
-$(src)/gnu/mail/util/UUEncoderStream.java
+$(src)/gnu/mail/util/UUInputStream.java \
+$(src)/gnu/mail/util/UUOutputStream.java
 
 # Utility and helper classes for the providers.
 provider_sources = \

@@ -16,7 +16,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASS,[
 AC_REQUIRE([AC_PROG_JAVA])
@@ -120,7 +120,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASSPATH,[
 if test "x$CLASSPATH" = x; then
@@ -164,7 +164,7 @@ dnl     echo "exec @JUNIT@ my.package.name.AllJunitTests" >> $@
 dnl     chmod +x $@
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN([AC_CHECK_JUNIT],[
 AC_CACHE_VAL(ac_cv_prog_JUNIT,[
@@ -202,7 +202,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 
 AC_DEFUN(AC_CHECK_RQRD_CLASS,[
@@ -226,7 +226,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_JAVA_OPTIONS,[
 AC_ARG_WITH(java-prefix,
@@ -271,7 +271,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAR],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -347,7 +347,7 @@ dnl
 dnl    AC_OUTPUT(Makefile)
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -373,7 +373,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA_WORKS, [
 AC_CHECK_PROG(uudecode, uudecode$EXEEXT, yes)
@@ -487,7 +487,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -513,7 +513,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC_WORKS,[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
@@ -559,7 +559,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVADOC],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -579,7 +579,7 @@ dnl and looks for the jni.h header file. If available, JAVAH is set to
 dnl the full path of javah and CPPFLAGS is updated accordingly.
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVAH],[
 AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
@@ -614,7 +614,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_COMPILE_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -653,7 +653,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_RUN_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -693,7 +693,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: acinclude.m4,v 1.3 2004-07-21 13:05:40 dog Exp $
+dnl @version $Id: acinclude.m4,v 1.4 2005-01-19 19:06:51 dog Exp $
 dnl
 AC_DEFUN([AC_TRY_RUN_JAVA],[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -800,45 +800,42 @@ if test x${INETLIB_JAR} = x ; then
 else
 	AC_MSG_RESULT([${INETLIB_JAR}])
 fi])
-dnl @synopsis GNUMAIL_WITH_JSSE_JAR
+dnl @synopsis GNUMAIL_WITH_JSSE
 dnl
-AC_DEFUN([GNUMAIL_WITH_JSSE_JAR],[
-AC_ARG_WITH([jsse_jar],
-	AC_HELP_STRING([--with-jsse-jar=DIR],
-		[path to JSSE library (jsse.jar). If unspecified, /usr/share/java and /usr/local/share/java are searched, in that order.]),
-	[if test "x${withval}" != x; then
-		AC_MSG_CHECKING([for ${withval}/jsse.jar])
-		if test -r ${withval}/jsse.jar ; then
-			AC_MSG_RESULT(yes)
-			JSSE_JAR=${withval}/jsse.jar
-			found_jsse_jar=true
-		else
-			AC_MSG_ERROR([can't find jsse.jar in specified path])
-		fi
-	fi],
-	[found_jsse_jar=false])
-if test "x${JSSE_JAR}" = x ;then
-	dnl AC_MSG_NOTICE([no value supplied, searching default locations])
-	_GNUMAIL_FIND_JSSE_JAR([/usr/share/java /usr/local/share/java])
-	if test "x${JSSE_JAR}" = x; then
-		AC_MSG_ERROR([can't find jsse.jar; use --with-jsse-jar])
-	fi
-	found_jsse_jar=true
+AC_DEFUN([GNUMAIL_WITH_JSSE],[
+AC_REQUIRE([AC_PROG_JAVAC])dnl
+AC_REQUIRE([AC_PROG_JAVA])dnl
+AC_MSG_CHECKING([for JSSE])
+JSSE_JAR=""
+JSSE_CLASSPATH=.
+if test "x" != "x$CLASSPATH" ; then
+  JSSE_CLASSPATH="$JSSE_CLASSPATH:$CLASSPATH"
 fi
+AC_ARG_WITH([jsse],
+  AC_HELP_STRING([--with-jsse=FILE], [path to external JSSE library]),
+  [
+  if test -r "${withval}" ; then
+    JSSE_JAR="${withval}"
+    JSSE_CLASSPATH="$JSSE_CLASSPATH:$JSSE_JAR"
+  fi
+  ])
+changequote(, )dnl
+cat << \EOF > Test.java
+/* [#]line __oline__ "configure" */
+public class Test {
+  public static void main(String[] args) {
+    try { Class.forName("javax.net.ssl.SSLSocket"); }
+    catch (Throwable e) { System.exit(1); }
+  }
+}
+EOF
+changequote([, ])dnl
+if AC_TRY_COMMAND($JAVAC $JAVACFLAGS Test.java) && test -s Test.class && ($JAVA $JAVAFLAGS -classpath "$JSSE_CLASSPATH" Test; exit) 2>/dev/null
+then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_ERROR([can't find JSSE classes; use --with-jsse])
+fi
+rm Test.java Test.class
 AC_SUBST(JSSE_JAR)
 ])
-dnl @synopsis _GNUMAIL_FIND_JSSE_JAR
-dnl
-AC_DEFUN([_GNUMAIL_FIND_JSSE_JAR],[
-AC_MSG_CHECKING([for jsse.jar])
-for _F in $1 ;do
-	if test -r ${_F}/jsse.jar ; then
-		JSSE_JAR=${_F}/jsse.jar
-		break
-	fi
-done
-if test x${JSSE_JAR} = x ; then
-	AC_MSG_RESULT([not found])
-else
-	AC_MSG_RESULT([${JSSE_JAR}])
-fi])

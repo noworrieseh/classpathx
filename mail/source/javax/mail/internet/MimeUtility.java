@@ -51,8 +51,8 @@ import gnu.mail.util.QInputStream;
 import gnu.mail.util.QOutputStream;
 import gnu.mail.util.QPInputStream;
 import gnu.mail.util.QPOutputStream;
-import gnu.mail.util.UUDecoderStream;
-import gnu.mail.util.UUEncoderStream;
+import gnu.mail.util.UUInputStream;
+import gnu.mail.util.UUOutputStream;
 
 /**
  * This is a utility class that provides various MIME related functionality.
@@ -230,7 +230,7 @@ public class MimeUtility
     if (encoding.equalsIgnoreCase("uuencode") || 
         encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUDecoderStream(is);
+        return new UUInputStream(is);
       }
     if (encoding.equalsIgnoreCase("binary") ||
         encoding.equalsIgnoreCase("7bit") ||
@@ -268,7 +268,7 @@ public class MimeUtility
     if (encoding.equalsIgnoreCase("uuencode") ||
         encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUEncoderStream(os);
+        return new UUOutputStream(os);
       }
     if (encoding.equalsIgnoreCase("binary") || 
         encoding.equalsIgnoreCase("7bit") || 
@@ -310,7 +310,7 @@ public class MimeUtility
     if (encoding.equalsIgnoreCase("uuencode") ||
         encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUEncoderStream(os, filename);
+        return new UUOutputStream(os, filename);
       }
     if (encoding.equalsIgnoreCase("binary") || 
         encoding.equalsIgnoreCase("7bit") || 

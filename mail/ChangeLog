@@ -1,3 +1,10 @@
+2005-01-19  Chris Burdess  <dog@bluezoo.org>
+
+	* acinclude.m4: Detect JSSE in Java runtime.
+	* UUInputStream.java,UUOutputStream.java: New UU encoder/decoder
+	supporting block reads and under FSF copyright.
+	* UUDecoderStream.java,UUEncoderStream.java: Removed.
+
 2005-01-05  Chris Burdess  <dog@bluezoo.org>
 
 	* UUDecoderStream.java: Fixed case where EOF is reached before buffer
