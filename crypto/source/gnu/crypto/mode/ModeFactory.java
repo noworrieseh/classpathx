@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: ModeFactory.java,v 1.3 2002-01-11 21:53:00 raif Exp $
+// $Id: ModeFactory.java,v 1.4 2002-06-08 05:18:04 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,9 +40,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate block cipher modes of operations.<p>
+ * <p>A <i>Factory</i> to instantiate block cipher modes of operations.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ModeFactory implements Registry {
 
@@ -61,14 +61,14 @@ public class ModeFactory implements Registry {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of a block cipher mode of operations given its name
-    * and characteristics of the underlying block cipher.<p>
+    * <p>Returns an instance of a block cipher mode of operations given its name
+    * and characteristics of the underlying block cipher.</p>
     *
     * @param mode the case-insensitive name of the mode of operations.
     * @param cipher the case-insensitive name of the block cipher.
     * @param cipherBlockSize the block size, in bytes, of the underlying cipher.
     * @return an instance of the block cipher algorithm, operating in a given
-    * mode of operations, or <tt>null</tt> if none found.
+    * mode of operations, or <code>null</code> if none found.
     * @exception InternalError if either the mode or the underlying block cipher
     * implementation does not pass its self-test.
     */
@@ -110,13 +110,13 @@ public class ModeFactory implements Registry {
          result = new CTR(cipher, cipherBlockSize);
       } else if (mode.equalsIgnoreCase(ICM_MODE)) {
          result = new ICM(cipher, cipherBlockSize);
+      } else if (mode.equalsIgnoreCase(OFB_MODE)) {
+         result = new OFB(cipher, cipherBlockSize);
       }
 //      else if (mode.equalsIgnoreCase(CBC_MODE)) {
 //         result = new CBC(cipher, cipherBlockSize);
 //      } else if (mode.equalsIgnoreCase(CFB_MODE)) {
 //         result = new CFB(cipher, cipherBlockSize);
-//      } else if (mode.equalsIgnoreCase(OFB_MODE)) {
-//         result = new OFB(cipher, cipherBlockSize);
 //      }
 
       if (result != null && !result.selfTest()) {
@@ -127,8 +127,8 @@ public class ModeFactory implements Registry {
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of mode supported by this
-    * <i>Factory</i>.<p>
+    * <p>Returns a {@link java.util.Set} of names of mode supported by this
+    * <i>Factory</i>.</p>
     *
     * @return a {@link java.util.Set} of mode names (Strings).
     */
@@ -137,9 +137,9 @@ public class ModeFactory implements Registry {
       hs.add(ECB_MODE);
       hs.add(CTR_MODE);
       hs.add(ICM_MODE);
+      hs.add(OFB_MODE);
 //      hs.add(CBC_MODE);
 //      hs.add(CFB_MODE);
-//      hs.add(OFB_MODE);
 
       return Collections.unmodifiableSet(hs);
    }
