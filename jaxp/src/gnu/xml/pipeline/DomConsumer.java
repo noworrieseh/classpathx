@@ -657,7 +657,7 @@ public class DomConsumer implements EventConsumer
 
 		else if (prefix == null)
 		    namespace = null;
-		else if (uri != "" && uri.length () != 0)
+		else if (!"".equals(uri) && uri.length () != 0)
 		    namespace = uri;
 		else
 		    namespace = getNamespace (prefix, attrs);
