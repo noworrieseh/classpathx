@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: HashFactory.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: HashFactory.java,v 1.3 2001-12-08 21:35:42 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * A Factory to instantiate hash algorithm instances.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class HashFactory {
 
@@ -48,6 +48,10 @@ public class HashFactory {
    public static final String WHIRLPOOL_HASH = "whirlpool";
    public static final String RIPEMD128_HASH = "ripemd-128";
    public static final String RIPEMD160_HASH = "ripemd-160";
+   public static final String SHA160_HASH =    "sha-160";
+   public static final String SHA1_HASH =      "sha1";
+   public static final String SHA_HASH =       "sha";
+   public static final String MD5_HASH =       "md5";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -81,6 +85,11 @@ public class HashFactory {
          result = new RipeMD128();
       } else if (name.equalsIgnoreCase(RIPEMD160_HASH)) {
          result = new RipeMD160();
+      } else if (name.equalsIgnoreCase(SHA160_HASH)
+            || name.equals(SHA1_HASH) || name.equals(SHA_HASH)) {
+         result = new Sha160();
+      } else if (name.equalsIgnoreCase(MD5_HASH)) {
+         result = new MD5();
       }
 
       if (result != null && !result.selfTest()) {
@@ -101,6 +110,7 @@ public class HashFactory {
       hs.add(WHIRLPOOL_HASH);
       hs.add(RIPEMD128_HASH);
       hs.add(RIPEMD160_HASH);
+      hs.add(SHA160_HASH);
 
       return Collections.unmodifiableSet(hs);
    }
