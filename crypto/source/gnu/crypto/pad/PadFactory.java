@@ -1,9 +1,9 @@
 package gnu.crypto.pad;
 
 // ----------------------------------------------------------------------------
-// $Id: PadFactory.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: PadFactory.java,v 1.3 2002-01-11 21:51:20 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,23 +30,22 @@ package gnu.crypto.pad;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate padding algorithms.
+ * A Factory to instantiate padding schemes.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class PadFactory {
+public class PadFactory implements Registry {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   public static final String PKCS7_PAD = "pkcs7";
-   public static final String TBC_PAD =   "tbc";
 
    // Constructor(s)
    // -------------------------------------------------------------------------

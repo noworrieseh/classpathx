@@ -1,9 +1,9 @@
 package gnu.crypto.pad;
 
 // ----------------------------------------------------------------------------
-// $Id: PKCS7.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: PKCS7.java,v 1.3 2002-01-11 21:50:51 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,14 +30,16 @@ package gnu.crypto.pad;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
  * The implementation of the PKCS7 padding algorithm.<p>
  *
  * This algorithm is described for 8-byte blocks in [RFC-1423] and extended to
- * block sizes of up to 256 bytes in [PKCS-7].
+ * block sizes of up to 256 bytes in [PKCS-7].<p>
  *
  * References:<br>
  * <a href="http://www.ietf.org/rfc/rfc1423.txt">RFC-1423</a>: Privacy
@@ -46,9 +48,9 @@ import java.io.PrintWriter;
  * <a href="http://www.ietf.org/">IETF</a>.
  * <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-7/">[PKCS-7]</a>PKCS #7:
  * Cryptographic Message Syntax Standard - An RSA Laboratories Technical Note.<br>
- * <a href="http://www.rsasecurity.com/">RSA Security</a>.
+ * <a href="http://www.rsasecurity.com/">RSA Security</a>.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class PKCS7 extends BasePad {
 
@@ -70,12 +72,12 @@ public final class PKCS7 extends BasePad {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the <i>Factory</i> class.
+    * Trivial package-private constructor for use by the <i>Factory</i> class.<p>
     *
     * @see gnu.crypto.pad.PadFactory
     */
    PKCS7() {
-      super(PadFactory.PKCS7_PAD);
+      super(Registry.PKCS7_PAD);
    }
 
    // Class methods

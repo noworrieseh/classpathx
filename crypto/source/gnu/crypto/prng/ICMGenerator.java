@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: ICMGenerator.java,v 1.4 2002-01-11 21:47:44 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,6 +30,7 @@ package gnu.crypto.prng;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
 
@@ -47,13 +48,13 @@ import java.util.Map;
  * In ICM, the keystream is logically broken into segments. Each segment is
  * identified with a segment index, and the segments have equal lengths. This
  * segmentation makes ICM especially appropriate for securing packet-based
- * protocols.
+ * protocols.<p>
  *
  * References:<br>
  * <a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
- * Integer Counter Mode</a>, David A. McGrew
+ * Integer Counter Mode</a>, David A. McGrew.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ICMGenerator extends BasePRNG {
 
@@ -119,7 +120,7 @@ public class ICMGenerator extends BasePRNG {
 
    /** Trivial 0-arguments constructor. */
    public ICMGenerator() {
-      super(PRNGFactory.ICM_PRNG);
+      super(Registry.ICM_PRNG);
    }
 
    // Class methods

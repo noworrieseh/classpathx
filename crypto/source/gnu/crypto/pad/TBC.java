@@ -1,9 +1,9 @@
 package gnu.crypto.pad;
 
 // ----------------------------------------------------------------------------
-// $Id: TBC.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TBC.java,v 1.3 2002-01-11 21:50:16 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,9 @@ package gnu.crypto.pad;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 
 /**
@@ -40,14 +42,14 @@ import java.io.PrintWriter;
  * complement of the trailing bit of the unpadded message: if the trailing bit
  * is <tt>1</tt>, then <tt>0</tt> bits are appended, and if the trailing bit is
  * <tt>0</tt>, then <tt>1</tt> bits are appended. As few bits are added as are
- * necessary to meet the formatting size requirement."
+ * necessary to meet the formatting size requirement."<p>
  *
  * References:<br>
  * <a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
  * Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
- * Morris Dworkin.
+ * Morris Dworkin.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class TBC extends BasePad {
 
@@ -69,12 +71,12 @@ public final class TBC extends BasePad {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the <i>Factory</i> class.
+    * Trivial package-private constructor for use by the <i>Factory</i> class.<p>
     *
     * @see gnu.crypto.pad.PadFactory
     */
    TBC() {
-      super(PadFactory.TBC_PAD);
+      super(Registry.TBC_PAD);
    }
 
    // Class methods

@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: MDGenerator.java,v 1.1 2001-12-08 21:34:45 raif Exp $
+// $Id: MDGenerator.java,v 1.2 2002-01-11 21:47:13 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,6 +30,7 @@ package gnu.crypto.prng;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
 
@@ -61,7 +62,7 @@ public class MDGenerator extends BasePRNG {
 
    /** Trivial 0-arguments constructor. */
    public MDGenerator() {
-      super(PRNGFactory.MD_PRNG);
+      super(Registry.MD_PRNG);
    }
 
    // Class methods

@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: PRNGFactory.java,v 1.3 2001-12-08 21:38:35 raif Exp $
+// $Id: PRNGFactory.java,v 1.4 2002-01-11 21:46:43 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,23 +30,22 @@ package gnu.crypto.prng;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate pseudo random number generators.
+ * A Factory to instantiate pseudo random number generators.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public class PRNGFactory {
+public class PRNGFactory implements Registry {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   public static final String ICM_PRNG = "icm";
-   public static final String MD_PRNG =  "md";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -60,7 +59,7 @@ public class PRNGFactory {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of a padding algorithm given its name.
+    * Returns an instance of a padding algorithm given its name.<p>
     *
     * @param prng the case-insensitive name of the PRNG.
     * @return an instance of the pseudo-random number generator.
@@ -85,7 +84,7 @@ public class PRNGFactory {
 
    /**
     * Returns a {@link java.util.Set} of names of padding algorithms supported
-    * by this <i>Factory</i>.
+    * by this <i>Factory</i>.<p>
     *
     * @return a {@link java.util.Set} of padding algorithm names (Strings).
     */
