@@ -36,11 +36,12 @@ so:
 The installation is as follow:
 
   cd $GCJ_CRYPTO_ROOT
-  ./admin.sh links
+  /bin/sh admin.sh links
 
 These first two commands change to the gcj sub-directory and build a
 few sym-links pointing to the real source directory and some important
-files that configure expects.
+files that configure expects. It also sets the executable flag on all
+shell scripts, for some reason cvs remove it when checking out!
 
 then
 

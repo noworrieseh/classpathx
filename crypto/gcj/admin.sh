@@ -21,6 +21,7 @@ case $1 in
     test -e COPYING || ln -s ../COPYING COPYING
     test -e AUTHORS || ln -s ../AUTHORS AUTHORS
     test -e ChangeLog || ln -s ../ChangeLog ChangeLog
+    chmod +x admin.sh config.guess config.sub configure depcomp install-sh ltconfig missing mkinstalldirs
     ;;
 
   # Clean all temporary files. This target should be called before a
