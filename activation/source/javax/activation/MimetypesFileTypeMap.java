@@ -1,5 +1,5 @@
 /*
-  GNU-Classpath Extensions: javamail
+  GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
   For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
