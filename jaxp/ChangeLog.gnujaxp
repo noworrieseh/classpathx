@@ -1,3 +1,9 @@
+2004-10-18  Dalibor Topic  <robilad@kaffe.org>
+
+       * sources/gnu/xml/xpath/Index.java: Added missing include.
+          (toString) Convert left and right hand side to strings
+          explicitely.
+
 2004-10-17  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Added experimental XPath 1.0 engine.

@@ -39,6 +39,7 @@
 package gnu.xml.xpath;
 
 import java.util.Collection;
+import java.util.Collections;
 import org.w3c.dom.Node;
 
 /**
@@ -81,7 +82,7 @@ extends Expr
 
   public String toString ()
   {
-    return lhs + '[' + rhs + ']';
+    return lhs.toString () + "[" + rhs.toString () + "]";
   }
   
 }
