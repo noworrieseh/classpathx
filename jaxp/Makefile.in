@@ -233,7 +233,9 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/DomConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/EventConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/EventFilter.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/LinkFilter.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/NSFilter.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/PipelineFactory.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/TeeConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/TextConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/ValidationConsumer.java \
