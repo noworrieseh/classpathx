@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.1 2001-06-08 20:59:00 db Exp $
+ * $Id: XMLWriter.java,v 1.2 2001-07-11 17:15:59 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -38,49 +38,52 @@ import org.xml.sax.helpers.*;
  * of SAX (no internal subset exposed) or DOM (the important declarations,
  * with their documentation, are discarded).
  *
+ * <p> By default, text is generated "as-is", but some optional modes
+ * are supported.  Pretty-printing is supported, to make life easier
+ * for people reading the output.  XHTML (1.0) output has can be made
+ * particularly pretty; all the built-in character entities are known.
+ * Canonical XML can also be generated, assuming the input is properly
+ * formed.
+ *
+ * <hr>
+ *
  * <p> Some of the methods on this class are intended for applications to
- * use directly.  Those methods access the JavaBeans properties (used
- * to enable XHTML format output, or pretty printing),
- * or are the SAX properties which write out various kinds
- * of XML information.  Subclasses are expected to add new behaviors,
- * not to modify current behavior, so many such methods are final.</p>
+ * use directly, rather than as pure SAX2 event callbacks.  Some of those
+ * methods access the JavaBeans properties (used to tweak output formats,
+ * for example canonicalization and pretty printing).  Subclasses
+ * are expected to add new behaviors, not to modify current behavior, so
+ * many such methods are final.</p>
+ *
+ * <p> The <em>write*()</em> methods may be slightly simpler for some
+ * applications to use than direct callbacks.  For example, they support
+ * a simple policy for encoding data items as the content of a single element.
  *
  * <p> To reuse an XMLWriter you must provide it with a new Writer, since
  * this handler closes the writer it was given as part of its endDocument()
  * handling.  (XML documents have an end of input, and the way to encode
  * that on a stream is to close it.) </p>
  *
+ * <hr>
+ *
  * <p> Note that any relative URIs in the source document, as found in
  * entity and notation declarations, ought to have been fully resolved by
  * the parser providing events to this handler.  This means that the
  * output text should only have fully resolved URIs, which may not be
- * the desired behavior in cases where later binding is desired.  In
- * such cases, you may wish to investigate using PUBLIC identifiers
- * and a catalog, or URNs and some other scheme. </p>
+ * the desired behavior in cases where later binding is desired. </p>
  *
- * <hr> <P> Users should note that SAX2 has problems with
- * how it reports the beginning and end of entities, where those entities are
- * used to construct other elements such as declarations in a DTD, attribute
- * values, or conditional sections.  <em>This handler will not attempt
- * to recreate such entity references.</em></P>
- *
- * <P> Also, declarations for attributes of type NOTATION are not fully
- * reported by SAX2; the particular notations which are legal
- * are not yet reported.  This class reports the permitted notations as
- * being the single <em>_unknown_</em> notation name (which will likely
- * produce errors if the output is validated, regardless of whether the
- * original document was valid). </P>
- *
- * <p> <em>Note that due to SAX2 defaults, you need to manually
+ * <p> <em>Note that due to SAX2 defaults, you may need to manually
  * ensure that the input events are XML-conformant with respect to namespace
  * prefixes and declarations.  {@link gnu.xml.pipeline.NSFilter} is
- * a solution to this problem, in the context of processing pipelines. </em>
- * Something as simple as connecting this handler to a parser may no longer
+ * one solution to this problem, in the context of processing pipelines.</em>
+ * Something as simple as connecting this handler to a parser might not
  * generate the correct output.  Another workaround is to ensure that the
- * <em>namespace-prefixes</em> feature is always set to true.
+ * <em>namespace-prefixes</em> feature is always set to true, if you're
+ * hooking this directly up to some XMLReader implementation.
+ *
+ * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-06-08 20:59:00 $
+ * @version $Date: 2001-07-11 17:15:59 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -97,34 +100,51 @@ public class XMLWriter
     private static final int	CTX_UNPARSED = 4;
     private static final int	CTX_NAME = 5;
 
-    // FIXME: names (element, attribute, PI, notation, etc) are not
-    // currently written out with range checks (escapeChars).
-    // In non-XHTML, some names can't be directly written; panic!
+// FIXME: names (element, attribute, PI, notation, etc) are not
+// currently written out with range checks (escapeChars).
+// In non-XHTML, some names can't be directly written; panic!
 
-    private static String	eol;
+    private static String	sysEOL;
 
     static {
 	try {
-	    eol = System.getProperty ("line.separator", "\n");
+	    sysEOL = System.getProperty ("line.separator", "\n");
+
+	    // don't use the system's EOL if it's illegal XML.
+	    if (!isLineEnd (sysEOL))
+		sysEOL = "\n";
+
 	} catch (SecurityException e) {
-	    eol = "\n";
+	    sysEOL = "\n";
 	}
+    }
+
+    private static boolean isLineEnd (String eol)
+    {
+	return "\n".equals (eol)
+		    || "\r".equals (eol)
+		    || "\r\n".equals (eol);
     }
 
     private Writer		out;
     private boolean		inCDATA;
     private int			elementNestLevel;
+    private String		eol = sysEOL;
 
     private short		dangerMask;
     private StringBuffer	stringBuf;
     private Locator		locator;
     private ErrorHandler	errHandler;
 
-    private boolean		expandingEntities;
+    private boolean		expandingEntities = false;
     private int			entityNestLevel;
     private boolean		xhtml;
     private boolean		startedDoctype;
     private String		encoding;
+
+    private boolean		canonical;
+    private boolean		inDoctype;
+    private boolean		inEpilogue;
 
     // pretty printing controls
     private boolean		prettyPrinting;
@@ -210,9 +230,7 @@ public class XMLWriter
      */
     public XMLWriter (Writer writer, String encoding)
     {
-	setWriter (writer);
-	if (out != null)
-	    setEncoding (encoding);
+	setWriter (writer, encoding);
     }
     
     private void setEncoding (String encoding)
@@ -260,18 +278,38 @@ public class XMLWriter
 
     /**
      * Resets the handler to write a new text document.
+     *
+     * @param writer XML text is written to this writer.
+     * @param encoding if non-null, and an XML declaration is written,
+     *	this is the name that will be used for the character encoding.
+     *
      * @exception IllegalStateException if the current
-     *	document hasn't yet ended
+     *	document hasn't yet ended (with {@link #endDocument})
      */
-    final public void setWriter (Writer writer)
+    final public void setWriter (Writer writer, String encoding)
     {
 	if (out != null)
 	    throw new IllegalStateException (
 		"can't change stream in mid course");
 	out = writer;
 	if (out != null)
-	    setEncoding (null);
+	    setEncoding (encoding);
 	space.push ("default");
+    }
+
+    /**
+     * Assigns the line ending style to be used on output.
+     * @param eolString null to use the system default; else
+     *	"\n", "\r", or "\r\n".
+     */
+    final public void setEOL (String eolString)
+    {
+	if (eolString == null)
+	    eol = sysEOL;
+	else if (!isLineEnd (eolString))
+	    eol = eolString;
+	else
+	    throw new IllegalArgumentException (eolString);
     }
 
     /**
@@ -378,6 +416,8 @@ public class XMLWriter
 	if (locator != null)
 	    throw new IllegalStateException ("started parsing");
 	xhtml = value;
+	if (xhtml)
+	    canonical = false;
     }
 
     /**
@@ -401,6 +441,8 @@ public class XMLWriter
 	if (locator != null)
 	    throw new IllegalStateException ("started parsing");
 	expandingEntities = value;
+	if (!expandingEntities)
+	    canonical = false;
     }
 
     /**
@@ -414,7 +456,7 @@ public class XMLWriter
 
     /**
      * Controls pretty-printing, which by default is not enabled
-     * (and currently is mostly useful for XHTML output).
+     * (and currently is most useful for XHTML output).
      * Pretty printing enables structural indentation, sorting of attributes
      * by name, line wrapping, and potentially other mechanisms for making
      * output more or less readable.
@@ -440,6 +482,8 @@ public class XMLWriter
 	if (locator != null)
 	    throw new IllegalStateException ("started parsing");
 	prettyPrinting = value;
+	if (prettyPrinting)
+	    canonical = false;
     }
 
     /**
@@ -448,6 +492,67 @@ public class XMLWriter
     final public boolean isPrettyPrinting ()
     {
 	return prettyPrinting;
+    }
+
+
+    /**
+     * Sets the output style to be canonicalized.  Input events must
+     * meet requirements that are slightly more stringent than the
+     * basic well-formedness ones, and include:  <ul>
+     *
+     *	<li> Namespace prefixes must not have been changed from those
+     *	in the original document.  (This may only be ensured by setting
+     *	the SAX2 XMLReader <em>namespace-prefixes</em> feature flag;
+     *	by default, it is cleared.)
+     *
+     *	<li> Redundant namespace declaration attributes have been
+     *	removed.  (If an ancestor element defines a namespace prefix
+     *	and that declaration hasn't been overriden, an element must
+     *	not redeclare it.)
+     *
+     *	<li> If comments are not to be included in the canonical output,
+     *	they must first be removed from the input event stream; this
+     *	<em>Canonical XML with comments</em> by default.
+     *
+     *	<li> If the input character encoding was not UCS-based, the
+     *	character data must have been normalized using Unicode
+     *	Normalization Form C.  (UTF-8 and UTF-16 are UCS-based.)
+     *
+     *	<li> Attribute values must have been normalized, as is done
+     *	by any conformant XML processor which processes all external
+     *	parameter entities.
+     *
+     *	<li> Similarly, attribute value defaulting has been performed.
+     *
+     *	</ul>
+     *
+     * <p> Note that fragments of XML documents, as specified by an XPath
+     * node set, may be canonicalized.  In such cases, elements may need
+     * some fixup (for <em>xml:*</em> attributes and application-specific
+     * context).
+     *
+     * @exception IllegalArgumentException if the output encoding
+     *	is anything other than UTF-8.
+     */
+    final public void setCanonical (boolean value)
+    {
+	if (value && !"UTF-8".equals (encoding))
+	    throw new IllegalArgumentException ("encoding != UTF-8");
+	canonical = value;
+	if (canonical) {
+	    prettyPrinting = xhtml = false;
+	    expandingEntities = true;
+	    eol = "\n";
+	}
+    }
+
+
+    /**
+     * Returns value of flag controlling canonical output.
+     */
+    final public boolean isCanonical ()
+    {
+	return canonical;
     }
 
 
@@ -463,6 +568,11 @@ public class XMLWriter
 	    out.flush ();
     }
 
+
+    // convenience routines
+
+// FIXME:  probably want a subclass that holds a lot of these...
+// and maybe more!
     
     /**
      * Writes the string as if characters() had been called on the contents
@@ -474,6 +584,46 @@ public class XMLWriter
     {
 	char	buf [] = data.toCharArray ();
 	characters (buf, 0, buf.length);
+    }
+
+
+    /**
+     * Writes an element that has content consisting of a single string.
+     * @see #startElement
+     */
+    public void writeElement (
+	String uri,
+	String local,
+	String name,
+	Attributes atts,
+	String content
+    ) throws SAXException
+    {
+	if (content == null || content.length () == 0) {
+	    writeEmptyElement (uri, local, name, atts);
+	    return;
+	}
+	startElement (uri, local, name, atts);
+	char chars [] = content.toCharArray ();
+	characters (chars, 0, chars.length);
+	endElement (uri, local, name);
+    }
+
+
+    /**
+     * Writes an element that has content consisting of a single integer,
+     * encoded as a decimal string.
+     * @see #startElement
+     */
+    public void writeElement (
+	String uri,
+	String local,
+	String name,
+	Attributes atts,
+	int content
+    ) throws SAXException
+    {
+	writeElement (uri, local, name, atts, Integer.toString (content));
     }
 
 
@@ -513,14 +663,16 @@ public class XMLWriter
 	    if (locator == null)
 		locator = new LocatorImpl ();
 	    
-	    // Unless the data is in US-ASCII, we always write the XML
-	    // declaration when we know the encoding.  US-ASCII won't
+	    // Unless the data is in US-ASCII or we're canonicalizing, write
+	    // the XML declaration if we know the encoding.  US-ASCII won't
 	    // normally get mangled by web server confusion about the
 	    // character encodings used.  Plus, it's an easy way to
 	    // ensure we can write ASCII that's unlikely to confuse
 	    // elderly HTML parsers.
 
-	    if (dangerMask != (short) 0xff80 && encoding != null) {
+	    if (!canonical
+		    && dangerMask != (short) 0xff80
+		    && encoding != null) {
 		rawWrite ("<?xml version='1.0'");
 		rawWrite (" encoding='" + encoding + "'");
 		rawWrite ("?>");
@@ -546,6 +698,8 @@ public class XMLWriter
 		startedDoctype = true;
 	    }
 
+	    entityNestLevel = 0;
+
 	} catch (IOException e) {
 	    fatal ("can't write", e);
 	}
@@ -557,8 +711,10 @@ public class XMLWriter
     throws SAXException
     {
 	try {
-	    newline ();
-	    newline ();
+	    if (!canonical) {
+		newline ();
+		newline ();
+	    }
 	    out.close ();
 	    out = null;
 	    locator = null;
@@ -654,6 +810,66 @@ public class XMLWriter
     final public void endPrefixMapping (String prefix)
 	{}
 
+    private void writeStartTag (
+	String name,
+	Attributes atts,
+	boolean isEmpty
+    ) throws SAXException, IOException
+    {
+	rawWrite ('<');
+	rawWrite (name);
+
+	// write out attributes ... sorting is particularly useful
+	// with output that's been heavily defaulted.
+	if (atts != null && atts.getLength () != 0) {
+
+	    // Set up to write, with optional sorting
+	    int 	indices [] = new int [atts.getLength ()];
+
+	    for (int i= 0; i < indices.length; i++)
+		indices [i] = i;
+	    
+	    // optionally sort
+
+// FIXME:  canon xml demands xmlns nodes go first,
+// and sorting by URI first (empty first) then localname
+// it should maybe use a different sort
+
+	    if (canonical || prettyPrinting) {
+
+		// insertion sort by attribute name
+		for (int i = 1; i < indices.length; i++) {
+		    int	n = indices [i], j;
+		    String	s = atts.getQName (n);
+
+		    for (j = i - 1; j >= 0; j--) {
+			if (s.compareTo (atts.getQName (indices [j]))
+				>= 0)
+			    break;
+			indices [j + 1] = indices [j];
+		    }
+		    indices [j + 1] = n;
+		}
+	    }
+
+	    // write, sorted or no
+	    for (int i= 0; i < indices.length; i++) {
+		String	s = atts.getQName (indices [i]);
+
+		    if (s == null || "".equals (s))
+			throw new IllegalArgumentException ("no XML name");
+		rawWrite (" ");
+		rawWrite (s);
+		rawWrite ("=");
+		writeQuotedValue (atts.getValue (indices [i]),
+		    CTX_ATTRIBUTE);
+	    }
+	}
+	if (isEmpty)
+	    rawWrite (" /");
+	rawWrite ('>');
+    }
+
     /**
      * <b>SAX2</b>:  indicates the start of an element.
      * When XHTML is in use, avoid attribute values with
@@ -698,58 +914,13 @@ public class XMLWriter
 			} else if (indentBefore (name))
 			    doIndent ();
 			// else it's inlined, modulo line length
-			// FIXME: don't increment element nest level!
+			// FIXME: incrementing element nest level
+			// for inlined elements causes ugliness
 		    } else
 			doIndent ();
 		}
 	    }
-	    rawWrite ('<');
-	    rawWrite (name);
-
-	    // write out attributes ... sorting is particularly useful
-	    // with output that's been heavily defaulted.
-	    if (atts != null && atts.getLength () != 0) {
-
-		// Set up to write, with optional sorting
-		int 	indices [] = new int [atts.getLength ()];
-
-		for (int i= 0; i < indices.length; i++)
-		    indices [i] = i;
-		
-		// optionally sort
-		if (prettyPrinting) {
-
-		    // insertion sort by attribute name
-		    for (int i = 1; i < indices.length; i++) {
-			int	n = indices [i], j;
-			String	s = atts.getQName (n);
-
-			for (j = i - 1; j >= 0; j--) {
-			    if (s.compareTo (atts.getQName (indices [j]))
-				    >= 0)
-				break;
-			    indices [j + 1] = indices [j];
-			}
-			indices [j + 1] = n;
-		    }
-		}
-
-		// write, sorted or no
-		for (int i= 0; i < indices.length; i++) {
-		    String	s = atts.getQName (indices [i]);
-
-			if (s == null || "".equals (s))
-			    throw new IllegalArgumentException ("no XML name");
-		    rawWrite (" ");
-		    rawWrite (s);
-		    rawWrite ("=");
-		    writeQuotedValue (atts.getValue (indices [i]),
-		    	CTX_ATTRIBUTE);
-		}
-	    }
-	    if (xhtml && isEmptyElementTag (name))
-		rawWrite (" /");
-	    rawWrite ('>');
+	    writeStartTag (name, atts, xhtml && isEmptyElementTag (name));
 
 	    if (xhtml) {
 // FIXME: if this is an XHTML "pre" element, turn
@@ -760,6 +931,30 @@ public class XMLWriter
 	    fatal ("can't write", e);
 	}
     }
+
+    /**
+     * Writes an empty element.
+     * @see #startElement
+     */
+    public void writeEmptyElement (
+	String uri,
+	String local,
+	String name,
+	Attributes atts
+    ) throws SAXException
+    {
+	if (canonical) {
+	    startElement (uri, local, name, atts);
+	    endElement (uri, local, name);
+	} else {
+	    try {
+		writeStartTag (name, atts, true);
+	    } catch (IOException e) {
+		fatal ("can't write", e);
+	    }
+	}
+    }
+
 
     /** <b>SAX2</b>:  indicates the end of an element */
     final public void endElement (String uri, String local, String name)
@@ -784,6 +979,8 @@ public class XMLWriter
 		else
 		    fatal ("stack discipline", null);
 	    }
+	    if (elementNestLevel == 0)
+		inEpilogue = true;
 
 	} catch (IOException e) {
 	    fatal ("can't write", e);
@@ -800,10 +997,11 @@ public class XMLWriter
 	try {
 	    if (entityNestLevel != 0)
 		return;
-	    if (inCDATA)
+	    if (inCDATA) {
 		escapeChars (buf, off, len, CTX_UNPARSED);
-	    else
+	    } else {
 		escapeChars (buf, off, len, CTX_CONTENT);
+	    }
 	} catch (IOException e) {
 	    fatal ("can't write", e);
 	}
@@ -843,12 +1041,14 @@ public class XMLWriter
 	try {
 	    if (entityNestLevel != 0)
 		return;
+	    if (canonical && inEpilogue)
+		newline ();
 	    rawWrite ("<?");
 	    rawWrite (name);
 	    rawWrite (' ');
 	    escapeChars (value.toCharArray (), -1, -1, CTX_UNPARSED);
 	    rawWrite ("?>");
-	    if (elementNestLevel == 0)
+	    if (elementNestLevel == 0 && !(canonical && inEpilogue))
 		newline ();
 	} catch (IOException e) {
 	    fatal ("can't write", e);
@@ -876,6 +1076,9 @@ public class XMLWriter
     {
 	if (locator == null)
 	    locator = new LocatorImpl ();
+	
+	if (canonical)
+	    return;
 
 	try {
 	    inCDATA = true;
@@ -890,6 +1093,9 @@ public class XMLWriter
     final public void endCDATA ()
     throws SAXException
     {
+	if (canonical)
+	    return;
+
 	try {
 	    inCDATA = false;
 	    if (entityNestLevel == 0)
@@ -912,15 +1118,19 @@ public class XMLWriter
 	if (xhtml)
 	    return;
 	try {
-	    startedDoctype = true;
+	    inDoctype = startedDoctype = true;
+	    if (canonical)
+		return;
 	    rawWrite ("<!DOCTYPE ");
 	    rawWrite (root);
 	    rawWrite (' ');
 
-	    if (pubid != null)
-		rawWrite ("PUBLIC '" + pubid + "' '" + sysid + "' ");
-	    else if (sysid != null)
-		rawWrite ("SYSTEM '" + sysid + "' ");
+	    if (!expandingEntities) {
+		if (pubid != null)
+		    rawWrite ("PUBLIC '" + pubid + "' '" + sysid + "' ");
+		else if (sysid != null)
+		    rawWrite ("SYSTEM '" + sysid + "' ");
+	    }
 
 	    rawWrite ('[');
 	    newline ();
@@ -933,7 +1143,8 @@ public class XMLWriter
     final public void endDTD ()
     throws SAXException
     {
-	if (xhtml)
+	inDoctype = false;
+	if (canonical || xhtml)
 	    return;
 	try {
 	    rawWrite ("]>");
@@ -953,7 +1164,7 @@ public class XMLWriter
 	    boolean	writeEOL = true;
 
 	    // Predefined XHTML entities (for characters) will get
-	    // mapped back later.  No other entities should be written.
+	    // mapped back later.
 	    if (xhtml || expandingEntities)
 		return;
 
@@ -1003,11 +1214,12 @@ public class XMLWriter
 	// don't print internal subset for XHTML
 	if (xhtml && startedDoctype)
 	    return;
+	// don't print comment in doctype for canon xml
+	if (canonical && inDoctype)
+	    return;
 
 	try {
 	    boolean indent;
-
-	    // FIXME: if "comment" has "--" ... die!
 
 	    if (prettyPrinting && space.empty ())
 		fatal ("stack discipline", null);
@@ -1016,12 +1228,14 @@ public class XMLWriter
 		return;
 	    if (indent)
 		doIndent ();
+	    if (canonical && inEpilogue)
+		newline ();
 	    rawWrite ("<!--");
 	    escapeChars (buf, off, len, CTX_UNPARSED);
 	    rawWrite ("-->");
 	    if (indent)
 		doIndent ();
-	    if (elementNestLevel == 0)
+	    if (elementNestLevel == 0 && !(canonical && inEpilogue))
 		newline ();
 	} catch (IOException e) {
 	    fatal ("can't write", e);
@@ -1038,13 +1252,8 @@ public class XMLWriter
 	    return;
 	try {
 	    // At this time, only SAX2 callbacks start these.
-	    if (!startedDoctype)  {
-		// FIXME: write to temporary buffer, and make the start
-		// of the root element write these declarations.
-		// Normal form puts notations first, in alpha order;
-		// followed by unparsed entities, in alpha order.
+	    if (!startedDoctype)
 		return;
-	    }
 
 	    if (entityNestLevel != 0)
 		return;
@@ -1111,8 +1320,6 @@ public class XMLWriter
 	    rawWrite ("<!ATTLIST " + element + ' ' + name + ' ');
 	    rawWrite (type);
 	    rawWrite (' ');
-	    if (type.equals ("NOTATION"))	// SAX2 API bug
-		rawWrite ("( _unknown_ ) ");
 	    if (defaultType != null)
 		rawWrite (defaultType + ' ');
 	    if (defaultValue != null) 
@@ -1317,11 +1524,18 @@ public class XMLWriter
 		break;
 
 	      // as above re markup constructs; but otherwise
-	      // this is just for consistency
+	      // except when canonicalizing, this is for consistency
 	      case '>':
 		if (code == CTX_ENTITY || code == CTX_UNPARSED)
 		    continue;
 	        esc = "gt";
+		break;
+	      case '\'':
+		if (code == CTX_CONTENT || code == CTX_UNPARSED)
+		    continue;
+		if (canonical)
+		    continue;
+		esc = "apos";
 		break;
 
 	      // needed when printing quoted attribute/entity values
@@ -1329,11 +1543,6 @@ public class XMLWriter
 		if (code == CTX_CONTENT || code == CTX_UNPARSED)
 		    continue;
 		esc = "quot";
-		break;
-	      case '\'':
-		if (code == CTX_CONTENT || code == CTX_UNPARSED)
-		    continue;
-		esc = "apos";
 		break;
 
 	      // make line ends work per host OS convention
@@ -1366,16 +1575,20 @@ public class XMLWriter
 		// other encodings we can't detect the second type of
 		// error at all.  (Never an issue for UTF-8 or UTF-16.)
 		//
+
+// FIXME:  CR in CDATA is an error; in text, turn to a char ref
+
+// FIXME:  CR/LF/TAB in attributes should become char refs
+
 		if ((c > 0xfffd)
 			|| ((c < 0x0020) && !((c == 0x0009)
 				|| (c == 0x000A) || (c == 0x000D)))
 			|| (((c & dangerMask) != 0)
 			    && (code == CTX_UNPARSED))) {
 
-		    // if !CTX_UNPARSED, we could kluge up a string
-		    // that prints as "<U+fffe>" ... we used to do
-		    // this, no more.  Application must mangle their
-		    // own data if it's necessary.
+		    // if case (b) in CDATA, we might end the section,
+		    // write a reference, then restart ... possible
+		    // in one DOM L3 draft.
 
 		    throw new CharConversionException (
 			    "Illegal or non-writable character: U+"
@@ -1404,7 +1617,7 @@ public class XMLWriter
 		    else if (c >= 945 && c <= 969)
 			esc = HTMLsymbolx_gr [c - 945];
 
-		    else switch (code) {
+		    else switch (c) {
 			// all of the HTMLspecialx.ent entities
 			case  338: esc = "OElig";	break;
 			case  339: esc = "oelig";	break;
@@ -1517,14 +1730,14 @@ public class XMLWriter
 		// else escape with numeric char refs
 		if (esc == null) {
 		    stringBuf.setLength (0);
-		    stringBuf.append ("#");
-		    stringBuf.append ((int) c);
+		    stringBuf.append ("#x");
+		    stringBuf.append (Integer.toHexString (c).toUpperCase ());
 		    esc = stringBuf.toString ();
 
-		    // We don't write surrogate pairs correctly.
+		    // FIXME:  We don't write surrogate pairs correctly.
 		    // They should work as one ref per character, since
 		    // each pair is one character.  For reading back into
-		    // Unicode, it should never matter.
+		    // Unicode, it matters beginning in Unicode 3.1 ...
 		}
 		break;
 	    }
