@@ -29,7 +29,7 @@ public class XPathTest
             in = new FileInputStream(args[1]);
           }
         
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory f = new gnu.xml.dom.JAXPFactory();
         f.setNamespaceAware(true);
         DocumentBuilder b = f.newDocumentBuilder();
         Document doc = b.parse(new InputSource(in));

@@ -138,7 +138,7 @@ public abstract class Expr
     try
       {
         DocumentBuilderFactory factory =
-          DocumentBuilderFactory.newInstance();
+          new gnu.xml.dom.JAXPFactory();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(source);
         return evaluate(doc, returnType);
