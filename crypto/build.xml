@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.10 2002-06-08 05:51:15 raif Exp $
+   $Id: build.xml,v 1.11 2002-06-24 11:31:05 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -115,7 +115,9 @@
    </target>
 
    <target name="jar-test" depends="compile-test">
-      <jar jarfile="${test.jar}" basedir="${classes.dir}" includes="test/**"/>
+      <jar jarfile="${test.jar}" basedir="${classes.dir}" includes="test/**">
+         <fileset dir="${basedir}" includes="tv/**"/>
+      </jar>
    </target>
 
    <target name="compile-test" depends="jar">
@@ -176,7 +178,7 @@
       <echo message="Computing test vectors for Anubis (${keysize}-bit key)"/>
       <java classname="gnu.crypto.tool.NessieCipherTVEmitter"
             fork="yes" failonerror="true" classpath="${main.jar}"
-            output="tv/anubis-${keysize}-tv.txt">
+            output="tv/nessie/anubis-${keysize}-tv.txt">
          <arg value="anubis"/>
          <arg value="${keysize}"/>
       </java>
@@ -186,7 +188,7 @@
       <echo message="Computing test vectors for Khazad"/>
       <java classname="gnu.crypto.tool.NessieCipherTVEmitter"
             fork="yes" failonerror="true" classpath="${main.jar}"
-            output="tv/khazad-tv.txt">
+            output="tv/nessie/khazad-tv.txt">
          <arg value="khazad"/>
       </java>
    </target>
@@ -195,7 +197,7 @@
       <echo message="Computing test vectors for Whirlpool"/>
       <java classname="gnu.crypto.tool.NessieHashTVEmitter"
             fork="yes" failonerror="true" classpath="${main.jar}"
-            output="tv/whirlpool-tv.txt">
+            output="tv/nessie/whirlpool-tv.txt">
          <arg value="whirlpool"/>
       </java>
    </target>
@@ -218,47 +220,35 @@
            description="Output test vectors in compliance with NIST's KAT">
       <parallel>
          <antcall target="nist-kat">
-            <param name="cipher" value="khazad"/>
-            <param name="keysize" value="128"/>
+            <param name="cipher" value="anubis"/>
          </antcall>
          <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="128"/>
+            <param name="cipher" value="rijndael"/>
          </antcall>
          <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="160"/>
+            <param name="cipher" value="serpent"/>
          </antcall>
          <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="192"/>
-         </antcall>
-         <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="224"/>
-         </antcall>
-         <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="256"/>
-         </antcall>
-         <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="288"/>
-         </antcall>
-         <antcall target="nist-kat">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="320"/>
+            <param name="cipher" value="twofish"/>
          </antcall>
       </parallel>
    </target>
 
    <target name="nist-kat">
-      <echo message="Running NIST KAT tool for ${cipher} (${keysize}-bit key)"/>
+      <mkdir dir="tv/nist/${cipher}"/>
+      <echo message="Generating NIST Variable Key KAT vectors for ${cipher}"/>
       <java classname="gnu.crypto.tool.NistKat"
             fork="yes" failonerror="true" classpath="${main.jar}"
-            output="tv/${cipher}-ecb-${keysize}-kat.txt">
+            output="tv/nist/${cipher}/ecb_vk.txt">
+         <arg value="-k"/>
          <arg value="${cipher}"/>
-         <arg value="${keysize}"/>
+      </java>
+      <echo message="Generating NIST Variable Text KAT vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistKat"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_vt.txt">
+         <arg value="-t"/>
+         <arg value="${cipher}"/>
       </java>
    </target>
 
@@ -266,53 +256,53 @@
            description="Output test vectors in compliance with NIST's MCT">
       <parallel>
          <antcall target="nist-mct">
-            <param name="cipher" value="khazad"/>
-            <param name="keysize" value="128"/>
+            <param name="cipher" value="anubis"/>
          </antcall>
          <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="128"/>
+            <param name="cipher" value="rijndael"/>
          </antcall>
          <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="160"/>
+            <param name="cipher" value="serpent"/>
          </antcall>
          <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="192"/>
+            <param name="cipher" value="twofish"/>
          </antcall>
-         <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="224"/>
-         </antcall>
-         <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="256"/>
-         </antcall>
-         <!--
-         NIST MCT test is designed for AES candidates; i.e. symmetric block
-         ciphers with user-supplied key material length between 128 and 256
-         bits only!
-
-         <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="288"/>
-         </antcall>
-         <antcall target="nist-mct">
-            <param name="cipher" value="anubis"/>
-            <param name="keysize" value="320"/>
-         </antcall>
-         -->
       </parallel>
    </target>
 
    <target name="nist-mct">
-      <echo message="Running NIST MCT tool for ${cipher} (${keysize}-bit key)"/>
+      <mkdir dir="tv/${cipher}"/>
+      <echo message="Generating NIST MCT ECB Encryption vectors for ${cipher}"/>
       <java classname="gnu.crypto.tool.NistMCT"
             fork="yes" failonerror="true" classpath="${main.jar}"
-            output="tv/${cipher}-${keysize}-mct.txt">
+            output="tv/nist/${cipher}/ecb_e_m.txt">
+         <arg value="-E"/>
+         <arg value="-e"/>
          <arg value="${cipher}"/>
-         <arg value="${keysize}"/>
+      </java>
+      <echo message="Generating NIST MCT ECB Decryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_d_m.txt">
+         <arg value="-E"/>
+         <arg value="-d"/>
+         <arg value="${cipher}"/>
+      </java>
+      <echo message="Generating NIST MCT CBC Encryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/cbc_e_m.txt">
+         <arg value="-C"/>
+         <arg value="-e"/>
+         <arg value="${cipher}"/>
+      </java>
+      <echo message="Generating NIST MCT CBC Decryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/cbc_d_m.txt">
+         <arg value="-C"/>
+         <arg value="-d"/>
+         <arg value="${cipher}"/>
       </java>
    </target>
 
