@@ -1614,7 +1614,8 @@ public class MimeMessage
     if (!saved)
       saveChanges();
 
-		String charset = "UTF-8"; // TODO default charset?
+    String charset = "UTF-8"; // TODO default charset?
+    byte[] sep = new byte[] { 0x0d, 0x0a };
 
     // Write the headers
     for (Enumeration e = getNonMatchingHeaderLines(ignoreList);
@@ -1630,8 +1631,7 @@ public class MimeMessage
       while (line.length()>max)
       {
         String left = line.substring(0, max);
-				byte[] bytes = left.getBytes(charset);
-				byte[] sep = new byte[] { 0x0d, 0x09 };
+        byte[] bytes = left.getBytes(charset);
         os.write(bytes);
         os.write(sep);
         line = line.substring(max);
@@ -1639,9 +1639,9 @@ public class MimeMessage
       }
 			byte[] bytes = line.getBytes(charset);
       os.write(bytes);
-      os.write(0x0d);
+      os.write(sep);
     }
-    os.write(0x0d);
+    os.write(sep);
     os.flush();
 
     /*
