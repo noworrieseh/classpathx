@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.30 2001-12-05 20:54:38 db Exp $
+ * $Id: XmlParser.java,v 1.31 2002-03-07 20:38:10 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.30 2001-12-05 20:54:38 db Exp $
+// $Id: XmlParser.java,v 1.31 2002-03-07 20:38:10 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -79,16 +79,13 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-12-05 20:54:38 $
+ * @version $Date: 2002-03-07 20:38:10 $
  * @see SAXDriver
  */
 final class XmlParser
 {
-    // parse from buffer, avoiding slow per-character readCh()
+    // avoid slow per-character readCh()
     private final static boolean USE_CHEATS = true;
-
-    // don't waste too much space in hashtables 
-    private final static int DEFAULT_ATTR_COUNT = 23;
 
 
     //////////////////////////////////////////////////////////////////////
@@ -160,14 +157,16 @@ final class XmlParser
 	setInternalEntity ("apos", "&#39;");
 	setInternalEntity ("quot", "&#34;");
 
-	pushURL (false, "[document]",
-		    // default baseURI: null
-		new String [] { publicId, systemId, null},
-		reader, stream, encoding, false);
-
-	handler.startDocument ();
-
 	try {
+	    // pushURL first to ensure locator is correct in startDocument
+	    // ... it might report an IO or encoding exception.
+	    // FIXME that could call endDocument without startDocument!
+	    pushURL (false, "[document]",
+			// default baseURI: null
+		    new String [] { publicId, systemId, null},
+		    reader, stream, encoding, false);
+
+	    handler.startDocument ();
 	    parseDocument ();
 	} finally {
 	    if (reader != null)
@@ -1050,7 +1049,6 @@ loop:
 		    }
 		}
 		// ... or has a default
-		// String value = getAttributeExpandedValue (gi, aname);
 		String value = getAttributeDefaultValue (gi, aname);
 
 		if (value == null)
@@ -1805,6 +1803,7 @@ loop2:
 	    error ("character reference " + value + " is too large for UTF-16",
 		   new Integer (value).toString (), null);
 	}
+	dataBufferFlush ();
     }
 
 
@@ -2025,12 +2024,10 @@ loop2:
 	int	state = 0;
 	boolean pureWhite = false;
 
-	// could have <![CDATA[...]]> text or char ref expansions
-	if (dataBufferPos != 0)
-	    dataBufferFlush ();
+	// assert (dataBufferPos == 0);
 
 	// are we expecting pure whitespace?  it might be dirty...
-	if (currentElementContent == CONTENT_ELEMENTS && !inCDATA)
+	if (currentElementContent == CONTENT_ELEMENTS);
 	    pureWhite = true;
 
 	// always report right out of readBuffer
@@ -2186,7 +2183,7 @@ loop:
 	    }
 	}
 
-	// OK, do it by the book.
+	// OK, do it the slow way.
 	char c = readCh ();
 	while (isWhitespace (c)) {
 	    c = readCh ();
@@ -2717,7 +2714,8 @@ loop:
 	int	hash = 0;
 	Object	bucket [];
 
-	// Generate a hash code.
+	// Generate a hash code.  This is a widely used string hash,
+	// often attributed to Brian Kernighan.
 	for (int i = start; i < start + length; i++)
 	    hash = 31 * hash + ch [i];
 	hash = (hash & 0x7fffffff) % SYMBOL_TABLE_LENGTH;
@@ -2733,7 +2731,7 @@ loop:
 	    while (index < bucket.length) {
 		char chFound [] = (char []) bucket [index];
 
-		// Stop when we hit a null index.
+		// Stop when we hit an empty entry.
 		if (chFound == null)
 		    break;
 
@@ -2760,16 +2758,16 @@ loop:
 
 	// OK, add it to the end of the bucket -- "local" interning.
 	// Intern "globally" to let applications share interning benefits.
+	// That is, "!=" and "==" work on our strings, not just equals().
 	String s = new String (ch, start, length).intern ();
 	bucket [index] = s.toCharArray ();
 	bucket [index + 1] = s;
 	return s;
     }
 
-
     /**
      * Ensure the capacity of an array, allocating a new one if
-     * necessary.  Usually called only a handful of times.
+     * necessary.  Usually extends only for name hash collisions. 
      */
     private Object extendArray (Object array, int currentSize, int requiredSize)
     {
@@ -3419,7 +3417,7 @@ loop:
 	boolean		doResolve
     ) throws SAXException, IOException
     {
-	boolean		ignoreEncoding = false;
+	boolean		ignoreEncoding;
 	String		systemId;
 	InputSource	source;
 
@@ -3436,7 +3434,7 @@ loop:
 	    // assert (stream == null && reader == null && encoding == null)
 	    source = handler.resolveEntity (isPE, ename, scratch, ids [2]);
 	    if (source == null) {
-		handler.warn ("Skipping entity: " + ename);
+		handler.warn ("skipping entity: " + ename);
 		handler.skippedEntity (ename);
 		if (isPE)
 		    skippedPE = true;
@@ -4663,7 +4661,7 @@ loop:
 
 
     //
-    // Buffer for parsed character data.
+    // Buffer for attribute values, char refs, DTD stuff.
     //
     private static int DATA_BUFFER_INITIAL = 4096;
     private char	dataBuffer [];
@@ -4720,7 +4718,20 @@ loop:
     //
     // Symbol table, for caching interned names.
     //
-    private final static int SYMBOL_TABLE_LENGTH = 1087;
+    // These show up wherever XML names or nmtokens are used:  naming elements,
+    // attributes, PIs, notations, entities, and enumerated attribute values.
+    //
+    // NOTE:  This hashtable doesn't grow.  The default size is intended to be
+    // rather large for most documents.  Example:  one snapshot of the DocBook
+    // XML 4.1 DTD used only about 350 such names.  As a rule, only pathological
+    // documents (ones that don't reuse names) should ever see much collision.
+    //
+    // Be sure that SYMBOL_TABLE_LENGTH always stays prime, for best hashing.
+    // "2039" keeps the hash table size at about two memory pages on typical
+    // 32 bit hardware.
+    //
+    private final static int SYMBOL_TABLE_LENGTH = 2039;
+
     private Object	symbolTable [][];
 
     //
