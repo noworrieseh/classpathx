@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -130,6 +131,10 @@ public class Bindings
       {
         Expr expr = (Expr) ret;
         ret = expr.evaluate(context);
+      }
+    if (ret instanceof Node)
+      {
+        ret = Collections.singleton(ret);
       }
     if (ret == null)
       {

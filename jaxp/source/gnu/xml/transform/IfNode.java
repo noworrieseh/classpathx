@@ -64,7 +64,10 @@ final class IfNode
     throws TransformerException
   {
     Object ret = test.evaluate(context);
-    if (ret instanceof Boolean && ((Boolean) ret).booleanValue())
+    boolean success = (ret instanceof Boolean) ?
+      ((Boolean) ret).booleanValue() :
+      Expr._boolean(context, ret);
+    if (success)
       {
         if (children != null)
           {
