@@ -68,8 +68,7 @@ public interface Filter
 
   /** destroy a filter.
    */
-  public void destroy()
-  throws ServletException;
+  public void destroy();
 
   /** filter the request/response.
    *

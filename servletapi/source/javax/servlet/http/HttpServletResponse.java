@@ -665,8 +665,7 @@ extends ServletResponse
    * @return the URL with any necessary session information added
    * @throws IllegalArgumentException if the URL is a relative URL
    */
-  String encodeRedirectURL (String url)
-  throws IllegalArgumentException;
+  String encodeRedirectURL (String url);
 
   /**
    * Encodes an URL that is going to be send to the client.
@@ -723,7 +722,7 @@ extends ServletResponse
    * @exception IllegalArgumentException if the argument is a relative URL
    */
   void sendRedirect (String url)
-  throws IOException, IllegalArgumentException;
+  throws IOException;
 
   /**
    * Adds a header to the response which contains a date.
@@ -850,6 +849,6 @@ extends ServletResponse
    *
    * @deprecated use <code>encodeRedirectURL()</code>
    */
-  String encodeRedirectUrl (String url)
-  throws IllegalArgumentException;
+  String encodeRedirectUrl (String url);
+
 }

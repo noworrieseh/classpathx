@@ -35,6 +35,34 @@ extends ServletRequest
 {
 
   /**
+   * Identifier for a request using basic authentication.
+   * Value is "BASIC"
+   */
+  
+  public static final String BASIC_AUTH = "BASIC";
+
+  /**
+   * Identifier for a request using form authentication.
+   * Value is "FORM"
+   */
+
+  public static final String FORM_AUTH = "FORM";
+
+  /**
+   * Indentifier for a request using client certificate authentication
+   * value is "CLIENT_CERT"
+   */
+  
+  public static final String CLIENT_CERT_AUTH = "CLIENT_CERT";
+
+  /**
+   * Indentifier for a request using digest authentication
+   * value is "DIGEST"
+   */
+
+  public static final String DIGEST_AUTH = "DIGEST";
+
+  /**
    * Gets the authorization scheme of this request.
    * This is the same as the CGI request metadata <code>AUTH_TYPE</code>.
    * See also section 11 of the HTTP/1.1 specification (RFC 2068).
@@ -121,8 +149,7 @@ extends ServletRequest
    * @exception NumberFormatException if the headervalue can't be converted
    * to an int.
    */
-  int getIntHeader(String name)
-  throws NumberFormatException;
+  int getIntHeader(String name);
 
 
   /**
@@ -251,6 +278,20 @@ extends ServletRequest
    * @return The requested URI
    */
   String getRequestURI();
+
+
+  /**
+   * Contains the URL that the client used to make the request without 
+   * the query string. This includes protocol,server,port, and path 
+   * information.
+   *
+   * @since Servlet API 2.3
+   *
+   * @return a StringBuffer containing the request URL.
+   * this Stringbuffer can be easily appended to, to add the query
+   * string if needed.
+   */
+  StringBuffer getRequestURL ();
 
   /**
    * Gets the part of the URI up to and including the servlet name.

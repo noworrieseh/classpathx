@@ -144,6 +144,16 @@ public interface ServletResponse
   void flushBuffer()
   throws IOException;
 
+  /**
+   * Resets the underlying response buffer, but does not clear the response code
+   * or headers.
+   *
+   * @since Servlet API 2.3
+   *
+   * @throws IllegalStateException if the response has already been committed
+   */
+  
+  void resetBuffer ();
 
   /**
    * set the locale for the response.

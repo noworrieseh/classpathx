@@ -23,6 +23,7 @@ package javax.servlet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * Whenever the server receives a request it creates a ServletRequest object,
@@ -161,6 +162,18 @@ public interface ServletRequest
   String getParameter(String name);
 
   /**
+   * Gets a Map of all the parameters contained within this request
+   *
+   * @since Servlet API 2.3
+   *
+   * @return java.util.Map containing key value pairs of the request parameters,
+   * where the key is a String containing the parameter name, and the
+   * value is an array of Strings containing the parameter values
+   */
+
+  Map getParameterMap ();
+
+  /**
    * Gets an array of Strings containing all the request parameter's
    * values whose name matches <CODE>name</CODE>.
    *
@@ -278,6 +291,19 @@ public interface ServletRequest
    * @return Character encoding or null if the encoding is unavailable
    */
   String getCharacterEncoding();
+
+
+  /**
+   * Sets the name of the character encoding used for the body
+   * of this request
+   *
+   * @since Servlet API 2.3
+   *
+   * @param enc a String containing the name of the character encoding
+   * @throws java.io.UnsupportedEncodingException if the provided name is not 
+   * a valid encoding scheme
+   */
+  void setCharacterEncoding (String enc);
 
 
   /**

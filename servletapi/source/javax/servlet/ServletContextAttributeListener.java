@@ -31,7 +31,7 @@ public interface ServletContextAttributeListener
 {
   public void attributeAdded(ServletContextAttributeEvent evt);
 
-  public void attributeChanged(ServletContextAttributeEvent evt);
+  public void attributeReplaced(ServletContextAttributeEvent evt);
 
   public void attributeRemoved(ServletContextAttributeEvent evt);
 

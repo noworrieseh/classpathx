@@ -38,6 +38,8 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/http/Cookie.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpServletRequest.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpServletResponse.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSession.java \
+		$(SOURCEDIR)/javax/servlet/http/HttpSessionActivationListener.java \
+		$(SOURCEDIR)/javax/servlet/http/HttpSessionAttributeListener.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionBindingEvent.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionBindingListener.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionContext.java \
@@ -53,7 +55,9 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/http/Cookie.java \
 		$(SOURCEDIR)/javax/servlet/ServletInputStream.java \
 		$(SOURCEDIR)/javax/servlet/ServletOutputStream.java \
 		$(SOURCEDIR)/javax/servlet/ServletRequest.java \
+		$(SOURCEDIR)/javax/servlet/ServletRequestWrapper.java \
 		$(SOURCEDIR)/javax/servlet/ServletResponse.java \
+		$(SOURCEDIR)/javax/servlet/ServletResponseWrapper.java \
 		$(SOURCEDIR)/javax/servlet/SingleThreadModel.java \
 		$(SOURCEDIR)/javax/servlet/UnavailableException.java \
 	        $(SOURCEDIR)/javax/servlet/Filter.java \

@@ -512,6 +512,10 @@ implements Serializable
       return response.isCommitted();
     }
 
+    public void resetBuffer ()
+    {
+      response.resetBuffer ();
+    }
 
     public void flushBuffer()
     throws IOException 

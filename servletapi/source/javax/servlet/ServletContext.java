@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Set;
 
 
 /**
@@ -47,7 +48,7 @@ import java.util.Locale;
  */
 public interface ServletContext
 {
-
+  
   /**
    * Gets the value of a named attribute
    *
@@ -138,6 +139,23 @@ public interface ServletContext
    */
   String getRealPath(String virtualPath);
 
+  /**
+   * Returns a listing of all the resources that are accessible inside 
+   * this web application, whose paths start with the path provided
+   * specified. This path must start with a "/", and all paths in the
+   * resulting set will be relative to the root of the web application
+   * So a call of <code>getResourcePaths ("/images/jpegs/")</code>
+   * might yield the set {"/images/jpegs/a.jpg","/images/jpegs/b.jpg,..."}
+   * 
+   * @since Servlet API 2.3
+   *
+   * @param pathPrefix The path starting with "/" used to match against the resources
+   *
+   * @return a Set containing the paths of the matching resources
+   * or null if no resources with the specified prefix can be found 
+   */
+  Set getResourcePaths (String pathPrefix);
+ 
 
   /**
    * Translates the requested virtual path to an URL object that can be
@@ -180,7 +198,7 @@ public interface ServletContext
   URL getResource(String virtualPath)
   throws MalformedURLException;
 
-
+      
 
   /**
    * A convenience method for

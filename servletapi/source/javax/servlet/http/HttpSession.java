@@ -19,7 +19,10 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 package javax.servlet.http;
+
 import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
 
 /**
  * A HttpSession holds session-dependant data on the server side.
@@ -30,7 +33,7 @@ import java.util.Enumeration;
  * <DL>
  * <DT>As follows:
  * <DD>
- * The server maintaines the set of HttpSessions.<BR>
+ * The server maintains the set of HttpSessions.<BR>
  * The server creates HttpSession on request by a servlet<BR>
  * The server removes all invalidated HttpSessions<BR>
  * The server connects an incoming request with its HttpSession
@@ -41,7 +44,7 @@ import java.util.Enumeration;
  * </DD>
  * </DL>
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.3
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
@@ -56,8 +59,8 @@ public interface HttpSession
    * @return a number of seconds
    * @exception IllegalStateException if the session has been invalidated.
    */
-  long getCreationTime()
-  throws IllegalStateException;
+  long getCreationTime();
+
 
 
   /**
@@ -70,8 +73,8 @@ public interface HttpSession
    * @return The Id
    * @exception IllegalStateException if the session has been invalidated.
    */
-  String getId()
-  throws IllegalStateException;
+  String getId();
+
 
 
   /**
@@ -88,9 +91,18 @@ public interface HttpSession
    * @return number of seconds since last access or -1
    * @exception IllegalStateException if the session has been invalidated.
    */
-  long getLastAccessedTime()
-  throws IllegalStateException;
+  long getLastAccessedTime();
 
+  /**
+   * Get the ServletContext to which this session belongs
+   *
+   * @since Servlet API 2.3
+   *
+   * @return the ServletContext representing the web application
+   * of which this session is a part.
+   */
+
+  ServletContext getServletContext ();
 
   /**
    * Returns the minimum time this session will be kept alive by the
@@ -100,8 +112,7 @@ public interface HttpSession
    *
    * @returns the time in seconds, or -1 when this session will live forever
    */
-  int getMaxInactiveInterval()
-  throws IllegalStateException;
+  int getMaxInactiveInterval();
 
   /**
    * Gets a object from the set of name/value pairs in the session.
@@ -115,8 +126,8 @@ public interface HttpSession
    * @since Servlet API 2.0
    * @deprecated Servlet API 2.2 use {@link #getAttribute instead}
    */
-  Object getValue(String name)
-  throws IllegalStateException;
+  Object getValue(String name);
+
 
 
   /**
@@ -128,8 +139,7 @@ public interface HttpSession
    * @since Servlet API 2.0
    * @deprecated Servlet API 2.2 use {@link #getAttributeNames instead}
    */
-  String[] getValueNames()
-  throws IllegalStateException;
+  String[] getValueNames();
 
 
   /**
@@ -145,8 +155,7 @@ public interface HttpSession
    *
    * @exception IllegalStateException if the session has been invalidated.
    */
-  void invalidate()
-  throws IllegalStateException;
+  void invalidate();
 
 
   /**
@@ -162,8 +171,7 @@ public interface HttpSession
    * @return Whether this is a new HttpSession
    * @exception IllegalStateException if the session has been invalidated.
    */
-  boolean isNew()
-  throws IllegalStateException;
+  boolean isNew();
 
 
   /**
@@ -178,8 +186,7 @@ public interface HttpSession
    * @since Servlet API 2.0
    * @deprecated Servlet API 2.2 use {@link #setAttribute instead}
    */
-  void putValue(String name,Object value)
-  throws IllegalStateException;
+  void putValue(String name,Object value);
 
   /**
    * Removes an item from the session.
@@ -192,8 +199,7 @@ public interface HttpSession
    * @since Servlet API 2.0
    * @deprecated Servlet API 2.2 use {@link #removeAttribute instead}
    */
-  void removeValue(String name)
-  throws IllegalStateException;
+  void removeValue(String name);
 
 
   /**
@@ -203,16 +209,20 @@ public interface HttpSession
    * @since Servlet API 2.1
    *
    * @param interval Probably seconds or -1 if never
+   *
+   * @throws IllegalStateException if this session has been invalidated
    */
-  void setMaxInactiveInterval(int interval)
-  throws IllegalStateException;
-
+  void setMaxInactiveInterval(int interval);
 
 
   /**
    * get the attribute value associated with the name
    *
    * @since Servlet API 2.2
+   *
+   * @param name the name of the attribute
+   * @return the Object associated with this name
+   * @throws IllegalStateException if this session has been invalidated
    */
   Object getAttribute(String name);
 
@@ -221,6 +231,7 @@ public interface HttpSession
    * get the list of attribute names
    *
    * @since Servlet API 2.2
+   * @throws IllegalStateException if this session has been invalidated
    */
   Enumeration getAttributeNames();
 
@@ -229,6 +240,7 @@ public interface HttpSession
    * set the attribute value to be associated with the name.
    *
    * @since Servlet API 2.2
+   * @throws IllegalStateException if this session has been invalidated
    */
   void setAttribute(String name, Object value);
 
@@ -237,6 +249,7 @@ public interface HttpSession
    * remove the specified attribute.
    *
    * @since Servlet API 2.2
+   * @throws IllegalStateException if this session has been invalidated
    */
   void removeAttribute(String name);
 
@@ -253,6 +266,6 @@ public interface HttpSession
    * @return The context
    * @exception IllegalStateException if the session has been invalidated.
    */
-  HttpSessionContext getSessionContext()
-  throws IllegalStateException;
+  HttpSessionContext getSessionContext();
+
 }
