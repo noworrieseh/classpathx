@@ -1,5 +1,5 @@
 /*
- * $Id: DomCharacterData.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: DomCharacterData.java,v 1.6 2001-11-19 22:21:21 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,39 +31,44 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomCharacterData.java,v 1.5 2001-10-23 17:42:25 db Exp $
+// $Id: DomCharacterData.java,v 1.6 2001-11-19 22:21:21 db Exp $
 
 /**
  * <p> Abstract "CharacterData" implementation.  This
  * facilitates reusing code in classes implementing subtypes of that DOM
  * interface (Text, Comment, CDATASection).  </p>
  *
- * <p> Representational efficiency wasn't exactly a goal here.  Strings
- * are not really an efficient internal representation, and aren't how parsers
- * generally deliver data, but they're the only API exposed by DOM.  To
- * use a more efficient representation would involve either conversion
- * costs, or defining some extension to DOM to permit faster construction. 
- * (For example, it could be defined through a new "feature" module.)
- *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-19 22:21:21 $
  */
 public abstract class DomCharacterData extends DomNode
     implements CharacterData
 {
-    private String		data;
+    private char		raw [];
 
     // package private
     DomCharacterData (Document doc, short type, String value)
     {
 	super (doc, type);
 	if (value != null)
-	    data = value;
+	    raw = value.toCharArray ();
 	else
-	    data = "";
+	    raw = new char [0];
     }
 
-    
+    // package private
+    DomCharacterData (Document doc, short type,
+	    char buf [], int offset, int length)
+    {
+	super (doc, type);
+	if (buf == null)
+	    raw = new char [0];
+	else {
+	    raw = new char [length];
+	    System.arraycopy (buf, offset, raw, 0, length);
+	}
+    }
+
     /**
      * <b>DOM L1</b>
      * Appends the specified data to the value of this node.
@@ -73,9 +78,14 @@ public abstract class DomCharacterData extends DomNode
     {
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	arg = data + arg;
-	mutating (arg);
-	data = arg;
+
+	char	tmp [] = arg.toCharArray ();
+	char	buf [] = new char [raw.length + tmp.length];
+
+	System.arraycopy (raw, 0, buf, 0, raw.length);
+	System.arraycopy (tmp, 0, buf, raw.length, tmp.length);
+	mutating (new String (buf));
+	raw = buf;
     }
     
 
@@ -86,37 +96,22 @@ public abstract class DomCharacterData extends DomNode
      */
     public void deleteData (int offset, int count)
     {
-	char		chars [];
-	StringBuffer	buf;
-	String		newValue;
+	char	buf [];
 
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	else if (count < 0)
+	if (offset < 0 || count < 0 || offset > raw.length)
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
-	buf = new StringBuffer ();
-	try {
-	    chars = data.toCharArray ();
-	    if (offset > chars.length)
-		throw new DomEx (DomEx.INDEX_SIZE_ERR);
-	    buf.append (chars, 0, offset);
-	    buf.append (chars, offset + count,
-		    chars.length - (offset + count));
-	    newValue = new String (buf);
-	    mutating (newValue);
-	    data = newValue;
-	} catch (IndexOutOfBoundsException x) {
-	    if (offset >= 0 && count >= 0) {
-		int len = data.length ();
-		if ((offset + count) > len) {
-		    newValue = data.substring (0, offset);
-		    mutating (newValue);
-		    data = newValue;
-		    return;
-		}
-	    }
-	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
-	}
+	if ((offset + count) > raw.length)
+	    count = raw.length - offset;
+	if (count == 0)
+	    return;
+	buf = new char [raw.length - count];
+	System.arraycopy (raw, 0, buf, 0, offset);
+	System.arraycopy (raw, offset + count, buf, offset,
+	    raw.length - (offset + count));
+	mutating (new String (buf));
+	raw = buf;
     }
     
 
@@ -126,7 +121,7 @@ public abstract class DomCharacterData extends DomNode
      */
     public String getNodeValue ()
     {
-	return data;
+	return new String (raw);
     }
 
     
@@ -146,7 +141,7 @@ public abstract class DomCharacterData extends DomNode
      */
     public int getLength ()
     {
-	return data.length ();
+	return raw.length;
     }
 
 
@@ -175,17 +170,19 @@ public abstract class DomCharacterData extends DomNode
      */
     public void insertData (int offset, String arg)
     {
-	StringBuffer buf;
-	String newValue;
+	char	tmp [] = arg.toCharArray ();
+	char	buf [] = new char [raw.length + tmp.length];
 
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	buf = new StringBuffer (data);
 	try {
-	    buf.insert (offset, arg);
-	    newValue = new String (buf);
-	    mutating (newValue);
-	    data = newValue;
+	    System.arraycopy (raw, 0, buf, 0, offset);
+	    System.arraycopy (tmp, 0, buf, offset,
+		tmp.length);
+	    System.arraycopy (raw, offset, buf, offset + tmp.length,
+	    	raw.length - offset);
+	    mutating (new String (buf));
+	    raw = buf;
 	} catch (IndexOutOfBoundsException x) {
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	}
@@ -221,7 +218,7 @@ public abstract class DomCharacterData extends DomNode
 	if (value == null)
 	    value = "";
 	mutating (value);
-	data = value;
+	raw = value.toCharArray ();
     }
 
     
@@ -242,12 +239,12 @@ public abstract class DomCharacterData extends DomNode
     public String substringData (int offset, int count)
     {
 	try {
-	    return data.substring (offset, offset + count);
+	    return new String (raw, offset, count);
 	} catch (IndexOutOfBoundsException e) {
 	    if (offset >= 0 && count >= 0) {
-		int len = data.length ();
+		int len = raw.length;
 		if (offset < len && (offset + count) > len)
-		    return data.substring (offset);
+		    return new String (raw, offset, len - offset);
 	    }
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	}
@@ -265,8 +262,7 @@ public abstract class DomCharacterData extends DomNode
 	event = (MutationEvent) createEvent ("MutationEvents");
 	event.initMutationEvent ("DOMCharacterDataModified",
 		true /* bubbles */, false /* nocancel */,
-		null, data, newValue, null, (short) 0);
+		null, new String (raw), newValue, null, (short) 0);
 	dispatchEvent (event);
     }
 }
-
