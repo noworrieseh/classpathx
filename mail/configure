@@ -271,7 +271,7 @@ PACKAGE_STRING='gnumail 0.1'
 PACKAGE_BUGREPORT=''
 
 ac_unique_file="source/gnu/mail/providers/ReadOnlyMessage.java"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ACTIVATION_JAR INETLIB_JAR ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAVADOC JAR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ACTIVATION_JAR INETLIB_JAR ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1953,95 +1953,7 @@ echo "$as_me:$LINENO: result: $ac_cv_prog_javac_works" >&5
 echo "${ECHO_T}$ac_cv_prog_javac_works" >&6
 
 
-
-if test "x$JAVAPREFIX" = x; then
-        test "x$JAVADOC" = x && for ac_prog in javadoc$EXEEXT
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVADOC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAVADOC"; then
-  ac_cv_prog_JAVADOC="$JAVADOC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_JAVADOC="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-JAVADOC=$ac_cv_prog_JAVADOC
-if test -n "$JAVADOC"; then
-  echo "$as_me:$LINENO: result: $JAVADOC" >&5
-echo "${ECHO_T}$JAVADOC" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$JAVADOC" && break
-done
-
-else
-        test "x$JAVADOC" = x && for ac_prog in javadoc
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVADOC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAVADOC"; then
-  ac_cv_prog_JAVADOC="$JAVADOC" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_JAVADOC="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-JAVADOC=$ac_cv_prog_JAVADOC
-if test -n "$JAVADOC"; then
-  echo "$as_me:$LINENO: result: $JAVADOC" >&5
-echo "${ECHO_T}$JAVADOC" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$JAVADOC" && break
-done
-test -n "$JAVADOC" || JAVADOC="$JAVAPREFIX"
-
-fi
-test "x$JAVADOC" = x && { { echo "$as_me:$LINENO: error: no acceptable javadoc generator found in \$PATH" >&5
-echo "$as_me: error: no acceptable javadoc generator found in \$PATH" >&2;}
-   { (exit 1); exit 1; }; }
-
+#AC_PROG_JAVADOC
 
 if test "x$JAVAPREFIX" = x; then
         test "x$JAR" = x && for ac_prog in jar$EXEEXT
@@ -2850,7 +2762,6 @@ s,@ENABLE_MBOX_FALSE@,$ENABLE_MBOX_FALSE,;t t
 s,@ENABLE_MAILDIR_TRUE@,$ENABLE_MAILDIR_TRUE,;t t
 s,@ENABLE_MAILDIR_FALSE@,$ENABLE_MAILDIR_FALSE,;t t
 s,@JAVAC@,$JAVAC,;t t
-s,@JAVADOC@,$JAVADOC,;t t
 s,@JAR@,$JAR,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

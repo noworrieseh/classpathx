@@ -5,11 +5,13 @@
 JAVAC = @JAVAC@
 #JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGS = -g
-JAVADOC = @JAVADOC@
+JAVADOC = javadoc
 
-src = source
-dst = classes
-doc = docs
+src = @srcdir@/source
+dst = @srcdir@/classes
+doc = @srcdir@/docs
+
+activation_jar = @srcdir@/activation.jar
 
 # Source files.
 sources = \
@@ -38,7 +40,7 @@ $(src)/gnu/activation/viewers/TextEditor.java \
 $(src)/gnu/activation/viewers/TextViewer.java
 
 # Targets
-BUILT_SOURCES = activation.jar
+BUILT_SOURCES = $(activation_jar)
 
 ACTIVATION_CLASSPATH = $(dst):$(src)
 META_INF = $(dst)/META-INF
@@ -55,8 +57,8 @@ package_names = javax.activation
 
 # Jar
 
-activation.jar: meta-inf activation
-	$(JAR) cf activation.jar -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
+$(activation_jar): meta-inf activation
+	$(JAR) cf $(activation_jar) -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
 
 meta-inf: $(META_INF) $(META_INF_FILES)
 
@@ -92,5 +94,9 @@ clean-local:
 
 distclean-local: clean-local
 	rm -f config.log config.status
+
+install-data-local:
+	@srcdir@/mkinstalldirs $(prefix)/share/java
+	$(INSTALL_DATA) $(activation_jar) $(prefix)/share/java
 
 # End of Makefile.am

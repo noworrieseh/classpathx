@@ -82,7 +82,7 @@ JAVA = @JAVA@
 JAVAC = @JAVAC@
 #JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGS = -g
-JAVADOC = @JAVADOC@
+JAVADOC = javadoc
 JAVAFLAGS = @JAVAFLAGS@
 JAVAH = @JAVAH@
 JAVAPREFIX = @JAVAPREFIX@
@@ -97,9 +97,11 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 uudecode = @uudecode@
 
-src = source
-dst = classes
-doc = docs
+src = @srcdir@/source
+dst = @srcdir@/classes
+doc = @srcdir@/docs
+
+activation_jar = @srcdir@/activation.jar
 
 # Source files.
 sources = \
@@ -129,7 +131,7 @@ $(src)/gnu/activation/viewers/TextViewer.java
 
 
 # Targets
-BUILT_SOURCES = activation.jar
+BUILT_SOURCES = $(activation_jar)
 
 ACTIVATION_CLASSPATH = $(dst):$(src)
 META_INF = $(dst)/META-INF
@@ -310,7 +312,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-data-local
 
 install-exec-am:
 
@@ -334,19 +336,20 @@ uninstall-am: uninstall-info-am
 .PHONY: all all-am check check-am clean clean-generic clean-local dist \
 	dist-all dist-gzip distcheck distclean distclean-generic \
 	distclean-local distcleancheck distdir dvi dvi-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic uninstall uninstall-am uninstall-info-am
+	install install-am install-data install-data-am \
+	install-data-local install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	uninstall uninstall-am uninstall-info-am
 
 
 # Targets...
 
 # Jar
 
-activation.jar: meta-inf activation
-	$(JAR) cf activation.jar -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
+$(activation_jar): meta-inf activation
+	$(JAR) cf $(activation_jar) -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
 
 meta-inf: $(META_INF) $(META_INF_FILES)
 
@@ -382,6 +385,10 @@ clean-local:
 
 distclean-local: clean-local
 	rm -f config.log config.status
+
+install-data-local:
+	@srcdir@/mkinstalldirs $(prefix)/share/java
+	$(INSTALL_DATA) $(activation_jar) $(prefix)/share/java
 
 # End of Makefile.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

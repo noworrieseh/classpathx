@@ -1,28 +1,42 @@
 Installing GNU JAF
 
-There's no installation target yet. But you can use
-autoconf/automakejar to build the activation.jar.
 
-With autoconf 2.52 installed do this:
+Configuration
 
- $  aclocal
+The configure program configures GNU JAF for your system. The various
+programs required to build GNU JAF should be automatically identified.
+If they aren't, or you wish to override the default programs found, you can
+do so here. Set the environment variable corresponding to the program you
+wish to change befre running configure, e.g.:
 
-This will setup the macros needed by the autoconf script. In
-particular it installs the JAVA_CC_PROG macro which selects java
-compilers based on a list. At the moment GCJ is used if it is found.
+    JAVAC=/my/special/javac ./configure
 
- $  autoconf
- $ ./automakejar
+The default should work for most environments:
 
-Running automakejar creates the Makefile.in.
-
- $ ./configure
- $ make
-
-The activation.jar is left in the make directory (the directory where
-you typed make).
+    ./configure
 
 
+Building
 
-Nic Ferrier
-2002
+To build GNU JAF, type the following at the command prompt:
+
+    make
+
+You may additionally build the API documentation in Javadoc format (you need
+the javadoc program in your PATH for this):
+
+    make javadoc
+
+
+Installation
+
+To install, simply type:
+
+    make install
+
+This installs activation.jar in $(prefix)/share/java (see the configuration
+options to change the prefix variable).
+
+
+$Author: dog $
+$Date: 2004-03-28 18:57:11 $

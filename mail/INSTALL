@@ -52,15 +52,21 @@ To build GNU JavaMail, type the following at the command prompt:
 
 	make
 
-You may additionally build the API documentation in Javadoc format:
+You may additionally build the API documentation in Javadoc format (you need
+the javadoc program in your PATH for this):
 
 	make javadoc
 
 
 Installation
 
--- TODO
+To install, simply type:
+
+    make install
+
+This installs gnumail.jar and gnumail-providers.jar in $(prefix)/share/java
+(see the configuration options to change the prefix variable).
 
 
 $Author: dog $
-$Date: 2004-03-13 21:14:06 $
+$Date: 2004-03-28 18:56:26 $

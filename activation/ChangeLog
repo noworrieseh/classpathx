@@ -1,3 +1,8 @@
+2004-03-28  Chris Burdess  <dog@bluezoo.org>
+
+	* configure.ac: Removed AC_PROG_JAVADOC.
+	* Makefile.am: Added install targets.
+
 2004-01-26  Chris Burdess  <dog@bluezoo.org>
 
     * build.xml: Updated ant build script to add licence to jar.

@@ -5,11 +5,14 @@
 JAVAC = @JAVAC@
 #JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGS = -g
-JAVADOC = @JAVADOC@
+JAVADOC = javadoc
 
 src = @srcdir@/source
 dst = @srcdir@/classes
 doc = @srcdir@/docs
+
+gnumail_jar = @srcdir@/gnumail.jar
+providers_jar = @srcdir@/gnumail-providers.jar
 
 # The java source files that make up the GNU version of the javax.mail API.
 gnumail_sources = \
@@ -254,12 +257,6 @@ $(mbox_package_name) \
 $(maildir_package_name) \
 gnu.mail.util
 
-# The main jar file.
-gnumail_jar = @srcdir@/gnumail.jar
-
-# The providers jar file.
-providers_jar = @srcdir@/providers.jar
-
 # The GNU JAF library.
 activation_jar = @ACTIVATION_JAR@
 
@@ -298,17 +295,17 @@ maildir_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(maildir_sources))
 META-INF:
 	mkdir -p META-INF
 
-META-INF/COPYING: META-INF COPYING
-	cp COPYING META-INF/COPYING
+META-INF/COPYING: META-INF @srcdir@/COPYING
+	cp @srcdir@/COPYING META-INF/COPYING
 
-META-INF/mime.types: META-INF mime.types
-	cp mime.types META-INF/mime.types
+META-INF/mime.types: META-INF @srcdir@/mime.types
+	cp @srcdir@/mime.types META-INF/mime.types
 
-META-INF/mailcap: META-INF mailcap
-	cp mailcap META-INF/mailcap
+META-INF/mailcap: META-INF @srcdir@/mailcap
+	cp @srcdir@/mailcap META-INF/mailcap
 
-META-INF/javamail.charset.map: META-INF javamail.charset.map
-	cp javamail.charset.map META-INF/javamail.charset.map
+META-INF/javamail.charset.map: META-INF @srcdir@/javamail.charset.map
+	cp @srcdir@/javamail.charset.map META-INF/javamail.charset.map
 
 META-INF/javamail.default.providers: META-INF javamail.providers smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
 	cp javamail.providers META-INF/javamail.default.providers
@@ -372,7 +369,7 @@ $(dst):
 # Jars
 
 $(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
-	$(JAR) cf gnumail.jar \
+	$(JAR) cf $(gnumail_jar) \
 		$(gnumail_meta) \
 		-C $(dst) javax \
 		-C $(dst) gnu/mail/handler \
@@ -381,7 +378,7 @@ $(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
 $(providers_jar): $(providers_meta) $(provider_classes) $(smtp_classes) \
 	$(imap_classes) $(pop3_classes) $(nntp_classes) $(mbox_classes) \
 	$(maildir_classes)
-	$(JAR) cf providers.jar \
+	$(JAR) cf $(providers_jar) \
 		$(providers_meta) \
 		-C $(dst) gnu/mail/providers \
 		-C $(dst) gnu/mail/treeutil
@@ -444,5 +441,10 @@ clean-local:
 	rm javamail.address.map javamail.providers
 	rm smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
+
+install-data-local:
+	@srcdir@/mkinstalldirs $(prefix)/share/java
+	$(INSTALL_DATA) $(gnumail_jar) $(prefix)/share/java
+	$(INSTALL_DATA) $(providers_jar) $(prefix)/share/java
 
 # End of Makefile.am

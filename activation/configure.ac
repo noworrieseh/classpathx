@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.2 2004-01-12 17:06:23 dog Exp $
+# $Id: configure.ac,v 1.3 2004-03-28 18:57:11 dog Exp $
 # Copyright (C) 2003 The Free Software Foundation
 # 
 # This file is part of GNU classpathx activation.
@@ -32,7 +32,7 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
 AC_PROG_JAVAC
-AC_PROG_JAVADOC
+#AC_PROG_JAVADOC
 AC_PROG_JAR
 AC_CHECK_CLASSPATH
 
