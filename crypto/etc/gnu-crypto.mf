@@ -6,7 +6,7 @@ Specification-Version: N/A
 Specification-Vendor: N/A
 Implementation-Title: GNU Crypto Library
 Implementation-Version: 1.0
-Implementation-Vendor: The Free Software Foundation
-Implementation-Vendor-Id: fsf
-Implementation-URL: http://sourceforge.net/projects/gnu-crypto
+Implementation-Vendor: Free Software Foundation
+Implementation-Vendor-Id: FSF
+Implementation-URL: http://www.gnu.org/software/classpathx/crypto
 
