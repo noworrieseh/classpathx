@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentBuilderFactory.java,v 1.6 2001-11-02 21:40:25 db Exp $
+ * $Id: DocumentBuilderFactory.java,v 1.7 2001-12-05 22:49:25 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -31,7 +31,6 @@ package javax.xml.parsers;
 // Imports
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -44,7 +43,7 @@ import org.xml.sax.*;
  * W3C DOM APIs don't include portable bootstrapping.
  *
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilderFactory.java,v 1.6 2001-11-02 21:40:25 db Exp $
+ * @version	$Id: DocumentBuilderFactory.java,v 1.7 2001-12-05 22:49:25 db Exp $
  */
 public abstract class DocumentBuilderFactory {
 
