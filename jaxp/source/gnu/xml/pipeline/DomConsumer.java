@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.8 2001-10-24 22:39:38 db Exp $
+ * $Id: DomConsumer.java,v 1.9 2001-11-04 01:11:44 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -52,9 +52,11 @@ import gnu.xml.util.DomParser;
  * problem areas involve information from the Document Type Declaration (DTD).
  * DOM only represents a limited subset, but has some behaviors that depend
  * on much deeper knowledge of a document's DTD.  You shouldn't have much to
- * worry about unless you change handling of "extra" nodes from its default
+ * worry about unless you change handling of "noise" nodes from its default
  * setting (which ignores them all); note if you use JAXP to populate your
- * DOM trees, it wants to save "extra" nodes by default.  Otherwise, your
+ * DOM trees, it wants to save "noise" nodes by default.  (Such nodes include
+ * ignorable whitespace, comments, entity references and CDATA boundaries.)
+ * Otherwise, your
  * main worry will be if you use a SAX parser that doesn't flag ignorable
  * whitespace unless it's validating (few don't).
  *
@@ -72,27 +74,22 @@ import gnu.xml.util.DomParser;
  * To create and populate such a node, subclass the inner
  * {@link DomConsumer.Handler} class and teach it about the backdoors into
  * whatever DOM implementation you want.  It's possible that some revised
- * DOM API will finally resolve this problem. </em>
+ * DOM API (L3?) will make this problem solvable again. </em>
  *
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-10-24 22:39:38 $
+ * @version $Date: 2001-11-04 01:11:44 $
  */
 public class DomConsumer implements EventConsumer
 {
     private Class		domImpl;
 
-    private boolean		saveExtra;
-    // FIXME:  for better JAXP integration, split out:
-    //	- whether to hide CDATA boundaries
-    //	- doctype stuff
+    private boolean		hidingCDATA = true;
+    private boolean		hidingComments = true;
+    private boolean		hidingWhitespace = true;
+    private boolean		hidingReferences = true;
 
-    private boolean		hidingComments;
-    private boolean		hidingWhitespace;
-
-    private boolean		usingNamespaces = true;
-    private boolean		expandingReferences = true;
     private Handler		handler;
     private ErrorHandler	errHandler;
 
@@ -192,24 +189,26 @@ public class DomConsumer implements EventConsumer
 
 
     /**
-     * Returns true if the consumer is expanding entity references in place
-     * (the default), and false if childless EntityReference nodes should
-     * instead be created.
+     * Returns true if the consumer is hiding entity references nodes
+     * (the default), and false if EntityReference nodes should
+     * instead be created.  Such EntityReference nodes will normally be
+     * empty, unless an implementation arranges to populate them and then
+     * turn them back into readonly objects.
      *
-     * @see #setExpandingReferences
+     * @see #setHidingReferences
      */
-    final public boolean	isExpandingReferences ()
-	{ return expandingReferences; }
+    final public boolean	isHidingReferences ()
+	{ return hidingReferences; }
 
     /**
-     * Controls whether the consumer will expand entity references in place,
-     * or will instead replace them with childless entity reference nodes.
+     * Controls whether the consumer will hide entity expansions,
+     * or will instead mark them with entity reference nodes.
      *
-     * @see #isExpandingReferences
-     * @param flag True iff extra nodes should be saved; false otherwise.
+     * @see #isHidingReferences
+     * @param flag False if entity reference nodes will appear
      */
-    final public void		setExpandingReferences (boolean flag)
-	{ expandingReferences = flag; }
+    final public void		setHidingReferences (boolean flag)
+	{ hidingReferences = flag; }
     
 
     /**
@@ -250,59 +249,24 @@ public class DomConsumer implements EventConsumer
 
 
     /**
-     * Returns true if the consumer is saving "extra" nodes, and false (the
-     * default) otherwise.  "Extra" nodes are currently defined to be
-     * CDATA nodes (instead of normal
-     * text nodes), DocumentType and EntityReference nodes.  (Notation and
-     * Entity nodes can't be portably created, and won't show up regardless
-     * of the setting of this flag.)
+     * Returns true if the consumer is saving CDATA boundaries, or
+     * false (the default) otherwise.
      *
-     * <p> You may not consistently see all these node types even if you
-     * set this flag to true.  Only Level 2 DOM implementations can create
-     * DocumentType nodes portably, but they can't be populated with any
-     * portable APIs.  No DOM implementation can populate EntityReference
-     * nodes with any portable APIs.  Not all parsers expose comment and
-     * CDATA nodes, but if they do than most DOM implementations are able
-     * to expose those nodes.  Any SAX parser may expose ignorable whitespace,
-     * and most do so, so stripping out such whitespace is the most reliable
-     * of this set of inconsistently supportable DOM features.
-     *
-     * @see #setSavingExtraNodes
+     * @see #setHidingCDATA
      */
-    final public boolean	isSavingExtraNodes ()
-	{ return saveExtra; }
+    final public boolean	isHidingCDATA ()
+	{ return hidingCDATA; }
 
     /**
-     * Controls whether the consumer will save "extra" nodes.
+     * Controls whether the consumer will save CDATA boundaries.
      *
-     * @see #isSavingExtraNodes
-     * @param flag True iff extra nodes should be saved; false otherwise.
+     * @see #isHidingCDATA
+     * @param flag True to treat CDATA text differently from other
+     *	text nodes
      */
-    final public void		setSavingExtraNodes (boolean flag)
-	{ saveExtra = flag; }
+    final public void		setHidingCDATA (boolean flag)
+	{ hidingCDATA = flag; }
     
-    /**
-     * Returns true (the default for L2 DOM implementations) if the
-     * consumer is using an "XML + Namespaces" style DOM construction,
-     * which will cause fatal errors on some legal XML 1.0 documents.
-     *
-     * @see #setUsingNamespaces
-     */
-    public boolean	isUsingNamespaces ()
-	{ return usingNamespaces; }
-
-
-    /**
-     * Controls whether the consumer uses an "XML + Namespaces" style
-     * DOM construction.
-     *
-     * @see #isUsingNamespaces
-     * @param flag True iff namespaces should be enforced; else false.
-     */
-    public void		setUsingNamespaces (boolean flag)
-	{ usingNamespaces = flag; }
-    
-
 
 
     /** Returns the document handler being used. */
@@ -471,7 +435,7 @@ public class DomConsumer implements EventConsumer
 	    ProcessingInstruction	pi;
 
 	    if (isL2
-		    && consumer.isUsingNamespaces ()
+		    // && consumer.isUsingNamespaces ()
 		    && target.indexOf (':') != -1)
 		namespaceError (
 		    "PI target name is namespace nonconformant: "
@@ -497,7 +461,7 @@ public class DomConsumer implements EventConsumer
 
 	    // merge consecutive text or CDATA nodes if appropriate.
 	    if (lastChild instanceof Text) {
-		if (!consumer.isSavingExtraNodes ()
+		if (consumer.isHidingCDATA ()
 			// consecutive Text content ... always merge
 			|| (!inCDATA
 			    && !(lastChild instanceof CDATASection))
@@ -512,7 +476,7 @@ public class DomConsumer implements EventConsumer
 		    return;
 		}
 	    }
-	    if (inCDATA && consumer.isSavingExtraNodes ()) {
+	    if (inCDATA && !consumer.isHidingCDATA ()) {
 		top.appendChild (document.createCDATASection (value));
 		mergeCDATA = true;
 	    } else
@@ -573,7 +537,7 @@ public class DomConsumer implements EventConsumer
 	    Element	element;
 	    int		length = atts.getLength ();
 
-	    if (!isL2 || !consumer.isUsingNamespaces ()) {
+	    if (!isL2) {
 		element = document.createElement (qName);
 
 		// first the explicit attributes ...
@@ -789,36 +753,6 @@ public class DomConsumer implements EventConsumer
 	{
 	    // need to filter out comments and PIs within the DTD
 	    inDTD = true;
-
-/*
- * XXX the second DOM L2 "candidate" REC really broke Doctype completely,
- * by saying they may only be used with createDocument, and can't
- * be appended as below ... createDocumentType needs to be a method
- * on Document, since it's an internal typing mechanism not an
- * external typing one.
- *
-	    if (isSavingExtraNodes () && isL2) {
-		DOMImplementation	impl;
-		DocumentType	doctype;
-
-		impl = document.getImplementation ();
-		
-		// NOTE:  SAX2 isn't currently exposing the internal
-		// subset string in a usable form; else we'd really like
-		// to store it away here!
-
-		doctype = impl.createDocumentType (name,
-				publicId, SystemId, null);
-		document.appendChild (doctype);
-
-		// NOTE:  there's no way to attach notation and entity
-		// nodes to this DocumentType, or to associate any type
-		// information (particularly element and attribute
-		// declarations) to it.  Calling it a Document "Type"
-		// node, in L1 or L2 of DOM, is an extreme misnomer.
-		// Real DTD support could be useful; what DOM has, not.
-	    }
-*/
 	}
 	
 	// SAX2 lexical event
@@ -844,44 +778,52 @@ public class DomConsumer implements EventConsumer
 	    top.appendChild (comment);
 	}
 
+	/**
+	 * May be overridden by subclasses to return true, indicating
+	 * that entity reference nodes can be populated and then made
+	 * read-only.
+	 */
+	public boolean canPopulateEntityRefs ()
+	    { return false; }
+
 	// SAX2 lexical event
 	public void startEntity (String name)
 	throws SAXException
 	{
-	    // Avoid creating entity ref nodes
-	    if (consumer.isExpandingReferences ())
-		return;
-
-	    // we can't create populated entity ref nodes using
-	    // only public DOM APIs (they've got to be readonly)
+	    // are we ignoring what would be contents of an
+	    // entity ref, since we can't populate it?
 	    if (currentEntity != null)
 		return;
 
-	    // SAX2 shows parameter entities; DOM doesn't care
+	    // Are we hiding all entity boundaries?
+	    if (consumer.isHidingReferences ())
+		return;
+
+	    // SAX2 shows parameter entities; DOM hides them
 	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
 		return;
 
 	    // Since we can't create a populated entity ref node in any
-	    // standard way, we create an unpopulated one and hope that
-	    // the DOM at least created it readonly (spec requires r/o).
-	    //
-	    // NOTE:  if we wanted to try populating it, we'd push it on the
-	    // stack and pop it with the matching endEntity call.
+	    // standard way, we create an unpopulated one.
 	    EntityReference ref = document.createEntityReference (name);
 	    top.appendChild (ref);
+	    top = ref;
 
-	    // arrange to ignore all events till end of this entity.
-	    currentEntity = name;
+	    // ... allowing subclasses to populate them
+	    if (!canPopulateEntityRefs ())
+		currentEntity = name;
 	}
 
 	// SAX2 lexical event
 	public void endEntity (String name)
 	throws SAXException
 	{
-	    if (consumer.isExpandingReferences () || currentEntity == null)
+	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
 		return;
-	    if (currentEntity.equals (name))
+	    if (name.equals (currentEntity))
 		currentEntity = null;
+	    if (!consumer.isHidingReferences ())
+		top = top.getParentNode ();
 	}
 
 
