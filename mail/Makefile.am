@@ -181,6 +181,8 @@ source/gnu/mail/providers/mbox/MboxStore.java
 # The main jar file.
 GNUMAILJAR = gnumail.jar
 
+# The NNTP client library.
+NNTPLIBJAR = lib/nntplib.jar
 
 # The META stuff
 MAIL_META = META-INF/COPYING \
@@ -189,7 +191,7 @@ MAIL_META = META-INF/COPYING \
 
 
 # Tell automake that we're specifying rules for these ourselves.
-BUILT_SOURCES = $(GNUMAILJAR) imap.jar smtp.jar pop2.jar nntp.jar maildir.jar mbox.jar
+BUILT_SOURCES = $(GNUMAILJAR) imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
 
 
 META-INF/COPYING: COPYING
@@ -234,7 +236,7 @@ pop3.jar: $(GNUMAILJAR) $(POP3_JAVASRC) $(MAIL_META)
 nntp.jar: $(GNUMAILJAR) $(NNTP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \
-		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
+		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR):$(NNTPLIBJAR) \
                          ./jarcompiler nntp.jar
 
 maildir.jar: $(GNUMAILJAR) $(MAILDIR_JAVASRC) $(MAIL_META)
