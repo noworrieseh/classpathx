@@ -1,5 +1,5 @@
 /*
- * $Id: LinkFilter.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: LinkFilter.java,v 1.3 2001-10-25 07:11:55 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -37,10 +37,10 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 
-// $Id: LinkFilter.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: LinkFilter.java,v 1.3 2001-10-25 07:11:55 db Exp $
 
 /**
- * Pipeline filter to remember (X)HTML links found in an (X)HTML document,
+ * Pipeline filter to remember XHTML links found in a document,
  * so they can later be crawled.  Fragments are not counted, and duplicates
  * are ignored.  Callers are responsible for filtering out URLs they aren't
  * interested in.  Events are passed through unmodified.
@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  * a stack of base URIs.  Similarly, recognize/support XLink data.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 07:11:55 $
  */
 public class LinkFilter extends EventFilter
 {
@@ -132,38 +132,38 @@ public class LinkFilter extends EventFilter
      * Collects URIs for (X)HTML content from elements which hold them.
      */
     public void startElement (
-	String	namespace,
-	String	local,
-	String	name,
-	Attributes	attrs
+	String		uri,
+	String		localName,
+	String		qName,
+	Attributes	atts
     ) throws SAXException
     {
 	String	link;
 
 	// Recognize XHTML links.
-	if ("http://www.w3.org/1999/xhtml".equals (namespace)) {
+	if ("http://www.w3.org/1999/xhtml".equals (uri)) {
 
-	    if ("a".equals (local) || "base".equals (local)
-		    || "area".equals (local))
-		link = attrs.getValue ("href");
-	    else if ("iframe".equals (local) || "frame".equals (local))
-		link = attrs.getValue ("src");
-	    else if ("blockquote".equals (local) || "q".equals (local)
-		    || "ins".equals (local) || "del".equals (local))
-		link = attrs.getValue ("cite");
+	    if ("a".equals (localName) || "base".equals (localName)
+		    || "area".equals (localName))
+		link = atts.getValue ("href");
+	    else if ("iframe".equals (localName) || "frame".equals (localName))
+		link = atts.getValue ("src");
+	    else if ("blockquote".equals (localName) || "q".equals (localName)
+		    || "ins".equals (localName) || "del".equals (localName))
+		link = atts.getValue ("cite");
 	    else
 		link = null;
 	    link = maybeAddLink (link);
 
 	    // "base" modifies designated baseURI
-	    if ("base".equals (local) && link != null)
+	    if ("base".equals (localName) && link != null)
 		baseURI = link;
 
-	    if ("iframe".equals (local) || "img".equals (local))
-		maybeAddLink (attrs.getValue ("longdesc"));
+	    if ("iframe".equals (localName) || "img".equals (localName))
+		maybeAddLink (atts.getValue ("longdesc"));
 	}
 	
-	super.startElement (namespace, local, name, attrs);
+	super.startElement (uri, localName, qName, atts);
     }
 
     private String maybeAddLink (String link)
