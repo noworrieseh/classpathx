@@ -315,28 +315,21 @@ xmljDetectCharEncoding (JNIEnv * env, jbyteArray buffer)
   xmlCharEncoding ret;
   jint nread;
  
-  printf("xmljDetectCharEncoding:1\n");
   nread = (*env)->GetArrayLength (env, buffer);
-  printf("xmljDetectCharEncoding:2\n");
   if (nread >= 5)
     {
       jbyte nativeBuffer[DETECT_BUFFER_SIZE + 1];
       unsigned char converted[DETECT_BUFFER_SIZE + 1];
       int i;
 
-  printf("xmljDetectCharEncoding:3\n");
       memset (nativeBuffer, 0, DETECT_BUFFER_SIZE + 1);
-  printf("xmljDetectCharEncoding:4\n");
       (*env)->GetByteArrayRegion (env, buffer, 0, nread, nativeBuffer);
-  printf("xmljDetectCharEncoding:5\n");
       /* Convert from signed to unsigned */
       for (i = 0; i < DETECT_BUFFER_SIZE + 1; i++)
         {
           converted[i] = UNSIGN (nativeBuffer[i]);
         }
-  printf("xmljDetectCharEncoding:6\n");
       ret = xmlDetectCharEncoding (converted, nread);
-  printf("xmljDetectCharEncoding:7\n");
     }
   else
     {
@@ -482,7 +475,7 @@ xmljParseDocument2 (JNIEnv * env,
   orig = ctx->sax;
   ctx->sax = sax;
               
-  /*xmljSetThreadContext (saxCtx);*/
+  xmljSetThreadContext (saxCtx);
   
   ret = xmlParseDocument (ctx);
   doc = ctx->myDoc;
@@ -503,7 +496,7 @@ xmljParseDocument2 (JNIEnv * env,
         }
     }
   
-  /*xmljClearThreadContext ();*/
+  xmljClearThreadContext ();
               
   ctx->sax = orig;
   free (sax);

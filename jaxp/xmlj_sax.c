@@ -30,6 +30,8 @@
 #include "xmlj_util.h"
 #include <unistd.h>
 
+xmlExternalEntityLoader defaultLoader = NULL;
+
 /* -- GnomeLocator -- */
 
 JNIEXPORT jstring JNICALL
@@ -105,7 +107,6 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                                                      declarationHandler,
                                                      jboolean lexicalHandler)
 {
-  printf("parseStream\n");
   xmljParseDocument (env,
                      self,
                      in,
@@ -130,11 +131,21 @@ xmljExternalEntityLoader (const char *url, const char *id,
 {
   const xmlChar *systemId;
   const xmlChar *publicId;
+  xmlParserInputPtr ret;
 
   printf("xmljExternalEntityLoader %s %s\n", url, id);
+  if (defaultLoader == NULL)
+    {
+      defaultLoader = xmlGetExternalEntityLoader ();
+    }
   systemId = xmlCharStrdup (url);
   publicId = xmlCharStrdup (id);
-  return xmljSAXResolveEntity (context, publicId, systemId);
+  ret = xmljSAXResolveEntity (context, publicId, systemId);
+  if (ret == NULL)
+    {
+      ret = defaultLoader (url, id, context);
+    }
+  return ret;
 }
 
 /*
@@ -153,8 +164,6 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
   xmlSAXHandlerPtr sax;
 
   sax = (xmlSAXHandlerPtr) malloc (sizeof (xmlSAXHandler));
-  if (sax == NULL)
-    return NULL;
 
   if (dtdHandler)
     {
@@ -176,6 +185,7 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
   else
     {
       sax->resolveEntity = (orig == NULL) ? NULL : orig->resolveEntity;
+      xmlSetExternalEntityLoader (defaultLoader);
     }
 
   if (declarationHandler)

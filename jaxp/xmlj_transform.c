@@ -299,8 +299,10 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
         {
           xsltSetGenericErrorFunc (ctx, xmljSAXError);
           
+  printf("newLibxsltStylesheet:1\n");
           nativeStylesheetHandle =
             xsltParseStylesheetDoc (xsltSourceDoc);
+  printf("newLibxsltStylesheet:2\n");
           
           if (!(*env)->ExceptionOccurred (env))
             {
@@ -412,6 +414,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
                               (*env)->DeleteLocalRef (env, prevValue);
                             }
                           (*env)->DeleteLocalRef (env, nameString);
+                          printf("newLibxsltStylesheet:end\n");
                         }
                       
                       (*env)->DeleteLocalRef (env, info.stringBuffer);
@@ -584,8 +587,9 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
               
               /* Apply stylesheet */
                 {
+                  xsltTransformContextPtr transformContext;
   printf("transform:5 stylesheet=%d xmlSourceDoc=%d\n",stylesheet, xmlSourceDoc);
-                  xsltTransformContextPtr transformContext
+                  transformContext
                     = xsltNewTransformContext (stylesheet, xmlSourceDoc);
                   
   printf("transform:6\n");

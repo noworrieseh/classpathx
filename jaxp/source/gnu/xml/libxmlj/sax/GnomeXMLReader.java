@@ -73,17 +73,37 @@ implements XMLReader
       System.loadLibrary("xmlj");
     }
 
-  private static final String FEATURES_PREFIX = "http://xml.org/sax/features/";
-  private static final List RECOGNIZED_FEATURES = Arrays.asList (new String[] {
-    "external-general-entities", "external-parameter-entities",
-          "is-standalone", "lexical-handler/parameter-entities", "namespaces",
-          "namespace-prefixes", "resolve-dtd-uris", "string-interning",
-          "use-attributes2", "use-locator2", "use-entity-resolver2", "validation"
-  });
-  private static final String PROPERTIES_PREFIX = "http://xml.org/sax/properties/";
-  private static final List RECOGNIZED_PROPERTIES = Arrays.asList (new String[] {
-    "declaration-handler", "dom-node", "lexical-handler", "xml-string"
-  });
+  private static final String FEATURES_PREFIX =
+    "http://xml.org/sax/features/";
+  
+  private static final List RECOGNIZED_FEATURES =
+    Arrays.asList (new String[]
+                   {
+                   "external-general-entities",
+                   "external-parameter-entities",
+                   "is-standalone",
+                   "lexical-handler/parameter-entities",
+                   "namespaces",
+                   "namespace-prefixes",
+                   "resolve-dtd-uris",
+                   "string-interning",
+                   "use-attributes2",
+                   "use-locator2",
+                   "use-entity-resolver2",
+                   "validation"
+                   });
+  
+  private static final String PROPERTIES_PREFIX =
+    "http://xml.org/sax/properties/";
+  
+  private static final List RECOGNIZED_PROPERTIES =
+    Arrays.asList (new String[]
+                   {
+                   "declaration-handler",
+                   "dom-node",
+                   "lexical-handler",
+                   "xml-string"
+                   });
 
   // Features
 
@@ -288,14 +308,6 @@ implements XMLReader
       byte[] detectBuffer = in.getDetectBuffer ();
       String publicId = input.getPublicId ();
       String systemId = input.getSystemId ();
-      // Handle zero-length document
-      if (detectBuffer == null)
-        {
-          startDocument (true);
-          fatalError ("No document element", 0, 0, publicId, systemId);
-          endDocument ();
-          return;
-        }
       // Reset state
       standalone = false;
       seenFatalError = false;
@@ -316,33 +328,26 @@ implements XMLReader
               base = systemId.substring (0, lsi + 1);
             }
         }
+      // Handle zero-length document
+      if (detectBuffer == null)
+        {
+          startDocument (true);
+          fatalError ("No document element", 0, 0, publicId, systemId);
+          endDocument ();
+          return;
+        }
       // Parse
-      try
-        {
-          parseStream(in,
-                      detectBuffer,
-                      publicId,
-                      systemId,
-                      validation,
-                      contentHandler != null,
-                      dtdHandler != null,
-                      entityResolver != null,
-                      errorHandler != null,
-                      declarationHandler != null,
-                      lexicalHandler != null);
-        }
-      catch (IOException e)
-        {
-          String message = e.getMessage ();
-          if ("document is empty".equals (message))
-            {
-              startDocument (false);
-              fatalError (message, -1, -1, publicId, systemId);
-              endDocument ();
-            }
-          else
-            throw e;
-        }
+      parseStream(in,
+                  detectBuffer,
+                  publicId,
+                  systemId,
+                  validation,
+                  contentHandler != null,
+                  dtdHandler != null,
+                  entityResolver != null,
+                  errorHandler != null,
+                  declarationHandler != null,
+                  lexicalHandler != null);
       in.close ();
     }
 
