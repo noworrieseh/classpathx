@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import gnu.xml.libxmlj.dom.GnomeDocument;
+import gnu.xml.libxmlj.util.NamedInputStream;
 import gnu.xml.libxmlj.util.StandaloneLocator;
 import gnu.xml.libxmlj.util.XMLJ;
 

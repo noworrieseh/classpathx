@@ -53,6 +53,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 
 import gnu.xml.libxmlj.dom.GnomeDocument;
+import gnu.xml.libxmlj.util.NamedInputStream;
 import gnu.xml.libxmlj.util.XMLJ;
 
 public class LibxsltStylesheet

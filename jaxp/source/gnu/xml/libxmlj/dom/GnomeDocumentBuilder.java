@@ -208,7 +208,7 @@ implements DOMImplementation
       {
         return false; // TODO
       }
-    return false;;
+    return false;
   }
   
   // DOM Level 3

@@ -56,6 +56,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 
+import gnu.xml.libxmlj.util.NamedInputStream;
 import gnu.xml.libxmlj.util.StandaloneLocator;
 import gnu.xml.libxmlj.util.XMLJ;
 

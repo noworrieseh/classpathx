@@ -43,11 +43,23 @@ implements DOMImplementationSource
   /*
    * GNU DOM implementations.
    */
-  private static final DOMImplementation[] implementations =
-    {
-      //new gnu.xml.dom.DomImpl (),
-      new gnu.xml.libxmlj.dom.GnomeDocumentBuilder ()
-    };
+  private static final DOMImplementation[] implementations;
+
+  static
+  {
+    List acc = new ArrayList ();
+    acc.add (new gnu.xml.dom.DomImpl ());
+    try
+      {
+        acc.add (new gnu.xml.libxmlj.dom.GnomeDocumentBuilder ());
+      }
+    catch (UnsatisfiedLinkError e)
+      {
+        // libxmlj not available
+      }
+    implementations = new DOMImplementation[acc.size ()];
+    acc.toArray (implementations);
+  }
 
   public DOMImplementation getDOMImplementation (String features)
   {
