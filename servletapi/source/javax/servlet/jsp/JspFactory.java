@@ -66,6 +66,18 @@ public abstract class JspFactory
 					       boolean autoflush);
 
   /**
+   * Get a PageContext object associated with a request/response.
+   */
+  public abstract PageContext getPageContext(Servlet servlet,
+					     ServletRequest request,
+					     ServletResponse response,
+					     String errorPageURL,
+					     boolean needsSession,
+					     int buffer,
+					     boolean autoflush);
+
+
+  /**
    * Release a PageContext.
    */
   public abstract void releasePageContext (PageContext ctx);
