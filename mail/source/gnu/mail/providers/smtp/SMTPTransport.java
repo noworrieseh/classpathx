@@ -331,7 +331,7 @@ public class SMTPTransport
           throw new MessagingException(connection.getLastResponse());
         mimeMessage.writeTo(dataStream);
         dataStream.flush();
-        if (connection.finishData())
+        if (!connection.finishData())
         {
           unsent.addAll(sent);
           sent.clear();
