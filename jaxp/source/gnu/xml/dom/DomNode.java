@@ -156,8 +156,8 @@ public abstract class DomNode
   private int nListeners;
 
   // DOM Level 3 userData dictionary.
-  private Map userData;
-  private Map userDataHandlers;
+  private HashMap userData;
+  private HashMap userDataHandlers;
 
   //
   // Some of the methods here are declared 'final' because

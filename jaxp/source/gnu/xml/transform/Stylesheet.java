@@ -71,6 +71,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.w3c.dom.UserDataHandler;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.NameTest;
 import gnu.xml.xpath.NodeTypeTest;
@@ -86,7 +87,7 @@ import gnu.xml.xpath.XPathImpl;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 class Stylesheet
-  implements NamespaceContext, XPathFunctionResolver, Cloneable
+  implements NamespaceContext, XPathFunctionResolver, UserDataHandler, Cloneable
 {
 
   static final String XSL_NS = "http://www.w3.org/1999/XSL/Transform";
@@ -1615,6 +1616,13 @@ class Stylesheet
         throw new TransformerConfigurationException(msg, l);
       }
     return value;
+  }
+
+  // Handle user data changes when nodes are cloned etc
+
+  public void handle(short op, String key, Object data, Node src, Node dst)
+  {
+    dst.setUserData(key, data, this);
   }
 
 }

@@ -1,3 +1,7 @@
+2004-11-28  Chris Burdess  <dog@gnu.org>
+
+   	* StreamSerializer.java: Fix typo for disable-output-escaping.
+   	
 2004-11-27  Julian Scheid  <julian@sektor37.de>
 
 	* SubstringFunction.java: Fixed a bug which would copy one character

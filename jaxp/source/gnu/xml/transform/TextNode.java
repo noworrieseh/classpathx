@@ -86,7 +86,7 @@ final class TextNode
     Text text = doc.createTextNode(value);
     if (disableOutputEscaping)
       {
-        text.setUserData("disable-output-escaping", "yes", null);
+        text.setUserData("disable-output-escaping", "yes", stylesheet);
       }
     // Insert into result tree
     if (nextSibling != null)

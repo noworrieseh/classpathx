@@ -223,7 +223,7 @@ public class StreamSerializer
         break;
       case Node.TEXT_NODE:
         value = node.getNodeValue();
-        if (!"yes".equals(node.getUserData("disable-output-encoding")))
+        if (!"yes".equals(node.getUserData("disable-output-escaping")))
           {
             value = encode(value, false);
           }

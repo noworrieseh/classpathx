@@ -83,7 +83,7 @@ final class ValueOfNode
         Text textNode = doc.createTextNode(value);
         if (disableOutputEscaping)
           {
-            textNode.setUserData("disable-output-escaping", "yes", null);
+            textNode.setUserData("disable-output-escaping", "yes", stylesheet);
           }
         if (nextSibling != null)
           {

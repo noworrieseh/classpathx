@@ -38,6 +38,7 @@
 
 JAVADOC = javadoc
 JAR = @JAR@
+JAVAC = @JAVAC@
 JAVAH = @JAVAH@
 
 SOFLAGS=        @SOFLAGS@
@@ -657,7 +658,8 @@ $(libj_jarfile): $(gnu_xml_jar_CLASSES) $(javax_xml_jar_CLASSES) $(org_w3c_dom_j
 $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $(gnu_xml_jar_CLASSES): classes
 
 $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $(gnu_xml_jar_CLASSES): classes/%.class: $(srcdir)/source/%.java
-	$(GCJ) $(GCJ_CLASS_FLAGS) -g -C -d classes $<
+	$(JAVAC) -g -d classes -classpath @srcdir@/source $<
+#	$(GCJ) $(GCJ_CLASS_FLAGS) -g -C -d classes $<
 
 classes:
 	mkdir -p classes

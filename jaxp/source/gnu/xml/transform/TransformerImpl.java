@@ -191,9 +191,10 @@ class TransformerImpl
                                               publicId,
                                               systemId) :
                       null;
-                    Document newDoc = impl.createDocument(root.getNamespaceURI(),
-                                                          root.getNodeName(),
-                                                          doctype);
+                    Document newDoc =
+                      impl.createDocument(root.getNamespaceURI(),
+                                          root.getNodeName(),
+                                          doctype);
                     Node newRoot = newDoc.getDocumentElement();
                     copyAttributes(newDoc, root, newRoot);
                     copyChildren(newDoc, root, newRoot);
@@ -234,15 +235,16 @@ class TransformerImpl
              */
             if (stylesheet.outputVersion != null)
               {
-                parent.setUserData("version", stylesheet.outputVersion, null);
+                parent.setUserData("version", stylesheet.outputVersion,
+                                   stylesheet);
               }
             if (stylesheet.outputOmitXmlDeclaration)
               {
-                parent.setUserData("omit-xml-declaration", "yes", null);
+                parent.setUserData("omit-xml-declaration", "yes", stylesheet);
               }
             if (stylesheet.outputStandalone)
               {
-                parent.setUserData("standalone", "yes", null);
+                parent.setUserData("standalone", "yes", stylesheet);
               }
             // TODO cdata-section-elements
             // TODO indent
