@@ -286,7 +286,7 @@ libxmlj_la_DEPENDENCIES = \
 	gnu_xml_libxmlj_transform_LibxmlDocument.h
 
 libxmlj_la_SOURCES = src/libxsltj.c src/xmlj_io.c src/xmlj_error.c
-libxmlj_la_LDFLAGS = -release 0.1.2
+libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
 JARFILE = gnujaxp.jar
