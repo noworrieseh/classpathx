@@ -1,3 +1,12 @@
+2001-06-15    <cowboyd@LOWELL>
+
+	* ServletResponseWrapper.java: Made the cornstructor throw and
+	IllegalArgumentException if the argument was null
+
+	* ServletRequestWrapper.java: Per the spec, the constructor
+	should throw an IllegalArgumentException if the argument is
+	null.
+
 2001-06-14    <cowboyd@LOWELL>
 
 	* http/HttpServletRequest.java: added the following fields to

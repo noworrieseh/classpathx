@@ -48,9 +48,14 @@ public class ServletResponseWrapper
    * @since Servlet API 2.3
    *
    * @param wrappedResponse the object to be wrapped
+   * @throws java.lang.IllegalArgumentException if wrappedResponse is null
    */
   public ServletResponseWrapper (ServletResponse wrappedResponse)
   {
+    if (wrappedResponse == null)
+    {
+      throw new IllegalArgumentException ("constructor called with null argument");
+    }
     _impl = wrappedResponse;
   }
 

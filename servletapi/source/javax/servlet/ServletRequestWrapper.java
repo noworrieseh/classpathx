@@ -51,9 +51,14 @@ public class ServletRequestWrapper
    *
    * @param wrappedRequest the request that will be wrapped
    * by this object 
+   * @throws java.lang.IllegalArgumentException if wrappedRequest is null
    */
   public ServletRequestWrapper (ServletRequest wrappedRequest)
   {
+    if (wrappedRequest == null) 
+    {
+      throw new IllegalArgumentException ("Constructor called with null argument");
+    }
     _impl  = wrappedRequest;
   }
   

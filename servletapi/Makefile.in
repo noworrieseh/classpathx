@@ -36,7 +36,9 @@ SOURCEDIR=$(SRCDIR)/source
 SOURCEFILES = 	$(SOURCEDIR)/javax/servlet/http/Cookie.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpServlet.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpServletRequest.java \
+		$(SOURCEDIR)/javax/servlet/http/HttpServletRequestWrapper.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpServletResponse.java \
+		$(SOURCEDIR)/javax/servlet/http/HttpServletResponseWrapper.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSession.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionActivationListener.java \
 		$(SOURCEDIR)/javax/servlet/http/HttpSessionAttributeListener.java \
