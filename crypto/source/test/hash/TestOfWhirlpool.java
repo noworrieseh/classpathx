@@ -1,7 +1,7 @@
 package test.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfWhirlpool.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TestOfWhirlpool.java,v 1.3 2001-12-08 21:29:59 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -42,7 +42,7 @@ import gnu.crypto.util.Util;
 /**
  * Conformance tests for the Whirlpool implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfWhirlpool extends TestCase {
 
@@ -101,6 +101,24 @@ public class TestOfWhirlpool extends TestCase {
          assertTrue("test16ZeroBits()", exp.equals(Util.toString(md)));
       } catch (Exception x) {
          fail("test16ZeroBits(): "+String.valueOf(x));
+      }
+   }
+
+   public void testCloning() {
+      try {
+         IMessageDigest algorithm = new Whirlpool();
+         algorithm.update((byte) 0x00);
+         IMessageDigest clone = (IMessageDigest) algorithm.clone();
+         byte[] md = algorithm.digest();
+         String exp = "EBAA1DF2E97113BE187EB0303C660F6E643E2C090EF2CDA9A2EA6DCF5002147D1D0E1E9D996E879CEF9D26896630A5DB3308D5A0DC235B199C38923BE2259E03";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+
+         clone.update((byte) 0x00);
+         md = clone.digest();
+         exp = "5777FC1F8467A1C004CD9130439403CCDAA9FDC86092D9CFFE339E6008612374D04C8FC0C724707FEAE6F7CEB1E030CABF652A673DA1849B02654AF76EEE24A7";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+      } catch (Exception x) {
+         fail("testCloning(): "+String.valueOf(x));
       }
    }
 }

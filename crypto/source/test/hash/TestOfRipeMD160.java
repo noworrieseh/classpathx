@@ -1,7 +1,7 @@
 package test.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRipeMD160.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TestOfRipeMD160.java,v 1.3 2001-12-08 21:28:49 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -42,7 +42,7 @@ import gnu.crypto.util.Util;
 /**
  * Conformance tests for the RipeMD160 implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfRipeMD160 extends TestCase {
 
@@ -124,6 +124,24 @@ public class TestOfRipeMD160 extends TestCase {
          assertTrue("testAlphabet()", exp.equals(Util.toString(md)));
       } catch (Exception x) {
          fail("testAlphabet(): "+String.valueOf(x));
+      }
+   }
+
+   public void testCloning() {
+      try {
+         IMessageDigest algorithm = new RipeMD160();
+         algorithm.update("a".getBytes(), 0, 1);
+         IMessageDigest clone = (IMessageDigest) algorithm.clone();
+         byte[] md = algorithm.digest();
+         String exp = "0BDC9D2D256B3EE9DAAE347BE6F4DC835A467FFE";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+
+         clone.update("bc".getBytes(), 0, 2);
+         md = clone.digest();
+         exp = "8EB208F7E05D987A9B044A8E98C6B087F15A0BFC";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+      } catch (Exception x) {
+         fail("testCloning(): "+String.valueOf(x));
       }
    }
 }

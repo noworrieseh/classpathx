@@ -1,7 +1,7 @@
 package test.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRipeMD128.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TestOfRipeMD128.java,v 1.3 2001-12-08 21:27:34 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -42,7 +42,7 @@ import gnu.crypto.util.Util;
 /**
  * Conformance tests for the RipeMD128 implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfRipeMD128 extends TestCase {
 
@@ -124,6 +124,24 @@ public class TestOfRipeMD128 extends TestCase {
          assertTrue("testAlphabet()", exp.equals(Util.toString(md)));
       } catch (Exception x) {
          fail("testAlphabet(): "+String.valueOf(x));
+      }
+   }
+
+   public void testCloning() {
+      try {
+         IMessageDigest algorithm = new RipeMD128();
+         algorithm.update("a".getBytes(), 0, 1);
+         IMessageDigest clone = (IMessageDigest) algorithm.clone();
+         byte[] md = algorithm.digest();
+         String exp = "86BE7AFA339D0FC7CFC785E72F578D33";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+
+         clone.update("bc".getBytes(), 0, 2);
+         md = clone.digest();
+         exp = "C14A12199C66E4BA84636B0F69144C77";
+         assertTrue("testCloning()", exp.equals(Util.toString(md)));
+      } catch (Exception x) {
+         fail("testCloning(): "+String.valueOf(x));
       }
    }
 }
