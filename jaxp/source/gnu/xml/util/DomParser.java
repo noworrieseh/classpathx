@@ -1,5 +1,5 @@
 /*
- * $Id: DomParser.java,v 1.4 2001-11-07 02:03:37 db Exp $
+ * $Id: DomParser.java,v 1.5 2001-11-09 22:58:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -34,6 +34,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 import org.xml.sax.ext.DeclHandler;
+import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.ext.LexicalHandler;
 
 import org.w3c.dom.*;
@@ -99,12 +100,12 @@ import org.w3c.dom.*;
  * by this "parser" are unspecified; don't do it! </P>
  *
  * @author David Brownell
- * @version $Date: 2001-11-07 02:03:37 $
+ * @version $Date: 2001-11-09 22:58:17 $
  */
 final public class DomParser implements XMLReader
 {
     // Stuff used internally to route events correctly
-    private DefaultHandler	defaultHandler = new DefaultHandler ();
+    private DefaultHandler2	defaultHandler = new DefaultHandler2 ();
 
     // per-parse SAX stuff
     private ContentHandler	contentHandler = defaultHandler;
