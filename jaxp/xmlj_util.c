@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 /* xmlChar->jstring cache */
+#ifdef XMLJ_STRING_CACHE
 #define XMLJ_STRING_CACHE_SIZE 1024
 xmlHashTablePtr xmljStringCache = NULL;
 
@@ -41,6 +42,7 @@ xmljHashDeallocate (void *data, xmlChar *name)
 {
   /* NOOP */
 }
+#endif /* XMLJ_STRING_CACHE */
 
 jstring
 xmljNewString (JNIEnv * env, const xmlChar * text)
@@ -51,6 +53,7 @@ xmljNewString (JNIEnv * env, const xmlChar * text)
     {
       return NULL;
     }
+#ifdef XMLJ_STRING_CACHE
   if (xmljStringCache == NULL) /* Init cache */
     {
       xmljStringCache = xmlHashCreate (XMLJ_STRING_CACHE_SIZE);
@@ -69,16 +72,25 @@ xmljNewString (JNIEnv * env, const xmlChar * text)
           xmlHashAddEntry (xmljStringCache, text, ret);
         }
     }
+#else
+  ret = (*env)->NewStringUTF (env, (char *) text);
+  if (ret == NULL) /* Why? */
+    {
+      printf("xmljNewString: ERROR: NewStringUTF returned null for \"%s\"\n", text);
+    }
+#endif /* XMLJ_STRING_CACHE */
   return ret;
 }
 
 void
 xmljClearStringCache ()
 {
+#ifdef XMLJ_STRING_CACHE
   if (xmljStringCache != NULL)
     {
       xmlHashFree (xmljStringCache, &xmljHashDeallocate);
     }
+#endif /* XMLJ_STRING_CACHE */
 }
 
 const xmlChar *
