@@ -43,6 +43,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
+import org.w3c.dom.traversal.DocumentTraversal;
+import org.w3c.dom.traversal.NodeFilter;
+import org.w3c.dom.traversal.NodeIterator;
+import org.w3c.dom.traversal.TreeWalker;
 import org.w3c.dom.xpath.XPathEvaluator;
 import org.w3c.dom.xpath.XPathException;
 import org.w3c.dom.xpath.XPathExpression;
@@ -55,7 +59,7 @@ import org.w3c.dom.xpath.XPathNSResolver;
  */
 public class GnomeDocument
 extends GnomeNode
-implements Document, DOMConfiguration, XPathEvaluator
+implements Document, DOMConfiguration, XPathEvaluator, DocumentTraversal
 {
 
   DOMImplementation dom;
@@ -454,6 +458,28 @@ implements Document, DOMConfiguration, XPathEvaluator
                                  short type,
                                  Object result)
     throws XPathException, DOMException;
+
+  // -- DocumentTraversal methods --
+
+  public NodeIterator createNodeIterator(Node root,
+                                         int whatToShow,
+                                         NodeFilter filter,
+                                         boolean entityReferenceExpansion)
+    throws DOMException
+  {
+    return new GnomeNodeIterator (root, whatToShow, filter,
+                                  entityReferenceExpansion, false);
+  }
+
+  public TreeWalker createTreeWalker(Node root,
+                                    int whatToShow,
+                                    NodeFilter filter,
+                                    boolean entityReferenceExpansion)
+    throws DOMException
+  {
+    return new GnomeNodeIterator (root, whatToShow, filter,
+                                  entityReferenceExpansion, true);
+  }
 
   // -- Debugging --
   

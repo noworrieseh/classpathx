@@ -445,6 +445,7 @@ $(src)/gnu/xml/libxmlj/dom/GnomeEntity.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNode.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeNodeIterator.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \

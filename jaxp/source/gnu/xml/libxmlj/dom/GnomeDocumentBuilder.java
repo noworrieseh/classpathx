@@ -202,7 +202,7 @@ implements DOMImplementation
       }
     if ("Traversal".equalsIgnoreCase (feature))
       {
-        return false; // TODO
+        return ("2.0".equals (version) || version ==  null);
       }
     if ("Range".equalsIgnoreCase (feature))
       {
