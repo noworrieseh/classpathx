@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.5 2001-07-10 22:29:04 db Exp $
+ * $Id: DomConsumer.java,v 1.6 2001-08-24 21:43:18 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-07-10 22:29:04 $
+ * @version $Date: 2001-08-24 21:43:18 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -397,6 +397,13 @@ public class DomConsumer implements EventConsumer
 	 */
 	protected Document getDocument ()
 	    { return document; }
+	
+	/**
+	 * Returns the current node being populated, which is always
+	 * an Element or Document.
+	 */
+	protected Node getTop ()
+	    { return top; }
 
 
 	// SAX1
@@ -442,7 +449,7 @@ public class DomConsumer implements EventConsumer
 
 	// SAX1
 	public void processingInstruction (String target, String data)
-	throws SAXParseException
+	throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly)
@@ -537,7 +544,7 @@ public class DomConsumer implements EventConsumer
 	    String local,
 	    String name,
 	    Attributes attrs
-	) throws SAXParseException
+	) throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly)
@@ -904,7 +911,7 @@ public class DomConsumer implements EventConsumer
 	    String z
 	) throws SAXException
 	{
-	    /* IGNORE -- no content model support in DOM L2 */
+	    /* IGNORE -- no attribute model support in DOM L2 */
 	}
 
 	// SAX2 declaration event
