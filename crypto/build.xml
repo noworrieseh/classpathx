@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.18 2002-08-25 04:25:49 raif Exp $
+   $Id: build.xml,v 1.19 2002-08-31 09:38:17 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -404,6 +404,7 @@
       <copy todir="${build.dir}">
          <fileset dir="${basedir}">
             <patternset refid="toplevel_files"/>
+            <include name=".ant.properties"/>
             <include name="build.xml"/>
             <include name="configure"/>
             <include name="configure.in"/>
@@ -438,6 +439,7 @@
       <copy todir="${build.dir}">
          <fileset dir="${basedir}">
             <patternset refid="toplevel_files"/>
+            <include name=".ant.properties"/>
             <include name="build.xml"/>
             <include name="configure"/>
             <include name="configure.in"/>

@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.in,v 1.8 2002-08-15 12:20:31 raif Exp $
+## $Id: Makefile.in,v 1.9 2002-08-31 09:38:17 raif Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -484,7 +484,7 @@ DIST_DIR =	$(LIBNAME)-$(VERSION)
 # XXX ChangeLog
 TOPLEVELFILES := \
 	AUTHORS ChangeLog COPYING LICENSE NEWS README THANKS \
-	build.xml configure configure.in Makefile.in
+	.ant.properties build.xml configure configure.in Makefile.in
 
 FILES := \
 	$(TOPLEVELFILES) \
