@@ -1,7 +1,7 @@
 package gnu.crypto.tool;
 
 // ----------------------------------------------------------------------------
-// $Id: NistKat.java,v 1.3 2002-06-22 09:59:57 raif Exp $
+// $Id: NistKat.java,v 1.4 2002-08-14 16:09:08 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -53,7 +53,7 @@ import java.util.HashMap;
  *    Answer Test (KAT) and Monte Carlo Test (MCT) Information</a></li>
  * </ol>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class NistKat
 {
@@ -143,11 +143,11 @@ public final class NistKat
                }
             }
             if (cipherName == null) {
-               cipherName = args[i++];
+               cipherName = args[i];
                continue;
             }
             if (kSize == null) {
-               kSize = args[i++];
+               kSize = args[i];
                break; // ignore anything after this
             }
          }
