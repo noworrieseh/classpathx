@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.4 2001-10-23 17:42:25 db Exp $
+ * $Id: XMLWriter.java,v 1.5 2001-10-25 08:09:19 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -91,7 +91,7 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 08:09:19 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -597,41 +597,43 @@ public class XMLWriter
 
     /**
      * Writes an element that has content consisting of a single string.
+     * @see #writeEmptyElement
      * @see #startElement
      */
     public void writeElement (
 	String uri,
-	String local,
-	String name,
+	String localName,
+	String qName,
 	Attributes atts,
 	String content
     ) throws SAXException
     {
 	if (content == null || content.length () == 0) {
-	    writeEmptyElement (uri, local, name, atts);
+	    writeEmptyElement (uri, localName, qName, atts);
 	    return;
 	}
-	startElement (uri, local, name, atts);
+	startElement (uri, localName, qName, atts);
 	char chars [] = content.toCharArray ();
 	characters (chars, 0, chars.length);
-	endElement (uri, local, name);
+	endElement (uri, localName, qName);
     }
 
 
     /**
      * Writes an element that has content consisting of a single integer,
      * encoded as a decimal string.
+     * @see #writeEmptyElement
      * @see #startElement
      */
     public void writeElement (
 	String uri,
-	String local,
-	String name,
+	String localName,
+	String qName,
 	Attributes atts,
 	int content
     ) throws SAXException
     {
-	writeElement (uri, local, name, atts, Integer.toString (content));
+	writeElement (uri, localName, qName, atts, Integer.toString (content));
     }
 
 
@@ -886,8 +888,8 @@ public class XMLWriter
      */
     final public void startElement (
 	String uri,
-	String local,
-	String name,
+	String localName,
+	String qName,
 	Attributes atts
     ) throws SAXException
     {
@@ -896,7 +898,7 @@ public class XMLWriter
 	if (locator == null)
 	    locator = new LocatorImpl ();
 	    
-	if (name == null || "".equals (name))
+	if (qName == null || "".equals (qName))
 	    throw new IllegalArgumentException ("no XML name");
 
 	try {
@@ -906,7 +908,7 @@ public class XMLWriter
 	    if (prettyPrinting) {
 		String whitespace = null;
 
-		if (xhtml && spacePreserve (name))
+		if (xhtml && spacePreserve (qName))
 		    whitespace = "preserve";
 		else if (atts != null)
 		    whitespace = atts.getValue ("xml:space");
@@ -916,10 +918,10 @@ public class XMLWriter
 
 		if ("default".equals (whitespace)) {
 		    if (xhtml) {
-			if (spaceBefore (name)) {
+			if (spaceBefore (qName)) {
 			    newline ();
 			    doIndent ();
-			} else if (indentBefore (name))
+			} else if (indentBefore (qName))
 			    doIndent ();
 			// else it's inlined, modulo line length
 			// FIXME: incrementing element nest level
@@ -928,7 +930,7 @@ public class XMLWriter
 			doIndent ();
 		}
 	    }
-	    writeStartTag (name, atts, xhtml && isEmptyElementTag (name));
+	    writeStartTag (qName, atts, xhtml && isEmptyElementTag (qName));
 
 	    if (xhtml) {
 // FIXME: if this is an XHTML "pre" element, turn
@@ -946,17 +948,17 @@ public class XMLWriter
      */
     public void writeEmptyElement (
 	String uri,
-	String local,
-	String name,
+	String localName,
+	String qName,
 	Attributes atts
     ) throws SAXException
     {
 	if (canonical) {
-	    startElement (uri, local, name, atts);
-	    endElement (uri, local, name);
+	    startElement (uri, localName, qName, atts);
+	    endElement (uri, localName, qName);
 	} else {
 	    try {
-		writeStartTag (name, atts, true);
+		writeStartTag (qName, atts, true);
 	    } catch (IOException e) {
 		fatal ("can't write", e);
 	    }
@@ -965,20 +967,20 @@ public class XMLWriter
 
 
     /** <b>SAX2</b>:  indicates the end of an element */
-    final public void endElement (String uri, String local, String name)
+    final public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
-	if (name == null || "".equals (name))
+	if (qName == null || "".equals (qName))
 	    throw new IllegalArgumentException ("no XML name");
 
 	try {
 	    elementNestLevel--;
 	    if (entityNestLevel != 0)
 		return;
-	    if (xhtml && isEmptyElementTag (name))
+	    if (xhtml && isEmptyElementTag (qName))
 		return;
 	    rawWrite ("</");
-	    rawWrite (name);
+	    rawWrite (qName);
 	    rawWrite ('>');
 
 	    if (prettyPrinting) {
@@ -996,7 +998,7 @@ public class XMLWriter
     }
 
     /** <b>SAX1</b>:  reports content characters */
-    final public void characters (char buf [], int off, int len)
+    final public void characters (char ch [], int start, int length)
     throws SAXException
     {
 	if (locator == null)
@@ -1006,9 +1008,9 @@ public class XMLWriter
 	    if (entityNestLevel != 0)
 		return;
 	    if (inCDATA) {
-		escapeChars (buf, off, len, CTX_UNPARSED);
+		escapeChars (ch, start, length, CTX_UNPARSED);
 	    } else {
-		escapeChars (buf, off, len, CTX_CONTENT);
+		escapeChars (ch, start, length, CTX_CONTENT);
 	    }
 	} catch (IOException e) {
 	    fatal ("can't write", e);
@@ -1016,7 +1018,7 @@ public class XMLWriter
     }
 
     /** <b>SAX1</b>:  reports ignorable whitespace */
-    final public void ignorableWhitespace (char buf [], int off, int len)
+    final public void ignorableWhitespace (char ch [], int start, int length)
     throws SAXException
     {
 	if (locator == null)
@@ -1026,7 +1028,7 @@ public class XMLWriter
 	    if (entityNestLevel != 0)
 		return;
 	    // don't forget to map NL to CRLF, CR, etc
-	    escapeChars (buf, off, len, CTX_CONTENT);
+	    escapeChars (ch, start, length, CTX_CONTENT);
 	} catch (IOException e) {
 	    fatal ("can't write", e);
 	}
@@ -1038,7 +1040,7 @@ public class XMLWriter
      * or namespace-incompatible ones like "big:dog"; the caller is
      * responsible for ensuring those names are legal.
      */
-    final public void processingInstruction (String name, String value)
+    final public void processingInstruction (String target, String data)
     throws SAXException
     {
 	if (locator == null)
@@ -1057,9 +1059,9 @@ public class XMLWriter
 	    if (canonical && inEpilogue)
 		newline ();
 	    rawWrite ("<?");
-	    rawWrite (name);
+	    rawWrite (target);
 	    rawWrite (' ');
-	    escapeChars (value.toCharArray (), -1, -1, CTX_UNPARSED);
+	    escapeChars (data.toCharArray (), -1, -1, CTX_UNPARSED);
 	    rawWrite ("?>");
 	    if (elementNestLevel == 0 && !(canonical && inEpilogue))
 		newline ();
@@ -1123,7 +1125,7 @@ public class XMLWriter
      * Note that this, like other doctype related calls, is ignored
      * when XHTML is in use.
      */
-    final public void startDTD (String root, String pubid, String sysid)
+    final public void startDTD (String name, String publicId, String systemId)
     throws SAXException
     {
 	if (locator == null)
@@ -1135,14 +1137,14 @@ public class XMLWriter
 	    if (canonical)
 		return;
 	    rawWrite ("<!DOCTYPE ");
-	    rawWrite (root);
+	    rawWrite (name);
 	    rawWrite (' ');
 
 	    if (!expandingEntities) {
-		if (pubid != null)
-		    rawWrite ("PUBLIC '" + pubid + "' '" + sysid + "' ");
-		else if (sysid != null)
-		    rawWrite ("SYSTEM '" + sysid + "' ");
+		if (publicId != null)
+		    rawWrite ("PUBLIC '" + publicId + "' '" + systemId + "' ");
+		else if (systemId != null)
+		    rawWrite ("SYSTEM '" + systemId + "' ");
 	    }
 
 	    rawWrite ('[');
@@ -1218,7 +1220,7 @@ public class XMLWriter
      * the grounds that comments are for users (and perhaps text
      * editors) not programs.  Instead, use external scripts
      */
-    final public void comment (char buf [], int off, int len)
+    final public void comment (char ch [], int start, int length)
     throws SAXException
     {
 	if (locator == null)
@@ -1244,7 +1246,7 @@ public class XMLWriter
 	    if (canonical && inEpilogue)
 		newline ();
 	    rawWrite ("<!--");
-	    escapeChars (buf, off, len, CTX_UNPARSED);
+	    escapeChars (ch, start, length, CTX_UNPARSED);
 	    rawWrite ("-->");
 	    if (indent)
 		doIndent ();
@@ -1258,7 +1260,8 @@ public class XMLWriter
     // SAX1 DTDHandler
 
     /** <b>SAX1</b>:  called on notation declarations */
-    final public void notationDecl (String name, String pubid, String sysid)
+    final public void notationDecl (String name,
+    	String publicId, String systemId)
     throws SAXException
     {
 	if (xhtml)
@@ -1271,12 +1274,12 @@ public class XMLWriter
 	    if (entityNestLevel != 0)
 		return;
 	    rawWrite ("<!NOTATION " + name + " ");
-	    if (pubid != null)
-		rawWrite ("PUBLIC \"" + pubid + '"');
+	    if (publicId != null)
+		rawWrite ("PUBLIC \"" + publicId + '"');
 	    else
 		rawWrite ("SYSTEM ");
-	    if (sysid != null)
-		rawWrite ('"' + sysid + '"');
+	    if (systemId != null)
+		rawWrite ('"' + systemId + '"');
 	    rawWrite (">");
 	    newline ();
 	} catch (IOException e) {
@@ -1286,8 +1289,8 @@ public class XMLWriter
 
     /** <b>SAX1</b>:  called on unparsed entity declarations */
     final public void unparsedEntityDecl (String name,
-	String pubid, String sysid,
-	String notation)
+	String publicId, String systemId,
+	String notationName)
     throws SAXException
     {
 	if (xhtml)
@@ -1303,12 +1306,12 @@ public class XMLWriter
 	    if (entityNestLevel != 0)
 		return;
 	    rawWrite ("<!ENTITY " + name + " ");
-	    if (pubid != null)
-		rawWrite ("PUBLIC \"" + pubid + '"');
+	    if (publicId != null)
+		rawWrite ("PUBLIC \"" + publicId + '"');
 	    else
 		rawWrite ("SYSTEM ");
-	    rawWrite ('"' + sysid + '"');
-	    rawWrite (" NDATA " + notation + ">");
+	    rawWrite ('"' + systemId + '"');
+	    rawWrite (" NDATA " + notationName + ">");
 	    newline ();
 	} catch (IOException e) {
 	    fatal ("can't write", e);
@@ -1318,8 +1321,8 @@ public class XMLWriter
     // SAX2 DeclHandler
 
     /** <b>SAX2</b>:  called on attribute declarations */
-    final public void attributeDecl (String element, String name,
-	    String type, String defaultType, String defaultValue)
+    final public void attributeDecl (String eName, String aName,
+	    String type, String mode, String value)
     throws SAXException
     {
 	if (xhtml)
@@ -1330,13 +1333,13 @@ public class XMLWriter
 		return;
 	    if (entityNestLevel != 0)
 		return;
-	    rawWrite ("<!ATTLIST " + element + ' ' + name + ' ');
+	    rawWrite ("<!ATTLIST " + eName + ' ' + aName + ' ');
 	    rawWrite (type);
 	    rawWrite (' ');
-	    if (defaultType != null)
-		rawWrite (defaultType + ' ');
-	    if (defaultValue != null) 
-		writeQuotedValue (defaultValue, CTX_ATTRIBUTE);
+	    if (mode != null)
+		rawWrite (mode + ' ');
+	    if (value != null) 
+		writeQuotedValue (value, CTX_ATTRIBUTE);
 	    rawWrite ('>');
 	    newline ();
 	} catch (IOException e) {
@@ -1366,8 +1369,8 @@ public class XMLWriter
     /** <b>SAX2</b>:  called on external entity declarations */
     final public void externalEntityDecl (
 	String name,
-	String pubid,
-	String sysid)
+	String publicId,
+	String systemId)
     throws SAXException
     {
 	if (xhtml)
@@ -1379,11 +1382,11 @@ public class XMLWriter
 	    if (entityNestLevel != 0)
 		return;
 	    rawWrite ("<!ENTITY " + name + ' ');
-	    if (pubid != null)
-		rawWrite ("PUBLIC \"" + pubid + '"');
+	    if (publicId != null)
+		rawWrite ("PUBLIC \"" + publicId + '"');
 	    else
 		rawWrite ("SYSTEM ");
-	    rawWrite ('"' + sysid + "\">");
+	    rawWrite ('"' + systemId + "\">");
 	    newline ();
 	} catch (IOException e) {
 	    fatal ("can't write", e);
