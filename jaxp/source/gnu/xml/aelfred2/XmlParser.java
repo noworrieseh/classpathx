@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.23 2001-11-10 18:36:23 db Exp $
+ * $Id: XmlParser.java,v 1.24 2001-11-11 06:53:29 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -66,7 +66,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.23 2001-11-10 18:36:23 db Exp $
+// $Id: XmlParser.java,v 1.24 2001-11-11 06:53:29 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -76,7 +76,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-10 18:36:23 $
+ * @version $Date: 2001-11-11 06:53:29 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -161,11 +161,6 @@ final class XmlParser
 	    }
 	}
 
-	basePublicId = publicId;
-	baseURI = systemId;
-	baseReader = reader;
-	baseInputStream = stream;
-
 	initializeVariables ();
 
 	// predeclare the built-in entities here (replacement texts)
@@ -177,19 +172,19 @@ final class XmlParser
 	setInternalEntity ("apos", "&#39;");
 	setInternalEntity ("quot", "&#34;");
 
-	pushURL (false, "[document]", basePublicId, baseURI,
-		baseReader, baseInputStream, encoding);
+	pushURL (false, "[document]", publicId, systemId,
+		reader, stream, encoding);
 
 	handler.startDocument ();
 
 	try {
 	    parseDocument ();
 	} finally {
-	    if (baseReader != null)
-		try { baseReader.close ();
+	    if (reader != null)
+		try { reader.close ();
 		} catch (IOException e) { /* ignore */ }
-	    if (baseInputStream != null)
-		try { baseInputStream.close ();
+	    if (stream != null)
+		try { stream.close ();
 		} catch (IOException e) { /* ignore */ }
 	    if (is != null)
 		try { is.close ();
@@ -820,7 +815,7 @@ ee.printStackTrace ();
 	// report (a) declaration of name, (b) lexical info (ids)
 	handler.doctypeDecl (doctypeName, ids [0],
 		    (ids [1] != null && handler.resolveURIs ())
-			? absolutize (ids [1])
+			? absolutize (ids, true) // FIXME: ASSUMES not skipped
 			: ids [1]);
 
 	// Internal subset is parsed first, if present
@@ -847,13 +842,13 @@ ee.printStackTrace ();
 
 	// Read the external subset, if any
 	if (ids [1] != null) {
-	    ids [1] = absolutize (ids [1]);
-
 	    pushString (null, ">");
 
 	    // NOTE:  [dtd] is so we say what SAX2 expects,
 	    // even though it's misleading, 
-	    pushURL (true, "[dtd]", ids [0], ids [1], null, null, null);
+	    pushURL (true, "[dtd]", ids [0], absolutize (ids, true),
+	    					// FIXME: ASSUMES not skipped
+	    		null, null, null);
 
 	    // Loop until we end up back at '>'
 	    while (true) {
@@ -1857,7 +1852,6 @@ loop2:
 	} else {
 	    // Read the external IDs
 	    String ids [] = readExternalIds (false, false);
-	    String absolute = absolutize (ids [1]);
 
 	    // Check for NDATA declaration.
 	    boolean white = tryWhitespace ();
@@ -1866,6 +1860,7 @@ loop2:
 		    error ("whitespace required before NDATA");
 		requireWhitespace ();
 		String notationName = readNmtoken (true);
+		String absolute = absolutize (ids, false);
 		if (!skippedPE) {
 		    setEntity (name, ENTITY_NDATA, ids [0], absolute,
 			    null, notationName);
@@ -1875,6 +1870,8 @@ loop2:
 				notationName);
 		}
 	    } else if (!skippedPE) {
+		String absolute = absolutize (ids, true);
+	    					// FIXME: ASSUMES not skipped
 		setEntity (name, ENTITY_TEXT, ids [0], absolute, null, null);
 		handler.getDeclHandler ()
 		    .externalEntityDecl (name, ids [0],
@@ -1912,7 +1909,7 @@ loop2:
 	ids = readExternalIds (true, false);
 
 	// Register the notation.
-	setNotation (nname, ids [0], ids [1]);
+	setNotation (nname, ids);
 
 	skipWhitespace ();
 	require ('>');
@@ -2328,13 +2325,14 @@ loop:
      * A system identifier is not required for notations.
      * @param inNotation Are we parsing a notation decl?
      * @param isSubset Parsing external subset decl (may be omitted)?
-     * @return A two-member String array containing the identifiers, or nulls.
+     * @return A three-member String array containing the identifiers,
+     *	or nulls. Order: public, system, baseURI.
      */
     private String[] readExternalIds (boolean inNotation, boolean isSubset)
     throws Exception
     {
 	char	c;
-	String	ids[] = new String [2];
+	String	ids[] = new String [3];
 	int	flags = LIT_DISABLE_CREF | LIT_DISABLE_PE | LIT_DISABLE_EREF;
 
 	if (tryRead ("PUBLIC")) {
@@ -2369,14 +2367,20 @@ loop:
 	} else if (!isSubset) 
 		error ("missing SYSTEM or PUBLIC keyword");
 
-	if (ids [1] != null && ids [1].indexOf ('#') != -1)
-	    handler.verror ("SYSTEM id has a URI fragment: " + ids [1]);
+	if (ids [1] != null) {
+	    if (ids [1].indexOf ('#') != -1)
+		handler.verror ("SYSTEM id has a URI fragment: " + ids [1]);
+	    ids [2] = handler.getSystemId ();
+	    if (ids [2] == null)
+		handler.warn ("No base URI; hope URI is absolute: "
+			+ ids [1]);
+	}
 
 	return ids;
     }
 
-    // absolutize a system ID relative to the appropriate base URI
-    private String absolutize (String uri)
+    // absolutize a system ID relative to the specified base URI
+    private String absolutize (String ids [], boolean parsed)
     throws SAXException
     {
 	// FIXME should probably normalize system IDs as follows:
@@ -2386,24 +2390,24 @@ loop:
 	// to the JVM, or how the JVM does handles non-ASCII...
 
 	try {
-	    URL	base;
-
-	    if (externalEntity != null)
-		base = externalEntity.getURL ();
-	    else if (baseURI != null)
-		base = new URL (baseURI);
-	    else {
+	    if (ids [2] == null) {
 		handler.warn ("No base URI; hope this is absolute: "
-			+ uri);
-		base = null;
-	    }
-	    if (base != null)
-		uri = new URL (base, uri).toString ();
+			+ ids [1]);
+		return new URL (ids [1]).toString ();
+	    } else
+		return new URL (new URL (ids [2]), ids [1]).toString ();
+
 	} catch (MalformedURLException e) {
-	    handler.warn ("Can't understand URI, hope it's absolute: <"
-		    + uri + ">");
+	    String message = "Can't absolutize URI: " + e.getMessage ();
+
+	    // Let unknown URI schemes pass through unless we need
+	    // the JVM to map them to i/o streams for us...
+	    if (parsed)
+		error (message);
+	    else
+		handler.warn (message);
+	    return null;
 	}
-	return uri;
     }
 
 
@@ -3145,17 +3149,17 @@ loop:
     /**
      * Report a notation declaration, checking for duplicates.
      */
-    private void setNotation (String nname, String pubid, String sysid)
+    private void setNotation (String nname, String ids [])
     throws Exception
     {
 	if (skippedPE)
 	    return;
 
-	if (handler.resolveURIs () && sysid != null)
-	    sysid = absolutize (sysid);
-
 	handler.getDTDHandler ()
-	    .notationDecl (nname, pubid, sysid);
+	    .notationDecl (nname, ids [0],
+		(handler.resolveURIs () && ids [1] != null)
+		    ? absolutize (ids, false)
+		    : ids [1]);
 
 	if (notationInfo.get (nname) == null)
 	    notationInfo.put (nname, nname);
@@ -3343,7 +3347,7 @@ loop:
 		// FIXME: encoding is null except maybe from toplevel;
 		// the only functionality it adds is UCS4 support and
 		// workarounds for encoding names the JDK doesn't know.
-		// reader/stream are likewise null in most cases.
+		// reader/stream are likewise null except from toplevel.
 	Reader		reader,
 	InputStream	stream,
 	String		encoding
@@ -3363,6 +3367,7 @@ loop:
 		dataBufferFlush ();
 
 	    // if we're not skipping, this will report startEntity()
+	    // and update the (handler's) stack of URIs
 	    scratch.setSystemId (systemId);
 	    scratch.setPublicId (publicId);
 	    scratch.setEncoding (encoding);
@@ -4604,14 +4609,6 @@ loop:
     //
     private String	currentElement;
     private int		currentElementContent;
-
-    //
-    // Base external identifiers for resolution.
-    //
-    private String	basePublicId;
-    private String	baseURI;
-    private Reader	baseReader;
-    private InputStream	baseInputStream;
 
     //
     // Stack of entity names, to detect recursion.
