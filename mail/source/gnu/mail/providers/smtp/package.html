@@ -94,7 +94,9 @@ of "success", "failure", or "delay" (separated by commas and/or spaces)</td>
 <tr>
 <td>mail.smtp.tls</td>
 <td>boolean</td>
-<td>If set to false, TLS negotiation will not be attempted.</td>
+<td>If set to false, TLS negotiation will not be attempted. Exceptionally,
+you may set this to the special value "required" to throw an exception on
+connect when TLS is not available.</td>
 </tr>
 
 <tr>
