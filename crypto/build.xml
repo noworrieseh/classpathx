@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.14 2002-08-07 10:10:44 raif Exp $
+   $Id: build.xml,v 1.15 2002-08-12 13:11:04 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -364,8 +364,11 @@
    <!--
    Make distribution ..........................................................
    -->
-   <target name="dist" depends="distclean,jar,docs"
-           description="Create .tar.gz and .zip deliverables for the project">
+   <target name="dist" depends="dist-library,dist-tv,compute-checksum"
+           description="Package the library's Software and generated Test Vectors">
+   </target>
+
+   <target name="dist-library" depends="distclean,jar,docs">
       <property name="build.dir" value="build/${package}-${version}"/>
       <copy todir="${build.dir}">
          <fileset dir="${basedir}">
@@ -389,11 +392,57 @@
             <include name="**/*.java"/>
          </fileset>
       </copy>
-      <zip basedir="build" zipfile="${package}-${version}.zip"/>
-      <tar basedir="build" tarfile="${package}-${version}.tar"/>
-      <gzip src="${package}-${version}.tar" zipfile="${package}-${version}.tar.gz"/>
-      <delete file="${package}-${version}.tar"/>
+
+      <property name="deliverable1" value="${package}-${version}"/>
+      <zip basedir="build" zipfile="${deliverable1}.zip"/>
+      <tar basedir="build" tarfile="${deliverable1}.tar"/>
+      <gzip src="${deliverable1}.tar" zipfile="${deliverable1}.tar.gz"/>
+      <bzip2 src="${deliverable1}.tar" zipfile="${deliverable1}.tar.bz2"/>
+      <delete file="${deliverable1}.tar"/>
       <delete dir="build"/>
+   </target>
+
+   <target name="dist-tv" depends="tv">
+      <property name="build.dir" value="build/${package}-${version}"/>
+      <copy todir="${build.dir}">
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+            <include name="build.xml"/>
+            <include name="configure"/>
+            <include name="configure.in"/>
+            <include name="Makefile.in"/>
+         </fileset>
+      </copy>
+      <copy todir="${build.dir}/tv">
+         <fileset dir="tv" includes="**/*"/>
+      </copy>
+
+      <property name="deliverable2" value="${package}-${version}-tv"/>
+      <zip basedir="build" zipfile="${deliverable2}.zip"/>
+      <tar basedir="build" tarfile="${deliverable2}.tar"/>
+      <gzip src="${deliverable2}.tar" zipfile="${deliverable2}.tar.gz"/>
+      <bzip2 src="${deliverable2}.tar" zipfile="${deliverable2}.tar.bz2"/>
+      <delete file="${deliverable2}.tar"/>
+      <delete dir="build"/>
+   </target>
+
+   <target name="compute-checksum" depends="dist-library,dist-tv">
+      <property name="deliverable1" value="${package}-${version}"/>
+      <property name="deliverable2" value="${package}-${version}-tv"/>
+      <checksum file="${deliverable1}.zip" algorithm="md5" property="zip1.md5"/>
+      <checksum file="${deliverable1}.tar.gz" algorithm="md5" property="tar1.gz.md5"/>
+      <checksum file="${deliverable1}.tar.bz2" algorithm="md5" property="tar1.bz2.md5"/>
+      <checksum file="${deliverable2}.zip" algorithm="md5" property="zip2.md5"/>
+      <checksum file="${deliverable2}.tar.gz" algorithm="md5" property="tar2.gz.md5"/>
+      <checksum file="${deliverable2}.tar.bz2" algorithm="md5" property="tar2.bz2.md5"/>
+      <echo file="${deliverable1}.md5" append="false">
+${zip1.md5} *${deliverable1}.zip
+${tar1.gz.md5} *${deliverable1}.tar.gz
+${tar1.bz2.md5} *${deliverable1}.tar.bz2
+${zip2.md5} *${deliverable2}.zip
+${tar2.gz.md5} *${deliverable2}.tar.gz
+${tar2.bz2.md5} *${deliverable2}.tar.bz2
+      </echo>
    </target>
 
    <!--
