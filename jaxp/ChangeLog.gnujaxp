@@ -1,7 +1,9 @@
 2004-11-27  Julian Scheid  <julian@sektor37.de>
 
-   	* SubstringFunction.java: Fixed a bug which would copy one character
+	* SubstringFunction.java: Fixed a bug which would copy one character
    	short if the length is specified explicitly.
+	* TransformerFactory.java,ImplementationSource.java: Load libxmlj
+	classes dynamically.
    	
 2004-11-26  Chris Burdess  <dog@gnu.org>
 

@@ -73,6 +73,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.NameTest;
+import gnu.xml.xpath.NodeTypeTest;
 import gnu.xml.xpath.Pattern;
 import gnu.xml.xpath.Selector;
 import gnu.xml.xpath.Root;

@@ -68,7 +68,12 @@ public class ImplementationSource
     acc.add(new gnu.xml.dom.DomImpl());
     try
       {
-        acc.add(new gnu.xml.libxmlj.dom.GnomeDocumentBuilder());
+        Class t = Class.forName("gnu.xml.libxmlj.dom.GnomeDocumentBuilder");
+        acc.add(t.newInstance());
+      }
+    catch (Exception e)
+      {
+        // libxmlj not available        
       }
     catch (UnsatisfiedLinkError e)
       {

@@ -82,6 +82,10 @@ final class SubstringFunction
       }
 
     int l = s.length() - p;
+    if (l <= 0)
+      {
+        return "";
+      }
 
     if (arg3 != null)
       {
