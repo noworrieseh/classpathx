@@ -1,7 +1,7 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.1 2002-01-17 11:54:47 raif Exp $
+// $Id: AllTests.java,v 1.2 2002-01-18 02:26:48 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import junit.textui.TestRunner;
 /**
  * TestSuite that runs all tests of the jce package.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AllTests extends TestCase {
 
@@ -65,6 +65,7 @@ public class AllTests extends TestCase {
       result.addTest(TestOfProvider.suite());
       result.addTest(TestOfMessageDigest.suite());
       result.addTest(TestOfKeyPairGenerator.suite());
+      result.addTest(TestOfSignature.suite());
 
       return result;
    }
