@@ -22,26 +22,54 @@
 package javax.xml.transform.sax;
 
 // Imports
+import org.xml.sax.InputSource;
 import org.xml.sax.XMLFilter;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 
 /**
- * SAX Transformer Factory
- * @author	Andrew Selkirk
+ * A TransformerFactory that supports several separate modes for
+ * working with SAX inputs and outputs.  Those modes include: <ul>
+ *
+ * <li> Pipeline Stage, pushing events through {@link TransformerHandler}
+ *	objects used as SAX handlers, and passing the transformed data
+ *	through a {@link SAXResult} encapsulating SAX ContentHandler and
+ *	LexicalHandler objects;
+ * <li> Pipeline Terminus, like a normal pipeline stage but using some other
+ *	kind of {@link Result} to store transformed data as text;
+ * <li> Event producer, an {@link XMLFilter} object taking data from a URI
+ *	or from a SAX {@link InputSource} input object and delivering it
+ *	to a SAX ContentHandler;
+ * <li>	Transformer objects produced by this factory will usually be able
+ *	to accept {@link SAXSource} objects as inputs.
+ * </ul>
+ *
+ * <p>Transformer objects produced by this factory will of course be
+ * able to perform {@link Transformer#transform Transformer.transform()}
+ * operations to map XML text into other text.
+ *
+ * <p>The factory also supports creating Templates objects.
+ * 
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
-public abstract class SAXTransformerFactory extends TransformerFactory {
-
-	//-------------------------------------------------------------
-	// Constants --------------------------------------------------
-	//-------------------------------------------------------------
-
+public abstract class SAXTransformerFactory extends TransformerFactory
+{
+	/**
+	 * Used with <em>TransformerFactory.getFeature()</em> to determine
+	 * whether the transformers it produces extend this class.
+	 */
 	public static final String FEATURE =
 		"http://javax.xml.transform.sax.SAXTransformerFactory/feature";
 
+	/**
+	 * Used with <em>TransformerFactory.getFeature()</em> to determine
+	 * whether <em>newXMLFilter()</em> methods are supported.
+	 */
 	public static final String FEATURE_XMLFILTER =
 		"http://javax.xml.transform.sax.SAXTransformerFactory/feature/xmlfilter";
 
@@ -74,7 +102,4 @@ public abstract class SAXTransformerFactory extends TransformerFactory {
 
 	public abstract XMLFilter newXMLFilter(Templates templates)
 		throws TransformerConfigurationException;
-
-
-} // SAXTransformerFactory
-
+}

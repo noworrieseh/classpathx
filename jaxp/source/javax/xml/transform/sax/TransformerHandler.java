@@ -21,33 +21,35 @@
 
 package javax.xml.transform.sax;
 
-// Imports
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ext.LexicalHandler;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 
+
 /**
- * Transformer Handler
- * @author	Andrew Selkirk
+ * Transforms SAX input events to a result, according to some
+ * stylesheet.  Note the expectation that XSLT transforms will
+ * discard DTD information (the DTD interfaces are not supported).
+ *
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
-public interface TransformerHandler extends	ContentHandler, 
-						LexicalHandler {
+public interface TransformerHandler extends ContentHandler, LexicalHandler
+{
+    /**
+     * Assigns the result of the transform.
+     */
+    public void setResult(Result result) 
+	    throws IllegalArgumentException;
 
-	//-------------------------------------------------------------
-	// Interface: TransformerHandler ------------------------------
-	//-------------------------------------------------------------
+    public void setSystemId(String systemID);
 
-	public void setResult(Result result) 
-		throws IllegalArgumentException;
+    public String getSystemId();
 
-	public void setSystemId(String systemID);
-
-	public String getSystemId();
-
-	public Transformer getTransformer();
-
-
-} // TransformerHandler
-
+    /**
+     * Returns the associated transformer, for use in setting
+     * parameters and output properties.
+     */
+    public Transformer getTransformer();
+}

@@ -21,22 +21,30 @@
 
 package javax.xml.transform.sax;
 
-// Imports
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
 import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
 
 /**
- * SAX Source
- * @author	Andrew Selkirk
+ * Acts as a holder for "pull style" inputs to an XSLT transform.
+ * SAX based transforms can support a second style of inputs,
+ * driving by a {@link TransformerHandler} as output of some
+ * other SAX processing pipeline. stage.
+ *
+ * @see SAXTransformerFactory#newTransformerHandler
+ * 
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
-public class SAXSource implements Source {
-
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
+public class SAXSource implements Source
+{
+	/**
+	 * Used with <em>TransformerFactory.getFeature()</em> to determine
+	 * whether the transformers it produces support SAXSource objects
+	 * (possibly without URIs) as inputs.
+	 */
 	public static final String FEATURE =
 		"http://javax.xml.transform.sax.SAXSource/feature";
 
@@ -94,11 +102,41 @@ public class SAXSource implements Source {
 		return null;
 	} // getSystemId()
 
-	public static InputSource sourceToInputSource(Source source) {
-		return null; // TODO
-	} // sourceToInputSource()
+	/**
+	 * Creates a SAX input source from its argument.
+	 * Understands StreamSource and System ID based input sources,
+	 * and insists on finding either a system ID (URI) or some kind
+	 * of input stream (character or byte).
+	 *
+	 * @param in TRAX style input source
+	 * @return SAX input source, or null if one could not be
+	 *	created.
+	 */
+	public static InputSource sourceToInputSource (Source in)
+	{
+	    InputSource	retval;
+	    boolean	ok = false;
 
+	    if (in.getSystemId () != null) {
+		retval = new InputSource (in.getSystemId ());
+		ok = true;
+	    } else
+		retval = new InputSource ();
+	    
+	    if (in instanceof StreamSource) {
+		StreamSource	ss = (StreamSource) in;
 
-} // SAXSource
+		if (ss.getReader () != null) {
+		    retval.setCharacterStream (ss.getReader ());
+		    ok = true;
+		} else if (ss.getInputStream () != null) {
+		    retval.setByteStream (ss.getInputStream ());
+		    ok = true;
+		}
+		if (ss.getPublicId () != null)
+		    retval.setPublicId (ss.getPublicId ());
+	    }
 
-
+	    return ok ? retval : null;
+	}
+}

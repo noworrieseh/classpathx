@@ -28,15 +28,17 @@ import javax.xml.transform.Result;
 
 /**
  * Collects the result of a SAX transform.
- * @author	Andrew Selkirk
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
-public class SAXResult implements Result {
+public class SAXResult implements Result
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
+	/**
+	 * Used with <em>TransformerFactory.getFeature()</em> to determine
+	 * whether the transformers it produces support SAXResult objects
+	 * as outputs.
+	 */
 	public static final String FEATURE =
 		"http://javax.xml.transform.sax.SAXResult/feature";
 
