@@ -166,6 +166,6 @@ SAXParseContext *
 xmljGetThreadContext (void);
 
 void
-xmljClearThreadContext ();
+xmljClearThreadContext (void);
 
 #endif /* !defined XMLJ_IO_H */

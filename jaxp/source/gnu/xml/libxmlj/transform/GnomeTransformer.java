@@ -1,5 +1,5 @@
 /* 
- * $Id: GnomeTransformer.java,v 1.2 2004-07-30 14:55:36 dog Exp $
+ * $Id: GnomeTransformer.java,v 1.3 2004-08-13 07:44:05 dog Exp $
  * Copyright (C) 2003, 2004 Free Software Foundation, Inc.
  * 
  * This file is part of GNU Classpathx/jaxp.
@@ -59,6 +59,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.Result;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -71,8 +72,16 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Node;
+
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+
 import gnu.xml.libxmlj.dom.GnomeDocument;
 import gnu.xml.libxmlj.sax.GnomeXMLReader;
+import gnu.xml.libxmlj.util.NamedInputStream;
+import gnu.xml.libxmlj.util.StandaloneLocator;
+import gnu.xml.libxmlj.util.XMLJ;
 
 /**
  * An implementation of {@link javax.xml.transform.Transformer} which

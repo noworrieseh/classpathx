@@ -8,6 +8,23 @@
 #include "xmlj_util.h"
 #include <libxml/xpath.h>
 
+/* Local function prototypes */
+
+xmlXPathContextPtr
+xmljCreateXPathContextPtr (JNIEnv *env, xmlNodePtr node);
+
+jobject
+xmljGetXPathResult (JNIEnv *env, xmlXPathObjectPtr obj);
+
+jobject
+xmljGetXPathNodeList (JNIEnv *env, xmlXPathObjectPtr obj);
+
+xmlXPathObjectPtr
+xmljGetXPathObjectID (JNIEnv *env, jobject obj);
+
+/**
+ * Creates an XPath context for the given node.
+ */
 xmlXPathContextPtr
 xmljCreateXPathContextPtr (JNIEnv *env, xmlNodePtr node)
 {
@@ -160,12 +177,12 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_free (JNIEnv *env,
 }
 
 JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_evaluate (JNIEnv *env,
-                                                        jobject self,
-                                                        jobject ptr,
-                                                        jobject contextNode,
-                                                        jshort type,
-                                                        jobject result)
+Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_doEvaluate (JNIEnv *env,
+                                                          jobject self,
+                                                          jobject ptr,
+                                                          jobject contextNode,
+                                                          jshort type,
+                                                          jobject result)
 {
   xmlXPathCompExprPtr expr;
   xmlNodePtr node;

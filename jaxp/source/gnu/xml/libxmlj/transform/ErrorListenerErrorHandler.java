@@ -30,6 +30,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides a SAX ErrorHandler interface to an ErrorListener.

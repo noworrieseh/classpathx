@@ -1,3 +1,7 @@
+2004-08-10  Chris Burdess <dog@gnu.org>
+
+	* transform: Fixed imports.
+
 2004-07-30  Chris Burdess <dog@gnu.org>
 
 	* transform: Added support for DOMSource and DOMResult transforms

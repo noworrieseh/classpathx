@@ -47,6 +47,17 @@ typedef struct
 }
 xmljHashScanData;
 
+/* Prototypes for local functions */
+
+void
+xmljAddAttribute (xmlNodePtr node, xmlAttrPtr attr);
+
+void
+xmljHashScanner (void *payload, void *vdata, xmlChar *name);
+
+xmlChar *
+xmljGetNodeValue (xmlNodePtr node);
+
 /*
  * Determines whether a child node is suitable for insertion in the list of
  * children for a given parent node.
@@ -1327,7 +1338,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv * env,
           if (attr == NULL)
             {
               char msg[1024];
-              sprintf (msg, "No attribute at index %d\n", index);
+              sprintf (msg, "No attribute at index %d\n", (int) index);
               xmljThrowException (env, "java/lang/NullPointerException", msg);
               return NULL;
             }

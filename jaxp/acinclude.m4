@@ -639,7 +639,7 @@ changequote([, ])dnl
     CPPFLAGS="$ac_save_CPPFLAGS -I$ac_dir -I$ac_dir/$ac_machdep"
     AC_TRY_CPP([#include <jni.h>],
                ac_save_CPPFLAGS="$CPPFLAGS",
-               AC_MSG_WARN([unable to include <jni.h>]))
+               AC_MSG_ERROR([unable to include <jni.h>]))
     CPPFLAGS="$ac_save_CPPFLAGS"])
 fi
 ])
@@ -725,7 +725,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: acinclude.m4,v 1.7 2004-07-30 07:47:03 dog Exp $
+# $Id: acinclude.m4,v 1.8 2004-08-13 07:44:03 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,

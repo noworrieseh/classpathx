@@ -66,6 +66,40 @@
 #include <libxslt/extensions.h>
 #include <libxslt/documents.h>
 
+/* Local function prototypes */
+
+void
+xmljDocumentFunction (xmlXPathParserContextPtr ctxt, int nargs);
+
+xsltStylesheetPtr
+xmljGetStylesheetID (JNIEnv * env, jobject transformer);
+
+jobject
+xmljGetTransformerProperties (JNIEnv *env, jobject transformer);
+
+const xmlChar *
+xmljBooleanToString (int value);
+
+void
+xmljSetOutputProperties (JNIEnv *env, jobject transformer,
+                         xsltStylesheetPtr stylesheet);
+
+jobjectArray
+xmljGetParameterArray (JNIEnv *env, jobject transformer);
+
+const char **
+xmljGetParameters (JNIEnv *env, jobjectArray pa);
+
+void
+xmljFreeParameters (JNIEnv *env, jobjectArray pa, const char **parameters);
+
+xmlDocPtr
+xmljTransform (JNIEnv *env, jobject transformer, xmlDocPtr source);
+
+void
+xmljTransformToSAX (JNIEnv *env, jobject transformer, xmlDocPtr source,
+                    jobject callback);
+
 /*
  * --------------------------------------------------------------------------
  * 

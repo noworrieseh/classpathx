@@ -46,31 +46,31 @@ class XMLName
     this.qName = qName;
     int ci = qName.lastIndexOf (':');
     if (ci < 1)
-    {
-      localName = qName;
-      prefix = null;
-      uri = "";
-    }
+      {
+        localName = qName;
+        prefix = null;
+        uri = "";
+      }
     else
-    {
-      localName = qName.substring (ci + 1);
-      prefix = qName.substring (0, ci);
-      if ("xml".equals (prefix))
-        {
-          if ("lang".equals (localName) || "space".equals (localName))
-            {
-              uri = XML_URI;
-            }
-          else
-            {
-              uri = parser.getURI (prefix);
-            }
-        }
-      else
-        {
-          uri = parser.getURI (prefix);
-        }
-    }
+      {
+        localName = qName.substring (ci + 1);
+        prefix = qName.substring (0, ci);
+        if ("xml".equals (prefix))
+          {
+            if ("lang".equals (localName) || "space".equals (localName))
+              {
+                uri = XML_URI;
+              }
+            else
+              {
+                uri = parser.getURI (prefix);
+              }
+          }
+        else
+          {
+            uri = parser.getURI (prefix);
+          }
+      }
   }
 
   public String toString ()

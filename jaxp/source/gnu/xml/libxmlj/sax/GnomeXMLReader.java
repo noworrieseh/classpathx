@@ -454,8 +454,22 @@ implements XMLReader
       {
         return;
       }
-    systemId = XMLJ.getAbsoluteURI (base, systemId);
-    lexicalHandler.startDTD (name, publicId, systemId);
+    try
+      {
+        systemId = XMLJ.getAbsoluteURI (base, systemId);
+        lexicalHandler.startDTD (name, publicId, systemId);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void externalEntityDecl (String name, String publicId,
@@ -466,8 +480,22 @@ implements XMLReader
       {
         return;
       }
-    systemId = XMLJ.getAbsoluteURI (base, systemId);
-    declarationHandler.externalEntityDecl (name, publicId, systemId);
+    try
+      {
+        systemId = XMLJ.getAbsoluteURI (base, systemId);
+        declarationHandler.externalEntityDecl (name, publicId, systemId);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void internalEntityDecl (String name, String value)
@@ -477,7 +505,21 @@ implements XMLReader
       {
         return;
       }
-    declarationHandler.internalEntityDecl (name, value);
+    try
+      {
+        declarationHandler.internalEntityDecl (name, value);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private InputStream resolveEntity (String publicId, String systemId)
@@ -487,9 +529,23 @@ implements XMLReader
       {
         return null;
       }
-    systemId = XMLJ.getAbsoluteURI (base, systemId);
-    InputSource source = entityResolver.resolveEntity (publicId, systemId);
-    return (source == null) ? null : XMLJ.getInputStream (source);
+    try
+      {
+        systemId = XMLJ.getAbsoluteURI (base, systemId);
+        InputSource source = entityResolver.resolveEntity (publicId, systemId);
+        return (source == null) ? null : XMLJ.getInputStream (source);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void notationDecl (String name, String publicId, String systemId)
@@ -499,8 +555,22 @@ implements XMLReader
       {
         return;
       }
-    systemId = XMLJ.getAbsoluteURI (base, systemId);
-    dtdHandler.notationDecl (name, publicId, systemId);
+    try
+      {
+        systemId = XMLJ.getAbsoluteURI (base, systemId);
+        dtdHandler.notationDecl (name, publicId, systemId);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void attributeDecl (String eName, String aName, String type,
@@ -511,7 +581,21 @@ implements XMLReader
       {
         return;
       }
-    declarationHandler.attributeDecl (eName, aName, type, mode, value);
+    try
+      {
+        declarationHandler.attributeDecl (eName, aName, type, mode, value);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void elementDecl (String name, String model)
@@ -521,7 +605,21 @@ implements XMLReader
       {
         return;
       }
-    declarationHandler.elementDecl (name, model);
+    try
+      {
+        declarationHandler.elementDecl (name, model);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void unparsedEntityDecl (String name, String publicId,
@@ -532,9 +630,23 @@ implements XMLReader
       {
         return;
       }
-    systemId = XMLJ.getAbsoluteURI (base, systemId);
-    dtdHandler.unparsedEntityDecl (name, publicId, systemId,
-                                   notationName);
+    try
+      {
+        systemId = XMLJ.getAbsoluteURI (base, systemId);
+        dtdHandler.unparsedEntityDecl (name, publicId, systemId,
+                                       notationName);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void setDocumentLocator (Object ctx, Object loc)
@@ -544,7 +656,13 @@ implements XMLReader
       {
         return;
       }
-    contentHandler.setDocumentLocator (locator);
+    try
+      {
+        contentHandler.setDocumentLocator (locator);
+      }
+    catch (Exception e)
+      {
+      }
   }
   
   private void startDocument (boolean standalone)
@@ -556,7 +674,21 @@ implements XMLReader
       {
         return;
       }
-    contentHandler.startDocument ();
+    try
+      {
+        contentHandler.startDocument ();
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void endDocument ()
@@ -566,7 +698,21 @@ implements XMLReader
       {
         return;
       }
-    contentHandler.endDocument();
+    try
+      {
+        contentHandler.endDocument();
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void startElement(String name, String[] attrs)
@@ -576,42 +722,56 @@ implements XMLReader
       {
         return;
       }
-    XMLName xName = new XMLName (this, name);
-    if (namespaces)
+    try
       {
-        // Handle defined namespaces
-        ns.push ();
-        int len = attrs.length;
-        if (len > 0)
+        XMLName xName = new XMLName (this, name);
+        if (namespaces)
           {
-            ArrayList filtered = new ArrayList (len);
-            for (int i = 0; i < len; i += 2)
+            // Handle defined namespaces
+            ns.push ();
+            int len = (attrs == null) ? 0 : attrs.length;
+            if (len > 0)
               {
-                String attName = attrs[i];
-                String attValue = attrs[i + 1];
-                if (attName.equals ("xmlns"))
+                ArrayList filtered = new ArrayList (len);
+                for (int i = 0; i < len; i += 2)
                   {
-                    startPrefixMapping ("", attValue);
+                    String attName = attrs[i];
+                    String attValue = attrs[i + 1];
+                    if (attName.equals ("xmlns"))
+                      {
+                        startPrefixMapping ("", attValue);
+                      }
+                    else if (attName.startsWith ("xmlns:"))
+                      {
+                        startPrefixMapping (attName.substring (6), attValue);
+                      }
+                    else
+                      {
+                        filtered.add (attName);
+                        filtered.add (attValue);
+                      }
                   }
-                else if (attName.startsWith ("xmlns:"))
-                  {
-                    startPrefixMapping (attName.substring (6), attValue);
-                  }
-                else
-                  {
-                    filtered.add (attName);
-                    filtered.add (attValue);
-                  }
+                // Remove xmlns attributes
+                attrs = new String[filtered.size ()];
+                filtered.toArray (attrs);
               }
-            // Remove xmlns attributes
-            attrs = new String[filtered.size ()];
-            filtered.toArray (attrs);
+          }
+        // Construct attributes
+        Attributes atts = new StringArrayAttributes (this, attrs);
+        contentHandler.startElement (xName.uri, xName.localName, xName.qName,
+                                     atts);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
           }
       }
-    // Construct attributes
-    Attributes atts = new StringArrayAttributes (this, attrs);
-    contentHandler.startElement (xName.uri, xName.localName, xName.qName,
-                                 atts);
   }
 
   private void endElement (String name)
@@ -621,17 +781,31 @@ implements XMLReader
       {
         return;
       }
-    XMLName xName = new XMLName (this, name);
-    String uri = (xName.uri == null) ? "" : xName.uri;
-    contentHandler.endElement (uri, xName.localName, xName.qName);
-    // Handle undefining namespaces
-    if (namespaces)
+    try
       {
-        for (Iterator i = ns.currentPrefixes (); i.hasNext (); )
+        XMLName xName = new XMLName (this, name);
+        String uri = (xName.uri == null) ? "" : xName.uri;
+        contentHandler.endElement (uri, xName.localName, xName.qName);
+        // Handle undefining namespaces
+        if (namespaces)
           {
-            endPrefixMapping ((String) i.next ());
+            for (Iterator i = ns.currentPrefixes (); i.hasNext (); )
+              {
+                endPrefixMapping ((String) i.next ());
+              }
+            ns.pop (); // releases current depth
           }
-        ns.pop (); // releases current depth
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
       }
   }
 
@@ -663,8 +837,22 @@ implements XMLReader
       {
         return;
       }
-    char[] ch = text.toCharArray ();
-    contentHandler.characters (ch, 0, ch.length);
+    try
+      {
+        char[] ch = text.toCharArray ();
+        contentHandler.characters (ch, 0, ch.length);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void ignorableWhitespace (String text)
@@ -674,8 +862,22 @@ implements XMLReader
       {
         return;
       }
-    char[] ch = text.toCharArray ();
-    contentHandler.ignorableWhitespace (ch, 0, ch.length);
+    try
+      {
+        char[] ch = text.toCharArray ();
+        contentHandler.ignorableWhitespace (ch, 0, ch.length);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void processingInstruction (String target, String data)
@@ -685,11 +887,25 @@ implements XMLReader
       {
         return;
       }
-    if (data == null)
+    try
       {
-        data = "";
+        if (data == null)
+          {
+            data = "";
+          }
+        contentHandler.processingInstruction (target, data);
       }
-    contentHandler.processingInstruction (target, data);
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void comment (String text)
@@ -699,8 +915,22 @@ implements XMLReader
       {
         return;
       }
-    char[] ch = text.toCharArray ();
-    lexicalHandler.comment (ch, 0, ch.length);
+    try
+      {
+        char[] ch = text.toCharArray ();
+        lexicalHandler.comment (ch, 0, ch.length);
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void cdataBlock (String text)
@@ -710,15 +940,29 @@ implements XMLReader
       {
         return;
       }
-    if (lexicalHandler == null)
+    try
       {
-        characters(text);
+        if (lexicalHandler == null)
+          {
+            characters(text);
+          }
+        else
+          {
+            lexicalHandler.startCDATA();
+            characters(text);
+            lexicalHandler.endCDATA();
+          }
       }
-    else
+    catch (Exception e)
       {
-        lexicalHandler.startCDATA();
-        characters(text);
-        lexicalHandler.endCDATA();
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
       }
   }
 
@@ -731,9 +975,23 @@ implements XMLReader
       {
         return;
       }
-    Locator l = new StandaloneLocator (lineNumber, columnNumber,
-                                       publicId, systemId);
-    errorHandler.warning (new SAXParseException (message, l));
+    try
+      {
+        Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                           publicId, systemId);
+        errorHandler.warning (new SAXParseException (message, l));
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void error (String message,
@@ -745,9 +1003,23 @@ implements XMLReader
       {
         return;
       }
-    Locator l = new StandaloneLocator (lineNumber, columnNumber,
-                                       publicId, systemId);
-    errorHandler.error (new SAXParseException (message, l));
+    try
+      {
+        Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                           publicId, systemId);
+        errorHandler.error (new SAXParseException (message, l));
+      }
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
   private void fatalError (String message,
@@ -759,14 +1031,28 @@ implements XMLReader
       {
         return;
       }
-    if (!seenStartDocument)
+    try
       {
-        startDocument (false);
+        if (!seenStartDocument)
+          {
+            startDocument (false);
+          }
+        seenFatalError = true;
+        Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                           publicId, systemId);
+        errorHandler.fatalError (new SAXParseException (message, l));
       }
-    seenFatalError = true;
-    Locator l = new StandaloneLocator (lineNumber, columnNumber,
-                                       publicId, systemId);
-    errorHandler.fatalError (new SAXParseException (message, l));
+    catch (Exception e)
+      {
+        if (e instanceof SAXException)
+          {
+            throw (SAXException) e;
+          }
+        else
+          {
+            throw new SAXException (e);
+          }
+      }
   }
 
 }

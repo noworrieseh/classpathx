@@ -514,7 +514,7 @@ libj_jarfile = gnujaxp.jar
 
 #XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -export-dynamic -D_JNI_IMPLEMENTATION_
 XMLJ_LFLAGS = -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
-XMLJ_CFLAGS = $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -pedantic -Wall -fbounds-check
+XMLJ_CFLAGS = $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -fbounds-check
 LT_COMPILE = $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
 LT_LINK = $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
 LT_INSTALL = $(LIBTOOL) --mode=install $(INSTALL)

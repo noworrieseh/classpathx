@@ -29,15 +29,55 @@
 #include <libxml/tree.h>
 #include <unistd.h>
 
+/* xmlChar->jstring cache */
+#define XMLJ_STRING_CACHE_SIZE 1024
+xmlHashTablePtr xmljStringCache = NULL;
+
+void
+xmljHashDeallocate (void *data, xmlChar *name);
+
+void
+xmljHashDeallocate (void *data, xmlChar *name)
+{
+  /* NOOP */
+}
+
 jstring
 xmljNewString (JNIEnv * env, const xmlChar * text)
 {
   jstring ret;
 
   if (text == NULL)
-    return NULL;
-  ret = (*env)->NewStringUTF (env, (char *) text);
+    {
+      return NULL;
+    }
+  if (xmljStringCache == NULL) /* Init cache */
+    {
+      xmljStringCache = xmlHashCreate (XMLJ_STRING_CACHE_SIZE);
+    }
+  ret = (jstring) xmlHashLookup (xmljStringCache, text);
+  if (ret == NULL)
+    {
+      ret = (*env)->NewStringUTF (env, (char *) text);
+      if (ret == NULL) /* Why? */
+        {
+          printf("xmljNewString: ERROR: NewStringUTF returned null for \"%s\"\n", text);
+        }
+      else
+        {
+          xmlHashAddEntry (xmljStringCache, text, ret);
+        }
+    }
   return ret;
+}
+
+void
+xmljClearStringCache ()
+{
+  if (xmljStringCache != NULL)
+    {
+      xmlHashFree (xmljStringCache, &xmljHashDeallocate);
+    }
 }
 
 const xmlChar *
@@ -47,7 +87,9 @@ xmljGetStringChars (JNIEnv * env, jstring text)
   xmlChar *x_text;
 
   if (text == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   s_text = (*env)->GetStringUTFChars (env, text, 0);
   x_text = (s_text == NULL) ? NULL : xmlCharStrdup (s_text);

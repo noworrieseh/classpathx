@@ -33,13 +33,22 @@
 
 xmlExternalEntityLoader defaultLoader = NULL;
 
+void
+xmljDispatchError (xmlParserCtxtPtr ctx,
+                   xmlSAXLocatorPtr loc,
+                   JNIEnv *env,
+                   jobject target,
+                   jmethodID method,
+                   const char *msg,
+                   va_list args);
+
 /* -- GnomeLocator -- */
 
 JNIEXPORT jstring JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
-                                                   jobject self,
-                                                   jobject j_ctx,
-                                                   jobject j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_publicId (JNIEnv * env,
+                                                jobject self,
+                                                jobject j_ctx,
+                                                jobject j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -53,10 +62,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
 }
 
 JNIEXPORT jstring JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
-                                                   jobject self,
-                                                   jobject j_ctx,
-                                                   jobject j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_systemId (JNIEnv * env,
+                                                jobject self,
+                                                jobject j_ctx,
+                                                jobject j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -70,10 +79,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
 }
 
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
-                                                     jobject self,
-                                                     jobject j_ctx,
-                                                     jobject j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_lineNumber (JNIEnv * env,
+                                                  jobject self,
+                                                  jobject j_ctx,
+                                                  jobject j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -88,10 +97,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
 }
 
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv * env,
-                                                       jobject self,
-                                                       jobject j_ctx,
-                                                       jobject j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_columnNumber (JNIEnv * env,
+                                                    jobject self,
+                                                    jobject j_ctx,
+                                                    jobject j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -271,6 +280,10 @@ xmljSAXInternalSubset (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->startDTD == NULL)
     {
@@ -320,6 +333,11 @@ xmljSAXResolveEntity (void *vctx,
   sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
+
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return NULL;
+    }
 
   if (sax->resolveEntity == NULL)
     {
@@ -403,6 +421,10 @@ xmljSAXEntityDecl (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   j_name = xmljNewString (env, name);
   switch (type)
@@ -475,6 +497,10 @@ xmljSAXNotationDecl (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->notationDecl == NULL)
     {
@@ -529,6 +555,10 @@ xmljSAXAttributeDecl (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->attributeDecl == NULL)
     {
@@ -580,6 +610,10 @@ xmljSAXElementDecl (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->elementDecl == NULL)
     {
@@ -628,6 +662,10 @@ xmljSAXUnparsedEntityDecl (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->unparsedEntityDecl == NULL)
     {
@@ -673,6 +711,10 @@ xmljSAXSetDocumentLocator (void *vctx, xmlSAXLocatorPtr loc)
 
   /* Update locator on sax context */
   sax->loc = loc;
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->setDocumentLocator == NULL)
     {
@@ -709,6 +751,10 @@ xmljSAXStartDocument (void *vctx)
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->startDocument == NULL)
     {
@@ -744,6 +790,10 @@ xmljSAXEndDocument (void *vctx)
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->endDocument == NULL)
     {
@@ -784,6 +834,10 @@ xmljSAXStartElement (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->startElement == NULL)
     {
@@ -811,12 +865,14 @@ xmljSAXStartElement (void *vctx,
           sax->stringClass = (*env)->FindClass (env, "java/lang/String");
           if (sax->stringClass == NULL)
             {
+              fprintf (stderr, "Can't find java.lang.String class!\n");
               return;
             }
         }
       j_attrs = (*env)->NewObjectArray (env, len, sax->stringClass, NULL);
       if (j_attrs == NULL)
         {
+          fprintf (stderr, "Can't allocate attributes array!\n");
           return;
         }
       len = 0;
@@ -862,6 +918,10 @@ xmljSAXEndElement (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->endElement == NULL)
     {
@@ -910,6 +970,10 @@ xmljSAXCharacters (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->characters == NULL)
     {
@@ -953,6 +1017,10 @@ xmljSAXIgnorableWhitespace (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->ignorableWhitespace == NULL)
     {
@@ -996,6 +1064,10 @@ xmljSAXProcessingInstruction (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->processingInstruction == NULL)
     {
@@ -1038,6 +1110,10 @@ xmljSAXComment (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->comment == NULL)
     {
@@ -1080,6 +1156,10 @@ xmljSAXCDataBlock (void *vctx,
   target = sax->obj;
 
   xmljCheckWellFormed (ctx);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
 
   if (sax->cdataBlock == NULL)
     {
@@ -1156,6 +1236,10 @@ xmljSAXWarning (void *vctx,
   env = sax->env;
   target = sax->obj;
 
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
   if (sax->warning == NULL)
     {
       sax->warning =
@@ -1194,6 +1278,10 @@ xmljSAXError (void *vctx,
   env = sax->env;
   target = sax->obj;
 
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
   if (sax->error == NULL)
     {
       sax->error =
@@ -1232,6 +1320,10 @@ xmljSAXFatalError (void *vctx,
   env = sax->env;
   target = sax->obj;
 
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return;
+    }
   if (sax->fatalError == NULL)
     {
       sax->fatalError =
