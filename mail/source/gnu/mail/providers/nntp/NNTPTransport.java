@@ -98,12 +98,12 @@ public class NNTPTransport extends Transport
         {
           int connectionTimeout = getIntProperty ("connectiontimeout");
           int timeout = getIntProperty ("timeout");
-          // TODO connectionTimeout && timeout
           if (port < 0)
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
-          connection = new NNTPConnection (host, port, username, password,
+          connection = new NNTPConnection (host, port,
+                                           connectionTimeout, timeout,
                                            debug);
           if (username != null && password != null)
             {

@@ -110,7 +110,6 @@ $(src)/javax/mail/search/SubjectTerm.java \
 $(src)/gnu/mail/handler/Application.java \
 $(src)/gnu/mail/handler/ApplicationOctetStream.java \
 $(src)/gnu/mail/handler/Message.java \
-$(src)/gnu/mail/handler/MessageDeliveryStatus.java \
 $(src)/gnu/mail/handler/MessageRFC822.java \
 $(src)/gnu/mail/handler/Multipart.java \
 $(src)/gnu/mail/handler/MultipartAlternative.java \
@@ -313,47 +312,27 @@ META-INF/mailcap: META-INF @srcdir@/mailcap
 META-INF/javamail.charset.map: META-INF @srcdir@/javamail.charset.map
 	cp @srcdir@/javamail.charset.map META-INF/javamail.charset.map
 
-META-INF/javamail.default.providers: META-INF javamail.providers smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
-	cp javamail.providers META-INF/javamail.default.providers
-
-javamail.providers:
+META-INF/javamail.default.providers: META-INF
 	echo "# javamail.providers for GNU JavaMail" > javamail.providers
-
-smtp.ok:
 if ENABLE_SMTP
 	grep "protocol=smtp" javamail.providers.in >> javamail.providers
 endif
-	touch smtp.ok
-
-imap.ok:
 if ENABLE_IMAP
 	grep "protocol=imap" javamail.providers.in >> javamail.providers
 endif
-	touch imap.ok
-
-pop3.ok:
 if ENABLE_POP3
 	grep "protocol=pop3" javamail.providers.in >> javamail.providers
 endif
-	touch pop3.ok
-
-nntp.ok:
 if ENABLE_NNTP
 	grep "protocol=nntp" javamail.providers.in >> javamail.providers
 endif
-	touch nntp.ok
-
-mbox.ok:
 if ENABLE_MBOX
 	grep "protocol=mbox" javamail.providers.in >> javamail.providers
 endif
-	touch mbox.ok
-
-maildir.ok:
 if ENABLE_MAILDIR
 	grep "protocol=maildir" javamail.providers.in >> javamail.providers
 endif
-	touch maildir.ok
+	cp javamail.providers META-INF/javamail.default.providers
 
 META-INF/javamail.default.address.map: META-INF javamail.address.map
 	cp javamail.address.map META-INF/javamail.default.address.map
@@ -443,7 +422,6 @@ javadoc:
 # Remove jar files and directories
 clean-local:
 	rm javamail.address.map javamail.providers
-	rm smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
 
 install-data-local:
