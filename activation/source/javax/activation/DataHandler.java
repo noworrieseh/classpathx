@@ -149,12 +149,11 @@ public class DataHandler implements Transferable
     if (dataSource != null) 
     {
       return dataSource.getInputStream();
-    } else 
+    }
+    else 
     {
-
       // Get Data Content Handler
       handler = getCommandMap().createDataContentHandler(objectMimeType);
-
       // Check Handler
       if (handler != null) 
       {
@@ -164,18 +163,18 @@ public class DataHandler implements Transferable
 	try 
 	{
 	  handler.writeTo(object, objectMimeType, output);
-	} catch (Exception e) 
+	}
+	catch (Exception e) 
 	{
 	}
 	return input;
-      } else 
+      }
+      else 
       {
 	throw new UnsupportedDataTypeException();
-      } // if: handler
-
-    } // if: dataSource
-
-  } // getInputStream()
+      }
+    }
+  }
 
   /**
    * Write to output stream.

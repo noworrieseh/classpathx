@@ -53,6 +53,11 @@ import java.util.*;
  * a particular MIME type.
  * </p>
  *
+ * <p><h4>Command line testing</h4>
+ * Running this class from the command line and supplying a content type will cause
+ * the preferred commands for the content type to be printed on the console.
+ * </p>
+ *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
  */
@@ -238,9 +243,9 @@ extends CommandMap
 	if(entry!=null)
 	size+=entry.length;
 	//if the specified mimetype is not a generic type test that specifically
-	if(!mimetype.endsWith("/*"));
+	if(!mimeType.endsWith("/*"));
 	{
-	  entry=(CommandInfo[])DB[i].get(mimetype.substring(0,mimetype.indexOf("/"))+"*");
+	  entry=(CommandInfo[])DB[i].get(mimeType.substring(0,mimeType.indexOf("/"))+"*");
 	  if(entry!=null)
 	  size+=entry.length;
 	}
@@ -258,12 +263,12 @@ extends CommandMap
 	  pos+=entry.length;
 	}
 	//if the specified mimetype is not a generic type test that specifically
-	if(!mimetype.endsWith("/*"));
+	if(!mimeType.endsWith("/*"));
 	{
-	  entry=(CommandInfo[])DB[i].get(mimetype.substring(0,mimetype.indexOf("/"))+"*");
+	  entry=(CommandInfo[])DB[i].get(mimeType.substring(0,mimeType.indexOf("/"))+"*");
 	  if(entry!=null)
 	  {
-	    System.arraycopy(entry,0,allcommands,pos,entry.length);
+	    System.arraycopy(entry,0,allCommands,pos,entry.length);
 	    pos+=entry.length;
 	  }
 	}
@@ -503,7 +508,6 @@ extends CommandMap
    */
   private void addCommand(Hashtable reg,String mimetype,String name,String value)
   {
-    System.out.println("mimetype="+mimetype+" command="+name+"="+value);
     if(name.startsWith("x-java-"))
     {
       CommandInfo ci=new CommandInfo(name,value);
@@ -524,16 +528,20 @@ extends CommandMap
     }
   }
 
-
+  /** with an argument of a content-type lists the preferred commands.
+   */
   public static void main(String[] argv)
   {
+    if(argv.length<1)
+    System.exit(0);
     try
     {
       MailcapCommandMap map=new MailcapCommandMap();
-      CommandInfo[] pref=map.getPreferredCommands("text/*");
+      String contentType=argv[0];
+      CommandInfo[] pref=map.getPreferredCommands(contentType);
       for(int i=0; i<pref.length; i++)
       {
-	System.err.println("command="+pref[i]);
+	System.out.println(contentType+" "+pref[i]);
       }
     }
     catch(Exception e)

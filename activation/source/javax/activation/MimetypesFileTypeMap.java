@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -52,6 +53,12 @@ import java.util.Properties;
  * </ul>
  * </p>
  *
+ * <p><h4>Command line testing</h4>
+ * This class has a <code>main</code> method so it's possible to test some
+ * of the funtionality. Supply a content type on the command line to find
+ * all the matching extensions in the (automatically constructed) database.
+ * </p>
+ *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
  */
@@ -68,10 +75,9 @@ extends FileTypeMap
   private static String defaultType = "application/octet-stream";
 
   /** the full registry.
-   * Each index of the array is a hash of mime types read
-   * from some location. If parsing the contents of the location
-   * causes an error then the appropriate index will contain
-   * an empty hashtable.
+   * Each index of the array is a hash of mime types (keyed by extension)
+   * read from some location. If parsing the contents of the location
+   * causes an error then the appropriate index will contain an empty hashtable.
    */
   private Hashtable[] DB = null;
 
@@ -282,6 +288,7 @@ extends FileTypeMap
 		state=READEXT;
 		continue;
 	      case READEXT:
+		//the extension has been read - store the mimetype against it
 		registry.put(toker.sval,mt);
 		continue;
 	      default:
@@ -298,12 +305,30 @@ extends FileTypeMap
     return null;
   }
 
-  /** only for testing purposes.
+  /** takes a content type and finds all the extensions associated with it.
+   * All the extensions are printed out, one per line.
    */
   public static void main(String[] argv)
   {
     MimetypesFileTypeMap fm=new MimetypesFileTypeMap();
-    String contentType=fm.getContentType("file.html");
-    System.out.println("the content type was: "+contentType);
+    if(argv.length<1)
+    {
+      //if no arguments then just die
+      System.exit(0);
+    }
+    String contentType=argv[0];
+    for(int i=0; i<fm.DB.length; i++)
+    {
+      Enumeration exts=fm.DB[i].keys();
+      Enumeration mimeTypes=fm.DB[i].elements();
+      while(exts.hasMoreElements())
+      {
+	String extension=(String)exts.nextElement();
+	MimeType mt=(MimeType)mimeTypes.nextElement();
+	String baseType=mt.getBaseType();
+	if(baseType.equals(contentType))
+	System.out.println(contentType+" "+extension);
+      }
+    }
   }
 }
