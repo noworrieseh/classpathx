@@ -1,5 +1,5 @@
 /*
- * $Id: XCat.java,v 1.1 2001-11-24 22:21:12 db Exp $
+ * $Id: XCat.java,v 1.2 2002-02-03 01:42:41 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -91,15 +91,15 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * <center><hr width='70%'></center>
  *
- * <p>Errors in catalogs implicitly loaded during resolution are ignored
- * beyond being reported through an <em>ErrorHandler</em> assigned using
+ * <p>Errors in catalogs implicitly loaded (during resolution) are ignored
+ * beyond being reported through any <em>ErrorHandler</em> assigned using
  * {@link #setErrorHandler setErrorHandler()}.  SAX exceptions
  * thrown from such a handler won't abort resolution, although throwing a
  * <em>RuntimeException</em> or <em>Error</em> will normally abort both
  * resolution and parsing.  Useful diagnostic information is available to
  * any <em>ErrorHandler</em> used to report problems, or from any exception
- * thrown from {@link #loadCatalog loadCatalog()}.  Applications can use
- * that information as troubleshooting aids.
+ * thrown from an explicit {@link #loadCatalog loadCatalog()} invocation.
+ * Applications can use that information as troubleshooting aids.
  *
  * <p>While this class requires <em>SAX2 Extensions 1.1</em> classes in
  * its class path, basic functionality does not require using a SAX2
@@ -228,7 +228,8 @@ public class XCat implements EntityResolver2
 
     /**
      * "New Style" external entity resolution for parsers.
-     * Calls to this method prevent loading additional catalogs.
+     * Calls to this method prevent explicit loading of additional catalogs
+     * using {@link #loadCatalog loadCatalog()}.
      *
      * <p>This supports the full core catalog functionality for locating
      * (and relocating) parsed entities that have been declared in a
@@ -281,7 +282,8 @@ public class XCat implements EntityResolver2
      * specification, though it's presented in an appendix.)
      * If no such entry is defined, this returns null to indicate that
      * this document will not be modified to include such a subset.
-     * Calls to this method prevent loading additional catalogs.
+     * Calls to this method prevent explicit loading of additional catalogs
+     * using {@link #loadCatalog loadCatalog()}.
      *
      * <p><em>Warning:</em> That catalog functionality can be dangerous.
      * It can provide definitions of general entities, and thereby mask
@@ -316,7 +318,8 @@ public class XCat implements EntityResolver2
     /**
      * "Old Style" external entity resolution for parsers.
      * This API provides only core functionality.
-     * Calls to this method prevent loading additional catalogs.
+     * Calls to this method prevent explicit loading of additional catalogs
+     * using {@link #loadCatalog loadCatalog()}.
      *
      * <p>The functional limitations of this interface include:</p><ul>
      *
@@ -365,7 +368,8 @@ public class XCat implements EntityResolver2
      * This is intended for use with URIs found in document text, such as
      * <em>xml-stylesheet</em> processing instructions and in attribute
      * values, where they are not recognized as URIs by XML parsers.
-     * Calls to this method prevent loading additional catalogs.
+     * Calls to this method prevent explicit loading of additional catalogs
+     * using {@link #loadCatalog loadCatalog()}.
      *
      * <p>This functionality is supported by the OASIS XML Catalog
      * specification, but will never be invoked by an XML parser.
@@ -373,6 +377,10 @@ public class XCat implements EntityResolver2
      * identifiers for entities declared in DTDs; closely enough that
      * this implementation's default behavior is that they be
      * identical, to minimize potential confusion.
+     *
+     * <p>This method could be useful when implementing the
+     * {@link javax.xml.transform.URIResolver} interface, wrapping the
+     * input source in a {@link javax.xml.transform.sax.SAXSource}.
      *
      * @see #isUnified
      * @see #setUnified
@@ -422,7 +430,7 @@ public class XCat implements EntityResolver2
     {
 	// NOTE:  this method and loadCatalog() are synchronized
 	// so that it's impossible to load (top level) catalogs
-	// lookups start.  Likewise, deferred loading is also
+	// after lookups start.  Likewise, deferred loading is also
 	// synchronized (for "next" and delegated catalogs) to
 	// ensure that parsers can share resolvers.
 	loadingPermitted = false;
@@ -485,7 +493,7 @@ public class XCat implements EntityResolver2
 
 
     /**
-     * Returns true (the default) if all entity resolution methods resolve
+     * Returns true (the default) if all methods resolve
      * a given URI in the same way.
      * Returns false if calls resolving URIs as entities (such as
      * {@link #resolveEntity resolveEntity()}) use different catalog entries
@@ -499,6 +507,10 @@ public class XCat implements EntityResolver2
      * <em>rewriteSystemId</em>, and <em>delegateSystemId</em>.
      * It's confusing and error prone to maintain two parallel copies of
      * such data.  Accordingly, this class makes that behavior optional.
+     * The <em>unified</em> interpretation of URI mappings is preferred,
+     * since it prevents surprises where one URI gets mapped to different
+     * contents depending on whether the reference happens to have come
+     * from a DTD (or not).
      *
      * @see #setUnified
      */
@@ -508,8 +520,8 @@ public class XCat implements EntityResolver2
     /**
      * Assigns the value of the flag returned by {@link #isUnified}.
      * Set it to false to be strictly conformant with the OASIS XML Catalog
-     * specification.  Set it to true to make all URI mapping calls
-     * for a given URI give the same result.
+     * specification.  Set it to true to make all mappings for a given URI
+     * give the same result, regardless of the reason for the mapping.
      *
      * <p>Don't change this once you've loaded the first catalog.
      *
