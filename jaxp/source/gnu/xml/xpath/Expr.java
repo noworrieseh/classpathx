@@ -224,11 +224,8 @@ public abstract class Expr
    */
   public static String _local_name(Node context, Collection nodeSet)
   {
-    if (nodeSet == null || nodeSet.size() == 0)
-      {
-        return context.getLocalName();
-      }
-    Node node = firstNode(nodeSet);
+    Node node = (nodeSet == null || nodeSet.size() == 0) ? context :
+      firstNode(nodeSet);
     return node.getLocalName();
   }
 
@@ -242,11 +239,8 @@ public abstract class Expr
    */
   public static String _namespace_uri(Node context, Collection nodeSet)
   {
-    if (nodeSet == null || nodeSet.size() == 0)
-      {
-        return context.getNamespaceURI();
-      }
-    Node node = firstNode(nodeSet);
+    Node node = (nodeSet == null || nodeSet.size() == 0) ? context :
+      firstNode(nodeSet);
     return node.getNamespaceURI();
   }
   
@@ -268,11 +262,8 @@ public abstract class Expr
    */
   public static String _name(Node context, Collection nodeSet)
   {
-    if (nodeSet == null || nodeSet.size() == 0)
-      {
-        return context.getNodeName();
-      }
-    Node node = firstNode(nodeSet);
+    Node node = (nodeSet == null || nodeSet.size() == 0) ? context :
+      firstNode(nodeSet);
     switch (node.getNodeType())
       {
       case Node.ATTRIBUTE_NODE:

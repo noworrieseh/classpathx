@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
@@ -65,7 +66,7 @@ final class ParameterNode
     this.global = global;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
@@ -96,7 +97,7 @@ final class ParameterNode
       }
   }
   
-  Object getValue(Stylesheet stylesheet, String mode,
+  Object getValue(Stylesheet stylesheet, QName mode,
                   Node context, int pos, int len)
   {
     if (select != null)

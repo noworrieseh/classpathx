@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
@@ -67,7 +68,7 @@ final class ForEachNode
     this.sortKeys = sortKeys;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
@@ -75,7 +76,7 @@ final class ForEachNode
     if (children != null)
       {
         Object ret = select.evaluate(context, pos, len);
-        //System.out.println(toString() + ": " + context+" -> "+ret);
+        //System.err.println(toString() + ": " + context+" -> "+ret);
         if (ret instanceof Collection)
           {
             Collection ns = (Collection) ret;

@@ -68,10 +68,10 @@ class Template
   final TemplateNode node;
   final double priority;
   final int precedence;
-  final String mode;
+  final QName mode;
 
   Template(Stylesheet stylesheet, QName name, Pattern match, Node source,
-           int precedence, double priority, String mode)
+           int precedence, double priority, QName mode)
     throws TransformerConfigurationException
   {
     this.stylesheet = stylesheet;
@@ -149,9 +149,10 @@ class Template
     return null;
   }
 
-  boolean matches(String mode, Node node)
+  boolean matches(QName mode, Node node)
   {
-    if (mode != null && !mode.equals(this.mode))
+    if ((mode == null && this.mode != null) ||
+        (mode != null && !mode.equals(this.mode)))
       {
         return false;
       }
@@ -162,6 +163,16 @@ class Template
     return match.matches(node);
   }
 
+  boolean matches(QName mode, QName name)
+  {
+    if ((mode == null && this.mode != null) ||
+        (mode != null && !mode.equals(this.mode)))
+      {
+        return false;
+      }
+    return name.equals(this.name);
+  }
+
   /**
    * @param stylesheet the stylesheet
    * @param parent the parent of result nodes
@@ -170,7 +181,7 @@ class Template
    * @param len the context size
    * @param nextSibling if non-null, add result nodes before this node
    */
-  void apply(Stylesheet stylesheet, String mode,
+  void apply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
@@ -186,7 +197,7 @@ class Template
 
   public String toString()
   {
-    /*
+    
     StringBuffer buf = new StringBuffer(getClass().getName());
     buf.append('[');
     if (name != null)
@@ -199,10 +210,15 @@ class Template
         buf.append("match=");
         buf.append(match);
       }
+    if (mode != null)
+      {
+        buf.append(",mode=");
+        buf.append(mode);
+      }
     buf.append(']');
     return buf.toString();
-    */
-    return (name != null) ? name.toString() : match.toString();
+    
+    //return (name != null) ? name.toString() : match.toString();
   }
 
   void list(PrintStream out)

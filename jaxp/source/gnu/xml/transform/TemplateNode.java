@@ -40,6 +40,7 @@ package gnu.xml.transform;
 
 import java.io.PrintStream;
 import java.util.Comparator;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.DocumentOrderComparator;
@@ -64,7 +65,7 @@ abstract class TemplateNode
     this.next = next;
   }
 
-  final void apply(Stylesheet stylesheet, String mode,
+  final void apply(Stylesheet stylesheet, QName mode,
                    Node context, int pos, int len,
                    Node parent, Node nextSibling)
     throws TransformerException
@@ -81,7 +82,7 @@ abstract class TemplateNode
     doApply(stylesheet, mode, context, pos, len, parent, nextSibling);
   }
 
-  abstract void doApply(Stylesheet stylesheet, String mode,
+  abstract void doApply(Stylesheet stylesheet, QName mode,
                         Node context, int pos, int len,
                         Node parent, Node nextSibling)
     throws TransformerException;

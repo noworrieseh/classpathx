@@ -1804,6 +1804,10 @@ public abstract class DomNode
    */
   public boolean nameAndTypeEquals(Node other)
   {
+    if (other == this)
+      {
+        return true;
+      }
     // node types must match
     if (nodeType != other.getNodeType())
       {
@@ -1975,7 +1979,7 @@ public abstract class DomNode
 
   public boolean isSameNode(Node other)
   {
-    return equals(other);
+    return this == other;
   }
 
   public String lookupPrefix(String namespaceURI)
@@ -1998,7 +2002,7 @@ public abstract class DomNode
 
   public boolean isEqualNode(Node arg)
   {
-    if (equals(arg))
+    if (this == arg)
       {
         return true;
       }

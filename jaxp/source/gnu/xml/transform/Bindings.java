@@ -135,6 +135,8 @@ public class Bindings
 
   public Object get(String name, Node context, int pos, int len)
   {
+    //System.err.println("bindings.get: "+name);
+    //System.err.println("\t"+toString());
     Object ret = null;
     for (Iterator i = variables.iterator(); i.hasNext() && ret == null; )
       {
@@ -180,6 +182,7 @@ public class Bindings
       {
         ret = "";
       }
+    //System.err.println("\tret="+ret);
     return ret;
   }
 

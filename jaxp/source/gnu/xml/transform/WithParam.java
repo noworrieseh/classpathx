@@ -40,6 +40,7 @@ package gnu.xml.transform;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -74,7 +75,7 @@ final class WithParam
     select = null;
   }
 
-  Object getValue(Stylesheet stylesheet, String mode,
+  Object getValue(Stylesheet stylesheet, QName mode,
                   Node context, int pos, int len)
     throws TransformerException
   {

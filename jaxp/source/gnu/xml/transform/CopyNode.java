@@ -38,7 +38,9 @@
 
 package gnu.xml.transform;
 
+import java.util.Iterator;
 import java.util.StringTokenizer;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -61,7 +63,7 @@ final class CopyNode
     this.uas = uas;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException
@@ -73,16 +75,24 @@ final class CopyNode
       case Node.ATTRIBUTE_NODE:
       case Node.ELEMENT_NODE:
       case Node.PROCESSING_INSTRUCTION_NODE:
+      case Node.COMMENT_NODE:
         Document doc = (parent instanceof Document) ? (Document) parent :
           parent.getOwnerDocument();
         copy = context.cloneNode(false);
         copy = doc.adoptNode(copy);
         if (copy.getNodeType() == Node.ATTRIBUTE_NODE)
           {
-            NamedNodeMap attrs = parent.getAttributes();
-            if (attrs != null)
+            if (parent.getFirstChild() != null)
               {
-                attrs.setNamedItemNS(copy);
+                // Ignore attempt to add attribute after children
+              }
+            else
+              {
+                NamedNodeMap attrs = parent.getAttributes();
+                if (attrs != null)
+                  {
+                    attrs.setNamedItemNS(copy);
+                  }
               }
           }
         else
@@ -97,13 +107,6 @@ final class CopyNode
               }
           }
       }
-    // Children have priority over used attribute sets
-    if (children != null)
-      {
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       copy, null);
-      }
     if (uas != null)
       {
         StringTokenizer st = new StringTokenizer(uas, " ");
@@ -113,6 +116,12 @@ final class CopyNode
                             copy, null, st.nextToken());
           }
       }
+    if (children != null)
+      {
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       copy, null);
+      }
     if (next != null)
       {
         next.apply(stylesheet, mode,
@@ -121,27 +130,32 @@ final class CopyNode
       }
   }
   
-  void addAttributeSet(Stylesheet stylesheet, String mode,
+  void addAttributeSet(Stylesheet stylesheet, QName mode,
                        Node context, int pos, int len,
                        Node parent, Node nextSibling, String attributeSet)
     throws TransformerException
   {
-    TemplateNode attribute =
-      (TemplateNode) stylesheet.attributeSets.get(attributeSet);
-    if (attribute != null)
+    for (Iterator i = stylesheet.attributeSets.iterator(); i.hasNext(); )
       {
-        attribute.apply(stylesheet, mode,
-                        context, pos, len,
-                        parent, nextSibling);
-      }
-    String uas = (String) stylesheet.usedAttributeSets.get(attributeSet);
-    if (uas != null)
-      {
-        StringTokenizer st = new StringTokenizer(uas, " ");
-        while (st.hasMoreTokens())
+        AttributeSet as = (AttributeSet) i.next();
+        if (!as.name.equals(attributeSet))
           {
-            addAttributeSet(stylesheet, mode, context, pos, len,
-                            parent, nextSibling, st.nextToken());
+            continue;
+          }
+        if (as.uas != null)
+          {
+            StringTokenizer st = new StringTokenizer(as.uas, " ");
+            while (st.hasMoreTokens())
+              {
+                addAttributeSet(stylesheet, mode, context, pos, len,
+                                parent, nextSibling, st.nextToken());
+              }
+          }
+        if (as.children != null)
+          {
+            as.children.apply(stylesheet, mode,
+                              context, pos, len,
+                              parent, nextSibling);
           }
       }
   }

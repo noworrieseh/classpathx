@@ -1,7 +1,8 @@
 2004-11-22  Chris Burdess  <dog@gnu.org>
 
    	* transform,xslt: Namespace context support.
-   	* transform: XSL message instruction, special number handling.
+   	* transform: XSL message instruction, special number handling, key()
+   	function
    	
 2004-11-21  Chris Burdess  <dog@gnu.org>
 

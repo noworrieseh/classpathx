@@ -91,7 +91,11 @@ public class StreamSerializer
   public StreamSerializer(int mode, String encoding, String eol)
   {
     this.mode = mode;
-    this.encoding = (encoding != null) ? encoding : "UTF-8";
+    if (encoding == null)
+      {
+        encoding = "UTF-8";
+      }
+    this.encoding = encoding.intern();
     this.eol = (eol != null) ? eol : System.getProperty("line.separator");
     namespaces = new HashMap();
   }
@@ -115,7 +119,7 @@ public class StreamSerializer
       {
         throw new NullPointerException("no output stream");
       }
-    String value;
+    String value, prefix;
     Node children;
     Node next = node.getNextSibling();
     String uri = node.getNamespaceURI();
@@ -128,36 +132,48 @@ public class StreamSerializer
     switch (nt)
       {
       case Node.ATTRIBUTE_NODE:
-        if (uri != null && !isDefined(uri))
+        prefix = node.getPrefix();
+        if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri) ||
+            XMLConstants.XMLNS_ATTRIBUTE.equals(prefix) ||
+            (prefix != null && prefix.startsWith("xmlns:")))
           {
-            String prefix = define(uri, node.getPrefix());
+            String nsuri = node.getNodeValue();
+            if (isDefined(nsuri))
+              {
+                break;
+              }
+            define(nsuri, node.getLocalName());
+          }
+        else if (uri != null && !isDefined(uri))
+          {
+            prefix = define(uri, prefix);
             String nsname = (prefix == null) ? "xmlns" : "xmlns:" + prefix;
             out.write(SPACE);
-            out.write(nsname.getBytes(encoding));
+            out.write(encodeText(nsname));
             out.write(EQ);
             String nsvalue = "'" + encode(uri, true) + "'";
             out.write(nsvalue.getBytes(encoding));
             defined = true;
           }
         out.write(SPACE);
-        out.write(node.getNodeName().getBytes(encoding));
+        out.write(encodeText(node.getNodeName()));
         out.write(EQ);
         value = "'" + encode(node.getNodeValue(), true) + "'";
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         break;
       case Node.ELEMENT_NODE:
         value = node.getNodeName();
         out.write(BRA);
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         if (uri != null && !isDefined(uri))
           {
-            String prefix = define(uri, node.getPrefix());
+            prefix = define(uri, node.getPrefix());
             String nsname = (prefix == null) ? "xmlns" : "xmlns:" + prefix;
             out.write(SPACE);
-            out.write(nsname.getBytes(encoding));
+            out.write(encodeText(nsname));
             out.write(EQ);
             String nsvalue = "'" + encode(uri, true) + "'";
-            out.write(nsvalue.getBytes(encoding));
+            out.write(encodeText(nsvalue));
             defined = true;
           }
         NamedNodeMap attrs = node.getAttributes();
@@ -190,7 +206,7 @@ public class StreamSerializer
             serialize(children, out, convertToCdata);
             out.write(BRA);
             out.write(SLASH);
-            out.write(value.getBytes(encoding));
+            out.write(encodeText(value));
             out.write(KET);
           }
         break;
@@ -200,19 +216,19 @@ public class StreamSerializer
           {
             value = encode(value, false);
           }
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         break;
       case Node.CDATA_SECTION_NODE:
         value = "<![CDATA[" + node.getNodeValue() + "]]>";
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         break;
       case Node.COMMENT_NODE:
         value = "<!--" + node.getNodeValue() + "-->";
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         Node cp = node.getParentNode();
         if (cp != null && cp.getNodeType() == Node.DOCUMENT_NODE)
           {
-            out.write(eol.getBytes(encoding));
+            out.write(encodeText(eol));
           }
         break;
       case Node.DOCUMENT_NODE:
@@ -251,10 +267,116 @@ public class StreamSerializer
                   }
                 out.write(0x3f);
                 out.write(KET);
-                out.write(eol.getBytes(encoding));
+                out.write(encodeText(eol));
               }
             // TODO warn if not outputting the declaration would be a
             // problem
+          }
+        else if (mode == Stylesheet.OUTPUT_HTML)
+          {
+            // Ensure that encoding is accessible
+            String contentType = "text/html; charset=" +
+              ((encoding.indexOf(' ') != -1) ?
+                "\"" + encoding + "\"" :
+                encoding);
+            Document doc = (node instanceof Document) ? (Document) node :
+              node.getOwnerDocument();
+            Node html = null;
+            for (Node ctx = node.getFirstChild(); ctx != null;
+                 ctx = ctx.getNextSibling())
+              {
+                if (ctx.getNodeType() == Node.ELEMENT_NODE)
+                  {
+                    html = ctx;
+                    break;
+                  }
+              }
+            if (html == null)
+              {
+                html = doc.createElement("html");
+                node.appendChild(html);
+              }
+            Node head = null;
+            for (Node ctx = html.getFirstChild(); ctx != null;
+                 ctx = ctx.getNextSibling())
+              {
+                if (ctx.getNodeType() == Node.ELEMENT_NODE &&
+                    "head".equalsIgnoreCase(ctx.getLocalName()))
+                  {
+                    head = ctx;
+                    break;
+                  }
+              }
+            if (head == null)
+              {
+                head = doc.createElement("head");
+                Node c1 = null;
+                for (Node ctx = html.getFirstChild(); ctx != null;
+                     ctx = ctx.getNextSibling())
+                  {
+                    if (ctx.getNodeType() == Node.ELEMENT_NODE)
+                      {
+                        c1 = ctx;
+                        break;
+                      }
+                  }
+                if (c1 != null)
+                  {
+                    html.insertBefore(head, c1);
+                  }
+                else
+                  {
+                    html.appendChild(head);
+                  }
+              }
+            Node meta = null;
+            Node metaContent = null;
+            for (Node ctx = head.getFirstChild(); ctx != null;
+                 ctx = ctx.getNextSibling())
+              {
+                if (ctx.getNodeType() == Node.ELEMENT_NODE &&
+                    "meta".equalsIgnoreCase(ctx.getLocalName()))
+                  {
+                    NamedNodeMap metaAttrs = ctx.getAttributes();
+                    int len = metaAttrs.getLength();
+                    String httpEquiv = null;
+                    Node content = null;
+                    for (int i = 0; i < len; i++)
+                      {
+                        Node attr = metaAttrs.item(i);
+                        String attrName = attr.getNodeName();
+                        if ("http-equiv".equalsIgnoreCase(attrName))
+                          {
+                            httpEquiv = attr.getNodeValue();
+                          }
+                        else if ("content".equalsIgnoreCase(attrName))
+                          {
+                            content = attr;
+                          }
+                      }
+                    if ("Content-Type".equalsIgnoreCase(httpEquiv))
+                      {
+                        meta = ctx;
+                        metaContent = content;
+                        break;
+                      }
+                  }
+              }
+            if (meta == null)
+              {
+                meta = doc.createElement("meta");
+                head.appendChild(meta);
+                Node metaHttpEquiv = doc.createAttribute("http-equiv");
+                meta.getAttributes().setNamedItem(metaHttpEquiv);
+                metaHttpEquiv.setNodeValue("Content-Type");
+              }
+            if (metaContent == null)
+              {
+                metaContent = doc.createAttribute("content");
+                meta.getAttributes().setNamedItem(metaContent);
+              }
+            metaContent.setNodeValue(contentType);
+            // phew
           }
         children = node.getFirstChild();
         if (children != null)
@@ -267,42 +389,42 @@ public class StreamSerializer
         out.write(BRA);
         out.write(BANG);
         value = doctype.getNodeName();
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         String publicId = doctype.getPublicId();
         if (publicId != null)
           {
-            out.write(" PUBLIC ".getBytes(encoding));
+            out.write(encodeText(" PUBLIC "));
             out.write(APOS);
-            out.write(publicId.getBytes(encoding));
+            out.write(encodeText(publicId));
             out.write(APOS);
           }
         String systemId = doctype.getSystemId();
         if (systemId != null)
           {
-            out.write(" SYSTEM ".getBytes(encoding));
+            out.write(encodeText(" SYSTEM "));
             out.write(APOS);
-            out.write(systemId.getBytes(encoding));
+            out.write(encodeText(systemId));
             out.write(APOS);
           }
         String internalSubset = doctype.getInternalSubset();
         if (internalSubset != null)
           {
-            out.write(internalSubset.getBytes(encoding));
+            out.write(encodeText(internalSubset));
           }
         out.write(KET);
         out.write(eol.getBytes(encoding));
         break;
       case Node.ENTITY_REFERENCE_NODE:
         value = "&" + node.getNodeValue() + ";";
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         break;
       case Node.PROCESSING_INSTRUCTION_NODE:
         value = "<?" + node.getNodeName() + " " + node.getNodeValue() + "?>";
-        out.write(value.getBytes(encoding));
+        out.write(encodeText(value));
         Node pp = node.getParentNode();
         if (pp != null && pp.getNodeType() == Node.DOCUMENT_NODE)
           {
-            out.write(eol.getBytes(encoding));
+            out.write(encodeText(eol));
           }
         break;
       }
@@ -337,6 +459,12 @@ public class StreamSerializer
   void undefine(String uri)
   {
     namespaces.remove(uri);
+  }
+
+  final byte[] encodeText(String text)
+    throws UnsupportedEncodingException
+  {
+    return text.getBytes(encoding);
   }
 
   static String encode(String text, boolean encodeCtl)

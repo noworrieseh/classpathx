@@ -65,7 +65,7 @@ final class CallTemplateNode
     this.withParams = withParams;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException

@@ -1330,8 +1330,8 @@ public class DomDocument
               }
                 
           }
-        src.name = qualifiedName;
-        src.namespace = namespaceURI;
+        src.setNodeName(qualifiedName);
+        src.setNamespaceURI(namespaceURI);
         src.notifyUserDataHandlers(UserDataHandler.NODE_RENAMED, src, src);
         // TODO MutationNameEvents
         // DOMElementNameChanged or DOMAttributeNameChanged

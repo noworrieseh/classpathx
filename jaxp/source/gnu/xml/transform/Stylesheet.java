@@ -40,8 +40,10 @@ package gnu.xml.transform;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -51,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -101,6 +104,9 @@ class Stylesheet
    */
   String version;
 
+  Collection extensionElementPrefixes;
+  Collection excludeResultPrefixes;
+
   /**
    * Set of element names for which we should strip whitespace.
    */
@@ -128,7 +134,7 @@ class Stylesheet
   /**
    * Keys.
    */
-  Map keys;
+  Collection keys;
 
   /**
    * Decimal formats.
@@ -143,8 +149,7 @@ class Stylesheet
   /**
    * Attribute-sets.
    */
-  Map attributeSets;
-  Map usedAttributeSets;
+  List attributeSets;
 
   /**
    * Variable and parameter bindings.
@@ -164,7 +169,7 @@ class Stylesheet
    * Necessary to associate the document function with its declaring node,
    * and resolve namespaces.
    */
-  transient Node current;
+  Node current;
 
   /**
    * Set by a terminating message.
@@ -181,17 +186,18 @@ class Stylesheet
     this.factory = factory;
     this.systemId = systemId;
     this.precedence = precedence;
+    extensionElementPrefixes = new HashSet();
+    excludeResultPrefixes = new HashSet();
     stripSpace = new LinkedHashSet();
     preserveSpace = new LinkedHashSet();
     outputCdataSectionElements = new LinkedHashSet();
     if (parent == null)
       {
         bindings = new Bindings(this);
-        attributeSets = new LinkedHashMap();
-        usedAttributeSets = new LinkedHashMap();
+        attributeSets = new LinkedList();
         namespaceAliases = new LinkedHashMap();
         templates = new LinkedList();
-        keys = new LinkedHashMap();
+        keys = new LinkedList();
         decimalFormats = new LinkedHashMap();
         initDefaultDecimalFormat();
       }
@@ -199,7 +205,6 @@ class Stylesheet
       {
         bindings = parent.bindings;
         attributeSets = parent.attributeSets;
-        usedAttributeSets = parent.usedAttributeSets;
         namespaceAliases = parent.namespaceAliases;
         templates = parent.templates;
         keys = parent.keys;
@@ -215,13 +220,14 @@ class Stylesheet
       new ApplyTemplatesNode(null, null,
                              new Selector(Selector.CHILD,
                                           Collections.EMPTY_LIST),
-                             null, null, null);
+                             null, null, null, true);
     builtInTextTemplate =
       new ValueOfNode(null, null,
                       new Selector(Selector.SELF, Collections.EMPTY_LIST),
                       false);
     
     parse(doc.getDocumentElement(), true);
+    current = doc; // Alow namespace resolution during processing
     
     if ("yes".equals(System.getProperty("xsl.debug")))
       {
@@ -289,7 +295,7 @@ class Stylesheet
   
   // -- Apply templates --
   
-  void applyTemplates(Expr select, String mode,
+  void applyTemplates(Expr select, QName mode,
                       Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
@@ -310,19 +316,19 @@ class Stylesheet
       }
   }
 
-  void applyTemplates(String mode,
+  void applyTemplates(QName mode,
                       Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
   {
-    //System.err.println("applyTemplates:");
+    //System.err.println("applyTemplates: mode="+mode);
     //System.err.println("\tcontext="+context);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
         boolean isMatch = t.matches(mode, context);
-        //System.err.println("applyTemplates: "+context+" "+t+"="+isMatch);
+        //System.err.println("\t"+context+" "+t+"="+isMatch);
         if (isMatch)
           {
             candidates.add(t);
@@ -338,6 +344,8 @@ class Stylesheet
           case Node.ELEMENT_NODE:
           case Node.DOCUMENT_NODE:
           case Node.DOCUMENT_FRAGMENT_NODE:
+          case Node.PROCESSING_INSTRUCTION_NODE:
+          case Node.COMMENT_NODE:
             builtInNodeTemplate.apply(this, mode,
                                       context, pos, len,
                                       parent, nextSibling);
@@ -366,16 +374,19 @@ class Stylesheet
       }
   }
 
-  void callTemplate(QName name, String mode,
+  void callTemplate(QName name, QName mode,
                     Node context, int pos, int len,
                     Node parent, Node nextSibling)
     throws TransformerException
   {
+    //System.err.println("callTemplate: mode="+mode);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
-        if (name.equals(t.name))
+        boolean isMatch = t.matches(mode, name);
+        //System.err.println("\t"+name+" "+t+"="+isMatch);
+        if (isMatch)
           {
             candidates.add(t);
           }
@@ -404,7 +415,8 @@ class Stylesheet
     String m = getAttribute(attrs, "match");
     Pattern match = (m != null) ? (Pattern) xpath.compile(m) : null;
     String p = getAttribute(attrs, "priority");
-    String mode = getAttribute(attrs, "mode");
+    String mm = getAttribute(attrs, "mode");
+    QName mode = (mm == null) ? null : getQName(mm);
     double priority = (p == null) ? Template.DEFAULT_PRIORITY :
       Double.parseDouble(p);
     return new Template(this, name, match,
@@ -475,15 +487,16 @@ class Stylesheet
   final void parseKey(Node node, NamedNodeMap attrs)
     throws TransformerConfigurationException, XPathExpressionException
   {
-    String name = getRequiredAttribute(attrs, "name", node);
+    String n = getRequiredAttribute(attrs, "name", node);
     String m = getRequiredAttribute(attrs, "match", node);
     String u = getRequiredAttribute(attrs, "use", node);
+    QName name = getQName(n);
     Expr use = (Expr) xpath.compile(u);
     try
       {
         Pattern match = (Pattern) xpath.compile(m);
         Key key = new Key(name, match, use);
-        keys.put(name, key);
+        keys.add(key);
       }
     catch (ClassCastException e)
       {
@@ -554,58 +567,10 @@ class Stylesheet
   final void parseAttributeSet(Node node, NamedNodeMap attrs)
     throws TransformerConfigurationException, XPathExpressionException
   {
+    TemplateNode children = parse(node.getFirstChild());
     String name = getRequiredAttribute(attrs, "name", node);
     String uas = getAttribute(attrs, "use-attribute-sets");
-    if (uas != null)
-      {
-        // Merge the two use-attribute-sets specifiers,
-        // ensuring that only one of each name is present
-        String oldUas = (String) usedAttributeSets.get(name);
-        if (oldUas != null)
-          {
-            Set set = new LinkedHashSet();
-            StringTokenizer st = new StringTokenizer(oldUas, " ");
-            while (st.hasMoreTokens())
-              {
-                set.add(st.nextToken());
-              }
-            st = new StringTokenizer(uas, " ");
-            while (st.hasMoreTokens())
-              {
-                set.add(st.nextToken());
-              }
-            StringBuffer buf = new StringBuffer();
-            for (Iterator i = set.iterator(); i.hasNext(); )
-              {
-                if (buf.length() != 0)
-                  {
-                    buf.append(' ');
-                  }
-                buf.append(i.next());
-              }
-            uas = buf.toString();
-          }
-        usedAttributeSets.put(name, uas);
-      }
-    // Create the attribute-set template node(s)
-    TemplateNode last = (TemplateNode) attributeSets.get(name);
-    for (Node ctx = node.getLastChild(); ctx != null;
-         ctx = ctx.getPreviousSibling())
-      {
-        String ctxNamespaceUri = ctx.getNamespaceURI();
-        if (XSL_NS.equals(ctxNamespaceUri) &&
-            ctx.getNodeType() == Node.ELEMENT_NODE &&
-            "attribute".equals(ctx.getLocalName()))
-          {
-            NamedNodeMap aattrs = ctx.getAttributes();
-            String aname = getRequiredAttribute(aattrs, "name", ctx);
-            String ns = getAttribute(aattrs, "namespace");
-            TemplateNode n = parseAttributeValueTemplate(aname, node);
-            Node children = ctx.getFirstChild();
-            last = new AttributeNode(parse(children), last, n, ns, ctx);
-          }
-      }
-    attributeSets.put(name, last);
+    attributeSets.add(new AttributeSet(children, name, uas));
   }
 
   /**
@@ -630,6 +595,24 @@ class Stylesheet
             if ("stylesheet".equals(name))
               {
                 version = getAttribute(attrs, "version");
+                String eep = getAttribute(attrs, "extension-element-prefixes");
+                if (eep != null)
+                  {
+                    StringTokenizer st = new StringTokenizer(eep);
+                    while (st.hasMoreTokens())
+                      {
+                        extensionElementPrefixes.add(st.nextToken());
+                      }
+                  }
+                String erp = getAttribute(attrs, "exclude-result-prefixes");
+                if (erp != null)
+                  {
+                    StringTokenizer st = new StringTokenizer(erp);
+                    while (st.hasMoreTokens())
+                      {
+                        excludeResultPrefixes.add(st.nextToken());
+                      }
+                  }
                 parse(node.getFirstChild(), false);
                 return;
               }
@@ -805,50 +788,96 @@ class Stylesheet
     throws TransformerConfigurationException, XPathExpressionException
   {
     current = source;
-    // Check for attribute value template    
-    int start = value.lastIndexOf('{');
-    int end = value.lastIndexOf('}');
-    TemplateNode ret = null;
-    Document doc = source.getOwnerDocument();
-    if (start != -1 && end > start &&
-        // Check for doubled accolades to abort processing
-        !(start > 0 && value.charAt(start - 1) == '{' &&
-          value.charAt(end - 1) == '}'))
+    // Tokenize
+    int len = value.length();
+    int off = 0;
+    List tokens = new ArrayList(); // text tokens
+    List types = new ArrayList(); // literal or expression
+    int depth = 0;
+    for (int i = 0; i < len; i++)
       {
-        while (value.length() > 0 && start != -1 && end > start)
+        char c = value.charAt(i);
+        if (c == '{')
           {
-            // Verbatim text at end
-            String sub = value.substring(end + 1);
-            if (sub.length() > 0)
+            if (i < (len - 1) && value.charAt(i + 1) == '{')
               {
-                ret = new LiteralNode(null, ret, doc.createTextNode(sub));
+                tokens.add(value.substring(off, i + 1));
+                types.add(Boolean.FALSE);
+                i++;
+                off = i + 1;
+                continue;
               }
-            // Expression text
-            String expr = value.substring(start + 1, end);
-            if (expr.length() == 0)
+            if (depth == 0)
               {
-                String msg =
-                  "attribute value template must contain expression";
-                DOMSourceLocator l = new DOMSourceLocator(source);
-                throw new TransformerConfigurationException(msg, l);
+                if (i - off > 0)
+                  {
+                    tokens.add(value.substring(off, i));
+                    types.add(Boolean.FALSE);
+                  }
+                off = i + 1;
               }
-            Expr select = (Expr) xpath.compile(expr);
-            ret = new ValueOfNode(null, ret, select, false);
-            // work backwards through the text
-            value = value.substring(0, start);
-            start = value.lastIndexOf('{');
-            end = value.lastIndexOf('}');
+            depth++;
           }
-        if (value.length() > 0)
+        else if (c == '}')
           {
-            // Verbatim text at beginning
-            ret = new LiteralNode(null, ret, doc.createTextNode(value));
+            if (i < (len - 1) && value.charAt(i + 1) == '}')
+              {
+                tokens.add(value.substring(off, i + 1));
+                types.add(Boolean.FALSE);
+                i++;
+                off = i + 1;
+                continue;
+              }
+            if (depth == 1)
+              {
+                if (i - off > 0)
+                  {
+                    tokens.add(value.substring(off, i));
+                    types.add(Boolean.TRUE);
+                  }
+                else
+                  {
+                    String msg = "attribute value template " +
+                      "must contain expression: " + value;
+                    DOMSourceLocator l = new DOMSourceLocator(source);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
+                off = i + 1;
+              }
+            depth--;
           }
       }
-    else
+    if (depth > 0)
       {
-        // Verbatim
-        ret = new LiteralNode(null, ret, doc.createTextNode(value));
+        String msg = "invalid attribute value template: " + value;
+        throw new TransformerConfigurationException(msg);
+      }
+    if (len - off > 0)
+      {
+        // Trailing text
+        tokens.add(value.substring(off));
+        types.add(Boolean.FALSE);
+      }
+    
+    // Construct template node tree
+    TemplateNode ret = null;
+    Document doc = source.getOwnerDocument();
+    len = tokens.size();
+    for (int i = len - 1; i >= 0; i--)
+      {
+        String token = (String) tokens.get(i);
+        Boolean type = (Boolean) types.get(i);
+        if (type == Boolean.TRUE)
+          {
+            // Expression text
+            Expr select = (Expr) xpath.compile(token);
+            ret = new ValueOfNode(null, ret, select, false);
+          }
+        else
+          {
+            // Verbatim text
+            ret = new LiteralNode(null, ret, doc.createTextNode(token));
+          }
       }
     return ret;
   }
@@ -972,7 +1001,8 @@ class Stylesheet
     throws TransformerConfigurationException, XPathExpressionException
   {
     NamedNodeMap attrs = node.getAttributes();
-    String mode = getAttribute(attrs, "mode");
+    String m = getAttribute(attrs, "mode");
+    QName mode = (m == null) ? null : getQName(m);
     String s = getAttribute(attrs, "select");
     if (s == null)
       {
@@ -983,7 +1013,7 @@ class Stylesheet
     Expr select = (Expr) xpath.compile(s);
     return new ApplyTemplatesNode(null, parse(next),
                                   select, mode,
-                                  sortKeys, withParams);
+                                  sortKeys, withParams, false);
   }
 
   /**
@@ -1059,9 +1089,11 @@ class Stylesheet
   {
     NamedNodeMap attrs = node.getAttributes();
     String name = getRequiredAttribute(attrs, "name", node);
-    String ns = getAttribute(attrs, "namespace");
+    String namespace = getAttribute(attrs, "namespace");
     String uas = getAttribute(attrs, "use-attribute-sets");
     TemplateNode n = parseAttributeValueTemplate(name, node);
+    TemplateNode ns = (namespace == null) ? null :
+      parseAttributeValueTemplate(namespace, node);
     return new ElementNode(parse(children), parse(next), n, ns, uas, node);
   }
 
@@ -1073,8 +1105,10 @@ class Stylesheet
   {
     NamedNodeMap attrs = node.getAttributes();
     String name = getRequiredAttribute(attrs, "name", node);
-    String ns = getAttribute(attrs, "namespace");
+    String namespace = getAttribute(attrs, "namespace");
     TemplateNode n = parseAttributeValueTemplate(name, node);
+    TemplateNode ns = (namespace == null) ? null :
+      parseAttributeValueTemplate(namespace, node);
     return new AttributeNode(parse(children), parse(next), n, ns, node);
   }
   
@@ -1323,6 +1357,12 @@ class Stylesheet
                 return parse(next);
               }
           }
+        String prefix = node.getPrefix();
+        if (extensionElementPrefixes.contains(prefix))
+          {
+            // Pass over extension elements
+            return parse(next);
+          }
         switch (node.getNodeType())
           {
           case Node.TEXT_NODE:
@@ -1355,7 +1395,7 @@ class Stylesheet
                   }
                 int start = value.indexOf('{');
                 int end = value.indexOf('}');
-                if (start != -1 && end > start)
+                if (start != -1 || end != -1)
                   {
                     convert = true;
                     break;
@@ -1369,9 +1409,9 @@ class Stylesheet
                 for (int i = 0; i < len; i++)
                   {
                     Node attr = attrs.item(i);
-                    String ns = attr.getNamespaceURI();
+                    String ans = attr.getNamespaceURI();
                     String aname = attr.getNodeName();
-                    if (Stylesheet.XSL_NS.equals(ns) &&
+                    if (Stylesheet.XSL_NS.equals(ans) &&
                         "use-attribute-sets".equals(attr.getLocalName()))
                       {
                         continue;
@@ -1381,13 +1421,16 @@ class Stylesheet
                       parseAttributeValueTemplate(value, node);
                     TemplateNode n =
                       parseAttributeValueTemplate(aname, node);
+                    TemplateNode ns = (ans == null) ? null :
+                      parseAttributeValueTemplate(ans, node);
                     child = new AttributeNode(grandchild, child, n, ns, attr);
                   }
                 String ename = node.getNodeName();
-                TemplateNode n =
-                  parseAttributeValueTemplate(ename, node);
+                TemplateNode n = parseAttributeValueTemplate(ename, node);
+                TemplateNode ns = (namespaceUri == null) ? null :
+                  parseAttributeValueTemplate(namespaceUri, node);
                 return new ElementNode(child, parse(next),
-                                       n, namespaceUri, useAttributeSets,
+                                       n, ns, useAttributeSets,
                                        node);
               }
             // Otherwise fall through
@@ -1467,6 +1510,52 @@ class Stylesheet
         node = node.getNextSibling();
       }
     return ret.isEmpty() ? null : ret;
+  }
+
+  /**
+   * Created element nodes have a copy of the namespace nodes in the
+   * stylesheet, except the XSLT namespace, extension namespaces, and
+   * exclude-result-prefixes.
+   */
+  final void addNamespaceNodes(Node source, Node target, Document doc,
+                               Collection elementExcludeResultPrefixes)
+  {
+    NamedNodeMap attrs = source.getAttributes();
+    if (attrs != null)
+      {
+        int len = attrs.getLength();
+        for (int i = 0; i < len; i++)
+          {
+            Node attr = attrs.item(i);
+            String uri = attr.getNamespaceURI();
+            if (uri == XMLConstants.XMLNS_ATTRIBUTE_NS_URI)
+              {
+                String prefix = attr.getLocalName();
+                String ns = attr.getNodeValue();
+                // Should the namespace be excluded?
+                if (XSL_NS.equals(ns) ||
+                    extensionElementPrefixes.contains(prefix) ||
+                    elementExcludeResultPrefixes.contains(prefix) ||
+                    excludeResultPrefixes.contains(prefix))
+                  {
+                    continue;
+                  }
+                // Is the namespace already defined on the target?
+                if (target.lookupNamespaceURI(prefix) != null)
+                  {
+                    continue;
+                  }
+                attr = attr.cloneNode(true);
+                attr = doc.adoptNode(attr);
+                target.getAttributes().setNamedItemNS(attr);
+              }
+          }
+      }
+    Node parent = source.getParentNode();
+    if (parent != null)
+      {
+        addNamespaceNodes(parent, target, doc, elementExcludeResultPrefixes);
+      }
   }
 
   static final String getAttribute(NamedNodeMap attrs, String name)

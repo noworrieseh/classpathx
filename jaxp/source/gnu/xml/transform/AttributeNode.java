@@ -39,6 +39,7 @@
 package gnu.xml.transform;
 
 import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -57,11 +58,11 @@ final class AttributeNode
 {
 
   final TemplateNode name;
-  final String namespace;
+  final TemplateNode namespace;
   final Node source;
   
   AttributeNode(TemplateNode children, TemplateNode next, TemplateNode name,
-                String namespace, Node source)
+                TemplateNode namespace, Node source)
   {
     super(children, next);
     this.name = name;
@@ -69,29 +70,67 @@ final class AttributeNode
     this.source = source;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
-    // Create a document fragment to hold the text
+    // Create a document fragment to hold the name
     DocumentFragment fragment = doc.createDocumentFragment();
-    // Apply children to the fragment
+    // Apply name to the fragment
     name.apply(stylesheet, mode,
                context, pos, len,
                fragment, null);
     // Use XPath string-value of fragment
     String nameValue = Expr.stringValue(fragment);
+  
+    String namespaceValue = null;
+    if (namespace != null)
+      {  
+        // Create a document fragment to hold the namespace
+        fragment = doc.createDocumentFragment();
+        // Apply namespace to the fragment
+        namespace.apply(stylesheet, mode,
+                        context, pos, len,
+                        fragment, null);
+        // Use XPath string-value of fragment
+        namespaceValue = Expr.stringValue(fragment);
+        if (namespaceValue.length() == 0)
+          {
+            namespaceValue = null;
+          }
+      }
+    
     String prefix = getPrefix(nameValue);
-    String namespaceValue = namespace;
     if (namespaceValue == null)
       {
         if (prefix != null)
           {
-            // Resolve namespace for this prefix
-            namespaceValue = source.lookupNamespaceURI(prefix);
+            if (XMLConstants.XML_NS_PREFIX.equals(prefix))
+              {
+                namespaceValue = XMLConstants.XML_NS_URI;
+              }
+            else
+              {
+                // Resolve namespace for this prefix
+                namespaceValue = source.lookupNamespaceURI(prefix);
+              }
+          }
+      }
+    else
+      {
+        if (prefix != null)
+          {
+            String ns2 = source.lookupNamespaceURI(prefix);
+            if (ns2 != null && !ns2.equals(namespaceValue))
+              {
+                // prefix clashes, reset it
+                prefix = null;
+                int ci = nameValue.indexOf(':');
+                nameValue = nameValue.substring(ci + 1);
+              }
           }
       }
     if (prefix == null)
@@ -102,18 +141,35 @@ final class AttributeNode
           {
             nameValue = prefix + ":" + nameValue;
           }
+        else
+          {
+            if (namespaceValue != null)
+              {
+                // Must invent a prefix
+                prefix = inventPrefix(parent);
+                nameValue = prefix + ":" + nameValue;
+              }
+          }
       }
     NamedNodeMap attrs = parent.getAttributes();
-    // Only insert if no existing attribute is present,
-    // AND there is no prefix if no namespace is present
-    boolean insert = (namespaceValue != null) ?
-      (attrs.getNamedItemNS(namespaceValue, nameValue) == null) :
-          (attrs.getNamedItem(nameValue) == null);
+    boolean insert = true;
     if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceValue) ||
         XMLConstants.XMLNS_ATTRIBUTE.equals(nameValue) ||
         nameValue.startsWith("xmlns:"))
       {
         // Namespace declaration, do not output
+        insert = false;
+      }
+    if (prefix != null && namespaceValue == null)
+      {
+        // Not a QName
+        insert = false;
+      }
+    if (parent.getNodeType() == Node.ELEMENT_NODE &&
+        parent.getFirstChild() != null)
+      {
+        // XSLT 7.1.3 Adding an attribute to an element after children have
+        // been added to it is an error
         insert = false;
       }
     if (insert)
@@ -151,7 +207,20 @@ final class AttributeNode
   final String getPrefix(String name)
   {
     int ci = name.indexOf(':');
-    return (ci == -1) ? name : name.substring(0, ci);
+    return (ci == -1) ? null : name.substring(0, ci);
+  }
+
+  final String inventPrefix(Node parent)
+  {
+    String base = "ns";
+    int count = 0;
+    String ret = base + Integer.toString(count);
+    while (parent.lookupNamespaceURI(ret) != null)
+      {
+        count++;
+        ret = base + Integer.toString(count);
+      }
+    return ret;
   }
   
   public String toString()

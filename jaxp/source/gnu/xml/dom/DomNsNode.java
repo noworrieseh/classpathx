@@ -51,8 +51,10 @@ public abstract class DomNsNode
   extends DomNode
 {
   
-  String name;		// changed by setPrefix, renameNode
-  String namespace;     // changed by renameNode
+  private String name;
+  private String namespace;
+  private String prefix;
+  private String localName;
   
   /**
    * Constructs a node associated with the specified document, and
@@ -69,14 +71,10 @@ public abstract class DomNsNode
   DomNsNode(short nodeType, DomDocument owner, String namespaceURI, String name)
   {
     super(nodeType, owner);
-    this.name = name;
-    if ("".equals(namespaceURI))
-      {
-        namespaceURI = null;
-      }
-    this.namespace = namespaceURI;
+    setNodeName(name);
+    setNamespaceURI(namespaceURI);
   }
-  
+
   /**
    * <b>DOM L1</b>
    * Returns the node's name, including any namespace prefix.
@@ -84,6 +82,22 @@ public abstract class DomNsNode
   public final String getNodeName()
   {
     return name;
+  }
+
+  final void setNodeName(String name)
+  {
+    this.name = name.intern();
+    int index = name.indexOf(':');
+    if (index == -1)
+      {
+        prefix = null;
+        localName = this.name;
+      }
+    else
+      {
+        prefix = name.substring(0, index).intern();
+        localName = name.substring(index + 1).intern();
+      }
   }
   
   /**
@@ -96,44 +110,38 @@ public abstract class DomNsNode
     return namespace;
   }
 
+  final void setNamespaceURI(String namespaceURI)
+  {
+    if ("".equals(namespaceURI))
+      {
+        namespaceURI = null;
+      }
+    namespace = (namespaceURI == null) ? null : namespaceURI.intern();
+  }
+  
   /**
    * <b>DOM L2</b>
    * Returns any prefix part of the node's name (before any colon).
    */
-  public String getPrefix()
+  public final String getPrefix()
   {
-    if (namespace == null)
-      {
-        return null;
-      }
-    
-    int index = name.indexOf(':');
-    if (index < 0)
-      {
-        return null;
-      }
-    else
-      {
-        return name.substring(0, index);
-      }
+    return prefix;
   }
 
   /**
    * <b>DOM L2</b>
    * Assigns the prefix part of the node's name (before any colon).
    */
-  public void setPrefix(String prefix)
+  public final void setPrefix(String prefix)
   {
-    String local = getLocalName();
-    
-    if (isReadonly())
+    if (readonly)
       {
         throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
 
     if (prefix == null)
       {
-        name = local;
+        name = localName;
         return;
       }
     else if (namespace == null)
@@ -174,24 +182,16 @@ public abstract class DomNsNode
                         "namespace declarations can't change names", this, 0);
       }
 
-    name = prefix + ':' + local;
+    this.prefix = prefix.intern();
   }
 
   /**
    * <b>DOM L2</b>
    * Returns the local part of the node's name (after any colon).
    */
-  public String getLocalName()
+  public final String getLocalName()
   {
-    int index = name.indexOf(':');
-    if (index < 0)
-      {
-        return name;
-      }
-    else
-      {
-        return name.substring(index + 1);
-      }
+    return localName;
   }
   
 }

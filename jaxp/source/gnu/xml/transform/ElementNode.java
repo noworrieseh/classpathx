@@ -38,12 +38,18 @@
 
 package gnu.xml.transform;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 
@@ -57,37 +63,71 @@ final class ElementNode
 {
 
   final TemplateNode name;
-  final String namespace;
+  final TemplateNode namespace;
   final String uas;
   final Node source;
+  final Collection elementExcludeResultPrefixes;
   
   ElementNode(TemplateNode children, TemplateNode next, TemplateNode name,
-              String namespace, String uas, Node source)
+              TemplateNode namespace, String uas, Node source)
   {
     super(children, next);
     this.name = name;
     this.namespace = namespace;
     this.uas = uas;
     this.source = source;
+    NamedNodeMap attrs = source.getAttributes();
+    Node attr = attrs.getNamedItemNS(Stylesheet.XSL_NS,
+                                     "exclude-result-prefixes");
+    if (attr != null)
+      {
+        elementExcludeResultPrefixes = new HashSet();
+        StringTokenizer st = new StringTokenizer(attr.getNodeValue());
+        while (st.hasMoreTokens())
+          {
+            elementExcludeResultPrefixes.add(st.nextToken());
+          }
+      }
+    else
+      {
+        elementExcludeResultPrefixes = Collections.EMPTY_SET;
+      }
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
-    // Create a document fragment to hold the text
+    // Create a document fragment to hold the name
     DocumentFragment fragment = doc.createDocumentFragment();
-    // Apply children to the fragment
+    // Apply name to the fragment
     name.apply(stylesheet, mode,
                context, pos, len,
                fragment, null);
     // Use XPath string-value of fragment
     String nameValue = Expr.stringValue(fragment);
+
+    String namespaceValue = null;
+    if (namespace != null)
+      {
+        // Create a document fragment to hold the namespace
+        fragment = doc.createDocumentFragment();
+        // Apply namespace to the fragment
+        namespace.apply(stylesheet, mode,
+                        context, pos, len,
+                        fragment, null);
+        // Use XPath string-value of fragment
+        namespaceValue = Expr.stringValue(fragment);
+        if (namespaceValue.length() == 0)
+          {
+            namespaceValue = null;
+          }
+      }
+    
     String prefix = getPrefix(nameValue);
-    String namespaceValue = namespace;
     if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix))
       {
         int ci = nameValue.indexOf(':');
@@ -99,14 +139,21 @@ final class ElementNode
           {
             if (prefix != null)
               {
-                // Resolve namespace for this prefix
-                namespaceValue = source.lookupNamespaceURI(prefix);
+                if (XMLConstants.XML_NS_PREFIX.equals(prefix))
+                  {
+                    namespaceValue = XMLConstants.XML_NS_URI;
+                  }
+                else
+                  {
+                    // Resolve namespace for this prefix
+                    namespaceValue = source.lookupNamespaceURI(prefix);
+                  }
               }
           }
         if (prefix == null)
           {
             // Resolve prefix for this namespace
-            prefix = source.lookupPrefix(namespaceValue);
+            prefix = parent.lookupPrefix(namespaceValue);
             if (prefix != null)
               {
                 nameValue = prefix + ":" + nameValue;
@@ -125,13 +172,8 @@ final class ElementNode
       {
         parent.appendChild(element);
       }
-    // Children have priority over used attribute sets
-    if (children != null)
-      {
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       element, null);
-      }
+    stylesheet.addNamespaceNodes(source, element, doc,
+                                 elementExcludeResultPrefixes);
     if (uas != null)
       {
         StringTokenizer st = new StringTokenizer(uas, " ");
@@ -140,6 +182,12 @@ final class ElementNode
             addAttributeSet(stylesheet, mode, context, pos, len,
                             element, null, st.nextToken());
           }
+      }
+    if (children != null)
+      {
+        children.apply(stylesheet, mode,
+                       context, pos, len,
+                       element, null);
       }
     if (next != null)
       {
@@ -152,30 +200,35 @@ final class ElementNode
   final String getPrefix(String name)
   {
     int ci = name.indexOf(':');
-    return (ci == -1) ? name : name.substring(0, ci);
+    return (ci == -1) ? null : name.substring(0, ci);
   }
 
-  void addAttributeSet(Stylesheet stylesheet, String mode,
+  void addAttributeSet(Stylesheet stylesheet, QName mode,
                        Node context, int pos, int len,
                        Node parent, Node nextSibling, String attributeSet)
     throws TransformerException
   {
-    TemplateNode attribute =
-      (TemplateNode) stylesheet.attributeSets.get(attributeSet);
-    if (attribute != null)
+    for (Iterator i = stylesheet.attributeSets.iterator(); i.hasNext(); )
       {
-        attribute.apply(stylesheet, mode,
-                        context, pos, len,
-                        parent, nextSibling);
-      }
-    String uas = (String) stylesheet.usedAttributeSets.get(attributeSet);
-    if (uas != null)
-      {
-        StringTokenizer st = new StringTokenizer(uas, " ");
-        while (st.hasMoreTokens())
+        AttributeSet as = (AttributeSet) i.next();
+        if (!as.name.equals(attributeSet))
           {
-            addAttributeSet(stylesheet, mode, context, pos, len,
-                            parent, nextSibling, st.nextToken());
+            continue;
+          }
+        if (as.uas != null)
+          {
+            StringTokenizer st = new StringTokenizer(as.uas, " ");
+            while (st.hasMoreTokens())
+              {
+                addAttributeSet(stylesheet, mode, context, pos, len,
+                                parent, nextSibling, st.nextToken());
+              }
+          }
+        if (as.children != null)
+          {
+            as.children.apply(stylesheet, mode,
+                              context, pos, len,
+                              parent, nextSibling);
           }
       }
   }

@@ -39,10 +39,16 @@
 package gnu.xml.transform;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.Function;
@@ -79,6 +85,7 @@ final class KeyFunction
 
   public Object evaluate(Node context, int pos, int len)
   {
+    // Evaluate arguments
     int arity = args.size();
     List values = new ArrayList(arity);
     for (int i = 0; i < arity; i++)
@@ -86,10 +93,99 @@ final class KeyFunction
         Expr arg = (Expr) args.get(i);
         values.add(arg.evaluate(context, pos, len));
       }
-    String keyName = _string(context, values.get(0));
-    Object arg = values.get(1);
-    // TODO
-    throw new UnsupportedOperationException();
+    // Get key name
+    QName keyName = QName.valueOf(_string(context, values.get(0)));
+    // Expand qualified name
+    String uri = keyName.getNamespaceURI();
+    String prefix = keyName.getPrefix();
+    if ((uri == null || uri.length() == 0) && 
+        (prefix != null && prefix.length() > 0))
+      {
+        uri = stylesheet.getNamespaceURI(prefix);
+        if (uri != null && uri.length() > 0)
+          {
+            String localName = keyName.getLocalName();
+            keyName = new QName(uri, localName, prefix);
+          }
+      }
+    // Compute matching key set
+    Collection keySet = new LinkedList();
+    for (Iterator i = stylesheet.keys.iterator(); i.hasNext(); )
+      {
+        Key key = (Key) i.next();
+        if (key.name.equals(keyName))
+          {
+            keySet.add(key);
+          }
+      }
+    // Get target
+    Object target = values.get(1);
+    Collection acc = new LinkedHashSet();
+    Document doc = (context instanceof Document) ? (Document) context :
+      context.getOwnerDocument();
+    if (target instanceof Collection)
+      {
+        for (Iterator i = ((Collection) target).iterator(); i.hasNext(); )
+          {
+            String val = Expr.stringValue((Node) i.next());
+            addKeyNodes(doc, keySet, val, acc);
+          }
+      }
+    else
+      {
+        String val = Expr._string(context, target);
+        addKeyNodes(doc, keySet, val, acc);
+      }
+    List ret = new ArrayList(acc);
+    Collections.sort(ret, documentOrderComparator);
+    return ret;
+  }
+
+  final void addKeyNodes(Node node, Collection keySet,
+                         String value, Collection acc)
+  {
+    addKeyNodeIfMatch(node, keySet, value, acc);
+    // Apply children
+    for (Node ctx = node.getFirstChild(); ctx != null;
+         ctx = ctx.getNextSibling())
+      {
+        addKeyNodes(ctx, keySet, value, acc);
+      }
+  }
+  
+  final void addKeyNodeIfMatch(Node node, Collection keySet,
+                               String value, Collection acc)
+  {
+    for (Iterator i = keySet.iterator(); i.hasNext(); )
+      {
+        Key key = (Key) i.next();
+        if (key.match.matches(node))
+          {
+            Object eval = key.use.evaluate(node, 1, 1);
+            if (eval instanceof Collection)
+              {
+                for (Iterator j = ((Collection) eval).iterator();
+                     j.hasNext(); )
+                  {
+                    String keyValue = Expr.stringValue((Node) j.next());
+                    if (value.equals(keyValue))
+                      {
+                        acc.add(node);
+                        return;
+                      }
+                  }
+              }
+            else
+              {
+                String keyValue = Expr._string(node, eval);
+                if (value.equals(keyValue))
+                  {
+                    acc.add(node);
+                    return;
+                  }
+              }
+          }
+      }
   }
 
 }

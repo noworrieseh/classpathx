@@ -140,13 +140,11 @@ public final class Steps
             s.addPrecedingNodes(context, candidates, true);
             break;
           case Selector.ATTRIBUTE:
+          case Selector.NAMESPACE:
             if (context.getNodeType() == Node.ATTRIBUTE_NODE)
               {
                 candidates.add(((Attr) context).getOwnerElement());
               }
-            break;
-          case Selector.NAMESPACE:
-            // TODO
             break;
           case Selector.SELF:
             candidates.add(context);
@@ -159,14 +157,17 @@ public final class Steps
 
   public Object evaluate(Node context, int pos, int len)
   {
+    //System.err.println(toString()+" evaluate");
     // Left to right
     Iterator i = path.iterator();
     Expr lhs = (Expr) i.next();
     Object val = lhs.evaluate(context, pos, len);
+    //System.err.println("\tevaluate "+lhs+" = "+val);
     while (val instanceof Collection && i.hasNext())
       {
         Path rhs = (Path) i.next();
         val = rhs.evaluate(context, (Collection) val);
+        //System.err.println("\tevaluate "+rhs+" = "+val);
       }
     return val;
   }

@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -323,10 +324,12 @@ class TransformerImpl
                 out = new FileOutputStream(url.getPath());
               }
           }
+        out = new BufferedOutputStream(out);
         StreamSerializer serializer =
           new StreamSerializer(outputMethod, encoding, null);
         serializer.setCdataSectionElements(stylesheet.outputCdataSectionElements);
         serializer.serialize(node, out);
+        out.flush();
       }
     finally
       {

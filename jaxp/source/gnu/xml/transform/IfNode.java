@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
@@ -59,7 +60,7 @@ final class IfNode
     this.test = test;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException

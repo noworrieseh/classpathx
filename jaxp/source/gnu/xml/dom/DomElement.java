@@ -360,6 +360,10 @@ public class DomElement
 
   public String lookupPrefix(String namespaceURI)
   {
+    if (namespaceURI == null)
+      {
+        return null;
+      }
     String namespace = getNamespaceURI();
     if (namespace != null && namespace.equals(namespaceURI))
       {
@@ -371,14 +375,18 @@ public class DomElement
           {
             if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
-                String qName = ctx.getNodeName();
-                if ("xmlns".equals(qName))
+                String value = ctx.getNodeValue();
+                if (value.equals(namespaceURI))
                   {
-                    return null;
-                  }
-                else
-                  {
-                    return qName.substring(6);
+                    String qName = ctx.getNodeName();
+                    if (XMLConstants.XMLNS_ATTRIBUTE.equals(qName))
+                      {
+                        return null;
+                      }
+                    else
+                      {
+                        return qName.substring(6);
+                      }
                   }
               }
           }
@@ -400,7 +408,7 @@ public class DomElement
             if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
-                return ("xmlns".equals(qName));
+                return (XMLConstants.XMLNS_ATTRIBUTE.equals(qName));
               }
           }
       }
@@ -421,7 +429,7 @@ public class DomElement
             if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
-                if ("xmlns".equals(qName))
+                if (XMLConstants.XMLNS_ATTRIBUTE.equals(qName))
                   {
                     if (prefix == null)
                       {

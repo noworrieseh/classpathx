@@ -1,5 +1,5 @@
 /*
- * ChooseNode.java
+ * AttributeSet.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,49 +38,24 @@
 
 package gnu.xml.transform;
 
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
-import org.w3c.dom.Node;
-
 /**
- * A template node representing an XSL <code>choose</code> instruction.
+ * An attribute-set entry in a stylesheet.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class ChooseNode
-  extends TemplateNode
+final class AttributeSet
 {
 
-  ChooseNode(TemplateNode children, TemplateNode next)
-  {
-    super(children, next);
-  }
+  final TemplateNode children;
+  final String name;
+  final String uas;
 
-  void doApply(Stylesheet stylesheet, QName mode,
-               Node context, int pos, int len,
-               Node parent, Node nextSibling)
-    throws TransformerException
+  AttributeSet(TemplateNode children, String name, String uas)
   {
-    if (children != null)
-      {
-        children.apply(stylesheet, mode,
-                       context, pos, len,
-                       parent, nextSibling);
-      }
-    if (next != null)
-      {
-        next.apply(stylesheet, mode,
-                   context, pos, len,
-                   parent, nextSibling);
-      }
-  }
-  
-  public String toString()
-  {
-    StringBuffer buf = new StringBuffer(getClass().getName());
-    buf.append('[');
-    buf.append(']');
-    return buf.toString();
+    this.children = children;
+    this.name = name;
+    this.uas = uas;
   }
   
 }
+

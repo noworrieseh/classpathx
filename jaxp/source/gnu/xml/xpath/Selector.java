@@ -178,7 +178,7 @@ public final class Selector
     addCandidates(context, acc);
     List candidates = new ArrayList(acc);
     //Collections.sort(candidates, documentOrderComparator);
-    return filterCandidates(candidates);
+    return filterCandidates(candidates, false);
   }
 
   Collection evaluate(Node context, Collection ns)
@@ -190,13 +190,13 @@ public final class Selector
       }
     List candidates = new ArrayList(acc);
     //Collections.sort(candidates, documentOrderComparator);
-    return filterCandidates(candidates);
+    return filterCandidates(candidates, true);
   }
 
   /**
    * Filter the given list of candates according to the node tests.
    */
-  List filterCandidates(List candidates)
+  List filterCandidates(List candidates, boolean cascade)
   {
     int len = candidates.size();
     int tlen = tests.length;
@@ -210,6 +210,16 @@ public final class Selector
             for (int i = 0; i < len; i++)
               {
                 Node node = (Node) candidates.get(i);
+                if (cascade)
+                  {
+                    short nodeType = node.getNodeType();
+                    if (nodeType == Node.DOCUMENT_NODE ||
+                        nodeType == Node.DOCUMENT_FRAGMENT_NODE)
+                      {
+                        successful.add(node);
+                        continue;
+                      }
+                  }
                 if (test.matches(node, i + 1, len))
                   {
                     successful.add(node);
@@ -393,46 +403,57 @@ public final class Selector
     switch (axis)
       {
       case ANCESTOR:
-        buf.append("ancestor");
+        buf.append("ancestor::");
         break;
       case ANCESTOR_OR_SELF:
-        buf.append("ancestor-or-self");
+        buf.append("ancestor-or-self::");
         break;
       case ATTRIBUTE:
-        buf.append("attribute");
+        buf.append("attribute::");
         break;
       case CHILD:
-        buf.append("child");
+        //buf.append("child::");
         break;
       case DESCENDANT:
-        buf.append("descendant");
+        buf.append("descendant::");
         break;
       case DESCENDANT_OR_SELF:
-        buf.append("descendant-or-self");
+        buf.append("descendant-or-self::");
         break;
       case FOLLOWING:
-        buf.append("following");
+        buf.append("following::");
         break;
       case FOLLOWING_SIBLING:
-        buf.append("following-sibling");
+        buf.append("following-sibling::");
         break;
       case NAMESPACE:
-        buf.append("namespace");
+        buf.append("namespace::");
         break;
       case PARENT:
-        buf.append("parent");
+        if (tests.length == 0 ||
+            (tests[0] instanceof NodeTypeTest &&
+             ((NodeTypeTest) tests[0]).type == 0))
+          {
+            return "..";
+          }
+        buf.append("parent::");
         break;
       case PRECEDING:
-        buf.append("preceding");
+        buf.append("preceding::");
         break;
       case PRECEDING_SIBLING:
-        buf.append("preceding-sibling");
+        buf.append("preceding-sibling::");
         break;
       case SELF:
-        buf.append("self");
+        if (tests.length == 0 ||
+            (tests[0] instanceof NodeTypeTest &&
+             ((NodeTypeTest) tests[0]).type == 0))
+          {
+            return ".";
+          }
+        buf.append("self::");
         break;
       }
-    buf.append("::");
     if (tests.length == 0)
       {
         buf.append('*');

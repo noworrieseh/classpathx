@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -75,7 +76,7 @@ abstract class AbstractNumberNode
     this.groupingSize = groupingSize;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException

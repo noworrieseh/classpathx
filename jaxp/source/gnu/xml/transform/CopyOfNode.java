@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -67,7 +68,7 @@ final class CopyOfNode
     this.select = select;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException
@@ -83,9 +84,35 @@ final class CopyOfNode
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node src = (Node) i.next();
+            short nodeType = src.getNodeType();
+            if (nodeType == Node.DOCUMENT_NODE)
+              {
+                // Use document element
+                src = ((Document) src).getDocumentElement();
+                if (src == null)
+                  {
+                    continue;
+                  }
+                nodeType = Node.ELEMENT_NODE;
+              }
+            else if (nodeType == Node.ATTRIBUTE_NODE)
+              {
+                if (parent.getFirstChild() != null)
+                  {
+                    // Ignore attempt to add attribute after children
+                    continue;
+                  }
+              }
+            if (parent.getNodeType() == Node.ATTRIBUTE_NODE &&
+                nodeType != Node.TEXT_NODE &&
+                nodeType != Node.ENTITY_REFERENCE_NODE)
+              {
+                // Ignore
+                continue;
+              }
             Node node = src.cloneNode(true);
             node = doc.adoptNode(node);
-            if (node.getNodeType() == Node.ATTRIBUTE_NODE)
+            if (nodeType == Node.ATTRIBUTE_NODE)
               {
                 NamedNodeMap attrs = parent.getAttributes();
                 if (attrs != null)

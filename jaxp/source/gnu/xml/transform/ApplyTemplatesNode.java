@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
@@ -58,22 +59,24 @@ final class ApplyTemplatesNode
 {
 
   final Expr select;
-  final String mode;
+  final QName mode;
   final List sortKeys;
   final List withParams;
+  final boolean isDefault;
 
   ApplyTemplatesNode(TemplateNode children, TemplateNode next,
-                     Expr select, String mode,
-                     List sortKeys, List withParams)
+                     Expr select, QName mode,
+                     List sortKeys, List withParams, boolean isDefault)
   {
     super(children, next);
     this.select = select;
     this.mode = mode;
     this.sortKeys = sortKeys;
     this.withParams = withParams;
+    this.isDefault = isDefault;
   }
 
-  void doApply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, QName mode,
                Node context, int pos, int len,
                Node parent, Node nextSibling)
     throws TransformerException
@@ -108,7 +111,7 @@ final class ApplyTemplatesNode
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
             Node node = (Node) i.next();
-            stylesheet.applyTemplates((this.mode != null) ? this.mode : mode,
+            stylesheet.applyTemplates(isDefault ? mode : this.mode,
                                       node, p++, l,
                                       parent, nextSibling);
           }
