@@ -45,4 +45,15 @@ public class JspTagException extends JspException
     super(message);
   }
   
+  public JspTagException (String message,
+                          Throwable rootCause)
+  {
+    super(message, rootCause);
+  }
+
+  public JspTagException (Throwable rootCause)
+  {
+    super(rootCause);
+  }
+
 }
