@@ -319,7 +319,7 @@ link_all_deplibs=no
 sys_lib_search_path_spec=" /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/ /usr/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../../powerpc-unknown-linux-gnu/lib/powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../../powerpc-unknown-linux-gnu/lib/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../ /lib/powerpc-unknown-linux-gnu/3.5.0/ /lib/ /usr/lib/powerpc-unknown-linux-gnu/3.5.0/ /usr/lib/"
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib /usr/lib/GNUstep/System/Library/Libraries "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""
@@ -7040,7 +7040,7 @@ link_all_deplibs=no
 sys_lib_search_path_spec=" /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/ /usr/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../../powerpc-unknown-linux-gnu/lib/powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../../powerpc-unknown-linux-gnu/lib/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../powerpc-unknown-linux-gnu/3.5.0/ /usr/local/lib/gcc/powerpc-unknown-linux-gnu/3.5.0/../../../ /lib/powerpc-unknown-linux-gnu/3.5.0/ /lib/ /usr/lib/powerpc-unknown-linux-gnu/3.5.0/ /usr/lib/"
 
 # Run-time system search path for libraries
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib /usr/lib/GNUstep/System/Library/Libraries "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/X11R6/lib "
 
 # Fix the shell variable $srcfile for the compiler.
 fix_srcfile_path=""
