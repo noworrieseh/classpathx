@@ -1,5 +1,5 @@
 /*
- * $Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
+ * $Id: ClassStuff.java,v 1.2 2001-11-29 22:38:26 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,10 +32,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 
-// $Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
+// $Id: ClassStuff.java,v 1.2 2001-11-29 22:38:26 db Exp $
 
 /**
  * Package-private utility methods for sharing
@@ -45,7 +46,7 @@ import java.util.Properties;
  * Keep changes to the two copies in sync.
  *
  * @author David Brownell
- * @version	$Id: ClassStuff.java,v 1.1 2001-10-26 20:47:03 db Exp $
+ * @version	$Id: ClassStuff.java,v 1.2 2001-11-29 22:38:26 db Exp $
  */
 final class ClassStuff
 {
@@ -62,22 +63,21 @@ final class ClassStuff
 	String		name = null;
 	ClassLoader	loader = null;
 
-	// NOTE:  Two restrictions here.
-	// (a) Needs JDK 1.2 to compile this, but runs on JDK 1.1.x
-	// (b) Seemingly won't work on the MSFT JVM, which uses
-	//	early method binding (ok by JDK 1.1 spec, not 1.2)
+	// figure out which class loader to use.
+	// source compiles on jdk 1.1, but works with jdk 1.2+ security
+        try {
+	    Method 	m = null;
 
-	// Can we use JDK 1.2 APIs?
-	try {
-	    loader = Thread.currentThread ().getContextClassLoader ();
-	} catch (Exception e) { /* ignore */ }
-
-	// If not, use JDK 1.1 calls.
-	try {
-	    if (loader == null)
-		loader = ClassLoader.class.getClassLoader ();
-	} catch (Exception e) { /* ignore */ }
-
+	    // Can we use JDK 1.2 APIs?  Preferred: security policies apply.
+            m = Thread.class.getMethod ("getContextClassLoader", null);
+            loader = (ClassLoader) m.invoke (Thread.currentThread(), null);
+        } catch (NoSuchMethodException e) {
+            // Assume that we are running JDK 1.1; use current ClassLoader
+            loader = ClassStuff.class.getClassLoader();
+	} catch (Exception e) {
+	    // "should not happen"
+            throw new UnknownError (e.getMessage());
+        }
 
 	// 1. Check System Property
 	// ... normally fails in applet environments
