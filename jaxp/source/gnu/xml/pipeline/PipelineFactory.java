@@ -1,5 +1,5 @@
 /*
- * $Id: PipelineFactory.java,v 1.1 2001-07-10 22:54:43 db Exp $
+ * $Id: PipelineFactory.java,v 1.2 2001-10-15 02:23:03 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: PipelineFactory.java,v 1.1 2001-07-10 22:54:43 db Exp $
+// $Id: PipelineFactory.java,v 1.2 2001-10-15 02:23:03 db Exp $
 
 /**
  * This provides static factory methods for creating simple event pipelines.
@@ -145,6 +145,16 @@ import gnu.xml.util.DefaultHandler;
 	characters are written as entity or character references; the text is
 	pretty printed.</td>
     </tr>
+    <tr valign="top" align="center">
+	<td><a href="XIncludeFilter.html">xinclude</a></td>
+	<td><em>none</em></td>
+	<td>no</td>
+	<td align="left">This stage handles XInclude processing.
+	This is like entity inclusion, except that the included content
+	is declared in-line rather than in the DTD at the beginning of
+	a document.
+	</td>
+    </tr>
 
  </table>
  
@@ -156,7 +166,7 @@ import gnu.xml.util.DefaultHandler;
  * it's absolutely necessary.
  *
  * @author David Brownell
- * @version $Date: 2001-07-10 22:54:43 $
+ * @version $Date: 2001-10-15 02:23:03 $
  */
 public class PipelineFactory
 {
@@ -299,6 +309,7 @@ public class PipelineFactory
 	{ "tee",	"gnu.xml.pipeline.TeeConsumer" },
 	{ "validate",	"gnu.xml.pipeline.ValidationConsumer" },
 	{ "wf",		"gnu.xml.pipeline.WellFormednessFilter" },
+	{ "xinclude",	"gnu.xml.pipeline.XIncludeFilter" },
 
 // XXX want:  option for validate, to preload external part of a DTD
 
@@ -511,7 +522,11 @@ public class PipelineFactory
 		} catch (NoSuchMethodException e) {
 		    fail (name + " constructor missing -- " + msg);
 
+		} catch (ClassNotFoundException e) {
+		    fail (name + " class not found");
+
 		} catch (Exception e) {
+		    // e.printStackTrace ();
 		    fail ("stage not available: " + e.getMessage ());
 		}
 	    }
