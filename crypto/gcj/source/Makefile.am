@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.3 2002-06-12 10:21:46 raif Exp $
+## $Id: Makefile.am,v 1.4 2002-06-15 06:59:35 olf Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -37,7 +37,8 @@ AUTOMAKE_OPTIONS = gnu
 # Variables
 #
 crypto_jar = gnu-crypto.jar
-AM_GCJFLAGS = --encoding=UTF-8 -fassume-compiled -fCLASSPATH=.
+encoding_flag = --encoding=UTF-8
+AM_GCJFLAGS = $(encoding_flag) -fassume-compiled -fCLASSPATH=.
 
 BUILT_SOURCES = $(crypto_jar)
 data_DATA = $(crypto_jar)
@@ -207,7 +208,7 @@ crypto_sources = \
 SUFFIXES = .java .lo .o .obj .class .jar
 
 %.class: %.java
-	$(GCJ) -C --encoding=UTF-8 -fCLASSPATH=$(srcdir) -d . $<
+	$(GCJ) -C $(encoding_flag) -fCLASSPATH=$(srcdir) -d . $<
 
 CLASSFILES = $(lib_gnu_crypto_la_SOURCES:.java=.class)
 
