@@ -22,7 +22,8 @@
 package javax.xml.transform;
 
 /**
- * ErrorListener
+ * JAXP/Transform analogue of SAX ErrorHandler, using
+ * {@link TransformerException} classes.
  * @author	Andrew Selkirk
  * @version	1.0
  */

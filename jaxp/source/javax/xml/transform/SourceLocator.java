@@ -22,7 +22,7 @@
 package javax.xml.transform;
 
 /**
- * Source Locator
+ * JAXP/transform analogue of SAX Locator.
  * @author	Andrew Selkirk
  * @version	1.0
  */
