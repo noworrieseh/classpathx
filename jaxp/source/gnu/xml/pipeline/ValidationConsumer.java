@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.1 2001-07-05 01:47:04 db Exp $
+ * $Id: ValidationConsumer.java,v 1.2 2001-07-08 12:30:27 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.1 2001-07-05 01:47:04 db Exp $
+// $Id: ValidationConsumer.java,v 1.2 2001-07-08 12:30:27 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -143,12 +143,13 @@ import gnu.xml.util.DefaultHandler;
  *
  *	<li> The <em>Unique Element Type Declaration</em> VC may not be
  *	reportable, if the underlying parser happens not to expose
- *	multiple declarations.   (&AElig;lfred does not.)</li>
+ *	multiple declarations.   (&AElig;lfred2 reports these validity
+ *	errors directly.)</li>
  *
  *	<li> Similarly, the <em>Unique Notation Name</em> VC, added in the
  *	14-January-2000 XML spec errata to restrict typing models used by
- *	elements, may not be reportable.  (&AElig;lfred does not expose
- *	information required to report this.) </li>
+ *	elements, may not be reportable.  (&AElig;lfred reports these
+ *	validity errors directly.) </li>
  *
  *	</ul>
  *
@@ -166,13 +167,12 @@ import gnu.xml.util.DefaultHandler;
  * to report validity errors.  When used with a parser that does so for
  * the validity constraints mentioned above (or any other SAX2 event
  * stream producer that does the same thing), overall conformance is
- * substantially improved.  The version of &AElig;lfred2 provided with
- * this validation consumer performs some of those optional notifications.
+ * substantially improved.
  *
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-07-05 01:47:04 $
+ * @version $Date: 2001-07-08 12:30:27 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
@@ -180,9 +180,6 @@ public final class ValidationConsumer extends EventFilter
     // report error if we happen to notice a non-deterministic choice?
     // we won't report buggy content models; just buggy instances
     private static final boolean	warnNonDeterministic = false;
-
-    // may be used in error reporting
-    private Locator		locator;
 
     // for tracking active content models
     private String		rootName;
@@ -394,6 +391,7 @@ public final class ValidationConsumer extends EventFilter
     throws SAXException
     {
 	ErrorHandler		errHandler = getErrorHandler ();
+	Locator			locator = getDocumentLocator ();
 	SAXParseException	err;
 
 	if (errHandler == null)
@@ -411,6 +409,7 @@ public final class ValidationConsumer extends EventFilter
     throws SAXException
     {
 	ErrorHandler		errHandler = getErrorHandler ();
+	Locator			locator = getDocumentLocator ();
 	SAXParseException	err;
 
 	if (locator == null)
@@ -427,6 +426,7 @@ public final class ValidationConsumer extends EventFilter
     throws SAXException
     {
 	ErrorHandler		errHandler = getErrorHandler ();
+	Locator			locator = getDocumentLocator ();
 	SAXParseException	err;
 
 	if (locator != null)
@@ -567,7 +567,7 @@ public final class ValidationConsumer extends EventFilter
 
 	// this is a convenient hook for end-of-dtd checks, but we
 	// could also trigger it in the first startElement call.
-	// locator info is more accurate here though.
+	// locator info is more appropriate here though.
 
 	// VC: Notation Declared (NDATA can refer to them before decls,
 	//	as can NOTATION attribute enumerations and defaults)
@@ -877,16 +877,6 @@ public final class ValidationConsumer extends EventFilter
     }
     
     
-    /**
-     * <b>ContentHandler</b> Records the locator for use in diagnostics.
-     */
-    public void setDocumentLocator (Locator locator)
-    {
-	// This method is only OPTIONALLY invoked (sigh)
-	this.locator = locator;
-	super.setDocumentLocator (locator);
-    }
-
     /**
      * <b>ContentHandler</b> Ensures that state from any previous parse
      * has been deleted.
@@ -1243,12 +1233,7 @@ public final class ValidationConsumer extends EventFilter
 
     /**
      * <b>ContentHandler</b> Checks whether all ID values that were
-     * referenced have been declared, and releases all resources.  Note
-     * that if a parse is aborted without invoking this method (which is
-     * strictly speaking a SAX conformance issue), and this same
-     * handler is used with multiple parsers, then it's possible that
-     * future callbacks will use a locator inappropriately; this can be
-     * worked around by calling setLocator manually.
+     * referenced have been declared, and releases all resources. 
      * Passed to the next consumer.
      * 
      * @see #setDocumentLocator
@@ -1268,7 +1253,6 @@ public final class ValidationConsumer extends EventFilter
 	    }
 	}
 
-	locator = null;
 	resetState ();
 	super.endDocument ();
     }
