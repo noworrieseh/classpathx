@@ -586,6 +586,15 @@ implements Serializable
       response.setContentType(type);
     }
 
+    public String getContentType()
+    {
+      return response.getContentType();
+    }
+
+    public void setCharacterEncoding(String encoding)
+    {
+      response.setCharacterEncoding(encoding);
+    }
 
     /**
      * Returns a dummy ServletOutputStream.
