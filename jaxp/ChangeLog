@@ -1,3 +1,8 @@
+2004-10-13  Arnaud Vandyck  <avdyk@gnu.org>
+	
+	Reported by John Kristian <jk2004@engineer.com>:
+	* manifest.mf: added Implementation Version field.
+	
 2004-10-06  Chris Burdess	<dog@gnu.org>
 
 	* Makefile.am: Make invocation of javadoc gjdoc-compatible.
