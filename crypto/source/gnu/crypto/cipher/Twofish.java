@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Twofish.java,v 1.6 2002-06-28 13:14:28 raif Exp $
+// $Id: Twofish.java,v 1.7 2002-08-24 03:49:32 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -58,7 +58,7 @@ import java.util.Iterator;
  *    128-bit Block Cipher</a>.</li>
  * </ol>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class Twofish extends BaseCipher {
 
@@ -426,14 +426,22 @@ public final class Twofish extends BaseCipher {
    }
 
    private static final int _b(int x, int N) {
-      int result = 0;
+//      int result = 0;
+//      switch (N%4) {
+//      case 0: result = b0(x); break;
+//      case 1: result = b1(x); break;
+//      case 2: result = b2(x); break;
+//      case 3: result = b3(x); break;
+//      }
+//      return result;
+      // profiling shows that the code spends too long in this method.
+      // following constructs seem to improve, albeit marginally, performance
       switch (N%4) {
-      case 0: result = b0(x); break;
-      case 1: result = b1(x); break;
-      case 2: result = b2(x); break;
-      case 3: result = b3(x); break;
+      case 0:  return  x         & 0xFF;
+      case 1:  return (x >>> 8)  & 0xFF;
+      case 2:  return (x >>> 16) & 0xFF;
+      default: return  x >>> 24;
       }
-      return result;
    }
 
    // Instance methods
