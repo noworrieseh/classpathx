@@ -576,9 +576,13 @@ final class XmlParser
 	require ("version");
 	parseEq ();
 	checkLegalVersion (version = readLiteral (flags));
-	if (!version.equals ("1.0"))
+	if (!version.equals ("1.0")){
+	    if(version.equals ("1.1"))
+	    	xmlVersion = XML_11;
 	    handler.warn ("expected XML version 1.0, not: " + version);
-
+	}
+	else
+	    xmlVersion = XML_10;
 	// Try reading an encoding declaration.
 	boolean white = tryWhitespace ();
 
@@ -3367,7 +3371,9 @@ loop:
 	} else {
 	    if (c == '<') {
 		/* the most common return to parseContent () ... NOP */
-	    } else if ((c < 0x0020 && (c != '\t') && (c != '\r')) || c > 0xFFFD)
+	    } else if (((c < 0x0020 && (c != '\t') && (c != '\r')) || c > 0xFFFD)
+	    		|| ((c >= 0x007f) && (c <= 0x009f) && (c != 0x0085) 
+	    		   && xmlVersion == XML_11)) 
 		error ("illegal XML character U+"
 			+ Integer.toHexString (c));
 
@@ -4822,4 +4828,11 @@ loop:
     // Utility flag: are we in CDATA?  If so, whitespace isn't ignorable.
     // 
     private boolean	inCDATA;
+    
+    //
+    // Xml version.
+    //  
+    private static final int XML_10 = 0; 
+    private static final int XML_11 = 1; 
+    private int 	xmlVersion = XML_10;
 }
