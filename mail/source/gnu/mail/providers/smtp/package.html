@@ -92,6 +92,20 @@ of "success", "failure", or "delay" (separated by commas and/or spaces)</td>
 <td>The MAIL RET option. Should be set to "full" or "hdrs".</td>
 </tr>
 
+<tr>
+<td>mail.smtp.tls</td>
+<td>boolean</td>
+<td>If set to false, TLS negotiation will not be attempted.</td>
+</tr>
+
+<tr>
+<td>mail.smtp.trustmanager</td>
+<td>String</td>
+<td>The name of a class implementing the
+<code>javax.net.ssl.TrustManager</code> interface, which will be used to
+determine trust in TLS negotiation.</td>
+</tr>
+
 </table>
 </p>
 

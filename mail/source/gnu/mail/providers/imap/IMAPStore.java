@@ -29,6 +29,7 @@ package gnu.mail.providers.imap;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import javax.mail.Folder;
@@ -123,23 +124,14 @@ public class IMAPStore
                 capabilities.contains (IMAPConstants.STARTTLS))
               {
                 // Locate custom trust manager
-                String tmt = getProperty ("trustmanager");
-                if (tmt == null)
+                TrustManager tm = getTrustManager ();
+                if (tm == null)
                   {
                     connection.starttls ();
                   }
                 else
                   {
-                    try
-                      {
-                        Class t = Class.forName (tmt);
-                        TrustManager tm = (TrustManager) t.newInstance ();
-                        connection.starttls (tm);
-                      }
-                    catch (Exception e)
-                      {
-                        throw new MessagingException (e.getMessage (), e);
-                      }
+                    connection.starttls (tm);
                   }
               }
             // Try SASL authentication
@@ -176,6 +168,44 @@ public class IMAPStore
               {
                 processAlerts ();
               }
+          }
+      }
+  }
+
+  /**
+   * Returns a trust manager used for TLS negotiation.
+   */
+  protected TrustManager getTrustManager ()
+    throws MessagingException
+  {
+    String tmt = getProperty ("trustmanager");
+    if (tmt == null)
+      {
+        return null;
+      }
+    else
+      {
+        try
+          {
+            // Instantiate the trust manager
+            Class t = Class.forName (tmt);
+            TrustManager tm = (TrustManager) t.newInstance ();
+            // If there is a setSession method, call it
+            try
+              {
+                Class[] pt = new Class[] { Session.class };
+                Method m = t.getMethod ("setSession", pt);
+                Object[] args = new Object[] { session };
+                m.invoke (tm, args);
+              }
+            catch (NoSuchMethodException e)
+              {
+              }
+            return tm;
+          }
+        catch (Exception e)
+          {
+            throw new MessagingException (e.getMessage (), e);
           }
       }
   }
