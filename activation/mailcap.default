@@ -1,9 +1,0 @@
-#
-# This is a very simple 'mailcap' file
-#
-# It would be cool to have this created by configure depending
-# on --with-mimetype or something
-#
-image/gif;;		x-java-view=gnu.inet.mime.viewers.ImageViewer
-image/jpeg;;		x-java-view=gnu.inet.mime.viewers.ImageViewer
-text/*;;		x-java-view=gnu.inet.mime.viewers.TextViewer
