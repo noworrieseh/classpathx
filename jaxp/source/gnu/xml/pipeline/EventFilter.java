@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.12 2001-11-09 22:53:58 db Exp $
+ * $Id: EventFilter.java,v 1.13 2001-11-11 03:27:56 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -124,7 +124,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-11-09 22:53:58 $
+ * @version $Date: 2001-11-11 03:27:56 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -467,6 +467,9 @@ public class EventFilter
 	    // builtin key that's not settable
 	    if (properties != null && !properties.containsKey (id))
 		throw new SAXNotSupportedException (id);
+
+	} catch (ClassCastException e) {
+	    throw new SAXNotSupportedException (id);
 
 	} catch (SAXNotRecognizedException e) {
 	    if (properties == null)
