@@ -1,7 +1,7 @@
 package gnu.crypto.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseSignature.java,v 1.1 2002-01-21 10:08:17 raif Exp $
+// $Id: BaseSignature.java,v 1.2 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -33,20 +33,36 @@ package gnu.crypto.sig;
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.sig.ISignature;
+import gnu.crypto.util.PRNG;
+
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.HashMap;
+import java.security.SecureRandom;
+import java.util.Map;
 
 /**
  * A base abstract class to facilitate implementations of concrete Signatures.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class BaseSignature implements ISignature {
 
    // Constants and variables
    // -------------------------------------------------------------------------
+
+   /** Property name of the verifier's public key. */
+   public static final String VERIFIER_KEY = "gnu.crypto.sig.public.key";
+
+   /** Property name of the signer's private key. */
+   public static final String SIGNER_KEY = "gnu.crypto.sig.private.key";
+
+   /**
+    * Property name of an optional {@link java.security.SecureRandom} instance
+    * to use. The default is to use a classloader singleton from
+    * {@link gnu.crypto.util.PRNG}.
+    */
+   public static final String SOURCE_OF_RANDOMNESS = "gnu.crypto.sig.prng";
 
    /** The canonical name of this signature scheme. */
    protected String schemeName;
@@ -59,6 +75,9 @@ public abstract class BaseSignature implements ISignature {
 
    /** The private key to use when generating signatures (signing). */
    protected PrivateKey privateKey;
+
+   /** The optional {@link java.security.SecureRandom} instance to use. */
+   private SecureRandom rnd;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -86,14 +105,28 @@ public abstract class BaseSignature implements ISignature {
       return schemeName;
    }
 
-   public void setupVerify(PublicKey key) throws IllegalArgumentException {
+   public void setupVerify(Map attributes) throws IllegalArgumentException {
       init();
-      setupForVerification(key);
+
+      // do we have a SecureRandom, or should we use our own?
+      rnd = (SecureRandom) attributes.get(SOURCE_OF_RANDOMNESS);
+      // do we have a public key?
+      PublicKey key = (PublicKey) attributes.get(VERIFIER_KEY);
+      if (key != null) {
+         setupForVerification(key);
+      }
    }
 
-   public void setupSign(PrivateKey key) throws IllegalArgumentException {
+   public void setupSign(Map attributes) throws IllegalArgumentException {
       init();
-      setupForSigning(key);
+
+      // do we have a SecureRandom, or should we use our own?
+      rnd = (SecureRandom) attributes.get(SOURCE_OF_RANDOMNESS);
+      // do we have a private key?
+      PrivateKey key = (PrivateKey) attributes.get(SIGNER_KEY);
+      if (key != null) {
+         setupForSigning(key);
+      }
    }
 
    public void update(byte b) {
@@ -149,7 +182,21 @@ public abstract class BaseSignature implements ISignature {
    /** Initialises the internal fields of this instance. */
    protected void init() {
       md.reset();
+      rnd = null;
       publicKey = null;
       privateKey = null;
+   }
+
+   /**
+    * Fills the designated byte array with random data.
+    *
+    * @param buffer the byte array to fill with random data.
+    */
+   protected void nextRandomBytes(byte[] buffer) {
+      if (rnd != null) {
+         rnd.nextBytes(buffer);
+      } else {
+         PRNG.nextBytes(buffer);
+      }
    }
 }

@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: SignatureAdapter.java,v 1.2 2002-01-21 10:13:12 raif Exp $
+// $Id: SignatureAdapter.java,v 1.3 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,6 +30,7 @@ package gnu.crypto.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.sig.ISignature;
 import gnu.crypto.sig.ISignatureCodec;
 import gnu.crypto.sig.SignatureFactory;
@@ -43,6 +44,7 @@ import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.HashMap;
 
 /**
  * The implementation of a generic {@link java.security.Signature} adapter class
@@ -59,7 +61,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * All the implementations which subclass this object, and which are serviced by
  * the GNU Crypto provider implement the {@link java.lang.Cloneable} interface.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 class SignatureAdapter extends SignatureSpi implements Cloneable {
 
@@ -110,8 +112,10 @@ class SignatureAdapter extends SignatureSpi implements Cloneable {
 
    public void engineInitVerify(PublicKey publicKey)
    throws InvalidKeyException {
+      HashMap attributes = new HashMap();
+      attributes.put(BaseSignature.VERIFIER_KEY, publicKey);
       try {
-         adaptee.setupVerify(publicKey);
+         adaptee.setupVerify(attributes);
       } catch (IllegalArgumentException x) {
          throw new InvalidKeyException(String.valueOf(x));
       }
@@ -119,8 +123,10 @@ class SignatureAdapter extends SignatureSpi implements Cloneable {
 
    public void engineInitSign(PrivateKey privateKey)
    throws InvalidKeyException {
+      HashMap attributes = new HashMap();
+      attributes.put(BaseSignature.SIGNER_KEY, privateKey);
       try {
-         adaptee.setupSign(privateKey);
+         adaptee.setupSign(attributes);
       } catch (IllegalArgumentException x) {
          throw new InvalidKeyException(String.valueOf(x));
       }
@@ -128,6 +134,14 @@ class SignatureAdapter extends SignatureSpi implements Cloneable {
 
    public void engineInitSign(PrivateKey privateKey, SecureRandom random)
    throws InvalidKeyException {
+      HashMap attributes = new HashMap();
+      attributes.put(BaseSignature.SIGNER_KEY, privateKey);
+      attributes.put(BaseSignature.SOURCE_OF_RANDOMNESS, random);
+      try {
+         adaptee.setupSign(attributes);
+      } catch (IllegalArgumentException x) {
+         throw new InvalidKeyException(String.valueOf(x));
+      }
    }
 
    public void engineUpdate(byte b) throws SignatureException {

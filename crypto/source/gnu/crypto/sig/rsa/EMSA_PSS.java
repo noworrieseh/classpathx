@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: EMSA_PSS.java,v 1.2 2002-01-21 10:10:48 raif Exp $
+// $Id: EMSA_PSS.java,v 1.3 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -32,8 +32,8 @@ package gnu.crypto.sig.rsa;
 
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
-import gnu.crypto.util.PRNG;
 import gnu.crypto.util.Util;
+
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -58,7 +58,7 @@ import java.util.HashMap;
  * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
  * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class EMSA_PSS implements Cloneable {
 
@@ -82,9 +82,6 @@ public class EMSA_PSS implements Cloneable {
    /** The output size of the hash function in octets. */
    private int hLen;
 
-   /** The length in octets of the desired salt. */
-   private int sLen;
-
    // Constructor(s)
    // -------------------------------------------------------------------------
 
@@ -94,12 +91,11 @@ public class EMSA_PSS implements Cloneable {
     * @param hash the message digest instance to use with this scheme instance.
     * @param sLen the intended length in octets of the salt.
     */
-   private EMSA_PSS(IMessageDigest hash, int sLen) {
+   private EMSA_PSS(IMessageDigest hash) {
       super();
 
       this.hash = hash;
       hLen = hash.hashSize();
-      this.sLen = sLen;
    }
 
    // Class methods
@@ -107,29 +103,22 @@ public class EMSA_PSS implements Cloneable {
 
    /**
     * Returns an instance of this object given a designated name of a hash
-    * function and a desired salt length.<p>
+    * function.<p>
     *
     * @param mdName the canonical name of a hash function.
-    * @param sLen the positive, possibly zero, desired length, in octets, of the
-    * salt to add when encoding signatures.
     * @return an instance of this object configured for use with the designated
     * options.
-    * @exception IllegalArgumentException if the <code>sLen</code> parameter is
-    * negative.
     */
-   public static EMSA_PSS getInstance(String mdName, int sLen) {
+   public static EMSA_PSS getInstance(String mdName) {
       IMessageDigest hash = HashFactory.getInstance(mdName);
-      if (sLen < 0) {
-         throw new IllegalArgumentException("sLen");
-      }
-      return new EMSA_PSS(hash, sLen);
+      return new EMSA_PSS(hash);
    }
 
    // Cloneable interface implementation
    // -------------------------------------------------------------------------
 
    public Object clone() {
-      return getInstance(hash.name(), sLen);
+      return getInstance(hash.name());
    }
 
    // Instance methods
@@ -145,12 +134,15 @@ public class EMSA_PSS implements Cloneable {
     * algorithm Hash to the message <i>M</i>.
     * @param emBits the maximal bit length of the integer OS2IP(EM), at least
     * <code>8.hLen + 8.sLen + 9</code>.
+    * @param salt the salt to use when encoding the output.
     * @return the encoded message <code>EM</code>, an octet string of length
     * <code>emLen = CEILING(emBits / 8)</code>.
     * @exception IllegalArgumentException if an exception occurs.
     *
     */
-   public byte[] encode(byte[] mHash, int emBits) {
+   public byte[] encode(byte[] mHash, int emBits, byte[] salt) {
+      int sLen = salt.length;
+
       // 1. If the length of M is greater than the input limitation for the hash
       // function (2**61 ? 1 octets for SHA-1) then output “message too long”
       // and stop.
@@ -165,8 +157,7 @@ public class EMSA_PSS implements Cloneable {
       int emLen = (emBits + 7) / 8;
       // 4. Generate a random octet string salt of length sLen; if sLen = 0,
       // then salt is the empty string.
-      byte[] salt = new byte[sLen];
-      PRNG.nextBytes(salt);
+      // ...passed as argument to accomodate JCE
       // 5. Let M0 = 00 00 00 00 00 00 00 00 || mHash || salt;
       // M0 is an octet string of length 8 + hLen + sLen with eight initial zero
       // octets.
@@ -221,17 +212,23 @@ public class EMSA_PSS implements Cloneable {
     * <code>emLen = CEILING(emBits/8).
     * @param emBits the maximal bit length of the integer OS2IP(EM), at least
     * <code>8.hLen + 8.sLen + 9</code>.
+    * @param sLen the length, in octets, of the expected salt.
     * @return <code>true</code> if the result of the verification was
     * <i>consistent</i> with the expected reseult; and <code>false</code> if the
     * result was <i>inconsistent</i>.
     * @exception IllegalArgumentException if an exception occurs.
     */
-   public boolean decode(byte[] mHash, byte[] EM, int emBits) {
+   public boolean decode(byte[] mHash, byte[] EM, int emBits, int sLen) {
       if (DEBUG && debuglevel > 8) {
          debug("mHash: "+Util.toString(mHash));
          debug("EM: "+Util.toString(EM));
          debug("emBits: "+String.valueOf(emBits));
+         debug("sLen: "+String.valueOf(sLen));
       }
+      if (sLen < 0) {
+         throw new IllegalArgumentException("sLen");
+      }
+
       // 1. If the length of M is greater than the input limitation for the hash
       //    function (2**61 ? 1 octets for SHA-1) then output 'inconsistent' and
       //    stop.

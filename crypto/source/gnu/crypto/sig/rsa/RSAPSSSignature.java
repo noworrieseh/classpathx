@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: RSAPSSSignature.java,v 1.2 2002-01-21 10:11:17 raif Exp $
+// $Id: RSAPSSSignature.java,v 1.3 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -62,7 +62,7 @@ import java.util.HashMap;
  * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
  * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RSAPSSSignature extends BaseSignature {
 
@@ -82,6 +82,9 @@ public class RSAPSSSignature extends BaseSignature {
 
    /** The underlying EMSA-PSS instance for this object. */
    private EMSA_PSS pss;
+
+   /** The desired length in octets of the EMSA-PSS salt. */
+   private int sLen;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -116,12 +119,13 @@ public class RSAPSSSignature extends BaseSignature {
    public RSAPSSSignature(String mdName, int sLen) {
       super(Registry.RSA_PSS_SIG, HashFactory.getInstance(mdName));
 
-      pss = EMSA_PSS.getInstance(mdName, sLen);
+      pss = EMSA_PSS.getInstance(mdName);
+      this.sLen = sLen;
    }
 
    /** Private constructor for cloning purposes. */
    private RSAPSSSignature(RSAPSSSignature that) {
-      this(that.md.name());
+      this(that.md.name(), that.sLen);
 
       this.publicKey = that.publicKey;
       this.privateKey = that.privateKey;
@@ -165,7 +169,9 @@ public class RSAPSSSignature extends BaseSignature {
       //    'message too long' or 'encoding error,' then output 'message too
       //    long' or 'encoding error' and stop.
       int modBits = ((RSAPrivateKey) privateKey).getModulus().bitLength();
-      byte[] EM = pss.encode(md.digest(), modBits - 1);
+      byte[] salt = new byte[sLen];
+      this.nextRandomBytes(salt);
+      byte[] EM = pss.encode(md.digest(), modBits - 1, salt);
       if (DEBUG && debuglevel > 8) {
          debug("EM (sign): "+Util.toString(EM));
       }
@@ -235,7 +241,7 @@ public class RSAPSSSignature extends BaseSignature {
       byte[] mHash = md.digest();
       boolean result = false;
       try {
-         result = pss.decode(mHash, EM, emBits);
+         result = pss.decode(mHash, EM, emBits, sLen);
       } catch (IllegalArgumentException x) {
          result = false;
       }

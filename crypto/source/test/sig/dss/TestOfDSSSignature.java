@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSSSignature.java,v 1.2 2002-01-21 10:14:14 raif Exp $
+// $Id: TestOfDSSSignature.java,v 1.3 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.sig.dss.DSSKeyPairGenerator;
 import gnu.crypto.sig.dss.DSSPrivateKey;
 import gnu.crypto.sig.dss.DSSPublicKey;
@@ -52,7 +53,7 @@ import java.util.HashMap;
  * Conformance tests for the DSS signature generation/verification
  * implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfDSSSignature extends TestCase {
 
@@ -96,11 +97,13 @@ public class TestOfDSSSignature extends TestCase {
 
       byte[] message = "1 if by land, 2 if by sea...".getBytes();
 
-      alice.setupSign(privateK);
+      map.put(BaseSignature.SIGNER_KEY, privateK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
-      bob.setupVerify(publicK);
+      map.put(BaseSignature.VERIFIER_KEY, publicK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("Verify own signature", bob.verify(signature));

@@ -1,7 +1,7 @@
 package test.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRSACodec.java,v 1.1 2002-01-11 22:03:28 raif Exp $
+// $Id: TestOfRSACodec.java,v 1.2 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.sig.IKeyPairCodec;
 import gnu.crypto.sig.ISignatureCodec;
 import gnu.crypto.sig.rsa.GnuRSAPrivateKey;
@@ -56,7 +57,7 @@ import java.util.HashMap;
  * Conformance tests for the RSA key/signature format encoding/decoding
  * implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfRSACodec extends TestCase {
 
@@ -116,7 +117,9 @@ public class TestOfRSACodec extends TestCase {
 
       byte[] message = "1 if by land, 2 if by sea...".getBytes();
 
-      alice.setupSign(secK);
+      HashMap map = new HashMap();
+      map.put(BaseSignature.SIGNER_KEY, secK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
@@ -125,7 +128,8 @@ public class TestOfRSACodec extends TestCase {
       byte[] encodedSignature = codec.encodeSignature(signature);
       Object decodedSignature = codec.decodeSignature(encodedSignature);
 
-      bob.setupVerify(pubK);
+      map.put(BaseSignature.VERIFIER_KEY, pubK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("RSA-PSS signature Raw encoder/decoder test",

@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSSignature.java,v 1.3 2002-01-21 10:09:35 raif Exp $
+// $Id: DSSSignature.java,v 1.4 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -34,7 +34,8 @@ import gnu.crypto.Registry;
 import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.hash.Sha160;
 import gnu.crypto.sig.BaseSignature;
-import gnu.crypto.util.PRNG;
+//import gnu.crypto.util.PRNG;
+
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -98,7 +99,7 @@ import java.util.HashMap;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class DSSSignature extends BaseSignature {
 
@@ -158,7 +159,8 @@ public class DSSSignature extends BaseSignature {
 
       byte[] kb = new byte[20]; // we'll use 159 bits only
       while (true) {
-         PRNG.nextBytes(kb);
+//         PRNG.nextBytes(kb);
+         this.nextRandomBytes(kb);
          k = new BigInteger(1, kb);
          k.clearBit(159);
          r = g.modPow(k, p).mod(q);

@@ -1,7 +1,7 @@
 package test.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRSAPSSSignature.java,v 1.1 2002-01-11 22:03:28 raif Exp $
+// $Id: TestOfRSAPSSSignature.java,v 1.2 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,6 +36,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import gnu.crypto.hash.HashFactory;
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.sig.rsa.GnuRSAPrivateKey;
 import gnu.crypto.sig.rsa.GnuRSAPublicKey;
 import gnu.crypto.sig.rsa.RSAKeyPairGenerator;
@@ -52,7 +53,7 @@ import java.util.HashMap;
  * Conformance tests for the RSA-PSS signature generation/verification
  * implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfRSAPSSSignature extends TestCase {
 
@@ -92,11 +93,14 @@ public class TestOfRSAPSSSignature extends TestCase {
 
       message = "1 if by land, 2 if by sea...".getBytes();
 
-      alice.setupSign(privateK);
+      HashMap map = new HashMap();
+      map.put(BaseSignature.SIGNER_KEY, privateK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
-      bob.setupVerify(publicK);
+      map.put(BaseSignature.VERIFIER_KEY, publicK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("testSigWithDefaults()", bob.verify(signature));
@@ -108,11 +112,14 @@ public class TestOfRSAPSSSignature extends TestCase {
 
       message = "Que du magnifique...".getBytes();
 
-      alice.setupSign(privateK);
+      HashMap map = new HashMap();
+      map.put(BaseSignature.SIGNER_KEY, privateK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
-      bob.setupVerify(publicK);
+      map.put(BaseSignature.VERIFIER_KEY, publicK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("testSigWithShaSalt16()", bob.verify(signature));
@@ -124,11 +131,14 @@ public class TestOfRSAPSSSignature extends TestCase {
 
       message = "abcdefghijklmnopqrstuvwxyz0123456789".getBytes();
 
-      alice.setupSign(privateK);
+      HashMap map = new HashMap();
+      map.put(BaseSignature.SIGNER_KEY, privateK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
-      bob.setupVerify(publicK);
+      map.put(BaseSignature.VERIFIER_KEY, publicK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("testSigWithRipeMD160Salt8()", bob.verify(signature));

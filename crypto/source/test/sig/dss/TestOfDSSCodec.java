@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSSCodec.java,v 1.2 2002-01-11 22:10:35 raif Exp $
+// $Id: TestOfDSSCodec.java,v 1.3 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,6 +35,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import gnu.crypto.sig.BaseSignature;
 import gnu.crypto.sig.IKeyPairCodec;
 import gnu.crypto.sig.ISignatureCodec;
 import gnu.crypto.sig.dss.DSSKeyPairGenerator;
@@ -55,7 +56,7 @@ import java.util.HashMap;
  * Conformance tests for the DSS key/signature format encoding/decoding
  * implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfDSSCodec extends TestCase {
 
@@ -119,7 +120,9 @@ public class TestOfDSSCodec extends TestCase {
 
       byte[] message = "1 if by land, 2 if by sea...".getBytes();
 
-      alice.setupSign(privateK);
+      HashMap map = new HashMap();
+      map.put(BaseSignature.SIGNER_KEY, privateK);
+      alice.setupSign(map);
       alice.update(message, 0, message.length);
       Object signature = alice.sign();
 
@@ -128,7 +131,8 @@ public class TestOfDSSCodec extends TestCase {
       byte[] encodedSignature = codec.encodeSignature(signature);
       Object decodedSignature = codec.decodeSignature(encodedSignature);
 
-      bob.setupVerify(publicK);
+      map.put(BaseSignature.VERIFIER_KEY, publicK);
+      bob.setupVerify(map);
       bob.update(message, 0, message.length);
 
       assertTrue("Signature Raw encoder/decoder test", bob.verify(decodedSignature));

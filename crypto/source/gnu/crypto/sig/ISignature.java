@@ -1,7 +1,7 @@
 package gnu.crypto.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: ISignature.java,v 1.3 2002-01-21 10:07:06 raif Exp $
+// $Id: ISignature.java,v 1.4 2002-01-28 01:43:23 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,8 +30,7 @@ package gnu.crypto.sig;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.util.Map;
 
 /**
  * The visible methods of every signature-with-appendix scheme.<p>
@@ -48,7 +47,7 @@ import java.security.PublicKey;
  * Cryptography</a>, Alfred J. Menezes, Paul C. van Oorschot and Scott A.
  * Vanstone. Section 11.2.2 Digital signature schemes with appendix.<p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface ISignature extends Cloneable {
 
@@ -68,20 +67,20 @@ public interface ISignature extends Cloneable {
    /**
     * Initialises this instance for signature verification.<p>
     *
-    * @param key the public key to use for verification.
+    * @param attributes the attributes to use for setting up this instance.
     * @exception IllegalArgumentException if the designated public key is not
     * appropriate for this signature scheme.
     */
-   void setupVerify(PublicKey key) throws IllegalArgumentException;
+   void setupVerify(Map attributes) throws IllegalArgumentException;
 
    /**
     * Initialises this instance for signature generation.<p>
     *
-    * @param key the private key to use for signing.
+    * @param attributes the attributes to use for setting up this instance.
     * @exception IllegalArgumentException if the designated private key is not
     * appropriate for this signature scheme.
     */
-   void setupSign(PrivateKey key) throws IllegalArgumentException;
+   void setupSign(Map attributes) throws IllegalArgumentException;
 
    /**
     * Digests one byte of a message for signing or verification purposes.<p>
