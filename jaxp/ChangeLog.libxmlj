@@ -1,3 +1,7 @@
+2004-07-04  Chris Burdess <dog@gnu.org>
+
+	* dom: Skeleton DOMConfiguration implementation.
+
 2004-07-03  Chris Burdess <dog@gnu.org>
 
 	* dom: Corrected GnomeElement attribute methods and isEqualNode.

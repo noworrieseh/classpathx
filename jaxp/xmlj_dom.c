@@ -479,7 +479,13 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_setXmlVersion (JNIEnv * env,
     }
   else
     {
-      doc->version = xmljGetStringChars (env, xmlVersion);
+      const xmlChar *version = xmljGetStringChars (env, xmlVersion);
+      if (!xmlStrEqual (version, "1.0"))
+        {
+          xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
+          return;
+        }
+      doc->version = version;
     }
 }
 
@@ -1380,7 +1386,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
     }
 
   newChildNode = xmlAddPrevSibling (refChildNode, newChildNode);
-  return xmljGetNodeInstance (env, newChild);
+  return xmljGetNodeInstance (env, newChildNode);
 }
 
 JNIEXPORT jobject JNICALL
@@ -1461,7 +1467,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv * env,
     }
 
   newChildNode = xmlAddChild (node, newChildNode);
-  return xmljGetNodeInstance (env, newChild);
+  return xmljGetNodeInstance (env, newChildNode);
 }
 
 JNIEXPORT jboolean JNICALL

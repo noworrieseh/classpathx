@@ -53,7 +53,7 @@ import org.w3c.dom.xpath.XPathNSResolver;
  */
 public class GnomeDocument
 extends GnomeNode
-implements Document, XPathEvaluator
+implements Document, DOMConfiguration, XPathEvaluator
 {
 
   DOMImplementation dom;
@@ -171,8 +171,7 @@ implements Document, XPathEvaluator
 
   public DOMConfiguration getDomConfig ()
   {
-    // TODO
-    return null;
+    return this;
   }
 
   public void normalizeDocument ()
@@ -182,6 +181,37 @@ implements Document, XPathEvaluator
 
   public native Node renameNode (Node n, String namespaceURI,
                                  String qualifiedName);
+
+  // -- DOMConfiguration methods --
+
+  public void setParameter (String name, Object value)
+    throws DOMException
+  {
+    /* TODO */
+    throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+  }
+
+  public Object getParameter (String name)
+    throws DOMException
+  {
+    /* TODO */
+    throw new GnomeDOMException (DOMException.NOT_FOUND_ERR, name);
+  }
+
+  public boolean canSetParameter (String name, Object value)
+  {
+    if (value == null)
+      {
+        return true;
+      }
+    /* TODO */
+    return false;
+  }
+  
+  public DOMStringList getParameterNames ()
+  {
+    return new GnomeDOMStringList (new String[0]);
+  }
 
   // -- XPathEvaluator methods --
 

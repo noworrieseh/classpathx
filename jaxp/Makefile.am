@@ -324,6 +324,7 @@ $(src)/gnu/xml/libxmlj/dom/GnomeDocumentBuilderFactory.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeDocumentFragment.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeDocumentType.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeDOMException.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeDOMStringList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeElement.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeEntity.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
