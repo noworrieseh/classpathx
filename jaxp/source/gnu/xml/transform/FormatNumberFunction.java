@@ -108,7 +108,7 @@ final class FormatNumberFunction
         throw new IllegalArgumentException("No such decimal-format: " +
                                            dfName);
       }
-    df.applyPattern(pattern);
+    df.applyLocalizedPattern(pattern);
     return df.format(number);
   }
 

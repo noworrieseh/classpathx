@@ -83,7 +83,7 @@ public abstract class DomCharacterData
   {
     if (isReadonly())
       {
-	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     String value = text + arg;
     mutating(value);
@@ -143,7 +143,7 @@ public abstract class DomCharacterData
    * <b>DOM L1</b>
    * Returns the value of this node; same as getNodeValue.
    */
-  final public String getData()
+  public final String getData()
   {
     return text;
   }
@@ -157,33 +157,6 @@ public abstract class DomCharacterData
     return text.length();
   }
   
-  static final class EmptyNodeList
-    implements NodeList
-  {
-    
-    public int getLength()
-    {
-      return 0;
-    }
-    
-    public Node item(int i)
-    {
-      return null;
-    }
-
-  }
-    
-  static final EmptyNodeList theEmptyNodeList = new EmptyNodeList();
-
-  /**
-   * <b>DOM L1</b>
-   * Returns an empty list of children.
-   */
-  final public NodeList getChildNodes()
-  {
-    return theEmptyNodeList;
-  }
-
   /**
    * <b>DOM L1</b>
    * Modifies the value of this node.
@@ -192,7 +165,7 @@ public abstract class DomCharacterData
   {
     if (isReadonly())
       {
-	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     char[] raw = text.toCharArray();
     char[] tmp = arg.toCharArray ();
@@ -205,8 +178,8 @@ public abstract class DomCharacterData
         System.arraycopy(raw, offset, buf, offset + tmp.length,
                          raw.length - offset);
         String value = new String(buf);
-	    mutating(value);
-	    text = value;
+        mutating(value);
+        text = value;
       }
     catch (IndexOutOfBoundsException x)
       {
@@ -221,22 +194,22 @@ public abstract class DomCharacterData
    */
   public void replaceData(int offset, int count, String arg)
   {
-	if (isReadonly())
+    if (readonly)
       {
-	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     char[] raw = text.toCharArray();
-
+    
     // deleteData
-	if (offset < 0 || count < 0 || offset > raw.length)
+    if (offset < 0 || count < 0 || offset > raw.length)
       {
-	    throw new DomEx(DomEx.INDEX_SIZE_ERR);
+        throw new DomEx(DomEx.INDEX_SIZE_ERR);
       }
-	if ((offset + count) > raw.length)
+    if ((offset + count) > raw.length)
       {
-	    count = raw.length - offset;
+        count = raw.length - offset;
       }
-	try
+    try
       {
         char[] buf = new char[raw.length - count];
         System.arraycopy(raw, 0, buf, 0, offset);
@@ -251,8 +224,8 @@ public abstract class DomCharacterData
         System.arraycopy(raw, offset, buf, offset + tmp.length,
                          raw.length - offset);
         String value = new String(buf);
-	    mutating(value);
-	    text = value;
+        mutating(value);
+        text = value;
       }
     catch (IndexOutOfBoundsException x)
       {
@@ -273,10 +246,10 @@ public abstract class DomCharacterData
       }
     if (value == null)
       {
-	    value = "";
+        value = "";
       }
-	mutating(value);
-	text = value;
+    mutating(value);
+    text = value;
   }
  
   /**
@@ -312,12 +285,12 @@ public abstract class DomCharacterData
   {
     if (!reportMutations)
       {
-	    return;
+        return;
       }
     
     // EVENT:  DOMCharacterDataModified, target = this,
-    //	prev/new values provided
-    MutationEvent	event;
+    //  prev/new values provided
+    MutationEvent  event;
     
     event = (MutationEvent) createEvent("MutationEvents");
     event.initMutationEvent("DOMCharacterDataModified",

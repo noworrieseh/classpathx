@@ -79,6 +79,7 @@ public class DomAttr
 {
   
   private boolean specified;
+  private String value; // string value cache
   
   /**
    * Constructs an Attr node associated with the specified document.
@@ -99,6 +100,7 @@ public class DomAttr
   {
     super(ATTRIBUTE_NODE, owner, namespaceURI, name);
     specified = true;
+    length = 1;
     
     // XXX register self to get insertion/removal events
     // and character data change events and when they happen,
@@ -139,6 +141,12 @@ public class DomAttr
    */
   public String getNodeValue()
   {
+    // If we have a simple node-value, use that
+    if (first == null)
+      {
+        return (value == null) ? "" : value;
+      }
+    // Otherwise collect child node-values
     StringBuffer buf = new StringBuffer();
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
@@ -185,21 +193,65 @@ public class DomAttr
    */
   public void setNodeValue(String value)
   {
-    if (isReadonly())
+    if (readonly)
       {
         throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
-    
-    String oldValue = getValue();
+    if (value == null)
+      {
+        value = "";
+      }
+    String oldValue = getNodeValue();
     while (last != null)
       {
         removeChild(last);
       }
-    Node text = owner.createTextNode(value);
-    appendChild(text);
+    // don't create a new node just for this...
+    /*
+     Node text = owner.createTextNode(value);
+     appendChild(text);
+     */
+    this.value = value;
+    length = 1;
     specified = true;
     
     mutating(oldValue, value, MutationEvent.MODIFICATION);
+  }
+
+  public final Node getFirstChild()
+  {
+    // Create a child text node if necessary
+    if (first == null)
+      {
+        length = 0;
+        Node text = owner.createTextNode(value);
+        appendChild(text);
+      }
+    return first;
+  }
+
+  public final Node getLastChild()
+  {
+    // Create a child text node if necessary
+    if (last == null)
+      {
+        length = 0;
+        Node text = owner.createTextNode(value);
+        appendChild(text);
+      }
+    return last;
+  }
+
+  public Node item(int index)
+  {
+    // Create a child text node if necessary
+    if (first == null)
+      {
+        length = 0;
+        Node text = owner.createTextNode(value);
+        appendChild(text);
+      }
+    return super.item(index);
   }
 
   /**
@@ -209,6 +261,21 @@ public class DomAttr
   public final Element getOwnerElement()
   {
     return (Element) parent;
+  }
+
+  public final Node getNextSibling()
+  {
+    return null;
+  }
+
+  public final Node getPreviousSibling()
+  {
+    return null;
+  }
+
+  public Node getParentNode()
+  {
+    return null;
   }
 
   /**

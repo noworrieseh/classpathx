@@ -426,6 +426,8 @@ $(src)/gnu/xml/dom/DomCharacterData.java \
 $(src)/gnu/xml/dom/DomComment.java \
 $(src)/gnu/xml/dom/DomDoctype.java \
 $(src)/gnu/xml/dom/DomDocument.java \
+$(src)/gnu/xml/dom/DomDocumentBuilder.java \
+$(src)/gnu/xml/dom/DomDocumentBuilderFactory.java \
 $(src)/gnu/xml/dom/DomDocumentConfiguration.java \
 $(src)/gnu/xml/dom/DomElement.java \
 $(src)/gnu/xml/dom/DomEntity.java \
@@ -530,6 +532,7 @@ $(src)/gnu/xml/xpath/XPathTest.java \
 $(src)/gnu/xml/transform/AbstractNumberNode.java \
 $(src)/gnu/xml/transform/ApplyTemplatesNode.java \
 $(src)/gnu/xml/transform/AttributeNode.java \
+$(src)/gnu/xml/transform/AttributeSet.java \
 $(src)/gnu/xml/transform/Bindings.java \
 $(src)/gnu/xml/transform/CallTemplateNode.java \
 $(src)/gnu/xml/transform/ChooseNode.java \
@@ -545,6 +548,7 @@ $(src)/gnu/xml/transform/ForEachNode.java \
 $(src)/gnu/xml/transform/FormatNumberFunction.java \
 $(src)/gnu/xml/transform/GenerateIdFunction.java \
 $(src)/gnu/xml/transform/IfNode.java \
+$(src)/gnu/xml/transform/Key.java \
 $(src)/gnu/xml/transform/KeyFunction.java \
 $(src)/gnu/xml/transform/LiteralNode.java \
 $(src)/gnu/xml/transform/MessageNode.java \

@@ -216,14 +216,15 @@ class Stylesheet
     xpath.setXPathVariableResolver(bindings);
     xpath.setXPathFunctionResolver(this);
 
+    Test anyNode = new NodeTypeTest((short) 0);
+    List tests = Collections.singletonList(anyNode);
     builtInNodeTemplate =
       new ApplyTemplatesNode(null, null,
-                             new Selector(Selector.CHILD,
-                                          Collections.EMPTY_LIST),
+                             new Selector(Selector.CHILD, tests),
                              null, null, null, true);
     builtInTextTemplate =
       new ValueOfNode(null, null,
-                      new Selector(Selector.SELF, Collections.EMPTY_LIST),
+                      new Selector(Selector.SELF, tests),
                       false);
     
     parse(doc.getDocumentElement(), true);
@@ -293,9 +294,9 @@ class Stylesheet
     return Collections.singleton(getPrefix(namespaceURI)).iterator();
   }
   
-  // -- Apply templates --
+  // -- Template selection --
   
-  void applyTemplates(Expr select, QName mode,
+  /*void applyTemplates(Expr select, QName mode,
                       Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
@@ -314,15 +315,12 @@ class Stylesheet
                            parent, nextSibling);
           }
       }
-  }
+  }*/
 
-  void applyTemplates(QName mode,
-                      Node context, int pos, int len,
-                      Node parent, Node nextSibling)
+  TemplateNode getTemplate(QName mode, Node context)
     throws TransformerException
   {
-    //System.err.println("applyTemplates: mode="+mode);
-    //System.err.println("\tcontext="+context);
+    //System.err.println("getTemplate: mode="+mode+" context="+context);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
@@ -346,40 +344,30 @@ class Stylesheet
           case Node.DOCUMENT_FRAGMENT_NODE:
           case Node.PROCESSING_INSTRUCTION_NODE:
           case Node.COMMENT_NODE:
-            builtInNodeTemplate.apply(this, mode,
-                                      context, pos, len,
-                                      parent, nextSibling);
-            break;
+            return builtInNodeTemplate;
           case Node.TEXT_NODE:
             if (!isPreserved((Text) context))
               {
-                return;
+                return null;
               }
             // fall through
           case Node.ATTRIBUTE_NODE:
-            builtInTextTemplate.apply(this, mode,
-                                      context, pos, len,
-                                      parent, nextSibling);
-            break;
+            return builtInTextTemplate;
+          default:
+            return null;
           }
       }
     else
       {
-        Template t =
-          (Template) candidates.iterator().next();
+        return ((Template) candidates.iterator().next()).node;
         //System.err.println("\ttemplate="+t+" context="+context);
-        t.apply(this, mode,
-                context, pos, len,
-                parent, nextSibling);
       }
   }
 
-  void callTemplate(QName name, QName mode,
-                    Node context, int pos, int len,
-                    Node parent, Node nextSibling)
+  TemplateNode getTemplate(QName mode, QName name)
     throws TransformerException
   {
-    //System.err.println("callTemplate: mode="+mode);
+    //System.err.println("getTemplate: mode="+mode+" name="+name);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
@@ -395,13 +383,7 @@ class Stylesheet
       {
         throw new TransformerException("template '" + name + "' not found");
       }
-    Template t =
-      (Template) candidates.iterator().next();
-    //System.err.println("*** calling "+t);
-    //System.err.println("*** bindings="+bindings);
-    t.apply(this, mode,
-            context, pos, len,
-            parent, nextSibling);
+    return ((Template) candidates.iterator().next()).node;
   }
 
   /**

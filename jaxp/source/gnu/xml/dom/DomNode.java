@@ -242,27 +242,25 @@ public abstract class DomNode
    * <b>DOM L1</b>
    * Returns the first child of this node, or null if there are none.
    */
-  final public Node getFirstChild()
+  public Node getFirstChild()
   {
     return first;
   }
-
 
   /**
    * <b>DOM L1</b>
    * Returns the last child of this node, or null if there are none.
    */
-  final public Node getLastChild()
+  public Node getLastChild()
   {
     return last;
   }
-
 
   /**
    * <b>DOM L1</b>
    * Returns true if this node has children.
    */
-  final public boolean hasChildNodes()
+  public boolean hasChildNodes()
   {
     return length != 0;
   }
@@ -273,7 +271,7 @@ public abstract class DomNode
    * entities and entity references are readonly, as are the
    * objects associated with DocumentType objets.
    */
-  final public boolean isReadonly()
+  public final boolean isReadonly()
   {
     return readonly;
   }
@@ -913,7 +911,7 @@ public abstract class DomNode
    * Returns the item with the specified index in this NodeList,
    * else null.
    */
-  final public Node item(int index)
+  public Node item(int index)
   {
     DomNode child = first;
     int count = 0;
@@ -955,40 +953,26 @@ public abstract class DomNode
    * <b>DOM L1</b>
    * Returns the previous sibling, if one is known.
    */
-  final public Node getNextSibling()
+  public Node getNextSibling()
   {
-    if (nodeType == ATTRIBUTE_NODE)
-      {
-        return null;
-      }
     return next;
   }
-
 
   /**
    * <b>DOM L1</b>
    * Returns the previous sibling, if one is known.
    */
-  final public Node getPreviousSibling()
+  public Node getPreviousSibling()
   {
-    if (nodeType == ATTRIBUTE_NODE)
-      {
-        return null;
-      }
     return previous;
   }
-
 
   /**
    * <b>DOM L1</b>
    * Returns the parent node, if one is known.
    */
-  final public Node getParentNode()
+  public Node getParentNode()
   {
-    if (nodeType == ATTRIBUTE_NODE)
-      {
-        return null;
-      }
     return parent;
   }
 

@@ -70,6 +70,7 @@ public class StreamSerializer
   static final int EQ = 0x3d; // =
 
   protected String encoding;
+  boolean compatibilityMode;
   final int mode;
   final Map namespaces;
   protected String eol;
@@ -96,6 +97,16 @@ public class StreamSerializer
         encoding = "UTF-8";
       }
     this.encoding = encoding.intern();
+    compatibilityMode = true;
+    if (encoding.length() > 3)
+      {
+        String p = encoding.substring(0, 3);
+        if (p.equalsIgnoreCase("UTF") ||
+            p.equalsIgnoreCase("UCS"))
+          {
+            compatibilityMode = false;
+          }
+      }
     this.eol = (eol != null) ? eol : System.getProperty("line.separator");
     namespaces = new HashMap();
   }
@@ -464,6 +475,34 @@ public class StreamSerializer
   final byte[] encodeText(String text)
     throws UnsupportedEncodingException
   {
+    if (compatibilityMode)
+      {
+        int len = text.length();
+        StringBuffer buf = null;
+        for (int i = 0; i < len; i++)
+          {
+            char c = text.charAt(i);
+            if (c >= 127)
+              {
+                if (buf == null)
+                  {
+                    buf = new StringBuffer(text.substring(0, i));
+                  }
+                buf.append('&');
+                buf.append('#');
+                buf.append((int) c);
+                buf.append(';');
+              }
+            else if (buf != null)
+              {
+                buf.append(c);
+              }
+          }
+        if (buf != null)
+          {
+            text = buf.toString();
+          }
+      }
     return text.getBytes(encoding);
   }
 

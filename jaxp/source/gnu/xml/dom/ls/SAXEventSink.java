@@ -38,6 +38,10 @@
 
 package gnu.xml.dom.ls;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import javax.xml.XMLConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -64,14 +68,18 @@ class SAXEventSink
   implements ContentHandler2, LexicalHandler, DTDHandler, DeclHandler
 {
 
+  private static final String XMLNS_URI = XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+  private static final String XMLNS_PREFIX = XMLConstants.XMLNS_ATTRIBUTE;
+
   boolean namespaceAware;
   boolean ignoreWhitespace;
   boolean expandEntityReferences;
   boolean ignoreComments;
   boolean coalescing;
   
-  DomDocument doc;
-  Node ctx;
+  DomDocument doc; // document being constructed
+  Node ctx; // current context (parent node)
+  List pending; // namespace nodes waiting for a declaring element
   Locator locator;
   boolean inCDATA;
   boolean inDTD;
@@ -92,6 +100,10 @@ class SAXEventSink
   public void startDocument()
     throws SAXException
   {
+    if (namespaceAware)
+      {
+        pending = new LinkedList();
+      }
     doc = new DomDocument();
     doc.setStrictErrorChecking(false);
     doc.setBuilding(true);
@@ -129,13 +141,30 @@ class SAXEventSink
   public void startPrefixMapping(String prefix, String uri)
     throws SAXException
   {
-    // TODO
+    if (namespaceAware)
+      {
+        String nsName = (prefix != null && prefix.length() > 0) ?
+          XMLNS_PREFIX + ":" + prefix : XMLNS_PREFIX;
+        DomAttr ns = (DomAttr) doc.createAttributeNS(XMLNS_URI, nsName);
+        ns.setNodeValue(uri);
+        if (ctx.getNodeType() == Node.ATTRIBUTE_NODE)
+          {
+            // Add to owner element
+            Node target = ((Attr) ctx).getOwnerElement();
+            target.getAttributes().setNamedItemNS(ns);
+          }
+        else
+          {
+            // Add to pending list; namespace node will be inserted when
+            // element is seen
+            pending.add(ns);
+          }
+      }
   }
 
   public void endPrefixMapping(String prefix)
     throws SAXException
   {
-    // TODO
   }
 
   public void startElement(String uri, String localName, String qName,
@@ -160,9 +189,18 @@ class SAXEventSink
     Element element = namespaceAware ?
       doc.createElementNS(uri, localName) :
       doc.createElement(qName);
+    NamedNodeMap attrs = element.getAttributes();
+    if (namespaceAware && !pending.isEmpty())
+      {
+        // add pending namespace nodes
+        for (Iterator i = pending.iterator(); i.hasNext(); )
+          {
+            attrs.setNamedItemNS((Node) i.next());
+          }
+        pending.clear();
+      }
     // add attributes
     int len = atts.getLength();
-    NamedNodeMap attrs = element.getAttributes();
     for (int i = 0; i < len; i++)
       {
         // create attribute
@@ -213,6 +251,10 @@ class SAXEventSink
     if (interrupted)
       {
         return;
+      }
+    if (namespaceAware)
+      {
+        pending.clear();
       }
     ctx = ctx.getParentNode();
   }

@@ -84,12 +84,12 @@ final class NodeNumberNode
     this.from = from;
   }
 
-  int[] compute(Stylesheet stylesheet, Node context)
+  int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
     throws TransformerException
   {
     if (from != null)
       {
-        Object ret = from.evaluate(context, 1, 1);
+        Object ret = from.evaluate(context, pos, len);
         if (ret instanceof Collection)
           {
             Collection ns = (Collection) ret;
@@ -118,7 +118,7 @@ final class NodeNumberNode
             context = context.getParentNode();
           }
         return (context == null) ? new int[0] :
-          new int[] { getIndex(context) };
+          new int[] { (context == current) ? pos : getIndex(current, context) };
       case MULTIPLE:
         List ancestors = new ArrayList();
         while (context != null)
@@ -132,7 +132,7 @@ final class NodeNumberNode
         int[] ret = new int[ancestors.size()];
         for (int i = 0; i < ret.length; i++)
           {
-            ret[i] = getIndex((Node) ancestors.get(i));
+            ret[i] = getIndex(current, (Node) ancestors.get(i));
           }
         return ret;
       case ANY:
@@ -141,7 +141,7 @@ final class NodeNumberNode
         Expr ancestorOrSelf = new Selector(Selector.ANCESTOR_OR_SELF,
                                            Collections.EMPTY_LIST);
         Expr any = new UnionExpr(preceding, ancestorOrSelf);
-        Object eval = any.evaluate(context, 1, 1);
+        Object eval = any.evaluate(context, pos, len);
         if (eval instanceof Collection)
           {
             Collection ns = (Collection) eval;
@@ -157,7 +157,7 @@ final class NodeNumberNode
             int[] ret2 = new int[candidates.size()];
             for (int i = 0; i < ret2.length; i++)
               {
-                ret2[i] = getIndex((Node) candidates.get(i));
+                ret2[i] = getIndex(current, (Node) candidates.get(i));
               }
             return ret2;
           }
@@ -171,40 +171,46 @@ final class NodeNumberNode
   {
     if (count == null)
       {
-        short nt = node.getNodeType();
-        if (nt != current.getNodeType())
+        int cnt = current.getNodeType();
+        int nnt = node.getNodeType();
+        if (cnt != nnt)
           {
             return false;
           }
-        switch (nt)
+        if (nnt == Node.ELEMENT_NODE || nnt == Node.ATTRIBUTE_NODE)
           {
-          case Node.ATTRIBUTE_NODE:
-          case Node.ELEMENT_NODE:
-            String nns = node.getNamespaceURI();
-            String cns = current.getNamespaceURI();
-            if ((nns == null && cns == null) ||
-                (nns != null && nns.equals(cns)))
+            String curi = current.getNamespaceURI();
+            String nuri = node.getNamespaceURI();
+            if ((curi == null && nuri != null) ||
+                (curi != null && !curi.equals(nuri)))
               {
-                return node.getLocalName().equals(current.getLocalName());
+                return false;
               }
-            return false;
+            String cn = current.getLocalName();
+            String nn = current.getLocalName();
+            if (!cn.equals(nn))
+              {
+                return false;
+              }
           }
         return true;
       }
     else
       {
-        Object ret = count.evaluate(node, 1, 1);
-        return (ret instanceof Collection) &&
-          ((Collection) ret).contains(node);
+        return count.matches(node);
       }
   }
 
-  int getIndex(Node node)
+  int getIndex(Node current, Node node)
   {
     int index = 0;
     do
       {
-        node = node.getPreviousSibling();
+        do
+          {
+            node = node.getPreviousSibling();
+          }
+        while (node != null && !countMatches(current, node));
         index++;
       }
     while (node != null);

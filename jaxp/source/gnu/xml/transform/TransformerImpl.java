@@ -129,9 +129,11 @@ class TransformerImpl
     if (stylesheet != null)
       {
         // XSLT transformation
-        stylesheet.applyTemplates(new Root(), null,
-                                  context, 1, 1,
-                                  parent, nextSibling);
+        TemplateNode t = stylesheet.getTemplate(null, context);
+        if (t != null)
+          {
+            t.apply(stylesheet, null, context, 1, 1, parent, nextSibling);
+          }
         outputMethod = stylesheet.outputMethod;
         encoding = stylesheet.outputEncoding;
         String publicId = stylesheet.outputPublicId;

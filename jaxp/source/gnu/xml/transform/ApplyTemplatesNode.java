@@ -97,23 +97,27 @@ final class ApplyTemplatesNode
               }
           }
         Collection ns = (Collection) ret;
-        List list = new ArrayList(ns);
+        List nodes = new ArrayList(ns);
         if (sortKeys != null)
           {
-            Collections.sort(list, new XSLComparator(sortKeys));
+            Collections.sort(nodes, new XSLComparator(sortKeys));
           }
         else
           {
-            Collections.sort(list, documentOrderComparator);
+            Collections.sort(nodes, documentOrderComparator);
           }
-        int l = list.size();
-        int p = 1;
-        for (Iterator i = list.iterator(); i.hasNext(); )
+        int l = nodes.size();
+        for (int i = 0; i < l; i++)
           {
-            Node node = (Node) i.next();
-            stylesheet.applyTemplates(isDefault ? mode : this.mode,
-                                      node, p++, l,
-                                      parent, nextSibling);
+            Node node = (Node) nodes.get(i);
+            TemplateNode t =
+              stylesheet.getTemplate(isDefault ? mode : this.mode,
+                                     node);
+            if (t != null)
+              {
+                t.apply(stylesheet, mode, node, i + 1, l,
+                        parent, nextSibling);
+              }
           }
         if (withParams != null)
           {

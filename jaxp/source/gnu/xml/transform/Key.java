@@ -1,5 +1,5 @@
 /*
- * NumberNode.java
+ * Key.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,39 +38,28 @@
 
 package gnu.xml.transform;
 
-import javax.xml.transform.TransformerException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import javax.xml.namespace.QName;
 import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Pattern;
 
 /**
- * A template node representing the XSL <code>number</code> instruction
- * with a <code>value</code> expression.
+ * An XSL key.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class NumberNode
-  extends AbstractNumberNode
+class Key
 {
 
-  final Expr value;
+  final QName name;
+  final Pattern match;
+  final Expr use;
 
-  NumberNode(TemplateNode children, TemplateNode next,
-             Expr value, String format, String lang,
-             int letterValue, String groupingSeparator, int groupingSize)
+  Key(QName name, Pattern match, Expr use)
   {
-    super(children, next, format, lang, letterValue, groupingSeparator,
-          groupingSize);
-    this.value = value;
-  }
-
-  int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
-    throws TransformerException
-  {
-    Object ret = value.evaluate(context, pos, len);
-    Double d = (ret instanceof Double) ? ((Double) ret) :
-      new Double(Expr._number(context, ret));
-    return new int[] { d.intValue() };
+    this.name = name;
+    this.match = match;
+    this.use = use;
   }
   
 }
+

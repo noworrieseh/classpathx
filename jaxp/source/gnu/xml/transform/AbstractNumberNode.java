@@ -83,7 +83,7 @@ abstract class AbstractNumberNode
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
-    String value = format(compute(stylesheet, context));
+    String value = format(compute(stylesheet, context, pos, len));
     Text text = doc.createTextNode(value);
     if (nextSibling != null)
       {
@@ -107,7 +107,7 @@ abstract class AbstractNumberNode
     int start = 0, end = 0, len = format.length(); // region of format
     int pos = 0; // number index
     StringBuffer buf = new StringBuffer();
-    
+  
     while (pos < number.length)
       {
         while (end < len && !isAlphanumeric(format.charAt(end)))
@@ -118,7 +118,7 @@ abstract class AbstractNumberNode
           {
             buf.append(format.substring(start, end));
           }
-        else
+        else if (end > 0)
           {
             buf.append('.');
           }
@@ -152,6 +152,7 @@ abstract class AbstractNumberNode
             if (formatToken.charAt(i) != (c - 1))
               {
                 format(buf, number, "1");
+                return;
               }
           }
         // Decimal representation
@@ -254,7 +255,7 @@ abstract class AbstractNumberNode
     return upper ? buf.toString().toUpperCase() : buf.toString();
   }
   
-  abstract int[] compute(Stylesheet stylesheet, Node context)
+  abstract int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
     throws TransformerException;
 
   public String toString()

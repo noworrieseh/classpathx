@@ -79,20 +79,27 @@ public class DomLSParser
     = Arrays.asList(new String[] { "cdata-sections",
                     "comments",
                     "element-content-whitespace",
-                    "namespaces" });
+                    "namespaces",
+                    "expand-entity-references",
+                    "coalescing",
+                    "validating",
+                    "entity-resolver",
+                    "error-handler" });
 
   private LSParserFilter filter;
   private final boolean async;
   private String schemaType;
   private SAXEventSink eventSink;
   private SAXParserFactory factory;
+  private XMLReader reader;
 
   private boolean namespaceAware = true;
   private boolean ignoreWhitespace;
   private boolean expandEntityReferences;
   private boolean ignoreComments;
   private boolean coalescing;
-  private EntityResolver resolver;
+  private boolean validating;
+  private EntityResolver entityResolver;
   private ErrorHandler errorHandler;
 
   public DomLSParser(short mode, String schemaType)
@@ -262,16 +269,25 @@ public class DomLSParser
                           namespaceAware);
         reader.setFeature("http://xml.org/sax/features/namespace-prefixes",
                           true);
-        // TODO validation
+        reader.setFeature("http://xml.org/sax/features/validation",
+                          validating);
+        reader.setFeature("http://xml.org/sax/features/use-attributes2",
+                          true);
+        reader.setEntityResolver(entityResolver);
+        reader.setErrorHandler(errorHandler);
         // parse
         reader.parse(source);
       }
     catch (SAXException e)
       {
+        reader = null;
+        eventSink = null;
         throw new DomLSEx(LSException.PARSE_ERR, e);
       }
     catch (IOException e)
       {
+        reader = null;
+        eventSink = null;
         throw new DomLSEx(LSException.PARSE_ERR, e);
       }
     // return document
@@ -283,22 +299,26 @@ public class DomLSParser
   private XMLReader getXMLReader()
     throws LSException
   {
-    factory.setNamespaceAware(namespaceAware);
-    // TODO validating
-    // TODO xincludeAware
-    try
+    if (reader == null)
       {
-        SAXParser parser = factory.newSAXParser();
-        return parser.getXMLReader();
+        factory.setNamespaceAware(namespaceAware);
+        factory.setValidating(validating);
+        // TODO xincludeAware
+        try
+          {
+            SAXParser parser = factory.newSAXParser();
+            reader = parser.getXMLReader();
+          }
+        catch (ParserConfigurationException e)
+          {
+            throw new DomLSEx(LSException.PARSE_ERR, e);
+          }
+        catch (SAXException e)
+          {
+            throw new DomLSEx(LSException.PARSE_ERR, e);
+          }
       }
-    catch (ParserConfigurationException e)
-      {
-        throw new DomLSEx(LSException.PARSE_ERR, e);
-      }
-    catch (SAXException e)
-      {
-        throw new DomLSEx(LSException.PARSE_ERR, e);
-      }
+    return reader;
   }
 
   private InputSource getInputSource(LSInput input)
@@ -312,12 +332,12 @@ public class DomLSParser
         source = new InputSource(in);
         source.setSystemId(systemId);
       }
-    if (source == null && resolver != null)
+    if (source == null && entityResolver != null)
       {
         String publicId = input.getPublicId();
         try
           {
-            source = resolver.resolveEntity(publicId, systemId);
+            source = entityResolver.resolveEntity(publicId, systemId);
           }
         catch (SAXException e)
           {
@@ -366,24 +386,46 @@ public class DomLSParser
   {
     if ("cdata-sections".equals(name))
       {
-        coalescing = "false".equals(value.toString());
+        coalescing = !((Boolean) value).booleanValue();
       }
     else if ("comments".equals(name))
       {
-        ignoreComments = "false".equals(value.toString());
+        ignoreComments = !((Boolean) value).booleanValue();
       }
     else if ("element-content-whitespace".equals(name))
       {
-        ignoreWhitespace = "false".equals(value.toString());
+        ignoreWhitespace = !((Boolean) value).booleanValue();
       }
     else if ("namespaces".equals(name))
       {
-        namespaceAware = "true".equals(value.toString());
+        namespaceAware = ((Boolean) value).booleanValue();
+      }
+    else if ("expand-entity-references".equals(name))
+      {
+        expandEntityReferences = ((Boolean) value).booleanValue();
+      }
+    else if ("coalescing".equals(name))
+      {
+        coalescing = ((Boolean) value).booleanValue();
+      }
+    else if ("validating".equals(name))
+      {
+        validating = ((Boolean) value).booleanValue();
+      }
+    else if ("entity-resolver".equals(name))
+      {
+        entityResolver = (EntityResolver) value;
+      }
+    else if ("error-handler".equals(name))
+      {
+        errorHandler = (ErrorHandler) value;
       }
     else
       {
         throw new DomEx(DomEx.NOT_SUPPORTED_ERR);
       }
+    // invalidate reader, a new one will be created
+    reader = null;
   }
 
   public Object getParameter(String name)
@@ -391,19 +433,39 @@ public class DomLSParser
   {
     if ("cdata-sections".equals(name))
       {
-        return coalescing ? "false" : "true";
+        return coalescing ? Boolean.FALSE : Boolean.TRUE;
       }
     else if ("comments".equals(name))
       {
-        return ignoreComments ? "false" : "true";
+        return ignoreComments ? Boolean.FALSE : Boolean.TRUE;
       }
     else if ("element-content-whitespace".equals(name))
       {
-        return ignoreWhitespace ? "false" : "true";
+        return ignoreWhitespace ? Boolean.FALSE : Boolean.TRUE;
       }
     else if ("namespaces".equals(name))
       {
-        return namespaceAware ? "true" : "false";
+        return namespaceAware ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("expand-entity-references".equals(name))
+      {
+        return expandEntityReferences ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("coalescing".equals(name))
+      {
+        return coalescing ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("validating".equals(name))
+      {
+        return validating ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("entity-resolver".equals(name))
+      {
+        return entityResolver;
+      }
+    else if ("error-handler".equals(name))
+      {
+        return errorHandler;
       }
     else
       {

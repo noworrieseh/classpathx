@@ -197,7 +197,6 @@ class Template
 
   public String toString()
   {
-    
     StringBuffer buf = new StringBuffer(getClass().getName());
     buf.append('[');
     if (name != null)

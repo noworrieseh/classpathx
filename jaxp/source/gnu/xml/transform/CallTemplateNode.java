@@ -82,9 +82,13 @@ final class CallTemplateNode
             stylesheet.bindings.set(p.name, value, false);
           }
       }
-    stylesheet.callTemplate(name, mode,
-                            context, pos, len,
-                            parent, nextSibling);
+    // If this fails, a transformation error is signalled
+    TemplateNode t = stylesheet.getTemplate(mode, name);
+    if (t != null)
+      {
+        t.apply(stylesheet, mode, context, pos, len,
+                parent, nextSibling);
+      }
     if (withParams != null)
       {
         // pop the variable context

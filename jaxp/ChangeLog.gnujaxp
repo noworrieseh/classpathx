@@ -1,6 +1,11 @@
+2004-11-23  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Use LS implementation for JAXP DocumentBuilder.
+   	* ls: Fixed namespace node handling.
+   	
 2004-11-22  Chris Burdess  <dog@gnu.org>
 
-   	* transform,xslt: Namespace context support.
+   	* transform,xpath: Namespace context support.
    	* transform: XSL message instruction, special number handling, key()
    	function
    	
