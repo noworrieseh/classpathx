@@ -209,7 +209,7 @@ public class NNTPStore extends Store
    */
   boolean isListAll()
   {
-		return propertyIsTrue("mail.nntp.listall");
+		return propertyIsTrue("listall");
   }
 
 	// -- Utility methods --
