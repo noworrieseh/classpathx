@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.6 2001-10-25 07:25:55 db Exp $
+ * $Id: ValidationConsumer.java,v 1.7 2001-11-05 06:46:45 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -42,7 +42,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.6 2001-10-25 07:25:55 db Exp $
+// $Id: ValidationConsumer.java,v 1.7 2001-11-05 06:46:45 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -180,7 +180,7 @@ import gnu.xml.util.DefaultHandler;
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-10-25 07:25:55 $
+ * @version $Date: 2001-11-05 06:46:45 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
@@ -477,7 +477,7 @@ public final class ValidationConsumer extends EventFilter
 
 	if (!pass)
 	    error ("In " + context + " for " + id
-		+ ", " + name + " is not a name");
+		+ ", '" + name + "' is not a name");
 	return pass;	// true == OK
     }
 
@@ -501,7 +501,7 @@ public final class ValidationConsumer extends EventFilter
 
 	if (!pass)
 	    error ("In " + context + " for " + id
-		+ ", " + nmtoken + " is not a name token");
+		+ ", '" + nmtoken + "' is not a name token");
 	return pass;	// true == OK
     }
 
@@ -1068,7 +1068,7 @@ public final class ValidationConsumer extends EventFilter
 	    } 
 
 	    if ("IDREFS" == ainfo.type) {
-		StringTokenizer	tokens = new StringTokenizer (value);
+		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
 		    // VC: IDREF (one or more values)
@@ -1095,7 +1095,7 @@ public final class ValidationConsumer extends EventFilter
 	    }
 
 	    if ("NMTOKENS" == ainfo.type) {
-		StringTokenizer	tokens = new StringTokenizer (value);
+		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
 		    // VC: Name Token (one or more values)
@@ -1120,7 +1120,7 @@ public final class ValidationConsumer extends EventFilter
 	    }
 
 	    if ("ENTITIES" == ainfo.type) {
-		StringTokenizer	tokens = new StringTokenizer (value);
+		StringTokenizer	tokens = new StringTokenizer (value, " ");
 
 		if (!tokens.hasMoreTokens ()) {
 		    // VC: Entity Name (one or more values)
