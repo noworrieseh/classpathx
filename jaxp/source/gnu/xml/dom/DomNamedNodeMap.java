@@ -1,5 +1,5 @@
 /*
- * $Id: DomNamedNodeMap.java,v 1.4 2001-11-16 22:42:26 db Exp $
+ * $Id: DomNamedNodeMap.java,v 1.5 2001-11-20 04:46:24 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -31,26 +31,29 @@ import java.util.Vector;
 
 import org.w3c.dom.*;
 
-import DomDoctype.ElementInfo;
+import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
-// $Id: DomNamedNodeMap.java,v 1.4 2001-11-16 22:42:26 db Exp $
+// $Id: DomNamedNodeMap.java,v 1.5 2001-11-20 04:46:24 db Exp $
 
 /**
  * <p> "NamedNodeMap" implementation. </p>
+ * Used mostly to hold element attributes, but sometimes also
+ * to list notations or entities.
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 22:42:26 $
+ * @version $Date: 2001-11-20 04:46:24 $
  */
 public class DomNamedNodeMap implements NamedNodeMap
 {
     private final Document		owner;
 
-	// XXX want a cheaper implementation than Vector.
-
-    private final Vector		v = new Vector ();
+    private DomNode			contents [] = new DomNode [1];
+    private int				length;
     private boolean			readonly;
     private final Element		element;
+
+    private static final int		DELTA = 5;
 
 
     /**
@@ -67,6 +70,23 @@ public class DomNamedNodeMap implements NamedNodeMap
     {
 	this.owner = owner;
 	this.element = element;
+    }
+
+    /**
+     * Reduces space utilization for this object.
+     */
+    public void compact ()
+    {
+	if (contents.length != length)
+	    setCapacity (length);
+    }
+
+    private void setCapacity (int len)
+    {
+	DomNode		newContents [] = new DomNode [len];
+
+	System.arraycopy (contents, 0, newContents, 0, length);
+	contents = newContents;
     }
 
     /**
@@ -88,11 +108,8 @@ public class DomNamedNodeMap implements NamedNodeMap
     public void makeReadonly ()
     {
 	readonly = true;
-
-	// We can't escape implementation dependencies here; we let the
-	// the Java runtime deal with error reporting
-	for (int i = 0; i < v.size (); i++)
-	    ((DomNode) v.elementAt (i)).makeReadonly ();
+	for (int i = 0; i < length; i++)
+	    contents [i].makeReadonly ();
     }
 
 
@@ -103,12 +120,9 @@ public class DomNamedNodeMap implements NamedNodeMap
      */
     public Node getNamedItem (String name)
     {
-	int length = v.size ();
-
 	for (int i = 0; i < length; i++) {
-	    Node temp = (Node) v.elementAt (i);
-	    if (temp.getNodeName ().equals (name))
-		return temp;
+	    if (contents [i].getNodeName ().equals (name))
+		return contents [i];
 	}
 	return null;
     }
@@ -121,10 +135,8 @@ public class DomNamedNodeMap implements NamedNodeMap
      */
     public Node getNamedItemNS (String namespaceURI, String localName)
     {
-	int length = v.size ();
-
 	for (int i = 0; i < length; i++) {
-	    Node	temp = (Node) v.elementAt (i);
+	    DomNode	temp = contents [i];
 	    String	tempName = temp.getLocalName ();
 	    String	ns;
 
@@ -174,19 +186,20 @@ public class DomNamedNodeMap implements NamedNodeMap
 	if (arg instanceof Attr)
 	    checkAttr ((Attr) arg);
 
-	int	length = v.size ();
 	String	name = arg.getNodeName ();
 
+// maybe attribute ADDITION events (?)
+
 	for (int i = 0; i < length; i++) {
-	    Node temp = (Node) v.elementAt (i);
+	    Node temp = contents [i];
 	    if (temp.getNodeName ().equals (name)) {
-// maybe attribute ADDITION (?)
-		v.setElementAt (arg, i);
+		contents [i] = (DomNode) arg;
 		return temp;
 	    }
 	}
-// maybe attribute ADDITION
-	v.addElement (arg);
+	if (length == contents.length)
+	    setCapacity (length + DELTA);
+	contents [length++] = (DomNode) arg;
 	return null;
     }
 
@@ -207,7 +220,6 @@ public class DomNamedNodeMap implements NamedNodeMap
 	if (arg instanceof Attr)
 	    checkAttr ((Attr) arg);
 
-	int	length = v.size ();
 	String	localName = arg.getLocalName ();
 	String	namespaceURI = arg.getNamespaceURI ();
 
@@ -215,7 +227,7 @@ public class DomNamedNodeMap implements NamedNodeMap
 	    throw new DomEx (DomEx.INVALID_ACCESS_ERR);
 
 	for (int i = 0; i < length; i++) {
-	    Node	temp = (Node) v.elementAt (i);
+	    DomNode	temp = contents [i];
 	    String	tempName = temp.getLocalName ();
 	    String	ns;
 
@@ -223,12 +235,14 @@ public class DomNamedNodeMap implements NamedNodeMap
 		ns = temp.getNamespaceURI ();
 		if ((ns == null && namespaceURI == null)
 			|| ns.equals (namespaceURI)) {
-		    v.setElementAt (arg, i);
+		    contents [i] = (DomNode) arg;
 		    return temp;
 		}
 	    }
 	}
-	v.addElement (arg);
+	if (length == contents.length)
+	    setCapacity (length + DELTA);
+	contents [length++] = (DomNode) arg;
 	return null;
     }
 
@@ -264,13 +278,14 @@ public class DomNamedNodeMap implements NamedNodeMap
 	if (readonly)
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
 
-	int length = v.size ();
+// report attribute REMOVAL event?
 
 	for (int i = 0; i < length; i++) {
-	    Node	temp = (Node) v.elementAt (i);
+	    DomNode	temp = contents [i];
 	    if (temp.getNodeName ().equals (name)) {
-// maybe attribute REMOVAL
-		v.removeElementAt (i);
+		System.arraycopy (contents, i+1, contents, i,
+			length - (i + 1));
+		contents [--length] = null;
 		if (element != null)
 		    maybeRestoreDefault (temp.getNamespaceURI (), name);
 		return temp;
@@ -290,10 +305,8 @@ public class DomNamedNodeMap implements NamedNodeMap
 	if (readonly)
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
 
-	int length = v.size ();
-
 	for (int i = 0; i < length; i++) {
-	    Node	temp = (Node) v.elementAt (i);
+	    DomNode	temp = contents [i];
 	    String	tempName = temp.getLocalName ();
 	    String	ns;
 
@@ -301,7 +314,9 @@ public class DomNamedNodeMap implements NamedNodeMap
 		ns = temp.getNamespaceURI ();
 		if ((ns == null && namespaceURI == null)
 			|| ns.equals (namespaceURI)) {
-		    v.removeElementAt (i);
+		    System.arraycopy (contents, i+1, contents, i,
+			    length - (i + 1));
+		    contents [--length] = null;
 		    if (element != null)
 			maybeRestoreDefault (ns, temp.getNodeName ());
 		    return temp;
@@ -318,9 +333,9 @@ public class DomNamedNodeMap implements NamedNodeMap
      */
     public Node item (int index)
     {
-	if (index < 0 || index >= v.size ())
+	if (index < 0 || index >= length)
 	    return null;
-	return (Node) v.elementAt (index);
+	return contents [index];
     }
 
 
@@ -329,5 +344,5 @@ public class DomNamedNodeMap implements NamedNodeMap
      * Returns the length of the map.
      */
     public int getLength ()
-	{ return v.size (); }
+	{ return length; }
 }

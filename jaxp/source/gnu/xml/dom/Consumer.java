@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.12 2001-11-20 01:20:13 db Exp $
+ * $Id: Consumer.java,v 1.13 2001-11-20 04:46:24 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -67,7 +67,7 @@ import gnu.xml.dom.DomDoctype.ElementInfo;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-20 01:20:13 $
+ * @version $Date: 2001-11-20 04:46:24 $
  */
 public class Consumer extends DomConsumer
 {
@@ -212,6 +212,7 @@ public class Consumer extends DomConsumer
 	    Attributes2		attrs = (Attributes2) atts;
 	    int			length = atts.getLength ();
 
+	    map.compact ();
 	    for (int i = 0; i < length; i++) {
 		if (attrs.isSpecified (i))
 		    continue;
