@@ -77,7 +77,7 @@ import java.util.Properties;
  * @author <a href='mailto:aselkirk@mailandnews.com'>Andrew Selkirk</a>
  * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class MailcapCommandMap
   extends CommandMap 
@@ -181,6 +181,7 @@ public class MailcapCommandMap
   public MailcapCommandMap(String fileName)
     throws IOException 
   {
+    this();
     try
     {
       DB[PROG] = loadMailcapRegistry(new FileReader(fileName));
@@ -196,6 +197,7 @@ public class MailcapCommandMap
    */
   public MailcapCommandMap(InputStream stream) 
   {
+    this();
     try 
     {
       DB[PROG] = loadMailcapRegistry(new InputStreamReader(stream));
