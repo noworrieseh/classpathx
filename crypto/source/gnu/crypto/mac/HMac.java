@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: HMac.java,v 1.1 2002-05-14 08:45:41 raif Exp $
+// $Id: HMac.java,v 1.2 2002-06-08 05:03:15 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -30,6 +30,7 @@ package gnu.crypto.mac;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.hash.MD5;
 import gnu.crypto.util.Util;
@@ -73,14 +74,12 @@ import java.util.Map;
  *    H. Krawczyk, M. Bellare, and R. Canetti.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class HMac extends BaseMac {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   private static final String HMAC_NAME_PREFIX = "hmac-";
 
    private static final byte IPAD_BYTE = 0x36;
    private static final byte OPAD_BYTE = 0x5C;
@@ -99,7 +98,7 @@ public class HMac extends BaseMac {
     * @param underlyingHash the underlying hash algorithm instance.
     */
    protected HMac(IMessageDigest underlyingHash) {
-      super(HMAC_NAME_PREFIX + underlyingHash.name(), underlyingHash);
+      super(Registry.HMAC_NAME_PREFIX + underlyingHash.name(), underlyingHash);
 
       this.blockSize = underlyingHash.blockSize();
       this.macSize = underlyingHash.hashSize();
