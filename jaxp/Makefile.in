@@ -43,6 +43,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/javax/xml/parsers/ParserConfigurationException.java \
 	$(SOURCEDIR)/javax/xml/parsers/SAXParserFactory.java \
 	$(SOURCEDIR)/javax/xml/parsers/SAXParser.java \
+	$(SOURCEDIR)/javax/xml/transform/ClassStuff.java \
 	$(SOURCEDIR)/javax/xml/transform/ErrorListener.java \
 	$(SOURCEDIR)/javax/xml/transform/OutputKeys.java \
 	$(SOURCEDIR)/javax/xml/transform/Result.java \
