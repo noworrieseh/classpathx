@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.MalformedURLException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.ErrorListener;
@@ -78,61 +79,97 @@ class DOMSourceWrapper
 
   public Node getNode()
   {
+    Node ret = null;
     if (source instanceof DOMSource)
       {
-        return ((DOMSource) source).getNode();
+        ret = ((DOMSource) source).getNode();
       }
-    else
+    if (ret == null)
       {
         try
           {
             DocumentBuilderFactory factory =
               DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true); // must have namespace support
+            //factory.setValidating(false);
             DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver(new URIResolverEntityResolver(uriResolver));
-            builder.setErrorHandler(new ErrorListenerErrorHandler(errorListener));
-            if (source instanceof StreamSource)
+            if (uriResolver != null)
               {
-                InputStream in = ((StreamSource) source).getInputStream();
-                if (in == null)
-                  {
-                    in = getInputStream(source.getSystemId());
-                  }
-                Document doc = builder.parse(in, source.getSystemId());
-                in.close();
-                return doc;
+                builder.setEntityResolver(new URIResolverEntityResolver(uriResolver));
               }
-            else if (source instanceof SAXSource)
+            if (errorListener != null)
+              {
+                builder.setErrorHandler(new ErrorListenerErrorHandler(errorListener));
+              }
+            String systemId = absolutize(source.getSystemId());
+            //System.out.println("Loading "+systemId);
+            if (source instanceof SAXSource)
               {
                 InputSource in = ((SAXSource) source).getInputSource();
                 if (in == null)
                   {
-                    in = new InputSource(getInputStream(source.getSystemId()));
+                    in = new InputSource(getInputStream(systemId));
+                    in.setSystemId(systemId);
                   }
-                return builder.parse(in);
+                ret = builder.parse(in);
               }
             else
               {
-                errorListener.fatalError(new TransformerException("source type is unsupported"));
-                return null;
+                InputStream in = (source instanceof StreamSource) ?
+                  ((StreamSource) source).getInputStream() :
+                  null;
+                if (in == null)
+                  {
+                    in = getInputStream(systemId);
+                  }
+                Document doc = builder.parse(in, systemId);
+                in.close();
+                ret = doc;
               }
           }
         catch (Exception e)
           {
-            // TODO handle this properly
-            e.printStackTrace();
-            return null;
+            if (errorListener != null)
+              {
+                try
+                  {
+                    errorListener.fatalError(new TransformerException(e));
+                  }
+                catch (TransformerException e2)
+                  {
+                    e2.printStackTrace();
+                  }
+              }
+            else
+              {
+                e.printStackTrace(System.err);
+              }
           }
+      }
+    if (ret == null)
+      {
+        System.err.println("Can't load "+source.getSystemId());
+      }
+    return ret;
+  }
+
+  String absolutize(String systemId)
+    throws IOException
+  {
+    try
+      {
+        return new URL(systemId).toString();
+      }
+    catch (MalformedURLException e)
+      {
+        return new File(systemId).toURL().toString();
       }
   }
 
   InputStream getInputStream(String systemId)
     throws IOException
   {
-    File cwd = new File(".");
-    URL context = cwd.toURL();
-    URL url = new URL(context, systemId);
+    URL url = new URL(systemId);
     return url.openStream();
   }
 

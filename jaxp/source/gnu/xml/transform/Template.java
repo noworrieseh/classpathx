@@ -349,4 +349,22 @@ class Template
     return ret.isEmpty() ? null : ret;
   }
 
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    if (name != null)
+      {
+        buf.append("name=");
+        buf.append(name);
+      }
+    else if (match != null)
+      {
+        buf.append("match=");
+        buf.append(match);
+      }
+    buf.append(']');
+    return buf.toString();
+  }
+
 }

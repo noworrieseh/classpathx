@@ -308,12 +308,10 @@ extends Expr
             Object val1 = arg1.evaluate (context);
             Object val2 = arg2.evaluate (context);
             Object val3 = arg3.evaluate (context);
-            if (val1 instanceof String && val2 instanceof String &&
-                val3 instanceof String)
-              {
-                return _translate (context, (String) val1, (String) val2,
-                                   (String) val3);
-              }
+            String s1 = _string(context, val1);
+            String s2 = _string(context, val2);
+            String s3 = _string(context, val3);
+            return _translate (context, s1, s2, s3);
           }
       }
     else if ("boolean".equals (name))

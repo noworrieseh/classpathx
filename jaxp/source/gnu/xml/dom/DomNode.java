@@ -432,7 +432,8 @@ public abstract class DomNode
 		    return;
 	}
 	throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR,
-	    "this node can't have that type of child", this, 0);
+	    "can't append " + nodeTypeToString(newType) +
+            " to node of type " + nodeTypeToString(nodeType), this, 0);
     }
 
     //
@@ -1797,6 +1798,39 @@ public abstract class DomNode
       }
     buf.append(']');
     return buf.toString();
+  }
+
+  String nodeTypeToString(short nodeType)
+  {
+    switch (nodeType)
+      {
+      case ELEMENT_NODE:
+        return "ELEMENT_NODE";
+      case ATTRIBUTE_NODE:
+        return "ATTRIBUTE_NODE";
+      case TEXT_NODE:
+        return "TEXT_NODE";
+      case CDATA_SECTION_NODE:
+        return "CDATA_SECTION_NODE";
+      case DOCUMENT_NODE:
+        return "DOCUMENT_NODE";
+      case DOCUMENT_TYPE_NODE:
+        return "DOCUMENT_TYPE_NODE";
+      case COMMENT_NODE:
+        return "COMMENT_NODE";
+      case PROCESSING_INSTRUCTION_NODE:
+        return "PROCESSING_INSTRUCTION_NODE";
+      case DOCUMENT_FRAGMENT_NODE:
+        return "DOCUMENT_FRAGMENT_NODE";
+      case ENTITY_NODE:
+        return "ENTITY_NODE";
+      case ENTITY_REFERENCE_NODE:
+        return "ENTITY_REFERENCE_NODE";
+      case NOTATION_NODE:
+        return "NOTATION_NODE";
+      default:
+        return "UNKNOWN";
+      }
   }
 
 }

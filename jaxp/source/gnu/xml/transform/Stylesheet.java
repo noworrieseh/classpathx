@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -170,6 +169,10 @@ class Stylesheet
             else if ("template".equals(name))
               {
                 String tname = element.getAttribute("name");
+                if (tname.length() == 0)
+                  {
+                    tname = null;
+                  }
                 String m = element.getAttribute("match");
                 Expr match = (m != null) ?
                   (Expr) factory.xpath.compile(m) : null;
@@ -194,6 +197,10 @@ class Stylesheet
                 Map target = "variable".equals(name) ? variables : parameters;
                 Node content = element.getFirstChild();
                 String paramName = element.getAttribute("name");
+                if (paramName.length() == 0)
+                  {
+                    paramName = null;
+                  }
                 String select = element.getAttribute("select");
                 if (select != null)
                   {
@@ -246,6 +253,10 @@ class Stylesheet
                 outputPublicId = element.getAttribute("public-id");
                 outputSystemId = element.getAttribute("system-id");
                 outputEncoding = element.getAttribute("encoding");
+                if (outputEncoding.length() == 0)
+                  {
+                    outputEncoding = null;
+                  }
                 String indent = element.getAttribute("indent");
                 outputIndent = "yes".equals(indent);
                 parse(element.getNextSibling(), false);
@@ -257,7 +268,7 @@ class Stylesheet
                                                          " ");
                 while (st.hasMoreTokens())
                   {
-                    preserveSpace.add(QName.valueOf(st.nextToken()));
+                    preserveSpace.add(st.nextToken());
                   }
                 parse(element.getNextSibling(), false);
               }
@@ -268,7 +279,7 @@ class Stylesheet
                                                          " ");
                 while (st.hasMoreTokens())
                   {
-                    stripSpace.add(QName.valueOf(st.nextToken()));
+                    stripSpace.add(st.nextToken());
                   }
                 parse(element.getNextSibling(), false);
               }
@@ -356,7 +367,9 @@ class Stylesheet
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
-        if (t.matches(context, subject, mode))
+        boolean isMatch = t.matches(context, subject, mode);
+        //System.out.println("applyTemplates: "+subject+" "+t+"="+isMatch);
+        if (isMatch)
           {
             candidates.add(t);
           }

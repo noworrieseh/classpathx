@@ -66,9 +66,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import gnu.xml.xpath.Expr;
-import gnu.xml.xpath.NodeTypeTest;
-import gnu.xml.xpath.Selector;
-import gnu.xml.xpath.Test;
+import gnu.xml.xpath.Root;
 
 class TransformerImpl
   extends Transformer
@@ -117,10 +115,7 @@ class TransformerImpl
     if (stylesheet != null)
       {
         // XSLT transformation
-        Test t = new NodeTypeTest((short) 0);
-        Expr select =
-          new Selector(Selector.CHILD, Collections.singletonList(t));
-        stylesheet.applyTemplates(context, select, null,
+        stylesheet.applyTemplates(context, new Root(), null,
                                   parent, nextSibling);
         outputMethod = stylesheet.outputMethod;
         encoding = stylesheet.outputEncoding;
@@ -143,20 +138,27 @@ class TransformerImpl
               {
                 root = root.getNextSibling();
               }
-            // Now that we know the name of the root element we can create
-            // the document
-            Document doc = (context instanceof Document) ? (Document) context :
-              context.getOwnerDocument();
-            DOMImplementation impl = doc.getImplementation();
-            DocumentType doctype = (publicId != null || systemId != null) ?
-              impl.createDocumentType(root.getNodeName(), publicId, systemId) :
-              null;
-            Document newDoc = impl.createDocument(root.getNamespaceURI(),
-                                                  root.getNodeName(), doctype);
-            Node newRoot = newDoc.getDocumentElement();
-            copyAttributes(newDoc, root, newRoot);
-            copyChildren(newDoc, root, newRoot);
-            parent = newDoc;
+            if (root != null)
+              {
+                // Now that we know the name of the root element we can create
+                // the document
+                Document doc = (context instanceof Document) ?
+                  (Document) context :
+                  context.getOwnerDocument();
+                DOMImplementation impl = doc.getImplementation();
+                DocumentType doctype = (publicId != null || systemId != null) ?
+                  impl.createDocumentType(root.getNodeName(),
+                                          publicId,
+                                          systemId) :
+                  null;
+                Document newDoc = impl.createDocument(root.getNamespaceURI(),
+                                                      root.getNodeName(),
+                                                      doctype);
+                Node newRoot = newDoc.getDocumentElement();
+                copyAttributes(newDoc, root, newRoot);
+                copyChildren(newDoc, root, newRoot);
+                parent = newDoc;
+              }
           }
       }
     else
@@ -191,7 +193,14 @@ class TransformerImpl
           }
         catch (IOException e)
           {
-            errorListener.error(new TransformerException(e));
+            if (errorListener != null)
+              {
+                errorListener.error(new TransformerException(e));
+              }
+            else
+              {
+                e.printStackTrace(System.err);
+              }
           }
       }
     else if (outputTarget instanceof SAXResult)
@@ -210,7 +219,14 @@ class TransformerImpl
           }
         catch (SAXException e)
           {
-            errorListener.error(new TransformerException(e));
+            if (errorListener != null)
+              {
+                errorListener.error(new TransformerException(e));
+              }
+            else
+              {
+                e.printStackTrace(System.err);
+              }
           }
       }
   }

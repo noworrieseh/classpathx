@@ -71,28 +71,12 @@ final class ValueOfNode
     throws TransformerException
   {
     Object ret = select.evaluate(context);
-    if (ret instanceof Collection)
+    String value = Expr._string(context, ret);
+    if (value != null && value.length() > 0)
       {
-        Collection ns = (Collection) ret;
-        for (Iterator i = ns.iterator(); i.hasNext(); )
-          {
-            Node child = (Node) i.next();
-            if (nextSibling != null)
-              {
-                parent.insertBefore(child, nextSibling);
-              }
-            else
-              {
-                parent.appendChild(child);
-              }
-          }
-      }
-    else if (ret != null)
-      {
-        String text = ret.toString(); // FIXME number formatting
         Document doc = (parent instanceof Document) ?
           (Document) parent : parent.getOwnerDocument();
-        Text textNode = doc.createTextNode(text);
+        Text textNode = doc.createTextNode(value);
         if (nextSibling != null)
           {
             parent.insertBefore(textNode, nextSibling);
