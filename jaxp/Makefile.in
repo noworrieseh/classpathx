@@ -32,8 +32,6 @@
 # 02111-1307 USA. 
 #
 
-# HACK why does configure not create these?
-
 
 SHELL = @SHELL@
 
@@ -134,33 +132,28 @@ XSLT_CONFIG = @XSLT_CONFIG@
 XSLT_LIBS = @XSLT_LIBS@
 uudecode = @uudecode@
 
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-
-
 JAVADOC = javadoc
-
-lib_LTLIBRARIES = libxmlj.la
 
 src = @srcdir@/source
 dst = @srcdir@/classes
-jni = @srcdir@/jni
 doc = @srcdir@/apidoc
 
 JARFILE = gnujaxp.jar
 #data_DATA = ${JARFILE} - needs $(prefix)/share/java
+
+lib_LTLIBRARIES = libxmlj.la
 
 sources =  $(src)/org/w3c/dom/Attr.java $(src)/org/w3c/dom/CDATASection.java $(src)/org/w3c/dom/CharacterData.java $(src)/org/w3c/dom/Comment.java $(src)/org/w3c/dom/DOMException.java $(src)/org/w3c/dom/DOMImplementation.java $(src)/org/w3c/dom/Document.java $(src)/org/w3c/dom/DocumentFragment.java $(src)/org/w3c/dom/DocumentType.java $(src)/org/w3c/dom/Element.java $(src)/org/w3c/dom/Entity.java $(src)/org/w3c/dom/EntityReference.java $(src)/org/w3c/dom/NamedNodeMap.java $(src)/org/w3c/dom/Node.java $(src)/org/w3c/dom/NodeList.java $(src)/org/w3c/dom/Notation.java $(src)/org/w3c/dom/ProcessingInstruction.java $(src)/org/w3c/dom/Text.java $(src)/org/w3c/dom/css/CSS2Azimuth.java $(src)/org/w3c/dom/css/CSS2BackgroundPosition.java $(src)/org/w3c/dom/css/CSS2BorderSpacing.java $(src)/org/w3c/dom/css/CSS2CounterIncrement.java $(src)/org/w3c/dom/css/CSS2CounterReset.java $(src)/org/w3c/dom/css/CSS2Cursor.java $(src)/org/w3c/dom/css/CSS2FontFaceSrc.java $(src)/org/w3c/dom/css/CSS2FontFaceWidths.java $(src)/org/w3c/dom/css/CSS2PageSize.java $(src)/org/w3c/dom/css/CSS2PlayDuring.java $(src)/org/w3c/dom/css/CSS2Properties.java $(src)/org/w3c/dom/css/CSS2TextShadow.java $(src)/org/w3c/dom/css/CSSCharsetRule.java $(src)/org/w3c/dom/css/CSSFontFaceRule.java $(src)/org/w3c/dom/css/CSSImportRule.java $(src)/org/w3c/dom/css/CSSMediaRule.java $(src)/org/w3c/dom/css/CSSPageRule.java $(src)/org/w3c/dom/css/CSSPrimitiveValue.java $(src)/org/w3c/dom/css/CSSRule.java $(src)/org/w3c/dom/css/CSSRuleList.java $(src)/org/w3c/dom/css/CSSStyleDeclaration.java $(src)/org/w3c/dom/css/CSSStyleRule.java $(src)/org/w3c/dom/css/CSSStyleSheet.java $(src)/org/w3c/dom/css/CSSUnknownRule.java $(src)/org/w3c/dom/css/CSSValue.java $(src)/org/w3c/dom/css/CSSValueList.java $(src)/org/w3c/dom/css/Counter.java $(src)/org/w3c/dom/css/DOMImplementationCSS.java $(src)/org/w3c/dom/css/DocumentCSS.java $(src)/org/w3c/dom/css/ElementCSSInlineStyle.java $(src)/org/w3c/dom/css/RGBColor.java $(src)/org/w3c/dom/css/Rect.java $(src)/org/w3c/dom/css/ViewCSS.java $(src)/org/w3c/dom/events/DocumentEvent.java $(src)/org/w3c/dom/events/Event.java $(src)/org/w3c/dom/events/EventException.java $(src)/org/w3c/dom/events/EventListener.java $(src)/org/w3c/dom/events/EventTarget.java $(src)/org/w3c/dom/events/MouseEvent.java $(src)/org/w3c/dom/events/MutationEvent.java $(src)/org/w3c/dom/events/UIEvent.java $(src)/org/w3c/dom/html/HTMLAnchorElement.java $(src)/org/w3c/dom/html/HTMLAppletElement.java $(src)/org/w3c/dom/html/HTMLAreaElement.java $(src)/org/w3c/dom/html/HTMLBRElement.java $(src)/org/w3c/dom/html/HTMLBaseElement.java $(src)/org/w3c/dom/html/HTMLBaseFontElement.java $(src)/org/w3c/dom/html/HTMLBodyElement.java $(src)/org/w3c/dom/html/HTMLButtonElement.java $(src)/org/w3c/dom/html/HTMLCollection.java $(src)/org/w3c/dom/html/HTMLDListElement.java $(src)/org/w3c/dom/html/HTMLDOMImplementation.java $(src)/org/w3c/dom/html/HTMLDirectoryElement.java $(src)/org/w3c/dom/html/HTMLDivElement.java $(src)/org/w3c/dom/html/HTMLDocument.java $(src)/org/w3c/dom/html/HTMLElement.java $(src)/org/w3c/dom/html/HTMLFieldSetElement.java $(src)/org/w3c/dom/html/HTMLFontElement.java $(src)/org/w3c/dom/html/HTMLFormElement.java $(src)/org/w3c/dom/html/HTMLFrameElement.java $(src)/org/w3c/dom/html/HTMLFrameSetElement.java $(src)/org/w3c/dom/html/HTMLHRElement.java $(src)/org/w3c/dom/html/HTMLHeadElement.java $(src)/org/w3c/dom/html/HTMLHeadingElement.java $(src)/org/w3c/dom/html/HTMLHtmlElement.java $(src)/org/w3c/dom/html/HTMLIFrameElement.java $(src)/org/w3c/dom/html/HTMLImageElement.java $(src)/org/w3c/dom/html/HTMLInputElement.java $(src)/org/w3c/dom/html/HTMLIsIndexElement.java $(src)/org/w3c/dom/html/HTMLLIElement.java $(src)/org/w3c/dom/html/HTMLLabelElement.java $(src)/org/w3c/dom/html/HTMLLegendElement.java $(src)/org/w3c/dom/html/HTMLLinkElement.java $(src)/org/w3c/dom/html/HTMLMapElement.java $(src)/org/w3c/dom/html/HTMLMenuElement.java $(src)/org/w3c/dom/html/HTMLMetaElement.java $(src)/org/w3c/dom/html/HTMLModElement.java $(src)/org/w3c/dom/html/HTMLOListElement.java $(src)/org/w3c/dom/html/HTMLObjectElement.java $(src)/org/w3c/dom/html/HTMLOptGroupElement.java $(src)/org/w3c/dom/html/HTMLOptionElement.java $(src)/org/w3c/dom/html/HTMLParagraphElement.java $(src)/org/w3c/dom/html/HTMLParamElement.java $(src)/org/w3c/dom/html/HTMLPreElement.java $(src)/org/w3c/dom/html/HTMLQuoteElement.java $(src)/org/w3c/dom/html/HTMLScriptElement.java $(src)/org/w3c/dom/html/HTMLSelectElement.java $(src)/org/w3c/dom/html/HTMLStyleElement.java $(src)/org/w3c/dom/html/HTMLTableCaptionElement.java $(src)/org/w3c/dom/html/HTMLTableCellElement.java $(src)/org/w3c/dom/html/HTMLTableColElement.java $(src)/org/w3c/dom/html/HTMLTableElement.java $(src)/org/w3c/dom/html/HTMLTableRowElement.java $(src)/org/w3c/dom/html/HTMLTableSectionElement.java $(src)/org/w3c/dom/html/HTMLTextAreaElement.java $(src)/org/w3c/dom/html/HTMLTitleElement.java $(src)/org/w3c/dom/html/HTMLUListElement.java $(src)/org/w3c/dom/ranges/DocumentRange.java $(src)/org/w3c/dom/ranges/Range.java $(src)/org/w3c/dom/ranges/RangeException.java $(src)/org/w3c/dom/stylesheets/DocumentStyle.java $(src)/org/w3c/dom/stylesheets/LinkStyle.java $(src)/org/w3c/dom/stylesheets/MediaList.java $(src)/org/w3c/dom/stylesheets/StyleSheet.java $(src)/org/w3c/dom/stylesheets/StyleSheetList.java $(src)/org/w3c/dom/traversal/DocumentTraversal.java $(src)/org/w3c/dom/traversal/NodeFilter.java $(src)/org/w3c/dom/traversal/NodeIterator.java $(src)/org/w3c/dom/traversal/TreeWalker.java $(src)/org/w3c/dom/views/AbstractView.java $(src)/org/w3c/dom/views/DocumentView.java $(src)/org/xml/sax/AttributeList.java $(src)/org/xml/sax/Attributes.java $(src)/org/xml/sax/ContentHandler.java $(src)/org/xml/sax/DTDHandler.java $(src)/org/xml/sax/DocumentHandler.java $(src)/org/xml/sax/EntityResolver.java $(src)/org/xml/sax/ErrorHandler.java $(src)/org/xml/sax/HandlerBase.java $(src)/org/xml/sax/InputSource.java $(src)/org/xml/sax/Locator.java $(src)/org/xml/sax/Parser.java $(src)/org/xml/sax/SAXException.java $(src)/org/xml/sax/SAXNotRecognizedException.java $(src)/org/xml/sax/SAXNotSupportedException.java $(src)/org/xml/sax/SAXParseException.java $(src)/org/xml/sax/XMLFilter.java $(src)/org/xml/sax/XMLReader.java $(src)/org/xml/sax/ext/Attributes2.java $(src)/org/xml/sax/ext/Attributes2Impl.java $(src)/org/xml/sax/ext/DeclHandler.java $(src)/org/xml/sax/ext/DefaultHandler2.java $(src)/org/xml/sax/ext/EntityResolver2.java $(src)/org/xml/sax/ext/LexicalHandler.java $(src)/org/xml/sax/ext/Locator2.java $(src)/org/xml/sax/ext/Locator2Impl.java $(src)/org/xml/sax/helpers/AttributeListImpl.java $(src)/org/xml/sax/helpers/AttributesImpl.java $(src)/org/xml/sax/helpers/DefaultHandler.java $(src)/org/xml/sax/helpers/LocatorImpl.java $(src)/org/xml/sax/helpers/NamespaceSupport.java $(src)/org/xml/sax/helpers/NewInstance.java $(src)/org/xml/sax/helpers/ParserAdapter.java $(src)/org/xml/sax/helpers/ParserFactory.java $(src)/org/xml/sax/helpers/XMLFilterImpl.java $(src)/org/xml/sax/helpers/XMLReaderAdapter.java $(src)/org/xml/sax/helpers/XMLReaderFactory.java $(src)/javax/xml/parsers/ClassStuff.java $(src)/javax/xml/parsers/DocumentBuilder.java $(src)/javax/xml/parsers/DocumentBuilderFactory.java $(src)/javax/xml/parsers/FactoryConfigurationError.java $(src)/javax/xml/parsers/ParserConfigurationException.java $(src)/javax/xml/parsers/SAXParser.java $(src)/javax/xml/parsers/SAXParserFactory.java $(src)/javax/xml/transform/ClassStuff.java $(src)/javax/xml/transform/ErrorListener.java $(src)/javax/xml/transform/OutputKeys.java $(src)/javax/xml/transform/Result.java $(src)/javax/xml/transform/Source.java $(src)/javax/xml/transform/SourceLocator.java $(src)/javax/xml/transform/Templates.java $(src)/javax/xml/transform/Transformer.java $(src)/javax/xml/transform/TransformerConfigurationException.java $(src)/javax/xml/transform/TransformerException.java $(src)/javax/xml/transform/TransformerFactory.java $(src)/javax/xml/transform/TransformerFactoryConfigurationError.java $(src)/javax/xml/transform/URIResolver.java $(src)/javax/xml/transform/dom/DOMLocator.java $(src)/javax/xml/transform/dom/DOMResult.java $(src)/javax/xml/transform/dom/DOMSource.java $(src)/javax/xml/transform/sax/SAXResult.java $(src)/javax/xml/transform/sax/SAXSource.java $(src)/javax/xml/transform/sax/SAXTransformerFactory.java $(src)/javax/xml/transform/sax/TemplatesHandler.java $(src)/javax/xml/transform/sax/TransformerHandler.java $(src)/javax/xml/transform/stream/StreamResult.java $(src)/javax/xml/transform/stream/StreamSource.java $(src)/gnu/xml/aelfred2/JAXPFactory.java $(src)/gnu/xml/aelfred2/SAXDriver.java $(src)/gnu/xml/aelfred2/XmlParser.java $(src)/gnu/xml/aelfred2/XmlReader.java $(src)/gnu/xml/dom/Consumer.java $(src)/gnu/xml/dom/DomAttr.java $(src)/gnu/xml/dom/DomCDATA.java $(src)/gnu/xml/dom/DomCharacterData.java $(src)/gnu/xml/dom/DomComment.java $(src)/gnu/xml/dom/DomDoctype.java $(src)/gnu/xml/dom/DomDocument.java $(src)/gnu/xml/dom/DomElement.java $(src)/gnu/xml/dom/DomEntity.java $(src)/gnu/xml/dom/DomEntityReference.java $(src)/gnu/xml/dom/DomEvent.java $(src)/gnu/xml/dom/DomEx.java $(src)/gnu/xml/dom/DomExtern.java $(src)/gnu/xml/dom/DomFragment.java $(src)/gnu/xml/dom/DomImpl.java $(src)/gnu/xml/dom/DomIterator.java $(src)/gnu/xml/dom/DomNamedNodeMap.java $(src)/gnu/xml/dom/DomNode.java $(src)/gnu/xml/dom/DomNotation.java $(src)/gnu/xml/dom/DomNsNode.java $(src)/gnu/xml/dom/DomPI.java $(src)/gnu/xml/dom/DomText.java $(src)/gnu/xml/dom/JAXPFactory.java $(src)/gnu/xml/pipeline/CallFilter.java $(src)/gnu/xml/pipeline/DomConsumer.java $(src)/gnu/xml/pipeline/EventConsumer.java $(src)/gnu/xml/pipeline/EventFilter.java $(src)/gnu/xml/pipeline/LinkFilter.java $(src)/gnu/xml/pipeline/NSFilter.java $(src)/gnu/xml/pipeline/PipelineFactory.java $(src)/gnu/xml/pipeline/TeeConsumer.java $(src)/gnu/xml/pipeline/TextConsumer.java $(src)/gnu/xml/pipeline/ValidationConsumer.java $(src)/gnu/xml/pipeline/WellFormednessFilter.java $(src)/gnu/xml/pipeline/XIncludeFilter.java $(src)/gnu/xml/pipeline/XsltFilter.java $(src)/gnu/xml/util/DoParse.java $(src)/gnu/xml/util/DomParser.java $(src)/gnu/xml/util/Resolver.java $(src)/gnu/xml/util/SAXNullTransformerFactory.java $(src)/gnu/xml/util/XCat.java $(src)/gnu/xml/util/XHTMLWriter.java $(src)/gnu/xml/util/XMLWriter.java $(src)/gnu/xml/libxmlj/sax/GnomeLocator.java $(src)/gnu/xml/libxmlj/sax/GnomeSAXParser.java $(src)/gnu/xml/libxmlj/sax/GnomeSAXParserFactory.java $(src)/gnu/xml/libxmlj/sax/GnomeXMLReader.java $(src)/gnu/xml/libxmlj/sax/Namespaces.java $(src)/gnu/xml/libxmlj/sax/StringArrayAttributes.java $(src)/gnu/xml/libxmlj/sax/XMLName.java $(src)/gnu/xml/libxmlj/dom/EmptyNodeList.java $(src)/gnu/xml/libxmlj/dom/GnomeAttr.java $(src)/gnu/xml/libxmlj/dom/GnomeCDATASection.java $(src)/gnu/xml/libxmlj/dom/GnomeCharacterData.java $(src)/gnu/xml/libxmlj/dom/GnomeComment.java $(src)/gnu/xml/libxmlj/dom/GnomeDocument.java $(src)/gnu/xml/libxmlj/dom/GnomeDocumentBuilder.java $(src)/gnu/xml/libxmlj/dom/GnomeDocumentBuilderFactory.java $(src)/gnu/xml/libxmlj/dom/GnomeDocumentFragment.java $(src)/gnu/xml/libxmlj/dom/GnomeDocumentType.java $(src)/gnu/xml/libxmlj/dom/GnomeElement.java $(src)/gnu/xml/libxmlj/dom/GnomeEntity.java $(src)/gnu/xml/libxmlj/dom/GnomeEntityReference.java $(src)/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java $(src)/gnu/xml/libxmlj/dom/GnomeNode.java $(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java $(src)/gnu/xml/libxmlj/dom/GnomeText.java $(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java $(src)/gnu/xml/libxmlj/dom/StandaloneDocumentType.java $(src)/gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.java $(src)/gnu/xml/libxmlj/transform/DefaultURIResolverImpl.java $(src)/gnu/xml/libxmlj/transform/ErrorListenerProxy.java $(src)/gnu/xml/libxmlj/transform/IOToolkit.java $(src)/gnu/xml/libxmlj/transform/JavaContext.java $(src)/gnu/xml/libxmlj/transform/LibxmlDocument.java $(src)/gnu/xml/libxmlj/transform/LibxsltStylesheet.java $(src)/gnu/xml/libxmlj/transform/SourceLocatorImpl.java $(src)/gnu/xml/libxmlj/transform/SourceWrapper.java $(src)/gnu/xml/libxmlj/transform/TemplatesImpl.java $(src)/gnu/xml/libxmlj/transform/TransformTest.java $(src)/gnu/xml/libxmlj/transform/TransformerFactoryImpl.java $(src)/gnu/xml/libxmlj/transform/TransformerImpl.java $(src)/gnu/xml/libxmlj/transform/URIResolverProxy.java
 
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 
-headers =  $(jni)/gnu_xml_libxmlj_sax_GnomeLocator.h $(jni)/gnu_xml_libxmlj_sax_GnomeXMLReader.h $(jni)/gnu_xml_libxmlj_dom_GnomeAttr.h $(jni)/gnu_xml_libxmlj_dom_GnomeDocument.h $(jni)/gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h $(jni)/gnu_xml_libxmlj_dom_GnomeDocumentType.h $(jni)/gnu_xml_libxmlj_dom_GnomeElement.h $(jni)/gnu_xml_libxmlj_dom_GnomeEntity.h $(jni)/gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h $(jni)/gnu_xml_libxmlj_dom_GnomeNode.h $(jni)/gnu_xml_libxmlj_dom_GnomeNodeList.h $(jni)/gnu_xml_libxmlj_dom_GnomeNotation.h $(jni)/gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h $(jni)/gnu_xml_libxmlj_dom_MatchingNodeList.h $(jni)/javax_xml_transform_OutputKeys.h $(jni)/gnu_xml_libxmlj_transform_JavaContext.h $(jni)/gnu_xml_libxmlj_transform_LibxmlDocument.h $(jni)/gnu_xml_libxmlj_transform_LibxsltStylesheet.h $(jni)/gnu_xml_libxmlj_transform_TransformerFactoryImpl.h
+headers =  gnu_xml_libxmlj_sax_GnomeLocator.h gnu_xml_libxmlj_sax_GnomeXMLReader.h gnu_xml_libxmlj_dom_GnomeAttr.h gnu_xml_libxmlj_dom_GnomeDocument.h gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h gnu_xml_libxmlj_dom_GnomeDocumentType.h gnu_xml_libxmlj_dom_GnomeElement.h gnu_xml_libxmlj_dom_GnomeEntity.h gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h gnu_xml_libxmlj_dom_GnomeNode.h gnu_xml_libxmlj_dom_GnomeNodeList.h gnu_xml_libxmlj_dom_GnomeNotation.h gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h gnu_xml_libxmlj_dom_MatchingNodeList.h javax_xml_transform_OutputKeys.h gnu_xml_libxmlj_transform_JavaContext.h gnu_xml_libxmlj_transform_LibxmlDocument.h gnu_xml_libxmlj_transform_LibxsltStylesheet.h gnu_xml_libxmlj_transform_TransformerFactoryImpl.h
 
 
 libxmlj_la_DEPENDENCIES = $(JARFILE) $(headers)
 
-libxmlj_la_SOURCES =  $(jni)/xmlj_dom.c $(jni)/xmlj_error.c $(jni)/xmlj_io.c $(jni)/xmlj_node.c $(jni)/xmlj_sax.c $(jni)/xmlj_transform.c $(jni)/xmlj_util.c
+libxmlj_la_SOURCES =  xmlj_dom.c xmlj_error.c xmlj_io.c xmlj_node.c xmlj_sax.c xmlj_transform.c xmlj_util.c
 
 
 libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
@@ -179,7 +172,12 @@ LTLIBRARIES =  $(lib_LTLIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 LDFLAGS = @LDFLAGS@
 libxmlj_la_LIBADD = 
-libxmlj_la_OBJECTS = 
+libxmlj_la_OBJECTS =  xmlj_dom.lo xmlj_error.lo xmlj_io.lo xmlj_node.lo \
+xmlj_sax.lo xmlj_transform.lo xmlj_util.lo
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 Makefile.in NEWS acinclude.m4 aclocal.m4 configure configure.ac \
 mkinstalldirs
@@ -189,6 +187,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
+DEP_FILES =  .deps/xmlj_dom.P .deps/xmlj_error.P .deps/xmlj_io.P \
+.deps/xmlj_node.P .deps/xmlj_sax.P .deps/xmlj_transform.P \
+.deps/xmlj_util.P
 SOURCES = $(libxmlj_la_SOURCES)
 OBJECTS = $(libxmlj_la_OBJECTS)
 
@@ -275,9 +276,35 @@ maintainer-clean-libtool:
 
 libxmlj.la: $(libxmlj_la_OBJECTS) $(libxmlj_la_DEPENDENCIES)
 	$(LINK) -rpath $(libdir) $(libxmlj_la_LDFLAGS) $(libxmlj_la_OBJECTS) $(libxmlj_la_LIBADD) $(LIBS)
-tags: TAGS
-TAGS:
 
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags -o $$here/TAGS $(ETAGS_ARGS) $$tags  $$unique $(LISP))
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -333,6 +360,38 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
+
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
 info-am:
 info: info-am
 dvi-am:
@@ -372,17 +431,19 @@ distclean-generic:
 maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean-am:  mostlyclean-libLTLIBRARIES mostlyclean-compile \
-		mostlyclean-libtool mostlyclean-generic
+		mostlyclean-libtool mostlyclean-tags mostlyclean-depend \
+		mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-libLTLIBRARIES clean-compile clean-libtool \
-		clean-generic mostlyclean-am clean-local
+clean-am:  clean-libLTLIBRARIES clean-compile clean-libtool clean-tags \
+		clean-depend clean-generic mostlyclean-am clean-local
 
 clean: clean-am
 
 distclean-am:  distclean-libLTLIBRARIES distclean-compile \
-		distclean-libtool distclean-generic clean-am
+		distclean-libtool distclean-tags distclean-depend \
+		distclean-generic clean-am
 	-rm -f libtool
 
 distclean: distclean-am
@@ -390,6 +451,7 @@ distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-libLTLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-tags maintainer-clean-depend \
 		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
@@ -402,32 +464,34 @@ clean-libLTLIBRARIES maintainer-clean-libLTLIBRARIES \
 uninstall-libLTLIBRARIES install-libLTLIBRARIES mostlyclean-compile \
 distclean-compile clean-compile maintainer-clean-compile \
 mostlyclean-libtool distclean-libtool clean-libtool \
-maintainer-clean-libtool tags distdir info-am info dvi-am dvi \
-check-local check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-local install-data-am install-data install-am \
-install uninstall-am uninstall all-redirect all-am all installdirs \
-mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+maintainer-clean-libtool tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir mostlyclean-depend \
+distclean-depend clean-depend maintainer-clean-depend info-am info \
+dvi-am dvi check-local check check-am installcheck-am installcheck \
+install-exec-am install-exec install-data-local install-data-am \
+install-data install-am install uninstall-am uninstall all-redirect \
+all-am all installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
 
 
 # Generate header files for classes containing native code.
-#$(headers): $(jni)/%.h: $(dst)/$(%:_=/).class) $(header_deps)
+#$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
 #	@JAVAH@ -jni -d $(jni) -classpath $(dst) $($<:/=.)
 
 # I did remove the -force argument (not available in gcjh nor in kaffe)
 
-$(jni)/gnu_xml_libxmlj_dom_%.h: $(dst)/gnu/xml/libxmlj/dom/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.dom.$*
+gnu_xml_libxmlj_dom_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
 
-$(jni)/gnu_xml_libxmlj_sax_%.h: $(dst)/gnu/xml/libxmlj/sax/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.sax.$*
+gnu_xml_libxmlj_sax_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
 
-#$(jni)/gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class $(dst)/gnu/xml/libxmlj/transform/JavaContext.class $(dst)/gnu/xml/libxmlj/transform/SourceContext.class
-$(jni)/gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.transform.$*
+gnu_xml_libxmlj_transform_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
 
-$(jni)/javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) javax.xml.transform.$*
+javax_xml_transform_%.h: 
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)

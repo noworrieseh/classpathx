@@ -20,22 +20,16 @@
 # 02111-1307 USA. 
 #
 
-# HACK why does configure not create these?
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-
 JAVADOC = javadoc
-
-lib_LTLIBRARIES = libxmlj.la
 
 src = @srcdir@/source
 dst = @srcdir@/classes
-jni = @srcdir@/jni
 doc = @srcdir@/apidoc
 
 JARFILE = gnujaxp.jar
 #data_DATA = ${JARFILE} - needs $(prefix)/share/java
+
+lib_LTLIBRARIES = libxmlj.la
 
 sources = \
 $(src)/org/w3c/dom/Attr.java \
@@ -326,37 +320,36 @@ $(src)/gnu/xml/libxmlj/transform/URIResolverProxy.java
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 
 headers = \
-$(jni)/gnu_xml_libxmlj_sax_GnomeLocator.h \
-$(jni)/gnu_xml_libxmlj_sax_GnomeXMLReader.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeAttr.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeDocument.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeDocumentType.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeElement.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeEntity.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeNode.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeNodeList.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeNotation.h \
-$(jni)/gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
-$(jni)/gnu_xml_libxmlj_dom_MatchingNodeList.h \
-$(jni)/javax_xml_transform_OutputKeys.h \
-$(jni)/gnu_xml_libxmlj_transform_JavaContext.h \
-$(jni)/gnu_xml_libxmlj_transform_LibxmlDocument.h \
-$(jni)/gnu_xml_libxmlj_transform_LibxsltStylesheet.h \
-$(jni)/gnu_xml_libxmlj_transform_TransformerFactoryImpl.h
+gnu_xml_libxmlj_sax_GnomeLocator.h \
+gnu_xml_libxmlj_sax_GnomeXMLReader.h \
+gnu_xml_libxmlj_dom_GnomeAttr.h \
+gnu_xml_libxmlj_dom_GnomeDocument.h \
+gnu_xml_libxmlj_dom_GnomeDocumentBuilder.h \
+gnu_xml_libxmlj_dom_GnomeDocumentType.h \
+gnu_xml_libxmlj_dom_GnomeElement.h \
+gnu_xml_libxmlj_dom_GnomeEntity.h \
+gnu_xml_libxmlj_dom_GnomeNamedNodeMap.h \
+gnu_xml_libxmlj_dom_GnomeNode.h \
+gnu_xml_libxmlj_dom_GnomeNodeList.h \
+gnu_xml_libxmlj_dom_GnomeNotation.h \
+gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+gnu_xml_libxmlj_dom_MatchingNodeList.h \
+javax_xml_transform_OutputKeys.h \
+gnu_xml_libxmlj_transform_JavaContext.h \
+gnu_xml_libxmlj_transform_LibxmlDocument.h \
+gnu_xml_libxmlj_transform_LibxsltStylesheet.h \
+gnu_xml_libxmlj_transform_TransformerFactoryImpl.h
 
 libxmlj_la_DEPENDENCIES = $(JARFILE) $(headers)
 
 libxmlj_la_SOURCES = \
-$(jni)/xmlj_dom.c \
-$(jni)/xmlj_error.c \
-$(jni)/xmlj_io.c \
-$(jni)/xmlj_node.c \
-$(jni)/xmlj_sax.c \
-$(jni)/xmlj_transform.c \
-$(jni)/xmlj_util.c
-
+xmlj_dom.c \
+xmlj_error.c \
+xmlj_io.c \
+xmlj_node.c \
+xmlj_sax.c \
+xmlj_transform.c \
+xmlj_util.c
 
 libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
@@ -389,23 +382,22 @@ gnu.xml.util
 BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
 
 # Generate header files for classes containing native code.
-#$(headers): $(jni)/%.h: $(dst)/$(%:_=/).class) $(header_deps)
+#$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
 #	@JAVAH@ -jni -d $(jni) -classpath $(dst) $($<:/=.)
 
 # I did remove the -force argument (not available in gcjh nor in kaffe)
 
-$(jni)/gnu_xml_libxmlj_dom_%.h: $(dst)/gnu/xml/libxmlj/dom/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.dom.$*
+gnu_xml_libxmlj_dom_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
 
-$(jni)/gnu_xml_libxmlj_sax_%.h: $(dst)/gnu/xml/libxmlj/sax/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.sax.$*
+gnu_xml_libxmlj_sax_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
 
-#$(jni)/gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class $(dst)/gnu/xml/libxmlj/transform/JavaContext.class $(dst)/gnu/xml/libxmlj/transform/SourceContext.class
-$(jni)/gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) gnu.xml.libxmlj.transform.$*
+gnu_xml_libxmlj_transform_%.h: $(JARFILE)
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
 
-$(jni)/javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
-	@JAVAH@ -jni -d $(jni) -classpath $(dst) javax.xml.transform.$*
+javax_xml_transform_%.h: 
+	CLASSPATH=$(JARFILE) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)

@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -109,6 +110,8 @@ implements XMLReader
   private transient boolean seenFatalError;
 
   private transient boolean seenStartDocument;
+
+  private transient URL base;
 
   public GnomeXMLReader()
   {
@@ -281,8 +284,24 @@ implements XMLReader
     standalone = false;
     seenFatalError = false;
     seenStartDocument = false;
+    base = (systemId != null) ? new URL(systemId) : null;
     // Parse
-    parseStream(in, publicId, systemId, validation);
+    try
+    {
+      parseStream(in, publicId, systemId, validation);
+    }
+    catch (IOException e)
+    {
+      String message = e.getMessage();
+      if ("document is empty".equals(message))
+      {
+        startDocument(false);
+        fatalError(message);
+        endDocument();
+      }
+      else
+        throw e;
+    }
     in.close();
   }
 
@@ -312,20 +331,50 @@ implements XMLReader
     return ns.getURI(prefix);
   }
 
+  /*
+   * Expands the given URI if necessary.
+   */
+  String expand(String uri)
+  {
+    if (uri != null && (uri.length() > 0) && (uri.indexOf(':') == -1) &&
+        base != null)
+    {
+      if (uri.charAt(0) != '/')
+      {
+        // relative
+        String path = base.getFile();
+        int lsi = path.lastIndexOf('/');
+        if (lsi != -1)
+          uri = path.substring(0, lsi + 1) + uri;
+      }
+      try
+      {
+        uri = new URL(base.getProtocol(),
+            base.getHost(),
+            base.getPort(),
+            uri).toString();
+      }
+      catch (MalformedURLException e)
+      {
+      }
+    }
+    return uri;
+  }
+
   // Callbacks from libxmlj
 
   private void startDTD(String name, String publicId, String systemId)
     throws SAXException
   {
     if (!seenFatalError && lexicalHandler != null)
-      lexicalHandler.startDTD(name, publicId, systemId);
+      lexicalHandler.startDTD(name, publicId, expand(systemId));
   }
 
   private void externalEntityDecl(String name, String publicId, String systemId)
     throws SAXException
   {
     if (!seenFatalError && declarationHandler != null)
-      declarationHandler.externalEntityDecl(name, publicId, systemId);
+      declarationHandler.externalEntityDecl(name, publicId, expand(systemId));
   }
 
   private void internalEntityDecl(String name, String value)
@@ -340,7 +389,7 @@ implements XMLReader
   {
     if (entityResolver != null)
       return getInputStream(entityResolver.resolveEntity(publicId,
-            systemId));
+            expand(systemId)));
     else
       return null;
   }
@@ -349,7 +398,7 @@ implements XMLReader
     throws SAXException
   {
     if (!seenFatalError && dtdHandler != null)
-      dtdHandler.notationDecl(name, publicId, systemId);
+      dtdHandler.notationDecl(name, publicId, expand(systemId));
   }
 
   private void attributeDecl(String eName, String aName, String type,
@@ -372,7 +421,8 @@ implements XMLReader
     throws SAXException
   {
     if (!seenFatalError && dtdHandler != null)
-      dtdHandler.unparsedEntityDecl(name, publicId, systemId, notationName);
+      dtdHandler.unparsedEntityDecl(name, publicId, expand(systemId),
+          notationName);
   }
 
   private void setDocumentLocator(int ctx, int loc)
@@ -473,7 +523,7 @@ implements XMLReader
   private void characters(String text)
     throws SAXException
   {
-    if (!seenFatalError && contentHandler != null)
+    if (!seenFatalError && contentHandler != null && text != null)
     {
       char[] ch = text.toCharArray();
       contentHandler.characters(ch, 0, ch.length);
@@ -483,7 +533,7 @@ implements XMLReader
   private void ignorableWhitespace(String text)
     throws SAXException
   {
-    if (!seenFatalError && contentHandler != null)
+    if (!seenFatalError && contentHandler != null && text != null)
     {
       char[] ch = text.toCharArray();
       contentHandler.ignorableWhitespace(ch, 0, ch.length);
@@ -504,7 +554,7 @@ implements XMLReader
   private void comment(String text)
     throws SAXException
   {
-    if (!seenFatalError && lexicalHandler != null)
+    if (!seenFatalError && lexicalHandler != null && text != null)
     {
       char[] ch = text.toCharArray();
       lexicalHandler.comment(ch, 0, ch.length);

@@ -426,7 +426,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="source/javax/xml/parsers/SAXParserFactory.java"
-ac_unique_file="jni/xmlj_util.c"
+ac_unique_file="xmlj_util.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

@@ -35,7 +35,7 @@ static xmlSAXHandler handler = {
   (hasInternalSubsetSAXFunc)xmljSAXHasInternalSubset,
   (hasExternalSubsetSAXFunc)xmljSAXHasExternalSubset,
   (resolveEntitySAXFunc)xmljSAXResolveEntity,
-  0, /*(getEntitySAXFunc)xmljSAXGetEntity,*/
+  (getEntitySAXFunc)xmljSAXGetEntity,
   (entityDeclSAXFunc)xmljSAXEntityDecl,
   (notationDeclSAXFunc)xmljSAXNotationDecl,
   (attributeDeclSAXFunc)xmljSAXAttributeDecl,
@@ -313,22 +313,30 @@ xmljSAXInternalSubset(void *vctx,
 int
 xmljSAXIsStandalone(void *vctx)
 {
-  /* TODO */
-  return 0;
+  xmlParserCtxtPtr ctx;
+  
+  ctx = (xmlParserCtxtPtr)vctx;
+  return ctx->standalone;
 }
 
 int
 xmljSAXHasInternalSubset(void *vctx)
 {
-  /* TODO */
-  return 0;
+  xmlParserCtxtPtr ctx;
+  xmlDocPtr doc;
+  
+  ctx = (xmlParserCtxtPtr)vctx;
+  doc = ctx->myDoc;
+  return (doc->intSubset != NULL);
 }
 
 int
 xmljSAXHasExternalSubset(void *vctx)
 {
-  /* TODO */
-  return 0;
+  xmlParserCtxtPtr ctx;
+  
+  ctx = (xmlParserCtxtPtr)vctx;
+  return ctx->hasExternalSubset;
 }
   
 xmlParserInputPtr
@@ -485,7 +493,6 @@ xmljSAXAttributeDecl(void *vctx,
     const xmlChar *defaultValue,
     xmlEnumerationPtr tree)
 {
-  /* TODO */
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
   
@@ -624,7 +631,7 @@ xmljSAXSetDocumentLocator (void *vctx,
 
   cls = (*env)->GetObjectClass(env, target);
 	
-  /* Get the unparsedEntityDecl method */
+  /* Get the setDocumentLocator method */
   method = (*env)->GetMethodID(env, cls,
       "setDocumentLocator",
       "(II)V");
