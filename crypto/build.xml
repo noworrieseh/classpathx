@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.1.1.1 2001-11-20 13:26:34 raif Exp $
+   $Id: build.xml,v 1.2 2001-11-21 19:57:26 raif Exp $
 
    Copyright (C) 2001 Free Software Foundation, Inc.
 
@@ -306,26 +306,25 @@
    <!--
    Generating Javadoc API in HTML format ......................................
    -->
-   <target name="docs"
+   <target name="docs" depends="jar"
            description="Generate programmer documentation in Javadoc HTML format">
       <mkdir dir="${docs.dir}/api"/>
-      <javadoc sourcepath="${src.dir}"
+      <javadoc packagenames="gnu.crypto.*"
+               sourcepath="${src.dir}"
                destdir="${docs.dir}/api"
-               defaultexcludes="yes"
                package="true"
                version="true"
-               sourcefiles="${src.dir}/*.java"
                windowtitle="${oneliner}, version ${version}">
          <doctitle>
             <![CDATA[<H1>${oneliner}<BR>Programmer's Documentation</H1>]]>
          </doctitle>
          <header>
             <![CDATA[For the latest news and information visit the<BR>
-            <A HREF="http://sourceforge.net/propjects/gnu-crypto">The GNU Crypto web site</A>]]>
+            <A HREF="http://sourceforge.net/propjects/gnu-crypto">The GNU Crypto project</A>]]>
          </header>
          <bottom>
-            <![CDATA[Copyright &copy;2001 <A HREF="mailto:raif@fl.net.au">
-            Ra&iuml;f S. Naffah.</A> All Rights Reserved.]]>
+            <![CDATA[Copyright &copy;2001 <A HREF="mailto:classpathx-crypto@gnu.org">
+            Free Software Foundation, Inc..</A> All Rights Reserved.]]>
          </bottom>
          <classpath>
             <pathelement location="${main.jar}"/>
