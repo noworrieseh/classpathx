@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.8 2001-08-24 21:44:45 db Exp $
+ * $Id: EventFilter.java,v 1.9 2001-10-15 02:18:51 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -118,7 +118,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-08-24 21:44:45 $
+ * @version $Date: 2001-10-15 02:18:51 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -179,6 +179,10 @@ public class EventFilter
      *	grounds that no XMLReader is permitted to producee malformed
      *	event streams and this would just be processing overhead.
      *
+     *	<li> {@link XIncludeFilter} stops the special handling, except
+     *	that it's told about the "namespace-prefixes" feature of the
+     *	event producer so that the event stream is internally consistent.
+     *
      *	<li> The first consumer which is not one of those classes stops
      *	such special handling.  This means that if you want to force
      *	one of those filters to be used, you could just precede it with
@@ -225,9 +229,18 @@ public class EventFilter
 	    } else if (consumer instanceof WellFormednessFilter) {
 		consumer = ((WellFormednessFilter)consumer).getNext ();
 
-	    // stop on the first pipeline stage we can't recognize
+	    // stop on the first pipeline stage we can't remove
 	    } else
 		break;
+	}
+
+	if (consumer instanceof XIncludeFilter) {
+	    try {
+		((XIncludeFilter)consumer).setSavingPrefixes (
+		    producer.getFeature (FEATURE_URI + "namespace-prefixes"));
+	    } catch (SAXException e) {
+		// "can't happen"
+	    }
 	}
 
 	// Some SAX parsers can't handle null handlers -- bleech
