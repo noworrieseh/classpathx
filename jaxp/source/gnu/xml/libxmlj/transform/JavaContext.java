@@ -139,7 +139,7 @@ class JavaContext
 
   //--- DOM caching methods follow
 
-  private native long parseDocument (InputStream in, String systemId,
+  private native int parseDocument (InputStream in, String systemId,
 				     String publicId);
 
   LibxmlDocument resolveURIAndOpen (String href,
@@ -179,7 +179,7 @@ class JavaContext
       }
     else
       {
-        long rc 
+        int rc 
           = parseDocument (new SourceWrapper (source).getInputStream (),
                            source.getSystemId (),
                            null);

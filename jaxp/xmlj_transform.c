@@ -43,6 +43,7 @@
 
 #include "xmlj_io.h"
 #include "xmlj_error.h"
+#include "xmlj_sax.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -51,9 +52,7 @@
 
 #include <libxml/xmlmemory.h>
 #include <libxml/debugXML.h>
-#include <libxml/HTMLtree.h>
 #include <libxml/xmlIO.h>
-#include <libxml/DOCBparser.h>
 #include <libxml/xinclude.h>
 #include <libxml/parser.h>
 #include <libxml/catalog.h>
@@ -251,7 +250,7 @@ xmljDocumentFunction (xmlXPathParserContextPtr ctxt, int nargs)
  * Method:    newLibxsltStylesheet
  * Signature: ([B)J
  */
-JNIEXPORT jlong JNICALL
+JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   JNIEnv * env, jclass clazz, jobject inputStream, jstring inSystemId,
   jstring inPublicId, jobject errorAdapter, jobject outputProperties)
@@ -261,11 +260,16 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   xmlDocPtr xsltSourceDoc;
 
   /* xmlMemSetup (memcheck_free, memcheck_malloc, memcheck_realloc, memcheck_strdup); */
-  xmlSetExternalEntityLoader (xmljLoadExternalEntity);
 
   xsltSourceDoc
-    = xmljParseJavaInputStream (env, inputStream,
-				inSystemId, inPublicId, 0, 0, 0, NULL, errorAdapter);
+    = xmljParseDocument (env,
+                         errorAdapter,
+                         inputStream,
+                         inPublicId,
+                         inSystemId,
+                         0, 0, 0,
+                         0, 0, 0, 0, 0, 0,
+                         0);
   if (!(*env)->ExceptionOccurred (env))
     {
       jclass transformerExceptionClass
@@ -432,9 +436,9 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
 
   /* Note: freeing xsltSourceDoc not allowed. */
 
-  /* Return handle/address casted to Java long value */
+  /* Return handle/address casted to Java int value */
 
-  return (jlong) (int) nativeStylesheetHandle;
+  return (jint) nativeStylesheetHandle;
 }
 
 /*
@@ -444,14 +448,14 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_freeLibxsltStylesheet
-(JNIEnv * env, jclass clazz, jlong nativeStylesheetHandle)
+(JNIEnv * env, jclass clazz, jint nativeStylesheetHandle)
 {
 
-  /* Cast Java long value to handle/address and free associated
+  /* Cast Java int value to handle/address and free associated
    * libxslt resources.
    */
 
-  xsltStylesheetPtr nativeStylesheet = (xsltStylesheetPtr) (int) nativeStylesheetHandle;
+  xsltStylesheetPtr nativeStylesheet = (xsltStylesheetPtr) nativeStylesheetHandle;
   nativeStylesheet->_private = NULL;
   xmlFreeDoc(nativeStylesheet->doc);
   nativeStylesheet->doc = NULL;
@@ -479,7 +483,7 @@ xmljXPathFuncLookupFunc (void * ctxt,
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
-  JNIEnv *env, jclass clazz, jlong xsltSource, jobject inputStream,
+  JNIEnv *env, jclass clazz, jint xsltSource, jobject inputStream,
   jstring inSystemId, jstring inPublicId, jobject outputStream,
   jobjectArray parametersArray, jobject errorAdapter)
 {
@@ -500,7 +504,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
 
     jmethodID getNativeHandleMethodID
       = (*env)->GetMethodID (env, libxmlDocumentClassID,
-                             "getNativeHandle", "()J");
+                             "getNativeHandle", "()I");
 
     jobject libxmlDocument =
       (*env)->CallObjectMethod (env, 
@@ -511,9 +515,9 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
                                 inPublicId);
 
     xmlDocPtr xmlSourceDoc = 
-      (xmlDocPtr)(int) (*env)->CallLongMethod (env, 
-                                               libxmlDocument,
-                                               getNativeHandleMethodID);
+      (xmlDocPtr) (*env)->CallIntMethod (env, 
+                                              libxmlDocument,
+                                              getNativeHandleMethodID);
 
     (*env)->DeleteLocalRef(env, libxmlDocument);
 
@@ -710,15 +714,21 @@ Java_gnu_xml_libxmlj_transform_TransformerFactoryImpl_freeLibxsltGlobal (
  * Method:    parseDocument
  * Signature: (Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL
-Java_gnu_xml_libxmlj_transform_JavaContext_parseDocument (
-  JNIEnv *env, jobject jthis, jobject inputStream, 
-  jstring inSystemId, jstring inPublicId)
+JNIEXPORT jint JNICALL
+Java_gnu_xml_libxmlj_transform_JavaContext_parseDocument (JNIEnv *env,
+                                                          jobject self,
+                                                          jobject in, 
+                                                          jstring systemId,
+                                                          jstring publicId)
 {
-  xmlDocPtr tree = xmljParseJavaInputStream (env, inputStream,
-					     inSystemId, inPublicId, 0, 0, 0,
-					     NULL, jthis);
-  return (jlong) (int) tree;
+  return (jint) xmljParseDocument(env,
+                                  self,
+                                  in,
+                                  publicId,
+                                  systemId,
+                                  0, 0, 0,
+                                  0, 0, 0, 0, 0, 0,
+                                  0);
 }
 
 /*
@@ -728,7 +738,7 @@ Java_gnu_xml_libxmlj_transform_JavaContext_parseDocument (
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxmlDocument_freeDocument (
-  JNIEnv *env, jobject jthis, jlong nativeHandle)
+  JNIEnv *env, jobject jthis, jint nativeHandle)
 {
-  xmlFreeDoc ((xmlDocPtr) (int) nativeHandle);
+  xmlFreeDoc ((xmlDocPtr) nativeHandle);
 }

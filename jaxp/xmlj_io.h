@@ -43,37 +43,74 @@
 #include <libxml/xmlIO.h>
 #include "xmlj_error.h"
 
+typedef struct _SAXParseContext
+{
+
+  JNIEnv *env; /* Current JNI environment */
+  jobject obj; /* The gnu.xml.libxmlj.sax.GnomeXmlReader instance */
+  xmlParserCtxtPtr ctx; /* libxml2 parser context */
+  xmlSAXLocatorPtr loc; /* libxml2 SAX locator */
+  xmlSAXHandlerPtr sax; /* pristine SAX handler */
+
+  jmethodID startDTD;
+  jmethodID externalEntityDecl;
+  jmethodID internalEntityDecl;
+  jmethodID resolveEntity;
+  jmethodID notationDecl;
+  jmethodID attributeDecl;
+  jmethodID elementDecl;
+  jmethodID unparsedEntityDecl;
+  jmethodID setDocumentLocator;
+  jmethodID startDocument;
+  jmethodID endDocument;
+  jmethodID startElement;
+  jmethodID endElement;
+  jmethodID characters;
+  jmethodID ignorableWhitespace;
+  jmethodID processingInstruction;
+  jmethodID comment;
+  jmethodID cdataBlock;
+  jmethodID warning;
+  jmethodID error;
+  jmethodID fatalError;
+  
+}
+SAXParseContext;
+
+SAXParseContext *
+xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx);
+
+void
+xmljFreeSAXParseContext (SAXParseContext * saxCtx);
+
 xmlParserCtxtPtr
-xmljEstablishParserContext (JNIEnv * env,
-			    jobject inputStream,
-			    jstring inSystemId,
-			    jstring inPublicId,
-			    jboolean validate,
-			    jboolean coalesce,
-			    jboolean expandEntities,
-			    jobject saxEntityResolver,
-			    jobject saxErrorAdapter, int useSaxErrorContext);
+xmljNewParserContext (JNIEnv * env,
+                      jobject inputStream,
+                      jstring inSystemId,
+                      jstring inPublicId,
+                      jboolean validate,
+                      jboolean coalesce,
+                      jboolean expandEntities);
 
-/* for DOM and transform */
 void
-xmljReleaseParserContext (xmlParserCtxtPtr inputParserCtx);
-
-/* for SAX */
-void
-xmljSAXFreeParserContext (xmlParserCtxtPtr parserContext);
+xmljFreeParserContext (xmlParserCtxtPtr parserContext);
 
 xmlDocPtr
-xmljParseJavaInputStream (JNIEnv * env,
-			  jobject inputStream,
-			  jstring inSystemId,
-			  jstring inPublicId,
-			  jboolean validate,
-			  jboolean coalesce,
-			  jboolean expandEntities,
-			  jobject saxEntityResolver, jobject saxErrorAdapter);
-
-xmlDocPtr
-xmljParseDocument (JNIEnv * env, xmlParserCtxtPtr inputParserCtx);
+xmljParseDocument (JNIEnv * env,
+                   jobject self,
+                   jobject in,
+                   jstring publicId,
+                   jstring systemId,
+                   jboolean validate,
+                   jboolean coalesce,
+                   jboolean expandEntities,
+                   jboolean contentHandler,
+                   jboolean dtdHandler,
+                   jboolean entityResolver,
+                   jboolean errorHandler,
+                   jboolean declarationHandler,
+                   jboolean lexicalHandler,
+                   int saxMode);
 
 xmlParserInputPtr
 xmljNewParserInput (JNIEnv * env,
@@ -88,6 +125,7 @@ xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
                                 xmlDocPtr tree,
                                 const char *outputEncoding);
 
+/*
 xmlParserInputPtr
 xmljLoadExternalEntity (const char *URL, const char *ID,
 					  xmlParserCtxtPtr ctxt);
@@ -95,15 +133,16 @@ xmljLoadExternalEntity (const char *URL, const char *ID,
 jobject
 xmljResolveURI (SaxErrorContext * saxErrorContext, const char *URL,
 			const char *ID);
-
+*/
 xmlDocPtr
 xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
 		       const char *URL, const char *ID);
 
-void
-xmljSetThreadContext (SaxErrorContext * ctxt);
 
-SaxErrorContext *
+void
+xmljSetThreadContext (SAXParseContext * ctxt);
+
+SAXParseContext *
 xmljGetThreadContext (void);
 
 void

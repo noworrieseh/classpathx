@@ -25,6 +25,7 @@
  * executable file might be covered by the GNU General Public License.
  */
 #include "xmlj_util.h"
+#include "xmlj_error.h"
 #include <libxml/tree.h>
 #include <unistd.h>
 
@@ -97,4 +98,43 @@ xmljGetLocalName (const xmlChar * qName)
       free (prefix);
       return localName;
     }
+}
+
+jmethodID xmljGetMethodID (JNIEnv *env,
+                           jobject target,
+                           const char *name,
+                           const char *signature)
+{
+  jclass cls;
+  jmethodID ret;
+
+  cls = (*env)->GetObjectClass (env, target);
+  if (cls == NULL)
+    {
+      xmljThrowException (env,
+                          "java/lang/ClassNotFoundException",
+                          NULL);
+      return NULL;
+    }
+  ret = (*env)->GetMethodID (env,
+                             cls,
+                             name,
+                             signature);
+  if (ret == NULL)
+    {
+      jclass clscls = (*env)->FindClass(env, "java/lang/Class");
+      jmethodID nm = (*env)->GetMethodID(env, clscls, "getName", "()Ljava/lang/String;");
+      jstring clsname = (jstring)(*env)->CallObjectMethod(env,
+                                                          (jobject)cls,
+                                                          nm);
+      const char * c_clsName = (*env)->GetStringUTFChars(env, clsname, 0);
+      char * cat = (char *)malloc(sizeof(char));
+      sprintf(cat, "%s.%s %s", c_clsName, name, signature);
+      xmljThrowException (env,
+                          "java/lang/NoSuchMethodException",
+                          cat);
+      free (cat);
+      (*env)->ReleaseStringUTFChars(env, clsname, c_clsName);
+    }
+  return ret;
 }

@@ -28,6 +28,7 @@
 #include "xmlj_error.h"
 #include "xmlj_io.h"
 #include "xmlj_node.h"
+#include "xmlj_sax.h"
 #include "xmlj_util.h"
 
 #include <sys/types.h>
@@ -289,67 +290,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementById (JNIEnv * env,
 
 /* -- GnomeDocumentBuilder -- */
 
-/*JNIEXPORT void JNICALL
-  Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_init (JNIEnv *env,
-  jobject self,
-  jboolean validate,
-  jboolean coalesce,
-  jboolean expandEntities)
-  {
-  xmlParserCtxtPtr context;
-  jclass cls;
-  jfieldID field;
-  int options;
-
-  dom_cb_env = env;
-  dom_cb_obj = self;
-
- * Initialise context *
- context = xmlNewParserCtxt();
- if (context != NULL)
- {
- defaultResolveEntity = context->sax->resolveEntity;
- defaultWarning = context->sax->warning;
- defaultError = context->sax->error;
- defaultFatalError = context->sax->fatalError;
- options = 0;
-
- if (validate)
- {
- options |= XML_PARSE_DTDLOAD;
- options |= XML_PARSE_DTDVALID;
- }
- if (coalesce)
- options |= XML_PARSE_NOCDATA;
- if (expandEntities)
- options |= XML_PARSE_NOENT;
-
- xmlCtxtUseOptions(context, options);
- }
- else if (validate)
- {
- * TODO throw exception *
- }
-
- * Save into field *
- cls = (*env)->GetObjectClass(env, self);
- field = (*env)->GetFieldID(env, cls, "context", "I");
- (*env)->SetIntField(env, self, field, (jint)context);
- }
-
- JNIEXPORT void JNICALL
- Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_finalize (JNIEnv *env,
- jobject self)
- {
- xmlParserCtxtPtr context;
-
- context = getContext(env, self);
-
- * Free *
- if (context != NULL)
- xmlClearParserCtxt(context);
- }*/
-
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
                                                            jobject self,
@@ -360,152 +300,30 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
                                                            jboolean coalesce,
                                                            jboolean
                                                            expandEntities,
-                                                           jobject
+                                                           jboolean
                                                            entityResolver,
-                                                           jobject
+                                                           jboolean
                                                            errorHandler)
 {
   xmlDocPtr doc;
 
-  doc = xmljParseJavaInputStream (env, in, systemId, publicId,
-                                  validate, coalesce, expandEntities,
-                                  entityResolver, errorHandler);
+  doc = xmljParseDocument(env,
+                          self,
+                          in,
+                          publicId,
+                          systemId,
+                          validate,
+                          coalesce,
+                          expandEntities,
+                          0,
+                          0,
+                          entityResolver,
+                          errorHandler,
+                          0,
+                          0,
+                          0);
   return createDocument (env, self, doc);
 }
-
-/*JNIEXPORT jobject JNICALL
-  Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseFile (JNIEnv *env,
-  jobject self,
-  jstring filename)
-  {
-  xmlParserCtxtPtr context;
-  xmlDocPtr doc;
-  const char *s_filename;
-  int fd;
-
-  if (filename == NULL)
-  return NULL;
-
- * Get parser context *
- context = getContext(env, self);
-
- dom_cb_env = env;
- dom_cb_obj = self;
-
- * Parse *
- s_filename = (*env)->GetStringUTFChars(env, filename, 0);
- if (context == NULL)
- doc = xmlParseFile(s_filename);
- else
- {
- fd = open(s_filename, O_RDONLY);
- if (fd == -1)
- doc = NULL;
- else
- {
- doc = xmlCtxtReadFd(context, fd, NULL, NULL, context->options);
- close(fd);
- xmlCtxtReset(context);
- }
- }
- (*env)->ReleaseStringUTFChars(env, filename, s_filename);
- if (doc == NULL)
- return NULL;
- else
- return createDocument(env, self, doc);
- }
-
- *
- * Class:     gnu_xml_libxmlj_dom_GnomeDocumentBuilder
- * Method:    parseMemory
- * Signature: ([B)Lorg/w3c/dom/Document;
- *
- JNIEXPORT jobject JNICALL
- Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseMemory (JNIEnv *env,
- jobject self,
- jbyteArray bytes)
- {
- xmlParserCtxtPtr context;
- xmlDocPtr doc;
- jbyte *j_bytes;
- xmlChar *x_bytes;
- jint len;
-
- * Get parser context *
- context = getContext(env, self);
-
- dom_cb_env = env;
- dom_cb_obj = self;
-
- * Parse *
- len = (*env)->GetArrayLength(env, bytes);
- j_bytes = (*env)->GetByteArrayElements(env, bytes, 0);
- x_bytes = (j_bytes == NULL) ? NULL : xmlCharStrdup(j_bytes); * TODO *
- if (context == NULL)
- doc = xmlParseMemory(x_bytes, len);
- else
- {
-doc = xmlCtxtReadDoc(context, x_bytes, NULL, NULL,
-                     context->options);
-xmlCtxtReset(context);
-}
-(*env)->ReleaseByteArrayElements(env, bytes, j_bytes, 0);
-free(x_bytes);
-if (doc == NULL)
-        return NULL;
-        else
-        return createDocument(env, self, doc);
-        }*/
-
-/*JNIEXPORT void JNICALL
-  Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomEntityResolver (JNIEnv *env,
-  jobject self,
-  jboolean flag)
-  {
-  xmlParserCtxtPtr context;
-
-  context = getContext(env, self);
-  if (context != NULL)
-  {
-  if (flag)
-  context->sax->resolveEntity = xmljDOMResolveEntity;
-  else
-  context->sax->resolveEntity = defaultResolveEntity;
-  }
-  else
-  {
- * TODO raise exception *
- }
- }*/
-
-/*JNIEXPORT void JNICALL
-  Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_setCustomErrorHandler (JNIEnv *env,
-  jobject self,
-  jboolean flag)
-  {
-  xmlParserCtxtPtr context;
-
-  context = getContext(env, self);
-  if (context != NULL)
-  {
-  if (flag)
-  {
-  context->sax->warning = xmljDOMWarning;
-  context->sax->error = xmljDOMError;
-  context->sax->fatalError = xmljDOMFatalError;
-  }
-  else
-  {
-  context->sax->warning = defaultWarning;
-  context->sax->error = defaultError;
-  context->sax->fatalError = defaultFatalError;
-  }
-  }
-  else
-  {
- * TODO raise exception *
- }
- }*/
 
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,

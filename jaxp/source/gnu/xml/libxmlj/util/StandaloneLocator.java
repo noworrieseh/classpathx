@@ -1,5 +1,5 @@
 /*
- * xmlj_util.h
+ * StandaloneLocator.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -24,24 +24,54 @@
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
  */
+package gnu.xml.libxmlj.util;
 
-#ifndef XMLJ_UTIL_H
-#define XMLJ_UTIL_H
+import org.xml.sax.Locator;
 
-#include <jni.h>
-#include <libxml/xmlstring.h>
+/**
+ * SAX Locator implementation that uses the specified values.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
+public final class StandaloneLocator
+implements Locator
+{
 
-jstring xmljNewString (JNIEnv *, const xmlChar *);
+  private final int lineNumber;
 
-const xmlChar *xmljGetStringChars (JNIEnv *, jstring);
+  private final int columnNumber;
 
-const xmlChar *xmljGetPrefix (const xmlChar * qName);
+  private final String publicId;
 
-const xmlChar *xmljGetLocalName (const xmlChar * qName);
+  private final String systemId;
 
-jmethodID xmljGetMethodID (JNIEnv *env,
-                           jobject target,
-                           const char *name,
-                           const char *signature);
+  public StandaloneLocator(int lineNumber, int columnNumber,
+                    String publicId, String systemId)
+    {
+      this.lineNumber = lineNumber;
+      this.columnNumber = columnNumber;
+      this.publicId = publicId;
+      this.systemId = systemId;
+    }
 
-#endif /* !defined XMLJ_UTIL_H */
+  public String getPublicId()
+    {
+      return publicId;
+    }
+
+  public String getSystemId()
+    {
+      return systemId;
+    }
+
+  public int getLineNumber()
+    {
+      return lineNumber;
+    }
+
+  public int getColumnNumber()
+    {
+      return columnNumber;
+    }
+
+}

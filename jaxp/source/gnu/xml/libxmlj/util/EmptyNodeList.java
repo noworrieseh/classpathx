@@ -24,7 +24,7 @@
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
  */
-package gnu.xml.libxmlj.dom;
+package gnu.xml.libxmlj.util;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

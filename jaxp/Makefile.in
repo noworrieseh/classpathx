@@ -418,7 +418,6 @@ $(src)/gnu/xml/libxmlj/sax/GnomeXMLReader.java \
 $(src)/gnu/xml/libxmlj/sax/Namespaces.java \
 $(src)/gnu/xml/libxmlj/sax/StringArrayAttributes.java \
 $(src)/gnu/xml/libxmlj/sax/XMLName.java \
-$(src)/gnu/xml/libxmlj/dom/EmptyNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeAttr.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeCDATASection.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeCharacterData.java \
@@ -438,7 +437,6 @@ $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
 $(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java \
-$(src)/gnu/xml/libxmlj/dom/StandaloneDocumentType.java \
 $(src)/gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.java \
 $(src)/gnu/xml/libxmlj/transform/DefaultURIResolverImpl.java \
 $(src)/gnu/xml/libxmlj/transform/ErrorListenerProxy.java \
@@ -452,7 +450,10 @@ $(src)/gnu/xml/libxmlj/transform/TemplatesImpl.java \
 $(src)/gnu/xml/libxmlj/transform/TransformTest.java \
 $(src)/gnu/xml/libxmlj/transform/TransformerFactoryImpl.java \
 $(src)/gnu/xml/libxmlj/transform/TransformerImpl.java \
-$(src)/gnu/xml/libxmlj/transform/URIResolverProxy.java
+$(src)/gnu/xml/libxmlj/transform/URIResolverProxy.java \
+$(src)/gnu/xml/libxmlj/util/EmptyNodeList.java \
+$(src)/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
+$(src)/gnu/xml/libxmlj/util/StandaloneLocator.java
 
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))

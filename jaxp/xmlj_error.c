@@ -367,45 +367,60 @@ xmljXsltErrorFunc (void *ctx, const char *msg, ...)
 
 void
 xmljThrowException (JNIEnv *env,
-    const char *classname,
-    const char *message)
+                    const char *classname,
+                    const char *message)
 {
   jclass cls;
   jmethodID method;
   jthrowable ex;
   jstring jmsg;
 
-  cls = (*env)->FindClass(env, classname);
+  cls = (*env)->FindClass (env, classname);
   if (cls == NULL)
-  {
-    fprintf(stderr, "Can't find class %s\n", classname);
-    return;
-  }
-  method = (*env)->GetMethodID(env, cls, "<init>", "(Ljava/lang/String;)V");
-  jmsg = (*env)->NewStringUTF(env, message);
-  ex = (jthrowable)(*env)->NewObject(env, cls, method, jmsg);
+    {
+      fprintf (stderr, "Can't find class %s\n", classname);
+      return;
+    }
+  method = (*env)->GetMethodID (env, cls, "<init>", "(Ljava/lang/String;)V");
+  if (method == NULL)
+    {
+      printf ("Can't find method %s.<init>\n", classname);
+      return;
+    }
+  jmsg = (message == NULL) ? NULL : (*env)->NewStringUTF (env, message);
+  ex = (jthrowable) (*env)->NewObject (env, cls, method, jmsg);
   if (ex == NULL)
-  {
-    fprintf(stderr, "Can't instantiate new %s\n", classname);
-    return;
-  }
-  (*env)->Throw(env, ex);
+    {
+      fprintf (stderr, "Can't instantiate new %s\n", classname);
+      return;
+    }
+  (*env)->Throw (env, ex);
 }
 
 void
 xmljThrowDOMException (JNIEnv* env,
-    int code,
-    const char *message)
+                       int code,
+                       const char *message)
 {
   jclass cls;
   jmethodID method;
   jthrowable ex;
   jstring jmsg;
 
-  cls = (*env)->FindClass(env, "org/w3c/dom/DOMException");
-  method = (*env)->GetMethodID(env, cls, "<init>", "(ILjava/lang/String;)V");
-  jmsg = (*env)->NewStringUTF(env, message);
-  ex = (jthrowable)(*env)->NewObject(env, cls, method, code, jmsg);
-  (*env)->Throw(env, ex);
+  cls = (*env)->FindClass (env, "org/w3c/dom/DOMException");
+  if (cls == NULL)
+    {
+      printf ("Can't find class org.w3c.dom.DOMException\n");
+      return;
+    }
+  method = (*env)->GetMethodID (env, cls, "<init>", "(SLjava/lang/String;)V");
+  if (method == NULL)
+    {
+      printf ("Can't find method org.w3c.dom.DOMException.<init>\n");
+      return;
+    }
+  jmsg = (message == NULL) ? NULL : (*env)->NewStringUTF (env, message);
+  ex = (jthrowable) (*env)->NewObject (env, cls, method, code, jmsg);
+  (*env)->Throw (env, ex);
 }
 

@@ -34,6 +34,19 @@
 #include <libxml/SAX.h>
 #include <libxml/parser.h>
 
+xmlSAXHandlerPtr
+xmljNewSAXHandler (xmlSAXHandlerPtr orig,
+                   jboolean contentHandler,
+                   jboolean dtdHandler,
+                   jboolean entityResolver,
+                   jboolean errorHandler,
+                   jboolean declarationHandler,
+                   jboolean lexicalHandler);
+
+xmlParserInputPtr
+xmljExternalEntityLoader (const char *systemId, const char *publicId,
+                          xmlParserCtxtPtr context);
+
 /* -- Function declarations for callback functions -- */
 
 void xmljSAXInternalSubset(void *ctx,

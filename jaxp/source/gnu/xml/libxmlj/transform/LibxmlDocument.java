@@ -40,16 +40,16 @@ package gnu.xml.libxmlj.transform;
 
 class LibxmlDocument 
 {
-  long nativeHandle;
+  int nativeHandle;
   boolean inCache;
 
-  public LibxmlDocument (long nativeHandle) 
+  public LibxmlDocument (int nativeHandle) 
   {
     this.nativeHandle = nativeHandle;
     this.inCache = true;
   }
    
-  public long getNativeHandle () 
+  public int getNativeHandle () 
   {
     return this.nativeHandle;
   }
@@ -63,5 +63,5 @@ class LibxmlDocument
       }
   }
 
-  private native void freeDocument (long nativeHandle);
+  private native void freeDocument (int nativeHandle);
 }

@@ -34,6 +34,7 @@ import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.DOMImplementation;
@@ -42,6 +43,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import gnu.xml.libxmlj.util.StandaloneDocumentType;
+import gnu.xml.libxmlj.util.StandaloneLocator;
 
 /**
  * A JAXP DOM implementation that uses Gnome libxml2 as the underlying
@@ -66,6 +70,7 @@ implements DOMImplementation
   private boolean expandEntities;
   private EntityResolver entityResolver;
   private ErrorHandler errorHandler;
+  private boolean seenFatalError;
 
   /**
    * Constructs a new validating document builder.
@@ -115,8 +120,15 @@ implements DOMImplementation
       InputStream in = getInputStream (input);
       String publicId = input.getPublicId();
       String systemId = input.getSystemId();
-      return parseStream(in, publicId, systemId, validate, coalesce,
-                         expandEntities, entityResolver, errorHandler);
+      seenFatalError = false;
+      return parseStream(in,
+                         input.getPublicId(),
+                         input.getSystemId(),
+                         validate,
+                         coalesce,
+                         expandEntities,
+                         entityResolver != null,
+                         errorHandler != null);
     }
 
   InputStream getInputStream(InputSource input) throws IOException
@@ -139,8 +151,8 @@ implements DOMImplementation
                                       boolean validate,
                                       boolean coalesce,
                                       boolean expandEntities,
-                                      EntityResolver resolver,
-                                      ErrorHandler errorHandler);
+                                      boolean entityResolver,
+                                      boolean errorHandler);
 
   public void setEntityResolver(EntityResolver resolver)
     {
@@ -169,41 +181,80 @@ implements DOMImplementation
     }
 
   public native Document createDocument(String namespaceURI,
-                                        String qualifiedName, DocumentType doctype);
+                                        String qualifiedName,
+                                        DocumentType doctype);
 
   public DocumentType createDocumentType(String qualifiedName,
-                                         String publicId, String systemId)
+                                         String publicId,
+                                         String systemId)
     {
       return new StandaloneDocumentType(qualifiedName, publicId, systemId);
     }
 
   // Callback hooks from JNI
+  
+  private void setDocumentLocator(int ctx, int loc)
+    {
+      // ignore
+    }
 
-  private void warning(String message, String publicId, String systemId,
-                       int lineNumber, int columnNumber)
-    throws SAXException
-      {
-        SAXParseException e = new SAXParseException(message, publicId, systemId,
-                                                    lineNumber, columnNumber);
-        errorHandler.warning(e);
-      }
+  private InputStream resolveEntity(String publicId,
+                                    String systemId) throws SAXException, IOException
+    {
+      if (entityResolver != null)
+        return getInputStream(entityResolver.resolveEntity(publicId,
+                                                           systemId));
+      else
+        return null;
+    }
+  
+  private void warning(String message,
+                       int lineNumber,
+                       int columnNumber,
+                       String publicId,
+                       String systemId) throws SAXException
+    {
+      if (!seenFatalError && errorHandler != null)
+        {
+          Locator l = new StandaloneLocator(lineNumber,
+                                            columnNumber,
+                                            publicId,
+                                            systemId);
+          errorHandler.warning(new SAXParseException(message, l));
+        }
+    }
 
-  private void error(String message, String publicId, String systemId,
-                     int lineNumber, int columnNumber)
-    throws SAXException
-      {
-        SAXParseException e = new SAXParseException(message, publicId, systemId,
-                                                    lineNumber, columnNumber);
-        errorHandler.error(e);
-      }
+  private void error(String message,
+                     int lineNumber,
+                     int columnNumber,
+                     String publicId,
+                     String systemId) throws SAXException
+    {
+      if (!seenFatalError && errorHandler != null)
+        {
+          Locator l = new StandaloneLocator(lineNumber,
+                                            columnNumber,
+                                            publicId,
+                                            systemId);
+          errorHandler.error(new SAXParseException(message, l));
+        }
+    }
 
-  private void fatalError(String message, String publicId, String systemId,
-                          int lineNumber, int columnNumber)
-    throws SAXException
-      {
-        SAXParseException e = new SAXParseException(message, publicId, systemId,
-                                                    lineNumber, columnNumber);
-        errorHandler.fatalError(e);
-      }
+  private void fatalError(String message,
+                          int lineNumber,
+                          int columnNumber,
+                          String publicId,
+                          String systemId) throws SAXException
+    {
+      if (!seenFatalError && errorHandler != null)
+        {
+          seenFatalError = true;
+          Locator l = new StandaloneLocator(lineNumber,
+                                            columnNumber,
+                                            publicId,
+                                            systemId);
+          errorHandler.fatalError(new SAXParseException(message, l));
+        }
+    }
 
 }

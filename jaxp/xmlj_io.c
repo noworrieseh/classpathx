@@ -38,6 +38,7 @@
 
 #include "xmlj_io.h"
 #include "xmlj_error.h"
+#include "xmlj_sax.h"
 
 #include <math.h>
 #include <string.h>
@@ -259,6 +260,49 @@ xmljFreeOutputStreamContext (OutputStreamContext * outContext)
   free (outContext);
 }
 
+SAXParseContext *
+xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx)
+{
+  SAXParseContext *ret;
+  
+  ret = (SAXParseContext *) malloc (sizeof (SAXParseContext));
+  ret->env = env;
+  ret->obj = obj;
+  ret->ctx = ctx;
+  ret->sax = ctx->sax;
+  ret->loc = NULL;
+  
+  ret->startDTD = NULL;
+  ret->externalEntityDecl = NULL;
+  ret->internalEntityDecl = NULL;
+  ret->resolveEntity = NULL;
+  ret->notationDecl = NULL;
+  ret->attributeDecl = NULL;
+  ret->elementDecl = NULL;
+  ret->unparsedEntityDecl = NULL;
+  ret->setDocumentLocator = NULL;
+  ret->startDocument = NULL;
+  ret->endDocument = NULL;
+  ret->startElement = NULL;
+  ret->endElement = NULL;
+  ret->characters = NULL;
+  ret->ignorableWhitespace = NULL;
+  ret->processingInstruction = NULL;
+  ret->comment = NULL;
+  ret->cdataBlock = NULL;
+  ret->warning = NULL;
+  ret->error = NULL;
+  ret->fatalError = NULL;
+  
+  return ret;
+}
+
+void
+xmljFreeSAXParseContext (SAXParseContext * saxCtx)
+{
+  free (saxCtx);
+}
+
 xmlCharEncoding
 xmljDetectCharEncoding (JNIEnv * env, jobject in)
 {
@@ -327,21 +371,18 @@ xmljDetectCharEncoding (JNIEnv * env, jobject in)
 }
 
 xmlParserCtxtPtr
-xmljEstablishParserContext (JNIEnv * env,
-                            jobject inputStream,
-                            jstring inSystemId,
-                            jstring inPublicId,
-                            jboolean validate,
-                            jboolean coalesce,
-                            jboolean expandEntities,
-                            jobject saxEntityResolver,
-                            jobject saxErrorAdapter, int useSaxErrorContext)
+xmljNewParserContext (JNIEnv * env,
+                      jobject inputStream,
+                      jstring inSystemId,
+                      jstring inPublicId,
+                      jboolean validate,
+                      jboolean coalesce,
+                      jboolean expandEntities)
 {
   InputStreamContext *inputContext;
   xmlCharEncoding encoding;
   xmlParserCtxtPtr parserContext;
   int options;
-  SaxErrorContext *saxErrorContext;
 
   encoding = xmljDetectCharEncoding (env, inputStream);
   if (encoding != XML_CHAR_ENCODING_ERROR)
@@ -371,28 +412,7 @@ xmljEstablishParserContext (JNIEnv * env,
               xmlCtxtUseOptions (parserContext, options);
               parserContext->userData = parserContext;
 
-              if (!useSaxErrorContext)
-                return parserContext;
-
-              /* TODO set up SAX entity resolver */
-
-              xmljInitErrorHandling (parserContext->sax);
-
-              /* Set up SAX error context */
-              saxErrorContext = xmljCreateSaxErrorContext (env,
-                                                           saxErrorAdapter,
-                                                           inSystemId,
-                                                           inPublicId);
-              if (NULL != saxErrorContext)
-                {
-                  parserContext->_private = saxErrorContext;
-                  return parserContext;
-                }
-              else
-                {
-                  xmlFreeParserCtxt (parserContext);
-                  xmljFreeSaxErrorContext (saxErrorContext);
-                }
+              return parserContext;
             }
           xmljFreeInputStreamContext (inputContext);
         }
@@ -401,25 +421,7 @@ xmljEstablishParserContext (JNIEnv * env,
 }
 
 void
-xmljReleaseParserContext (xmlParserCtxtPtr parserContext)
-{
-  SaxErrorContext *saxErrorContext;
-  InputStreamContext *inputStreamContext;
-
-  saxErrorContext = (SaxErrorContext *) parserContext->_private;
-  
-  inputStreamContext
-    = (InputStreamContext *) parserContext->input->buf->context;
-
-  xmljFreeSaxErrorContext (saxErrorContext);
-  
-  xmljFreeInputStreamContext (inputStreamContext);
-  
-  /* FIXME xmlFreeParserCtxt (parserContext); */
-}
-
-void
-xmljSAXFreeParserContext (xmlParserCtxtPtr parserContext)
+xmljFreeParserContext (xmlParserCtxtPtr parserContext)
 {
   InputStreamContext *inputStreamContext;
 
@@ -429,61 +431,88 @@ xmljSAXFreeParserContext (xmlParserCtxtPtr parserContext)
   if (inputStreamContext != NULL)
     xmljFreeInputStreamContext (inputStreamContext);
 
-  /* FIXME xmlFreeParserCtxt (parserContext); */
+  /* TODO xmlFreeParserCtxt (parserContext); */
 }
 
 xmlDocPtr
-xmljParseJavaInputStream (JNIEnv * env,
-                          jobject inputStream,
-                          jstring inSystemId,
-                          jstring inPublicId,
-                          jboolean validate,
-                          jboolean coalesce,
-                          jboolean expandEntities,
-                          jobject saxEntityResolver, jobject saxErrorAdapter)
+xmljParseDocument (JNIEnv * env,
+                   jobject self,
+                   jobject in,
+                   jstring publicId,
+                   jstring systemId,
+                   jboolean validate,
+                   jboolean coalesce,
+                   jboolean expandEntities,
+                   jboolean contentHandler,
+                   jboolean dtdHandler,
+                   jboolean entityResolver,
+                   jboolean errorHandler,
+                   jboolean declarationHandler,
+                   jboolean lexicalHandler,
+                   int saxMode)
 {
-  xmlDocPtr tree = NULL;
-
-  xmlParserCtxtPtr parserContext
-    = xmljEstablishParserContext (env, inputStream,
-                                  inSystemId,
-                                  inPublicId,
-                                  validate,
-                                  coalesce,
-                                  expandEntities,
-                                  saxEntityResolver,
-                                  saxErrorAdapter,
-                                  1);
-
-  if (NULL != parserContext)
-    {
-      tree = xmljParseDocument (env, parserContext);
-      xmljReleaseParserContext (parserContext);
-    }
-
-  return tree;
-}
-
-xmlDocPtr
-xmljParseDocument (JNIEnv * env, xmlParserCtxtPtr parserContext)
-{
-  xmlDocPtr tree = NULL;
+  xmlParserCtxtPtr ctx;
+  SAXParseContext *saxCtx;
+  xmlSAXHandler *sax;
+  xmlSAXHandler *orig;
+  xmlDocPtr doc;
   int ret;
-
-  xmljSetThreadContext ((SaxErrorContext *) parserContext->_private);
-
-  ret = xmlParseDocument (parserContext);
-  if (0 == ret)
-    tree = parserContext->myDoc;
-  else
+  
+  ctx = xmljNewParserContext (env, in, systemId, publicId, validate,
+                              coalesce, expandEntities);
+  if (ctx != NULL)
     {
-      printf ("ERROR[%d]: %s\n", ret, parserContext->lastError.message);
-      xmljThrowDOMException (env, ret, parserContext->lastError.message);
+      saxCtx = xmljNewSAXParseContext (env, self, ctx);
+      if (saxCtx != NULL)
+        {
+          ctx->_private = saxCtx;
+          ctx->userData = ctx;
+          orig = ctx->sax;
+          sax = xmljNewSAXHandler (contentHandler ? NULL : orig,
+                                   contentHandler,
+                                   dtdHandler,
+                                   entityResolver,
+                                   errorHandler,
+                                   declarationHandler,
+                                   lexicalHandler);
+          if (sax != NULL)
+            {
+              ctx->sax = sax;
+              
+              /*xmljSetThreadContext (saxCtx);*/
+              
+              ret = xmlParseDocument (ctx);
+              doc = ctx->myDoc;
+              if (ret)
+                {
+                  if (saxMode)
+                    {
+                      xmljSAXFatalError (ctx, ctx->lastError.message);
+                    }
+                  else
+                    {
+                      xmljThrowDOMException (env, ret, ctx->lastError.message);
+                    }
+                }
+              
+              /*xmljClearThreadContext ();*/
+              
+              ctx->sax = orig;
+              free (sax);
+              xmljFreeSAXParseContext (saxCtx);
+              xmljFreeParserContext (ctx);
+              return doc;
+            }
+          xmljFreeSAXParseContext (saxCtx);
+        }
+      xmljFreeParserContext (ctx);
     }
-
-  xmljClearThreadContext ();
-
-  return tree;
+  if (!(*env)->ExceptionOccurred (env))
+    {
+      xmljThrowException (env, "java/io/IOException",
+                          "Unable to create parser context");
+    }
+  return NULL;
 }
 
 xmlParserInputPtr
@@ -547,6 +576,7 @@ xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
   xmljFreeOutputStreamContext (outputContext);
 }
 
+/*
 jobject
 xmljResolveURI (SaxErrorContext * saxErrorContext,
                 const char *URL, const char *ID)
@@ -580,17 +610,18 @@ xmljResolveURI (SaxErrorContext * saxErrorContext,
 
       if ((*env)->ExceptionOccurred (env))
         {
-          /* Report to ErrorAdapter here? */
+          -* Report to ErrorAdapter here? *-
           return NULL;
         }
 
       return sourceInputStream;
     }
-}
+}*/
 
 xmlDocPtr
-xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
-                       const char *URL, const char *ID)
+xmljResolveURIAndOpen (SaxErrorContext *saxErrorContext,
+                       const char *URL,
+                       const char *ID)
 {
   JNIEnv *env = saxErrorContext->env;
 
@@ -623,7 +654,7 @@ xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
     }
 }
 
-xmlParserInputPtr
+/*xmlParserInputPtr
 xmljLoadExternalEntity (const char *URL, const char *ID,
                         xmlParserCtxtPtr ctxt)
 {
@@ -663,7 +694,7 @@ xmljLoadExternalEntity (const char *URL, const char *ID,
 
       if ((*env)->ExceptionOccurred (env))
         {
-          /* Report to ErrorAdapter */
+          -* Report to ErrorAdapter *-
           return NULL;
         }
 
@@ -692,7 +723,7 @@ xmljLoadExternalEntity (const char *URL, const char *ID,
           (char *) xmlStrdup ((const xmlChar *) inputStream->directory);
       return (inputStream);
     }
-}
+}*/
 
 /* Key for the thread-specific buffer */
 static pthread_key_t thread_context_key;
@@ -708,7 +739,7 @@ thread_context_key_alloc ()
 }
 
 void
-xmljSetThreadContext (SaxErrorContext * context)
+xmljSetThreadContext (SAXParseContext * context)
 {
   pthread_once (&thread_context_once, thread_context_key_alloc);
   pthread_setspecific (thread_context_key, context);
@@ -721,8 +752,8 @@ xmljClearThreadContext (void)
 }
 
 /* Return the thread-specific buffer */
-SaxErrorContext *
+SAXParseContext *
 xmljGetThreadContext (void)
 {
-  return (SaxErrorContext *) pthread_getspecific (thread_context_key);
+  return (SAXParseContext *) pthread_getspecific (thread_context_key);
 }
