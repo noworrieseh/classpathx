@@ -25,10 +25,12 @@ xmljGetXPathObject (JNIEnv *env, xmlXPathObjectPtr obj)
   jclass cls;
   jmethodID method;
   jobject ret;
-      
+  jlong val;
+  
   cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeXPathResult");
   method = (*env)->GetMethodID (env, cls, "<init>", "(J)V");
-  ret = (*env)->NewObject (env, cls, method, obj);
+  val = xmljAsField (obj);
+  ret = (*env)->NewObject (env, cls, method, val);
   
   return ret;
 }
@@ -39,11 +41,14 @@ xmljGetXPathObjectID (JNIEnv *env, jobject obj)
   jclass cls;
   jfieldID field;
   jlong val;
+  xmlXPathObjectPtr ret;
 
   cls = (*env)->GetObjectClass (env, obj);
   field = (*env)->GetFieldID (env, cls, "obj", "J");
   val = (*env)->GetLongField (env, obj, field);
-  return (xmlXPathObjectPtr) xmljAsPointer (val);
+  ret = (xmlXPathObjectPtr) xmljAsPointer (val);
+
+  return ret;
 }
 
 JNIEXPORT jobject JNICALL

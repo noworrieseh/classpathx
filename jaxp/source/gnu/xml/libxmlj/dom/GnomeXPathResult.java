@@ -81,5 +81,22 @@ implements XPathResult
 
   public native Node snapshotItem (int index)
     throws XPathException;
+
+  public String toString ()
+    {
+      short type = getResultType ();
+      switch (type)
+        {
+        case STRING_TYPE:
+          return getStringValue ();
+        case NUMBER_TYPE:
+          return new Double (getNumberValue ()).toString ();
+        case BOOLEAN_TYPE:
+          return Boolean.valueOf (getBooleanValue ()).toString ();
+        default:
+          return getClass ().getName () + "[type=" + type + ",length=" +
+            getSnapshotLength () + ']';
+        }
+    }
   
 }
