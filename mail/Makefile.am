@@ -176,7 +176,8 @@ META-INF/COPYING \
 META-INF/mime.types \
 META-INF/mailcap \
 META-INF/javamail.default.providers \
-META-INF/javamail.default.address.map
+META-INF/javamail.default.address.map \
+META-INF/javamail.charset.map
 
 # Targets
 BUILT_SOURCES = $(GNUMAILJAR) smtp.jar imap.jar pop3.jar nntp.jar mbox.jar maildir.jar
@@ -222,6 +223,10 @@ META-INF/javamail.default.providers: javamail.providers.in
 META-INF/javamail.default.address.map: javamail.address.map.in
 	mkdir -p META-INF
 	cp javamail.address.map.in META-INF/javamail.default.address.map
+
+META-INF/javamail.charset.map: javamail.charset.map
+	mkdir -p META-INF
+	cp javamail.charset.map META-INF/javamail.charset.map
 
 MAIL_CLASSPATH = lib/activation.jar
 

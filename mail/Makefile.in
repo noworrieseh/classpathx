@@ -135,7 +135,7 @@ GNUMAILJAR = gnumail.jar
 INETLIBJAR = lib/inetlib.jar
 
 # The META stuff
-MAIL_META =  META-INF/COPYING META-INF/mime.types META-INF/mailcap META-INF/javamail.default.providers META-INF/javamail.default.address.map
+MAIL_META =  META-INF/COPYING META-INF/mime.types META-INF/mailcap META-INF/javamail.default.providers META-INF/javamail.default.address.map META-INF/javamail.charset.map
 
 
 # Targets
@@ -339,6 +339,10 @@ META-INF/javamail.default.providers: javamail.providers.in
 META-INF/javamail.default.address.map: javamail.address.map.in
 	mkdir -p META-INF
 	cp javamail.address.map.in META-INF/javamail.default.address.map
+
+META-INF/javamail.charset.map: javamail.charset.map
+	mkdir -p META-INF
+	cp javamail.charset.map META-INF/javamail.charset.map
 
 # Targets for the various tools
 $(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
