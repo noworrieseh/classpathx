@@ -89,6 +89,7 @@ JAVAFLAGS = @JAVAFLAGS@
 JAVAH = @JAVAH@
 JAVAPREFIX = @JAVAPREFIX@
 JAVA_JUNIT = @JAVA_JUNIT@
+JSSE_JAR = @JSSE_JAR@
 JUNIT = @JUNIT@
 PACKAGE = @PACKAGE@
 STRIP = @STRIP@
@@ -331,6 +332,9 @@ activation_jar = @ACTIVATION_JAR@
 # The GNU classpath inetlib library.
 inetlib_jar = @INETLIB_JAR@
 
+# The JSSE library.
+jsse_jar = @JSSE_JAR@
+
 # The META stuff
 gnumail_meta = \
 @srcdir@/META-INF/COPYING \
@@ -345,7 +349,7 @@ providers_meta = \
 
 
 # Classpaths
-classpath = $(src):$(activation_jar):$(inetlib_jar)
+classpath = $(src):$(activation_jar):$(inetlib_jar):$(jsse_jar)
 
 # Targets
 BUILT_SOURCES = $(gnumail_jar) $(providers_jar)

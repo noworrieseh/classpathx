@@ -54,7 +54,7 @@ public class IMAPMultipartDataSource
   /**
    * Called by the IMAPMessage.
    */
-  protected IMAPMultipartDataSource(IMAPMultipart multipart)
+  protected IMAPMultipartDataSource (IMAPMultipart multipart)
   {
     this.multipart = multipart;
   }
@@ -63,87 +63,93 @@ public class IMAPMultipartDataSource
    * Returns the content description of the body part that contains the
    * multipart.
    */
-  public String getName()
+  public String getName ()
   {
     try
-    {
-      return multipart.getParent().getDescription();
-    }
+      {
+        return multipart.getParent ().getDescription ();
+      }
     catch (MessagingException e)
-    {
-      return null;
-    }
+      {
+        return null;
+      }
   }
 
   /**
    * Returns the content type of the body part that contains the multipart.
    */
-  public String getContentType()
+  public String getContentType ()
   {
     try
-    {
-      return multipart.getParent().getContentType();
-    }
+      {
+        return multipart.getParent ().getContentType ();
+      }
     catch (MessagingException e)
-    {
-      return null;
-    }
+      {
+        return null;
+      }
   }
 
   /**
    * Returns an input stream from which the content of this multipart can be
    * read.
    */
-  public InputStream getInputStream()
+  public InputStream getInputStream ()
     throws IOException
   {
     try
-    {
-      Part part = multipart.getParent();
-      if (part instanceof IMAPBodyPart)
-        return ((IMAPBodyPart)part).getContentStream();
-      else if (part instanceof IMAPMessage)
-        return ((IMAPMessage)part).getContentStream();
-      else
-        throw new IOException("Internal error in part structure");
-    }
+      {
+        Part part = multipart.getParent ();
+        if (part instanceof IMAPBodyPart)
+          {
+            return ((IMAPBodyPart) part).getContentStream ();
+          }
+        else if (part instanceof IMAPMessage)
+          {
+            return ((IMAPMessage) part).getContentStream ();
+          }
+        else
+          {
+            throw new IOException ("Internal error in part structure");
+          }
+      }
     catch (MessagingException e)
-    {
-      throw new IOException(e.getMessage());
-    }
+      {
+        throw new IOException (e.getMessage ());
+      }
   }
 
   /**
    * IMAP multiparts are read-only.
    */
-  public OutputStream getOutputStream()
+  public OutputStream getOutputStream ()
     throws IOException
   {
-    throw new ProtocolException("IMAP multiparts are read-only");
+    throw new ProtocolException ("IMAP multiparts are read-only");
   }
 
   /**
    * Returns the secified sub-part of the multipart.
    */
-  public BodyPart getBodyPart(int index)
+  public BodyPart getBodyPart (int index)
     throws MessagingException
   {
-    return multipart.getBodyPart(index);
+    return multipart.getBodyPart (index);
   }
 
   /**
    * Returns the number of sub-parts of the multipart.
    */
-  public int getCount()
+  public int getCount ()
   {
     try
-    {
-      return multipart.getCount();
-    }
+      {
+        return multipart.getCount ();
+      }
     catch (MessagingException e)
-    {
-      return 0;
-    }
+      {
+        return 0;
+      }
   }
 
 }

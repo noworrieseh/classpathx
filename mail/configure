@@ -271,7 +271,7 @@ PACKAGE_STRING='gnumail 0.1'
 PACKAGE_BUGREPORT=''
 
 ac_unique_file="source/gnu/mail/providers/ReadOnlyMessage.java"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ACTIVATION_JAR INETLIB_JAR ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ACTIVATION_JAR INETLIB_JAR JSSE_JAR ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -804,6 +804,9 @@ Optional Packages:
                           /usr/share/java and /usr/local/share/java are
                           searched, in that order.
   --with-inetlib-jar=DIR  path to GNU inetlib (inetlib.jar). If unspecified,
+                          /usr/share/java and /usr/local/share/java are
+                          searched, in that order.
+  --with-jsse-jar=DIR     path to JSSE library (jsse.jar). If unspecified,
                           /usr/share/java and /usr/local/share/java are
                           searched, in that order.
 
@@ -1703,6 +1706,54 @@ fi
 
 
 
+
+# Check whether --with-jsse_jar or --without-jsse_jar was given.
+if test "${with_jsse_jar+set}" = set; then
+  withval="$with_jsse_jar"
+  if test "x${withval}" != x; then
+		echo "$as_me:$LINENO: checking for ${withval}/jsse.jar" >&5
+echo $ECHO_N "checking for ${withval}/jsse.jar... $ECHO_C" >&6
+		if test -r ${withval}/jsse.jar ; then
+			echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+			JSSE_JAR=${withval}/jsse.jar
+			found_jsse_jar=true
+		else
+			{ { echo "$as_me:$LINENO: error: can't find jsse.jar in specified path" >&5
+echo "$as_me: error: can't find jsse.jar in specified path" >&2;}
+   { (exit 1); exit 1; }; }
+		fi
+	fi
+else
+  found_jsse_jar=false
+fi;
+if test "x${JSSE_JAR}" = x ;then
+
+echo "$as_me:$LINENO: checking for jsse.jar" >&5
+echo $ECHO_N "checking for jsse.jar... $ECHO_C" >&6
+for _F in /usr/share/java /usr/local/share/java ;do
+	if test -r ${_F}/jsse.jar ; then
+		JSSE_JAR=${_F}/jsse.jar
+		break
+	fi
+done
+if test x${JSSE_JAR} = x ; then
+	echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+else
+	echo "$as_me:$LINENO: result: ${JSSE_JAR}" >&5
+echo "${ECHO_T}${JSSE_JAR}" >&6
+fi
+	if test "x${JSSE_JAR}" = x; then
+		{ { echo "$as_me:$LINENO: error: can't find jsse.jar; use --with-jsse-jar" >&5
+echo "$as_me: error: can't find jsse.jar; use --with-jsse-jar" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
+	found_jsse_jar=true
+fi
+
+
+
 # Check whether --enable-smtp or --disable-smtp was given.
 if test "${enable_smtp+set}" = set; then
   enableval="$enable_smtp"
@@ -1928,7 +1979,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 1931 "configure" */
+/* #line 1982 "configure" */
 public class Test {
 }
 EOF
@@ -2749,6 +2800,7 @@ s,@AWK@,$AWK,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@ACTIVATION_JAR@,$ACTIVATION_JAR,;t t
 s,@INETLIB_JAR@,$INETLIB_JAR,;t t
+s,@JSSE_JAR@,$JSSE_JAR,;t t
 s,@ENABLE_SMTP_TRUE@,$ENABLE_SMTP_TRUE,;t t
 s,@ENABLE_SMTP_FALSE@,$ENABLE_SMTP_FALSE,;t t
 s,@ENABLE_IMAP_TRUE@,$ENABLE_IMAP_TRUE,;t t

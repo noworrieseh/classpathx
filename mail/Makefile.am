@@ -265,6 +265,9 @@ activation_jar = @ACTIVATION_JAR@
 # The GNU classpath inetlib library.
 inetlib_jar = @INETLIB_JAR@
 
+# The JSSE library.
+jsse_jar = @JSSE_JAR@
+
 # The META stuff
 gnumail_meta = \
 @srcdir@/META-INF/COPYING \
@@ -277,7 +280,7 @@ providers_meta = \
 @srcdir@/META-INF/javamail.default.address.map
 
 # Classpaths
-classpath = $(src):$(activation_jar):$(inetlib_jar)
+classpath = $(src):$(activation_jar):$(inetlib_jar):$(jsse_jar)
 
 # Targets
 BUILT_SOURCES = $(gnumail_jar) $(providers_jar)

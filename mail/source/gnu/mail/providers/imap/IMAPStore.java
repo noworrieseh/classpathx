@@ -38,6 +38,7 @@ import javax.mail.Store;
 import javax.mail.StoreClosedException;
 import javax.mail.URLName;
 import javax.mail.event.StoreEvent;
+import javax.net.ssl.TrustManager;
 
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
@@ -46,7 +47,6 @@ import gnu.inet.imap.IMAPConstants;
  * The storage class implementing the IMAP4rev1 mail protocol.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 0.1
  */
 public class IMAPStore
   extends Store
@@ -70,156 +70,196 @@ public class IMAPStore
   /**
    * Constructor.
    */
-  public IMAPStore(Session session, URLName url)
+  public IMAPStore (Session session, URLName url)
   {
-    super(session, url);
+    super (session, url);
   }
 
   /**
    * Connects to the IMAP server and authenticates with the specified
    * parameters.
    */
-  protected boolean protocolConnect(String host, int port, String username,
-      String password)
+  protected boolean protocolConnect (String host, int port, String username,
+                                     String password)
     throws MessagingException
   {
     if (connection != null)
-      return true;
+      {
+        return true;
+      }
     if (host == null)
-      host = getProperty("host");
+      {
+        host = getProperty ("host");
+      }
     if (username == null)
-      username = getProperty("user");
+      {
+        username = getProperty ("user");
+      }
     if (port < 0)
-      port = getIntProperty("port");
+      {
+        port = getIntProperty ("port");
+      }
     if (host == null || username == null || password == null)
-      return false;
+      {
+        return false;
+      }
     synchronized (this)
-    {
-      try
       {
-        int connectionTimeout = getIntProperty("connectiontimeout");
-        int timeout = getIntProperty("timeout");
-        connection = new IMAPConnection(host, port,
-            connectionTimeout, timeout, session.getDebug());
-        
-        if (propertyIsTrue("debug.ansi"))
-          connection.setAnsiDebug(true);
-        
-        List capabilities = connection.capability();
-        if (!propertyIsFalse("tls"))
-        {
-          if (capabilities.contains(IMAPConstants.STARTTLS))
-            connection.starttls();
-        }
-        // Try SASL authentication
-        // TODO user ordering of mechanisms
-        for (Iterator i = capabilities.iterator(); i.hasNext(); )
-        {
-          String cap = (String)i.next();
-          if (cap.startsWith("AUTH="))
+        try
           {
-            cap = cap.substring(5);
-            if (connection.authenticate(cap, username, password))
-              return true;
+            int connectionTimeout = getIntProperty ("connectiontimeout");
+            int timeout = getIntProperty ("timeout");
+            connection = new IMAPConnection (host, port,
+                                             connectionTimeout, timeout,
+                                             session.getDebug());
+        
+            if (propertyIsTrue ("debug.ansi"))
+              {
+                connection.setAnsiDebug (true);
+              }
+        
+            List capabilities = connection.capability ();
+            if (!propertyIsFalse ("tls") &&
+                capabilities.contains (IMAPConstants.STARTTLS))
+              {
+                // Locate custom trust manager
+                String tmt = getProperty ("trustmanager");
+                if (tmt == null)
+                  {
+                    connection.starttls ();
+                  }
+                else
+                  {
+                    try
+                      {
+                        Class t = Class.forName (tmt);
+                        TrustManager tm = (TrustManager) t.newInstance ();
+                        connection.starttls (tm);
+                      }
+                    catch (Exception e)
+                      {
+                        throw new MessagingException (e.getMessage (), e);
+                      }
+                  }
+              }
+            // Try SASL authentication
+            // TODO user ordering of mechanisms
+            for (Iterator i = capabilities.iterator (); i.hasNext (); )
+              {
+                String cap = (String) i.next ();
+                if (cap.startsWith ("AUTH="))
+                  {
+                    cap = cap.substring (5);
+                    if (connection.authenticate (cap, username, password))
+                      {
+                        return true;
+                      }
+                  }
+              }
+            if (capabilities.contains (IMAPConstants.LOGINDISABLED))
+              {
+                return false; // sorry
+              }
+            return connection.login (username, password);
           }
-        }
-        if (!capabilities.contains(IMAPConstants.LOGINDISABLED))
-          return connection.login(username, password);
-        else
-          return false; // sorry
+        catch (UnknownHostException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
+        finally
+          {
+            if (connection != null && connection.alertsPending ())
+              {
+                processAlerts ();
+              }
+          }
       }
-      catch (UnknownHostException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-      catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-      finally
-      {
-        if (connection!=null && connection.alertsPending())
-          processAlerts();
-      }
-    }
   }
 
   /**
    * Closes the connection.
    */
-  public synchronized void close()
+  public synchronized void close ()
     throws MessagingException
   {
-    if (connection!=null)
-    {
-      synchronized (this)
+    if (connection != null)
       {
-        try
-        {
-          connection.logout();
-        }
-        catch (IOException e)
-        {
-        }
-        connection = null;
+        synchronized (this)
+          {
+            try
+              {
+                connection.logout ();
+              }
+            catch (IOException e)
+              {
+              }
+            connection = null;
+          }
       }
-    }
-    super.close();
+    super.close ();
   }
 
   /**
    * Returns the root folder.
    */
-  public Folder getDefaultFolder()
+  public Folder getDefaultFolder ()
     throws MessagingException
   {
-    if (root==null)
-      root = new IMAPFolder(this, "");
+    if (root == null)
+      {
+        root = new IMAPFolder (this, "");
+      }
     return root;
   }
 
   /**
    * Returns the folder with the specified name.
    */
-  public Folder getFolder(String name)
+  public Folder getFolder (String name)
     throws MessagingException
   {
-    return new IMAPFolder(this, name);
+    return new IMAPFolder (this, name);
   }
 
   /**
    * Returns the folder whose name is the file part of the specified URLName.
    */
-  public Folder getFolder(URLName urlname)
+  public Folder getFolder (URLName urlname)
     throws MessagingException
   {
-    return getFolder(urlname.getFile());
+    return getFolder (urlname.getFile ());
   }
 
   /**
    * Returns the IMAP connection used by this store.
    * @exception StoreClosedException if the store is not currently connected
    */
-  protected IMAPConnection getConnection()
+  protected IMAPConnection getConnection ()
     throws StoreClosedException
   {
-    if (!isConnected())
-      throw new StoreClosedException(this);
+    if (!isConnected ())
+      {
+        throw new StoreClosedException (this);
+      }
     return connection;
   }
 
   /**
    * Indicates whether the specified folder is selected.
    */
-  protected boolean isSelected(IMAPFolder folder)
+  protected boolean isSelected (IMAPFolder folder)
   {
-    return folder.equals(selected);
+    return folder.equals (selected);
   }
 
   /**
    * Sets the selected folder.
    */
-  protected void setSelected(IMAPFolder folder)
+  protected void setSelected (IMAPFolder folder)
   {
     selected = folder;
   }
@@ -227,50 +267,54 @@ public class IMAPStore
   /**
    * Process any alerts supplied by the server.
    */
-  protected void processAlerts()
+  protected void processAlerts ()
   {
-    String[] alerts = connection.getAlerts();
-    for (int i=0; i<alerts.length; i++)
-      notifyStoreListeners(StoreEvent.ALERT, alerts[i]);
+    String[] alerts = connection.getAlerts ();
+    for (int i = 0; i < alerts.length; i++)
+      {
+        notifyStoreListeners (StoreEvent.ALERT, alerts[i]);
+      }
   }
 
   // -- Utility methods --
   
-  private int getIntProperty(String key)
+  private int getIntProperty (String key)
   {
-    String value = getProperty(key);
-    if (value!=null)
-    {
-      try
+    String value = getProperty (key);
+    if (value != null)
       {
-        return Integer.parseInt(value);
+        try
+          {
+            return Integer.parseInt (value);
+          }
+        catch (Exception e)
+          {
+          }
       }
-      catch (Exception e)
-      {
-      }
-    }
     return -1;
   }
 
-  private boolean propertyIsFalse(String key)
+  private boolean propertyIsFalse (String key)
   {
-    return "false".equals(getProperty(key));
+    return "false".equals (getProperty (key));
   }
 
-  private boolean propertyIsTrue(String key)
+  private boolean propertyIsTrue (String key)
   {
-    return "true".equals(getProperty(key));
+    return "true".equals (getProperty (key));
   }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty(String key)
+  private String getProperty (String key)
   {
-    String value = session.getProperty("mail.imap."+key);
-    if (value==null)
-      value = session.getProperty("mail."+key);
+    String value = session.getProperty ("mail.imap." + key);
+    if (value == null)
+      {
+        value = session.getProperty ("mail." + key);
+      }
     return value;
   }
 

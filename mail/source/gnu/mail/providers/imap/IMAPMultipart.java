@@ -42,7 +42,7 @@ import javax.mail.internet.MimeMultipart;
  * @version 0.1
  */
 public class IMAPMultipart
-  extends MimeMultipart
+extends MimeMultipart
 {
 
   /**
@@ -53,10 +53,10 @@ public class IMAPMultipart
   /**
    * Called by the IMAPMessage.
    */
-  protected IMAPMultipart(IMAPMessage message, Part parent, String subtype)
+  protected IMAPMultipart (IMAPMessage message, Part parent, String subtype)
   {
-    super(subtype);
-    setParent(parent);
+    super (subtype);
+    setParent (parent);
     this.message = message;
   }
 

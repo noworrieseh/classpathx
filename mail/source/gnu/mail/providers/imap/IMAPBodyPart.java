@@ -46,11 +46,10 @@ import gnu.inet.imap.Pair;
  * A MIME body part of an IMAP multipart message.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 0.1
  */
 public class IMAPBodyPart
-  extends MimeBodyPart
-  implements IMAPConstants
+extends MimeBodyPart
+implements IMAPConstants
 {
 
   /**
@@ -81,15 +80,15 @@ public class IMAPBodyPart
   /**
    * Called by the IMAPMessage.
    */
-  protected IMAPBodyPart(IMAPMessage message,
-      IMAPMultipart parent,
-      String section,
-      InternetHeaders headers,
-      int size,
-      int lines)
+  protected IMAPBodyPart (IMAPMessage message,
+                          IMAPMultipart parent,
+                          String section,
+                          InternetHeaders headers,
+                          int size,
+                          int lines)
     throws MessagingException
   {
-    super(headers, null);
+    super (headers, null);
     this.parent = parent;
     this.message = message;
     this.section = section;
@@ -100,95 +99,110 @@ public class IMAPBodyPart
   /**
    * Fetches the message body.
    */
-  void fetchContent()
+  void fetchContent ()
     throws MessagingException
   {
     String[] commands = new String[1];
-    commands[0] = new StringBuffer("BODY.PEEK[")
-      .append(section)
-      .append(']')
-      .toString();
-    fetch(commands);
+    commands[0] = "BODY.PEEK[" + section + "]";
+    fetch (commands);
   }
 
   /*
    * Perform the IMAP fetch.
    */
-  void fetch(String[] commands)
+  void fetch (String[] commands)
     throws MessagingException
   {
     try
-    {
-      IMAPConnection connection =
-        ((IMAPStore)message.getFolder().getStore()).getConnection();
-      int msgnum = message.getMessageNumber();
-      int[] messages = new int[] { msgnum };
-      synchronized (connection)
       {
-        MessageStatus[] ms = connection.fetch(messages, commands);
-        for (int i=0; i<ms.length; i++)
-        {
-          if (ms[i].getMessageNumber()==msgnum)
-            update(ms[i]);
-        }
-                                                  }
-    }
+        IMAPConnection connection =
+          ((IMAPStore) message.getFolder ().getStore ()).getConnection ();
+        int msgnum = message.getMessageNumber ();
+        int[] messages = new int[] { msgnum };
+        synchronized (connection)
+          {
+            MessageStatus[] ms = connection.fetch (messages, commands);
+            for (int i = 0; i < ms.length; i++)
+              {
+                if (ms[i].getMessageNumber () == msgnum)
+                  {
+                    update (ms[i]);
+                  }
+              }
+          }
+      }
     catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
+      {
+        throw new MessagingException (e.getMessage (), e);
+      }
   }
 
   /*
    * Update this body part's content from the specified message status
    * object.
    */
-  void update(MessageStatus status)
+  void update (MessageStatus status)
     throws MessagingException
   {
-    List code = status.getCode();
-    int clen = code.size();
-    for (int i=0; i<clen; i+=2)
-    {
-      Object item = code.get(i);
-      String key = null;
-      List params = Collections.EMPTY_LIST;
-      if (item instanceof Pair)
+    List code = status.getCode ();
+    int clen = code.size ();
+    for (int i = 0; i < clen; i += 2)
       {
-        Pair pair = (Pair)item;
-        key = pair.getKey();
-        params = pair.getValue();
-      }
-      else if (item instanceof String)
-        key = (String)item;
-      else
-        throw new MessagingException("Unexpected status item: "+item);
-  
-      if (key==BODY)
-      {
-        int plen = params.size();
-        if (plen>0)
-        {
-          Object pitem = params.get(0);
-          String pkey = null;
-          if (pitem instanceof String)
-            pkey = (String)pitem;
-          else
-            throw new MessagingException("Unexpected status item: "+pitem);
-          
-          if (pkey.equals(section))
+        Object item = code.get (i);
+        String key = null;
+        List params = Collections.EMPTY_LIST;
+        if (item instanceof Pair)
           {
-            content = (byte[])code.get(i+1);
+            Pair pair = (Pair) item;
+            key = pair.getKey ();
+            params = pair.getValue ();
           }
-          else
-            throw new MessagingException("Unexpected section number: "+pkey);
-        }
+        else if (item instanceof String)
+          {
+            key = (String) item;
+          }
         else
-          throw new MessagingException("Not a section!");
+          {
+            throw new MessagingException ("Unexpected status item: " + item);
+          }
+        
+        if (key == BODY)
+          {
+            int plen = params.size ();
+            if (plen > 0)
+              {
+                Object pitem = params.get (0);
+                String pkey = null;
+                if (pitem instanceof String)
+                  {
+                    pkey = (String) pitem;
+                  }
+                else
+                  {
+                    throw new MessagingException ("Unexpected status item: " +
+                                                  pitem);
+                  }
+                
+                if (pkey.equals (section))
+                  {
+                    content = (byte[]) code.get (i + 1);
+                  }
+                else
+                  {
+                    throw new MessagingException ("Unexpected section number: " +
+                                                  pkey);
+                  }
+              }
+            else
+              {
+                throw new MessagingException ("Not a section!");
+              }
+          }
+        else
+          {
+            throw new MessagingException ("Unknown section status key: " + key);
+          }
       }
-      else
-        throw new MessagingException("Unknown section status key: "+key);
-    }
   }
 
   // -- Simple accessors --
@@ -196,7 +210,7 @@ public class IMAPBodyPart
   /**
    * Returns the content size of this body part in bytes.
    */
-  public int getSize()
+  public int getSize ()
     throws MessagingException
   {
     return size;
@@ -205,7 +219,7 @@ public class IMAPBodyPart
   /**
    * Returns the number of text lines in the content of this body part.
    */
-  public int getLineCount()
+  public int getLineCount ()
     throws MessagingException
   {
     return lines;
@@ -216,44 +230,47 @@ public class IMAPBodyPart
   /**
    * Returns a data handler for this part's content.
    */
-  public DataHandler getDataHandler()
+  public DataHandler getDataHandler ()
     throws MessagingException
   {
-    ContentType ct = new ContentType(getContentType());
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
-    {
-      // Our multipart object should already have been configured
-      return new DataHandler(new IMAPMultipartDataSource(multipart));
-    }
+    ContentType ct = new ContentType (getContentType ());
+    if ("multipart".equalsIgnoreCase (ct.getPrimaryType ()))
+      {
+        // Our multipart object should already have been configured
+        return new DataHandler (new IMAPMultipartDataSource (multipart));
+      }
     else
-    {
-      if (content==null)
-        fetchContent();
-      return super.getDataHandler();
-    }
+      {
+        if (content == null)
+          {
+            fetchContent ();
+          }
+        return super.getDataHandler ();
+      }
   }
 
-  public Object getContent()
+  public Object getContent ()
     throws MessagingException, IOException
   {
-    ContentType ct = new ContentType(getContentType());
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
-    {
-      return multipart;
-    }
-    else
-      return super.getContent();
+    ContentType ct = new ContentType (getContentType ());
+    if ("multipart".equalsIgnoreCase (ct.getPrimaryType ()))
+      {
+        return multipart;
+      }
+    return super.getContent ();
   }
   
   /**
    * Returns the raw content stream.
    */
-  protected InputStream getContentStream()
+  protected InputStream getContentStream ()
     throws MessagingException
   {
-    if (content==null)
-      fetchContent();
-    return super.getContentStream();
+    if (content == null)
+      {
+        fetchContent ();
+      }
+    return super.getContentStream ();
   }
 
 }
