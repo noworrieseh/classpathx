@@ -295,68 +295,70 @@ mbox_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(mbox_sources))
 maildir_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(maildir_sources))
 
 META-INF:
-	test ! -d META-INF && mkdir META-INF
+	mkdir -p META-INF
 
 META-INF/COPYING: META-INF COPYING
-	cp COPYING META-INF/
+	cp COPYING META-INF/COPYING
 
 META-INF/mime.types: META-INF mime.types
-	cp mime.types META-INF/
+	cp mime.types META-INF/mime.types
 
 META-INF/mailcap: META-INF mailcap
-	cp mailcap META-INF/
+	cp mailcap META-INF/mailcap
 
 META-INF/javamail.charset.map: META-INF javamail.charset.map
 	cp javamail.charset.map META-INF/javamail.charset.map
 
-META-INF/javamail.default.providers: META-INF clean_providers smtp_provider imap_provider pop3_provider nntp_provider mbox_provider maildir_provider
+META-INF/javamail.default.providers: META-INF javamail.providers smtp.ok imap.ok pop3.ok nntp.ok mbox.ok maildir.ok
 	cp javamail.providers META-INF/javamail.default.providers
 
-clean_providers:
+javamail.providers:
 	echo "# javamail.providers for GNU JavaMail" > javamail.providers
 
-smtp_provider:
+smtp.ok:
 if ENABLE_SMTP
 	grep "protocol=smtp" javamail.providers.in >> javamail.providers
 endif
+	touch smtp.ok
 
-imap_provider:
+imap.ok:
 if ENABLE_IMAP
 	grep "protocol=imap" javamail.providers.in >> javamail.providers
 endif
+	touch imap.ok
 
-pop3_provider:
+pop3.ok:
 if ENABLE_POP3
 	grep "protocol=pop3" javamail.providers.in >> javamail.providers
 endif
+	touch pop3.ok
 
-nntp_provider:
+nntp.ok:
 if ENABLE_NNTP
 	grep "protocol=nntp" javamail.providers.in >> javamail.providers
 endif
+	touch nntp.ok
 
-mbox_provider:
+mbox.ok:
 if ENABLE_MBOX
 	grep "protocol=mbox" javamail.providers.in >> javamail.providers
 endif
+	touch mbox.ok
 
-maildir_provider:
+maildir.ok:
 if ENABLE_MAILDIR
 	grep "protocol=maildir" javamail.providers.in >> javamail.providers
 endif
+	touch maildir.ok
 
-META-INF/javamail.default.address.map: META-INF clean_address_map smtp_address_map nntp_address_map
+META-INF/javamail.default.address.map: META-INF javamail.address.map
 	cp javamail.address.map META-INF/javamail.default.address.map
 
-clean_address_map:
+javamail.address.map:
 	rm -f javamail.address.map
-
-smtp_address_map:
 if ENABLE_SMTP
 	echo "rfc822=smtp" > javamail.address.map
 endif
-
-nntp_address_map:
 #if ENABLE_NNTP
 #	if [[ ! -f javamail.address.map]]; then \
 #	  echo "rfc822=nntp-post" > javamail.address.map \
@@ -368,14 +370,16 @@ $(dst):
 
 # Jars
 
-$(gnumail_jar): $(gnumail_meta) gnumail
+$(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
 	$(JAR) cf gnumail.jar \
 		$(gnumail_meta) \
 		-C $(dst) javax \
 		-C $(dst) gnu/mail/handler \
 		-C $(dst) gnu/mail/util 
 
-$(providers_jar): $(providers_meta) smtp imap pop3 nntp mbox maildir
+$(providers_jar): $(providers_meta) $(provider_classes) $(smtp_classes) \
+	$(imap_classes) $(pop3_classes) $(nntp_classes) $(mbox_classes) \
+	$(maildir_classes)
 	$(JAR) cf providers.jar \
 		$(providers_meta) \
 		-C $(dst) gnu/mail/providers \
@@ -383,47 +387,47 @@ $(providers_jar): $(providers_meta) smtp imap pop3 nntp mbox maildir
 
 # Compilation
 
-gnumail: util $(gnumail_classes)
+#gnumail: util $(gnumail_classes)
 
 $(gnumail_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-util: $(util_classes)
+#util: $(util_classes)
 
 $(util_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-provider_util: $(gnumail_jar) $(provider_classes)
+#provider_util: $(gnumail_jar) $(provider_classes)
 
 $(provider_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-smtp: provider_util $(smtp_classes)
+#smtp: provider_util $(smtp_classes)
 
 $(smtp_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-imap: provider_util $(imap_classes)
+#imap: provider_util $(imap_classes)
 
 $(imap_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-pop3: provider_util $(pop3_classes)
+#pop3: provider_util $(pop3_classes)
 
 $(pop3_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-nntp: provider_util $(nntp_classes)
+#nntp: provider_util $(nntp_classes)
 
 $(nntp_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-mbox: provider_util $(mbox_classes)
+#mbox: provider_util $(mbox_classes)
 
 $(mbox_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
-maildir: provider_util $(maildir_classes)
+#maildir: provider_util $(maildir_classes)
 
 $(maildir_classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<

@@ -1,3 +1,9 @@
+2004-01-19  Chris Burdess  <dog@bluezoo.org>
+
+    * Makefile.am: Workarounds to avoid recursion.
+    * configure.ac: Added PACKAGE and VERSION for compatibility with different
+        versions of automake.
+
 2004-01-11  Chris Burdess  <dog@bluezoo.org>
 
 	* Makefile.am: Major rework, dropping jarcompiler.
