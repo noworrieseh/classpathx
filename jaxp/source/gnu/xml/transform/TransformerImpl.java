@@ -92,13 +92,15 @@ class TransformerImpl
   Properties outputProperties;
 
   TransformerImpl(TransformerFactoryImpl factory,
-                  Stylesheet stylesheet)
+                  Stylesheet stylesheet,
+                  Properties outputProperties)
     throws TransformerConfigurationException
   {
     this.factory = factory;
     uriResolver = factory.userResolver;
     errorListener = factory.userListener;
     this.stylesheet = stylesheet;
+    this.outputProperties = outputProperties;
     if (stylesheet != null)
       {
         // Set up parameter context for this transformer
@@ -158,8 +160,6 @@ class TransformerImpl
         created = true;
       }
     // Transformation
-    int outputMethod = Stylesheet.OUTPUT_XML;
-    String encoding = null;
     if (stylesheet != null)
       {
         // Make a copy of the source node, and strip it
@@ -168,6 +168,8 @@ class TransformerImpl
         // XSLT transformation
         try
           {
+            // Set output properties in the underlying stylesheet
+            ((TransformerOutputProperties) outputProperties).apply();
             stylesheet.initTopLevelVariables(context);
             TemplateNode t = stylesheet.getTemplate(null, context, false);
             if (t != null)
@@ -175,80 +177,6 @@ class TransformerImpl
                 stylesheet.current = context;
                 t.apply(stylesheet, null, context, 1, 1, parent, nextSibling);
               }
-            outputMethod = stylesheet.outputMethod;
-            encoding = stylesheet.outputEncoding;
-            String publicId = stylesheet.outputPublicId;
-            String systemId = stylesheet.outputSystemId;
-            if (created)
-              {
-                // Discover document element
-                DomDocument resultDoc = (DomDocument) parent;
-                Node root = resultDoc.getDocumentElement();
-                // Add doctype if specified
-                if ((publicId != null || systemId != null) &&
-                    root != null)
-                  {
-                    // We must know the name of the root element to
-                    // create the document type
-                    resultDoc.appendChild(new DomDoctype(resultDoc,
-                                                         root.getNodeName(),
-                                                         publicId,
-                                                         systemId));
-                  }
-                resultDoc.setBuilding(false);
-                resultDoc.setCheckWellformedness(true);
-              }
-            else if (publicId != null || systemId != null)
-              {
-                switch (parent.getNodeType())
-                  {
-                  case Node.DOCUMENT_NODE:
-                  case Node.DOCUMENT_FRAGMENT_NODE:
-                    Document resultDoc = (parent instanceof Document) ?
-                      (Document) parent :
-                      parent.getOwnerDocument();
-                    DOMImplementation impl = resultDoc.getImplementation();
-                    DocumentType doctype =
-                      impl.createDocumentType(resultDoc.getNodeName(),
-                                              publicId,
-                                              systemId);
-                    // Try to insert doctype before first element
-                    Node ctx = parent.getFirstChild();
-                    for (; ctx != null &&
-                         ctx.getNodeType() != Node.ELEMENT_NODE;
-                         ctx = ctx.getNextSibling())
-                      {
-                      }
-                    if (ctx != null)
-                      {
-                        parent.insertBefore(doctype, ctx);
-                      }
-                    else
-                      {
-                        parent.appendChild(doctype);
-                      }
-                  }
-              }
-            if (stylesheet.outputVersion != null)
-              {
-                parent.setUserData("version", stylesheet.outputVersion,
-                                   stylesheet);
-              }
-            if (stylesheet.outputOmitXmlDeclaration)
-              {
-                parent.setUserData("omit-xml-declaration", "yes", stylesheet);
-              }
-            if (stylesheet.outputStandalone)
-              {
-                parent.setUserData("standalone", "yes", stylesheet);
-              }
-            if (stylesheet.outputMediaType != null)
-              {
-                parent.setUserData("media-type", stylesheet.outputMediaType,
-                                   stylesheet);
-              }
-            // TODO cdata-section-elements
-            // TODO indent
           }
         catch (TransformerException e)
           {
@@ -272,6 +200,87 @@ class TransformerImpl
           {
             parent.appendChild(clone);
           }
+      }
+    String method = outputProperties.getProperty(OutputKeys.METHOD);
+    int outputMethod = "html".equals(method) ? Stylesheet.OUTPUT_HTML :
+      "text".equals(method) ? Stylesheet.OUTPUT_TEXT :
+      Stylesheet.OUTPUT_XML;
+    String encoding = outputProperties.getProperty(OutputKeys.ENCODING);
+    String publicId = outputProperties.getProperty(OutputKeys.DOCTYPE_PUBLIC);
+    String systemId = outputProperties.getProperty(OutputKeys.DOCTYPE_SYSTEM);
+    String version = outputProperties.getProperty(OutputKeys.VERSION);
+    boolean omitXmlDeclaration = 
+      "yes".equals(outputProperties.getProperty(OutputKeys.OMIT_XML_DECLARATION));
+    boolean standalone = 
+      "yes".equals(outputProperties.getProperty(OutputKeys.STANDALONE));
+    String mediaType = outputProperties.getProperty(OutputKeys.MEDIA_TYPE);
+    // TODO cdata-section-elements
+    // TODO indent
+    if (created)
+      {
+        // Discover document element
+        DomDocument resultDoc = (DomDocument) parent;
+        Node root = resultDoc.getDocumentElement();
+        // Add doctype if specified
+        if ((publicId != null || systemId != null) &&
+            root != null)
+          {
+            // We must know the name of the root element to
+            // create the document type
+            resultDoc.appendChild(new DomDoctype(resultDoc,
+                                                 root.getNodeName(),
+                                                 publicId,
+                                                 systemId));
+          }
+        resultDoc.setBuilding(false);
+        resultDoc.setCheckWellformedness(true);
+      }
+    else if (publicId != null || systemId != null)
+      {
+        switch (parent.getNodeType())
+          {
+          case Node.DOCUMENT_NODE:
+          case Node.DOCUMENT_FRAGMENT_NODE:
+            Document resultDoc = (parent instanceof Document) ?
+              (Document) parent :
+              parent.getOwnerDocument();
+            DOMImplementation impl = resultDoc.getImplementation();
+            DocumentType doctype =
+              impl.createDocumentType(resultDoc.getNodeName(),
+                                      publicId,
+                                      systemId);
+            // Try to insert doctype before first element
+            Node ctx = parent.getFirstChild();
+            for (; ctx != null &&
+                 ctx.getNodeType() != Node.ELEMENT_NODE;
+                 ctx = ctx.getNextSibling())
+              {
+              }
+            if (ctx != null)
+              {
+                parent.insertBefore(doctype, ctx);
+              }
+            else
+              {
+                parent.appendChild(doctype);
+              }
+          }
+      }
+    if (version != null)
+      {
+        parent.setUserData("version", version, stylesheet);
+      }
+    if (omitXmlDeclaration)
+      {
+        parent.setUserData("omit-xml-declaration", "yes", stylesheet);
+      }
+    if (standalone)
+      {
+        parent.setUserData("standalone", "yes", stylesheet);
+      }
+    if (mediaType != null)
+      {
+        parent.setUserData("media-type", mediaType, stylesheet);
       }
     // Render result to the target device
     if (outputTarget instanceof DOMResult)
@@ -472,7 +481,14 @@ class TransformerImpl
   public void setOutputProperties(Properties oformat)
     throws IllegalArgumentException
   {
-    outputProperties.putAll(oformat);
+    if (oformat == null)
+      {
+        outputProperties.clear();
+      }
+    else
+      {
+        outputProperties.putAll(oformat);
+      }
   }
 
   public Properties getOutputProperties()

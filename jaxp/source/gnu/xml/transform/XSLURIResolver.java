@@ -114,64 +114,12 @@ class XSLURIResolver
       }
     String systemId = (source == null) ? null : source.getSystemId();
     long lastModified = 0L, lastLastModified = 0L;
-    URL url = null;
-    Node node = null;
 
     try
       {
-        try
-          {
-            if (systemId != null)
-              {
-                try
-                  {
-                    url = new URL(systemId);
-                  }
-                catch (MalformedURLException e)
-                  {
-                    // Try building from base + href
-                  }
-              }
-            if (url == null)
-              {
-                if (base != null)
-                  {
-                    URL baseURL = new URL(base);
-                    url = new URL(baseURL, href);
-                  }
-                else
-                  {
-                    url = new URL(href);
-                  }
-              }
-            systemId = url.toString();
-          }
-        catch (MalformedURLException e)
-          {
-            // Fall back to local filesystem
-            File file = null;
-            if (href == null)
-              {
-                href = systemId;
-              }
-            if (base != null)
-              {
-                int lsi = base.lastIndexOf(File.separatorChar);
-                if (lsi != -1 && lsi < base.length() - 1)
-                  {
-                    base = base.substring(0, lsi);
-                  }
-                File baseFile = new File(base);
-                file = new File(baseFile, href);
-              }
-            else
-              {
-                file = new File(href);
-              }
-            url = file.toURL();
-            systemId = url.toString();
-          }
-        node = (Node) nodeCache.get(systemId);
+        URL url = resolveURL(systemId, base, href);
+        systemId = url.toString();
+        Node node = (Node) nodeCache.get(systemId);
         // Is the resource up to date?
         URLConnection conn = url.openConnection();
         Long llm = (Long) lastModifiedCache.get(systemId);
@@ -208,6 +156,63 @@ class XSLURIResolver
     catch (SAXException e)
       {
         throw new TransformerException(e);
+      }
+  }
+
+  URL resolveURL(String systemId, String base, String href)
+    throws IOException
+  {
+    URL url = null;
+    try
+      {
+        if (systemId != null)
+          {
+            try
+              {
+                url = new URL(systemId);
+              }
+            catch (MalformedURLException e)
+              {
+                // Try building from base + href
+              }
+          }
+        if (url == null)
+          {
+            if (base != null)
+              {
+                URL baseURL = new URL(base);
+                url = new URL(baseURL, href);
+              }
+            else
+              {
+                url = new URL(href);
+              }
+          }
+        return url;
+      }
+    catch (MalformedURLException e)
+      {
+        // Fall back to local filesystem
+        File file = null;
+        if (href == null)
+          {
+            href = systemId;
+          }
+        if (base != null)
+          {
+            int lsi = base.lastIndexOf(File.separatorChar);
+            if (lsi != -1 && lsi < base.length() - 1)
+              {
+                base = base.substring(0, lsi);
+              }
+            File baseFile = new File(base);
+            file = new File(baseFile, href);
+          }
+        else
+          {
+            file = new File(href);
+          }
+        return file.toURL();
       }
   }
   

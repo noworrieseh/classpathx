@@ -1244,7 +1244,10 @@ public class DomDocument
           case ELEMENT_NODE:
             if (!config.namespaceDeclarations)
               {
-                NamedNodeMap attrs = node.getAttributes();
+                DomNamedNodeMap attrs =
+                  (DomNamedNodeMap) node.getAttributes();
+                boolean aro = attrs.readonly;
+                attrs.readonly = false; // Ensure we can delete if necessary
                 int len = attrs.getLength();
                 for (int i = 0; i < len; i++)
                   {
@@ -1253,11 +1256,12 @@ public class DomDocument
                     if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace))
                       {
                         attrs.removeNamedItemNS(namespace,
-                                                attr.getNodeName());
+                                                attr.getLocalName());
                         i--;
                         len--;
                       }
                   }
+                attrs.readonly = aro;
               }
             break;
           }

@@ -224,7 +224,7 @@ public class DomAttr
     if (first == null)
       {
         length = 0;
-        Node text = owner.createTextNode(value);
+        Node text = owner.createTextNode((value == null) ? "" : value);
         appendChild(text);
       }
     return first;
@@ -236,7 +236,7 @@ public class DomAttr
     if (last == null)
       {
         length = 0;
-        Node text = owner.createTextNode(value);
+        Node text = owner.createTextNode((value == null) ? "" : value);
         appendChild(text);
       }
     return last;
@@ -248,7 +248,7 @@ public class DomAttr
     if (first == null)
       {
         length = 0;
-        Node text = owner.createTextNode(value);
+        Node text = owner.createTextNode((value == null) ? "" : value);
         appendChild(text);
       }
     return super.item(index);

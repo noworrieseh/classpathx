@@ -302,6 +302,7 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/transform/TextNode.lo \
 	source/gnu/xml/transform/TransformerFactoryImpl.lo \
 	source/gnu/xml/transform/TransformerImpl.lo \
+	source/gnu/xml/transform/TransformerOutputProperties.lo \
 	source/gnu/xml/transform/URIResolverEntityResolver.lo \
 	source/gnu/xml/transform/ValueOfNode.lo \
 	source/gnu/xml/transform/WhenNode.lo \
@@ -1262,6 +1263,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/TextNode.java \
 	source/gnu/xml/transform/TransformerFactoryImpl.java \
 	source/gnu/xml/transform/TransformerImpl.java \
+	source/gnu/xml/transform/TransformerOutputProperties.java \
 	source/gnu/xml/transform/URIResolverEntityResolver.java \
 	source/gnu/xml/transform/ValueOfNode.java \
 	source/gnu/xml/transform/WhenNode.java \
@@ -2027,6 +2029,9 @@ source/gnu/xml/transform/TransformerFactoryImpl.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/TransformerImpl.lo:  \
+	source/gnu/xml/transform/$(am__dirstamp) \
+	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/transform/TransformerOutputProperties.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/URIResolverEntityResolver.lo:  \
@@ -3239,6 +3244,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/transform/TransformerFactoryImpl.lo
 	-rm -f source/gnu/xml/transform/TransformerImpl.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/TransformerImpl.lo
+	-rm -f source/gnu/xml/transform/TransformerOutputProperties.$(OBJEXT)
+	-rm -f source/gnu/xml/transform/TransformerOutputProperties.lo
 	-rm -f source/gnu/xml/transform/URIResolverEntityResolver.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/URIResolverEntityResolver.lo
 	-rm -f source/gnu/xml/transform/UnparsedEntityUriFunction.$(OBJEXT)
@@ -4030,6 +4037,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/TextNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/TransformerFactoryImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/TransformerImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/TransformerOutputProperties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/URIResolverEntityResolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/UnparsedEntityUriFunction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ValueOfNode.Plo@am__quote@
@@ -5878,6 +5886,13 @@ source/gnu/xml/transform/TransformerImpl.lo: source/gnu/xml/transform/Transforme
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/TransformerImpl.java' object='source/gnu/xml/transform/TransformerImpl.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/TransformerImpl.lo `test -f 'source/gnu/xml/transform/TransformerImpl.java' || echo '$(srcdir)/'`source/gnu/xml/transform/TransformerImpl.java
+
+source/gnu/xml/transform/TransformerOutputProperties.lo: source/gnu/xml/transform/TransformerOutputProperties.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/TransformerOutputProperties.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/TransformerOutputProperties.Tpo" -c -o source/gnu/xml/transform/TransformerOutputProperties.lo `test -f 'source/gnu/xml/transform/TransformerOutputProperties.java' || echo '$(srcdir)/'`source/gnu/xml/transform/TransformerOutputProperties.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/TransformerOutputProperties.Tpo" "source/gnu/xml/transform/$(DEPDIR)/TransformerOutputProperties.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/TransformerOutputProperties.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/TransformerOutputProperties.java' object='source/gnu/xml/transform/TransformerOutputProperties.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/TransformerOutputProperties.lo `test -f 'source/gnu/xml/transform/TransformerOutputProperties.java' || echo '$(srcdir)/'`source/gnu/xml/transform/TransformerOutputProperties.java
 
 source/gnu/xml/transform/URIResolverEntityResolver.lo: source/gnu/xml/transform/URIResolverEntityResolver.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/URIResolverEntityResolver.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/URIResolverEntityResolver.Tpo" -c -o source/gnu/xml/transform/URIResolverEntityResolver.lo `test -f 'source/gnu/xml/transform/URIResolverEntityResolver.java' || echo '$(srcdir)/'`source/gnu/xml/transform/URIResolverEntityResolver.java; \

@@ -579,6 +579,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/TextNode.java \
 	source/gnu/xml/transform/TransformerFactoryImpl.java \
 	source/gnu/xml/transform/TransformerImpl.java \
+	source/gnu/xml/transform/TransformerOutputProperties.java \
 	source/gnu/xml/transform/URIResolverEntityResolver.java \
 	source/gnu/xml/transform/ValueOfNode.java \
 	source/gnu/xml/transform/WhenNode.java \
