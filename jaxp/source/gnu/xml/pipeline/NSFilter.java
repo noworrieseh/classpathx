@@ -1,5 +1,5 @@
 /*
- * $Id: NSFilter.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: NSFilter.java,v 1.6 2001-10-25 07:06:07 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -78,7 +78,7 @@ import gnu.xml.util.DefaultHandler;
  * appropriate logic (perhaps adding additional heuristics in a subclass).
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 07:06:07 $
  */
 public class NSFilter extends EventFilter
 {
@@ -239,8 +239,8 @@ public class NSFilter extends EventFilter
     }
 
     public void startElement (
-	String ns, String l,
-	String name, Attributes atts
+	String uri, String localName,
+	String qName, Attributes atts
     ) throws SAXException
     {
 	if (!pushedContext)
@@ -285,7 +285,7 @@ public class NSFilter extends EventFilter
 	// name fixups:  element, then attributes.
 	// fixName may declare a new prefix or, for the element,
 	// redeclare the default (if element name needs it).
-	name = fixName (ns, l, name, false);
+	qName = fixName (uri, localName, qName, false);
 
 	for (int i = 0; i < length; i++) {
 	    String	aName = atts.getQName (i);
@@ -300,18 +300,18 @@ public class NSFilter extends EventFilter
 	    attributes.addAttribute (aNS, aLocal, aName, aType, aValue);
 	}
 
-	elementStack.push (name);
+	elementStack.push (qName);
 
 	// pass event along, with cleaned-up names and decls.
-	super.startElement (ns, l, name, attributes);
+	super.startElement (uri, localName, qName, attributes);
     }
 
-    public void endElement (String uri, String localName, String rawName)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
 	nsStack.popContext ();
-	rawName = (String) elementStack.pop ();
-	super.endElement (uri, localName, rawName);
+	qName = (String) elementStack.pop ();
+	super.endElement (uri, localName, qName);
     }
 
     /**
