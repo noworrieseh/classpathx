@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.13 2002-07-27 02:12:00 raif Exp $
+   $Id: build.xml,v 1.14 2002-08-07 10:10:44 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -203,10 +203,10 @@
    </target>
 
    <!--
-   Exercise block ciphers to measure their performance ........................
+   Exercise block cipher and hash algorithms to measure their performance .....
    -->
    <target name="speed" depends="jar"
-           description="Exercise block ciphers to measure performance">
+           description="Exercise hash and block ciphers to measure their performance">
       <java classname="gnu.crypto.tool.CipherSpeed"
             fork="yes" failonerror="true" classpath="${main.jar}"/>
       <java classname="gnu.crypto.tool.HashSpeed"
@@ -214,8 +214,20 @@
    </target>
 
    <!--
+   Exercise PRNG algorithms to measure their randomness .......................
+   -->
+   <target name="ent" depends="jar"
+           description="Test randomness of PRNG algorithms">
+      <java classname="gnu.crypto.tool.Ent"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+   </target>
+
+   <!--
    Generating test vectors and exercising algorithms the NIST way .............
    -->
+   <target name="tv" depends="kat,mct"
+           description="Output NIST-compliant Known Answer and Monte-Carlo Test vectors"/>
+
    <target name="kat" depends="jar"
            description="Output test vectors in compliance with NIST's KAT">
       <parallel>
