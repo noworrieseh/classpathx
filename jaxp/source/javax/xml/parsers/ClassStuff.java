@@ -1,5 +1,5 @@
 /*
- * $Id: ClassStuff.java,v 1.4 2001-11-29 22:38:26 db Exp $
+ * $Id: ClassStuff.java,v 1.5 2003-01-20 23:54:20 nferrier Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 
-// $Id: ClassStuff.java,v 1.4 2001-11-29 22:38:26 db Exp $
+// $Id: ClassStuff.java,v 1.5 2003-01-20 23:54:20 nferrier Exp $
 
 /**
  * Package-private utility methods for sharing
@@ -46,7 +46,7 @@ import java.util.Properties;
  * Keep changes to the two copies in sync.
  *
  * @author David Brownell
- * @version	$Id: ClassStuff.java,v 1.4 2001-11-29 22:38:26 db Exp $
+ * @version	$Id: ClassStuff.java,v 1.5 2003-01-20 23:54:20 nferrier Exp $
  */
 final class ClassStuff
 {
@@ -74,7 +74,7 @@ final class ClassStuff
         } catch (NoSuchMethodException e) {
             // Assume that we are running JDK 1.1; use current ClassLoader
             loader = ClassStuff.class.getClassLoader();
-	} catch (Exception e) {
+	} catch (Throwable e) {
 	    // "should not happen"
             throw new UnknownError (e.getMessage());
         }
