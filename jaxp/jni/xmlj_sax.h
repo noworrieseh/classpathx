@@ -129,4 +129,12 @@ void xmljSAXFatalError(void *ctx,
     const char *msg,
     ...);
 
+void xmljCheckWellFormed(xmlParserCtxtPtr ctx);
+
+jstring xmljAttributeTypeName (JNIEnv *env,
+    int type);
+
+jstring xmljAttributeModeName (JNIEnv *env,
+    int type);
+
 #endif /* !defined XMLJ_SAX_H */

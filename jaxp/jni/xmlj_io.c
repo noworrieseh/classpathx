@@ -50,6 +50,7 @@
 #include <pthread.h>
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define UNSIGN(a) (((a) < 0) ? ((a) + 0x100) : (a))
 
 #define DETECT_BUFFER_SIZE 50
 
@@ -201,7 +202,15 @@ xmljNewInputStreamContext (JNIEnv * env, jobject inputStream)
   InputStreamContext *result;
   
   inputStreamClass = (*env)->FindClass (env, "java/io/InputStream");
+  if (inputStreamClass == NULL)
+  {
+    xmljThrowException(env, "java/lang/ClassNotFoundException",
+        "java.io.InputStream");
+    return NULL;
+  }
   result = (InputStreamContext *) malloc (sizeof (InputStreamContext));
+  if (result == NULL)
+    return NULL;
 
   result->env = env;
   result->inputStream = inputStream;
@@ -209,7 +218,7 @@ xmljNewInputStreamContext (JNIEnv * env, jobject inputStream)
     (*env)->GetMethodID (env, inputStreamClass, "read", "([BII)I");
   result->inputStreamCloseFunc =
     (*env)->GetMethodID (env, inputStreamClass, "close", "()V");
-  result->bufferLength = 4000;
+  result->bufferLength = 4096;
   result->bufferByteArray = (*env)->NewByteArray (env, result->bufferLength);
   return result;
 }
@@ -231,7 +240,15 @@ xmljNewOutputStreamContext (JNIEnv * env, jobject outputStream)
   OutputStreamContext *result;
   
   outputStreamClass = (*env)->FindClass (env, "java/io/OutputStream");
+  if (outputStreamClass == NULL)
+  {
+    xmljThrowException(env, "java/lang/ClassNotFoundException",
+        "java.io.OutputStream");
+    return NULL;
+  }
   result = (OutputStreamContext *) malloc (sizeof (OutputStreamContext));
+  if (result == NULL)
+    return NULL;
   
   result->env = env;
   result->outputStream = outputStream;
@@ -250,56 +267,71 @@ xmljFreeOutputStreamContext (OutputStreamContext * outContext)
 }
 
 xmlCharEncoding
-xmljDetectCharEncoding (JNIEnv * env, jobject pushbackInputStream)
+xmljDetectCharEncoding (JNIEnv *env,
+    jobject in)
 {
-  jclass pushbackInputStreamClass;
+  xmlCharEncoding ret;
+  jclass cls;
   jbyteArray buffer;
   jmethodID readMethod;
   jmethodID unreadMethod;
   jint nread;
+  int i;
 
-  pushbackInputStreamClass =
-    (*env)->FindClass (env, "java/io/PushbackInputStream");
+  /* Find PushbackInputStream class */
+  cls = (*env)->FindClass (env, "java/io/PushbackInputStream");
+  if (cls == NULL)
+  {
+    xmljThrowException(env, "java/lang/ClassNotFoundException",
+        "java.io.PushbackInputStream");
+    return XML_CHAR_ENCODING_ERROR;
+  }
+  /* Find read and unread methods */
+  readMethod = (*env)->GetMethodID (env, cls, "read", "([B)I");
+  unreadMethod = (*env)->GetMethodID (env, cls, "unread", "([BII)V");
 
+  /* Allocate buffer and read bytes */
   buffer = (*env)->NewByteArray (env, DETECT_BUFFER_SIZE);
+  nread = (*env)->CallIntMethod (env, in, readMethod, buffer);
 
-  readMethod =
-    (*env)->GetMethodID (env, pushbackInputStreamClass, "read", "([B)I");
-
-  unreadMethod =
-    (*env)->GetMethodID (env, pushbackInputStreamClass, "unread", "([BII)V");
-
-  nread =
-    (*env)->CallIntMethod (env, pushbackInputStream, readMethod, buffer);
-
-  if (nread > 0)
+  if (!(*env)->ExceptionOccurred(env) && nread > 0)
   {
     jbyte nativeBuffer[DETECT_BUFFER_SIZE + 1];
+    unsigned char converted[DETECT_BUFFER_SIZE + 1];
     
-    
-    (*env)->CallVoidMethod (env, pushbackInputStream, unreadMethod,
-                            buffer, 0, nread);
-    
-    memset (nativeBuffer, 0, DETECT_BUFFER_SIZE + 1);
-    
-    (*env)->GetByteArrayRegion (env, buffer, 0, nread, nativeBuffer);
-    
-    (*env)->DeleteLocalRef (env, buffer);
+    /* Unread bytes back into pushback input stream */
+    (*env)->CallVoidMethod (env, in, unreadMethod, buffer, 0, nread);
     
     if (nread >= 5)
     {
-      return xmlDetectCharEncoding ((unsigned char *) nativeBuffer,
-          nread);
+      memset (nativeBuffer, 0, DETECT_BUFFER_SIZE + 1);
+      (*env)->GetByteArrayRegion (env, buffer, 0, nread, nativeBuffer);
+      /* Convert from signed to unsigned */
+      for (i = 0; i < DETECT_BUFFER_SIZE + 1; i++)
+      {
+        converted[i] = UNSIGN(nativeBuffer[i]);
+      }
+      ret = xmlDetectCharEncoding (converted, nread);
     }
     else
     {
-      return XML_CHAR_ENCODING_NONE;
+      ret = XML_CHAR_ENCODING_NONE;
     }
   }
   else
   {
-    return XML_CHAR_ENCODING_ERROR;
+    if (!(*env)->ExceptionOccurred(env))
+    {
+      xmljThrowException(env, "java/io/IOException",
+          "document is empty");
+    }
+    ret = XML_CHAR_ENCODING_ERROR;
   }
+  
+  /* Unallocate buffer */
+  (*env)->DeleteLocalRef (env, buffer);
+
+  return ret;
 }
 
 xmlParserCtxtPtr
@@ -314,83 +346,85 @@ xmljEstablishParserContext (JNIEnv * env,
     jobject saxErrorAdapter,
     int useSaxErrorContext)
 {
+  InputStreamContext *inputContext;
+  xmlCharEncoding encoding;
+  xmlParserCtxtPtr parserContext;
   int options;
   SaxErrorContext *saxErrorContext;
   
-  xmlCharEncoding encoding = xmljDetectCharEncoding (env, inputStream);
-
-  InputStreamContext *inputContext =
-    xmljNewInputStreamContext (env, inputStream);
-
-  if (NULL != inputContext)
+  encoding = xmljDetectCharEncoding (env, inputStream);
+  if (encoding != XML_CHAR_ENCODING_ERROR)
   {
-    xmlParserCtxtPtr inputParserCtx 
-      = xmlCreateIOParserCtxt (NULL, NULL,        
+    inputContext = xmljNewInputStreamContext (env, inputStream);
+    if (NULL != inputContext)
+    {
+      parserContext = xmlCreateIOParserCtxt (NULL, NULL,
           /* NOTE: userdata must be NULL for DOM to work */
           xmljInputReadCallback,
           xmljInputCloseCallback,
-          inputContext, encoding);
-    if (NULL != inputParserCtx)
-    {
-      /* Set parsing options */
-      options = 0;
-      if (validate)
+          inputContext,
+          encoding);
+      if (NULL != parserContext)
       {
-        options |= XML_PARSE_DTDLOAD;
-        options |= XML_PARSE_DTDVALID;
+        /* Set parsing options */
+        options = 0;
+        if (validate)
+        {
+          options |= XML_PARSE_DTDLOAD;
+          options |= XML_PARSE_DTDVALID;
+        }
+        if (coalesce)
+          options |= XML_PARSE_NOCDATA;
+        if (expandEntities)
+          options |= XML_PARSE_NOENT;
+        
+        xmlCtxtUseOptions(parserContext, options);
+        parserContext->userData = parserContext;
+        
+        if (!useSaxErrorContext)
+          return parserContext;
+        
+        /* TODO set up SAX entity resolver */
+        
+        xmljInitErrorHandling (parserContext->sax);
+        
+        /* Set up SAX error context */
+        saxErrorContext = xmljCreateSaxErrorContext (env,
+            saxErrorAdapter,
+            inSystemId,
+            inPublicId);
+        if (NULL != saxErrorContext)
+        {
+          parserContext->_private = saxErrorContext;
+          return parserContext;
+        }
+        else
+        {
+          xmlFreeParserCtxt (parserContext);
+          xmljFreeSaxErrorContext (saxErrorContext);
+        }
       }
-      if (coalesce)
-        options |= XML_PARSE_NOCDATA;
-      if (expandEntities)
-        options |= XML_PARSE_NOENT;
-      
-      xmlCtxtUseOptions(inputParserCtx, options);
-      inputParserCtx->userData = inputParserCtx;
-      
-      if (!useSaxErrorContext)
-        return inputParserCtx;
-      
-      /* TODO set up SAX entity resolver */
-      
-      xmljInitErrorHandling (inputParserCtx->sax);
-      
-      /* Set up SAX error context */
-      saxErrorContext
-          = xmljCreateSaxErrorContext (env, saxErrorAdapter,
-              inSystemId, inPublicId);
-      
-      if (NULL != saxErrorContext)
-      {
-        inputParserCtx->_private = saxErrorContext;
-        return inputParserCtx;
-      }
-      else
-      {
-        xmlFreeParserCtxt (inputParserCtx);
-        xmljFreeSaxErrorContext (saxErrorContext);
-      }
+      xmljFreeInputStreamContext (inputContext);
     }
   }
-  
-  xmljFreeInputStreamContext (inputContext);
   return NULL;
 }
 
 void
-xmljReleaseParserContext (xmlParserCtxtPtr inputParserCtx)
+xmljReleaseParserContext (xmlParserCtxtPtr parserContext)
 {
   SaxErrorContext *saxErrorContext;
   InputStreamContext *inputStreamContext;
   
   saxErrorContext
-    = (SaxErrorContext *) inputParserCtx->_private;
+    = (SaxErrorContext *) parserContext->_private;
 
   inputStreamContext
-    = (InputStreamContext *) inputParserCtx->input->buf->context;
+    = (InputStreamContext *) parserContext->input->buf->context;
 
   xmljFreeSaxErrorContext (saxErrorContext);
 
-  xmlFreeParserCtxt (inputParserCtx);
+  xmlFreeParserCtxt (parserContext);
 
   xmljFreeInputStreamContext (inputStreamContext);
 }
@@ -408,7 +442,7 @@ xmljParseJavaInputStream (JNIEnv * env,
 {
   xmlDocPtr tree = NULL;
 
-  xmlParserCtxtPtr inputParserCtx
+  xmlParserCtxtPtr parserContext
     = xmljEstablishParserContext (env, inputStream,
 				  inSystemId,
 				  inPublicId,
@@ -419,10 +453,10 @@ xmljParseJavaInputStream (JNIEnv * env,
 				  saxErrorAdapter,
                   1);
 
-  if (NULL != inputParserCtx)
+  if (NULL != parserContext)
   {
-    tree = xmljParseDocument(env, inputParserCtx);
-    xmljReleaseParserContext (inputParserCtx);
+    tree = xmljParseDocument(env, parserContext);
+    xmljReleaseParserContext (parserContext);
   }
   
   return tree;
@@ -430,20 +464,20 @@ xmljParseJavaInputStream (JNIEnv * env,
 
 xmlDocPtr
 xmljParseDocument (JNIEnv *env,
-    xmlParserCtxtPtr inputParserCtx)
+    xmlParserCtxtPtr parserContext)
 {
   xmlDocPtr tree = NULL;
   int ret;
 
-  xmljSetThreadContext ((SaxErrorContext *) inputParserCtx->_private);
+  xmljSetThreadContext ((SaxErrorContext *) parserContext->_private);
 
-  ret = xmlParseDocument (inputParserCtx);
+  ret = xmlParseDocument (parserContext);
   if (0 == ret)
-    tree = inputParserCtx->myDoc;
+    tree = parserContext->myDoc;
   else
   {
-    printf("ERROR[%d]: %s\n", ret, inputParserCtx->lastError.message);
-    xmljThrowDOMException (env, ret, inputParserCtx->lastError.message);
+    printf("ERROR[%d]: %s\n", ret, parserContext->lastError.message);
+    xmljThrowDOMException (env, ret, parserContext->lastError.message);
   }
   
   xmljClearThreadContext ();

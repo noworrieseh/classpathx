@@ -87,7 +87,6 @@ callErrorAdapterMethod (void *ctx, const char *msg, va_list va,
   xmlParserCtxtPtr parseContext;
   SaxErrorContext *saxErrorContext;
   JNIEnv *env;
-  jmethodID method;
   
   parseContext = (xmlParserCtxtPtr) ctx;
   saxErrorContext = (SaxErrorContext *) parseContext->_private;
@@ -367,6 +366,33 @@ xmljXsltErrorFunc (void *ctx, const char *msg, ...)
 }
 
 void
+xmljThrowException (JNIEnv *env,
+    const char *classname,
+    const char *message)
+{
+  jclass cls;
+  jmethodID method;
+  jthrowable ex;
+  jstring jmsg;
+
+  cls = (*env)->FindClass(env, classname);
+  if (cls == NULL)
+  {
+    fprintf(stderr, "Can't find class %s\n", classname);
+    return;
+  }
+  method = (*env)->GetMethodID(env, cls, "<init>", "(Ljava/lang/String;)V");
+  jmsg = (*env)->NewStringUTF(env, message);
+  ex = (jthrowable)(*env)->NewObject(env, cls, method, jmsg);
+  if (ex == NULL)
+  {
+    fprintf(stderr, "Can't instantiate new %s\n", classname);
+    return;
+  }
+  (*env)->Throw(env, ex);
+}
+
+void
 xmljThrowDOMException (JNIEnv* env,
     int code,
     const char *message)
@@ -374,10 +400,12 @@ xmljThrowDOMException (JNIEnv* env,
   jclass cls;
   jmethodID method;
   jthrowable ex;
+  jstring jmsg;
 
   cls = (*env)->FindClass(env, "org/w3c/dom/DOMException");
   method = (*env)->GetMethodID(env, cls, "<init>", "(ILjava/lang/String;)V");
-  ex = (jthrowable)(*env)->NewObject(env, cls, method, code, message);
+  jmsg = (*env)->NewStringUTF(env, message);
+  ex = (jthrowable)(*env)->NewObject(env, cls, method, code, jmsg);
   (*env)->Throw(env, ex);
 }
 

@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,8 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.DeclHandler;
+import org.xml.sax.ext.LexicalHandler;
 
 /**
  * A SAX2 parser that uses libxml2.
@@ -76,12 +79,15 @@ implements XMLReader
     "declaration-handler", "dom-node", "lexical-handler", "xml-string"
   });
 
-  // Instance members
+  // Features
 
-  private boolean namespaceAware;
+  private transient boolean standalone;
+  private boolean namespaces;
+  private boolean namespacePrefixes;
+  private boolean validation;
 
-  private boolean validating;
-
+  // Callback handlers
+  
   private ContentHandler contentHandler;
 
   private DTDHandler dtdHandler;
@@ -92,20 +98,26 @@ implements XMLReader
 
   private GnomeLocator locator;
 
-  private transient Namespaces namespaces;
+  private DeclHandler declarationHandler;
 
-  int context; // TODO remove
+  private LexicalHandler lexicalHandler;
+
+  // Namespace helper for handling callbacks
+  private transient Namespaces ns;
+
+  // If true, do not invoke callback methods except endDocument
+  private transient boolean seenFatalError;
 
   public GnomeXMLReader()
   {
     this(true, true);
   }
 
-  public GnomeXMLReader(boolean namespaceAware, boolean validating)
+  public GnomeXMLReader(boolean namespaces, boolean validation)
   {
-    this.namespaceAware = namespaceAware;
-    this.validating = validating;
-    namespaces = new Namespaces();
+    this.namespaces = namespaces;
+    this.validation = validation;
+    ns = new Namespaces();
   }
 
   public ContentHandler getContentHandler()
@@ -154,29 +166,38 @@ implements XMLReader
     throws SAXNotRecognizedException, SAXNotSupportedException
   {
     checkFeatureName(name);
-    switch (getFeature(context, name))
-    {
-      case 1:
-        return true;
-      case 0:
-        return false;
-      default:
-        throw new SAXNotSupportedException(name);
-    }
+    String key = name.substring(FEATURES_PREFIX.length());
+    if ("external-general-entities".equals(key))
+      return validation; // TODO check this
+    else if ("external-parameter-entities".equals(key))
+      return validation; // TODO check this
+    else if ("standalone".equals(key))
+      return standalone;
+    else if ("namespaces".equals(key))
+      return namespaces;
+    else if ("namespace-prefixes".equals(key))
+      return namespacePrefixes;
+    else if ("resolve-dtd-uris".equals(key))
+      return true; // TODO check this
+    else if ("validation".equals(key))
+      return validation;
+    else
+      return false;
   }
-
-  native int getFeature(int context, String name);
 
   public void setFeature(String name, boolean value)
     throws SAXNotRecognizedException, SAXNotSupportedException
   {
     checkFeatureName(name);
-    if (setFeature(context, name, value ? 1 : 0) == -1)
-      throw new SAXNotSupportedException(name);
+    String key = name.substring(FEATURES_PREFIX.length());
+    if ("namespaces".equals(key))
+      namespaces = value;
+    else if ("namespace-prefixes".equals(key))
+      namespacePrefixes = value;
+    else if ("validation".equals(key))
+      validation = value;
   }
   
-  native int setFeature(int context, String name, int value);
-
   /**
    * Check that the specified feature name is recognized.
    */
@@ -196,14 +217,24 @@ implements XMLReader
     throws SAXNotRecognizedException, SAXNotSupportedException
   {
     checkPropertyName(name);
-    throw new SAXNotSupportedException(name);
+    String key = name.substring(PROPERTIES_PREFIX.length());
+    if ("declaration-handler".equals(key))
+      return declarationHandler;
+    else if ("lexical-handler".equals(key))
+      return lexicalHandler;
+    else
+      throw new SAXNotSupportedException(name);
   }
   
   public void setProperty(String name, Object value)
     throws SAXNotRecognizedException, SAXNotSupportedException
   {
     checkPropertyName(name);
-    throw new SAXNotSupportedException(name);
+    String key = name.substring(PROPERTIES_PREFIX.length());
+    if ("declaration-handler".equals(key))
+      declarationHandler = (DeclHandler)value;
+    else if ("lexical-handler".equals(key))
+      lexicalHandler = (LexicalHandler)value;
   }
   
   /**
@@ -242,10 +273,27 @@ implements XMLReader
     throws IOException, SAXException
   {
     InputStream in = input.getByteStream();
-    in = new PushbackInputStream(in, 50);
     String publicId = input.getPublicId();
     String systemId = input.getSystemId();
-    parseStream(in, publicId, systemId, validating);
+    boolean opened = false;
+    if (in == null)
+    {
+      if (systemId != null)
+      {
+        in = new URL(systemId).openStream();
+        opened = true;
+      }
+      else
+        throw new IOException("Unable to locate input source");
+    }
+    in = new PushbackInputStream(in, 50);
+    // Reset state
+    standalone = false;
+    seenFatalError = false;
+    // Parse
+    parseStream(in, publicId, systemId, validation);
+    if (opened)
+      in.close();
   }
 
   native void parseStream(InputStream in, String publicId, String systemId,
@@ -254,40 +302,77 @@ implements XMLReader
 
   String getURI(String prefix)
   {
-    if (!namespaceAware)
+    if (!namespaces)
       return null;
-    return namespaces.getURI(prefix);
+    return ns.getURI(prefix);
   }
 
   // Callbacks from libxmlj
 
+  private void startDTD(String name, String publicId, String systemId)
+    throws SAXException
+  {
+    if (!seenFatalError && lexicalHandler != null)
+      lexicalHandler.startDTD(name, publicId, systemId);
+  }
+
+  private void externalEntityDecl(String name, String publicId, String systemId)
+    throws SAXException
+  {
+    if (!seenFatalError && declarationHandler != null)
+      declarationHandler.externalEntityDecl(name, publicId, systemId);
+  }
+
+  private void internalEntityDecl(String name, String value)
+    throws SAXException
+  {
+    if (!seenFatalError && declarationHandler != null)
+      declarationHandler.internalEntityDecl(name, value);
+  }
+
   private void notationDecl(String name, String publicId, String systemId)
     throws SAXException
   {
-    if (dtdHandler != null)
+    if (!seenFatalError && dtdHandler != null)
       dtdHandler.notationDecl(name, publicId, systemId);
+  }
+
+  private void attributeDecl(String eName, String aName, String type,
+      String mode, String value)
+    throws SAXException
+  {
+    if (!seenFatalError && declarationHandler != null)
+      declarationHandler.attributeDecl(eName, aName, type, mode, value);
+  }
+
+  private void elementDecl(String name, String model)
+    throws SAXException
+  {
+    if (!seenFatalError && declarationHandler != null)
+      declarationHandler.elementDecl(name, model);
   }
 
   private void unparsedEntityDecl(String name, String publicId,
       String systemId, String notationName)
     throws SAXException
   {
-    if (dtdHandler != null)
+    if (!seenFatalError && dtdHandler != null)
       dtdHandler.unparsedEntityDecl(name, publicId, systemId, notationName);
   }
 
   private void setDocumentLocator(int id)
   {
     locator = new GnomeLocator(id);
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
       contentHandler.setDocumentLocator(locator);
   }
 
-  private void startDocument()
+  private void startDocument(boolean standalone)
     throws SAXException
   {
     if (contentHandler != null)
       contentHandler.startDocument();
+    this.standalone = standalone;
   }
 
   private void endDocument()
@@ -300,13 +385,13 @@ implements XMLReader
   private void startElement(String name, String[] attrs)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
     {
       XMLName xName = new XMLName(this, name);
-      if (namespaceAware)
+      if (namespaces)
       {
         // Handle defined namespaces
-        namespaces.push();
+        ns.push();
         int len = attrs.length;
         ArrayList filtered = new ArrayList(len);
         for (int i = 0; i < len; i += 2)
@@ -314,7 +399,7 @@ implements XMLReader
           String attName = attrs[i];
           String attValue = attrs[i + 1];
           if (attName.equals("xmlns"))
-            startPrefixMapping(null, attValue);
+            startPrefixMapping("", attValue);
           else if (attName.startsWith("xmlns:"))
             startPrefixMapping(attName.substring(6), attValue);
           else
@@ -338,17 +423,17 @@ implements XMLReader
   private void endElement(String name)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
     {
       XMLName xName = new XMLName(this, name);
       String uri = (xName.uri == null) ? "" : xName.uri;
       contentHandler.endElement(uri, xName.localName, xName.qName);
       // Handle undefining namespaces
-      if (namespaceAware)
+      if (namespaces)
       {
-        for (Iterator i = namespaces.currentPrefixes(); i.hasNext(); )
+        for (Iterator i = ns.currentPrefixes(); i.hasNext(); )
           endPrefixMapping((String)i.next());
-        namespaces.pop(); // releases current depth
+        ns.pop(); // releases current depth
       }
     }
   }
@@ -356,9 +441,9 @@ implements XMLReader
   private void startPrefixMapping(String prefix, String uri)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
     {
-      namespaces.define(prefix, uri);
+      ns.define(prefix, uri);
       contentHandler.startPrefixMapping(prefix, uri);
     }
   }
@@ -366,56 +451,73 @@ implements XMLReader
   private void endPrefixMapping(String prefix)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
       contentHandler.endPrefixMapping(prefix);
   }
 
-  private void characters(String text, int len)
+  private void characters(String text)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
     {
       char[] ch = text.toCharArray();
-      contentHandler.characters(ch, 0, len);
+      contentHandler.characters(ch, 0, ch.length);
     }
   }
 
-  private void ignorableWhitespace(String text, int len)
+  private void ignorableWhitespace(String text)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
     {
       char[] ch = text.toCharArray();
-      contentHandler.ignorableWhitespace(ch, 0, len);
+      contentHandler.ignorableWhitespace(ch, 0, ch.length);
     }
   }
 
   private void processingInstruction(String target, String data)
     throws SAXException
   {
-    if (contentHandler != null)
+    if (!seenFatalError && contentHandler != null)
+    {
+      if (data == null)
+        data = "";
       contentHandler.processingInstruction(target, data);
+    }
+  }
+
+  private void comment(String text)
+    throws SAXException
+  {
+    if (!seenFatalError && lexicalHandler != null)
+    {
+      char[] ch = text.toCharArray();
+      lexicalHandler.comment(ch, 0, ch.length);
+    }
   }
 
   private void warning(String message)
     throws SAXException
   {
-    if (errorHandler != null)
+    if (!seenFatalError && errorHandler != null)
       errorHandler.warning(new SAXParseException(message, locator));
   }
 
   private void error(String message)
     throws SAXException
   {
-    if (errorHandler != null)
+    if (!seenFatalError && errorHandler != null)
       errorHandler.error(new SAXParseException(message, locator));
   }
 
   private void fatalError(String message)
     throws SAXException
   {
-    if (errorHandler != null)
+    if (!seenFatalError && errorHandler != null)
+    {
+      seenFatalError = true;
       errorHandler.fatalError(new SAXParseException(message, locator));
+    }
   }
 
 }
