@@ -1,2 +1,31 @@
 AC_INIT(source/javax/xml/parsers/SAXParserFactory.java)
+
+AC_SUBST(COMPILER)dnl
+
+dnl
+dnl Use the GNU Compiler for Java?
+dnl - first for bytecode
+dnl - native codegen is the goal
+dnl
+AC_ARG_WITH(gcj,[  --with-gcj              GCJ compiler will be used ],
+	use_gcj="yes", use_gcj="no" )
+if test $use_gcj = "yes"; then
+    dnl
+    dnl FIXME add --with-gcj-prefix
+    dnl
+    AC_PATH_PROG(GCJ, gcj, no)
+
+    # Need very new versions of GCJ for this:  GCJ 3.0.x won't work ...
+    gcj_compile_tester='source/gnu/xml/dom/DomNode.java'
+    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&$AC_FD_CC'
+    if AC_TRY_EVAL(ac_gcj_test); then
+	COMPILER='GCJ'
+    else
+	version=$(gcj --version)
+	AC_MSG_ERROR([GCJ version $version isn't new enough to work])
+    fi
+else
+    COMPILER='JAVAC'
+fi
+
 AC_OUTPUT(Makefile)

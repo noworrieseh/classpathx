@@ -11,6 +11,8 @@
 ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
+ac_help="$ac_help
+  --with-gcj              GCJ compiler will be used "
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -521,6 +523,67 @@ else
 fi
 
 
+
+
+# Check whether --with-gcj or --without-gcj was given.
+if test "${with_gcj+set}" = set; then
+  withval="$with_gcj"
+  use_gcj="yes"
+else
+  use_gcj="no" 
+fi
+
+if test $use_gcj = "yes"; then
+                # Extract the first word of "gcj", so it can be a program name with args.
+set dummy gcj; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:541: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_path_GCJ'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  case "$GCJ" in
+  /*)
+  ac_cv_path_GCJ="$GCJ" # Let the user override the test with a path.
+  ;;
+  ?:/*)			 
+  ac_cv_path_GCJ="$GCJ" # Let the user override the test with a dos path.
+  ;;
+  *)
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
+  ac_dummy="$PATH"
+  for ac_dir in $ac_dummy; do 
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_path_GCJ="$ac_dir/$ac_word"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_path_GCJ" && ac_cv_path_GCJ="no"
+  ;;
+esac
+fi
+GCJ="$ac_cv_path_GCJ"
+if test -n "$GCJ"; then
+  echo "$ac_t""$GCJ" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
+    # Need very new versions of GCJ for this:  GCJ 3.0.x won't work ...
+    gcj_compile_tester='source/gnu/xml/dom/DomNode.java'
+    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&$5'
+    if { (eval echo configure:578: \"$ac_gcj_test\") 1>&5; (eval $ac_gcj_test) 2>&5; }; then
+	COMPILER='GCJ'
+    else
+	version=$(gcj --version)
+	{ echo "configure: error: GCJ version $version isn't new enough to work" 1>&2; exit 1; }
+    fi
+else
+    COMPILER='JAVAC'
+fi
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -665,6 +728,8 @@ s%@includedir@%$includedir%g
 s%@oldincludedir@%$oldincludedir%g
 s%@infodir@%$infodir%g
 s%@mandir@%$mandir%g
+s%@COMPILER@%$COMPILER%g
+s%@GCJ@%$GCJ%g
 
 CEOF
 EOF
