@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.22 2001-11-14 21:13:44 db Exp $
+ * $Id: SAXDriver.java,v 1.23 2001-11-19 05:23:36 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.22 2001-11-14 21:13:44 db Exp $
+// $Id: SAXDriver.java,v 1.23 2001-11-19 05:23:36 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -120,7 +120,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-14 21:13:44 $
+ * @version $Date: 2001-11-19 05:23:36 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -140,6 +140,7 @@ final public class SAXDriver
     private String			elementName = null;
     private Stack			entityStack = new Stack ();
 
+    // could use just one vector (of object/struct): faster, smaller
     private Vector			attributeNames = new Vector ();
     private Vector			attributeNamespaces = new Vector ();
     private Vector			attributeLocalNames = new Vector ();
@@ -156,7 +157,7 @@ final public class SAXDriver
     private int				attributeCount = 0;
     private boolean			attributes;
     private String			nsTemp [] = new String [3];
-    private NamespaceSupport		prefixStack = new NamespaceSupport ();
+    private NamespaceSupport		prefixStack;
 
     //
     // Constructor.
@@ -311,6 +312,8 @@ final public class SAXDriver
     {
 	synchronized (base) {
 	    parser = new XmlParser ();
+	    if (namespaces)
+		prefixStack = new NamespaceSupport ();
 	    parser.setHandler (this);
 
 	    try {
@@ -331,6 +334,7 @@ final public class SAXDriver
 		contentHandler.endDocument ();
 		entityStack.removeAllElements ();
 		parser = null;
+		prefixStack = null;
 	    }
 	}
     }
