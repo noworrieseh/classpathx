@@ -275,13 +275,15 @@ axis_name:
 
 node_test:
   name_test
-  | node_type LP RP
+  /*| PROCESSING_INSTRUCTION LP LITERAL RP*/
+  | PROCESSING_INSTRUCTION LITERAL RP
+    {
+      $$ = new NodeTypeTest (Node.PROCESSING_INSTRUCTION_NODE, (String) $2);
+    }
+  /*| node_type LP RP*/
+  | node_type RP
     {
       $$ = new NodeTypeTest (((Short) $1).shortValue ());
-    }
-  | PROCESSING_INSTRUCTION LP LITERAL RP
-    {
-      $$ = new NodeTypeTest (Node.PROCESSING_INSTRUCTION_NODE, (String) $3);
     }
   ;
 

@@ -1,3 +1,7 @@
+2004-10-17  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: XPath function calls.
+   	
 2004-10-18  Dalibor Topic  <robilad@kaffe.org>
 
        * sources/gnu/xml/xpath/Index.java: Added missing include.
