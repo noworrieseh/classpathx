@@ -1,6 +1,6 @@
 /*
  * POP3Store.java
- * Copyright (C) 1999 dog <dog@dog.net.uk>
+ * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,28 +18,34 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * You may retrieve the latest version of this library from
- * http://www.dog.net.uk/knife/
  */
 
 package gnu.mail.providers.pop3;
 
-import java.io.*;
-import java.net.*;
-import javax.mail.*;
-import javax.mail.event.*;
-import gnu.mail.util.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+
+import gnu.mail.util.CRLFInputStream;
+import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.MessageInputStream;
 
 /**
  * The storage class implementing the POP3 mail protocol.
  *
- * @author dog@dog.net.uk
- * @author nferrier@tapsellferrier.co.uk
- * @version 1.1.2
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
+ * @version 1.2
  */
-public class POP3Store
-extends Store
+public final class POP3Store
+  extends Store
 {
 
   /**
@@ -65,14 +71,13 @@ extends Store
   public POP3Store(Session session, URLName urlname)
   {
     super(session, urlname);
-    //this can be used in development to turn debugging on
-    // debug=true;
+    debug = session.getDebug();
     String ccs = session.getProperty("mail.pop3.fetchsize");
     if (ccs!=null)
     {
       try
       {
-	fetchsize = Math.max(Integer.parseInt(ccs), 1024);
+        fetchsize = Math.max(Integer.parseInt(ccs), 1024);
       }
       catch (NumberFormatException e)
       {}
@@ -83,52 +88,50 @@ extends Store
   //protocol and socket methods
 
   /**
-   * Connects to the POP3 server and authenticates with the specified parameters.
+   * Connects to the POP3 server and authenticates with the specified
+   * parameters.
    */
   protected boolean protocolConnect(String host, int port, String username, String password)
-  throws MessagingException
+    throws MessagingException
   {
-    if (port<0) port = DEFAULT_PORT;
+    if (port<0)
+      port = DEFAULT_PORT;
     if (host==null || username==null || password==null)
-    return false;
+      return false;
     if (socket!=null)
-    return true;
+      return true;
     synchronized (this)
     {
       try
       {
-	hostname = host;
-	socket = new Socket(host, port);
-	in = new CRLFInputStream(socket.getInputStream());
-	out = new CRLFOutputStream(socket.getOutputStream());
-	if (getResponse()!=OK)
-	throw new MessagingException("Connect failed. Server responded: "+response);
-	int index = response.indexOf(' ');
-	if (index>-1) hostname = response.substring(0, index);
-	//some usefull contextual debugging info comes from throwing exceps like this
-	if(username==null)
-	throw new NullPointerException("user can't be null");
-	if(password==null)
-	throw new NullPointerException("password can't be null");
-	send("USER "+username);
-	if (getResponse()!=OK)
-	throw new MessagingException("Connect failed. Server responded: "+response);
-	send("PASS "+password);
-	if (getResponse()!=OK)
-	throw new MessagingException("Connect failed. Server responded: "+response);
-	return true;
+        hostname = host;
+        socket = new Socket(host, port);
+        in = new CRLFInputStream(socket.getInputStream());
+        out = new CRLFOutputStream(socket.getOutputStream());
+        if (getResponse()!=OK)
+          throw new MessagingException("Connect failed: "+response);
+        int index = response.indexOf(' ');
+        if (index>-1)
+          hostname = response.substring(0, index);
+        send("USER "+username);
+        if (getResponse()!=OK)
+          return false;
+        send("PASS "+password);
+        if (getResponse()!=OK)
+          return false;
+        return true;
       }
-      catch(UnknownHostException e)
+      catch (UnknownHostException e)
       {
-	throw new MessagingException("Connect failed", e);
+        throw new MessagingException("Connect failed", e);
       }
-      catch(IOException e)
+      catch (IOException e)
       {
-	throw new MessagingException("Connect failed", e);
+        throw new MessagingException("Connect failed", e);
       }
-      catch(NullPointerException e)
+      catch (NullPointerException e)
       {
-	throw new MessagingException("Connect failed",e);
+        throw new MessagingException("Connect failed",e);
       }
     }
   }
@@ -137,76 +140,81 @@ extends Store
    * Closes the connection.
    */
   public synchronized void close()
-  throws MessagingException
+    throws MessagingException
   {
     if (socket!=null)
     {
       synchronized (this)
       {
-	try
-	{
-	  send("QUIT");
-	  if (getResponse()!=OK)
-	  throw new MessagingException("Close failed: "+response);
-	  socket.close();
-	  socket = null;
-	}
-	catch (IOException e)
-	{
-	  // socket.close() always seems to throw an exception!
-	  //throw new MessagingException("Close failed", e);
-	}
+        try
+        {
+          send("QUIT");
+          if (getResponse()!=OK)
+            throw new MessagingException("Close failed: "+response);
+          socket.close();
+          socket = null;
+        }
+        catch (IOException e)
+        {
+          // socket.close() always seems to throw an exception!
+          //throw new MessagingException("Close failed", e);
+        }
       }
     }
     super.close();
 
   }
 
-  /** parse the response from the server.
+  /**
+   * Parse the response from the server.
    * If the <code>Store</code> switch <code>debug</code> is
    * <code>true</code> then the response is echoed to
    * <code>System.err</code>.
    */
   private int getResponse()
-  throws IOException
+    throws IOException
   {
     String okstr = "+OK", errstr = "-ERR";
     response = in.readLine();
-    if(debug) System.err.println("POP< "+response);
+    if (debug)
+      System.err.println("POP< "+response);
     if (response.indexOf(okstr)==0)
     {
       response = response.substring(okstr.length()).trim();
       return OK;
     }
     else if (response.indexOf(errstr)==0)
-    response = response.substring(errstr.length()).trim();
+      response = response.substring(errstr.length()).trim();
     return ERR;
   }
 
-  /** send the command to the server.
+  /** 
+   * Send the command to the server.
    * If the <code>Store</code> switch <code>debug</code> is
    * <code>true</code> then the command is echoed to
    * <code>System.err</code>.
    */
   private void send(String command)
-  throws IOException
+    throws IOException
   {
-    if(debug) System.err.println("POP> "+command);
+    if (debug)
+      System.err.println("POP> "+command);
     out.write(command.getBytes());
     out.writeln();
     out.flush();
   }
 
-  /** get a stream of content related to a particular message.
+  /** 
+   * Get a stream of content related to a particular message.
    */
   synchronized InputStream popRETR(int msgnum)
-  throws MessagingException
+    throws MessagingException
   {
     try
     {
       send("RETR "+msgnum);
       if (getResponse()!=OK)
-      throw new MessagingException("Retrieve failed. Server responded: "+response);
+        throw new MessagingException("Retrieve failed: "+response);
       return new MessageInputStream(in);
     }
     catch (IOException e)
@@ -219,7 +227,8 @@ extends Store
     }
   }
 
-  /** get just the headers of a particular message.
+  /** 
+   * Get just the headers of a particular message.
    * This method issues the command
    * <blockquote>
    *   TOP msg 0
@@ -233,13 +242,13 @@ extends Store
    * because we expect to see something.
    */
   synchronized InputStream popTOP(int msgnum)
-  throws MessagingException
+    throws MessagingException
   {
     try
     {
       send("TOP "+msgnum+" 0");
       if (getResponse()!=OK)
-      throw new MessagingException("Retrieve failed. Server responded: "+response);
+        throw new MessagingException("Retrieve failed: "+response);
       return new MessageInputStream(in);
     }
     catch (IOException e)
@@ -252,33 +261,34 @@ extends Store
     }
   }
 
-  /** @return the hostname of the POP server.
+  /** 
+   * @return the hostname of the POP server.
    */
   String getHostName()
   {
     return hostname;
   }
 
-
   //javamail provider methods
 
-  /** used by the Folder to assess how many messages there are.
+  /** 
+   * Used by the Folder to assess how many messages there are.
    */
   synchronized int getMessageCount()
-  throws MessagingException
+    throws MessagingException
   {
     try
     {
       send("STAT");
       if (getResponse()!=OK)
-      throw new MessagingException("Status failed. Server responded: "+response);
+        throw new MessagingException("Status failed: "+response);
       try
       {
-	return Integer.parseInt(response.substring(0, response.indexOf(' ')));
+        return Integer.parseInt(response.substring(0, response.indexOf(' ')));
       }
-      catch(NumberFormatException e)
+      catch (NumberFormatException e)
       {
-	throw new MessagingException("Status failed. Server responded: "+response);
+        throw new MessagingException("Status failed: "+response);
       }
     }
     catch (IOException e)
@@ -287,52 +297,53 @@ extends Store
     }
   }
 
-  /** retrieve the message.
+  /** 
+   * Retrieve the message.
    * This method tries to build a nearlly empty message object (with
    * just the size). If it can't do that it pulls back the whole thing.
    */
   synchronized Message getMessage(POP3Folder folder, int msgnum)
-  throws MessagingException
+    throws MessagingException
   {
-    int size=-1;
+    int size = -1;
     try
     {
       send("LIST "+msgnum);
-      if(getResponse()!=OK)
-      throw new MessagingException("Top failed. Server responded: "+response);
+      if (getResponse()!=OK)
+        throw new MessagingException("Top failed: "+response);
       //try and get the message size
-      String sizePart=response.substring(response.indexOf(' ')+1);
-      size=Integer.parseInt(sizePart);
+      String sizePart = response.substring(response.indexOf(' ')+1);
+      size = Integer.parseInt(sizePart);
     }
-    catch(Throwable t)
+    catch (Throwable t)
     {
       //failed to work out the size
       //- just try to retrieve the whole message
       try
       {
-	send("RETR "+msgnum);
-	if (getResponse()!=OK)
-	throw new MessagingException("Retrieve failed. Server responded: "+response);
+        send("RETR "+msgnum);
+        if (getResponse()!=OK)
+          throw new MessagingException("Retrieve failed: "+response);
       }
       catch (IOException e)
       {
-	throw new MessagingException("Retrieve failed.", e);
+        throw new MessagingException("Retrieve failed.", e);
       }
     }
     //get the message and create an object for it
-    if(size>-1)
-    return new POP3Message(folder, new MessageInputStream(in),msgnum,size);
-    return new POP3Message(folder, new MessageInputStream(in),msgnum);
+    if (size>-1)
+      return new POP3Message(folder, new MessageInputStream(in), msgnum, size);
+    return new POP3Message(folder, new MessageInputStream(in), msgnum);
   }
 
   synchronized void delete(int msgnum)
-  throws MessagingException
+    throws MessagingException
   {
     try
     {
       send("DELE "+msgnum);
       if (getResponse()!=OK)
-      throw new MessagingException("Delete failed. Server responded: "+response);
+        throw new MessagingException("Delete failed: "+response);
     }
     catch (IOException e)
     {
@@ -344,11 +355,12 @@ extends Store
    * Returns the root folder.
    */
   public Folder getDefaultFolder()
-  throws MessagingException
+    throws MessagingException
   {
     synchronized (this)
     {
-      if (root==null) root = new POP3Folder(this, Folder.HOLDS_FOLDERS);
+      if (root==null)
+        root = new POP3Folder(this, Folder.HOLDS_FOLDERS);
     }
     return root;
   }
@@ -357,7 +369,7 @@ extends Store
    * Returns the folder with the specified name.
    */
   public Folder getFolder(String s)
-  throws MessagingException
+    throws MessagingException
   {
     return getDefaultFolder().getFolder(s);
   }
@@ -366,7 +378,7 @@ extends Store
    * Returns the folder whose name is the file part of the specified URLName.
    */
   public Folder getFolder(URLName urlname)
-  throws MessagingException
+    throws MessagingException
   {
     return getDefaultFolder().getFolder(urlname.getFile());
   }

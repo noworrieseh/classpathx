@@ -1,6 +1,6 @@
 /*
  * POP3Folder.java
- * Copyright (C) 1999 dog <dog@dog.net.uk>
+ * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,30 +18,36 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
- * You may retrieve the latest version of this library from
- * http://www.dog.net.uk/knife/
  */
 
 package gnu.mail.providers.pop3;
 
-import java.io.*;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.event.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.mail.FetchProfile;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.IllegalWriteException;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Store;
+import javax.mail.event.ConnectionEvent;
 
 /**
  * The folder class implementing the POP3 mail protocol.
  *
- * @author dog@dog.net.uk
- * @author nferrier@tapsellferrier.co.uk
- * @version 1.1.2
+ * @author <a href='mailto:dog@dog.net.uk'>Chris Burdess</a>
+ * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
+ * @version 1.2
  */
-public class POP3Folder 
-extends Folder 
+public final class POP3Folder 
+  extends Folder 
 {
 
-  Hashtable messages = new Hashtable();
+  Map messages = new HashMap();
   boolean readonly = false, open = false;
   int type;
 
@@ -64,11 +70,11 @@ extends Folder
     switch (type) 
     {
       case HOLDS_FOLDERS:
-	return "/";
+        return "/";
       case HOLDS_MESSAGES:
-	return "INBOX";
+        return "INBOX";
       default:
-	return "(Unknown)";
+        return "(Unknown)";
     }
   }
 
@@ -85,7 +91,7 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public int getType() 
-  throws MessagingException 
+    throws MessagingException 
   {
     return type;
   }
@@ -95,7 +101,7 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public boolean exists() 
-  throws MessagingException 
+    throws MessagingException 
   {
     return (type==HOLDS_MESSAGES);
   }
@@ -105,7 +111,7 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public boolean hasNewMessages() 
-  throws MessagingException 
+    throws MessagingException 
   {
     return getNewMessageCount()>0;
   }
@@ -115,16 +121,16 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public void open(int mode) 
-  throws MessagingException 
+    throws MessagingException 
   {
     switch (mode)
     {
       case READ_WRITE:
-	readonly = false;
-	break;
+        readonly = false;
+        break;
       case READ_ONLY:
-	readonly = true;
-	break;
+        readonly = true;
+        break;
     }
     open = true;
     notifyConnectionListeners(ConnectionEvent.OPENED);
@@ -136,12 +142,12 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public void close(boolean expunge) 
-  throws MessagingException 
+    throws MessagingException 
   {
     if (!open)
-    throw new MessagingException("Folder is not open");
+      throw new MessagingException("Folder is not open");
     if (expunge)
-    expunge();
+      expunge();
     open = false;
     notifyConnectionListeners(ConnectionEvent.CLOSED);
   }
@@ -152,25 +158,26 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public Message[] expunge() 
-  throws MessagingException 
+    throws MessagingException 
   {
     if (!open)
-    throw new MessagingException("Folder is not open");
+      throw new MessagingException("Folder is not open");
     if (readonly)
-    throw new MessagingException("Folder was opened read-only");
-    Vector vector = new Vector();
-    for (Enumeration enum = messages.elements(); enum.hasMoreElements(); )
+      throw new MessagingException("Folder was opened read-only");
+    List acc = new ArrayList(messages.size());
+    for (Iterator i = messages.values().iterator(); i.hasNext(); )
     {
-      Message message = (Message)enum.nextElement();
+      Message message = (Message)i.next();
       Flags flags = message.getFlags();
       if (flags.contains(Flags.Flag.DELETED))
-      vector.addElement(message);
+        acc.add(message);
     }
-    Message[] delete = new Message[vector.size()]; vector.copyInto(delete);
-    for (int i=0; i<delete.length; i++)
-    ((POP3Store)store).delete(delete[i].getMessageNumber());
+    Message[] d = new Message[acc.size()]; acc.toArray(d);
+    POP3Store pstore = (POP3Store)store;
+    for (int i=0; i<d.length; i++)
+      pstore.delete(d[i].getMessageNumber());
     messages.clear();
-    return delete;
+    return d;
   }
 
   /**
@@ -196,7 +203,7 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public int getMessageCount() 
-  throws MessagingException 
+    throws MessagingException 
   {
     return ((POP3Store)store).getMessageCount();
   }
@@ -210,12 +217,13 @@ extends Folder
    * @exception MessagingException if a messaging error occurred
    */
   public Message getMessage(int msgnum) 
-  throws MessagingException 
+    throws MessagingException 
   {
     if (!open)
-    throw new MessagingException("Folder is not open");
+      throw new MessagingException("Folder is not open");
     Message message = (Message)messages.get(new Integer(msgnum));
-    if (message==null) {
+    if (message==null)
+    {
       message = ((POP3Store)store).getMessage(this, msgnum);
       messages.put(new Integer(msgnum), message);
     }
@@ -225,10 +233,10 @@ extends Folder
   /**
    * You can't append messages to a POP3 folder.
    */
-  public void appendMessages(Message amessage[]) 
-  throws MessagingException 
+  public void appendMessages(Message[] messages) 
+    throws MessagingException 
   {
-    throw new MessagingException("Can't append messages to a POP3 folder");
+    throw new IllegalWriteException();
   }
 
   /**
@@ -237,8 +245,8 @@ extends Folder
    * this is the nature of the POP3 protocol.
    * @exception MessagingException ignore
    */
-  public void fetch(Message amessage[], FetchProfile fetchprofile) 
-  throws MessagingException 
+  public void fetch(Message[] messages, FetchProfile fp) 
+    throws MessagingException 
   {
   }
 
@@ -246,16 +254,17 @@ extends Folder
    * Returns the subfolders for this folder.
    */
   public Folder[] list() 
-  throws MessagingException 
+    throws MessagingException 
   {
     switch (type)
     {
       case HOLDS_FOLDERS:
-	if (inbox==null) inbox = new POP3Folder(store, HOLDS_MESSAGES);
-	Folder[] folders = { inbox };
-	return folders;
+        if (inbox==null)
+          inbox = new POP3Folder(store, HOLDS_MESSAGES);
+        Folder[] folders = { inbox };
+        return folders;
       default:
-	throw new MessagingException("This folder can't contain subfolders");
+        throw new MessagingException("This folder can't contain subfolders");
     }
   }
 
@@ -263,7 +272,7 @@ extends Folder
    * Returns the subfolders for this folder.
    */
   public Folder[] list(String pattern) 
-  throws MessagingException 
+    throws MessagingException 
   {
     return list();
   }
@@ -272,14 +281,14 @@ extends Folder
    * POP3 folders can't have parents.
    */
   public Folder getParent() 
-  throws MessagingException 
+    throws MessagingException 
   {
     switch (type)
     {
       case HOLDS_MESSAGES:
-	return ((POP3Store)store).root;
+        return ((POP3Store)store).root;
       default:
-	throw new MessagingException("Root folders can't have a parent");
+        throw new MessagingException("Root folders can't have a parent");
     }
   }
 
@@ -287,15 +296,16 @@ extends Folder
    * POP3 folders can't contain subfolders.
    */
   public Folder getFolder(String s) 
-  throws MessagingException 
+    throws MessagingException 
   {
     switch (type)
     {
       case HOLDS_FOLDERS:
-	if (inbox==null) inbox = new POP3Folder(store, HOLDS_MESSAGES);
-	return inbox;
+        if (inbox==null)
+          inbox = new POP3Folder(store, HOLDS_MESSAGES);
+        return inbox;
       default:
-	throw new MessagingException("This folder can't contain subfolders");
+        throw new MessagingException("This folder can't contain subfolders");
     }
   }
 
@@ -303,7 +313,7 @@ extends Folder
    * Returns the path separator charcter.
    */
   public char getSeparator() 
-  throws MessagingException 
+    throws MessagingException 
   {
     return '\u0000';
   }
@@ -315,27 +325,27 @@ extends Folder
    * POP3 folders can't be created, deleted, or renamed.
    */
   public boolean create(int i) 
-  throws MessagingException 
+    throws MessagingException 
   {
-    throw new MessagingException("Folder can't be created");
+    throw new IllegalWriteException();
   }
 
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
   public boolean delete(boolean flag) 
-  throws MessagingException 
+    throws MessagingException 
   {
-    throw new MessagingException("Folder can't be deleted");
+    throw new IllegalWriteException("Folder can't be deleted");
   }
 
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
   public boolean renameTo(Folder folder) 
-  throws MessagingException 
+    throws MessagingException 
   {
-    throw new MessagingException("Folder can't be renamed");
+    throw new IllegalWriteException("Folder can't be renamed");
   }
 
 }
