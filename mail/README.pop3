@@ -17,6 +17,15 @@ Note that the POP3 protocol only allows for ONE mailbox. This is always
 called INBOX. Much of the advanced searching functionality provided by
 JavaMail, fecth profiles for instance, will not work over POP3.
 
+The POP3Connection class
+
+The POP3 provider internally uses an instance of POP3Connection to negotiate
+the POP3 protocol with the server. This simple class models a POP3 client.
+You may find it useful independently of the provider. Please note that
+access to the POP3Connection is not synchronized - you must synchronize on
+it yourself if you have a multithreaded application. This is taken care of
+by the POP3 JavaMail provider.
+
 Local cache
 
 No local cache is provided. It is recommended that if you want to maintain a
@@ -28,14 +37,6 @@ Filtering
 No filtering mechanism is currently supplied. It was originally hoped that
 JavaMail would provide a standard architecture for this, but this
 possibility now seems remote. Suggestions are welcome.
-
-Session properties
-
-There is a session property you can set that may help speed up network
-reads, depending on your configuration (try setting between 1-4K):
-
-  property --------------------+ type ---+ default + description ----------
-  mail.pop3.fetchsize          | int     | 1024    | read buffer size
 
 
 Chris Burdess, August 2001

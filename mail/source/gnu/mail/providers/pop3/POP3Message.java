@@ -49,41 +49,21 @@ public final class POP3Message
 {
 
   /*
-   * The size of this message, if predetermined.
+   * The size of this message.
    */
   int size;
 
   /**
    * Create a POP3Message.
+	 * @param folder the parent folder
+	 * @param msgnum the message number
+	 * @param size the size of the entire message
    */
-  POP3Message(POP3Folder folder, InputStream in, int msgnum) 
+  POP3Message(POP3Folder folder, int msgnum, int size) 
     throws MessagingException 
   {
-    this(folder, in, msgnum, -1);
-  }
-
-  /** 
-   * Create a POP3Message.
-   * This is called by the POP3Store.
-   *
-   * <p>The constructor is smart about what data it retrieves. If the stream
-   * contains no data then the object is left in a state where the headers and
-   * the content must be read. If the constructor manages to read the headers
-   * it will acknowledge their receipt in the internal state of the object,
-   * the content will be read in if the user causes it to be necessary.
-   * Finally, the constructor may see the whole content on the stream in which
-   * case it reads in everything.</p>
-   */
-  POP3Message(POP3Folder folder, InputStream in, int msgnum, int size) 
-    throws MessagingException 
-  {
-    super(folder, in, msgnum);
-    this.size = size;
-    POP3Headers h = (POP3Headers)headers;
-    if (headers!=null && h.isEmpty())
-      headers = null;
-    if (content!=null && content.length==0)
-      content = null;
+    super(folder, msgnum);
+		this.size = size;
   }
 
   // -- Content --
@@ -95,8 +75,18 @@ public final class POP3Message
   void fetchContent() 
     throws MessagingException 
   {
-    POP3Store str = (POP3Store)folder.getStore();
-    parse(str.popRETR(msgnum));
+    POP3Connection connection = ((POP3Store)folder.getStore()).connection;
+		synchronized (connection)
+		{
+			try
+			{
+				parse(connection.retr(msgnum));
+			}
+			catch (IOException e)
+			{
+				throw new MessagingException(e.getMessage(), e);
+			}
+		}
   }
 
   /** 
@@ -143,8 +133,18 @@ public final class POP3Message
   void fetchHeaders() 
     throws MessagingException 
   {
-    POP3Store str = (POP3Store)folder.getStore();
-    headers = createInternetHeaders(str.popTOP(msgnum));
+    POP3Connection connection = ((POP3Store)folder.getStore()).connection;
+		synchronized (connection)
+		{
+			try
+			{
+				headers = createInternetHeaders(connection.top(msgnum));
+			}
+			catch (IOException e)
+			{
+				throw new MessagingException(e.getMessage(), e);
+			}
+		}
   }
 
   /**
@@ -233,12 +233,6 @@ public final class POP3Message
     if (headers==null)
       fetchHeaders();
     return super.getNonMatchingHeaderLines(names);
-  }
-
-  protected InternetHeaders createInternetHeaders(InputStream is)
-    throws MessagingException
-  {
-    return new POP3Headers(is);
   }
 
   // -- Utility --

@@ -147,6 +147,10 @@ source/gnu/mail/providers/imap/MessageStatus.java \
 source/gnu/mail/providers/imap/Pair.java \
 source/gnu/mail/providers/imap/UTF7imap.java
 
+# IMAP SSL classes
+IMAPS_JAVASRC = source/gnu/mail/providers/imap/IMAPSStore.java \
+source/gnu/mail/providers/imap/IMAPSConnection.java
+
 # The SMTP provider
 SMTP_JAVASRC = source/gnu/mail/providers/smtp/BASE64.java \
 source/gnu/mail/providers/smtp/SMTPOutputStream.java \
@@ -154,9 +158,9 @@ source/gnu/mail/providers/smtp/SMTPTransport.java
 
 # POP3 protocol
 POP3_JAVASRC = source/gnu/mail/providers/pop3/POP3Folder.java \
-source/gnu/mail/providers/pop3/POP3Headers.java \
 source/gnu/mail/providers/pop3/POP3Message.java \
-source/gnu/mail/providers/pop3/POP3Store.java
+source/gnu/mail/providers/pop3/POP3Store.java \
+source/gnu/mail/providers/pop3/POP3Connection.java
 
 # News protocol
 NNTP_JAVASRC = source/gnu/mail/providers/nntp/NNTPFolder.java \
@@ -215,6 +219,7 @@ $(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC)
 		   JARCOMPILER_JAR=@JAR@ \
                          ./jarcompiler $(GNUMAILJAR)
 
+#imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(IMAPS_JAVASRC) $(MAIL_META)
 imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \

@@ -27,11 +27,10 @@
 
 package gnu.mail.providers.pop3;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -46,17 +45,18 @@ import javax.mail.event.ConnectionEvent;
  *
  * @author <a href='mailto:dog@dog.net.uk'>Chris Burdess</a>
  * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
- * @version 1.2
+ * @version 1.3
  */
 public final class POP3Folder 
   extends Folder 
 {
 
-  Map messages = new HashMap();
   boolean readonly = false, open = false;
   int type;
 
   Folder inbox;
+
+	List deleted;
 
   /**
    * Constructor.
@@ -132,6 +132,7 @@ public final class POP3Folder
     {
       case READ_WRITE:
         readonly = false;
+				deleted = new ArrayList();
         break;
       case READ_ONLY:
         readonly = true;
@@ -153,6 +154,7 @@ public final class POP3Folder
       throw new MessagingException("Folder is not open");
     if (expunge)
       expunge();
+		deleted = null;
     open = false;
     notifyConnectionListeners(ConnectionEvent.CLOSED);
   }
@@ -169,19 +171,26 @@ public final class POP3Folder
       throw new MessagingException("Folder is not open");
     if (readonly)
       throw new MessagingException("Folder was opened read-only");
-    List acc = new ArrayList(messages.size());
-    for (Iterator i = messages.values().iterator(); i.hasNext(); )
-    {
-      Message message = (Message)i.next();
-      Flags flags = message.getFlags();
-      if (flags.contains(Flags.Flag.DELETED))
-        acc.add(message);
+		POP3Connection connection = ((POP3Store)store).connection;
+		synchronized (connection)
+		{
+			try
+			{
+				for (Iterator i = deleted.iterator(); i.hasNext(); )
+				{
+					Message msg = (Message)i.next();
+					int msgnum = msg.getMessageNumber();
+					connection.dele(msgnum);
+				}
+			}
+			catch (IOException e)
+			{
+				throw new MessagingException(e.getMessage(), e);
+			}
     }
-    Message[] d = new Message[acc.size()]; acc.toArray(d);
-    POP3Store pstore = (POP3Store)store;
-    for (int i=0; i<d.length; i++)
-      pstore.delete(d[i].getMessageNumber());
-    messages.clear();
+    Message[] d = new Message[deleted.size()];
+	 	deleted.toArray(d);
+    deleted.clear();
     return d;
   }
 
@@ -210,15 +219,23 @@ public final class POP3Folder
   public int getMessageCount() 
     throws MessagingException 
   {
-    return ((POP3Store)store).getMessageCount();
+		POP3Connection connection = ((POP3Store)store).connection;
+		synchronized (connection)
+		{
+			try
+			{
+				return connection.stat();
+			}
+			catch (IOException e)
+			{
+				throw new MessagingException(e.getMessage(), e);
+			}
+		}
   }
 
   /**
-   * Returns the specified message number from this folder.
-   * The message is only retrieved once from the server.
-   * Subsequent getMessage() calls to the same message are cached.
-   * Since POP3 does not provide a mechanism for retrieving only part of
-   * the message (headers, etc), the entire message is retrieved.
+   * Returns the specified message from this folder.
+	 * @param msgnum the message number
    * @exception MessagingException if a messaging error occurred
    */
   public Message getMessage(int msgnum) 
@@ -226,13 +243,19 @@ public final class POP3Folder
   {
     if (!open)
       throw new MessagingException("Folder is not open");
-    Message message = (Message)messages.get(new Integer(msgnum));
-    if (message==null)
-    {
-      message = ((POP3Store)store).getMessage(this, msgnum);
-      messages.put(new Integer(msgnum), message);
-    }
-    return message;
+		POP3Connection connection = ((POP3Store)store).connection;
+		synchronized (connection)
+		{
+			try
+			{
+				int size = connection.list(msgnum);
+				return new POP3Message(this, msgnum, size);
+			}
+			catch (IOException e)
+			{
+				throw new MessagingException(e.getMessage(), e);
+			}
+		}
   }
 
   /**
@@ -245,14 +268,39 @@ public final class POP3Folder
   }
 
   /**
-   * Does nothing.
-   * The messages <i>must</i> be fetched in their entirety by getMessage(int) -
-   * this is the nature of the POP3 protocol.
+   * Fetches headers and/or content for the specified messages.
    * @exception MessagingException ignore
    */
   public void fetch(Message[] messages, FetchProfile fp) 
     throws MessagingException 
   {
+		// Determine whether to fetch headers or content
+		boolean fetchHeaders = false;
+		boolean fetchContent = false;
+		FetchProfile.Item[] items = fp.getItems();
+		for (int i=0; i<items.length; i++)
+		{
+			if (items[i]==FetchProfile.Item.CONTENT_INFO)
+				fetchContent = true;
+			else
+				fetchHeaders = true;
+		}
+		if (fp.getHeaderNames().length>0)
+			fetchHeaders = true;
+		if (!fetchHeaders && !fetchContent)
+			return;
+		// Do fetch
+		for (int i=0; i<messages.length; i++)
+		{
+			if (messages[i] instanceof POP3Message)
+			{
+				POP3Message m = (POP3Message)messages[i];
+				if (fetchContent)
+					m.fetchContent();
+				else
+					m.fetchHeaders();
+			}
+		}
   }
 
   /**

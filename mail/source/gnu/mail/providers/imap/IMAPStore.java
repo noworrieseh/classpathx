@@ -85,7 +85,6 @@ public class IMAPStore
       String password)
     throws MessagingException
   {
-    if (port<0) port = DEFAULT_PORT;
     if (host==null || username==null || password==null)
       return false;
     if (connection!=null)
@@ -94,7 +93,7 @@ public class IMAPStore
     {
       try
       {
-        connection = new IMAPConnection(host, port);
+        connection = createConnection(host, port);
         
         if (session.getDebug())
           connection.setDebug(true);
@@ -122,6 +121,17 @@ public class IMAPStore
       }
     }
   }
+
+	/**
+	 * Returns a new connection for this store.
+	 */
+	protected IMAPConnection createConnection(String host, int port)
+		throws UnknownHostException, IOException
+	{
+    if (port<0)
+			port = DEFAULT_PORT;
+		return new IMAPConnection(host, port);
+	}
 
   /**
    * Closes the connection.

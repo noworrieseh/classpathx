@@ -27,7 +27,10 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 /** 
  * An output stream that filters LFs into CR/LF pairs.
@@ -37,6 +40,8 @@ import java.io.*;
 public class CRLFOutputStream
   extends FilterOutputStream
 {
+
+	static final String US_ASCII = "US-ASCII";
 
   /**
    * The CR octet.
@@ -130,14 +135,21 @@ public class CRLFOutputStream
   }
 
   /**
-   * Writes the specified string to the underlying stream.
+   * Writes the specified ASCII string to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
   public void write(String text)
     throws IOException
   {
-    byte[] bytes = text.getBytes();
-    write(bytes, 0, bytes.length);
+		try
+		{
+			byte[] bytes = text.getBytes(US_ASCII);
+			write(bytes, 0, bytes.length);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new IOException("Not ASCII: "+text);
+		}
   }
 
   /**

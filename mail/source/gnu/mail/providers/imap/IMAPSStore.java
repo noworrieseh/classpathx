@@ -1,5 +1,5 @@
 /*
- * POP3Headers.java
+ * IMAPSStore.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
@@ -25,39 +25,45 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.pop3;
+package gnu.mail.providers.imap;
 
-import java.io.InputStream;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetHeaders;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import javax.mail.Session;
+import javax.mail.URLName;
 
 /**
- * Utility class to determine if headers have actually been read.
+ * The storage class implementing the IMAP4rev1 mail protocol with
+ * transport-level encryption.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.2
+ * @version 0.1
  */
-public final class POP3Headers 
-  extends InternetHeaders
+public class IMAPSStore
+  extends IMAPStore
 {
-
-  boolean empty = true;
-
-  POP3Headers(InputStream in)
-    throws MessagingException
+	/**
+	 * The default IMAPS port.
+	 */
+	public static final int DEFAULT_PORT = 993;
+		
+  /**
+   * Constructor.
+   */
+  public IMAPSStore(Session session, URLName url)
   {
-    super(in);
+    super(session, url);
   }
 
-  public boolean isEmpty()
-  {
-    return empty;
-  }
-  
-  public void addHeaderLine(String line)
-  {
-    super.addHeaderLine(line);
-    empty = false;
-  }
+	/**
+	 * Returns a new connection for this store.
+	 */
+	protected IMAPConnection createConnection(String host, int port)
+		throws UnknownHostException, IOException
+	{
+		if (port<0)
+			port = DEFAULT_PORT;
+		return new IMAPConnection(host, port);
+	}
 
 }

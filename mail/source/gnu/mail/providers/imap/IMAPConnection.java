@@ -102,16 +102,39 @@ public class IMAPConnection implements IMAPConstants
 
   /**
    * Constructor.
+	 * @param host the name of the host to connect to
+	 * @param port the port to connect to
    */
   public IMAPConnection(String host, int port)
     throws UnknownHostException, IOException
   {
-    socket = new Socket(host, port);
+		this(host, port, false);
+	}
+	
+  /**
+   * Constructor.
+	 * @param host the name of the host to connect to
+	 * @param port the port to connect to
+	 * @param secure if true, use TLS
+   */
+  public IMAPConnection(String host, int port, boolean secure)
+    throws UnknownHostException, IOException
+  {
+    socket = createSocket(host, port);
     in = new IMAPResponseTokenizer(socket.getInputStream());
     out = socket.getOutputStream();
     asyncResponses = new ArrayList();
     alerts = new ArrayList();
   }
+
+	/**
+	 * Creates the socket to connect to the host.
+	 */
+	protected Socket createSocket(String host , int port)
+		throws UnknownHostException, IOException
+	{
+		return new Socket(host, port);
+	}
 
   /**
    * Sets whether to log debugging output to stderr.
