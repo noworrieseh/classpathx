@@ -1,3 +1,61 @@
+2004-04-15  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	* src/gnu/xml/pipeline/WellFormednessFilter.java (startDTD)
+	(notationDecl, unparsedEntityDecl): if string-interning use the
+	'==' comparison, else, use 'equals'
+
+	* src/gnu/xml/pipeline/ValidationConsumer.java:
+	http://xml.org/sax/features/string-interning can now be set to
+	false so comparison if perform using equals (if true, comparison
+	is performed with '==').
+
+	* src/gnu/xml/pipeline/DomConsumer.java:
+	(populateAttributes): using equals because I'm not sure "" is
+	interned?
+
+	* src/gnu/xml/aelfred2/XmlParser.java (parseAttribute)
+	(parseAttDef, readAttType, parseDefault)
+	(setInternalEntity, pushURL): if string-interning use the '=='
+	comparison, else, use 'equals'
+
+	* src/gnu/xml/aelfred2/SAXDriver.java (attribute, startElement)
+	(getType): if string-interning use the '==' comparison, else, use
+	'equals'
+
+2004-04-14  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	* src/gnu/xml/aelfred2/SAXDriver.java (getFeature):
+	http://xml.org/sax/features/string-interning can now be set to
+	false so comparison if perform using equals (if true, comparison
+	is performed with '==').
+
+	* src/gnu/xml/util/XCat.java (startElement): reverted the '=='
+	comparison between String's because they are internaled and there
+	is no way to choose if the comparison must use '==' or 'equals'
+
+	* src/javax/xml/transform/sax/SAXResult.java, SAXSource.java,
+	SAXTransformerFactory.java, TemplatesHandler.java,
+	TransformerHandler.java,
+	src/javax/xml/transform/stream/StreamResult.java,
+	StreamSource.java, src/javax/xml/transform/dom/DOMLocator.java,
+	DOMResult.java, DOMSource.java,
+	src/javax/xml/parsers/ClassStuff.java, DocumentBuilder.java,
+	DocumentBuilderFactory.java, FactoryConfigurationError.java,
+	ParserConfigurationException.java, SAXParser.java,
+	SAXParserFactory.java, src/javax/xml/transform/ClassStuff.java,
+	ErrorListener.java, OutputKeys.java, Result.java, Source.java,
+	Templates.java, Transformer.java,
+	TransformerConfigurationException.java, TransformerException.java,
+	TransformerFactory.java,
+	TransformerFactoryConfigurationError.java,
+	src/gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.java,
+	DefaultURIResolverImpl.java, ErrorListenerProxy.java,
+	IOToolkit.java, JavaContext.java, LibxmlDocument.java,
+	SourceLocatorImpl.java, SourceWrapper.java, TemplatesImpl.java,
+	TransformTest.java, TransformerImpl.java,
+	TransformerFactoryImpl.java, URIResolverProxy.java: removed the id
+	cvs tag to ease integration in other cvs repositories
+
 2004-04-08  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
 	* NEWS: initial commit
