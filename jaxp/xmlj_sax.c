@@ -152,10 +152,6 @@ xmljExternalEntityLoader (const char *url, const char *id,
   xmlParserInputPtr ret;
 
   printf("xmljExternalEntityLoader %s %s\n", url, id);
-  if (defaultLoader == NULL)
-    {
-      defaultLoader = xmlGetExternalEntityLoader ();
-    }
   systemId = xmlCharStrdup (url);
   publicId = xmlCharStrdup (id);
   ret = xmljSAXResolveEntity (context, publicId, systemId);
@@ -194,16 +190,21 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
   sax->isStandalone = &xmljSAXIsStandalone;
   sax->hasInternalSubset = &xmljSAXHasInternalSubset;
   sax->hasExternalSubset = &xmljSAXHasExternalSubset;
+  if (defaultLoader == NULL)
+    {
+      defaultLoader = xmlGetExternalEntityLoader ();
+    }
   if (entityResolver)
     {
       sax->resolveEntity = &xmljSAXResolveEntity;
       /* The above function is never called in libxml2 */
-      printf ("Set custom external entity loader\n");
+      /*printf ("Set custom external entity loader\n");*/
       xmlSetExternalEntityLoader (xmljExternalEntityLoader);
     }
   else
     {
       sax->resolveEntity = (orig == NULL) ? NULL : orig->resolveEntity;
+      /*printf ("Reset custom external entity loader\n");*/
       xmlSetExternalEntityLoader (defaultLoader);
     }
 

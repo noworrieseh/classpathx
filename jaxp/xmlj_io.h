@@ -96,7 +96,8 @@ xmljNewParserContext (JNIEnv * env,
                       jstring inPublicId,
                       jboolean validate,
                       jboolean coalesce,
-                      jboolean expandEntities);
+                      jboolean expandEntities,
+                      jboolean loadEntities);
 
 void
 xmljFreeParserContext (xmlParserCtxtPtr parserContext);

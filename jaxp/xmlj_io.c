@@ -351,7 +351,8 @@ xmljNewParserContext (JNIEnv * env,
                       jstring inPublicId,
                       jboolean validate,
                       jboolean coalesce,
-                      jboolean expandEntities)
+                      jboolean expandEntities,
+                      jboolean loadEntities)
 {
   InputStreamContext *inputContext;
   xmlCharEncoding encoding;
@@ -377,7 +378,6 @@ xmljNewParserContext (JNIEnv * env,
               options = 0;
               if (validate)
                 {
-                  options |= XML_PARSE_DTDLOAD;
                   options |= XML_PARSE_DTDVALID;
                 }
               if (coalesce)
@@ -387,6 +387,10 @@ xmljNewParserContext (JNIEnv * env,
               if (expandEntities)
                 {
                   options |= XML_PARSE_NOENT;
+                }
+              if (loadEntities)
+                {
+                  options |= XML_PARSE_DTDLOAD;
                 }
               if (xmlCtxtUseOptions (ctx, options))
                 {
@@ -450,7 +454,8 @@ xmljParseDocument (JNIEnv * env,
           lexicalHandler);*/
   
   ctx = xmljNewParserContext (env, in, detectBuffer, systemId, publicId,
-                              validate, coalesce, expandEntities);
+                              validate, coalesce, expandEntities,
+                              entityResolver);
   if (ctx != NULL)
     {
       saxCtx = xmljNewSAXParseContext (env, self, ctx, publicId, systemId);
@@ -501,9 +506,9 @@ xmljParseDocument2 (JNIEnv * env,
               
   xmljSetThreadContext (saxCtx);
 
-  printf ("xmljParseDocument2 loadsubset=%d\n", ctx->loadsubset);
+  /*printf ("xmljParseDocument2 loadsubset=%d\n", ctx->loadsubset);*/
   ret = xmlParseDocument (ctx);
-  printf ("xmlParseDocument done\n");
+  /*printf ("xmlParseDocument done\n");*/
   doc = ctx->myDoc;
   if (ret)
     {

@@ -266,7 +266,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
 
   /* xmlMemSetup (memcheck_free, memcheck_malloc, memcheck_realloc, memcheck_strdup); */
   ctx = xmljNewParserContext (env, inputStream, detectBuffer, inSystemId,
-                              inPublicId, 0, 0, 0);
+                              inPublicId, 0, 0, 0, 0);
   if (ctx == NULL)
     {
       return 0;
