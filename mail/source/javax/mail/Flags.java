@@ -166,9 +166,9 @@ public class Flags
     
   }
 
-  private int systemFlags;
+  private int systemFlags = 0;
 
-  private HashMap userFlags;
+  private HashMap userFlags = null;
   
   /**
    * Construct an empty Flags object.

@@ -134,12 +134,12 @@ public abstract class Message
    * The number of this message within its folder, 
    * or zero if the message was not retrieved from a folder.
    */
-  protected int msgnum;
+  protected int msgnum = 0;
 
   /**
    * True if this message has been expunged.
    */
-  protected boolean expunged;
+  protected boolean expunged = false;
 
   /**
    * The containing folder, if this message is obtained from a folder
@@ -156,6 +156,8 @@ public abstract class Message
    */
   protected Message()
   {
+    folder = null;
+    session = null;
   }
 
   /**
@@ -178,6 +180,7 @@ public abstract class Message
    */
   protected Message(Session session)
   {
+    folder = null;
     this.session = session;
   }
 

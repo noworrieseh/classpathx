@@ -66,9 +66,9 @@ public abstract class Service
   /*
    * @see #isConnected
    */
-  private boolean connected;
+  private boolean connected = false;
 
-  private ArrayList connectionListeners;
+  private ArrayList connectionListeners = null;
 
   /**
    * Constructor.

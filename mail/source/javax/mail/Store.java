@@ -48,8 +48,8 @@ public abstract class Store
   extends Service
 {
 
-  private ArrayList storeListeners;
-  private ArrayList folderListeners;
+  private ArrayList storeListeners = null;
+  private ArrayList folderListeners = null;
 
   /**
    * Constructor.

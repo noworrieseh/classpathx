@@ -132,10 +132,10 @@ public abstract class Folder
 
   // -- Event listener lists --
 
-  private volatile ArrayList connectionListeners;
-  private volatile ArrayList folderListeners;
-  private volatile ArrayList messageCountListeners;
-  private volatile ArrayList messageChangedListeners;
+  private volatile ArrayList connectionListeners = null;
+  private volatile ArrayList folderListeners = null;
+  private volatile ArrayList messageCountListeners = null;
+  private volatile ArrayList messageChangedListeners = null;
 
   /**
    * Constructor that takes a Store object.

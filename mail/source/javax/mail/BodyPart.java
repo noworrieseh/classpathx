@@ -44,7 +44,7 @@ public abstract class BodyPart
   /**
    * The Multipart object containing this BodyPart, if known.
    */
-  protected Multipart parent;
+  protected Multipart parent = null;
 
   /**
    * Return the containing Multipart object, or null if not known.

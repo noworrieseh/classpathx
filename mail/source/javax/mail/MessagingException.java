@@ -46,6 +46,7 @@ public class MessagingException
    */
   public MessagingException()
   {
+    this(null, null);
   }
 
   /**
@@ -54,7 +55,7 @@ public class MessagingException
    */
   public MessagingException(String message)
   {
-    super(message);
+    this(message, null);
   }
 
   /**

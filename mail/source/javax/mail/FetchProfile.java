@@ -121,8 +121,8 @@ public class FetchProfile
   }
 
 
-  private ArrayList items;
-  private ArrayList headers;
+  private ArrayList items = null;
+  private ArrayList headers = null;
 
   /**
    * Create an empty FetchProfile.

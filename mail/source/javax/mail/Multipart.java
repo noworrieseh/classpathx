@@ -77,6 +77,7 @@ public abstract class Multipart
   {
     parts = new ArrayList();
     contentType = "multipart/mixed";
+    parent = null;
   }
 
   /**

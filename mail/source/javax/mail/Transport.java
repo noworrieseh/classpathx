@@ -49,7 +49,7 @@ public abstract class Transport
   /*
    * Transport listener list.
    */
-  private ArrayList transportListeners;
+  private ArrayList transportListeners = null;
 
   /**
    * Constructor.

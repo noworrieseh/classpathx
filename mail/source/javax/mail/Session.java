@@ -103,8 +103,7 @@ public final class Session
   {
     this.props = props;
     this.authenticator = authenticator;
-    if (new Boolean(props.getProperty("mail.debug")).booleanValue())
-      debug = true;
+    debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
     if (debug)
       System.out.println("DEBUG: using GNU JavaMail");
     ClassLoader loader = null;
