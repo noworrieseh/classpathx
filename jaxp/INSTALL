@@ -1,10 +1,10 @@
-GNU jaxp Installation Instructions
+GNU Jaxp Installation Instructions
 ========================================================================
 
 Dependencies
 ------------------------------------------------------------------------
 
-GNU jaxp depends on the following packages which you must download and
+GNU Jaxp depends on the following packages which you must download and
 install first:
 
 - The XML C library for Gnome (Libxml2)
@@ -18,7 +18,7 @@ install first:
 - An up-to-date version of gcc/gcj is recommended, 3.3 is known to
   work.
 
-Note that gcj is no requirement, you can also use GNU jaxp with your
+Note that gcj is no requirement, you can also use GNU Jaxp with your
 favorite Java SDK (you will still need a C compiler, though.)  You may
 have to pass --with-java-home or other configuration parameters to
 configure. See below.
@@ -27,7 +27,7 @@ configure. See below.
 Installation
 ------------------------------------------------------------------------
 
-Change to the directory where you unpacked GNU jaxp to and issue the
+Change to the directory where you unpacked GNU Jaxp to and issue the
 following commands:
 
        ./configure
