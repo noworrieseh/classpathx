@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: HashFactory.java,v 1.3 2001-12-08 21:35:42 raif Exp $
+// $Id: HashFactory.java,v 1.4 2001-12-08 21:37:17 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * A Factory to instantiate hash algorithm instances.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class HashFactory {
 
@@ -111,6 +111,7 @@ public class HashFactory {
       hs.add(RIPEMD128_HASH);
       hs.add(RIPEMD160_HASH);
       hs.add(SHA160_HASH);
+      hs.add(MD5_HASH);
 
       return Collections.unmodifiableSet(hs);
    }
