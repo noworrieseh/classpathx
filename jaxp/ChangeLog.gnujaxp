@@ -1,3 +1,8 @@
+2004-08-06  Musachy Barroso  <musachy@gmail.com>
+
+	* SAXDriver.java: Checks added for colon in entities, PI and
+	notations. Unbounded prefixes error changed to fatal.
+	
 2004-08-05  Musachy Barroso  <musachy@gmail.com>
 
 	* SAXDriver.java: Fixed bug intruduced with the partial character
