@@ -180,12 +180,12 @@ public class IMAPConnection implements IMAPConstants
   public boolean login(String username, String password)
     throws IOException
   {
-    return invokeSimpleCommand(new StringBuffer(LOGIN)
-        .append(' ')
-        .append(username)
-        .append(' ')
-        .append(password)
-        .toString());
+    StringBuffer cmd = new StringBuffer(LOGIN);
+    cmd.append(' ');
+    cmd.append(quote(username));
+    cmd.append(' ');
+    cmd.append(quote(password));
+    return invokeSimpleCommand(cmd.toString());
   }
 
   /**
@@ -239,7 +239,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     sendCommand(tag, new StringBuffer(command)
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
     MailboxStatus ms = new MailboxStatus();
     while (true)
@@ -327,7 +327,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(CREATE)
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
   }
 
@@ -341,7 +341,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(DELETE)
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
   }
 
@@ -356,9 +356,9 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(RENAME)
         .append(' ')
-        .append(UTF7imap.encode(source))
+        .append(quote(UTF7imap.encode(source)))
         .append(' ')
-        .append(UTF7imap.encode(target))
+        .append(quote(UTF7imap.encode(target)))
         .toString());
   }
 
@@ -373,7 +373,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(SUBSCRIBE)
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
   }
 
@@ -388,7 +388,7 @@ public class IMAPConnection implements IMAPConstants
   {
     return invokeSimpleCommand(new StringBuffer(UNSUBSCRIBE)
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
   }
 
@@ -419,16 +419,16 @@ public class IMAPConnection implements IMAPConstants
       String mailbox)
     throws IOException
   {
-    if (reference==null || reference.length()==0)
-      reference = "\"\"";
-    if (mailbox==null || mailbox.length()==0)
-      mailbox = "\"\"";
+    if (reference==null)
+      reference = "";
+    if (mailbox==null)
+      mailbox = "";
     String tag = newTag();
     sendCommand(tag, new StringBuffer(command)
         .append(' ')
-        .append(UTF7imap.encode(reference))
+        .append(quote(UTF7imap.encode(reference)))
         .append(' ')
-        .append(UTF7imap.encode(mailbox))
+        .append(quote(UTF7imap.encode(mailbox)))
         .toString());
     List acc = new ArrayList();
     while (true)
@@ -497,7 +497,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     StringBuffer buffer = new StringBuffer(STATUS)
       .append(' ')
-      .append(UTF7imap.encode(mailbox))
+      .append(quote(UTF7imap.encode(mailbox)))
       .append(' ')
       .append('(');
     for (int i=0; i<statusNames.length; i++)
@@ -568,7 +568,7 @@ public class IMAPConnection implements IMAPConstants
     String tag = newTag();
     StringBuffer buffer = new StringBuffer(APPEND)
       .append(' ')
-      .append(UTF7imap.encode(mailbox))
+      .append(quote(UTF7imap.encode(mailbox)))
       .append(' ');
     if (flags!=null)
     {
@@ -703,10 +703,9 @@ public class IMAPConnection implements IMAPConstants
       {
         if (id==FETCH)
         {
-          MessageStatus status = new MessageStatus(response.getCount());
+          int msgnum = response.getCount();
           List code = response.getResponseCode();
-          addKeys(code, status);
-          status.content = response.content;
+          MessageStatus status = new MessageStatus(msgnum, code);
           list.add(status);
         }
       }
@@ -720,29 +719,6 @@ public class IMAPConnection implements IMAPConstants
         }
         else
           throw new IMAPException(id, response.getText());
-      }
-    }
-  }
-
-  void addKeys(List code, MessageStatus status)
-  {
-    int len = code.size();
-    for (int i=0; i<len; i++)
-    {
-      Object key = code.get(i);
-      if (key instanceof String)
-      {
-        Object value = null;
-        if ((i+1)<len)
-        {
-          value = code.get(i+1);
-          i++;
-        }
-        status.put((String)key, value);
-      }
-      else if (key instanceof List)
-      {
-        addKeys((List)key, status);
       }
     }
   }
@@ -787,31 +763,20 @@ public class IMAPConnection implements IMAPConstants
       String id = response.getID();
       if (response.isUntagged())
       {
+        int msgnum = response.getCount();
+        List code = response.getResponseCode();
         // 2 different styles returned by server: FETCH or FETCH FLAGS
         if (id==FETCH)
         {
-          MessageStatus mf = new MessageStatus(response.getCount());
-          List code = response.getResponseCode();
-          int len = code.size();
-          for (int i=0; i<len; i++)
-          {
-            Object key = code.get(i);
-            if (key instanceof String && (i+1)<len)
-            {
-              Object value = code.get(i+1);
-              if (value instanceof List)
-              {
-                mf.put((String)key, value);
-                i++;
-              }
-            }
-          }
+          MessageStatus mf = new MessageStatus(msgnum, code);
           list.add(mf);
         }
         else if (id==FETCH_FLAGS)
         {
-          MessageStatus mf = new MessageStatus(response.getCount());
-          mf.put(FLAGS, response.getResponseCode());
+          List base = new ArrayList();
+          base.add(FLAGS);
+          base.add(code);
+          MessageStatus mf = new MessageStatus(msgnum, base);
           list.add(mf);
         }
       }
@@ -848,7 +813,7 @@ public class IMAPConnection implements IMAPConstants
       buffer.append(messages[i]);
     }
     buffer.append(' ')
-      .append(UTF7imap.encode(mailbox));
+      .append(quote(UTF7imap.encode(mailbox)));
     return invokeSimpleCommand(buffer.toString());
   }
 
@@ -864,6 +829,22 @@ public class IMAPConnection implements IMAPConstants
       int len = text.length();
       if (text.charAt(len-1)=='"')
         return text.substring(1, len-1);
+    }
+    return text;
+  }
+
+  /**
+   * Quote the specified text if necessary.
+   */
+  static String quote(String text)
+  {
+    if (text.length()==0 || text.indexOf(' ')!=-1)
+    {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append('"');
+      buffer.append(text);
+      buffer.append('"');
+      return buffer.toString();
     }
     return text;
   }

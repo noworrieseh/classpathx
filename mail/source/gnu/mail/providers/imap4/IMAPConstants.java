@@ -57,6 +57,7 @@ public interface IMAPConstants
   public static final String FETCH = "FETCH".intern();
   public static final String STORE = "STORE".intern();
   public static final String COPY = "COPY".intern();
+  public static final String UID = "UID".intern();
   
   // Server responses
   public static final String OK = "OK".intern();
@@ -103,13 +104,10 @@ public interface IMAPConstants
   // Fetch data items
   public static final String BODY = "BODY".intern();
   public static final String BODY_PEEK = "BODY.PEEK".intern();
-  public static final String BODYHEADER = "BODYHEADER".intern();
-  public static final String BODYHEADER_FIELDS = "BODYHEADER.FIELDS".intern();
-  public static final String BODYHEADER_FIELDS_NOT =
-    "BODYHEADER.FIELDS.NOT".intern();
-  public static final String BODYMIME = "BODYMIME".intern();
+  public static final String HEADER = "HEADER".intern();
+  public static final String HEADER_FIELDS = "HEADER.FIELDS".intern();
+  public static final String HEADER_FIELDS_NOT = "HEADER.FIELDS.NOT".intern();
   public static final String BODYSTRUCTURE = "BODYSTRUCTURE".intern();
-  public static final String BODYTEXT = "BODYTEXT".intern();
   public static final String ENVELOPE = "ENVELOPE".intern();
   public static final String INTERNALDATE = "INTERNALDATE".intern();
   public static final String RFC822 = "RFC822".intern();

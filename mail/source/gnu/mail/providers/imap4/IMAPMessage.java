@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -189,12 +190,84 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   void update(MessageStatus status)
     throws MessagingException
   {
-    for (Iterator i = status.keySet().iterator(); i.hasNext(); )
+    List code = status.getCode();
+    int clen = code.size();
+    for (int i=0; i<clen; i+=2)
     {
-      String key = (String)i.next();
-      if (key==FLAGS)
+      Object item = code.get(i);
+      String key = null;
+      List params = Collections.EMPTY_LIST;
+      if (item instanceof Pair)
       {
-        List fl = (List)status.get(key);
+        Pair pair = (Pair)item;
+        key = pair.getKey();
+        params = pair.getValue();
+      }
+      else if (item instanceof String)
+        key = (String)item;
+      else
+        throw new MessagingException("Unexpected status item: "+item);
+      
+      if (key==BODY || key==RFC822)
+      {
+        byte[] literal = (byte[])code.get(i+1);
+        int plen = params.size();
+        if (plen==0)
+        {
+          InputStream in = new ByteArrayInputStream(literal);
+          parse(in);
+        }
+        else
+        {
+          for (int pi=0; pi<plen; pi+=2)
+          {
+            Object pitem = params.get(pi);
+            String pkey = null;
+            if (pitem instanceof String)
+              pkey = (String)pitem;
+            else
+              throw new MessagingException("Unexpected status item: "+pitem);
+
+            if (pkey==HEADER)
+            {
+              InputStream in = new ByteArrayInputStream(literal);
+              headers = createInternetHeaders(in);
+              headersComplete = true;
+            }
+            else if (pkey==HEADER_FIELDS)
+            {
+              if (!headersComplete)
+              {
+                InputStream in = new ByteArrayInputStream(literal);
+                headers = createInternetHeaders(in);
+              }
+            }
+            else
+              throw new MessagingException("Unknown message status key: "+pkey);
+          }
+        }
+      }
+      else if (key==RFC822_HEADER)
+      {
+        byte[] literal = (byte[])code.get(i+1);
+        InputStream in = new ByteArrayInputStream(literal);
+        headers = createInternetHeaders(in);
+        headersComplete = true;
+      }
+      else if (key==BODYSTRUCTURE)
+      {
+        List mlist = (List)code.get(i+1);
+        if (headers==null)
+          headers = new InternetHeaders();
+        multipart = parseMultipart(mlist, this, headers, null);
+      }
+      else if (key==ENVELOPE)
+      {
+        // TODO
+      }
+      else if (key==FLAGS)
+      {
+        List fl = (List)code.get(i+1);
         flags = new Flags();
         for (Iterator j = fl.iterator(); j.hasNext(); )
         {
@@ -215,35 +288,13 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
             flags.add((String)f);
         }
       }
-      else if (key==BODYHEADER)
-      {
-        InputStream in = new ByteArrayInputStream(status.getContent());
-        headers = createInternetHeaders(in);
-        headersComplete = true;
-      }
-      else if (key==BODY)
-      {
-        InputStream in = new ByteArrayInputStream(status.getContent());
-        parse(in);
-      }
       else if (key==INTERNALDATE)
       {
-        internalDate = parseAtom(status.get(key));
+        internalDate = (String)code.get(i+1);
       }
-      else if (key==BODYHEADER_FIELDS)
+      else if (key==UID)
       {
-        // individual header fields
-        if (!headersComplete)
-        {
-          InputStream in = new ByteArrayInputStream(status.getContent());
-          headers = createInternetHeaders(in);
-        }
-      }
-      else if (key==BODYSTRUCTURE)
-      {
-        if (headers==null)
-          headers = new InternetHeaders();
-        multipart = parseMultipart((List)status.get(key), this, headers, null);
+        // TODO
       }
       else
         throw new MessagingException("Unknown message status key: "+key);

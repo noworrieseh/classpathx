@@ -1,5 +1,5 @@
 /*
- * MessageStatus.java
+ * Pair.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
@@ -30,32 +30,37 @@ package gnu.mail.providers.imap4;
 import java.util.List;
 
 /**
- * Represents the state of a message.
+ * Implementation of a key-value pair.
+ * The key is always a String, and the value must be a List.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 0.1
  */
-public final class MessageStatus
+public final class Pair
 {
 
-  private int messageNumber;
+  private String key;
+  private List value;
 
-  private List code;
-
-  MessageStatus(int messageNumber, List code)
+  Pair(String key, List value)
   {
-    this.messageNumber = messageNumber;
-    this.code = code;
+    this.key = key;
+    this.value = value;
   }
   
-  public int getMessageNumber()
+  public String getKey()
   {
-    return messageNumber;
+    return key;
   }
 
-  public List getCode()
+  public List getValue()
   {
-    return code;
+    return value;
+  }
+
+  public String toString()
+  {
+    return new StringBuffer(key).append(value).toString();
   }
 
 }

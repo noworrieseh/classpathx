@@ -60,8 +60,8 @@ public class IMAPResponseTokenizer implements IMAPConstants
   private static final int STATE_ID = 2;
   private static final int STATE_MAYBE_CODE = 3;
   private static final int STATE_CODE = 4;
-  private static final int STATE_CONTENT_LENGTH = 5;
-  private static final int STATE_CONTENT = 6;
+  private static final int STATE_LITERAL_LENGTH = 5;
+  private static final int STATE_LITERAL = 6;
   private static final int STATE_TEXT = 7;
   private static final int STATE_STATUS = 8;
 
@@ -92,6 +92,10 @@ public class IMAPResponseTokenizer implements IMAPConstants
       len = in.read(tmp, 0, max);
     if (len==-1)
       return null; // EOF
+    //char[] chars = new char[len];
+    //for (int i=0; i<len; i++)
+    //  chars[i] = (char)tmp[i];
+    //System.out.println("<- "+new String(chars));
     int blen = (buffer==null) ? 0 : buffer.length;
     byte[] uni = new byte[blen+len];
     if (blen!=0)
@@ -132,8 +136,8 @@ public class IMAPResponseTokenizer implements IMAPConstants
     
     IMAPResponse response = new IMAPResponse();
     ByteArrayOutputStream genericSink = new ByteArrayOutputStream();
-    ByteArrayOutputStream contentSink = null;
-    int contentCount = 0, contentLength = -1;
+    ByteArrayOutputStream literalSink = null;
+    int literalCount = 0, literalLength = -1;
     Stack context = new Stack();
     int state = STATE_TAG;
     boolean inQuote = false;
@@ -161,7 +165,7 @@ public class IMAPResponseTokenizer implements IMAPConstants
             else
               state = STATE_COUNT;
           }
-          else // tag content
+          else // tag literal
             genericSink.write(b);
           break;
         case STATE_COUNT: // expect count or id
@@ -203,14 +207,14 @@ public class IMAPResponseTokenizer implements IMAPConstants
             mark(i);
             return response;
           }
-          else if (b!=0x0d) // id content
+          else if (b!=0x0d) // id literal
             genericSink.write(b);
           break;
         case STATE_MAYBE_CODE: // expect code or text
           if (b==0x28 || b==0x5b)
           {
             List top = new ArrayList();
-            //response.code = top;
+            response.code = top;
             context.push(top);
             state = STATE_CODE;
           }
@@ -254,7 +258,6 @@ public class IMAPResponseTokenizer implements IMAPConstants
           if (b==0x22) // quote delimiter
           {
             inQuote = !inQuote;
-            //genericSink.write(b);
           }
           else if (inQuote)
           {
@@ -264,30 +267,38 @@ public class IMAPResponseTokenizer implements IMAPConstants
           {
             if (b==0x28 || b==0x5b) // start parenthesis/bracket
             {
-              List top = new ArrayList();
               List parent = (List)context.peek();
-              parent.add(top);
+              List top = new ArrayList();
+              if (genericSink.size()>0)
+              {
+                byte[] tb = genericSink.toByteArray();
+                String token = new String(tb, DEFAULT_ENCODING).intern();
+                Pair pair = new Pair(token, top);
+                parent.add(pair);
+                genericSink.reset();
+              }
+              else
+              {
+                parent.add(top);
+              }
               context.push(top);
             }
             else if (b==0x29 || b==0x5d) // end parenthesis/bracket
             {
               List top = (List)context.pop();
               // flush genericSink
-              byte[] tb = genericSink.toByteArray();
-              if (tb.length>0)
+              if (genericSink.size()>0)
               {
-                genericSink.reset();
+                byte[] tb = genericSink.toByteArray();
                 String token = new String(tb, DEFAULT_ENCODING).intern();
                 top.add(token);
+                genericSink.reset();
               }
-              if (context.size()==0) // set response code
-                response.code = top;
             }
-            else if (b==0x7b) // content length
+            else if (b==0x7b) // literal length
             {
-              // TODO process genericSink
               genericSink.reset();
-              state = STATE_CONTENT_LENGTH;
+              state = STATE_LITERAL_LENGTH;
             }
             else if (b==0x20) // token delimiter
             {
@@ -297,12 +308,12 @@ public class IMAPResponseTokenizer implements IMAPConstants
               {
                 List top = (List)context.peek();
                 // flush genericSink
-                byte[] tb = genericSink.toByteArray();
-                if (tb.length>0)
+                if (genericSink.size()>0)
                 {
-                  genericSink.reset();
+                  byte[] tb = genericSink.toByteArray();
                   String token = new String(tb, DEFAULT_ENCODING).intern();
                   top.add(token);
+                  genericSink.reset();
                 }
               }
             }
@@ -317,42 +328,44 @@ public class IMAPResponseTokenizer implements IMAPConstants
               genericSink.write(b);
           }
           break;
-        case STATE_CONTENT_LENGTH:
-          if (b==0x7d) // end content length
+        case STATE_LITERAL_LENGTH:
+          if (b==0x7d) // end literal length
           {
             byte[] cb = genericSink.toByteArray();
             genericSink.reset();
             String cs = new String(cb, DEFAULT_ENCODING);
             try
             {
-              contentLength = Integer.parseInt(cs);
+              literalLength = Integer.parseInt(cs);
             }
             catch (NumberFormatException e)
             {
               throw new ProtocolException("Expecting number: "+cs);
             }
           }
-          else if (b==0x0a) // start content
+          else if (b==0x0a) // start literal
           {
-            state = STATE_CONTENT;
-            contentSink = new ByteArrayOutputStream();
-            contentCount = 0;
+            state = STATE_LITERAL;
+            literalSink = new ByteArrayOutputStream();
+            literalCount = 0;
           }
           else if (b!=0x0d) // ignore CR
             genericSink.write(b);
           break;
-        case STATE_CONTENT:
-          if (contentCount>=contentLength)
+        case STATE_LITERAL:
+          if (literalCount>=literalLength)
           {
-            response.content = contentSink.toByteArray();
-            contentSink = null;
+            List top = (List)context.peek();
+            byte[] literal = literalSink.toByteArray();
+            top.add(literal);
+            literalSink = null;
             inContent = false;
             state = STATE_CODE;
           }
           else
           {
-            contentSink.write(b);
-            contentCount++;
+            literalSink.write(b);
+            literalCount++;
           }
           break;
         case STATE_TEXT: // human-readable text

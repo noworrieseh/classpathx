@@ -29,7 +29,8 @@ package gnu.mail.providers.imap4;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
 import javax.activation.DataHandler;
 import javax.mail.MessagingException;
 import javax.mail.internet.ContentType;
@@ -140,16 +141,48 @@ public class IMAPBodyPart
   void update(MessageStatus status)
     throws MessagingException
   {
-    for (Iterator i = status.keySet().iterator(); i.hasNext(); )
+    List code = status.getCode();
+    int clen = code.size();
+    for (int i=0; i<clen; i+=2)
     {
-      String key = (String)i.next();
-      String target = BODY + section;
-      if (key.equals(target))
+      Object item = code.get(i);
+      String key = null;
+      List params = Collections.EMPTY_LIST;
+      if (item instanceof Pair)
       {
-        content = status.getContent();
+        Pair pair = (Pair)item;
+        key = pair.getKey();
+        params = pair.getValue();
+      }
+      else if (item instanceof String)
+        key = (String)item;
+      else
+        throw new MessagingException("Unexpected status item: "+item);
+  
+      if (key==BODY)
+      {
+        int plen = params.size();
+        if (plen>0)
+        {
+          Object pitem = params.get(0);
+          String pkey = null;
+          if (pitem instanceof String)
+            pkey = (String)pitem;
+          else
+            throw new MessagingException("Unexpected status item: "+pitem);
+          
+          if (pkey.equals(section))
+          {
+            content = (byte[])code.get(i+1);
+          }
+          else
+            throw new MessagingException("Unexpected section number: "+pkey);
+        }
+        else
+          throw new MessagingException("Not a section!");
       }
       else
-        throw new MessagingException("Unknown message status key: "+key);
+        throw new MessagingException("Unknown section status key: "+key);
     }
   }
 
