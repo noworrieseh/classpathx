@@ -502,18 +502,20 @@ xmljParseDocument2 (JNIEnv * env,
   doc = ctx->myDoc;
   if (ret)
     {
+      const char *msg = ctx->lastError.message;
       switch (mode)
         {
         case 0:
-          xmljSAXFatalError (ctx, ctx->lastError.message);
+          
+          xmljSAXFatalError (ctx, msg);
           break;
         case 1:
-          xmljThrowDOMException (env, ret, ctx->lastError.message);
+          xmljThrowDOMException (env, ret, msg);
           break;
         case 2:
           xmljThrowException (env,
                               "javax/xml/transform/TransformerException",
-                              ctx->lastError.message);
+                              msg);
         }
     }
   

@@ -938,7 +938,7 @@ xmljSAXIgnorableWhitespace (void *vctx,
     {
       sax->ignorableWhitespace = xmljGetMethodID (env,
                                                   target,
-                                                  "characters",
+                                                  "ignorableWhitespace",
                                                   "(Ljava/lang/String;)V");
       if (sax->ignorableWhitespace == NULL)
         {
@@ -1097,9 +1097,12 @@ xmljDispatchError (xmlParserCtxtPtr ctx,
   jint columnNumber;
   jstring publicId;
   jstring systemId;
-  char buffer[2048] = "[Error message too long]";
+  char buffer[2048] = "";
 
-  vsnprintf (buffer, sizeof buffer, msg, args);
+  if (msg != NULL)
+    {
+      vsnprintf (buffer, sizeof buffer, msg, args);
+    }
   lineNumber = loc->getLineNumber (ctx);
   columnNumber = loc->getColumnNumber (ctx);
   publicId = xmljNewString (env, loc->getPublicId (ctx));
