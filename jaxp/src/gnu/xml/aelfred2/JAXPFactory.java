@@ -117,7 +117,7 @@ public final class JAXPFactory extends SAXParserFactory
     {
 	Boolean	value = (Boolean) flags.get (name);
 	
-	if (value == null)
+	if (value != null)
 	    return value.booleanValue ();
 	else
 	    try {
