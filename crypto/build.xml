@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.19 2002-08-31 09:38:17 raif Exp $
+   $Id: build.xml,v 1.20 2002-08-31 10:50:01 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -82,13 +82,12 @@
 
    <target name="jar" depends="configure,compile"
            description="Build the project's main .jar file">
-      <copy todir="${classes.dir}">
+      <jar jarfile="${main.jar}" manifest="${etc.dir}/gnu-crypto.mf">
+         <fileset dir="${classes.dir}" includes="gnu/**" excludes="test/**"/>
          <fileset dir="${basedir}">
             <patternset refid="toplevel_files"/>
          </fileset>
-      </copy>
-      <jar jarfile="${main.jar}" basedir="${classes.dir}"
-           manifest="${etc.dir}/gnu-crypto.mf"/>
+      </jar>
    </target>
 
    <target name="compile" depends="configure">
@@ -115,7 +114,12 @@
    </target>
 
    <target name="jar-test" depends="compile-test">
-      <jar jarfile="${test.jar}" basedir="${classes.dir}" includes="test/**"/>
+      <jar jarfile="${test.jar}">
+         <fileset dir="${classes.dir}" includes="test/**" excludes="gnu/**"/>
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+         </fileset>
+      </jar>
    </target>
 
    <target name="compile-test" depends="jar">
