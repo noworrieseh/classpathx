@@ -47,7 +47,7 @@ import gnu.inet.nntp.StatusResponse;
  * @version 2.0
  */
 final class NNTPRootFolder
-  extends Folder
+extends Folder
 {
 
   NNTPRootFolder(NNTPStore store)
@@ -73,49 +73,49 @@ final class NNTPRootFolder
    */
   public Folder[] list(String pattern)
     throws MessagingException
-  {
-    pattern = pattern.replace('%', '*'); // convert pattern to wildmat
-    try
     {
-      NNTPStore ns = (NNTPStore)store;
-      // Indicates whether to *really* list all folders.
-      boolean listAll = ns.isListAll();
-      
-      List acc = new LinkedList();
-      synchronized (ns.connection)
+      pattern = pattern.replace('%', '*'); // convert pattern to wildmat
+      try
       {
-        GroupIterator i = listAll ?
-          ns.connection.listActive(pattern) :
-          ns.connection.listSubscriptions();
-        while (i.hasNext())
+        NNTPStore ns = (NNTPStore)store;
+        // Indicates whether to *really* list all folders.
+        boolean listAll = ns.isListAll();
+
+        List acc = new LinkedList();
+        synchronized (ns.connection)
         {
-          Group group = i.nextGroup();
-          NNTPFolder folder = new NNTPFolder(ns, group.getName());
-          acc.add(folder);
+          GroupIterator i = listAll ?
+            ns.connection.listActive(pattern) :
+            ns.connection.listSubscriptions();
+          while (i.hasNext())
+          {
+            Group group = i.nextGroup();
+            NNTPFolder folder = new NNTPFolder(ns, group.getName());
+            acc.add(folder);
+          }
+        }
+        int len = acc.size();
+        Folder[] folders = new Folder[len];
+        acc.toArray(folders);
+        return folders;
+      }
+      catch (StatusResponse e)
+      {
+        switch (e.getStatus())
+        {
+          case NNTPConstants.COMMAND_NOT_RECOGNIZED:
+          case NNTPConstants.SYNTAX_ERROR:
+          case NNTPConstants.INTERNAL_ERROR:
+            return listSubscribed(pattern);
+          default:
+            throw new MessagingException(e.getMessage(), e);
         }
       }
-      int len = acc.size();
-      Folder[] folders = new Folder[len];
-      acc.toArray(folders);
-      return folders;
-    }
-    catch (StatusResponse e)
-    {
-      switch (e.getStatus())
+      catch (IOException e)
       {
-        case NNTPConstants.COMMAND_NOT_RECOGNIZED:
-        case NNTPConstants.SYNTAX_ERROR:
-        case NNTPConstants.INTERNAL_ERROR:
-          return listSubscribed(pattern);
-        default:
-          throw new MessagingException(e.getMessage(), e);
+        throw new MessagingException(e.getMessage(), e);
       }
     }
-    catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
-  }
 
   /**
    * Returns the list of subscribed folders matching the specified pattern.
@@ -123,33 +123,33 @@ final class NNTPRootFolder
    */
   public Folder[] listSubscribed(String pattern)
     throws MessagingException
-  {
-    pattern = pattern.replace('%', '*'); // convert pattern to wildmat
-    // Does the pattern contain any wildcards?
-    boolean hasWildcard = pattern.indexOf('*')>-1;
-    // Does the pattern contain only a wildcard?
-    boolean onlyWildcard = hasWildcard && (pattern.length()==0);
-    
-    NNTPStore ns = (NNTPStore)store;
-    List acc = new LinkedList();
-    Iterator i = ns.newsrc.list();
-    while (i.hasNext())
     {
-      String name = (String)i.next();
-      // Check that name matches pattern
-      if (!onlyWildcard)
+      pattern = pattern.replace('%', '*'); // convert pattern to wildmat
+      // Does the pattern contain any wildcards?
+      boolean hasWildcard = pattern.indexOf('*')>-1;
+      // Does the pattern contain only a wildcard?
+      boolean onlyWildcard = hasWildcard && (pattern.length()==0);
+
+      NNTPStore ns = (NNTPStore)store;
+      List acc = new LinkedList();
+      Iterator i = ns.newsrc.list();
+      while (i.hasNext())
       {
-        if (hasWildcard && matches(name, pattern))
-          acc.add(new NNTPFolder(ns, name));
-        else if (!hasWildcard && pattern.equals(name))
-          acc.add(new NNTPFolder(ns, name));
+        String name = (String)i.next();
+        // Check that name matches pattern
+        if (!onlyWildcard)
+        {
+          if (hasWildcard && matches(name, pattern))
+            acc.add(new NNTPFolder(ns, name));
+          else if (!hasWildcard && pattern.equals(name))
+            acc.add(new NNTPFolder(ns, name));
+        }
       }
+      int len = acc.size();
+      Folder[] folders = new Folder[len];
+      acc.toArray(folders);
+      return folders;
     }
-    int len = acc.size();
-    Folder[] folders = new Folder[len];
-    acc.toArray(folders);
-    return folders;
-  }
 
   /**
    * Implements a subset of wildmat matching on the client side.
@@ -192,28 +192,28 @@ final class NNTPRootFolder
     }
     return true;
   }
-    
+
   /**
    * Returns a new Folder object associated with the specified name.
    */
   public Folder getFolder(String name)
     throws MessagingException
-  {
-    NNTPStore ns = (NNTPStore)store;
-    return new NNTPFolder(ns, name);
-  }
-  
+    {
+      NNTPStore ns = (NNTPStore)store;
+      return new NNTPFolder(ns, name);
+    }
+
   public Folder getParent()
     throws MessagingException
-  {
-    return null;
-  }
+    {
+      return null;
+    }
 
   public boolean exists()
     throws MessagingException
-  {
-    return true;
-  }
+    {
+      return true;
+    }
 
   /**
    * As we're dealing with a flat namespace, the value of this is
@@ -221,9 +221,9 @@ final class NNTPRootFolder
    */
   public char getSeparator()
     throws MessagingException
-  {
-    return '.';
-  }
+    {
+      return '.';
+    }
 
   /**
    * This folder contains only folders.
@@ -235,23 +235,23 @@ final class NNTPRootFolder
 
   public void open(int mode)
     throws MessagingException
-  {
-    // Although we will never actually _be_ open,
-    // it's always good to remind people....
-    if (mode!=READ_ONLY)
-      throw new IllegalWriteException("Folder is read-only");
-  }
+    {
+      // Although we will never actually _be_ open,
+      // it's always good to remind people....
+      if (mode!=READ_ONLY)
+        throw new IllegalWriteException("Folder is read-only");
+    }
 
   public void close(boolean expunge)
     throws MessagingException
-  {
-  }
+    {
+    }
 
   public Message[] expunge()
     throws MessagingException
-  {
-    throw new IllegalWriteException("Folder is read-only");
-  }
+    {
+      throw new IllegalWriteException("Folder is read-only");
+    }
 
   public boolean isOpen()
   {
@@ -265,54 +265,54 @@ final class NNTPRootFolder
 
   public int getMessageCount()
     throws MessagingException
-  {
-    return -1;
-  }
+    {
+      return -1;
+    }
 
   public Message getMessage(int msgnum)
     throws MessagingException
-  {
-    throw new IllegalStateException("Folder not open");
-  }
+    {
+      throw new IllegalStateException("Folder not open");
+    }
 
   /**
    * This folder is always &quot;subscribed&quot;.
    */
   public void setSubscribed(boolean flag)
     throws MessagingException
-  {
-    if (!flag)
-      throw new IllegalWriteException("Can't unsubscribe root folder");
-  }
+    {
+      if (!flag)
+        throw new IllegalWriteException("Can't unsubscribe root folder");
+    }
 
   public boolean hasNewMessages()
     throws MessagingException
-  {
-    return false;
-  }
+    {
+      return false;
+    }
 
   public void appendMessages(Message[] messages)
     throws MessagingException
-  {
-    throw new IllegalWriteException("Folder is read-only");
-  }
+    {
+      throw new IllegalWriteException("Folder is read-only");
+    }
 
   public boolean create(int type)
     throws MessagingException
-  {
-    throw new MessagingException("Folder already exists");
-  }
+    {
+      throw new MessagingException("Folder already exists");
+    }
 
   public boolean delete(boolean flag)
     throws MessagingException
-  {
-    throw new IllegalWriteException("Folder is read-only");
-  }
+    {
+      throw new IllegalWriteException("Folder is read-only");
+    }
 
   public boolean renameTo(Folder folder)
     throws MessagingException
-  {
-    throw new IllegalWriteException("Folder is read-only");
-  }
-  
+    {
+      throw new IllegalWriteException("Folder is read-only");
+    }
+
 }
