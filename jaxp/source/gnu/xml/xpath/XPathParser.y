@@ -457,63 +457,24 @@ unary_expr:
     }
   ;
 
-/*expr_token:
-  LP
-  | RP
-  | LB
-  | RB
-  | DOT
-  | DOUBLE_DOT
-  | AT
-  | COMMA
-  | DOUBLE_COLON
-  | name_test
-  | node_type
-  | operator
-  | function_name
-  | axis_name
-  | LITERAL
-  | number
-  | variable_reference
-  ;*/
-
 number:
   DIGITS
     {
-      $$ = new Integer ((String) $1);
+      $$ = new Double ((String) $1 + ".0");
     }
   | DIGITS DOT
     {
-      $$ = new Double ((String) $1);
+      $$ = new Double ((String) $1 + ".0");
     }
   | DIGITS DOT DIGITS
     {
-      $$ = new Double ((String) $1 + '.' + (String) $3);
+      $$ = new Double ((String) $1 + "." + (String) $3);
     }
   | DOT DIGITS
     {
-      $$ = new Double ('0' + '.' + (String) $2);
+      $$ = new Double ("0." + (String) $2);
     }
   ;
-
-/*operator:
-  AND
-  | OR
-  | MOD
-  | DIV
-  | STAR
-  | SLASH
-  | DOUBLE_SLASH
-  | PIPE
-  | PLUS
-  | MINUS
-  | EQ
-  | NE
-  | LT
-  | LTE
-  | GT
-  | GTE
-  ;*/
 
 function_name:
   qname
@@ -586,10 +547,6 @@ node_type:
       $$ = new Short ((short) 0);
     }
   ;
-
-/*expr_whitespace:
-  S
-  ;*/
 
 %%
 

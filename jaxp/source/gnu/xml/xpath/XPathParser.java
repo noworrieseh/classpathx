@@ -675,80 +675,80 @@ case 71:
     }
   break;
 case 72:
-					// line 482 "XPathParser.y"
+					// line 462 "XPathParser.y"
   {
-      yyVal = new Integer ((String) yyVals[0+yyTop]);
+      yyVal = new Double ((String) yyVals[0+yyTop] + ".0");
     }
   break;
 case 73:
-					// line 486 "XPathParser.y"
+					// line 466 "XPathParser.y"
   {
-      yyVal = new Double ((String) yyVals[-1+yyTop]);
+      yyVal = new Double ((String) yyVals[-1+yyTop] + ".0");
     }
   break;
 case 74:
-					// line 490 "XPathParser.y"
+					// line 470 "XPathParser.y"
   {
-      yyVal = new Double ((String) yyVals[-2+yyTop] + '.' + (String) yyVals[0+yyTop]);
+      yyVal = new Double ((String) yyVals[-2+yyTop] + "." + (String) yyVals[0+yyTop]);
     }
   break;
 case 75:
-					// line 494 "XPathParser.y"
+					// line 474 "XPathParser.y"
   {
-      yyVal = new Double ('0' + '.' + (String) yyVals[0+yyTop]);
+      yyVal = new Double ("0." + (String) yyVals[0+yyTop]);
     }
   break;
 case 77:
-					// line 542 "XPathParser.y"
+					// line 503 "XPathParser.y"
   {
       Object value = bindings.get ((String) yyVals[0+yyTop]);
       yyVal = new Constant (value);
     }
   break;
 case 78:
-					// line 550 "XPathParser.y"
+					// line 511 "XPathParser.y"
   {
       yyVal = new NameTest (null, true, true);
     }
   break;
 case 79:
-					// line 554 "XPathParser.y"
+					// line 515 "XPathParser.y"
   {
       yyVal = new NameTest ((String) yyVals[-2+yyTop], true, false);
     }
   break;
 case 80:
-					// line 558 "XPathParser.y"
+					// line 519 "XPathParser.y"
   {
       yyVal = new NameTest ((String) yyVals[0+yyTop], false, false);
     }
   break;
 case 82:
-					// line 566 "XPathParser.y"
+					// line 527 "XPathParser.y"
   {
       yyVal = (String) yyVals[-2+yyTop] + ':' + (String) yyVals[0+yyTop];
     }
   break;
 case 83:
-					// line 573 "XPathParser.y"
+					// line 534 "XPathParser.y"
   {
       yyVal = new Short (Node.COMMENT_NODE);
     }
   break;
 case 84:
-					// line 577 "XPathParser.y"
+					// line 538 "XPathParser.y"
   {
       yyVal = new Short (Node.TEXT_NODE);
     }
   break;
 case 85:
-					// line 581 "XPathParser.y"
+					// line 542 "XPathParser.y"
   {
       yyVal = new Short (Node.PROCESSING_INSTRUCTION_NODE);
     }
   break;
 case 86:
-					// line 585 "XPathParser.y"
+					// line 546 "XPathParser.y"
   {
       yyVal = new Short ((short) 0);
     }
@@ -1227,7 +1227,7 @@ case 86:
   } /* End of class YyNameClass */
 
 
-					// line 595 "XPathParser.y"
+					// line 552 "XPathParser.y"
 
 }
 					// line 1232 "-"

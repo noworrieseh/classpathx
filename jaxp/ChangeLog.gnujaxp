@@ -1,3 +1,7 @@
+2004-10-18  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: Number parsing fixes.
+   	
 2004-10-17  Chris Burdess  <dog@gnu.org>
 
    	* xpath: XPath function calls.
