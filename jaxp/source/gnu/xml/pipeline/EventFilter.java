@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.14 2001-12-13 19:20:42 db Exp $
+ * $Id: EventFilter.java,v 1.15 2002-03-07 19:06:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -29,7 +29,6 @@ package gnu.xml.pipeline;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Hashtable;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
@@ -126,7 +125,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-12-13 19:20:42 $
+ * @version $Date: 2002-03-07 19:06:46 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -138,8 +137,6 @@ public class EventFilter
     private LexicalHandler		lexHandler, lexNext;
     private DeclHandler			declHandler, declNext;
     // and ideally, one more for the stuff SAX2 doesn't show
-
-    private Hashtable			properties;
 
     private Locator			locator;
     private EventConsumer		next;
@@ -447,7 +444,7 @@ public class EventFilter
 	docNext = next.getContentHandler ();
 	if (docHandler == null)
 	    docHandler = docNext;
-	dtdNext = next.getDTDHandler ();;
+	dtdNext = next.getDTDHandler ();
 	if (dtdHandler == null)
 	    dtdHandler = dtdNext;
 
@@ -549,19 +546,11 @@ public class EventFilter
 		lexHandler = (LexicalHandler) o;
 		return;
 	    }
-
-	    // builtin key that's not settable
-	    if (properties != null && !properties.containsKey (id))
-		throw new SAXNotSupportedException (id);
+	    throw new SAXNotSupportedException (id);
 
 	} catch (ClassCastException e) {
 	    throw new SAXNotSupportedException (id);
-
-	} catch (SAXNotRecognizedException e) {
-	    if (properties == null)
-		properties = new Hashtable (5);
 	}
-	properties.put (id, o);
     }
 
     /** Retrieves a property of unknown intent (usually a handler) */
@@ -573,12 +562,6 @@ public class EventFilter
 	if (LEXICAL_HANDLER.equals (id))
 	    return lexHandler;
 
-	Object	property = null;
-
-	if (properties != null)
-	    property = properties.get (id);
-	if (property != null)
-	    return property;
 	throw new SAXNotRecognizedException (id);
     }
 
