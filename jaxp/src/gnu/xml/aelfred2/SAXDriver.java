@@ -745,13 +745,21 @@ final public class SAXDriver
 	if (namespaces) {
 	    int	index;
 
-	    // default NS declaration?
-	    if ("xmlns" == qname) {
-		declarePrefix ("", value);
-		if (!xmlNames)
-		    return;
-	    }
-
+      // default NS declaration?
+      if (getFeature (FEATURE + "string-interning")) {
+        if ("xmlns" == qname) {
+          declarePrefix ("", value);
+          if (!xmlNames)
+            return;
+        }
+      } else {
+        if ("xmlns".equals(qname)) {
+          declarePrefix ("", value);
+          if (!xmlNames)
+            return;
+        }
+      }
+      
 	    // NS prefix declaration?
 	    else if ((index = qname.indexOf (':')) == 5
 		    && qname.startsWith ("xmlns")) {
@@ -815,9 +823,14 @@ final public class SAXDriver
 		String	qname = (String) attributeNames.elementAt (i);
 		int	index;
 
-		// default NS declaration?
-		if ("xmlns" == qname)
+    // default NS declaration?
+    if (getFeature (FEATURE + "string-interning")) {
+      if ("xmlns" == qname)
 		    continue;
+    } else {
+      if ("xmlns".equals(qname))
+		    continue;
+    }
 
 		index = qname.indexOf (':');
 
@@ -1002,8 +1015,13 @@ final public class SAXDriver
 	if (type == null)
 	    return "CDATA";
 	// ... use DeclHandler.attributeDecl to see enumerations
-	if (type == "ENUMERATION")
-	    return "NMTOKEN";
+    if (getFeature (FEATURE + "string-interning")) {
+      if (type == "ENUMERATION")
+        return "NMTOKEN";
+    } else {
+      if (type.equals("ENUMERATION"))
+        return "NMTOKEN";
+    }
 	return type;
     }
 
