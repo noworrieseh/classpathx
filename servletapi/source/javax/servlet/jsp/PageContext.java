@@ -437,4 +437,17 @@ public abstract class PageContext
    */
   public abstract void include(String urlPath, JspWriter out)
     throws IOException, ServletException, IllegalArgumentException, SecurityException;
+
+  /**
+   * Handle an exception created by the page.
+   */
+  public abstract void handlePageException (Exception e)
+    throws ServletException, IOException;
+
+  /**
+   * Handle an exception created by the page.
+   */
+  public abstract void handlePageException (Throwable t)
+    throws ServletException, IOException;
+
 }
