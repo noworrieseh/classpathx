@@ -1,7 +1,7 @@
 package gnu.crypto.tool;
 
 // ----------------------------------------------------------------------------
-// $Id: CipherSpeed.java,v 1.1.1.1 2001-11-20 13:40:44 raif Exp $
+// $Id: CipherSpeed.java,v 1.2 2001-11-21 19:54:27 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -31,10 +31,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * Exercise a block cipher to measure its performance in terms of bytes
- * encrypted/decrypted per second.
+ * A tool to exercise a block cipher in order to measure its performance in
+ * terms of encrypted/decrypted bytes per second.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class CipherSpeed {
 
