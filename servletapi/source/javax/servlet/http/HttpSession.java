@@ -269,4 +269,12 @@ public interface HttpSession
    */
   HttpSessionContext getSessionContext();
 
+  /**
+   * invalidate all the sessions with this client.
+   * 
+   * @since Servlet API 2.4
+   * @throws IllegalStateException if the session has been invalidated.
+   */
+  void logout();
+
 }
