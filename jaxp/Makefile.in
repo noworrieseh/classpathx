@@ -36,6 +36,7 @@ GCJ = @GCJ@
 #the source files belonging to the project
 
 SOURCEFILES = \
+	$(SOURCEDIR)/javax/xml/parsers/ClassStuff.java \
 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilder.java \
 	$(SOURCEDIR)/javax/xml/parsers/FactoryConfigurationError.java \
@@ -96,8 +97,12 @@ SOURCEFILES = \
 	$(SOURCEDIR)/org/w3c/dom/Notation.java \
 	$(SOURCEDIR)/org/w3c/dom/ProcessingInstruction.java \
 	$(SOURCEDIR)/org/w3c/dom/Text.java \
+	$(SOURCEDIR)/org/xml/sax/ext/Attributes2.java \
+	$(SOURCEDIR)/org/xml/sax/ext/Attributes2Impl.java \
 	$(SOURCEDIR)/org/xml/sax/ext/DeclHandler.java \
 	$(SOURCEDIR)/org/xml/sax/ext/LexicalHandler.java \
+	$(SOURCEDIR)/org/xml/sax/ext/Locator2.java \
+	$(SOURCEDIR)/org/xml/sax/ext/Locator2Impl.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/AttributeListImpl.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/AttributesImpl.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/DefaultHandler.java \
@@ -277,6 +282,7 @@ $(LIBNAME).jar: $(LIBNAME) $(CC-DESTDIR)
 	$(CC-DESTDIR)/META-INF/services/javax.xml.parsers.SAXParserFactory
 	echo -n gnu.xml.dom.JAXPFactory > \
 	$(CC-DESTDIR)/META-INF/services/javax.xml.parsers.DocumentBuilderFactory
+	cp COPYING LICENSE $(CC-DESTDIR)/META-INF
 	cd $(CC-DESTDIR); jar cmf ../manifest.mf ../$(LIBNAME).jar \
 		META-INF gnu org/xml org/w3c javax/xml
 
