@@ -1,0 +1,4 @@
+2004-01-11  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Added javax.* classfiles to jar
+

@@ -48,7 +48,7 @@ classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 # Jar
 
 activation.jar: meta-inf activation
-	$(JAR) cf activation.jar -C $(dst) META-INF -C $(dst) gnu
+	$(JAR) cf activation.jar -C $(dst) META-INF -C $(dst) gnu -C $(dst) javax
 
 meta-inf: $(META_INF_FILES)
 
