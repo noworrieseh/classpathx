@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: TMMH16.java,v 1.1 2002-07-06 23:42:41 raif Exp $
+// $Id: TMMH16.java,v 1.2 2002-07-14 01:41:33 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -64,11 +64,12 @@ import java.util.Map;
  * <p>References:</p>
  *
  * <ol>
- *    <li><a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-tmmh-01.txt">
+ *    <li><a
+      href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-tmmh-01.txt">
  *    The Truncated Multi-Modular Hash Function (TMMH)</a>, David A. McGrew.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TMMH16 extends BaseMac {
 
@@ -77,6 +78,7 @@ public class TMMH16 extends BaseMac {
 
    public static final String TAG_LENGTH = "gnu.crypto.mac.tmmh.tag.length";
    public static final String KEYSTREAM = "gnu.crypto.mac.tmmh.keystream";
+   public static final String PREFIX = "gnu.crypto.mac.tmmh.prefix";
 
    private static final int P = (1 << 16) + 1; // the TMMH/16 prime
 
@@ -85,6 +87,7 @@ public class TMMH16 extends BaseMac {
 
    private int tagWords = 0; // the tagLength expressed in words
    private IRandom keystream = null; // the keystream generator
+   private byte[] prefix; // mask to use when operating as an authentication f.
    private long keyWords; // key words counter
    private long msgLength; // in bytes
    private long msgWords; // should be = msgLength * WORD_LENGTH
@@ -140,23 +143,33 @@ public class TMMH16 extends BaseMac {
 
    public void init(Map attributes)
    throws InvalidKeyException, IllegalStateException {
+      int wantTagLength = 0;
       Integer tagLength = (Integer) attributes.get(TAG_LENGTH); // get tag length
       if (tagLength == null) {
          if (tagWords == 0) { // was never set
             throw new IllegalArgumentException(TAG_LENGTH);
-         } // else reuse
+         } // else re-use
       } else { // check if positive and is divisible by WORD_LENGTH
-         int wantTagLength = tagLength.intValue();
+         wantTagLength = tagLength.intValue();
          if (wantTagLength < 2 || (wantTagLength % 2 != 0)) {
             throw new IllegalArgumentException(TAG_LENGTH);
+         } else if (wantTagLength > (512/8)) { // 512-bits is our maximum
+            throw new IllegalArgumentException(TAG_LENGTH);
          }
-
-         // TODO: should put an upper limit on tag length, say 512 bytes
 
          tagWords = wantTagLength / 2; // init local vars
          K0 = new int[tagWords];
          Ki = new int[tagWords];
          context = new int[tagWords];
+      }
+
+      prefix = (byte[]) attributes.get(PREFIX);
+      if (prefix == null) { // default to all-zeroes
+         prefix = new byte[tagWords * 2];
+      } else { // ensure it's as long as it should
+         if (prefix.length != tagWords * 2) {
+            throw new IllegalArgumentException(PREFIX);
+         }
       }
 
       IRandom prng = (IRandom) attributes.get(KEYSTREAM); // get keystream
@@ -170,7 +183,7 @@ public class TMMH16 extends BaseMac {
 
       reset(); // reset context variables
       for (int i = 0; i < tagWords; i++) { // init starting key words
-         Ki[i] = K0[i] = getNextKeyWord();
+         Ki[i] = K0[i] = getNextKeyWord(keystream);
       }
    }
 
@@ -190,26 +203,12 @@ public class TMMH16 extends BaseMac {
    //
    // where j ranges from 1 to TAG_WORDS.
    public void update(byte b) {
-      Mi <<= 8; // update message buffer
-      Mi |= b & 0xFF;
-      msgLength++; // update message length (bytes)
-      if (msgLength % 2 == 0) { // got a full word
-         msgWords++; // update message words counter
-         System.arraycopy(Ki, 1, Ki, 0, tagWords-1); // 1. shift Ki up by 1
-         Ki[tagWords-1] = getNextKeyWord(); // 2. fill last box of Ki
-         long t; // temp var to allow working in modulo 2^32
-         for (int i = 0; i < tagWords; i++) { // 3. update context
-            t = context[i] & 0xFFFFFFFFL;
-            t += Ki[i] * Mi;
-            context[i] = (int) t;
-         }
-         Mi = 0; // reset message buffer
-      }
+      this.update(b, keystream);
    }
 
    public void update(byte[] b, int offset, int len) {
       for (int i = 0; i < len; i++) {
-         this.update(b[offset + i]);
+         this.update(b[offset + i], keystream);
       }
    }
 
@@ -232,15 +231,7 @@ public class TMMH16 extends BaseMac {
    // The symbol * denotes multiplication and the symbol +32 denotes addition
    // modulo 2^32.
    public byte[] digest() {
-      doFinalRound();
-      byte[] result = new byte[tagWords * 2];
-      for (int i = 0, j = 0; i < tagWords; i++) {
-         result[j++] = (byte)(context[i] >>> 8);
-         result[j++] = (byte) context[i];
-      }
-
-      reset();
-      return result;
+      return this.digest(keystream);
    }
 
    public void reset() {
@@ -262,11 +253,73 @@ public class TMMH16 extends BaseMac {
 
    // own methods -------------------------------------------------------------
 
-   private int getNextKeyWord() {
+   /**
+    * <p>Similar to the same method with one argument, but uses the designated
+    * random number generator to compute needed keying material.</p>
+    *
+    * @param b the byte to process.
+    * @param prng the source of randomness to use.
+    */
+   public void update(byte b, IRandom prng) {
+      Mi <<= 8; // update message buffer
+      Mi |= b & 0xFF;
+      msgLength++; // update message length (bytes)
+      if (msgLength % 2 == 0) { // got a full word
+         msgWords++; // update message words counter
+         System.arraycopy(Ki, 1, Ki, 0, tagWords-1); // 1. shift Ki up by 1
+         Ki[tagWords-1] = getNextKeyWord(prng); // 2. fill last box of Ki
+         long t; // temp var to allow working in modulo 2^32
+         for (int i = 0; i < tagWords; i++) { // 3. update context
+            t = context[i] & 0xFFFFFFFFL;
+            t += Ki[i] * Mi;
+            context[i] = (int) t;
+         }
+         Mi = 0; // reset message buffer
+      }
+   }
+
+   /**
+    * <p>Similar to the same method with three arguments, but uses the
+    * designated random number generator to compute needed keying material.</p>
+    *
+    * @param b the byte array to process.
+    * @param offset the starting offset in <code>b</code> to start considering
+    * the bytes to process.
+    * @param len the number of bytes in <code>b</code> starting from
+    * <code>offset</code> to process.
+    * @param prng the source of randomness to use.
+    */
+   public void update(byte[] b, int offset, int len, IRandom prng) {
+      for (int i = 0; i < len; i++) {
+         this.update(b[offset + i], prng);
+      }
+   }
+
+   /**
+    * <p>Similar to the same method with no arguments, but uses the designated
+    * random number generator to compute needed keying material.</p>
+    *
+    * @param prng the source of randomness to use.
+    * @return the final result of the algorithm.
+    */
+   public byte[] digest(IRandom prng) {
+      doFinalRound(prng);
+      byte[] result = new byte[tagWords * 2];
+      for (int i = 0, j = 0; i < tagWords; i++) {
+         result[j] = (byte)((context[i] >>> 8) ^ prefix[j]);
+         j++;
+         result[j] = (byte)( context[i]        ^ prefix[j]);
+         j++;
+      }
+
+      reset();
+      return result;
+   }
+
+   private int getNextKeyWord(IRandom prng) {
       int result = 0;
       try {
-         result = (keystream.nextByte() & 0xFF) << 8
-                | (keystream.nextByte() & 0xFF);
+         result = (prng.nextByte() & 0xFF) << 8 | (prng.nextByte() & 0xFF);
       } catch (LimitReachedException x) {
          throw new RuntimeException(String.valueOf(x));
       }
@@ -275,10 +328,10 @@ public class TMMH16 extends BaseMac {
       return result;
    }
 
-   private void doFinalRound() {
+   private void doFinalRound(IRandom prng) {
       long limit = msgLength; // formula works on real message length
       while (msgLength % 2 != 0) {
-         update((byte) 0x00);
+         update((byte) 0x00, prng);
       }
       long t;
       for (int i = 0; i < tagWords; i++) {
