@@ -1,9 +1,9 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuRSAPrivateKey.java,v 1.1 2002-01-11 21:21:57 raif Exp $
+// $Id: GnuRSAPrivateKey.java,v 1.2 2002-06-08 05:27:06 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -37,14 +37,18 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 
 /**
- * An object that embodies an RSA private key.<p>
+ * <p>An object that embodies an RSA private key.</p>
  *
- * References:<br>
- * <a href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
- * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
- * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.1 $
+ * <ol>
+ *    <li><a href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
+ *    RSA-PSS Signature Scheme with Appendix, part B.</a><br>
+ *    Primitive specification and supporting documentation.<br>
+ *    Jakob Jonsson and Burt Kaliski.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.2 $
  */
 public class GnuRSAPrivateKey extends GnuRSAKey
 implements PrivateKey, RSAPrivateCrtKey {
@@ -64,10 +68,10 @@ implements PrivateKey, RSAPrivateCrtKey {
    /** The private exponent of an RSA private key. */
    private final BigInteger d;
 
-   /** The first factor’s exponent. */
+   /** The first factor's exponent. */
    private final BigInteger dP;
 
-   /** The second factor’s exponent. */
+   /** The second factor's exponent. */
    private final BigInteger dQ;
 
    /** The CRT (Chinese Remainder Theorem) coefficient. */
@@ -77,7 +81,7 @@ implements PrivateKey, RSAPrivateCrtKey {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial constructor.<p>
+    * <p>Trivial constructor.</p>
     *
     * @param p the modulus first prime divisor.
     * @param p the modulus second prime divisor.
@@ -95,13 +99,13 @@ implements PrivateKey, RSAPrivateCrtKey {
 
       // the exponents dP and dQ are positive integers less than p and q
       // respectively satisfying
-      //    e · dP = 1 (mod p ? 1);
-      //    e · dQ = 1 (mod q ? 1),
+      //    e * dP = 1 (mod p-1);
+      //    e * dQ = 1 (mod q-1),
       dP = e.modInverse(p.subtract(BigInteger.ONE));
       dQ = e.modInverse(q.subtract(BigInteger.ONE));
       // and the CRT coefficient qInv is a positive integer less than p
       // satisfying
-      //    q · qInv = 1 (mod p).
+      //    q * qInv = 1 (mod p).
       qInv = q.modInverse(p);
    }
 
@@ -109,10 +113,10 @@ implements PrivateKey, RSAPrivateCrtKey {
    // -------------------------------------------------------------------------
 
    /**
-    * A class method that takes the output of the <code>encodePrivateKey()</code>
+    * <p>A class method that takes the output of the <code>encodePrivateKey()</code>
     * method of a DSS keypair codec object (an instance implementing
     * {@link gnu.crypto.sig.IKeyPairCodec} for DSS keys, and re-constructs an
-    * instance of this object.<p>
+    * instance of this object.</p>
     *
     * @param k the contents of a previously encoded instance of this object.
     * @exception ArrayIndexOutOfBoundsException if there is not enough bytes,
@@ -135,8 +139,7 @@ implements PrivateKey, RSAPrivateCrtKey {
       return null;
    }
 
-   // java.security.interfaces.RSAPrivateCrtKey interface implementation
-   // -------------------------------------------------------------------------
+   // java.security.interfaces.RSAPrivateCrtKey interface implementation ------
 
    public BigInteger getPublicExponent() {
       return e;
@@ -174,12 +177,11 @@ implements PrivateKey, RSAPrivateCrtKey {
       return getEncoded(IKeyPairCodec.RAW_FORMAT);
    }
 
-   // Other instance methods
-   // -------------------------------------------------------------------------
+   // Other instance methods --------------------------------------------------
 
    /**
-    * Returns the encoded form of this private key according to the designated
-    * format.<p>
+    * <p>Returns the encoded form of this private key according to the
+    * designated format.</p>
     *
     * @param format the desired format identifier of the resulting encoding.
     * @return the byte sequence encoding this key according to the designated
@@ -200,13 +202,13 @@ implements PrivateKey, RSAPrivateCrtKey {
    }
 
    /**
-    * Returns <code>true</code> if the designated object is an instance of this
-    * class and has the same DSS (Digital Signature Standard) parameter values
-    * as this one.<p>
+    * <p>Returns <code>true</code> if the designated object is an instance of
+    * this class and has the same DSS (Digital Signature Standard) parameter
+    * values as this one.</p>
     *
     * @param obj the other non-null DSS key to compare to.
-    * @return <code>true</code> if the designated object is of the same type and
-    * value as this one.
+    * @return <code>true</code> if the designated object is of the same type
+    * and value as this one.
     */
    public boolean equals(Object obj) {
       if (obj == null) {

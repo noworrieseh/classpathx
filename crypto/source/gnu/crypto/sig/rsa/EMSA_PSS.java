@@ -1,9 +1,9 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: EMSA_PSS.java,v 1.3 2002-01-28 01:43:23 raif Exp $
+// $Id: EMSA_PSS.java,v 1.4 2002-06-08 05:27:06 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -35,30 +35,32 @@ import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.util.Util;
 
 import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.util.HashMap;
 
 /**
- * An implementation of the EMSA-PSS encoding/decoding scheme.<p>
+ * <p>An implementation of the EMSA-PSS encoding/decoding scheme.</p>
  *
- * EMSA-PSS coincides with EMSA4 in IEEE P1363a D5 except that EMSA-PSS acts on
- * octet strings and not on bit strings. In particular, the bit lengths of the
- * hash and the salt must be multiples of 8 in EMSA-PSS. Moreover, EMSA4 outputs
- * an integer of a desired bit length rather than an octet string.<p>
+ * <p>EMSA-PSS coincides with EMSA4 in IEEE P1363a D5 except that EMSA-PSS acts
+ * on octet strings and not on bit strings. In particular, the bit lengths of
+ * the hash and the salt must be multiples of 8 in EMSA-PSS. Moreover, EMSA4
+ * outputs an integer of a desired bit length rather than an octet string.</p>
  *
- * EMSA-PSS is parameterized by the choice of hash function Hash and mask
+ * <p>EMSA-PSS is parameterized by the choice of hash function Hash and mask
  * generation function MGF. In this submission, MGF is based on a Hash
  * definition that coincides with the corresponding definitions in IEEE Std
  * 1363-2000, PKCS #1 v2.0, and the draft ANSI X9.44. In PKCS #1 v2.0 and the
  * draft ANSI X9.44, the recommended hash function is SHA-1, while IEEE Std
- * 1363-2000 recommends SHA-1 and RIPEMD-160.<p>
+ * 1363-2000 recommends SHA-1 and RIPEMD-160.</p>
  *
- * References:<br>
- * <a href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
- * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
- * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.3 $
+ * <ol>
+ *    <li><a href="http://www.cosic.esat.kuleuven.ac.be/nessie/workshop/submissions/rsa-pss.zip">
+ *    RSA-PSS Signature Scheme with Appendix, part B.</a><br>
+ *    Primitive specification and supporting documentation.<br>
+ *    Jakob Jonsson and Burt Kaliski.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.4 $
  */
 public class EMSA_PSS implements Cloneable {
 
@@ -89,7 +91,6 @@ public class EMSA_PSS implements Cloneable {
     * Trivial private constructor to enforce use through Factory method.<p>
     *
     * @param hash the message digest instance to use with this scheme instance.
-    * @param sLen the intended length in octets of the salt.
     */
    private EMSA_PSS(IMessageDigest hash) {
       super();
@@ -102,8 +103,8 @@ public class EMSA_PSS implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of this object given a designated name of a hash
-    * function.<p>
+    * <p>Returns an instance of this object given a designated name of a hash
+    * function.</p>
     *
     * @param mdName the canonical name of a hash function.
     * @return an instance of this object configured for use with the designated
@@ -125,10 +126,10 @@ public class EMSA_PSS implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * The encoding operation EMSA-PSS-Encode computes the hash of a message
+    * <p>The encoding operation EMSA-PSS-Encode computes the hash of a message
     * <code>M</code> using a hash function and maps the result to an encoded
     * message <code>EM</code> of a specified length using a mask generation
-    * function.<p>
+    * function.</p>
     *
     * @param mHash the byte sequence resulting from applying the message digest
     * algorithm Hash to the message <i>M</i>.
@@ -144,7 +145,7 @@ public class EMSA_PSS implements Cloneable {
       int sLen = salt.length;
 
       // 1. If the length of M is greater than the input limitation for the hash
-      // function (2**61 ? 1 octets for SHA-1) then output “message too long”
+      // function (2**61 - 1 octets for SHA-1) then output "message too long"
       // and stop.
       // 2. Let mHash = Hash(M), an octet string of length hLen.
       if (hLen != mHash.length) {
@@ -202,9 +203,9 @@ public class EMSA_PSS implements Cloneable {
    }
 
    /**
-    * The decoding operation EMSA-PSS-Decode recovers the message hash from an
-    * encoded message <code>EM</code> and compares it to the hash of
-    * <code>M</code>.<p>
+    * <p>The decoding operation EMSA-PSS-Decode recovers the message hash from
+    * an encoded message <code>EM</code> and compares it to the hash of
+    * <code>M</code>.</p>
     *
     * @param mHash the byte sequence resulting from applying the message digest
     * algorithm Hash to the message <i>M</i>.
@@ -327,17 +328,17 @@ public class EMSA_PSS implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * A mask generation function takes an octet string of variable length and a
-    * desired output length as input, and outputs an octet string of the desired
-    * length. There may be restrictions on the length of the input and output
-    * octet strings, but such bounds are generally very large. Mask generation
-    * functions are deterministic; the octet string output is completely
-    * determined by the input octet string. The output of a mask generation
-    * function should be pseudorandom, that is, it should be infeasible to
-    * predict, given one part of the output but not the input, another part of
-    * the output. The provable security of RSA-PSS relies on the random nature
-    * of the output of the mask generation function, which in turn relies on the
-    * random nature of the underlying hash function.<p>
+    * <p>A mask generation function takes an octet string of variable length
+    * and a desired output length as input, and outputs an octet string of the
+    * desired length. There may be restrictions on the length of the input and
+    * output octet strings, but such bounds are generally very large. Mask
+    * generation functions are deterministic; the octet string output is
+    * completely determined by the input octet string. The output of a mask
+    * generation function should be pseudorandom, that is, it should be
+    * infeasible to predict, given one part of the output but not the input,
+    * another part of the output. The provable security of RSA-PSS relies on
+    * the random nature of the output of the mask generation function, which in
+    * turn relies on the random nature of the underlying hash function.</p>
     *
     * @param Z a seed.
     * @param l the desired output length in octets.
