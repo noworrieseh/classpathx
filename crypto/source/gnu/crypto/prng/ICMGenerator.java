@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.1.1.1 2001-11-20 13:40:42 raif Exp $
+// $Id: ICMGenerator.java,v 1.2 2001-11-21 19:55:05 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -47,7 +47,7 @@ import java.util.Map;
  * <a href="../draft-mcgrew-saag-icm-00.txt">Integer Counter Mode</a>, David A.
  * McGrew
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ICMGenerator extends BasePRNG {
 
@@ -113,7 +113,7 @@ public class ICMGenerator extends BasePRNG {
 
    /** Trivial 0-arguments constructor. */
    public ICMGenerator() {
-      super("icm");
+      super(PRNGFactory.ICM_PRNG);
    }
 
    // Class methods
