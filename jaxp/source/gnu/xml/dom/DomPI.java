@@ -1,0 +1,130 @@
+/*
+ * $Id: DomPI.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * Copyright (C) 1999-2000 David Brownell
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+package gnu.xml.dom;
+
+import org.w3c.dom.*;
+
+
+// $Id: DomPI.java,v 1.1 2001-06-20 21:30:05 db Exp $
+
+/**
+ * <p> "ProcessingInstruction" (PI) implementation.
+ * This is a non-core DOM class, supporting the "XML" feature. </p>
+ *
+ * <p> Unlike other DOM APIs in the "XML" feature, this one fully
+ * exposes the functionality it describes.  So there is no reason
+ * inherent in DOM to avoid using this API, unless you want to rely
+ * on NOTATION declarations to associate meaning with your PIs;
+ * there is no vendor-neutal way to record those notations in DOM.</p>
+ *
+ * <p> Also of note is that PI support is part of SAX, so that XML
+ * systems using PIs can choose among multiple APIs. </p>
+ *
+ * @see DomNotation
+ *
+ * @author David Brownell 
+ * @version $Date: 2001-06-20 21:30:05 $
+ */
+public class DomPI extends DomNode implements ProcessingInstruction
+{
+    private String	target;
+    private String	data;
+
+
+    /**
+     * Constructs a ProcessingInstruction node associated with the
+     * specified document, with the specified data.
+     *
+     * <p>This constructor should only be invoked by a Document object as
+     * part of its createProcessingInstruction functionality, or through
+     * a subclass which is similarly used in a "Sub-DOM" style layer. 
+     */
+    protected DomPI (Document owner, String target, String data)
+    {
+	super (owner, PROCESSING_INSTRUCTION_NODE);
+	this.target = target;
+	this.data = data;
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the target of the processing instruction.
+     */
+    final public String getTarget ()
+    {
+	return target;
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the target of the processing instruction
+     * (same as getTarget).
+     */
+    final public String getNodeName ()
+    {
+	return target;
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the data associated with the processing instruction.
+     */
+    final public String getData ()
+    {
+	return data;
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the data associated with the processing instruction
+     * (same as getData).
+     */
+    final public String getNodeValue ()
+    {
+	return data;
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Assigns the data associated with the processing instruction;
+     * same as setNodeValue.
+     */
+    final public void setData (String data)
+    {
+	setNodeValue (data);
+    }
+
+
+    /**
+     * <b>DOM L1</b>
+     * Assigns the data associated with the processing instruction.
+     */
+    final public void setNodeValue (String data)
+    {
+	if (isReadonly ())
+	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
+	this.data = data;
+    }
+}
