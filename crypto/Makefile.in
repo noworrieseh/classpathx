@@ -62,12 +62,21 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/prng/MDGenerator.java \
 	$(SOURCEDIR)/gnu/crypto/prng/PRNGFactory.java \
 	\
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSKey.java \
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSKeyPairGenerator.java \
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSKeyPairRawCodec.java \
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSPrivateKey.java \
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSPublicKey.java \
+	$(SOURCEDIR)/gnu/crypto/sig/dss/DSSSignature.java \
+	\
 	$(SOURCEDIR)/gnu/crypto/tool/CipherSpeed.java \
+	$(SOURCEDIR)/gnu/crypto/tool/HashSpeed.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NessieCipherTVEmitter.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NessieHashTVEmitter.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NistKat.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NistMCT.java \
 	\
+	$(SOURCEDIR)/gnu/crypto/util/Prime.java \
 	$(SOURCEDIR)/gnu/crypto/util/Util.java
 
 TESTFILES = \
@@ -101,6 +110,11 @@ TESTFILES = \
 	$(SOURCEDIR)/test/prng/AllTests.java \
 	$(SOURCEDIR)/test/prng/TestOfICMGenerator.java \
 	$(SOURCEDIR)/test/prng/TestOfPRNGFactory.java \
+	\
+	$(SOURCEDIR)/test/sig/dss/AllTests.java \
+	$(SOURCEDIR)/test/sig/dss/TestOfDSSCodec.java \
+	$(SOURCEDIR)/test/sig/dss/TestOfDSSKeyGeneration.java \
+	$(SOURCEDIR)/test/sig/dss/TestOfDSSSignature.java \
 
 PKGFILES =
 
@@ -191,6 +205,9 @@ lib/$(LIBNAME)-doc.zip:
 		\
 		-group "GNU Crypto Algorithms" \
 		"gnu.crypto.cipher:gnu.crypto.hash:gnu.crypto.mode:gnu.crypto.pad:gnu.crypto.prng" \
+		\
+		-group "GNU Crypto Signature Schemes" \
+		"gnu.crypto.sig" \
 		\
 		-group "GNU Crypto Tools" \
 		"gnu.crypto.tool" \
