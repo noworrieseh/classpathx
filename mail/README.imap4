@@ -3,6 +3,22 @@ performance and to remove the Scheme-interpreter dependency.
 
 It uses a generic IMAPConnection object to manage the IMAP protocol level.
 
+Features:
+- all IMAP4rev1 commands except UID (and NOOP)
+- BODYSTRUCTURE fetches for remote MIME body part handling
+- CRAM-MD5 authentication mechanism
+- ANSI coloured debug output! (whoops, need to make that a session flag)
+- currently tested against UW imapd and GNU mailutils imapd
+
+Todo:
+- implement message/* body parts
+- test Part.getContent/getDataHandler when activation is working
+- handle store notifications
+- write the UID code and make IMAPFolder implement UIDFolder
+- test against as many IMAP servers as possible
+- write more authentication mechanisms
+- implement protection mechanisms (encrypted communications)
+
 This provider is still under active development: use at your own risk!
 
 If you want to help get it stable, please contact dog@gnu.org

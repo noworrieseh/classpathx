@@ -58,7 +58,7 @@ public class IMAPConnection implements IMAPConstants
   /**
    * The encoding used to create strings for IMAP commands.
    */
-  protected static final String DEFAULT_ENCODING = "US-ASCII";
+  protected static final String US_ASCII = "US-ASCII";
 
   /**
    * The socket used for communication with the server.
@@ -125,7 +125,7 @@ public class IMAPConnection implements IMAPConstants
       .append('\r')
       .append('\n')
       .toString()
-      .getBytes(DEFAULT_ENCODING);
+      .getBytes(US_ASCII);
     out.write(bytes);
   }
 
@@ -256,11 +256,11 @@ public class IMAPConnection implements IMAPConstants
       {
         try
         {
-          byte[] s = secret.getBytes(DEFAULT_ENCODING); // TODO encoding?
-          byte[] c0 = response.getText().getBytes(DEFAULT_ENCODING);
+          byte[] s = secret.getBytes(US_ASCII); // TODO encoding?
+          byte[] c0 = response.getText().getBytes(US_ASCII);
           byte[] c1 = BASE64.decode(c0); // challenge
           byte[] digest = hmac_md5(s, c1);
-          byte[] r0 = username.getBytes(DEFAULT_ENCODING); // username
+          byte[] r0 = username.getBytes(US_ASCII); // username
           byte[] r1 = new byte[r0.length+digest.length+1]; // response
           System.arraycopy(r0, 0, r1, 0, r0.length); // add username
           r1[r0.length] = 0x20; // SPACE
@@ -789,8 +789,9 @@ public class IMAPConnection implements IMAPConstants
       {
         if (id==OK)
         {
-          int[] mn = new int[numbers.size()];
-          for (int i=0; i<mn.length; i++)
+          int len = numbers.size();
+          int[] mn = new int[len];
+          for (int i=0; i<len; i++)
             mn[i] = ((Integer)numbers.get(i)).intValue();
           return mn;
         }
@@ -800,10 +801,69 @@ public class IMAPConnection implements IMAPConstants
     }
   }
 
-  public void search()
+  /**
+   * Searches the currently selected mailbox for messages matching the
+   * specified criteria.
+   */
+  public int[] search(String charset, String[] criteria)
     throws IOException
   {
-    // TODO
+    String tag = newTag();
+    StringBuffer buffer = new StringBuffer(SEARCH);
+    buffer.append(' ');
+    if (charset!=null)
+    {
+      buffer.append(charset);
+      buffer.append(' ');
+    }
+    for (int i=0; i<criteria.length; i++)
+    {
+      if (i>0)
+        buffer.append(' ');
+      buffer.append(criteria[i]);
+    }
+    sendCommand(tag, buffer.toString());
+    List list = new ArrayList();
+    while (true)
+    {
+      IMAPResponse response = readResponse();
+      String id = response.getID();
+      if (response.isUntagged())
+      {
+        if (id==SEARCH)
+        {
+          String text = response.getText();
+          try
+          {
+            int si = text.indexOf(' ');
+            while (si!=-1)
+            {
+              list.add(new Integer(text.substring(0, si)));
+              text = text.substring(si+1);
+              si = text.indexOf(' ');
+            }
+            list.add(new Integer(text));
+          }
+          catch (NumberFormatException e)
+          {
+            throw new IMAPException(id, "Expecting number: "+text);
+          }
+        }
+      }
+      else if (response.isTagged())
+      {
+        if (id==OK)
+        {
+          int len = list.size();
+          int[] mn = new int[len];
+          for (int i=0; i<len; i++)
+            mn[i] = ((Integer)list.get(i)).intValue();
+          return mn;
+        }
+        else
+          throw new IMAPException(id, response.getText());
+      }
+    }
   }
 
   /**

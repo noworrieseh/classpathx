@@ -117,6 +117,43 @@ public interface IMAPConstants
   public static final String RFC822_HEADER = "RFC822.HEADER".intern();
   public static final String RFC822_SIZE = "RFC822.SIZE".intern();
   public static final String RFC822_TEXT = "RFC822.TEXT".intern();
+
+  // Search criteria
+  public static final String SEARCH_ALL = "ALL";
+  public static final String SEARCH_ANSWERED = "ANSWERED";
+  public static final String SEARCH_BCC = "BCC";
+  public static final String SEARCH_BEFORE = "BEFORE";
+  public static final String SEARCH_BODY = "BODY";
+  public static final String SEARCH_CC = "CC";
+  public static final String SEARCH_DELETED = "DELETED";
+  public static final String SEARCH_DRAFT = "DRAFT";
+  public static final String SEARCH_FLAGGED = "FLAGGED";
+  public static final String SEARCH_FROM = "FROM";
+  public static final String SEARCH_HEADER = "HEADER";
+  public static final String SEARCH_KEYWORD = "KEYWORD";
+  public static final String SEARCH_LARGER = "LARGER";
+  public static final String SEARCH_NEW = "NEW";
+  public static final String SEARCH_NOT = "NOT";
+  public static final String SEARCH_OLD = "OLD";
+  public static final String SEARCH_ON = "ON";
+  public static final String SEARCH_OR = "OR";
+  public static final String SEARCH_RECENT = "RECENT";
+  public static final String SEARCH_SEEN = "SEEN";
+  public static final String SEARCH_SENTBEFORE = "SENTBEFORE";
+  public static final String SEARCH_SENTON = "SENTON";
+  public static final String SEARCH_SENTSINCE = "SENTSINCE";
+  public static final String SEARCH_SINCE = "SINCE";
+  public static final String SEARCH_SMALLER = "SMALLER";
+  public static final String SEARCH_SUBJECT = "SUBJECT";
+  public static final String SEARCH_TEXT = "TEXT";
+  public static final String SEARCH_TO = "TO";
+  public static final String SEARCH_UID = "UID";
+  public static final String SEARCH_UNANSWERED = "UNANSWERED";
+  public static final String SEARCH_UNDELETED = "UNDELETED";
+  public static final String SEARCH_UNDRAFT = "UNDRAFT";
+  public static final String SEARCH_UNFLAGGED = "UNFLAGGED";
+  public static final String SEARCH_UNKEYWORD = "UNKEYWORD";
+  public static final String SEARCH_UNSEEN = "UNSEEN";
   
   // NIL
   public static final String NIL = "NIL".intern();

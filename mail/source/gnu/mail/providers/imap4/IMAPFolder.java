@@ -29,8 +29,12 @@ package gnu.mail.providers.imap4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import javax.mail.Address;
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -43,6 +47,30 @@ import javax.mail.Store;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.FolderEvent;
 import javax.mail.internet.MimeMessage;
+
+import javax.mail.search.AddressStringTerm;
+import javax.mail.search.AddressTerm;
+import javax.mail.search.AndTerm;
+import javax.mail.search.BodyTerm;
+import javax.mail.search.ComparisonTerm;
+import javax.mail.search.DateTerm;
+import javax.mail.search.FlagTerm;
+import javax.mail.search.FromStringTerm;
+import javax.mail.search.FromTerm;
+import javax.mail.search.HeaderTerm;
+import javax.mail.search.IntegerComparisonTerm;
+import javax.mail.search.MessageIDTerm;
+import javax.mail.search.MessageNumberTerm;
+import javax.mail.search.NotTerm;
+import javax.mail.search.OrTerm;
+import javax.mail.search.ReceivedDateTerm;
+import javax.mail.search.RecipientStringTerm;
+import javax.mail.search.RecipientTerm;
+import javax.mail.search.SearchTerm;
+import javax.mail.search.SentDateTerm;
+import javax.mail.search.SizeTerm;
+import javax.mail.search.StringTerm;
+import javax.mail.search.SubjectTerm;
 
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
@@ -77,6 +105,8 @@ public class IMAPFolder
   protected int messageCount = -1;
 
   protected int newMessageCount = -1;
+
+  private static DateFormat searchdf = new SimpleDateFormat("d-MMM-yyyy");
 
   /**
    * Constructor.
@@ -643,6 +673,265 @@ public class IMAPFolder
     catch (IOException e)
     {
       throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * IMAP search function.
+   */
+  public Message[] search(SearchTerm term)
+    throws MessagingException
+  {
+    return search(term, null);
+  }
+
+  /**
+   * IMAP search function.
+   */
+  public Message[] search(SearchTerm term, Message[] msgs)
+    throws MessagingException
+  {
+    List list = new ArrayList();
+    if (msgs!=null)
+    {
+      // <message set>
+      StringBuffer buffer = new StringBuffer();
+      for (int i=0; i<msgs.length; i++)
+      {
+        int msgnum = msgs[i].getMessageNumber();
+        if (i>0)
+          buffer.append(',');
+        buffer.append(msgnum);
+      }
+      list.add(buffer.toString());
+    }
+    addTerm(term, list);
+    String[] criteria = new String[list.size()];
+    list.toArray(criteria);
+    try
+    {
+      int[] mn = null;
+      IMAPConnection connection = ((IMAPStore)store).connection;
+      synchronized (connection)
+      {
+        mn = connection.search(null, criteria);
+      }
+      Message[] messages = new Message[mn.length];
+      for (int i=0; i<mn.length; i++)
+        messages[i] = new IMAPMessage(this, mn[i]);
+      // Enforce final constraints
+      return super.search(term, messages);
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Possibly recursive search term add function.
+   * Note that this is not sufficient to enforce all the constraints imposed
+   * by the SearchTerm structures - this is why we finally call
+   * <code>super.search()</code> in the search method.
+   */
+  private void addTerm(SearchTerm term, List list)
+  {
+    if (term instanceof AndTerm)
+    {
+      SearchTerm[] terms = ((AndTerm)term).getTerms();
+      for (int i=0; i<terms.length; i++)
+        addTerm(terms[i], list);
+    }
+    else if (term instanceof OrTerm)
+    {
+      list.add(SEARCH_OR);
+      SearchTerm[] terms = ((OrTerm)term).getTerms();
+      for (int i=0; i<terms.length; i++)
+        addTerm(terms[i], list);
+    }
+    else if (term instanceof NotTerm)
+    {
+      list.add(SEARCH_NOT);
+      addTerm(((NotTerm)term).getTerm(), list);
+    }
+    else if (term instanceof FlagTerm)
+    {
+      FlagTerm ft = (FlagTerm)term;
+      Flags f = ft.getFlags();
+      boolean set = ft.getTestSet();
+      // System flags
+      Flags.Flag[] sf = f.getSystemFlags();
+      for (int i=0; i<sf.length; i++)
+      {
+        Flags.Flag ff = sf[i];
+        if (ff==Flags.Flag.ANSWERED)
+          list.add(set ? SEARCH_ANSWERED : SEARCH_UNANSWERED);
+        else if (ff==Flags.Flag.DELETED)
+          list.add(set ? SEARCH_DELETED : SEARCH_UNDELETED);
+        else if (ff==Flags.Flag.DRAFT)
+          list.add(set ? SEARCH_DRAFT : SEARCH_UNDRAFT);
+        else if (ff==Flags.Flag.FLAGGED)
+          list.add(set ? SEARCH_FLAGGED : SEARCH_UNFLAGGED);
+        else if (ff==Flags.Flag.RECENT)
+          list.add(set ? SEARCH_RECENT : SEARCH_OLD);
+        else if (ff==Flags.Flag.SEEN)
+          list.add(set ? SEARCH_SEEN : SEARCH_UNSEEN);
+      }
+      // Keywords
+      String[] uf = f.getUserFlags();
+      for (int i=0; i<uf.length; i++)
+      {
+        StringBuffer keyword = new StringBuffer();
+        keyword.append(set ? SEARCH_KEYWORD : SEARCH_UNKEYWORD);
+        keyword.append('"');
+        keyword.append(uf[i]);
+        keyword.append('"');
+        list.add(keyword.toString());
+      }
+    }
+    else if (term instanceof AddressTerm)
+    {
+      Address address = ((AddressTerm)term).getAddress();
+      StringBuffer criterion = new StringBuffer();
+      if (term instanceof FromTerm)
+        criterion.append(SEARCH_FROM);
+      else if (term instanceof RecipientTerm)
+      {
+        Message.RecipientType type = ((RecipientTerm)term).getRecipientType();
+        if (type==Message.RecipientType.TO)
+          criterion.append(SEARCH_TO);
+        else if (type==Message.RecipientType.CC)
+          criterion.append(SEARCH_CC);
+        else if (type==Message.RecipientType.BCC)
+          criterion.append(SEARCH_BCC);
+        else
+          criterion = null;
+      }
+      else
+        criterion = null;
+      if (criterion!=null)
+      {
+        criterion.append(' ');
+        criterion.append('"');
+        criterion.append(address.toString());
+        criterion.append('"');
+        list.add(criterion.toString());
+      }
+    }
+    else if (term instanceof ComparisonTerm)
+    {
+      if (term instanceof DateTerm)
+      {
+        DateTerm dt = (DateTerm)term;
+        Date date = dt.getDate();
+        int comparison = dt.getComparison();
+        StringBuffer criterion = new StringBuffer();
+        switch (comparison)
+        {
+          case ComparisonTerm.NE:
+          case ComparisonTerm.GE:
+          case ComparisonTerm.LE:
+            criterion.append(SEARCH_NOT);
+            criterion.append(' ');
+        }
+        if (term instanceof SentDateTerm)
+          criterion.append("SENT");
+        switch (comparison)
+        {
+          case ComparisonTerm.EQ:
+          case ComparisonTerm.NE:
+            criterion.append(SEARCH_ON);
+            break;
+          case ComparisonTerm.LT:
+          case ComparisonTerm.GE:
+            criterion.append(SEARCH_BEFORE);
+            break;
+          case ComparisonTerm.GT:
+          case ComparisonTerm.LE:
+            criterion.append(SEARCH_SINCE);
+            break;
+        }
+        criterion.append(' ');
+        criterion.append(searchdf.format(date));
+        list.add(criterion.toString());
+      }
+      else if (term instanceof IntegerComparisonTerm)
+      {
+        IntegerComparisonTerm it = (IntegerComparisonTerm)term;
+        int number = it.getNumber();
+        int comparison = it.getComparison();
+        if (term instanceof SizeTerm)
+        {
+          StringBuffer criterion = new StringBuffer();
+          switch (comparison)
+          {
+            case ComparisonTerm.EQ:
+            case ComparisonTerm.GE:
+            case ComparisonTerm.LE:
+              criterion.append(SEARCH_NOT);
+              criterion.append(' ');
+          }
+          switch (comparison)
+          {
+            case ComparisonTerm.EQ:
+            case ComparisonTerm.NE:
+              criterion.append(SEARCH_OR);
+              criterion.append(' ');
+              criterion.append(SEARCH_SMALLER);
+              criterion.append(' ');
+              criterion.append(number);
+              criterion.append(' ');
+              criterion.append(SEARCH_LARGER);
+              criterion.append(' ');
+              criterion.append(number);
+              break;
+            case ComparisonTerm.LT:
+            case ComparisonTerm.GE:
+              criterion.append(SEARCH_SMALLER);
+              criterion.append(' ');
+              criterion.append(number);
+              break;
+            case ComparisonTerm.GT:
+            case ComparisonTerm.LE:
+              criterion.append(SEARCH_LARGER);
+              criterion.append(' ');
+              criterion.append(number);
+              break;
+          }
+          list.add(criterion.toString());
+        }
+      }
+    }
+    else if (term instanceof StringTerm)
+    {
+      String pattern = ((StringTerm)term).getPattern();
+      StringBuffer criterion = new StringBuffer();
+      if (term instanceof BodyTerm)
+        criterion.append(SEARCH_BODY);
+      else if (term instanceof HeaderTerm)
+      {
+        criterion.append(SEARCH_HEADER);
+        criterion.append(' ');
+        criterion.append(((HeaderTerm)term).getHeaderName());
+      }
+      else if (term instanceof SubjectTerm)
+        criterion.append(SEARCH_SUBJECT);
+      else if (term instanceof MessageIDTerm)
+      {
+        criterion.append(SEARCH_HEADER);
+        criterion.append(' ');
+        criterion.append("Message-ID");
+      }
+      else
+        criterion=null; // TODO StringAddressTerms?
+      if (criterion!=null)
+      {
+        criterion.append(' ');
+        criterion.append('"');
+        criterion.append(pattern);
+        criterion.append('"');
+        list.add(criterion.toString());
+      }
     }
   }
 
