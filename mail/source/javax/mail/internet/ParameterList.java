@@ -77,14 +77,14 @@ public class ParameterList
           {
             if (type != 0x3b) // ';'
               {
-                throw new ParseException(s);
+                throw new ParseException("expected ';': " + s);
               }
             
             token = ht.next();
             type = token.getType();
             if (type != HeaderTokenizer.Token.ATOM)
               {
-                throw new ParseException(s);
+                throw new ParseException("expected parameter name: " + s);
               }
             String key = token.getValue().toLowerCase();
             
@@ -92,7 +92,7 @@ public class ParameterList
             type = token.getType();
             if (type != 0x3d) // '='
               {
-                throw new ParseException(s);
+                throw new ParseException("expected '=': " + s);
               }
             
             token = ht.next();
@@ -100,7 +100,7 @@ public class ParameterList
             if (type != HeaderTokenizer.Token.ATOM && 
                 type != HeaderTokenizer.Token.QUOTEDSTRING)
               {
-                throw new ParseException(s);
+                throw new ParseException("expected parameter value: " + s);
               }
             String value = token.getValue();
 

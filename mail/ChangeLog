@@ -2,6 +2,8 @@
 
 	* Makefile.am: Fixed relative META-INF.
 	* all: Reformatted according to GNU Classpath guidelines. 
+	* ContentType.java,ParameterList.java: Parse exception message
+	details cause of exception (#103447).
 
 2004-12-04  Chris Burdess  <dog@gnu.org>
 

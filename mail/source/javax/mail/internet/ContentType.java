@@ -87,18 +87,18 @@ public class ContentType
     HeaderTokenizer.Token token = ht.next();
     if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException();
+        throw new ParseException("expected primary type: " + s);
       }
     primaryType = token.getValue();
     token = ht.next();
     if (token.getType() != 0x2f) // '/'
       {
-        throw new ParseException();
+        throw new ParseException("expected '/': " + s);
       }
     token = ht.next();
     if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException();
+        throw new ParseException("expected subtype: " + s);
       }
     subType = token.getValue();
     s = ht.getRemainder();
