@@ -97,6 +97,8 @@ public final class Session
     this.authenticator = authenticator;
     if (new Boolean(props.getProperty("mail.debug")).booleanValue())
       debug = true;
+    if (debug)
+      System.out.println("DEBUG: using GNU JavaMail");
     ClassLoader loader = null;
     if (authenticator == null)
       loader = getClass().getClassLoader();

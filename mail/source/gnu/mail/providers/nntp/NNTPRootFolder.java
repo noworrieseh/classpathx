@@ -74,6 +74,7 @@ final class NNTPRootFolder
   public Folder[] list(String pattern)
     throws MessagingException
   {
+    pattern = pattern.replace('%', '*'); // convert pattern to wildmat
     try
     {
       NNTPStore ns = (NNTPStore)store;
@@ -81,7 +82,6 @@ final class NNTPRootFolder
       boolean listAll = ns.isListAll();
       
       List acc = new LinkedList();
-      pattern = pattern.replace('%', '*'); // convert pattern to wildmat
       synchronized (ns.connection)
       {
         GroupIterator i = listAll ?
@@ -124,8 +124,11 @@ final class NNTPRootFolder
   public Folder[] listSubscribed(String pattern)
     throws MessagingException
   {
-    // Convert pattern to regexp
-    // TODO
+    pattern = pattern.replace('%', '*'); // convert pattern to wildmat
+    // Does the pattern contain any wildcards?
+    boolean hasWildcard = pattern.indexOf('*')>-1;
+    // Does the pattern contain only a wildcard?
+    boolean onlyWildcard = hasWildcard && (pattern.length()==0);
     
     NNTPStore ns = (NNTPStore)store;
     List acc = new LinkedList();
@@ -133,12 +136,14 @@ final class NNTPRootFolder
     while (i.hasNext())
     {
       String name = (String)i.next();
-      
-      // Check that name matches regexp
-      // TODO
-      
-      NNTPFolder folder = new NNTPFolder(ns, name);
-      acc.add(folder);
+      // Check that name matches pattern
+      if (!onlyWildcard)
+      {
+        if (hasWildcard && matches(name, pattern))
+          acc.add(new NNTPFolder(ns, name));
+        else if (!hasWildcard && pattern.equals(name))
+          acc.add(new NNTPFolder(ns, name));
+      }
     }
     int len = acc.size();
     Folder[] folders = new Folder[len];
@@ -146,6 +151,48 @@ final class NNTPRootFolder
     return folders;
   }
 
+  /**
+   * Implements a subset of wildmat matching on the client side.
+   * This is necessary for newsgroup matching from newsrc lists.
+   */
+  boolean matches(String name, String pattern)
+  {
+    int i1 = pattern.indexOf('*');
+    int pn = 0, pp = 0;
+    while (i1>-1)
+    {
+      if (i1>0)
+      {
+        String ps = pattern.substring(pp, i1);
+        int len = ps.length();
+        String ns = name.substring(pn, len);
+        if (!ps.equals(ns))
+          return false;
+        pp = i1+1;
+        pn += len;
+        i1 = 0;
+      }
+      else
+      {
+        pp = i1+1;
+        i1 = pattern.indexOf('*', pp);
+        String ps = null;
+        if (i1==-1)
+          ps = pattern.substring(pp);
+        else
+          ps = pattern.substring(pp, i1);
+        int len = ps.length();
+        if (len>0)
+        {
+          String ns = name.substring(pn, len);
+          if (!ps.equals(ns))
+            return false;
+        }
+      }
+    }
+    return true;
+  }
+    
   /**
    * Returns a new Folder object associated with the specified name.
    */
