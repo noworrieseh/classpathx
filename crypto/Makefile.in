@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.in,v 1.7 2002-08-14 16:01:58 raif Exp $
+## $Id: Makefile.in,v 1.8 2002-08-15 12:20:31 raif Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -318,6 +318,7 @@ clean:
 	-rm -rf lib/$(LIBNAME)* $(CC-DESTDIR) docs/api
 	-rm -rf $(LIBNAME)-*.zip
 	-rm -rf $(LIBNAME)-*.tar.*
+	-rm -rf $(LIBNAME)-*.md5
 
 # must rerun configure after this
 distclean:	clean
