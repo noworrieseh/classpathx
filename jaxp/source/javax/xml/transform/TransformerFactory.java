@@ -1,5 +1,5 @@
 /*
- * $Id: TransformerFactory.java,v 1.5 2001-11-02 22:07:45 db Exp $
+ * $Id: TransformerFactory.java,v 1.6 2004-02-05 22:51:03 avdyk Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -96,7 +96,7 @@ public abstract class TransformerFactory {
 	    try {
 		return (TransformerFactory) ClassStuff.createFactory (
 			"javax.xml.transform.TransformerFactory",
-			"com.icl.saxon.TransformerFactoryImpl"
+			"gnu.xml.libxmlj.transform.TransformerFactoryImpl"
 			// "gnu.xml.util.SAXNullTransformerFactory"
 			// "org.apache.xalan.processor.TransformerFactoryImpl"
 			);
