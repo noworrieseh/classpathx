@@ -24,6 +24,7 @@
 		<echo>
 Available targets are:
 compile --> compiles the source code
+check   --> checks the style of the source code
 release	--> package into release
 clean	--> cleans the build directory
 javadoc	--> build JavaDoc
@@ -42,6 +43,25 @@ javadoc	--> build JavaDoc
 				<pathelement location="${libsrc}"/> 
 			</classpath>
 		</javac>		
+	
+	</target>
+
+
+	<!--************************************************************-->
+	<!-- check target **********************************************-->
+	<!--************************************************************-->
+
+	<taskdef name="checkstyle"
+		classname="com.puppycrawl.tools.checkstyle.CheckStyleTask"/>
+
+	<target name="check" depends="init">
+		<checkstyle allowTabs="yes" allowProtected="yes"
+				headerFile="source/header"
+				paramPattern="^[a-z][a-zA-Z0-9]*$"
+				staticPattern="^[a-z][a-zA-Z0-9]*$"
+				memberPattern="^[a-z][a-zA-Z0-9]*$">
+			<fileset dir="${src}" includes="**/*.java"/>
+		</checkstyle>		
 	
 	</target>
 	
