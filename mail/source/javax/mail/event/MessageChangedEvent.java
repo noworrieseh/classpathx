@@ -1,91 +1,88 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessageChangedEvent.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Message;
 
 /**
- * Message Changed Event.
+ * This class models Message change events.
  */
-public class MessageChangedEvent extends MailEvent {
+public class MessageChangedEvent 
+  extends MailEvent
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The message's flags changed.
+   */
+  public static final int FLAGS_CHANGED = 1;
 
-	/**
-	 * Flags changed type.
-	 */
-	public static final int	FLAGS_CHANGED		= 1;
+  /**
+   * The message's envelope (headers, but not body) changed.
+   */
+  public static final int ENVELOPE_CHANGED = 2;
 
-	/**
-	 * Envelope changed type.
-	 */
-	public static final int	ENVELOPE_CHANGED	= 2;
+  /**
+   * The event type.
+   */
+  protected int type;
 
-	/**
-	 * Connection type of event.
-	 */
-	protected		int	type		= -1;
+  /**
+   * The message that changed.
+   */
+  protected transient Message msg;
 
-	/**
-	 * Message.
-	 */
-	protected transient	Message	msg		= null;
+  /**
+   * Constructor.
+   * @param source The folder that owns the message
+   * @param type The change type
+   * @param msg The changed message
+   */
+  public MessageChangedEvent(Object source, int type, Message msg)
+  {
+    super(source);
+    this.msg = msg;
+    this.type = type;
+  }
 
+  /**
+   * Return the type of this event.
+   */
+  public int getMessageChangeType()
+  {
+    return type;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the changed Message.
+   */
+  public Message getMessage()
+  {
+    return msg;
+  }
 
-	/**
-	 * Create new message changed event.
-	 * @param source Source of event
-	 * @param type Message changed type
-	 * @param message Message
-	 */
-	public MessageChangedEvent(Object source, int type, Message message) {
-		super(source);
-		this.type = type;
-		this.msg = message;
-	} // MessageChangedEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Dispatch event to listener
-	 * @param listener Listener to notify
-	 */
-	public void dispatch(Object listener) {
-
-		// Check for MessageChanged Listener
-		if (listener instanceof MessageChangedListener) {
-			((MessageChangedListener) listener).messageChanged(this);
-		} // if
-
-	} // dispatch()
-
-	/**
-	 * Get message change type.
-	 * @returns MessageChange type
-	 */
-	public int getMessageChangeType() {
-		return type;
-	} // getMessageChangeType()
-
-	/**
-	 * Get message.
-	 * @returns Message
-	 */
-	public Message getMessage() {
-		return msg;
-	} // getMessage()
-
-
-} // MessageChangedEvent
+  /**
+   * Invokes the appropriate MessageChangedListener method.
+   */
+  public void dispatch(Object listener)
+  {
+    ((MessageChangedListener)listener).messageChanged(this);
+  }
+  
+}

@@ -1,184 +1,134 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessagingException.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
 /**
- * A Provider object describes the information regarding a protocol
- * implementation.
- * @author	Andrew Selkirk
- * @version	1.0
+ * The Provider is a class that describes a protocol implementation.
+ * The values come from the javamail.providers &amp; 
+ * javamail.default.providers resource files.
  */
-public class Provider {
+public class Provider
+{
 
-	//-------------------------------------------------------------
-	// Classes ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * This inner class defines the Provider type.
+   * Currently, STORE and TRANSPORT are the only two provider types supported.
+   */
+  public static class Type
+  {
 
-	/**
-	 * Type of Provider.  Currently, STORE and TRANSPORT are the
-	 * only two defined types of providers.
-	 */
-	public static class Type {
+    public static final Type STORE = new Type("Store");
+    public static final Type TRANSPORT = new Type("Transport");
 
-		public static final Type STORE     = new Type("STORE");
-		public static final Type TRANSPORT = new Type("TRANSPORT");
+    private String type;
 
-		/**
-		 * Type identifier
-		 */
-		private	String	type	= null;
+    private Type(String type)
+    {
+      this.type = type;
+    }
+    
+  }
 
-		/**
-		 * Create new Type.
-		 * @param value String representation of Type
-		 */
-		private Type(String value) {
-			type = value;
-		} // Type()
+  private Type type;
+  private String protocol;
+  private String className;
+  private String vendor;
+  private String version;
 
+  Provider(Type type, 
+      String protocol, String className, String vendor, String version)
+  {
+    this.type = type;
+    this.protocol = protocol;
+    this.className = className;
+    this.vendor = vendor;
+    this.version = version;
+  }
 
-	} // Type
+  /**
+   * Returns the type of this Provider.
+   */
+  public Type getType()
+  {
+    return type;
+  }
 
+  /**
+   * Returns the protocol supported by this Provider.
+   */
+  public String getProtocol()
+  {
+    return protocol;
+  }
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Returns the name of the class that implements the protocol.
+   */
+  public String getClassName()
+  {
+    return className;
+  }
 
-	/**
-	 * Provider type.
-	 */
-	private	Type	type		= null;
+  /**
+   * Returns name of vendor associated with this implementation.
+   * May be null.
+   */
+  public String getVendor()
+  {
+    return vendor;
+  }
 
-	/**
-	 * Provider protocol.
-	 */
-	private	String	protocol	= null;
+  /**
+   * Returns version of this implementation or null if no version.
+   */
+  public String getVersion()
+  {
+    return version;
+  }
 
-	/**
-	 * Provider class name.
-	 */
-	private String	className	= null;
-
-	/**
-	 * Provider vendor information.
-	 */
-	private	String	vendor		= null;
-
-	/**
-	 * Provider version information.
-	 */
-	private	String	version		= null;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Create new Provider
-	 */
-	Provider(Type type, String protocol, String className,
-			String vendor, String version) {
-		this.type = type;
-		this.protocol = protocol;
-		this.className = className;
-		this.vendor = vendor;
-		this.version = version;
-	} // Provider()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get string representation of Provider.
-	 * @returns String representation
-	 */
-	public String toString() {
-
-		// Variables
-		StringBuffer	output;
-
-		// Add Provider class to output
-		output = new StringBuffer(getClass().getName() + "[");
-
-		// Add Type to Output
-		if (type == Type.STORE) {
-			output.append("STORE");
-		} else {
-			output.append("TRANSPORT");
-		}
-
-		// Add Protocol
-		if (protocol != null) {
-			output.append("," + protocol);
-		}
-
-		// Add Class Name
-		if (className != null) {
-			output.append("," + className);
-		}
-
-		// Add Vendor
-		if (vendor != null) {
-			output.append("," + vendor);
-		}
-
-		// Add Version
-		if (version != null) {
-			output.append("," + version);
-		}
-
-		// Close off output
-		output.append("]");
-
-		// Return Result
-		return output.toString();
-
-	} // toString()
-
-	/**
-	 * Get provider type.
-	 * @returns Provider type
-	 */
-	public Type getType() {
-		return type;
-	} // getType()
-
-	/**
-	 * Get provider protocol.
-	 * @returns Protocol
-	 */
-	public String getProtocol() {
-		return protocol;
-	} // getProtocol()
-
-	/**
-	 * Get provider version.
-	 * @returns Version information
-	 */
-	public String getVersion() {
-		return version;
-	} // getVersion()
-
-	/**
-	 * Get provider class name.
-	 * @returns Class name
-	 */
-	public String getClassName() {
-		return className;
-	} // getClassName()
-
-	/**
-	 * Get vendor information.
-	 * @returns Vendor information
-	 */
-	public String getVendor() {
-		return vendor;
-	} // getVendor()
-
-
-} // Provider
+  /**
+   * Overrides Object.toString()
+   */
+  public String toString()
+  {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("javax.mail.Provider[");
+    if (type==Type.STORE)
+      buffer.append("STORE,");
+    else if (type==Type.TRANSPORT)
+      buffer.append("TRANSPORT,");
+    buffer.append(protocol);
+    buffer.append(',');
+    buffer.append(className);
+    if (vendor!=null)
+    {
+      buffer.append(',');
+      buffer.append(vendor);
+    }
+    if (version!=null)
+    {
+      buffer.append(',');
+      buffer.append(version);
+    }
+    buffer.append("]");
+    return buffer.toString();
+  }
+  
+}

@@ -1,64 +1,71 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * NotTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
 import javax.mail.Message;
 
 /**
- * Not Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements the logical NEGATION operator.
  */
-public final class NotTerm extends SearchTerm {
+public final class NotTerm
+  extends SearchTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The search term to negate.
+   */
+  protected SearchTerm term;
 
-	/**
-	 * Term to negate.
-	 */
-	protected	SearchTerm	term	= null;
+  public NotTerm(SearchTerm t)
+  {
+    term = t;
+  }
 
+  /**
+   * Return the term to negate.
+   */
+  public SearchTerm getTerm()
+  {
+    return term;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  public boolean match(Message msg)
+  {
+    return !term.match(msg);
+  }
 
-	/**
-	 * Create a new Search Term.
-	 * @param term Term to negate
-	 */
-	public NotTerm(SearchTerm term) {
-		this.term = term;
-	} // NotTerm()
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return (other instanceof NotTerm &&
+      ((NotTerm)other).term.equals(term));
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get term to negate.
-	 * @returns Search term
-	 */
-	public SearchTerm getTerm() {
-		return term;
-	} // getTerm()
-
-	/**
-	 * Match Search Term.
-	 * @param message Message to match
-	 */
-	public boolean match(Message message) {
-		if (term.match(message) == true) {
-			return false;
-		}
-		return true;
-	} // match()
-
-
-} // NotTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return term.hashCode() << 1;
+  }
+  
+}

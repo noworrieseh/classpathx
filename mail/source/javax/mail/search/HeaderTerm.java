@@ -1,79 +1,103 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * HeaderTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Message;
 
 /**
- * Header Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for Message headers.
+ * The comparison is case-insensitive.
  */
-public final class HeaderTerm extends StringTerm {
+public final class HeaderTerm
+  extends StringTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The name of the header.
+   */
+  protected String headerName;
 
-	private	String	headerName;
+  /**
+   * Constructor.
+   * @param headerName The name of the header
+   * @param pattern The pattern to search for
+   */
+  public HeaderTerm(String headerName, String pattern)
+  {
+    super(pattern);
+    this.headerName = headerName;
+  }
 
+  /**
+   * Return the name of the header to compare with.
+   */
+  public String getHeaderName()
+  {
+    return headerName;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The header match method.
+   * @param msg The match is applied to this Message's header
+   * @return true if the match succeeds, otherwise false
+   */
+  public boolean match(Message msg)
+  {
+    try
+    {
+      String[] headers = msg.getHeader(headerName);
+      if (headers!=null)
+      {
+        for (int i = 0; i<headers.length; i++)
+        {
+          if (super.match(headers[i]))
+            return true;
+        }
+      }
+    }
+    catch (Exception e)
+    {
+    }
+    return false;
+  }
 
-	/**
-	 * Create a new Header Term.
-	 * @param headerName Header name
-	 * @param pattern Search pattern
-	 */
-	public HeaderTerm(String headerName, String pattern) {
-		super(pattern, true);
-		this.headerName = headerName;
-	} // HeaderTerm()
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    if (other instanceof HeaderTerm)
+    {
+      HeaderTerm ht = (HeaderTerm)other;
+      return ht.headerName.equalsIgnoreCase(headerName) &&
+        super.equals(ht);
+    }
+    return false;
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	public String getHeaderName() {
-		return headerName;
-	} // getHeaderName()
-
-	/**
-	 * Do Message match.
-	 * @param Address Message to check
-	 * @returns true if match, false otherwise
-	 */
-	public boolean match(Message message) {
-
-		// Variables
-		String[]	headerList;
-		int			index;
-
-		try {
-
-			// Get List of Headers
-			headerList = message.getHeader(headerName);
-
-			// Process Each Header
-			for (index = 0; index < headerList.length; index++) {
-				if (match(headerList[index]) == true) {
-					return true;
-				} // if
-			} // for
-
-		} catch (MessagingException e) {
-		} // try
-
-		// Unable to Locate Pattern
-		return false;
-
-	} // match()
-
-
-} // HeaderTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return headerName.toLowerCase().hashCode() + super.hashCode();
+  }
+  
+}

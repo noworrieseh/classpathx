@@ -1,47 +1,50 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * Address.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
+import java.io.Serializable;
+
 /**
- * Address
+ * This abstract class models the addresses in a message.
+ * Subclasses provide specific implementations.
+ * Subclasses will typically be serializable so that (for example)
+ * the use of Address objects in search terms can be serialized 
+ * along with the search terms.
  */
-public abstract class Address {
+public abstract class Address
+  implements Serializable
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return a type string that identifies this address type.
+   */
+  public abstract String getType();
 
-	/**
-	 * Create new Address.
-	 */
-	public Address() {
-	} // Address()
+  /**
+   * Return a String representation of this address object.
+   */
+  public abstract String toString();
 
+  /**
+   * The equality operator.
+   */
+  public abstract boolean equals(Object obj);
 
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Check Equality.
-	 * @param object Object to compare against
-	 * @returns true if equal, false otherwise
-	 */
-	public abstract boolean equals(Object object);
-
-	/**
-	 * Get string representation of Address.
-	 * @returns String
-	 */
-	public abstract String toString();
-
-	/**
-	 * Get address type.
-	 * @returns Address type
-	 */
-	public abstract String getType();
-
-
-} // Address
+}

@@ -1,85 +1,116 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * AndTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
 import javax.mail.Message;
 
 /**
- * And Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements the logical AND operator on individual SearchTerms.
  */
-public final class AndTerm extends SearchTerm {
+public final class AndTerm
+  extends SearchTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The array of terms on which the AND operator should be applied.
+   */
+  protected SearchTerm[] terms;
 
-	/**
-	 * List of terms.
-	 */
-	protected	SearchTerm[]	terms	= null;
+  /**
+   * Constructor that takes two terms.
+   * @param t1 first term
+   * @param t2 second term
+   */
+  public AndTerm(SearchTerm t1, SearchTerm t2)
+  {
+    terms = new SearchTerm[2];
+    terms[0] = t1;
+    terms[1] = t2;
+  }
 
+  /**
+   * Constructor that takes an array of SearchTerms.
+   * @param t array of terms
+   */
+  public AndTerm(SearchTerm[] t)
+  {
+    terms = new SearchTerm[t.length];
+    System.arraycopy(t, 0, terms, 0, t.length);
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the search terms.
+   */
+  public SearchTerm[] getTerms()
+  {
+    return (SearchTerm[])terms.clone();
+  }
 
-	/**
-	 * Create a new Search Term.
-	 * @param term1 Term 1
-	 * @param term2 Term 2
-	 */
-	public AndTerm(SearchTerm term1, SearchTerm term2) {
-		terms = new SearchTerm[2];
-		terms[0] = term1;
-		terms[1] = term2;
-	} // AndTerm()
+  /**
+   * The AND operation.
+   * <p>
+   * The terms specified in the constructor are applied to the given object 
+   * and the AND operator is applied to their results.
+   * @param msg The specified SearchTerms are applied to this Message 
+   * and the AND operator is applied to their results.
+   * @return true if the AND succeds, otherwise false
+   */
+  public boolean match(Message message)
+  {
+    for (int i = 0; i<terms.length; i++)
+    {
+      if (!terms[i].match(message))
+        return false;
+    }
+    return true;
+  }
 
-	/**
-	 * Create a new Search Term.
-	 * @param terms List of terms
-	 */
-	public AndTerm(SearchTerm[] terms) {
-		this.terms = terms;
-	} // AndTerm()
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    if (other instanceof AndTerm)
+    {
+      AndTerm andterm = (AndTerm)other;
+      if (andterm.terms.length!=terms.length)
+        return false;
+      for (int i = 0; i<terms.length; i++)
+      {
+        if (!terms[i].equals(andterm.terms[i]))
+          return false;
+      }
+      return true;
+    }
+    return false;
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get terms.
-	 * @returns List of search terms
-	 */
-	public SearchTerm[] getTerms() {
-		return terms;
-	} // getTerms()
-
-	/**
-	 * Match Search Term.
-	 * @param message Message to match
-	 */
-	public boolean match(Message message) {
-
-		// Variables
-		int	index;
-
-		// Check each term
-		for (index = 0; index < terms.length; index++) {
-			if (terms[index].match(message) == false) {
-				return false;
-			} // if
-		} // for
-
-		// Valid
-		return true;
-
-	} // match()
-
-
-} // AndTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    int acc = 0;
+    for (int i = 0; i<terms.length; i++)
+      acc += terms[i].hashCode();
+    return acc;
+  }
+  
+}

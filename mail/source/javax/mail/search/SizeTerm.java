@@ -1,49 +1,68 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * SizeTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Message;
 
 /**
- * Size Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for Message sizes.
  */
-public final class SizeTerm extends IntegerComparisonTerm {
+public final class SizeTerm
+  extends IntegerComparisonTerm
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Constructor.
+   * @param comparison the Comparison type
+   * @param size the size
+   */
+  public SizeTerm(int comparison, int size)
+  {
+    super(comparison, size);
+  }
 
-	/**
-	 * Create a new Size Term.
-	 * @param comparison Comparison type
-	 * @param size Size to check
-	 */
-	public SizeTerm(int comparison, int size) {
-		super(comparison, size);
-	} // SizeTerm()
+  /**
+   * The match method.
+   * @param msg the size comparator is applied to this Message's size
+   * @return true if the size is equal, otherwise false
+   */
+  public boolean match(Message msg)
+  {
+    try
+    {
+      int size = msg.getSize();
+      if (size!=-1)
+        return super.match(size);
+    }
+    catch (Exception e)
+    {
+    }
+    return false;
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Match search term
-	 * @param message Message to match
-	 * @returns true if match, false otherwise
-	 */
-	public boolean match(Message message) {
-		try {
-			return match(((Part) message).getSize());
-		} catch (Exception e) {
-		}
-		return false;
-	} // match()
-
-
-} // SizeTerm
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return (other instanceof SizeTerm && super.equals(other));
+  }
+  
+}

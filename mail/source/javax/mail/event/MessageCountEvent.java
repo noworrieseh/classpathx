@@ -1,122 +1,132 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessageCountEvent.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Folder;
+import javax.mail.Message;
 
 /**
- * Message Count Event.
+ * This class notifies changes in the number of messages in a folder.
+ * <p>
+ * Note that some folder types may only deliver MessageCountEvents at certain
+ * times or after certain operations. IMAP in particular will only notify the
+ * client of MessageCountEvents when a client issues a new command. Refer to 
+ * RFC 2060 http://www.ietf.org/rfc/rfc2060.txt for details. 
+ * A client may want "poll" the folder by occasionally calling the 
+ * <code>getMessageCount</code> or <code>isConnected</code> methods
+ * to solicit any such notifications.
  */
-public class MessageCountEvent extends MailEvent {
+public class MessageCountEvent
+  extends MailEvent
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The messages were added to their folder
+   */
+  public static final int ADDED = 1;
 
-	/**
-	 * Message added.
-	 */
-	public static final int	ADDED		= 1;
+  /**
+   * The messages were removed from their folder
+   */
+  public static final int REMOVED = 2;
 
-	/**
-	 * Message removed.
-	 */
-	public static final int	REMOVED		= 2;
+  /**
+   * The event type.
+   */
+  protected int type;
 
-	/**
-	 * Message count type.
-	 */
-	protected		int		type		= -1;
+  /**
+   * If true, this event is the result of an explicit expunge by this client,
+   * and the messages in this folder have been renumbered to account for this.
+   * If false, this event is the result of an expunge by external sources.
+   */
+  protected boolean removed;
 
-	/**
-	 * Message removed?
-	 */
-	protected		boolean		removed		= false;
+  /**
+   * The messages.
+   */
+  protected transient Message[] msgs;
 
-	/**
-	 * Messages
-	 */
-	protected transient	Message[]	msgs	= null;
+  /**
+   * Constructor.
+   * @param source The containing folder
+   * @param type The event type
+   * @param removed If true, this event is the result of an explicit expunge by
+   * this client, and the messages in this folder have been renumbered to
+   * account for this. If false, this event is the result of an expunge by
+   * external sources.
+   * @param msgs The messages added/removed
+   */
+  public MessageCountEvent(Folder source, int type, boolean removed, 
+      Message[] msgs)
+  {
+    super(source);
+    this.type = type;
+    this.removed = removed;
+    this.msgs = msgs;
+  }
 
+  /**
+   * Return the type of this event.
+   */
+  public int getType()
+  {
+    return type;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Indicates whether this event is the result of an explicit expunge by this
+   * client, or due to an expunge from external sources. If true, this event is
+   * due to an explicit expunge and hence all remaining messages in this folder
+   * have been renumbered. If false, this event is due to an external expunge.
+   * <p>
+   * Note that this method is valid only if the type of this event is REMOVED
+   */
+  public boolean isRemoved()
+  {
+    return removed;
+  }
 
-	/**
-	 * Create a new message count event.
-	 * @param folder Source
-	 * @param type Message count type
-	 * @param removed Message removed
-	 * @param msgs Messages
-	 */
-	public MessageCountEvent(Folder folder, int type,
-				boolean removed, Message[] msgs) {
-		super(folder);
-		this.type = type;
-		this.removed = removed;
-		this.msgs = msgs;
-	} // MessageCountEvent()
+  /**
+   * Return the array of messages added or removed.
+   */
+  public Message[] getMessages()
+  {
+    return msgs;
+  }
 
+  /**
+   * Invokes the appropriate MessageCountListener method.
+   */
+  public void dispatch(Object listener)
+  {
+    MessageCountListener l = (MessageCountListener)listener;
+    switch (type)
+    {
+      case ADDED:
+        l.messagesAdded(this);
+        break;
+      case REMOVED:
+        l.messagesRemoved(this);
+        break;
+    }
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Dispatch event to listener
-	 * @param listener Listener to notify
-	 */
-	public void dispatch(Object listener) {
-
-		// Variables
-		MessageCountListener mcListener;
-
-		// Get Message Count Listener
-		if (listener instanceof MessageCountListener) {
-			mcListener = (MessageCountListener) listener;
-		} else {
-			return;
-		}
-
-		// Check Type
-		switch (type) {
-			case ADDED:
-				mcListener.messageAdded(this);
-				break;
-			case REMOVED:
-				mcListener.messageRemoved(this);
-				break;
-		} // switch
-
-	} // dispatch()
-
-	/**
-	 * Get message count type.
-	 * @returns Message count type
-	 */
-	public int getType() {
-		return type;
-	} // getType()
-
-	/**
-	 * Get messages.
-	 * @returns List of messages
-	 */
-	public Message[] getMessages() {
-		return msgs;
-	} // getMessages()
-
-	/**
-	 * Determine if removed.
-	 * @returns true is removed, false otherwise
-	 */
-	public boolean isRemoved() {
-		return removed;
-	} // isRemoved()
-
-
-} // MessageCountEvent
+}

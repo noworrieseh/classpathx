@@ -1,125 +1,119 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * Authenticator.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
-// Imports
 import java.net.InetAddress;
 
 /**
- * Authenticator.
- * @author	Andrew Selkirk
- * @version	1.0
+ * The class Authenticator represents an object that knows how to obtain
+ * authentication for a network connection.
+ * Usually, it will do this by prompting the user for information.
+ * <p>
+ * Applications use this class by creating a subclass, and registering an
+ * instance of that subclass with the session when it is created.
+ * When authentication is required, the system will invoke a method on the
+ * subclass (like getPasswordAuthentication). The subclass's method can
+ * query about the authentication being requested with a number of inherited
+ * methods (getRequestingXXX()), and form an appropriate message for the
+ * user.
+ * <p>
+ * All methods that request authentication have a default implementation that
+ * fails.
  */
-public abstract class Authenticator {
+public abstract class Authenticator
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  private String defaultUserName;
+  private int requestingPort = -1;
+  private String requestingPrompt;
+  private String requestingProtocol;
+  private InetAddress requestingSite;
 
-	private	InetAddress		requestingSite		= null;
-	private	int				requestingPort		= -1;
-	private	String			requestingProtocol	= null;
-	private String			requestingPrompt	= null;
-	private	String			requestingUserName	= null;
+  final PasswordAuthentication requestPasswordAuthentication(
+      InetAddress requestingSite, 
+      int requestingPort, 
+      String requestingProtocol, 
+      String requestingPrompt, 
+      String defaultUserName)
+  {
+    this.requestingSite = requestingSite;
+    this.requestingPort = requestingPort;
+    this.requestingProtocol = requestingProtocol;
+    this.requestingPrompt = requestingPrompt;
+    this.defaultUserName = defaultUserName;
+    return getPasswordAuthentication();
+  }
 
+  /**
+   * Returns the default user name given by the requestor.
+   */
+  protected final String getDefaultUserName()
+  {
+    return defaultUserName;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Called when password authentication is needed.
+   * Subclasses should override the default implementation, which returns null.
+   * <p>
+   * Note that if this method uses a dialog to prompt the user for this
+   * information, the dialog needs to block until the user supplies the
+   * information. This method can not simply return after showing the dialog.
+   */
+  protected PasswordAuthentication getPasswordAuthentication()
+  {
+    return null;
+  }
 
-	public Authenticator() {
-	} // Authenticator()
+  /**
+   * Returns the port for the requested connection.
+   */
+  protected final int getRequestingPort()
+  {
+    return requestingPort;
+  }
 
+  /**
+   * Returns the prompt string given by the requestor.
+   */
+  protected final String getRequestingPrompt()
+  {
+    return requestingPrompt;
+  }
 
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Returns the protocol requesting the connection.
+   * Often this will be based on a URLName.
+   */
+  protected final String getRequestingProtocol()
+  {
+    return requestingProtocol;
+  }
 
-	/**
-	 * Reset entries.
-	 */
-	private void reset() {
-		requestingSite     = null;
-		requestingPort     = -1;
-		requestingProtocol = null;
-		requestingPrompt   = null;
-		requestingUserName = null;
-	} // reset()
+  /**
+   * Returns the address of the site requesting authorization,
+   * or null if not available.
+   */
+  protected final InetAddress getRequestingSite()
+  {
+    return requestingSite;
+  }
 
-	/**
-	 * Get password authentication object.
-	 * @returns default null
-	 */
-	protected PasswordAuthentication getPasswordAuthentication() {
-		return null;
-	} // getPasswordAuthentication()
-
-	/**
-	 * Get default user name.
-	 * @returns Default username
-	 */
-	protected final String getDefaultUserName() {
-		return requestingUserName;
-	} // getDefaultUserName()
-
-	/**
-	 * Get requesting port.
-	 * @returns Port number
-	 */
-	protected final int getRequestingPort() {
-		return requestingPort;
-	} // getRequestingPort()
-
-	/**
-	 * Get requesting prompt.
-	 * @returns Prompt
-	 */
-	protected final String getRequestingPrompt() {
-		return requestingPrompt;
-	} // getRequestingPrompt()
-
-	/**
-	 * Get requesting protocol.
-	 * @returns Protocol
-	 */
-	protected final String getRequestingProtocol() {
-		return requestingProtocol;
-	} // getRequestingProtocol()
-
-	/**
-	 * Get requesting site.
-	 * @returns InetAddress
-	 */
-	protected final InetAddress getRequestingSite() {
-		return requestingSite;
-	} // getRequestingSite()
-
-	/**
-	 * Get password authentication.
-	 */
-	final PasswordAuthentication requestPasswordAuthentication(
-					InetAddress	address,
-					int			port,
-					String		protocol,
-					String		prompt,
-					String		userName) {
-
-		// Reset Entries
-		reset();
-
-		// Set Properties
-		requestingSite		= address;
-		requestingPort		= port;
-		requestingProtocol	= protocol;
-		requestingPrompt	= prompt;
-		requestingUserName	= userName;
-
-		// Generate Password Authentication
-		return getPasswordAuthentication();
-
-	} // requestPasswordAuthentication()
-
-
-} // Authenticator
+}

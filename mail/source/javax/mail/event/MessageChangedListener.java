@@ -1,26 +1,36 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessageChangeListener.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
 import java.util.EventListener;
 
 /**
- * Message Changed Listener Interface.
+ * This is the Listener interface for MessageChanged events.
  */
-public interface MessageChangedListener extends EventListener {
+public interface MessageChangedListener
+  extends EventListener
+{
 
-	//-------------------------------------------------------------
-	// Interface: MessageChangedListener --------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a message is changed.
+   */
+  public void messageChanged(MessageChangedEvent e);
 
-	/**
-	 * Message changed event.
-	 * @param event MessageChanged event
-	 */
-	public abstract void messageChanged(MessageChangedEvent event);
-
-
-} // MessageChangedListener
+}

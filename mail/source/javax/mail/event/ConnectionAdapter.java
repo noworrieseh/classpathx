@@ -1,49 +1,55 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * ConnectionAdapter.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
 /**
- * Connection Adapter
+ * The adapter which receives connection events. 
+ * The methods in this class are empty; this class is provided 
+ * as a convenience for easily creating listeners by extending this class 
+ * and overriding only the methods of interest.
  */
-public abstract class ConnectionAdapter implements ConnectionListener {
+public abstract class ConnectionAdapter
+  implements ConnectionListener
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a Store/Folder/Transport is opened.
+   */
+  public void opened(ConnectionEvent e)
+  {
+  }
 
-	/**
-	 * Create a new Connection Adapter.
-	 */
-	public ConnectionAdapter() {
-	} // ConnectionAdapter()
+  /**
+   * Invoked when a Store is disconnected.
+   * Note that a folder cannot be disconnected, so a folder will not fire 
+   * this event.
+   */
+  public void disconnected(ConnectionEvent e)
+  {
+  }
 
+  /**
+   * Invoked when a Store/Folder/Transport is closed.
+   */
+  public void closed(ConnectionEvent e)
+  {
+  }
 
-	//-------------------------------------------------------------
-	// Interface: ConnectionListener ------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Connection closed.
-	 * @param event Connection event
-	 */
-	public void closed(ConnectionEvent event) {
-	} // closed()
-
-	/**
-	 * Connection disconnected.
-	 * @param event Connection event
-	 */
-	public void disconnected(ConnectionEvent event) {
-	} // disconnected()
-
-	/**
-	 * Connection opened.
-	 * @param event Connection event
-	 */
-	public void opened(ConnectionEvent event) {
-	} // opened()
-
-
-} // ConnectionAdapter
+}

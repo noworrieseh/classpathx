@@ -1,108 +1,88 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessageContext.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
 /**
- * The context that a particular part of a message is contained.
- * Generate from MessageAware objects.
- * @author	Andrew Selkirk
- * @version	1.0
+ * The context in which a piece of Message content is contained. 
+ * A MessageContext object is returned by the <code>getMessageContext</code>
+ * method of the MessageAware interface. MessageAware is typically 
+ * implemented by DataSources to allow a DataContentHandler to pass on 
+ * information about the context in which a data content object is operating.
  */
-public class MessageContext {
+public class MessageContext
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The Part to describe.
+   */
+  private Part part;
 
-	/**
-	 * Message Context Part.
-	 */
-	private	Part	part	= null;
+  /**
+   * Create a MessageContext object describing the context of the given Part.
+   */
+  public MessageContext(Part part)
+  {
+    this.part = part;
+  }
 
+  /**
+   * Return the Part that contains the content. May be null.
+   */
+  public Part getPart()
+  {
+    return part;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the Message that contains the content.
+   * Follows the parent chain up through containing Multipart objects 
+   * until it comes to a Message object, or null.
+   */
+  public Message getMessage()
+  {
+    Part p = part;
+    while (p!=null)
+    {
+      if (p instanceof Message)
+        return (Message)p;
+      if (p instanceof BodyPart)
+      {
+        BodyPart bp = (BodyPart)p;
+        Multipart mp = bp.getParent();
+        p = mp.getParent();
+      }
+      else
+        p = null;
+    }
+    return null;
+  }
 
-	/**
-	 * Create a new Message Context from part.
-	 * @param part Part
-	 */
-	public MessageContext(Part part) {
-		this.part = part;
-	} // MessageContext()
+  /**
+   * Return the Session we're operating in.
+   */
+  public Session getSession()
+  {
+    Message message = getMessage();
+    if (message!=null)
+      return message.session;
+    return null;
+  }
 
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get message.
-	 * @returns Message
-	 */
-	public Message getMessage() {
-		try {
-			return getMessage(part);
-		} catch (Exception e) {
-		}
-		return null;
-	} // getMessage()
-
-	/**
-	 * Get message.
-	 * @param part Part
-	 * @returns Message
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	private static Message getMessage(Part part)
-			throws MessagingException {
-
-		// Check for Message part
-		if (part instanceof Message) {
-			return (Message) part;
-
-		// Check for Multipart
-		} else if (part instanceof Multipart &&
-			   ((Multipart) part).getParent() != null) {
-			return getMessage(((Multipart) part).getParent());
-		}
-
-		// Unable to locate message, return null
-		return null;
-
-	} // getMessage()
-
-	/**
-	 * Get part.
-	 * @returns Part
-	 */
-	public Part getPart() {
-		return part;
-	} // getPart()
-
-	/**
-	 * Get session.
-	 * @returns Session
-	 */
-	public Session getSession() {
-
-		// Variables
-		Message	message;
-
-		// This technique of accessing the protected
-		// session property of message is the only
-		// way I can connect a Part object to a Session.
-
-		// Locate Message
-		message = getMessage();
-
-		// If Exists, look for Session
-		return message.session;
-
-	} // getSession()
-
-
-} // MessageContext
+}

@@ -1,5 +1,5 @@
 /*
- * ComparisonTerm.java
+ * ReadOnlyFolderException.java
  * Copyright (C) 2001 dog <dog@dog.net.uk>
  * 
  * This library is free software; you can redistribute it and/or
@@ -17,44 +17,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package javax.mail.search;
+package javax.mail;
 
 /**
- * This class models the comparison operator.
- * This is an abstract class; subclasses implement comparisons 
- * for different datatypes.
+ * This exception is thrown when an attempt is made to open a folder 
+ * read-write access when the folder is marked read-only.
+ * <p>
+ * The <code>getMessage()</code> method returns more detailed information 
+ * about the error that caused this exception.
  */
-public abstract class ComparisonTerm
-  extends SearchTerm
+public class ReadOnlyFolderException
+  extends MessagingException
 {
 
-  public static final int LE = 1;
-  public static final int LT = 2;
-  public static final int EQ = 3;
-  public static final int NE = 4;
-  public static final int GT = 5;
-  public static final int GE = 6;
-
   /**
-   * The comparison.
+   * The Folder.
    */
-  protected int comparison;
+  private Folder folder;
 
-  /**
-   * Equality comparison.
-   */
-  public boolean equals(Object other)
+  public ReadOnlyFolderException(Folder folder)
   {
-    return ((other instanceof ComparisonTerm) && 
-        ((ComparisonTerm)other).comparison==comparison);
+    this(folder, null);
+  }
+
+  public ReadOnlyFolderException(Folder folder, String message)
+  {
+    super(message);
+    this.folder = folder;
   }
 
   /**
-   * Compute a hashCode for this object.
+   * Returns the dead Folder object.
    */
-  public int hashCode()
+  public Folder getFolder()
   {
-    return comparison;
+    return folder;
   }
-
 }

@@ -1,228 +1,379 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * URLName.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
-// Imports
+import java.io.*;
 import java.net.*;
 import java.util.BitSet;
 
 /**
- * URL Name
+ * The name of a URL.
+ * This class represents a URL name and also provides the basic
+ * parsing functionality to parse most internet standard URL schemes.
+ * <p>
+ * Note that this class differs from java.net.URL in that this class just
+ * represents the name of a URL, it does not model the connection to a URL.
  */
-public class URLName {
+public class URLName
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The full version of the URL
+   */
+  protected String fullURL;
 
-	protected	String		fullURL				= null;
-	private		String		protocol			= null;
-	private		String		username			= null;
-	private		String		password			= null;
-	private		String		host				= null;
-	private		InetAddress	hostAddress			= null;
-	private		boolean		hostAddressKnown	= false;
-	private		int			port				= 0;
-	private		String		file				= null;
-	private		String		ref					= null;
-	private		int			hashCode			= 0;
-	private static	boolean	doEncode			= false;
-	static		BitSet		dontNeedEncoding	= null;
-	static	final	int		caseDiff			= 0;
+  private String protocol;
+  private String host;
+  private int port = -1;
+  private String file;
+  private String ref;
+  private String username;
+  private String password;
 
+  private InetAddress hostAddress;
+  private boolean gotHostAddress = false;
+  
+  
+  private int hashCode;
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Creates a URLName object from the specified protocol, host,
+   * port number, file, username, and password.
+   * Specifying a port number of -1 indicates that the URL should 
+   * use the default port for the protocol.
+   */
+  public URLName(String protocol, String host, int port,
+      String file, String username, String password)
+  {
+    this.protocol = protocol;
+    this.host = host;
+    this.port = port;
+    this.file = file;
+    if (file!=null)
+    {
+      int hashIndex = file.indexOf('#');
+      if (hashIndex!=-1)
+      {
+        this.file = file.substring(0, hashIndex);
+        ref = file.substring(hashIndex+1);
+      }
+    }
+    this.username = username;
+    this.password = password;
+  }
 
-	/**
-	 * Create new URL Name.
-	 */
-	public URLName(String protocol, String host, int port,
-			String file, String username, String password) {
-		this.protocol = protocol;
-		this.host = host;
-		this.port = port;
-		this.file = file;
-		this.username = username;
-		this.password = password;
-	} // URLName()
+  /**
+   * Construct a URLName from a java.net.URL object.
+   */
+  public URLName(URL url)
+  {
+    this(url.toString());
+  }
 
-	public URLName(URL url) {
-		this.protocol = url.getProtocol();
-		this.host = url.getHost();
-		this.port = url.getPort();
-		this.file = url.getFile();
-	} // URLName()
+  /**
+   * Construct a URLName from the string. Parses out all the possible
+   * information (protocol, host, port, file, username, password).
+   */
+  public URLName(String url)
+  {
+    parseString(url);
+  }
 
-	public URLName(String url) {
-		parseString(url);
-	} // URLName()
+  /**
+   * Returns the port number of this URLName.
+   * Returns -1 if the port is not set.
+   */
+  public int getPort()
+  {
+    return port;
+  }
 
+  /**
+   * Returns the protocol of this URLName. 
+   * Returns null if this URLName has no protocol.
+   */
+  public String getProtocol()
+  {
+    return protocol;
+  }
 
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Returns the file name of this URLName.
+   * Returns null if this URLName has no file name.
+   */
+  public String getFile()
+  {
+    return file;
+  }
 
-	public int hashCode() {
-		return 0; // TODO
-	} // hashCode()
+  /**
+   * Returns the reference of this URLName.
+   * Returns null if this URLName has no reference.
+   */
+  public String getRef()
+  {
+    return ref;
+  }
 
-	public boolean equals(Object object) {
+  /**
+   * Returns the host of this URLName.
+   * Returns null if this URLName has no host.
+   */
+  public String getHost()
+  {
+    return host;
+  }
 
-		// Variables
-		URLName	urlName;
+  /**
+   * Returns the user name of this URLName.
+   * Returns null if this URLName has no user name.
+   */
+  public String getUsername()
+  {
+    return username;
+  }
 
-		if (object != null) {
-			urlName = (URLName) object;
+  /**
+   * Returns the password of this URLName.
+   * Returns null if this URLName has no password.
+   */
+  public String getPassword()
+  {
+    return password;
+  }
 
-			// Check Protocol
-			if (protocol != null && urlName.getProtocol() != null &&
-				protocol.equals(urlName.getProtocol()) == false) {
-					return false;
-			}
+  /**
+   * Constructs a URL from the URLName.
+   */
+  public URL getURL()
+    throws MalformedURLException
+  {
+    return new URL(getProtocol(), getHost(), getPort(), getFile());
+  }
 
-			// Check Host
-			if (host != null && urlName.getHost() != null &&
-				host.equals(urlName.getHost()) == false) {
-					return false;
-			}
+  // -- Utility methods --
 
-			// Check Port
-			if (port != urlName.getPort()) {
-				return false;
-			}
+  /**
+   * Constructs a string representation of this URLName.
+   */
+  public String toString()
+  {
+    if (fullURL==null)
+    {
+      StringBuffer buffer = new StringBuffer();
+      if (protocol!=null)
+      {
+        buffer.append(protocol);
+        buffer.append(":");
+      }
+      if (username!=null || host!=null)
+      {
+        buffer.append("//");
+        if (username!=null)
+        {
+          buffer.append(username);
+          if (password!=null)
+          {
+            buffer.append(":");
+            buffer.append(password);
+          }
+          buffer.append("@");
+        }
+        if (host!=null)
+          buffer.append(host);
+        if (port!=-1)
+        {
+          buffer.append(":");
+          buffer.append(Integer.toString(port));
+        }
+        if (file!=null)
+          buffer.append("/");
+      }
+      if (file!=null)
+        buffer.append(file);
+      if (ref!=null)
+      {
+        buffer.append("#");
+        buffer.append(ref);
+      }
+      fullURL = buffer.toString();
+    }
+    return fullURL;
+  }
 
-			// Check Username
-			if (username != null && urlName.getUsername() != null &&
-				username.equals(urlName.getUsername()) == false) {
-					return false;
-			}
+  /**
+   * Compares two URLNames. The result is true if and only if the argument is
+   * not null and is a URLName object that represents the same URLName as this
+   * object. Two URLName objects are equal if they have the same protocol and
+   * reference the same host, the same port number on the host, the same
+   * username and password, and the same file on the host. The fields (host,
+   * username, password, file) are also considered the same if they are both
+   * null.
+   */
+  public boolean equals(Object other)
+  {
+    if (!(other instanceof URLName))
+      return false;
+    URLName url = (URLName)other;
+    if (url.protocol==null || !url.protocol.equals(protocol))
+      return false;
+    InetAddress address = getHostAddress();
+    InetAddress otherAddress = url.getHostAddress();
+    if (address!=null && otherAddress!=null)
+    {
+      if (!address.equals(otherAddress))
+        return false;
+    }
+    else if (host!=null && url.host!=null)
+    {
+      if (!host.equalsIgnoreCase(url.host))
+        return false;
+    }
+    else if (host!=url.host)
+      return false;
+    if (username!=url.username && 
+        (username==null || !username.equals(url.username)))
+      return false;
+    String file = this.file!=null ? this.file : "";
+    String otherFile = url.file!=null ? url.file : "";
+    if (!file.equals(otherFile))
+      return false;
+    return port==url.port;
+  }
 
-			// Check Password
-			if (password != null && urlName.getPassword() != null &&
-				password.equals(urlName.getPassword()) == false) {
-					return false;
-			}
+  /**
+   * Compute the hash code for this URLName.
+   */
+  public int hashCode()
+  {
+    if (hashCode!=0)
+      return hashCode;
+    if (protocol!=null)
+      hashCode += protocol.hashCode();
+    InetAddress address = getHostAddress();
+    if (address!=null)
+      hashCode += address.hashCode();
+    else
+    if (host!=null)
+      hashCode += host.toLowerCase().hashCode();
+    if (username!=null)
+      hashCode += username.hashCode();
+    if (file!=null)
+      hashCode += file.hashCode();
+    hashCode += port;
+    return hashCode;
+  }
 
-			// Check File
-			if (file != null && urlName.getFile() != null &&
-				file.equals(urlName.getFile()) == false) {
-					return false;
-			}
+  private synchronized InetAddress getHostAddress()
+  {
+    if (gotHostAddress)
+      return hostAddress;
+    if (host==null)
+      return null;
+    try
+    {
+      hostAddress = InetAddress.getByName(host);
+    }
+    catch (UnknownHostException e)
+    {
+      hostAddress = null;
+    }
+    gotHostAddress = true;
+    return hostAddress;
+  }
 
-			return true;
+  /**
+   * Method which does all of the work of parsing the string.
+   */
+  protected void parseString(String url)
+  {
+    protocol = file = ref = host = username = password = null;
+    port = -1;
+    int len = url.length();
+    int colonIndex = url.indexOf(':');
+    if (colonIndex!=-1)
+      protocol = url.substring(0, colonIndex);
+    if (url.regionMatches(colonIndex+1, "//", 0, 2))
+    {
+      String hostPart;
+      int slashIndex = url.indexOf('/', colonIndex+3);
+      if (slashIndex!=-1)
+      {
+        hostPart = url.substring(colonIndex+3, slashIndex);
+        if ((slashIndex+1)<len)
+          file = url.substring(slashIndex+1);
+        else
+          file = "";
+      }
+      else
+        hostPart = url.substring(colonIndex+3);
 
-		} // if
+      // user:password@host?
+      int atIndex = hostPart.indexOf('@');
+      if (atIndex!=-1)
+      {
+        String userPart = hostPart.substring(0, atIndex);
+        hostPart = hostPart.substring(atIndex+1);
+        colonIndex = userPart.indexOf(':');
+        if (colonIndex!=-1)
+        {
+          username = userPart.substring(0, colonIndex);
+          password = userPart.substring(colonIndex+1);
+        }
+        else
+          username = userPart;
+      }
 
-		return false;
+      // host:port?
+      if (hostPart.length()>0 && hostPart.charAt(0)=='[')
+        colonIndex = hostPart.indexOf(':', hostPart.indexOf(']'));
+      else
+        colonIndex = hostPart.indexOf(':');
+      if (colonIndex!=-1)
+      {
+        String portPart = hostPart.substring(colonIndex + 1);
+        if (portPart.length()>0)
+        {
+          try
+          {
+            port = Integer.parseInt(portPart);
+          }
+          catch (NumberFormatException e)
+          {
+            port = -1;
+          }
+        }
+        host = hostPart.substring(0, colonIndex);
+      }
+      else
+        host = hostPart;
+    }
+    else if ((colonIndex+1)<len)
+      file = url.substring(colonIndex+1);
+    
+    int hashIndex = (file!=null) ? file.indexOf('#') : -1;
+    if (hashIndex!=-1)
+    {
+      ref = file.substring(hashIndex+1);
+      file = file.substring(0, hashIndex);
+    }
+  }
 
-	} // equals()
-
-	public String toString() {
-
-		// Variables
-		String	result;
-
-		// Add Protocol to String
-		result = getProtocol() + "://";
-
-		// Add Username
-		if (getUsername() != null) {
-			result += getUsername();
-		}
-
-		// Add Password
-		if (getPassword() != null) {
-			result += ":" + getPassword();
-		}
-
-		// Add Username/Hostname separator
-		if (getUsername() != null) {
-			result += "@";
-		}
-
-		// Add Host
-		result += getHost();
-
-		// Add Port
-		if (getPort() != -1) {
-			result += ":" + getPort();
-		}
-
-		// Add Hostname ender
-		result += "/";
-
-		// Add File
-		if (getFile() != null) {
-			result += getFile();
-		}
-
-		// Return Result
-		return result;
-
-	} // toString()
-
-	public URL getURL() throws MalformedURLException {
-		return new URL(protocol, host, port, file);
-	} // getURL()
-
-	static String decode(String value) {
-		return null; // TODO
-	} // decode()
-
-	public String getProtocol() {
-		return protocol;
-	} // getProtocol()
-
-	public String getFile() {
-		return file;
-	} // getFile()
-
-	public String getHost() {
-		return host;
-	} // getHost()
-
-	public int getPort() {
-		return port;
-	} // getPort()
-
-	public String getRef() {
-		return null; // TODO
-	} // getRef()
-
-	private synchronized InetAddress getHostAddress() {
-		return null; // TODO
-	} // getHostAddress()
-
-	public static String _encode(String value) {
-		return null; // TODO
-	} // _encode()
-
-	static String encode(String value) {
-		return null; // TODO
-	} // encode()
-
-	public String getPassword() {
-		return password;
-	} // getPassword()
-
-	public String getUsername() {
-		return username;
-	} // getUsername()
-
-	private static int indexOfAny(String value1, String value2) {
-		return 0; // TODO
-	} // indexOfAny()
-
-	private static int indexOfAny(String value1, String value2, int value3) {
-		return 0; // TODO
-	} // indexOfAny()
-
-	protected void parseString(String url) {
-	} // parseString()
-
-
-} // URLName
+}

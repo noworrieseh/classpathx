@@ -1,83 +1,105 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * DateTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
 import java.util.Date;
-import javax.mail.Message;
 
 /**
- * Date Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for Dates.
  */
-public abstract class DateTerm extends ComparisonTerm {
+public abstract class DateTerm
+  extends ComparisonTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The date.
+   */
+  protected Date date;
 
-	/**
-	 * Comparison date.
-	 */
-	protected	Date	date	= null;
+  /**
+   * Constructor.
+   * @param comparison the comparison type
+   */
+  protected DateTerm(int comparison, Date date)
+  {
+    this.comparison = comparison;
+    this.date = date;
+  }
 
+  /**
+   * Return the Date to compare with.
+   */
+  public Date getDate()
+  {
+    return new Date(date.getTime());
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the type of comparison.
+   */
+  public int getComparison()
+  {
+    return comparison;
+  }
 
-	/**
-	 * Create a new Date Term.
-	 */
-	public DateTerm(int comparison, Date date) {
-		this.comparison = comparison;
-		this.date = date;
-	} // DateTerm()
+  /**
+   * The date comparison method.
+   * @param d the date in the constructor is compared with this date
+   * @return true if the dates match, otherwise false
+   */
+  protected boolean match(Date d)
+  {
+    switch (comparison)
+    {
+      case LE:
+        return d.before(date) || d.equals(date);
+      case LT:
+        return d.before(date);
+      case EQ:
+        return d.equals(date);
+      case NE:
+        return !d.equals(date);
+      case GT:
+        return d.after(date);
+      case GE:
+        return d.after(date) || d.equals(date);
+    }
+    return false;
+  }
 
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return ((other instanceof DateTerm) &&
+        ((DateTerm)other).date.equals(date) &&
+        super.equals(other));
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return date.hashCode() + super.hashCode();
+  }
 
-	/**
-	 * Get comparison operator.
-	 * @returns Comparison operator
-	 */
-	public int getComparison() {
-		return comparison;
-	} // getComparison()
-
-	/**
-	 * Get comparison value.
-	 * @returns Comparison date
-	 */
-	public Date getDate() {
-		return date;
-	} // getDate()
-
-	/**
-	 * Date comparison match.
-	 * @param value Date to check
-	 * @returns true if match, false otherwise
-	 */
-	protected boolean match(Date value) {
-		switch (comparison) {
-			case LE:
-				return (value.getTime() <= date.getTime());
-			case LT:
-				return (value.getTime() < date.getTime());
-			case EQ:
-				return (value.getTime() == date.getTime());
-			case GT:
-				return (value.getTime() > date.getTime());
-			case GE:
-				return (value.getTime() >= date.getTime());
-		} // switch()
-		return false;
-	} // match()
-
-
-} // DateTerm
+}

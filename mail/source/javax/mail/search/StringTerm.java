@@ -1,94 +1,107 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * StringTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.Message;
-
 /**
- * String Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements the match method for Strings.
+ * The current implementation provides only for substring matching.
+ * We could add comparisons (like strcmp ...).
  */
-public abstract class StringTerm extends SearchTerm {
+public abstract class StringTerm
+  extends SearchTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The pattern.
+   */
+  protected String pattern;
 
-	/**
-	 * Search pattern.
-	 */
-	protected	String	pattern		= null;
+  /**
+   * Ignore case when comparing?
+   */
+  protected boolean ignoreCase;
 
-	/**
-	 * Case should be ignored in match.
-	 */
-	protected	boolean	ignoreCase	= false;
+  protected StringTerm(String pattern)
+  {
+    this(pattern, true);
+  }
 
+  protected StringTerm(String pattern, boolean ignoreCase)
+  {
+    this.pattern = pattern;
+    this.ignoreCase = ignoreCase;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the string to match with.
+   */
+  public String getPattern()
+  {
+    return pattern;
+  }
 
-	/**
-	 * Create a new String Term.
-	 * @param pattern Search pattern
-	 */
-	public StringTerm(String pattern) {
-		this.pattern = pattern;
-	} // StringTerm()
+  /**
+   * Return true if we should ignore case when matching.
+   */
+  public boolean getIgnoreCase()
+  {
+    return ignoreCase;
+  }
 
-	/**
-	 * Create a new String Term.
-	 * @param pattern Search pattern
-	 * @param ignoreCase Ignore case
-	 */
-	public StringTerm(String pattern, boolean ignoreCase) {
-		this.pattern = pattern;
-		this.ignoreCase = ignoreCase;
-	} // StringTerm()
+  // locate pattern in s
+  protected boolean match(String s)
+  {
+    int patlen = pattern.length();
+    int len = s.length()-patlen;
+    for (int i = 0; i<=len; i++)
+    {
+      if (s.regionMatches(ignoreCase, i, pattern, 0, patlen))
+        return true;
+    }
+    return false;
+  }
 
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    if (other instanceof StringTerm)
+    {
+      StringTerm st = (StringTerm)other;
+      if (ignoreCase)
+        return st.pattern.equalsIgnoreCase(pattern) && 
+          st.ignoreCase==ignoreCase;
+      else
+        return st.pattern.equals(pattern) && 
+          st.ignoreCase==ignoreCase;
+    }
+    return false;
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get ignore case.
-	 * @returns true if case ignored, false otherwise
-	 */
-	public boolean getIgnoreCase() {
-		return ignoreCase;
-	} // getIgnoreCase()
-
-	/**
-	 * Get search pattern.
-	 * @returns Search pattern
-	 */
-	public String getPattern() {
-		return pattern;
-	} // getPattern()
-
-	/**
-	 * Do string match.
-	 * @param str String to check
-	 * @returns true if match, false otherwise
-	 */
-	protected boolean match(String str) {
-		if (ignoreCase == true) {
-			if (str.toLowerCase().indexOf(pattern.toLowerCase()) != -1) {
-				return true;
-			}
-		} else {
-			if (str.indexOf(pattern) != -1) {
-				return true;
-			}
-		}
-		return false;
-	} // match()
-
-
-} // StringTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return (ignoreCase) ? pattern.hashCode() : ~pattern.hashCode();
+  }
+  
+}

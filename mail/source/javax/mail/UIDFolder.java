@@ -1,72 +1,137 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * UIDFolder.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
+import java.util.NoSuchElementException;
+
 /**
- * UID Folder
+ * The UIDFolder interface is implemented by Folders that can support the
+ * "disconnected" mode of operation, by providing unique-ids for messages in 
+ * the folder. This interface is based on the IMAP model for supporting 
+ * disconnected operation.
+ * <p>
+ * A Unique identifier (UID) is a positive long value, assigned to each 
+ * message in a specific folder. Unique identifiers are assigned in a strictly 
+ * ascending fashion in the mailbox. That is, as each message is added to the 
+ * mailbox it is assigned a higher UID than the message(s) which were added 
+ * previously. Unique identifiers persist across sessions. This permits a 
+ * client to resynchronize its state from a previous session with the server.
+ * <p>
+ * Associated with every mailbox is a unique identifier validity value. If 
+ * unique identifiers from an earlier session fail to persist to this session,
+ * the unique identifier validity value must be greater than the one used in 
+ * the earlier session.
+ * <p>
+ * Refer to RFC 2060 http://www.ietf.org/rfc/rfc2060.txt for more information.
  */
-public interface UIDFolder {
+public interface UIDFolder
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * A fetch profile item for fetching UIDs. 
+   * This inner class extends the FetchProfile.Item class to add new 
+   * FetchProfile item types, specific to UIDFolders. The only item 
+   * currently defined here is the UID item.
+   */
+  public static class FetchProfileItem 
+    extends FetchProfile.Item
+  {
 
-	/**
-	 * Last UID
-	 */
-	public static final long	LASTUID	= -1;
+    /**
+     * UID is a fetch profile item that can be included in a 
+     * FetchProfile during a fetch request to a Folder. 
+     * This item indicates that the UIDs for messages in the specified 
+     * range are desired to be prefetched.
+     * <p>
+     * An example of how a client uses this is below:
+     * <pre>
+     FetchProfile fp = new FetchProfile();
+     fp.add(UIDFolder.FetchProfileItem.UID);
+     folder.fetch(msgs, fp);
+     </pre>
+     */
+    public static final FetchProfileItem UID = new FetchProfileItem("UID");
 
+    protected FetchProfileItem(String name)
+    {
+      super(name);
+    }
+    
+  }
 
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * This is a special value that can be used as the end parameter in
+   * <code>getMessages(start, end)</code>, to denote the last UID 
+   * in this folder.
+   */
+  public static final long LASTUID = -1L;
 
-	/**
-	 * Get message by UID.
-	 * @param uid UID of message
-	 * @returns Message
-	 * @throws MessagingException Messaging exception
-	 */
-	public abstract Message getMessageByUID(long uid)
-		throws MessagingException;
+  /**
+   * Returns the UIDValidity value associated with this folder.
+   * <p>
+   * Clients typically compare this value against a UIDValidity value 
+   * saved from a previous session to insure that any cached UIDs not stale.
+   */
+  public long getUIDValidity()
+    throws MessagingException;
 
-	/**
-	 * Get messages.
-	 * @param value1 ??? min maybe?
-	 * @param value2 ??? max maybe?
-	 * @returns Message array
-	 * @throws MessagingException Messaging exception
-	 */
-	public abstract Message[] getMessagesByUID(long value1, long value2)
-		throws MessagingException;
+  /**
+   * Get the Message corresponding to the given UID.
+   * If no such message exists, null is returned.
+   * @param uid UID for the desired message
+   */
+  public Message getMessageByUID(long uid)
+    throws MessagingException;
 
-	/**
-	 * Get messages by UID.
-	 * @param uid UID list
-	 * @returns Message array
-	 * @throws MessagingException Messaging exception
-	 */
-	public abstract Message[] getMessagesByUID(long[] uid)
-		throws MessagingException;
+  /**
+   * Get the Messages specified by the given range.
+   * The special value LASTUID can be used for the end parameter 
+   * to indicate the last available UID.
+   * @param start start UID
+   * @param end end UID
+   */
+  public Message[] getMessagesByUID(long start, long end)
+    throws MessagingException;
 
-	/**
-	 * Get UID for messaging.
-	 * @param message Message
-	 * @returns UID value
-	 * @throws MessagingException Messaging exception
-	 */
-	public abstract long getUID(Message message)
-		throws MessagingException;
+  /**
+   * Get the Messages specified by the given array of UIDs.
+   * If any UID is invalid, null is returned for that entry.
+   * <p>
+   * Note that the returned array will be of the same size as the specified
+   * array of UIDs, and null entries may be present in the array to indicate
+   * invalid UIDs.
+   * @param uids array of UIDs
+   */
+  public Message[] getMessagesByUID(long[] uids)
+    throws MessagingException;
 
-	/**
-	 * Get UID validity.
-	 * @returns UID value
-	 * @throws MessagingException Messaging exception
-	 */
-	public abstract long getUIDValidity()
-		throws MessagingException;
-
-
-} // UIDFolder
+  /**
+   * Get the UID for the specified message. 
+   * Note that the message must belong to this folder.
+   * Else NoSuchElementException is thrown.
+   * @param message Message from this folder
+   * @return UID for this message
+   * @exception NoSuchElementException if the given Message is not in this
+   * Folder.
+   */
+  public long getUID(Message message)
+    throws MessagingException;
+  
+}

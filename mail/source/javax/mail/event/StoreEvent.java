@@ -1,88 +1,91 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * StoreEvent.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Store;
 
 /**
- * Store Event.
+ * This class models notifications from the Store connection. 
+ * These notifications can be ALERTS or NOTICES.
+ * ALERTS must be presented to the user in a fashion that calls 
+ * the user's attention to the message.
  */
-public class StoreEvent extends MailEvent {
+public class StoreEvent
+  extends MailEvent
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Indicates that this message is an ALERT.
+   */
+  public static final int ALERT = 1;
 
-	/**
-	 * ALERT store type.
-	 */
-	public static final int	ALERT		= 1;
+  /**
+   * Indicates that this message is a NOTICE.
+   */
+  public static final int NOTICE = 2;
 
-	/**
-	 * NOTICE store type.
-	 */
-	public static final int	NOTICE		= 2;
+  /**
+   * The event type.
+   */
+  protected int type;
 
-	/**
-	 * Store type of event.
-	 */
-	protected		int	type		= -1;
+  /**
+   * The message text to be presented to the user.
+   */
+  protected String message;
 
-	/**
-	 * Store message.
-	 */
-	protected		String	message		= null;
+  /**
+   * Constructor.
+   * @param source The source Store
+   */
+  public StoreEvent(Store source, int type, String message)
+  {
+    super(source);
+    this.type = type;
+    this.message = message;
+  }
 
+  /**
+   * Return the type of this event.
+   * @see #ALERT
+   * @see #NOTICE
+   */
+  public int getMessageType()
+  {
+    return type;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Get the message from the Store.
+   */
+  public String getMessage()
+  {
+    return message;
+  }
 
-	/**
-	 * Create a new store event.
-	 */
-	public StoreEvent(Store store, int type, String message) {
-		super(store);
-		this.type = type;
-		this.message = message;
-	} // StoreEvent()
-
-
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Dispatch event to listener
-	 * @param listener Listener to notify
-	 */
-	public void dispatch(Object listener) {
-
-		// Check for Store Listener
-		if (listener instanceof StoreListener) {
-			((StoreListener) listener).notification(this);
-		} // if
-
-	} // dispatch()
-
-	/**
-	 * Get message.
-	 * @returns Message
-	 */
-	public String getMessage() {
-		return message;
-	} // getMessage()
-
-	/**
-	 * Get message type.
-	 * @returns Message type
-	 */
-	public int getMessageType() {
-		return type;
-	} // getMessageType()
-                    
-
-} // StoreEvent
+  /**
+   * Invokes the appropriate StoreListener method.
+   */
+  public void dispatch(Object listener)
+  {
+    ((StoreListener)listener).notification(this);
+  }
+  
+}

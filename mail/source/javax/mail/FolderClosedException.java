@@ -1,58 +1,61 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * FolderClosedException.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
 /**
- * Folder Closed Exception
+ * This exception is thrown when a method is invoked on a Messaging object 
+ * and the Folder that owns that object has died due to some reason.
+ * <p>
+ * Following the exception, the Folder is reset to the "closed" state. All
+ * messaging objects owned by the Folder should be considered invalid.
+ * The Folder can be reopened using the "open" method to reestablish the 
+ * lost connection.
+ * <p>
+ * The <code>getMessage()</code> method returns more detailed information 
+ * about the error that caused this exception.
  */
-public class FolderClosedException extends MessagingException {
+public class FolderClosedException
+  extends MessagingException
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /*
+   * The Folder
+   */
+  private Folder folder;
 
-	/**
-	 * Folder
-	 */
-	private	transient	Folder	folder	= null;
+  public FolderClosedException(Folder folder)
+  {
+    this(folder, null);
+  }
 
+  public FolderClosedException(Folder folder, String message)
+  {
+    super(message);
+    this.folder = folder;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Create new folder closed exception.
-	 */
-	public FolderClosedException() {
-		super();
-	} // FolderClosedException()
-
-	/**
-	 * Create new folder closed exception with description.
-	 * @param message Description
-	 * @param folder Folder
-	 */
-	public FolderClosedException(String message, Folder folder) {
-		super(message);
-		this.folder = folder;
-	} // FolderClosedException()
-
-
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get folder.
-	 * @returns Folder
-	 */
-	public Folder getFolder() {
-		return folder;
-	} // getFolder()
-
-
-} // FolderClosedException
-
+  /**
+   * Returns the dead Folder object
+   */
+  public Folder getFolder()
+  {
+    return folder;
+  }
+}

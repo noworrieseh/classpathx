@@ -1,49 +1,53 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * TransportAdapter.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
 /**
- * Transport Adapter.
+ * The adapter which receives Transport events.
+ * The methods in this class are empty; this class is provided as 
+ * a convenience for easily creating listeners by extending this class 
+ * and overriding only the methods of interest.
  */
-public abstract class TransportAdapter implements TransportListener {
+public abstract class TransportAdapter
+  implements TransportListener
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a Message is succesfully delivered.
+   */
+  public void messageDelivered(TransportEvent e)
+  {
+  }
 
-	/**
-	 * Create a new Transport Adapter.
-	 */
-	public TransportAdapter() {
-	} // TransportAdapter()
+  /**
+   * Invoked when a Message is not delivered.
+   */
+  public void messageNotDelivered(TransportEvent e)
+  {
+  }
 
+  /**
+   * Invoked when a Message is partially delivered.
+   */
+  public void messagePartiallyDelivered(TransportEvent e)
+  {
+  }
 
-	//-------------------------------------------------------------
-	// Interface: TransportListener ------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Message delivered.
-	 * @param event Transport event
-	 */
-	public void messageDelivered(TransportEvent event) {
-	} // messageDelivered()
-
-	/**
-	 * Message not delivered.
-	 * @param event Transport event
-	 */
-	public void messageNotDelivered(TransportEvent event) {
-	} // messageNotDelivered()
-
-	/**
-	 * Message partially delivered
-	 * @param event Transport event
-	 */
-	public void messagePartiallyDelivered(TransportEvent event) {
-	} // messagePartiallyDelivered()
-
-
-} // TransportAdapter
+}

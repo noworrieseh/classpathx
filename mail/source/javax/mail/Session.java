@@ -1,929 +1,707 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * Session.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
-// Imports
 import java.io.*;
-import java.net.*;
+import java.lang.reflect.Constructor;
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.*;
-import java.lang.reflect.*;
 
 /**
- * Session.
- *
- * @author	Andrew Selkirk
- * @version	1.0
+ * The Session class represents a mail session and is not subclassed.
+ * It collects together properties and defaults used by the mail API's.
+ * A single default session can be shared by multiple applications on 
+ * the desktop. Unshared sessions can also be created.
  */
-public final class Session 
+public final class Session
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Session properties.
-   */
-  private Properties props = null;
-
-  /**
-   * Session authenticator call back that is used when password
-   * authentication is required by the service.
-   */
-  private Authenticator authenticator = null;
-
-  /**
-   * Authentication table that shares PasswordAuthentication
-   * objects between users of a session.
-   */
+  private static final String SYSTEM_PROVIDERS = 
+    System.getProperty("java.home")+File.separator+"lib"+File.separator+
+    "javamail.providers";
+      
+  private static final String CUSTOM_PROVIDERS = 
+    "/META-INF/javamail.providers";
+  
+  private static final String DEFAULT_PROVIDERS = 
+    "/META-INF/javamail.default.providers";
+  
+  private static final String SYSTEM_ADDRESS_MAP = 
+    System.getProperty("java.home")+File.separator+"lib"+File.separator+
+    "javamail.address.map";
+  
+  private static final String CUSTOM_ADDRESS_MAP =
+    "/META-INF/javamail.address.map";
+  
+  private static final String DEFAULT_ADDRESS_MAP =
+    "/META-INF/javamail.default.address.map";
+  
+  private Properties props;
+  
+  private Authenticator authenticator;
   private Hashtable authTable = new Hashtable();
-
-  /**
-   * Debug mode flag.
-   */
-  private boolean debug = false;
-
-  /**
-   * List of providers.
-   */
+  
+  private boolean debug;
+  
   private Vector providers = new Vector();
-
-  /**
-   * Mapping of providers by protocol.
-   */
   private Hashtable providersByProtocol = new Hashtable();
-
-  /**
-   * Mapping of providers by class name.
-   */
   private Hashtable providersByClassName = new Hashtable();
 
-  /**
-   * Mapping of address types to protocol.
-   */
   private Properties addressMap = new Properties();
-
-  /**
-   * Unknown.
-   */
-  private static Method getResources = null;
-
-  /**
-   * Unknown.
-   */
-  private static Method getSystemResources = null;
-
-  /**
-   * Default Session.
-   */
+  
   private static Session defaultSession = null;
 
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Session constructor.
-   * @param properties Session properties
-   * @param auth Authenticator for session
-   */
-  private Session(Properties properties, Authenticator auth) 
+  private Session(Properties props, Authenticator authenticator)
   {
+    this.props = props;
+    this.authenticator = authenticator;
 
-    // Variables
-    String result;
+    if (new Boolean(props.getProperty("mail.debug")).booleanValue())
+      debug = true;
 
-    props = properties;
-    authenticator = auth;
-
-    // Check mail.debug property
-    result = getProperty("mail.debug");
-    if (result != null && result.equals("true") == true) 
+    ClassLoader loader = (authenticator==null) ?
+      getClass().getClassLoader() :
+      authenticator.getClass().getClassLoader();
+    
+    // load the providers
+    loadProviders(loader.getResourceAsStream(DEFAULT_PROVIDERS),
+        "default");
+    loadProviders(loader.getResourceAsStream(CUSTOM_PROVIDERS),
+        "custom");
+    try
     {
-      setDebug(true);
-    } // if
+      loadProviders(
+          new BufferedInputStream(new FileInputStream(SYSTEM_PROVIDERS)), 
+          "system");
+    }
+    catch (FileNotFoundException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: no system providers");
+    }
+    
+    if (debug)
+    {
+      System.out.println("DEBUG: Providers by class name: "+
+          providersByClassName.toString());
+      System.out.println("DEBUG: Providers by protocol: "+
+          providersByProtocol.toString());
+    }
 
-    // Load Providers
-    loadProviders(getClass());
+    // load the address map
+    loadAddressMap(loader.getResourceAsStream(DEFAULT_ADDRESS_MAP),
+        "default");
+    loadAddressMap(loader.getResourceAsStream(CUSTOM_ADDRESS_MAP),
+        "custom");
+    try
+    {
+      loadAddressMap(
+          new BufferedInputStream(new FileInputStream(SYSTEM_ADDRESS_MAP)), 
+          "system");
+    }
+    catch (FileNotFoundException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: no system address map");
+    }
+  }
 
-    // Load Address Maps
-    loadAddressMap(getClass());
-
-  } // Session()
-
-
-  //-------------------------------------------------------------
-  // Methods ----------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Get session property.
-   * @param name Property name
-   * @returns Value of property if property exists, null otherwise.
-   */
-  public String getProperty(String name) 
+  private void loadProviders(InputStream in, String description)
   {
-    return props.getProperty(name);
-  } // getProperty()
+    if (in==null)
+      return;
+    try
+    {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+      for (String line = reader.readLine();
+          line!=null;
+          line = reader.readLine()) 
+      {
+        if (!line.startsWith("#"))
+        {
+          Provider.Type type = null;
+          String protocol = null;
+          String className = null;
+          String vendor = null;
+          String version = null;
+          for (StringTokenizer st = new StringTokenizer(line, ";"); 
+              st.hasMoreTokens();)
+          {
+            String token = st.nextToken().trim();
+            int equalsIndex = token.indexOf("=");
+            if (token.startsWith("protocol="))
+              protocol = token.substring(equalsIndex+1);
+            else if (token.startsWith("type="))
+            {
+              String transportValue = token.substring(equalsIndex+1);
+              if (transportValue.equalsIgnoreCase("store"))
+                type = Provider.Type.STORE;
+              else if (transportValue.equalsIgnoreCase("transport"))
+                type = Provider.Type.TRANSPORT;
+            }
+            else if (token.startsWith("class="))
+              className = token.substring(equalsIndex+1);
+            else if (token.startsWith("vendor="))
+              vendor = token.substring(equalsIndex+1);
+            else if (token.startsWith("version="))
+              version = token.substring(equalsIndex+1);
+          }
+          
+          if (type==null || protocol==null || className==null)
+          {
+            if (debug)
+              System.out.println("DEBUG: Invalid provider: "+line);
+          }
+          else
+          {
+            Provider provider = new Provider(type, protocol, className,
+                vendor, version);
+            providers.addElement(provider);
+            providersByClassName.put(className, provider);
+            if (!providersByProtocol.containsKey(protocol))
+              providersByProtocol.put(protocol, provider);
+          }
+        }
+      }
+      in.close();
+      if (debug)
+        System.out.println("DEBUG: loaded "+description+" providers");
+    }
+    catch (IOException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: "+e.getMessage());
+    }
+    catch (SecurityException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: can't load "+description+" providers");
+    }
+  }
+
+  private void loadAddressMap(InputStream in, String description)
+  {
+    if (in==null)
+      return;
+    try
+    {
+      addressMap.load(in);
+      in.close();
+      if (debug)
+        System.out.println("DEBUG: loaded "+description+" address map");
+    }
+    catch (IOException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: "+e.getMessage());
+    }
+    catch (SecurityException e)
+    {
+      if (debug)
+        System.out.println("DEBUG: can't load "+description+" address map");
+    }
+  }
 
   /**
-   * Get the debug state of this session.
-   * @returns true if debug is on, false otherwise
+   * Get a new Session object.
+   * @param props Properties object that hold relevant properties.
+   * It is expected that the client supplies values for the properties
+   * listed in Appendix A of the JavaMail spec (particularly
+   * <code>mail.store.protocol</code>, 
+   * <code>mail.transport.protocol</code>,
+   * <code>mail.host</code>,
+   * <code>mail.user</code>,
+   * and <code>mail.from</code>)
+   * as the defaults are unlikely to work in all cases.
+   * @param authenticator Authenticator object used to call back to the
+   * application when a user name and password is needed.
    */
-  public boolean getDebug() 
+  public static Session getInstance(Properties props, 
+      Authenticator authenticator)
+  {
+    return new Session(props, authenticator);
+  }
+
+  /**
+   * Get a new Session object.
+   * @param props Properties object that hold relevant properties.
+   * It is expected that the client supplies values for the properties
+   * listed in Appendix A of the JavaMail spec (particularly
+   * <code>mail.store.protocol</code>, 
+   * <code>mail.transport.protocol</code>,
+   * <code>mail.host</code>,
+   * <code>mail.user</code>,
+   * and <code>mail.from</code>)
+   * as the defaults are unlikely to work in all cases.
+   */
+  public static Session getInstance(Properties props)
+  {
+    return getInstance(props, null);
+  }
+
+  /**
+   * Get the default Session object. 
+   * If a default has not yet been setup, a new Session object is created 
+   * and installed as the default.
+   * <p>
+   * Since the default session is potentially available to all code 
+   * executing in the same Java virtual machine, and the session can 
+   * contain security sensitive information such as user names and 
+   * passwords, access to the default session is restricted. 
+   * The Authenticator object, which must be created by the caller, 
+   * is used indirectly to check access permission. The Authenticator 
+   * object passed in when the session is created is compared with
+   * the Authenticator object passed in to subsequent requests to get the
+   * default session. If both objects are the same, or are from the same
+   * ClassLoader, the request is allowed. Otherwise, it is denied.
+   * <p>
+   * Note that if the Authenticator object used to create the session is null,
+   * anyone can get the default session by passing in null.
+   * <p>
+   * In JDK 1.2, additional security Permission objects may be used to control
+   * access to the default session.
+   * @param props Properties object that hold relevant properties.
+   * It is expected that the client supplies values for the properties
+   * listed in Appendix A of the JavaMail spec (particularly
+   * <code>mail.store.protocol</code>, 
+   * <code>mail.transport.protocol</code>,
+   * <code>mail.host</code>,
+   * <code>mail.user</code>,
+   * and <code>mail.from</code>)
+   * as the defaults are unlikely to work in all cases.
+   * @param authenticator Authenticator object used to call back to the
+   * application when a user name and password is needed.
+   */
+  public static Session getDefaultInstance(Properties props,
+      Authenticator authenticator)
+  {
+    if (defaultSession==null)
+      defaultSession = new Session(props, authenticator);
+    else if (defaultSession.authenticator!=authenticator &&
+        (defaultSession.authenticator==null ||
+         authenticator==null || 
+         defaultSession.authenticator.getClass().getClassLoader() !=
+         authenticator.getClass().getClassLoader()))
+      throw new SecurityException("Access denied");
+    return defaultSession;
+  }
+
+  /**
+   * Get the default Session object.
+   * If a default has not yet been setup, a new Session object is created 
+   * and installed as the default.
+   * <p>
+   * Note that a default session created with no Authenticator is available 
+   * to all code executing in the same Java virtual machine, and the session 
+   * can contain security sensitive information such as user names and 
+   * passwords.
+   * @param props Properties object that hold relevant properties.
+   * It is expected that the client supplies values for the properties
+   * listed in Appendix A of the JavaMail spec (particularly
+   * <code>mail.store.protocol</code>, 
+   * <code>mail.transport.protocol</code>,
+   * <code>mail.host</code>,
+   * <code>mail.user</code>,
+   * and <code>mail.from</code>)
+   * as the defaults are unlikely to work in all cases.
+   */
+  public static Session getDefaultInstance(Properties props)
+  {
+    return getDefaultInstance(props, null);
+  }
+
+  /**
+   * Set the debug setting for this Session.
+   * <p>
+   * Since the debug setting can be turned on only after the Session has been
+   * created, to turn on debugging in the Session constructor, set the property
+   * <code>mail.debug</code> in the Properties object passed in to the 
+   * constructor to true. The value of the <code>mail.debug</code> property 
+   * is used to initialize the per-Session debugging flag. Subsequent calls 
+   * to the <code>setDebug</code> method manipulate the per-Session debugging 
+   * flag and have no affect on the <code>mail.debug</code> property.
+   */
+  public void setDebug(boolean debug)
+  {
+    this.debug = debug;
+  }
+
+  /**
+   * Get the debug setting for this Session.
+   */
+  public boolean getDebug()
   {
     return debug;
-  } // getDebug()
+  }
 
   /**
-   * Create session instance.
-   * @param properties Session properties
-   * @param auth Authenticator for session
+   * This method returns an array of all the implementations installed 
+   * via the javamail.[default.]providers files that can be loaded 
+   * using the ClassLoader available to this application.
    */
-  public static Session getInstance(Properties properties, Authenticator auth) 
+  public Provider[] getProviders()
   {
-    return new Session(properties, auth);
-  } // getInstance()
+    Provider[] p = new Provider[providers.size()];
+    providers.copyInto(p);
+    return p;
+  }
 
   /**
-   * Returns an array of installed providers.
-   * @returns Array of providers
+   * Returns the default Provider for the protocol specified.
+   * Checks <code>mail.&lt;protocol&gt;.class</code> property first 
+   * and if it exists, returns the Provider associated with 
+   * this implementation. If it doesn't exist, returns the Provider that 
+   * appeared first in the configuration files. 
+   * If an implementation for the protocol isn't found, 
+   * throws NoSuchProviderException
+   * @param protocol Configured protocol (i.e. smtp, imap, etc)
+   * @param NoSuchProviderException If a provider for the given protocol 
+   * is not found.
    */
-  public Provider[] getProviders() 
+  public Provider getProvider(String protocol)
+    throws NoSuchProviderException
   {
-
-    // Variables
-    Provider[] list;
-    int index;
-
-    // Create Array
-    list = new Provider[providers.size()];
-    for (index = 0; index < providers.size(); index++) 
+    if (protocol==null || protocol.length() <= 0)
+      throw new NoSuchProviderException("Invalid protocol: "+protocol);
+    Provider provider = null;
+    String providerClassKey = "mail."+protocol+".class";
+    String providerClassName = props.getProperty(providerClassKey);
+    if (providerClassName!=null)
     {
-      list[index] = (Provider) providers.elementAt(index);
-    } // for
-
-    // Return List
-    return list;
-
-  } // getProviders()
+      if (debug)
+        System.out.println("DEBUG: "+providerClassKey+"="+providerClassName);
+      provider = (Provider)providersByClassName.get(providerClassName);
+    }
+    if (provider==null)
+      provider = (Provider)providersByProtocol.get(protocol);
+    if (provider==null)
+      throw new NoSuchProviderException("No provider for "+protocol);
+    if (debug)
+      System.out.println("DEBUG: getProvider(): " + provider.toString());
+    return provider;
+  }
 
   /**
-   * Get provider for the specified protocol.
-   * @param protocol Protocol name
-   * @returns Provider for protocol
-   * @throws NoSuchProviderException No provider exists for the
-   * specified protocol
-   */
-  public Provider getProvider(String protocol) throws NoSuchProviderException 
-  {
-
-    // Variables
-    String query;
-    Provider provider;
-
-    // Check for Provider Class
-    query = getProperty("mail." + protocol + ".class");
-    if (query != null) 
-    {
-      return (Provider) providersByClassName.get(query);
-    } // if
-
-    // Check by Protocol
-    provider = (Provider) providersByProtocol.get(protocol);
-    if (provider != null) 
-    {
-      return provider;
-    } // if
-
-    // Unknown Provider Error
-    throw new NoSuchProviderException();
-
-  } // getProvider()
-
-  /**
-   * Add a default provider.  The protocol name is extracted
-   * from the provider.
-   * @param Provider to register
-   * @throws NoSuchProviderException Unknown why this would be
-   * thrown // TODO
+   * Set the passed Provider to be the default implementation for the protocol
+   * in Provider.protocol overriding any previous values.
    */
   public void setProvider(Provider provider)
-  throws NoSuchProviderException 
+    throws NoSuchProviderException
   {
-
-    // Variables
-    String protocol;
-    String className;
-
-    // Get Protocol of Provider
-    protocol = provider.getProtocol();
-
-    // Get Class Name
-    className = provider.getClassName();
-
-    // Register as Default
-    providersByProtocol.put(protocol, provider);
-    providersByClassName.put(className, provider);
-
-  } // setProvider()
+    if (provider==null)
+      throw new NoSuchProviderException("Can't set null provider");
+    providersByProtocol.put(provider.getProtocol(), provider);
+    String providerClassKey = "mail."+provider.getProtocol()+".class";
+    props.put(providerClassKey, provider.getClassName());
+  }
 
   /**
-   * Retrieve the default session instance.  A default session
-   * instance will be created if it doesn't exist yet.
-   * @param properties Properties for default instance
-   * @param auth Authenticator for default instance
-   * @returns Default session instance
+   * Get a Store object that implements this user's desired Store protocol.
+   * The <code>mail.store.protocol</code> property specifies the desired 
+   * protocol. If an appropriate Store object is not obtained,
+   * NoSuchProviderException is thrown
    */
-  public static Session getDefaultInstance(Properties properties,
-					   Authenticator auth) 
+  public Store getStore()
+    throws NoSuchProviderException
   {
-
-    // Check Permission
-    // TODO
-
-    // Create Default Session
-    if (defaultSession == null) 
-    {
-      defaultSession = getInstance(properties, auth);
-    } // if
-
-    // Return Default Session
-    return defaultSession;
-
-  } // getDefaultInstance()
+    return getStore(getProperty("mail.store.protocol"));
+  }
 
   /**
-   * Get Folder from URLName.
-   * @param urlName URLName of folder
-   * @returns Folder
-   * @throws MessagingException Messaging problem has occurred
+   * Get a Store object that implements the specified protocol.
+   * If an appropriate Store object cannot be obtained,
+   * NoSuchProviderException is thrown.
    */
-  public Folder getFolder(URLName urlName) throws MessagingException 
+  public Store getStore(String protocol)
+    throws NoSuchProviderException
   {
-
-    // Variables
-    Store store;
-
-    try 
-    {
-
-      // Get Store
-      store = getStore(urlName);
-
-      // Get Folder from Store
-      return store.getFolder(urlName);
-
-    } catch (Exception e) 
-    {
-      throw new MessagingException();
-    } // try
-
-  } // getFolder()
+    return getStore(new URLName(protocol, null, -1, null, null, null));
+  }
 
   /**
-   * Get password authentication for specified URLName.
-   * @param urlName URLName to lookup
-   * @returns Password authentication
+   * Get a Store object for the given URLName.
+   * If the requested Store object cannot be obtained,
+   * NoSuchProviderException is thrown. 
+   * The "scheme" part of the URL string (Refer RFC 1738) is used to 
+   * locate the Store protocol.
+   * @param url URLName that represents the desired Store
    */
-  public PasswordAuthentication getPasswordAuthentication(URLName urlName) 
+  public Store getStore(URLName url)
+    throws NoSuchProviderException
   {
-    return (PasswordAuthentication) authTable.get(urlName);
-  } // getPasswordAuthentication()
+    String protocol = url.getProtocol();
+    Provider provider = getProvider(protocol);
+    return getStore(provider, url);
+  }
 
   /**
-   * Get service instance.
-   * @param provider Provider
-   * @param urlname URLName to initialize store
-   * @returns Service instance
-   * @throws NoSuchProviderException Provider doesn't exist
+   * Get an instance of the store specified by Provider.
+   * Instantiates the store and returns it.
+   * @param provider Store Provider that will be instantiated
    */
-  private Object getService(Provider provider, URLName urlName)
-  throws NoSuchProviderException 
+  public Store getStore(Provider provider)
+    throws NoSuchProviderException
   {
+    return getStore(provider, null);
+  }
 
-    // Variables
-    String className;
-    Class classObject;
-    Constructor constructor;
-    Object instance;
-
-    // Get Class Name of Provider
-    className = provider.getClassName();
-
-    try 
-    {
-
-      // Get Class
-      classObject = Class.forName(className);
-
-      // Get Constructor
-      constructor = classObject.getConstructor(new Class[] 
-	{
-	  Class.forName("javax.mail.Session"),
-	  Class.forName("javax.mail.URLName")});
-
-      // Instantiate Class
-      instance = constructor.newInstance(new Object[] {this, urlName});
-
-      // Return Object
-      return instance;
-
-    } catch (Exception e) 
-    {
-      throw new NoSuchProviderException();
-    } // try
-
-  } // getService()
-
-  /**
-   * Get default protocol store instance.
-   * @returns Store instance
-   * @throws NoSuchProviderException Store provider doesn't exist
-   */
-  public Store getStore() throws NoSuchProviderException 
+  private Store getStore(Provider provider, URLName url)
+    throws NoSuchProviderException
   {
-
-    // Variables
-    String defaultStore;
-
-    // Get Default Store Protocol
-    defaultStore = getProperty("mail.store.protocol");
-
-    // Get Store for Protocol
-    return getStore(defaultStore);
-
-  } // getStore()
-
-  /**
-   * Get store instance.
-   * @param protocol Store protocol
-   * @returns Store instance
-   * @throws NoSuchProviderException Store provider doesn't exist
-   */
-  public Store getStore(String protocol) throws NoSuchProviderException 
-  {
-
-    // Variables
-    Provider provider;
-
-    // Get Provider for Protocol
-    provider = (Provider) providersByProtocol.get(protocol);
-
-    // Check Result
-    if (provider == null) 
+    if (provider==null || provider.getType()!=Provider.Type.STORE)
+      throw new NoSuchProviderException("invalid provider");
+    try
     {
-      throw new NoSuchProviderException();
-    } // if
-
-    // Check Type
-    if (provider.getType() != Provider.Type.STORE) 
-    {
-      throw new NoSuchProviderException();
+      return (Store)getService(provider, url);
     }
-
-    // Generate Store Object
-    return getStore(provider);
-
-  } // getStore()
-
-  /**
-   * Get store instance.
-   * @param urlname URLName to initialize store
-   * @returns Store instance
-   * @throws NoSuchProviderException Store provider doesn't exist
-   */
-  public Store getStore(URLName urlName) throws NoSuchProviderException 
-  {
-
-    // Variables
-    String protocol;
-
-    // Get Protocol from URLName
-    protocol = urlName.getProtocol();
-    if (protocol == null) 
+    catch (ClassCastException e)
     {
-      throw new NoSuchProviderException();
-    } // if
-
-    // Get Store for Protocol
-    return getStore(protocol);
-
-  } // getStore()
+      throw new NoSuchProviderException("not a store");
+    }
+  }
 
   /**
-   * Get store instance.
-   * @param provider Provider
-   * @returns Store instance
-   * @throws NoSuchProviderException Store provider doesn't exist
+   * Get a Transport object that implements this user's desired Transport
+   * protocol.
+   * The <code>mail.transport.protocol</code> property specifies the desired
+   * protocol. If an appropriate Transport object cannot be obtained,
+   * MessagingException is thrown.
+   * @exception NoSuchProviderException If the provider is not found.
    */
-  public Store getStore(Provider provider) throws NoSuchProviderException 
+  public Transport getTransport()
+    throws NoSuchProviderException
   {
-    return getStore(provider, null); // TODO
-  } // getStore()
+    return getTransport(getProperty("mail.transport.protocol"));
+  }
 
   /**
-   * Get store instance.
-   * @param provider Provider
-   * @param urlname URLName to initialize store
-   * @returns Store instance
-   * @throws NoSuchProviderException Store provider doesn't exist
-   */
-  private Store getStore(Provider provider, URLName urlName)
-  throws NoSuchProviderException 
-  {
-
-    // Variables
-    Object service;
-
-    // Get Service
-    service = getService(provider, urlName);
-
-    // Check for Store
-    if (service instanceof Store) 
-    {
-      return (Store) service;
-    } // if
-
-    // Problem, return error
-    throw new NoSuchProviderException();
-
-  } // getStore()
-
-  /**
-   * Instantiate a transport based on the default
-   * transport protocol.  Looks up parameter "mail.transport.protocol"
-   * @return Transport instance
-   * @throws NoSuchProviderException No provider available
-   */
-  public Transport getTransport() throws NoSuchProviderException 
-  {
-
-    // Variables
-    String defaultTransport;
-
-    // Get Default Transport Protocol
-    defaultTransport = getProperty("mail.transport.protocol");
-
-    // Get Store for Protocol
-    if (defaultTransport == null) 
-    {
-      throw new NoSuchProviderException("property mail.transport.protocol" +
-					" does not exist");
-    } // if
-    return getTransport(defaultTransport);
-
-  } // getTransport()
-
-  /**
-   * Instantiate a transport for the specified protocol.
-   * @param protocol Protocol to transport over
-   * @returns Transport object
-   * @throws NoSuchProviderException There doesn't exist a
-   * transport that implements the specified protocol
+   * Get a Transport object that implements the specified protocol.
+   * If an appropriate Transport object cannot be obtained, null is returned.
+   * @exception NoSuchProviderException If the provider is not found.
    */
   public Transport getTransport(String protocol)
-  throws NoSuchProviderException 
+    throws NoSuchProviderException
   {
-
-    // Variables
-    Provider provider;
-
-    // Get Provider for Protocol
-    provider = (Provider) providersByProtocol.get(protocol);
-
-    // Check Result
-    if (provider == null) 
-    {
-      throw new NoSuchProviderException();
-    } // if
-
-    // Check Type
-    if (provider.getType() != Provider.Type.TRANSPORT) 
-    {
-      throw new NoSuchProviderException();
-    }
-
-    // Generate Transport Object
-    return getTransport(provider);
-
-  } // getTransport()
+    return getTransport(new URLName(protocol, null, -1, null, null, null));
+  }
 
   /**
-   * Get a transport based on a URL Name.
-   * @param urlName URL name to look up provider with
-   * @returns Transport object
-   * @throws NoSuchProviderException Provider doesn't exist
+   * Get a Transport object for the given URLName.
+   * If the requested Transport object cannot be obtained,
+   * NoSuchProviderException is thrown. The "scheme" part of the URL 
+   * string (Refer RFC 1738) is used to locate the Transport protocol.
+   * @param url URLName that represents the desired Transport
+   * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport(URLName urlName)
-  throws NoSuchProviderException 
+  public Transport getTransport(URLName url)
+    throws NoSuchProviderException
   {
-
-    // Variables
-    String protocol;
-
-    // Get Protocol from URLName
-    protocol = urlName.getProtocol();
-    if (protocol == null) 
-    {
-      throw new NoSuchProviderException();
-    } // if
-
-    // Get Transport for Protocol
-    return getTransport(protocol);
-
-  } // getTransport()
+    String protocol = url.getProtocol();
+    Provider provider = getProvider(protocol);
+    return getTransport(provider, url);
+  }
 
   /**
-   * Returns an instance of the provider.
-   * @param provider Provider to instantiate transport from
-   * @returns Transport object
-   * @throws NoSuchProviderException Provider doesn't
-   * exist or supply a transport instance.
+   * Get an instance of the transport specified in the Provider.
+   * Instantiates the transport and returns it.
+   * @exception NoSuchProviderException If the provider is not found.
    */
   public Transport getTransport(Provider provider)
-  throws NoSuchProviderException 
+    throws NoSuchProviderException
   {
-    return getTransport(provider, null); // TODO
-  } // getTransport()
+    return getTransport(provider, null);
+  }
 
   /**
-   * Get transport based on protocol used to deliver
-   * to the provided address.
-   * @param address Address to deliver to
-   * @returns Transport object
-   * @throws NoSuchProviderException There doesn't exist
-   * a registered provider to deliver a message to
-   * the address.
+   * Get a Transport object that can transport a Message to the specified
+   * address type.
+   * @exception NoSuchProviderException If the provider is not found.
    */
   public Transport getTransport(Address address)
-  throws NoSuchProviderException 
+    throws NoSuchProviderException
   {
+    String provider = (String)addressMap.get(address.getType());
+    if (provider==null)
+      throw new NoSuchProviderException("No provider for address: "+
+          address.getType());
+    return getTransport(provider);
+  }
 
-    // Variables
-    String addressType;
-    String protocol;
-
-    // Get Address Type
-    addressType = address.getType();
-
-    // Check for protocol mapping for Type
-    protocol = addressMap.getProperty(addressType);
-
-    // Check for Error
-    if (protocol == null) 
+  private Transport getTransport(Provider provider, URLName urlname)
+    throws NoSuchProviderException
+  {
+    if (provider==null || provider.getType()!=Provider.Type.TRANSPORT)
+      throw new NoSuchProviderException("invalid provider");
+    try
     {
-      throw new NoSuchProviderException();
-    } // if
-
-    // Get Transport
-    return getTransport(protocol);
-
-  } // getTransport()
+      return (Transport)getService(provider, urlname);
+    }
+    catch(ClassCastException _ex)
+    {
+      throw new NoSuchProviderException("incorrect class");
+    }
+  }
 
   /**
-   * Get transport for specified provider and URL.
-   * @param provider Provider to use
-   * @param urlName URLName to use
-   * @returns Transport object
+   * Get a closed Folder object for the given URLName.
+   * If the requested Folder object cannot be obtained, null is returned.
+   * <p>
+   * The "scheme" part of the URL string (Refer RFC 1738) is used to locate 
+   * the Store protocol. The rest of the URL string (that is, the
+   * "schemepart", as per RFC 1738) is used by that Store in a protocol 
+   * dependent manner to locate and instantiate the appropriate Folder object.
+   * <p>
+   * Note that RFC 1738 also specifies the syntax for the "schemepart" for
+   * IP-based protocols (IMAP4, POP3, etc.). Providers of IP-based mail Stores
+   * should implement that syntax for referring to Folders.
+   * @param url URLName that represents the desired folder
+   * @exception NoSuchProviderException If a provider for the given URLName 
+   * is not found.
+   * @param MessagingException if the Folder could not be located or created.
    */
-  private Transport getTransport(Provider provider, URLName urlName)
-  throws NoSuchProviderException 
+  public Folder getFolder(URLName url)
+    throws MessagingException
   {
+    Store store = getStore(url);
+    store.connect();
+    return store.getFolder(url);
+  }
 
-    // Variables
-    Object service;
-
-    // Get Service
-    service = getService(provider, urlName);
-
-    // Check for Store
-    if (service instanceof Transport) 
-    {
-      return (Transport) service;
-    } // if
-
-    // Problem, return error
-    throw new NoSuchProviderException();
-
-  } // getTransport()
-
-  /**
-   * Load Providers.
-   * @param object Class to obtain loader from
-   */
-  private void loadProviders(Class object) 
+  private Object getService(Provider provider, URLName url)
+    throws NoSuchProviderException
   {
-
-    // Variables
+    if (provider==null)
+      throw new NoSuchProviderException("null");
+    if (url==null)
+      url = new URLName(provider.getProtocol(), null, -1, null, null, null);
+    
+    Class providerClass = null;
     ClassLoader loader;
-    Provider provider;
-    InputStream stream;
-    String home;
-    String resource;
-
-    // Get Class Loader
-    loader = object.getClassLoader();
-
-    try 
+    if (authenticator!=null)
+      loader = authenticator.getClass().getClassLoader();
+    else
+      loader = getClass().getClassLoader();
+    try
     {
-
-      // Load <java.home>/lib/javamail.provider
-      home = System.getProperty("java.home");
-      resource = home + "/lib/javamail.provider";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
+      providerClass = loader.loadClass(provider.getClassName());
+    }
+    catch (Exception e)
+    {
+      try
       {
-	loadProvidersFromStream(stream);
-      } // if
-
-    } catch (IOException e) 
-    {
-      System.out.println(e);
-    } // try
-
-    try 
-    {
-
-      // Load META-INF/javamail.provider
-      resource = "META-INF/javamail.provider";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
+        providerClass = Class.forName(provider.getClassName());
+      }
+      catch (Exception e2)
       {
-	loadProvidersFromStream(stream);
-      } // if
-
-    } catch (IOException e) 
+        if (debug)
+          e2.printStackTrace();
+        throw new NoSuchProviderException(provider.getProtocol());
+      }
+    }
+    try
     {
-      System.out.println(e);
-    } // try
-
-    try 
+      Class[] parameterTypes = {
+        javax.mail.Session.class, javax.mail.URLName.class
+      };
+      Constructor constructor = providerClass.getConstructor(parameterTypes);
+      Object[] parameters = {
+        this, url
+      };
+      return constructor.newInstance(parameters);
+    }
+    catch (Exception e)
     {
-
-      // Load META-INF/javamail.default.provider
-      resource = "META-INF/javamail.default.providers";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
-      {
-	loadProvidersFromStream(stream);
-      } // if
-
-    } catch (IOException e) 
-    {
-      System.out.println(e);
-    } // try
-
-  } // loadProviders()
+      if (debug)
+        e.printStackTrace();
+      throw new NoSuchProviderException(provider.getProtocol());
+    }
+  }
 
   /**
-   * Load Address Map.
-   * @param object Class to obtain loader from
+   * Save a PasswordAuthentication for this (store or transport) URLName.
+   * If <code>pw</code> is null the entry corresponding to the URLName 
+   * is removed.
+   * <p>
+   * This is normally used only by the store or transport implementations to
+   * allow authentication information to be shared among multiple uses of a
+   * session.
    */
-  private void loadAddressMap(Class object) 
+  public void setPasswordAuthentication(URLName url,
+      PasswordAuthentication pw)
   {
-
-    // Variables
-    ClassLoader loader;
-    Provider provider;
-    InputStream stream;
-    String home;
-    String resource;
-
-    // Get Class Loader
-    loader = object.getClassLoader();
-
-    try 
-    {
-
-      // Load <java.home>/lib/javamail.address.map
-      home = System.getProperty("java.home");
-      resource = home + "/lib/javamail.address.map";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
-      {
-	addressMap.load(stream);
-      } // if
-
-    } catch (IOException e) 
-    {
-      System.out.println(e);
-    } // try
-
-    try 
-    {
-
-      // Load META-INF/javamail.address.map
-      resource = "META-INF/javamail.address.map";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
-      {
-	addressMap.load(stream);
-      } // if
-
-    } catch (IOException e) 
-    {
-      System.out.println(e);
-    } // try
-
-    try 
-    {
-
-      // Load META-INF/javamail.default.address.map
-      resource = "META-INF/javamail.default.address.map";
-      stream = loader.getResourceAsStream(resource);
-      if (stream != null) 
-      {
-	addressMap.load(stream);
-      } // if
-
-    } catch (IOException e) 
-    {
-      System.out.println(e);
-    } // try
-
-  } // loadAddressMap()
+    if (pw==null)
+      authTable.remove(url);
+    else
+      authTable.put(url, pw);
+  }
 
   /**
-   * Load providers from specified stream.
-   * @param stream Stream to load providers from
-   * @throws IOException IO exception occurred during reading
+   * Return any saved PasswordAuthentication for this (store or transport)
+   * URLName. Normally used only by store or transport implementations.
    */
-  private void loadProvidersFromStream(InputStream stream)
-  throws IOException 
+  public PasswordAuthentication getPasswordAuthentication(URLName url)
   {
-
-    // Variables
-    BufferedReader input;
-    String line;
-    StringTokenizer tokens;
-    String section;
-    String field;
-    String value;
-    String value2;
-    int index;
-    String protocol;
-    String className;
-    String vendor;
-    String version;
-    Provider.Type providerType;
-    Provider provider;
-
-    // Get Reader
-    // TODO: This should 1.1 compatible...no readers
-    input = new BufferedReader(new InputStreamReader(stream));
-
-    // Process Each Line
-    line = input.readLine();
-    while (line != null) 
-    {
-
-      // Check for Comment
-      if (line.trim().startsWith("#") == false) 
-      {
-
-	// Initialize Elements
-	protocol = null;
-	className = null;
-	providerType = null;
-	vendor = null;
-	version = null;
-
-	// Tokenize Line
-	tokens = new StringTokenizer(line, ";");
-	while (tokens.hasMoreTokens() == true) 
-	{
-	  section = tokens.nextToken();
-	  index = section.indexOf("=");
-	  if (index != -1) 
-	  {
-	    field = section.substring(0, index).trim().toUpperCase();
-	    value = section.substring(index + 1).trim();
-
-	    // Check for Protocol
-	    if (field.equals("PROTOCOL") == true) 
-	    {
-	      protocol = value;
-
-	      // Check for Class
-	    } else if (field.equals("CLASS") == true) 
-	    {
-	      className = value;
-
-	      // Check for Type
-	    } else if (field.equals("TYPE") == true) 
-	    {
-
-	      value2 = value.toUpperCase();
-	      if (value2.equals("TRANSPORT") == true) 
-	      {
-		providerType = Provider.Type.TRANSPORT;
-	      } else if (value2.equals("STORE") == true) 
-	      {
-		providerType = Provider.Type.STORE;
-	      }
-
-	      // Check for Vendor
-	    } else if (field.equals("VENDOR") == true) 
-	    {
-	      vendor = value;
-
-	      // Check for Version
-	    } else if (field.equals("VERSION") == true) 
-	    {
-	      version = value;
-
-	    } // if
-	    // System.out.println("Field: " + field + " Value: " + value);
-	  }
-	} // while
-
-	// Check for necessary information for Provider
-	if ((protocol != null) &&
-	    (providerType != null) &&
-	    (className != null)) 
-	{
-
-	  // Create Provider
-	  provider = new Provider(providerType, protocol,
-				  className, vendor, version);
-
-	  try 
-	  {
-
-	    // Add Provider
-	    providers.addElement(provider);
-	    setProvider(provider);
-
-	  } catch (Exception e) 
-	  {
-	  } // try
-
-	} // if
-
-      } // if
-
-      // Read Next Line
-      line = input.readLine();
-
-    } // while
-
-  } // loadProvidersFromStream()
-
-  private static void pr(String value) 
-  {
-    // TODO
-  } // pr()
+    return (PasswordAuthentication)authTable.get(url);
+  }
 
   /**
-   * Request that callback be done to request a password
-   * authentication for this session.
-   * @param address Internet address being inquiried about
-   * @param port Port on host
-   * @param protocol Protocol being authenticated
-   * @param prompt Prompt to send to user
-   * @param defaultUsername Default username to use in authentiation
-   * @returns Password authentication, or null if unsuccessful
+   * Call back to the application to get the needed user name and password.
+   * The application should put up a dialog something like:
+   * <pre>
+   Connecting to <protocol> mail service on host <addr>, port <port>.
+   <prompt>
+   
+   User Name: <defaultUserName>
+   Password:
+   * @param addr InetAddress of the host. may be null.
+   * @param protocol protocol scheme (e.g. imap, pop3, etc.)
+   * @param prompt any additional String to show as part of the prompt; may be
+   * null.
+   * @param defaultUserName the default username. may be null.
    */
-  public PasswordAuthentication requestPasswordAuthentication(InetAddress address,
-							      int port, String protocol, String prompt, String defaultUserName) 
+  public PasswordAuthentication requestPasswordAuthentication(
+      InetAddress address, int port, String protocol, String prompt,
+      String defaultUserName)
   {
-
-    // Check for Authenticator
-    if (authenticator != null) 
-    {
-      return authenticator.requestPasswordAuthentication(address, port,
-							 protocol, prompt, defaultUserName);
-    } // if
-
-    // Unknown
+    if (authenticator!=null)
+      return authenticator.requestPasswordAuthentication(address, port, 
+          protocol, prompt, defaultUserName);
     return null;
-
-  } // requestPasswordAuthentication()
-
-  /**
-   * Set the debug state of the session.
-   * @param value Debug state to set
-   */
-  public void setDebug(boolean value) 
-  {
-    debug = value;
-  } // setDebug()
+  }
 
   /**
-   * Set the default password authentication for the specified
-   * URLName.
-   * @param urlName URLName to register PA with
-   * @param pass Password Authentication object
+   * Returns the Properties object associated with this Session.
    */
-  public void setPasswordAuthentication(URLName urlName,
-					PasswordAuthentication pass) 
+  public Properties getProperties()
   {
-    authTable.put(urlName, pass);
-  } // setPasswordAuthentication()
+    return props;
+  }
 
+  /**
+   * Returns the value of the specified property.
+   * Returns null if this property does not exist.
+   */
+  public String getProperty(String name)
+  {
+    return props.getProperty(name);
+  }
 
-} // Session
+}

@@ -1,38 +1,46 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * FolderListener.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
 import java.util.EventListener;
 
 /**
- * Folder Listener Interface.
+ * This is the Listener interface for Folder events.
  */
-public interface FolderListener extends EventListener {
+public interface FolderListener
+  extends EventListener
+{
 
-	//-------------------------------------------------------------
-	// Interface: FolderListener ------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a Folder is created.
+   */
+  public void folderCreated(FolderEvent e);
 
-	/**
-	 * Folder created.
-	 * @param event Folder event
-	 */
-	public abstract void folderCreated(FolderEvent event);
+  /**
+   * Invoked when a folder is deleted.
+   */
+  public void folderDeleted(FolderEvent e);
 
-	/**
-	 * Folder deleted.
-	 * @param event Folder event
-	 */
-	public abstract void folderDeleted(FolderEvent event);
-
-	/**
-	 * Folder renamed.
-	 * @param event Folder event
-	 */
-	public abstract void folderRenamed(FolderEvent event);
-
-
-} // FolderListener
+  /**
+   * Invoked when a folder is renamed.
+   */
+  public void folderRenamed(FolderEvent e);
+  
+}

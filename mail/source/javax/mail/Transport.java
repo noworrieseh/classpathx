@@ -1,180 +1,356 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * Transport.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
-// Imports
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
-import javax.mail.event.*;
+import javax.mail.event.TransportEvent;
+import javax.mail.event.TransportListener;
 
 /**
- * A Transport Service is a Provider that implements a transport
- * protocol for sending out a message.
- * @author	Andrew Selkirk
- * @version	1.0
+ * An abstract class that models a message transport.
+ * Subclasses provide actual implementations.
+ * <p>
+ * Note that Transport extends the Service class, which provides many common
+ * methods for naming transports, connecting to transports, and listening to
+ * connection events.
  */
-public abstract class Transport extends Service {
+public abstract class Transport 
+  extends Service
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /*
+   * Transport listener list.
+   */
+  private Vector transportListeners;
 
-	/**
-	 * Transport listeners
-	 */
-	private	Vector	transportListeners	= new Vector();
+  /**
+   * Constructor.
+   * @param session Session object for this Transport.
+   * @param url URLName object to be used for this Transport
+   */
+  public Transport(Session session, URLName url)
+  {
+    super(session, url);
+  }
 
+  /**
+   * Send a message.
+   * The message will be sent to all recipient addresses specified in the 
+   * message (as returned from the Message method 
+   * <code>getAllRecipients</code>), using message transports appropriate to
+   * each address. The <code>send</code> method calls the 
+   * <code>saveChanges</code> method on the message before sending it.
+   * <p>
+   * If any of the recipient addresses is detected to be invalid by the
+   * Transport during message submission, a SendFailedException is thrown.
+   * Clients can get more detail about the failure by examining the exception.
+   * Whether or not the message is still sent succesfully to any valid 
+   * addresses depends on the Transport implementation. See 
+   * SendFailedException for more details. Note also that success does not 
+   * imply that the message was delivered to the ultimate recipient, as 
+   * failures may occur in later stages of delivery. Once a Transport 
+   * accepts a message for delivery to a recipient, failures that occur 
+   * later should be reported to the user via another mechanism, such as 
+   * returning the undeliverable message.
+   * @param msg the message to send
+   * @exception SendFailedException if the message could not be sent to 
+   * some or any of the recipients.
+   */
+  public static void send(Message msg)
+    throws MessagingException
+  {
+    msg.saveChanges();
+    doSend(msg, msg.getAllRecipients());
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Send the message to the specified addresses, ignoring any recipients
+   * specified in the message itself. The <code>send</code> method calls 
+   * the <code>saveChanges</code> method on the message before sending it.
+   * @param msg the message to send
+   * @param addresses the addresses to which to send the message
+   * @exception SendFailedException if the message could not be sent to 
+   * some or any of the recipients.
+   */
+  public static void send(Message msg, Address[] addresses)
+    throws MessagingException
+  {
+    msg.saveChanges();
+    doSend(msg, addresses);
+  }
 
-	/**
-	 * Create new Transport.
-	 * @param session Session that created this Transport
-	 * @param urlName URLName representation of transport
-	 */
-	public Transport(Session session, URLName urlName) {
-		super(session, urlName);
-	} // Transport()
+  /*
+   * Performs the send after saveChanges() has been called.
+   */
+  private static void doSend(Message msg, Address[] addresses)
+    throws MessagingException
+  {
+    if (addresses==null || addresses.length==0)
+      throw new SendFailedException("No recipient addresses");
+    
+    Hashtable addressesByType = new Hashtable();
+    for (int i = 0; i<addresses.length; i++)
+    {
+      String type = addresses[i].getType();
+      if (addressesByType.containsKey(type))
+        ((Vector)addressesByType.get(type)).addElement(addresses[i]);
+      else
+      {
+        Vector addressList = new Vector();
+        addressList.addElement(addresses[i]);
+        addressesByType.put(type, addressList);
+      }
+    }
+    
+    int size = addressesByType.size();
+    if (size==0)
+      throw new SendFailedException("No recipient addresses");
+    
+    Session session = msg.session;
+    if (msg.session==null) 
+      msg.session = Session.getDefaultInstance(System.getProperties(), null);
 
+    MessagingException ex = null;
+    boolean error = false;
+    Vector validSent = new Vector();
+    Vector validUnsent = new Vector();
+    Vector invalid = new Vector();
+    
+    for (Enumeration e = addressesByType.elements(); e.hasMoreElements();)
+    {
+      Vector addressList = (Vector)e.nextElement();
+      Address[] addressArray = new Address[addressList.size()];
+      addressList.copyInto(addressArray);
 
-	//-------------------------------------------------------------
-	// Public Accessor Methods ------------------------------------
-	//-------------------------------------------------------------
+      if (addressArray.length<1)
+        break;
+      
+      Transport transport = session.getTransport(addressArray[0]);
+      if (transport==null)
+      {
+        for (int i = 0; i<addressArray.length; i++)
+          invalid.addElement(addressArray[i]);
+      }
+      else
+      {
+        try
+        {
+          transport.connect();
+          transport.sendMessage(msg, addressArray);
+        }
+        catch (SendFailedException sfex)
+        {
+          error = true;
+          if (ex==null)
+            ex = sfex;
+          else
+            ex.setNextException(sfex);
 
-	/**
-	 * Add a listener for transport events.
-	 * @param listener Transport listener
-	 */
-	public synchronized void addTransportListener(TransportListener listener) {
-		if (transportListeners.contains(listener) == false) {
-			transportListeners.addElement(listener);
-		}
-	} // addTransportListener()
+          Address[] a;
+          
+          a = sfex.getValidSentAddresses();
+          if (a!=null)
+          {
+            for (int i = 0; i<a.length; i++)
+              validSent.addElement(a[i]);
 
-	/**
-	 * Remove a listener from being notified of transport events.
-	 * @param listener Transport listener
-	 */
-	public synchronized void removeTransportListener(TransportListener listener) {
-		if (transportListeners.contains(listener) == true) {
-			transportListeners.remove(listener);
-		}
-	} // removeTransportListener()
+          }
+          a = sfex.getValidUnsentAddresses();
+          if (a!=null)
+          {
+            for (int i = 0; i<a.length; i++)
+              validUnsent.addElement(a[i]);
 
-	/**
-	 * Notify Transport listeners of event.  The event is queued into a
-	 * Service event queue.
-	 * @param type Transport type
-	 * @param validSent Valid sent addresses
-	 * @param validUnsent Valid unsent addresses
-	 * @param invalid Invalid addresses
-	 * @param message Message that was sent
-	 */
-	protected void notifyTransportListeners(int type, Address[] validSent,
-			Address[] validUnsent, Address[] invalid, Message message) {
+          }
+          a = sfex.getInvalidAddresses();
+          if (a!=null)
+          {
+            for (int i = 0; i<a.length; i++)
+              invalid.addElement(a[i]);
+          }
+        }
+        catch (MessagingException mex)
+        {
+          error = true;
+          if (ex==null)
+            ex = mex;
+          else
+            ex.setNextException(mex);
+        }
+        finally
+        {
+          transport.close();
+        }
+      }
+    }
 
-		// Variables
-		TransportEvent	event;
+    if (error || invalid.size()!=0 || validSent.size()!=0)
+    {
+      Address[] validSentAddresses = null;
+      Address[] validUnsentAddresses = null;
+      Address[] invalidAddresses = null;
+      
+      if (validSent.size() > 0)
+      {
+        validSentAddresses = new Address[validSent.size()];
+        validSent.copyInto(validSentAddresses);
+      }
+      if (validUnsent.size() > 0)
+      {
+        validUnsentAddresses = new Address[validUnsent.size()];
+        validUnsent.copyInto(validUnsentAddresses);
+      }
+      if (invalid.size() > 0)
+      {
+        invalidAddresses = new Address[invalid.size()];
+        invalid.copyInto(invalidAddresses);
+      }
+      throw new SendFailedException("Send failed", ex,
+          validSentAddresses, validUnsentAddresses, invalidAddresses);
+    }
+  }
 
-		// Create Event
-		event = new TransportEvent(this, type, validSent,
-									validUnsent, invalid, message);
+  /**
+   * Send the Message to the specified list of addresses.
+   * An appropriate TransportEvent indicating the delivery status is 
+   * delivered to any TransportListener registered on this Transport. 
+   * Also, if any of the addresses is invalid, a SendFailedException is 
+   * thrown. Note however, that the message is sent to the valid addresses.
+   * <p>
+   * Unlike the static <code>send</code> method, the <code>sendMessage</code>
+   * method does not call the <code>saveChanges</code> method on the message;
+   * the caller should do so.
+   * @param msg The Message to be sent
+   * @param addresses List of addresses to send this message to
+   * @exception SendFailedException if the send failed because of 
+   * invalid addresses.
+   * @exception MessagingException if the connection is dead 
+   * or not in the connected state
+   */
+  public abstract void sendMessage(Message msg, Address[] addresses)
+    throws MessagingException;
 
-		// Queue Event
-		queueEvent(event, (Vector) transportListeners.clone());
+  // -- Event management --
+  
+  /*
+   * Because the propagation of events of different kinds in the JavaMail
+   * API is so haphazard, I have here sacrificed a small time advantage for
+   * readability and consistency.
+   *
+   * All the various propagation methods now call a method with a name based
+   * on the eventual listener method name prefixed by 'fire', as is the
+   * preferred pattern for usage of the EventListenerList in Swing.
+   *
+   * Note that all events are currently delivered synchronously, where in
+   * Sun's implementation a different thread is used for event delivery.
+   * 
+   * TODO Examine the impact of this.
+   */
+  
+  // -- Transport events --
 
-	} // notifyTransportListeners()
+  /**
+   * Add a listener for Transport events.
+   */
+  public synchronized void addTransportListener(TransportListener l)
+  {
+    if (transportListeners==null)
+      transportListeners = new Vector();
+    transportListeners.addElement(l);
+  }
 
-	/**
-	 * Send a message.  Recipients are determined from the message.
-	 * Before the message is sent, saveChanges() is called.
-	 * @param message Message to send
-	 * @throws MessaginException Messaging exception occurred
-	 */
-	public static void send(Message message) throws MessagingException {
+  /**
+   * Remove a listener for Transport events.
+   */
+  public synchronized void removeTransportListener(TransportListener l)
+  {
+    if (transportListeners!=null)
+      transportListeners.removeElement(l);
+  }
 
-		// Variables
-		Address[]	addresses;
+  /**
+   * Notify all TransportListeners. Transport implementations are expected to
+   * use this method to broadcast TransportEvents.
+   */
+  protected void notifyTransportListeners(int type, 
+      Address[] validSent, Address[] validUnsent, Address[] invalid,
+      Message msg)
+  {
+    TransportEvent event = 
+      new TransportEvent(this, type, validSent, validUnsent, invalid, msg);
+    switch (type)
+    {
+      case TransportEvent.MESSAGE_DELIVERED:
+        fireMessageDelivered(event);
+        break;
+      case TransportEvent.MESSAGE_NOT_DELIVERED:
+        fireMessageNotDelivered(event);
+        break;
+      case TransportEvent.MESSAGE_PARTIALLY_DELIVERED:
+        fireMessagePartiallyDelivered(event);
+        break;
+    }
+  }
 
-		// Get Addresses
-		addresses = message.getAllRecipients();
-
-		// Save Changes
-		message.saveChanges();
-
-		// Send Message
-		send0(message, addresses);
-
-	} // send()
-
-	/**
-	 * Send a message.  Recipients are not determined from the message
-	 * are are sent exclusively to the provided addresses.  This allows
-	 * for the implementation of BCC type destinations.  Before the
-	 * message is sent, saveChanges() is called.
-	 * @param message Message to send
-	 * @param addresses Addresses to send message to
-	 * @throws MessaginException Messaging exception occurred
-	 */
-	public static void send(Message message, Address[] addresses)
-			throws MessagingException {
-
-		// Save Changes
-		message.saveChanges();
-
-		// Send Message
-		send0(message, addresses);
-
-	} // send()
-
-	/**
-	 * Determine the Transport necessary to send to each address and
-	 * send the message.
-	 * @param message Message to send
-	 * @param addresses Addresses to send message to
-	 * @throws MessaginException Messaging exception occurred
-	 */
-	private static void send0(Message message, Address[] addresses)
-			throws MessagingException {
-
-		// Variables
-		Session		session;
-		Transport	transport;
-		int			index;
-
-		// Get Session
-		// OK, the problem is we need to get ourselves a valid
-		// session object so that we can do the song and dance to
-		// get the related Transport object.  Assuming that a
-		// default session has already been created, the following
-		// will return us a valid Session.  Is this the way to do it?
-		session = Session.getDefaultInstance(null, null);
-
-		// Process Each Address
-		for (index = 0; index < addresses.length; index++) {
-
-			// Get Transport for Address
-			transport = session.getTransport(addresses[index]);
-
-			// Send Message
-			transport.sendMessage(message,
-						new Address[]{addresses[index]});
-
-		} // for: index
-
-	} // send0()
-
-	/**
-	 * Implementation of sending message over the determined protocol.
-	 * @param message Message to send
-	 * @param addresses Addresses to send message to
-	 * @throws MessaginException Messaging exception occurred
-	 */
-	public abstract void sendMessage(Message message, Address[] addresses)
-			throws MessagingException;
-
-
-} // Transport
+  /*
+   * Propagates a MESSAGE_DELIVERED TransportEvent 
+   * to all registered listeners.
+   */
+  void fireMessageDelivered(TransportEvent event)
+  {
+    if (transportListeners!=null)
+    {
+      for (Enumeration e = transportListeners.elements(); 
+          e.hasMoreElements(); )
+        ((TransportListener)e.nextElement()).messageDelivered(event);
+    }
+  }
+  
+  /*
+   * Propagates a MESSAGE_NOT_DELIVERED TransportEvent 
+   * to all registered listeners.
+   */
+  void fireMessageNotDelivered(TransportEvent event)
+  {
+    if (transportListeners!=null)
+    {
+      for (Enumeration e = transportListeners.elements(); 
+          e.hasMoreElements(); )
+        ((TransportListener)e.nextElement()).messageNotDelivered(event);
+    }
+  }
+  
+  /*
+   * Propagates a MESSAGE_PARTIALLY_DELIVERED TransportEvent 
+   * to all registered listeners.
+   */
+  void fireMessagePartiallyDelivered(TransportEvent event)
+  {
+    if (transportListeners!=null)
+    {
+      for (Enumeration e = transportListeners.elements(); 
+          e.hasMoreElements(); )
+        ((TransportListener)e.nextElement()).messagePartiallyDelivered(event);
+    }
+  }
+  
+}

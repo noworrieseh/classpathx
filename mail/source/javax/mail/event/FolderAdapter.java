@@ -1,49 +1,53 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * FolderAdapter.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
 /**
- * Folder Adapter
+ * The adapter which receives Folder events.
+ * The methods in this class are empty; this class is provided 
+ * as a convenience for easily creating listeners by extending this class 
+ * and overriding only the methods of interest.
  */
-public abstract class FolderAdapter implements FolderListener {
+public abstract class FolderAdapter
+  implements FolderListener
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a Folder is created.
+   */
+  public void folderCreated(FolderEvent e)
+  {
+  }
 
-	/**
-	 * Create a new Folder Adapter.
-	 */
-	public FolderAdapter() {
-	} // FolderAdapter()
+  /**
+   * Invoked when a folder is renamed.
+   */
+  public void folderRenamed(FolderEvent e)
+  {
+  }
 
+  /**
+   * Invoked when a folder is deleted.
+   */
+  public void folderDeleted(FolderEvent e)
+  {
+  }
 
-	//-------------------------------------------------------------
-	// Interface: FolderListener ------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Folder created.
-	 * @param event Folder event
-	 */
-	public void folderCreated(FolderEvent event) {
-	} // folderCreated()
-
-	/**
-	 * Folder deleted.
-	 * @param event Folder event
-	 */
-	public void folderDeleted(FolderEvent event) {
-	} // folderDeleted()
-
-	/**
-	 * Folder renamed.
-	 * @param event Folder event
-	 */
-	public void folderRenamed(FolderEvent event) {
-	} // folderRenamed()
-
-
-} // FolderAdapter
+}

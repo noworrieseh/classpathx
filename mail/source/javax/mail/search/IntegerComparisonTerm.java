@@ -1,82 +1,93 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * IntegerComparisonTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.Message;
-
 /**
- * Integer Comparison Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for integers.
  */
-public abstract class IntegerComparisonTerm extends ComparisonTerm {
+public abstract class IntegerComparisonTerm
+  extends ComparisonTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The number.
+   */
+  protected int number;
 
-	/**
-	 * Comparison number.
-	 */
-	protected	int	number	= 0;
+  protected IntegerComparisonTerm(int comparison, int number)
+  {
+    this.comparison = comparison;
+    this.number = number;
+  }
 
+  /**
+   * Return the number to compare with.
+   */
+  public int getNumber()
+  {
+    return number;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /** 
+   * Return the type of comparison.
+   */
+  public int getComparison()
+  {
+    return super.comparison;
+  }
 
-	/**
-	 * Create a new Comparison Term.
-	 */
-	public IntegerComparisonTerm(int comparison, int number) {
-		this.comparison = comparison;
-		this.number = number;
-	} // IntegerComparisonTerm()
+  protected boolean match(int i)
+  {
+    switch (comparison)
+    {
+      case LE:
+        return i<=number;
+      case LT:
+        return i<number;
+      case EQ:
+        return i==number;
+      case NE:
+        return i!=number;
+      case GT:
+        return i>number;
+      case GE:
+        return i>=number;
+    }
+    return false;
+  }
 
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return (other instanceof IntegerComparisonTerm &&
+        ((IntegerComparisonTerm)other).number==number &&
+        super.equals(other));
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get comparison operator.
-	 * @returns Comparison operator
-	 */
-	public int getComparison() {
-		return comparison;
-	} // getComparison()
-
-	/**
-	 * Get comparison value.
-	 * @returns Comparison value
-	 */
-	public int getNumber() {
-		return number;
-	} // getNumber()
-
-	/**
-	 * Integer comparison match.
-	 * @param value Value to check
-	 * @returns true if match, false otherwise
-	 */
-	protected boolean match(int value) {
-		switch (comparison) {
-			case LE:
-				return (value <= number);
-			case LT:
-				return (value < number);
-			case EQ:
-				return (value == number);
-			case GT:
-				return (value > number);
-			case GE:
-				return (value >= number);
-		} // switch()
-		return false;
-	} // match()
-
-
-} // IntegerComparisonTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return number + super.hashCode();
+  }
+}

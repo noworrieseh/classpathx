@@ -1,63 +1,65 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * PasswordAuthentication.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
 /**
- * Password Authentication.
+ * The class PasswordAuthentication is a data holder that is used by
+ * Authenticator. It is simply a repository for a user name and a password.
  */
-public final class PasswordAuthentication {
+public final class PasswordAuthentication
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /*
+   * The user name.
+   */
+  private String userName;
 
-	/**
-	 * User name for authentication.
-	 */
-	private	String	userName	= null;
+  /*
+   * The password.
+   */
+  private String password;
 
-	/**
-	 * Password for authentication.
-	 */
-	private	String	password	= null;
+  /**
+   * Initialize a new PasswordAuthentication
+   * @param userName the user name
+   * @param password The user's password
+   */
+  public PasswordAuthentication(String userName, String password)
+  {
+    this.userName = userName;
+    this.password = password;
+  }
 
+  /**
+   * @return the user name
+   */
+  public String getUserName()
+  {
+    return userName;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Create new Password Authentication.
-	 * @param userName User Name
-	 * @param password Password
-	 */
-	public PasswordAuthentication(String userName, String password) {
-		this.userName = userName;
-		this.password = password;
-	} // PasswordAuthentication()
-
-
-	//-------------------------------------------------------------
-	// Metods -----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get password.
-	 * @returns Password
-	 */
-	public String getPassword() {
-		return password;
-	} // getPassword()
-
-	/**
-	 * Get user name.
-	 * @returns User name
-	 */
-	public String getUserName() {
-		return userName;
-	} // getUserName()
-
-
-} // PasswordAuthentication
+  /**
+   * @return the password
+   */
+  public String getPassword()
+  {
+    return password;
+  }
+}

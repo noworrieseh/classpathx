@@ -1,32 +1,39 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * IllegalWriteException.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
 /**
- * Illegal Write Exception
+ * The exception thrown when a write is attempted on a read-only attribute 
+ * of any Messaging object.
  */
-public class IllegalWriteException extends MessagingException {
+public class IllegalWriteException 
+  extends MessagingException
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  public IllegalWriteException()
+  {
+  }
 
-	/**
-	 * Create new illegal write exception.
-	 */
-	public IllegalWriteException() {
-		super();
-	} // IllegalWriteException()
+  public IllegalWriteException(String message)
+  {
+    super(message);
+  }
 
-	/**
-	 * Create new illegal write exception with description.
-	 * @param message Description
-	 */
-	public IllegalWriteException(String message) {
-		super(message);
-	} // IllegalWriteException()
-
-
-} // IllegalWriteException
+}

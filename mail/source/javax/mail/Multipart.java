@@ -1,164 +1,228 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * Mulipart.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail;
 
-// Imports
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Vector;
+import javax.activation.DataSource;
 
 /**
- * Multipart.
+ * Multipart is a container that holds multiple body parts. 
+ * Multipart provides methods to retrieve and set its subparts.
+ * <p>
+ * Multipart also acts as the base class for the content object returned by 
+ * most Multipart DataContentHandlers. For example, invoking 
+ * <code>getContent()</code> on a DataHandler whose source is a 
+ * "multipart/signed" data source may return an appropriate subclass 
+ * of Multipart.
+ * <p>
+ * Some messaging systems provide different subtypes of Multiparts.
+ * For example, MIME specifies a set of subtypes that include 
+ * "alternative", "mixed", "related", "parallel", "signed", etc.
+ * <p>
+ * Multipart is an abstract class. Subclasses provide actual implementations.
  */
-public abstract class Multipart {
+public abstract class Multipart
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Vector of BodyPart objects.
+   */
+  protected Vector parts;
 
-	/**
-	 * Collection of parts.
-	 */
-	protected	Vector	parts		= new Vector();
+  /**
+   * This field specifies the content-type of this multipart object.
+   * It defaults to "multipart/mixed".
+   */
+  protected String contentType;
 
-	/**
-	 * Content type of multipart.
-	 */
-	protected	String	contentType	= null;
+  /**
+   * The Part containing this Multipart, if known.
+   */
+  protected Part parent;
 
-	/**
-	 * Parent part
-	 */
-	protected	Part	parent		= null;
+  /**
+   * Default constructor. An empty Multipart object is created.
+   */
+  protected Multipart()
+  {
+    parts = new Vector();
+    contentType = "multipart/mixed";
+  }
 
+  /**
+   * Setup this Multipart object from the given MultipartDataSource.
+   * <p>
+   * The method adds the MultipartDataSource's BodyPart objects into this
+   * Multipart. This Multipart's <code>contentType</code> is set to that of 
+   * the MultipartDataSource.
+   * <p>
+   * This method is typically used in those cases where one has a multipart 
+   * data source that has already been pre-parsed into the individual body 
+   * parts (for example, an IMAP datasource), but needs to create an 
+   * appropriate Multipart subclass that represents a specific multipart 
+   * subtype.
+   * @param mp Multipart datasource
+   */
+  protected void setMultipartDataSource(MultipartDataSource mp)
+    throws MessagingException
+  {
+    contentType = mp.getContentType();
+    int count = mp.getCount();
+    for (int i = 0; i<count; i++)
+      addBodyPart(mp.getBodyPart(i));
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the content-type of this Multipart.
+   * <p>
+   * This implementation just returns the value of the 
+   * <code>contentType</code> field.
+   */
+  public String getContentType()
+  {
+    return contentType;
+  }
 
-	/**
-	 * Create new multipart.
-	 */
-	protected Multipart() {
-	} // Multipart()
+  /**
+   * Return the number of enclosed BodyPart objects.
+   */
+  public int getCount()
+    throws MessagingException
+  {
+    return (parts==null) ? 0 : parts.size();
+  }
 
+  /**
+   * Get the specified Part.
+   * Parts are numbered starting at 0.
+   * @param index the index of the desired Part
+   * @exception IndexOutOfBoundsException if the given index is out of range.
+   */
+  public BodyPart getBodyPart(int index)
+    throws MessagingException
+  {
+    if (parts==null)
+      throw new IndexOutOfBoundsException();
+    return (BodyPart)parts.elementAt(index);
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Remove the specified part from the multipart message.
+   * Shifts all the parts after the removed part down one.
+   * @param part The part to remove
+   * @return true if part removed, false otherwise
+   * @exception MessagingException if no such Part exists
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification of existing values
+   */
+  public boolean removeBodyPart(BodyPart part)
+    throws MessagingException
+  {
+    if (parts==null)
+      throw new MessagingException("No such BodyPart");
+    boolean success = parts.removeElement(part);
+    if (success)
+      part.setParent(null);
+    return success;
+  }
 
-	/**
-	 * Get parent part.
-	 * @returns Parent part
-	 */
-	public Part getParent() {
-		return parent;
-	} // getParent()
+  /**
+   * Remove the part at specified location (starting from 0).
+   * Shifts all the parts after the removed part down one.
+   * @param index Index of the part to remove
+   * @exception IndexOutOfBoundsException if the given index is out of range.
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification of existing values
+   */
+  public void removeBodyPart(int index)
+    throws MessagingException
+  {
+    if (parts==null)
+      throw new IndexOutOfBoundsException("No such BodyPart");
+    BodyPart part = (BodyPart)parts.elementAt(index);
+    parts.removeElementAt(index);
+    part.setParent(null);
+  }
 
-	/**
-	 * Write object to output stream.
-	 * @param stream Output stream to write to
-	 */
-	public abstract void writeTo(OutputStream stream)
-		throws IOException, MessagingException;
+  /**
+   * Adds a Part to the multipart. 
+   * The BodyPart is appended to the list of existing Parts.
+   * @param part The Part to be appended
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification of existing values
+   */
+  public synchronized void addBodyPart(BodyPart part)
+    throws MessagingException
+  {
+    if (parts==null)
+      parts = new Vector();
+    parts.addElement(part);
+    part.setParent(this);
+  }
 
-	/**
-	 * Get content type.
-	 * @returns Content type
-	 */
-	public String getContentType() {
-		return contentType;
-	} // getContentType()
+  /**
+   * Adds a BodyPart at position index.
+   * If index is not the last one in the list, the subsequent parts 
+   * are shifted up. If index is larger than the number of parts present,
+   * the BodyPart is appended to the end.
+   * @param part The BodyPart to be inserted
+   * @param index Location where to insert the part
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification of existing values
+   */
+  public synchronized void addBodyPart(BodyPart part, int index)
+    throws MessagingException
+  {
+    if (parts==null)
+      parts = new Vector();
+    parts.insertElementAt(part, index);
+    part.setParent(this);
+  }
 
-	/**
-	 * Add body part.
-	 * @param part Part to add
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public synchronized void addBodyPart(BodyPart part)
-			throws MessagingException {
-		parts.addElement(part);
-	} // addBodyPart()
+  /**
+   * Output an appropriately encoded bytestream to the given OutputStream.
+   * The implementation subclass decides the appropriate encoding algorithm 
+   * to be used. The bytestream is typically used for sending.
+   */
+  public abstract void writeTo(OutputStream os)
+    throws IOException, MessagingException;
 
-	/**
-	 * Add body part.
-	 * @param part Part to add
-	 * @param index Position index to add
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public synchronized void addBodyPart(BodyPart part, int index)
-			throws MessagingException {
-		parts.insertElementAt(part, index);
-	} // addBodyPart()
+  /**
+   * Return the Part that contains this Multipart object, or null if not known.
+   */
+  public Part getParent()
+  {
+    return parent;
+  }
 
-	/**
-	 * Get body part.
-	 * @param index Index of part
-	 * @returns Body Part
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public BodyPart getBodyPart(int index) throws MessagingException {
-		return (BodyPart) parts.elementAt(index);
-	} // getBodyPart()
-
-	/**
-	 * Get count.
-	 * @returns Body part count
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public int getCount() throws MessagingException {
-		return parts.size();
-	} // getCount()
-
-	/**
-	 * Remove body part.
-	 * @param part Body part to remove
-	 * @returns true if successful, false otherwise
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public boolean removeBodyPart(BodyPart part)
-			throws MessagingException {
-		return parts.removeElement(part);
-	} // removeBodyPart()
-
-	/**
-	 * Remove body part at index.
-	 * @param index Index of body part ot remove
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	public void removeBodyPart(int index) throws MessagingException {
-		parts.removeElementAt(index);
-	} // removeBodyPart()
-
-	/**
-	 * Set data source.
-	 * @param dataSource Data source
-	 * @throws MessagingException Messaging exception occurred
-	 */
-	protected void setMultipartDataSource(MultipartDataSource dataSource)
-			throws MessagingException {
-
-		// Variables
-		int	index;
-
-		// Add Body Parts
-		for (index = 0; index < dataSource.getCount(); index++) {
-			addBodyPart(dataSource.getBodyPart(index));
-		} // for: index
-
-		// Set Content Type
-		contentType = dataSource.getContentType();
-
-	} // setMultipartDataSource()
-
-	/**
-	 * Set parent body part.
-	 * @param parent Parent body part
-	 */
-	public void setParent(Part parent) {
-		this.parent = parent;
-	} // setParent()
-
-
-} // Multipart
+  /**
+   * Set the parent of this Multipart to be the specified Part.
+   * Normally called by the Message or BodyPart 
+   * <code>setContent(Multipart)</code> method. parent may be null if 
+   * the Multipart is being removed from its containing Part.
+   */
+  public void setParent(Part part)
+  {
+    parent = part;
+  }
+  
+}

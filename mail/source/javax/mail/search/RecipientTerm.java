@@ -1,83 +1,100 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * RecipientTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Message;
 
 /**
- * Recipient Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for the Recipient Address headers.
  */
-public final class RecipientTerm extends AddressTerm {
+public final class RecipientTerm
+  extends AddressTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The recipient type.
+   */
+  protected Message.RecipientType type;
 
-	/**
-	 * Recipient Type.
-	 */
-	protected Message.RecipientType	type	= null;
+  /**
+   * Constructor.
+   * @param type the recipient type
+   * @param address the address to match for
+   */
+  public RecipientTerm(Message.RecipientType type, Address address)
+  {
+    super(address);
+    this.type = type;
+  }
 
+  /**
+   * Return the type of recipient to match with.
+   */
+  public Message.RecipientType getRecipientType()
+  {
+    return type;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The match method.
+   * @param msg The address match is applied to this Message's recepient address
+   * @param true if the match succeeds, otherwise false
+   */
+  public boolean match(Message msg)
+  {
+    Address aaddress[];
+    try
+    {
+      Address[] addresses = msg.getRecipients(type);
+      if (addresses!=null)
+      {
+        for (int i = 0; i<addresses.length; i++)
+        {
+          if (super.match(addresses[i]))
+            return true;
+        }
+      }
+    }
+    catch (Exception e)
+    {
+    }
+    return false;
+  }
 
-	/**
-	 * Create a new Recipient Term.
-	 */
-	public RecipientTerm(Message.RecipientType type, Address address) {
-		super(address);
-		this.type = type;
-	} // RecipientTerm()
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return (other instanceof RecipientTerm &&
+        ((RecipientTerm)other).type.equals(type) &&
+        super.equals(other));
+  }
 
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return type.hashCode() + super.hashCode();
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Get recipient type.
-	 * @returns Recipient type
-	 */
-	public Message.RecipientType getRecipientType() {
-		return type;
-	} // getRecipientType()
-
-	/**
-	 * Recipient Address comparison match.
-	 * @param value Recipient address to check
-	 * @returns true if match, false otherwise
-	 */
-	public boolean match(Message message) {
-
-		// Variables
-		Address[]	recipients;
-		int		index;
-
-		try {
-			// Get From List
-			recipients = message.getRecipients(type);
-
-			// Check From List
-			for (index = 0; index < recipients.length; index++) {
-				if (match(recipients[index]) == true) {
-					return true;
-				} // if
-			} // for
-
-		} catch (Exception e) {
-		} // try
-
-		// Return Result
-		return false;
-
-	} // match()
-
-
-} // RecipientTerm
+}

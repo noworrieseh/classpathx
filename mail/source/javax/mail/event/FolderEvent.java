@@ -1,116 +1,146 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * FolderEvent.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Folder;
 
 /**
- * Folder Event.
+ * This class models Folder existence events.
+ * FolderEvents are delivered to FolderListeners registered on 
+ * the affected Folder as well as the containing Store.
+ * <p>
+ * Service providers vary widely in their ability to notify clients of these
+ * events. At a minimum, service providers must notify listeners registered 
+ * on the same Store or Folder object on which the operation occurs.
+ * Service providers may also notify listeners when changes are made through 
+ * operations on other objects in the same virtual machine, or by other 
+ * clients in the same or other hosts. Such notifications are not required 
+ * and are typically not supported by mail protocols (including IMAP).
  */
-public class FolderEvent extends MailEvent {
+public class FolderEvent
+  extends MailEvent
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * The folder was created.
+   */
+  public static final int CREATED = 1;
 
-	public static final int	CREATED		= 1;
-	public static final int	DELETED		= 2;
-	public static final int	RENAMED		= 3;
+  /**
+   * The folder was deleted.
+   */
+  public static final int DELETED = 2;
 
-	/**
-	 * Connection type of event.
-	 */
-	protected		int	type		= -1;
+  /**
+   * The folder was renamed.
+   */
+  public static final int RENAMED = 3;
 
-	/**
-	 * Folder source of event.
-	 */
-	protected transient	Folder	folder		= null;
+  /**
+   * The event type.
+   */
+  protected int type;
 
-	/**
-	 * New folder.
-	 */
-	protected transient	Folder	newFolder	= null;
+  /**
+   * The folder the event occurred on.
+   */
+  protected transient Folder folder;
 
+  /**
+   * The folder that represents the new name, in case of a RENAMED event.
+   */
+  protected transient Folder newFolder;
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Constructor.
+   * @param source The source of the event
+   * @param folder The affected folder
+   * @param type The event type
+   */
+  public FolderEvent(Object source, Folder folder, int type)
+  {
+    this(source, folder, folder, type);
+  }
 
-	public FolderEvent(Object source, Folder folder, int type) {
-		this(source, folder, null, type);
-	} // FolderEvent()
+  /**
+   * Constructor. Use for RENAMED events.
+   * @param source The source of the event
+   * @param oldFolder The folder that is renamed
+   * @param newFolder The folder that represents the new name
+   * @param type The event type
+   */
+  public FolderEvent(Object source, Folder oldFolder, Folder newFolder, 
+      int type)
+  {
+    super(source);
+    folder = oldFolder;
+    this.newFolder = newFolder;
+    this.type = type;
+  }
 
-	public FolderEvent(Object source, Folder oldFolder,
-				Folder newFolder, int type) {
-		super(source);
-		this.folder = oldFolder;
-		this.newFolder = newFolder;
-		this.type = type;
-	} // FolderEvent()
+  /**
+   * Return the type of this event.
+   */
+  public int getType()
+  {
+    return type;
+  }
 
+  /**
+   * Return the affected folder.
+   * @see #getNewFolder
+   */
+  public Folder getFolder()
+  {
+    return folder;
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * If this event indicates that a folder is renamed, (i.e, the event type is
+   * RENAMED), then this method returns the Folder object representing the new
+   * name. The getFolder() method returns the folder that is renamed.
+   * @see #getFolder
+   */
+  public Folder getNewFolder()
+  {
+    return newFolder;
+  }
 
-	/**
-	 * Dispatch event to listener
-	 * @param listener Listener to notify
-	 */
-	public void dispatch(Object listener) {
+  /**
+   * Invokes the appropriate FolderListener method.
+   */
+  public void dispatch(Object listener)
+  {
+    FolderListener l = (FolderListener)listener;
+    switch (type)
+    {
+      case CREATED:
+        l.folderCreated(this);
+        break;
+      case DELETED:
+        l.folderDeleted(this);
+        break;
+      case RENAMED:
+        l.folderRenamed(this);
+        break;
+    }
+  }
 
-		// Variables
-		FolderListener fListener;
-
-		// Get Folder Listener
-		if (listener instanceof FolderListener) {
-			fListener = (FolderListener) listener;
-		} else {
-			return;
-		}
-
-		// Check Type
-		switch (type) {
-			case CREATED:
-				fListener.folderCreated(this);
-				break;
-			case DELETED:
-				fListener.folderDeleted(this);
-				break;
-			case RENAMED:
-				fListener.folderRenamed(this);
-				break;
-		} // switch
-
-	} // dispatch()
-
-	/**
-	 * Get folder event type.
-	 * @returns Folder type
-	 */
-	public int getType() {
-		return type;
-	} // getType()
-
-	/**
-	 * Get folder.
-	 * @returns Folder
-	 */
-	public Folder getFolder() {
-		return folder;
-	} // getFolder()
-
-	/**
-	 * Get new folder.
-	 * @returns New folder
-	 */
-	public Folder getNewFolder() {
-		return newFolder;
-	} // getNewFolder()
-
-
-} // FolderEvent
+}

@@ -1,96 +1,124 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * FlagTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Flags;
+import javax.mail.Message;
 
 /**
- * Flag Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for Message Flags.
  */
-public final class FlagTerm extends SearchTerm {
+public final class FlagTerm
+  extends SearchTerm
+{
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Indicates whether to test for the presence or absence of the specified
+   * Flag. If true, then test whether all the specified flags are present, 
+   * else test whether all the specified flags are absent.
+   */
+  protected boolean set;
 
-	protected	Flags	flags;
-	protected	boolean	set;
+  /**
+   * Flags object containing the flags to test.
+   */
+  protected Flags flags;
 
+  /**
+   * Constructor.
+   * @param flags Flags object containing the flags to check for
+   * @param set the flag setting to check for
+   */
+  public FlagTerm(Flags flags, boolean set)
+  {
+    this.flags = flags;
+    this.set = set;
+  }
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Return the Flags to test.
+   */
+  public Flags getFlags()
+  {
+    return (Flags)flags.clone();
+  }
 
-	/**
-	 * Create a new Flags Term.
-	 * @param flags Flags to check for
-	 * @param set Whether to check for set/unset
-	 */
-	public FlagTerm(Flags flags, boolean set) {
-		this.flags = flags;
-		this.set = set;
-	} // FlagTerm()
+  /**
+   * Return true if testing whether the flags are set.
+   */
+  public boolean getTestSet()
+  {
+    return set;
+  }
 
+  /**
+   * The comparison method.
+   * @param msg The flag comparison is applied to this Message
+   * @return true if the comparson succeeds, otherwise false.
+   */
+  public boolean match(Message msg)
+  {
+    try
+    {
+      Flags messageFlags = msg.getFlags();
+      if (set)
+        return messageFlags.contains(flags);
+      Flags.Flag[] systemFlags = flags.getSystemFlags();
+      for (int i = 0; i<systemFlags.length; i++)
+      {
+        if (messageFlags.contains(systemFlags[i]))
+          return false;
+      }
+      String[] userFlags = flags.getUserFlags();
+      for (int i = 0; i<userFlags.length; i++)
+      {
+        if (messageFlags.contains(userFlags[i]))
+          return false;
+      }
+      return true;
+    }
+    catch (Exception e)
+    {
+    }
+    return false;
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    if (other instanceof FlagTerm)
+    {
+      FlagTerm ft = (FlagTerm)other;
+      return (ft.set==set && ft.flags.equals(flags));
+    }
+    return false;
+  }
 
-	public Flags getFlags() {
-		return flags;
-	} // getFlags()
-
-	public boolean getTestSet() {
-		return set;
-	} // getTestSet()
-
-	/**
-	 * Do Message match.
-	 * @param Address Message to check
-	 * @returns true if match, false otherwise
-	 */
-	public boolean match(Message message) {
-
-		// Variables
-		Flags.Flag[]	systemFlags;
-		String[]		userFlags;
-		Flags			messageFlags;
-		int				index;
-
-		try {
-
-			// Get Message Flags
-			messageFlags = message.getFlags();
-			systemFlags = flags.getSystemFlags();
-			userFlags = flags.getUserFlags();
-
-		} catch (MessagingException e) {
-			return false;
-		} // try
-
-		// Process System Flags
-		for (index = 0; index < systemFlags.length; index++) {
-			if (messageFlags.contains(systemFlags[index]) != set) {
-				return false;
-			} // if
-		} // for
-
-		// Process User Flags
-		for (index = 0; index < userFlags.length; index++) {
-			if (messageFlags.contains(userFlags[index]) != set) {
-				return false;
-			} // if
-		} // for
-
-		// Flags Match
-		return true;
-
-	} // match()
-
-
-} // FlagTerm
+  /**
+   * Compute a hashCode for this object.
+   */
+  public int hashCode()
+  {
+    return set ?  flags.hashCode() : ~flags.hashCode();
+  }
+  
+}

@@ -1,44 +1,65 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * MessageNumberTerm.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.search;
 
-// Imports
-import javax.mail.*;
+import javax.mail.Message;
 
 /**
- * Message Number Term.
- * @author	Andrew Selkirk
- * @version	1.0
+ * This class implements comparisons for Message numbers.
  */
-public final class MessageNumberTerm extends IntegerComparisonTerm {
+public final class MessageNumberTerm
+  extends IntegerComparisonTerm
+{
 
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Constructor.
+   * @param number the Message number
+   */
+  public MessageNumberTerm(int number)
+  {
+    super(EQ, number);
+  }
 
-	/**
-	 * Create a new Message Number Term.
-	 * @param number Message number to check
-	 */
-	public MessageNumberTerm(int number) {
-		super(EQ, number);
-	} // MessageNumberTerm()
+  /**
+   * The match method.
+   * @param msg the Message number is matched with this Message
+   * @param true if the match succeeds, otherwise false
+   */
+  public boolean match(Message msg)
+  {
+    try
+    {
+      return super.match(msg.getMessageNumber());
+    }
+    catch (Exception e)
+    {
+    }
+    return false;
+  }
 
+  /**
+   * Equality comparison.
+   */
+  public boolean equals(Object other)
+  {
+    return (other instanceof MessageNumberTerm && super.equals(other));
+  }
 
-	//-------------------------------------------------------------
-	// Methods ----------------------------------------------------
-	//-------------------------------------------------------------
-
-	/**
-	 * Match search term
-	 * @param message Message to match
-	 * @returns true if match, false otherwise
-	 */
-	public boolean match(Message message) {
-		return match(message.getMessageNumber());
-	} // match()
-
-
-} // MessageNumberTerm
+}

@@ -1,39 +1,48 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+ * ConnectionListener.java
+ * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 package javax.mail.event;
 
-// Imports
 import java.util.EventListener;
 
 /**
- * Connection Interface.
+ * This is the Listener interface for Connection events.
  */
-public interface ConnectionListener extends EventListener {
+public interface ConnectionListener
+  extends EventListener
+{
 
-	//-------------------------------------------------------------
-	// Interface: ConnectionListener ------------------------------
-	//-------------------------------------------------------------
+  /**
+   * Invoked when a Store/Folder/Transport is opened.
+   */
+  public void opened(ConnectionEvent e);
 
-	/**
-	 * Connection closed.
-	 * @param event Connection event
-	 */
-	public abstract void closed(ConnectionEvent event);
+  /**
+   * Invoked when a Store is disconnected.
+   * Note that a folder cannot be disconnected, so a folder will not fire 
+   * this event.
+   */
+  public void disconnected(ConnectionEvent e);
 
-	/**
-	 * Connection disconnected.
-	 * @param event Connection event
-	 */
-	public abstract void disconnected(ConnectionEvent event);
+  /**
+   * Invoked when a Store/Folder/Transport is closed.
+   */
+  public void closed(ConnectionEvent e);
 
-	/**
-	 * Connection opened.
-	 * @param event Connection event
-	 */
-	public abstract void opened(ConnectionEvent event);
-
-
-} // ConnectionListener
-
+}
