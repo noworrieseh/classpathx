@@ -1962,7 +1962,7 @@ loop2:
     throws Exception
     {
 	boolean peFlag = false;
-	int flags = LIT_DISABLE_CREF;
+	int flags = 0;
 
 	// Check for a parameter entity.
 	expandPE = false;
