@@ -1,7 +1,7 @@
 // DeclHandler.java - Optional handler for DTD declaration events.
 // http://sax.sourceforge.net
 // Public Domain: no warranty.
-// $Id: DefaultHandler2.java,v 1.2 2001-11-13 20:46:30 db Exp $
+// $Id: DefaultHandler2.java,v 1.3 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.ext;
 
@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-// $Id: DefaultHandler2.java,v 1.2 2001-11-13 20:46:30 db Exp $
+// $Id: DefaultHandler2.java,v 1.3 2001-11-21 01:36:54 db Exp $
 
 /**
  * This class extends the SAX2 base handler class to support the

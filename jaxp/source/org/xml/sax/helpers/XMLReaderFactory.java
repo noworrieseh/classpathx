@@ -1,10 +1,9 @@
 // XMLReaderFactory.java - factory for creating a new reader.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // Written by David Megginson
 // and by David Brownell
 // NO WARRANTY!  This class is in the Public Domain.
-
-// $Id: XMLReaderFactory.java,v 1.7 2001-11-13 20:44:08 db Exp $
+// $Id: XMLReaderFactory.java,v 1.8 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.helpers;
 import java.io.BufferedReader;
@@ -20,6 +19,8 @@ import org.xml.sax.SAXException;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This class contains static methods for creating an XML reader
@@ -43,7 +44,7 @@ import org.xml.sax.SAXException;
  *
  * @since SAX 2.0
  * @author David Megginson, David Brownell
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  */
 final public class XMLReaderFactory
 {

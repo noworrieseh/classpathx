@@ -1,9 +1,8 @@
 // XMLFilter.java - filter SAX2 events.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the Public Domain.
-
-// $Id: XMLFilter.java,v 1.4 2001-10-18 00:36:10 db Exp $
+// $Id: XMLFilter.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 
 package org.xml.sax;
@@ -15,6 +14,8 @@ package org.xml.sax;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>An XML filter is like an XML reader, except that it obtains its
@@ -30,7 +31,7 @@ package org.xml.sax;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.helpers.XMLFilterImpl
  */
 public interface XMLFilter extends XMLReader

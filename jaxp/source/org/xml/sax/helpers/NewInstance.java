@@ -1,9 +1,9 @@
 // NewInstance.java - create a new instance of a class by name.
+// http://www.saxproject.org
 // Written by Edwin Goei, edwingo@apache.org
 // and by David Brownell, dbrownell@users.sourceforge.net
 // NO WARRANTY!  This class is in the Public Domain.
-
-// $Id: NewInstance.java,v 1.3 2001-11-13 20:43:13 db Exp $
+// $Id: NewInstance.java,v 1.4 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -16,7 +16,7 @@ import java.lang.reflect.InvocationTargetException;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
- * See <a href='http://sax.sourceforge.net'>http://sax.sourceforge.net</a>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
  * for further information.
  * </blockquote>
  *
@@ -29,7 +29,7 @@ import java.lang.reflect.InvocationTargetException;
  * including versions of Java 2.</p>
  *
  * @author Edwin Goei, David Brownell
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  */
 class NewInstance {
 

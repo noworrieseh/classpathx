@@ -1,7 +1,7 @@
 // SAX entity resolver.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: EntityResolver.java,v 1.4 2001-10-18 00:36:09 db Exp $
+// $Id: EntityResolver.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -14,6 +14,8 @@ import java.io.IOException;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>If a SAX application needs to implement customized handling
@@ -60,7 +62,7 @@ import java.io.IOException;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.XMLReader#setEntityResolver
  * @see org.xml.sax.InputSource
  */

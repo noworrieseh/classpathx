@@ -1,7 +1,7 @@
 // DeclHandler.java - Optional handler for DTD declaration events.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // Public Domain: no warranty.
-// $Id: DeclHandler.java,v 1.4 2001-10-18 00:36:10 db Exp $
+// $Id: DeclHandler.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.ext;
 
@@ -14,11 +14,13 @@ import org.xml.sax.SAXException;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This is an optional extension handler for SAX2 to provide more
  * complete information about DTD declarations in an XML document.
- * XML readers are not required to support this handler, and it
+ * XML readers are not required to recognize this handler, and it
  * is not part of core-only SAX2 distributions.</p>
  *
  * <p>Note that data-related DTD declarations (unparsed entities and
@@ -32,17 +34,16 @@ import org.xml.sax.SAXException;
  *
  * <p>To set the DeclHandler for an XML reader, use the
  * {@link org.xml.sax.XMLReader#setProperty setProperty} method
- * with the propertyId "http://xml.org/sax/properties/declaration-handler".
- * If the reader does not support declaration events, it will throw a
+ * with the property name
+ * <code>http://xml.org/sax/properties/declaration-handler</code>
+ * and an object implementing this interface (or null) as the value.
+ * If the reader does not report declaration events, it will throw a
  * {@link org.xml.sax.SAXNotRecognizedException SAXNotRecognizedException}
- * or a
- * {@link org.xml.sax.SAXNotSupportedException SAXNotSupportedException}
  * when you attempt to register the handler.</p>
  *
  * @since SAX 2.0 (extensions 1.0)
  * @author David Megginson
- * @version 2.0r2pre2
- * @see org.xml.sax.XMLReader
+ * @version 2.0r2pre3
  */
 public interface DeclHandler
 {

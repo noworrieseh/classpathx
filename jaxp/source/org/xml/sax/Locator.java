@@ -1,7 +1,7 @@
 // SAX locator interface for document events.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: Locator.java,v 1.4 2001-10-18 00:36:10 db Exp $
+// $Id: Locator.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -12,6 +12,8 @@ package org.xml.sax;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>If a SAX parser provides location information to the SAX
@@ -19,13 +21,13 @@ package org.xml.sax;
  * passing an instance to the application using the content
  * handler's {@link org.xml.sax.ContentHandler#setDocumentLocator
  * setDocumentLocator} method.  The application can use the
- * object to obtain the location of any other content handler event
+ * object to obtain the location of any other SAX event
  * in the XML source document.</p>
  *
  * <p>Note that the results returned by the object will be valid only
- * during the scope of each content handler method: the application
+ * during the scope of each callback method: the application
  * will receive unpredictable results if it attempts to use the
- * locator at any other time.</p>
+ * locator at any other time, or after parsing completes.</p>
  *
  * <p>SAX parsers are not required to supply a locator, but they are
  * very strongly encouraged to do so.  If the parser supplies a
@@ -37,7 +39,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.ContentHandler#setDocumentLocator 
  */
 public interface Locator {

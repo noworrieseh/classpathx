@@ -1,7 +1,7 @@
 // SAX DTD handler.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: DTDHandler.java,v 1.4 2001-10-18 00:36:09 db Exp $
+// $Id: DTDHandler.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -11,6 +11,8 @@ package org.xml.sax;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>If a SAX application needs information about notations and
@@ -42,7 +44,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.XMLReader#setDTDHandler
  */
 public interface DTDHandler {
@@ -55,14 +57,12 @@ public interface DTDHandler {
      * reference, if necessary;
      * notations may appear as attribute values and in unparsed entity
      * declarations, and are sometime used with processing instruction
-     * target names.
-     * When a system identifier is present, applications are responsible
-     * for knowing if it is used as a URL, and absolutizing it against
-     * the appropriate URI when appropriate.
-     * That base URI is available from {@link Locator#getSystemId} during
-     * this callback, assuming the parser provides a Locator.</p>
+     * target names.</p>
      *
-     * <p>At least one of publicId and systemId must be non-null. </p>
+     * <p>At least one of publicId and systemId must be non-null.
+     * If a system identifier is present, and it is a URL, the SAX
+     * parser must resolve it fully before passing it to the
+     * application through this event.</p>
      *
      * <p>There is no guarantee that the notation declaration will be
      * reported before any unparsed entities that use it.</p>

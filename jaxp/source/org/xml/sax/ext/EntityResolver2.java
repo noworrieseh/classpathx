@@ -1,7 +1,7 @@
 // SAX entity resolver.
 // http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: EntityResolver2.java,v 1.1 2001-11-13 20:46:30 db Exp $
+// $Id: EntityResolver2.java,v 1.2 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.ext;
 

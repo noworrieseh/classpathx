@@ -1,7 +1,7 @@
 // SAX exception class.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: SAXParseException.java,v 1.4 2001-10-18 00:36:10 db Exp $
+// $Id: SAXParseException.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -11,6 +11,8 @@ package org.xml.sax;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This exception will include information for locating the error
@@ -26,7 +28,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.SAXException
  * @see org.xml.sax.Locator
  * @see org.xml.sax.ErrorHandler

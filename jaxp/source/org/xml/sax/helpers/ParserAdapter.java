@@ -1,9 +1,8 @@
 // ParserAdapter.java - adapt a SAX1 Parser to a SAX2 XMLReader.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
-
-// $Id: ParserAdapter.java,v 1.6 2001-11-06 05:45:55 db Exp $
+// $Id: ParserAdapter.java,v 1.7 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -35,6 +34,8 @@ import org.xml.sax.SAXNotSupportedException;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This class wraps a SAX1 {@link org.xml.sax.Parser Parser}
@@ -48,7 +49,7 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.helpers.XMLReaderAdapter
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.Parser

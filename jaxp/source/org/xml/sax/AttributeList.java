@@ -1,7 +1,7 @@
 // SAX Attribute List Interface.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: AttributeList.java,v 1.4 2001-10-18 00:36:09 db Exp $
+// $Id: AttributeList.java,v 1.5 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -11,6 +11,8 @@ package org.xml.sax;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This is the original SAX1 interface for reporting an element's
@@ -63,7 +65,7 @@ package org.xml.sax;
  *             interface, which includes Namespace support.
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.DocumentHandler#startElement startElement
  * @see org.xml.sax.helpers.AttributeListImpl AttributeListImpl
  */

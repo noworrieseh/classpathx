@@ -1,7 +1,7 @@
 // SAX input source.
-// http://sax.sourceforge.net
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: InputSource.java,v 1.6 2001-10-18 00:36:10 db Exp $
+// $Id: InputSource.java,v 1.7 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax;
 
@@ -14,6 +14,8 @@ import java.io.InputStream;
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
  * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+ * for further information.
  * </blockquote>
  *
  * <p>This class allows a SAX application to encapsulate information
@@ -49,7 +51,7 @@ import java.io.InputStream;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre2
+ * @version 2.0r2pre3
  * @see org.xml.sax.XMLReader#parse(org.xml.sax.InputSource)
  * @see org.xml.sax.EntityResolver#resolveEntity
  * @see java.io.InputStream

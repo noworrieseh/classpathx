@@ -1,6 +1,6 @@
 // Attributes2.java - extended Attributes
 // Public Domain: no warranty.
-// $Id: Attributes2.java,v 1.1 2001-10-18 00:39:00 db Exp $
+// $Id: Attributes2.java,v 1.2 2001-11-21 01:36:54 db Exp $
 
 package org.xml.sax.ext;
 
