@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSKeyPairGenerator.java,v 1.2 2001-12-31 21:46:16 raif Exp $
+// $Id: DSSKeyPairGenerator.java,v 1.3 2002-01-11 21:26:46 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,11 +30,12 @@ package gnu.crypto.sig.dss;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.hash.Sha160;
-import gnu.crypto.prng.IRandom;
-import gnu.crypto.prng.LimitReachedException;
-import gnu.crypto.prng.MDGenerator;
+import gnu.crypto.sig.IKeyPairGenerator;
 import gnu.crypto.util.Prime;
+import gnu.crypto.util.PRNG;
+
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -53,9 +54,9 @@ import java.util.Map;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class DSSKeyPairGenerator {
+public class DSSKeyPairGenerator implements IKeyPairGenerator {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
@@ -68,21 +69,8 @@ public class DSSKeyPairGenerator {
       err.println(">>> "+NAME+": "+s);
    }
 
-   private static final boolean DO_MILLER_RABIN = false;
-
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   /** SHA-based random number generator. */
-   private static final IRandom prng;
-   static {
-      prng = new MDGenerator();
-      try {
-         prng.init(new HashMap()); // default is to use SHA
-      } catch (Exception x) {
-         throw new ExceptionInInitializerError(x);
-      }
-   }
 
    /** The BigInteger constant 2. */
    private static final BigInteger TWO = new BigInteger("2");
@@ -161,17 +149,22 @@ public class DSSKeyPairGenerator {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Instance methods
+   // gnu.crypto.sig.IKeyPairGenerator interface implementation
    // -------------------------------------------------------------------------
 
+   public String name() {
+      return Registry.DSS_KPG;
+   }
+
    /**
-    * Sets up user parameters for use with this instance.<p>
+    * Configures this instance.<p>
     *
+    * @param attributes the map of name/value pairs to use.
     * @exception IllegalArgumentException if the designated MODULUS_LENGTH
     * value is not greater than 512, less than 1024 and not of the form
-    * <code>512 + 64j</code>
+    * <code>512 + 64j</code>.
     */
-    public void setup(Map attributes) {
+   public void setup(Map attributes) {
       // find out the modulus length
       Integer l = (Integer) attributes.get(MODULUS_LENGTH);
       L = (l == null ? DEFAULT_MODULUS_LENGTH : l.intValue());
@@ -209,10 +202,7 @@ public class DSSKeyPairGenerator {
 
       // set the seed-key
       byte[] kb = new byte[20]; // we need 160 bits of randomness
-      try {
-         prng.nextBytes(kb, 0, 20);
-      } catch (LimitReachedException ignored) {
-      }
+      PRNG.nextBytes(kb);
       XKEY = new BigInteger(1, kb).setBit(159).setBit(0);
    }
 
@@ -224,18 +214,14 @@ public class DSSKeyPairGenerator {
       BigInteger x = nextX();
       BigInteger y = g.modPow(x, p);
 
-      return encodeParameters(x, y);
-   }
-
-   // helper methods
-   // -------------------------------------------------------------------------
-
-   protected KeyPair encodeParameters(BigInteger x, BigInteger y) {
       PublicKey pubK = new DSSPublicKey(p, q, g, y);
       PrivateKey secK = new DSSPrivateKey(p, q, g, x);
 
       return new KeyPair(pubK, secK);
    }
+
+   // Other instance methods
+   // -------------------------------------------------------------------------
 
    /**
     * This method generates the DSS <code>p</code>, <code>q</code>, and
@@ -282,10 +268,7 @@ public class DSSKeyPairGenerator {
          step1: while (true) {
             // 1. Choose an arbitrary sequence of at least 160 bits and
             // call it SEED.
-            try {
-               prng.nextBytes(kb, 0, 20);
-            } catch (LimitReachedException ignored) {
-            }
+            PRNG.nextBytes(kb);
             SEED = new BigInteger(1, kb).setBit(159).setBit(0);
             // Let g be the length of SEED in bits. here always 160
             // 2. Compute: U = SHA[SEED] XOR SHA[(SEED+1) mod 2**g]
@@ -312,7 +295,7 @@ public class DSSKeyPairGenerator {
             // probability of a non-prime number passing the test is at
             // most 1/2**80.
             // 5. If q is not prime, go to step 1.
-            if (isProbablePrime(q)) {
+            if (Prime.isProbablePrime(q)) {
                break step1;
             }
          } // step1
@@ -352,7 +335,7 @@ public class DSSKeyPairGenerator {
             if (p.compareTo(TWO.pow(L-1)) >= 0) {
                // 11. Perform a robust primality test on p.
                // 12. If p passes the test performed in step 11, go to step 15.
-               if (isProbablePrime(p)) {
+               if (Prime.isProbablePrime(p)) {
                   break algorithm;
                }
             }
@@ -429,98 +412,5 @@ public class DSSKeyPairGenerator {
       XKEY = XKEY.add(result).add(BigInteger.ONE).mod(TWO_POW_160);
 
       return result;
-   }
-
-   /**
-    * From FIPS-186: Section 2.1. A PROBABILISTIC PRIMALITY TEST<br>
-    * In order to generate the primes p and q, a primality test is required.<p>
-    *
-    * There are several fast probabilistic algorithms available. The following
-    * algorithm is a simplified version of a procedure due to M.O. Rabin, based
-    * in part on ideas of Gary L. Miller. [See Knuth, The Art of Computer
-    * Programming, Vol. 2, Addison-Wesley, 1981, Algorithm P, page 379.] If
-    * this algorithm is iterated <code>n</code> times, it will produce a false
-    * prime with probability no greater than <code>1/4<sup>n</sup></code>.
-    * Therefore, n >= 50 will give an acceptable probability of error.<p>
-    *
-    * <b>IMPORTANT</b>: This implementation does not rely on the Miller-Rabin
-    * strong probabilistic primality test solely to claim the primality of the
-    * designated number. It instead, tries dividing the designated number by
-    * the first 1000 small primes, and if no divisor was found, invokes a port
-    * of Colin Plumb's implementation of the Euler Criterion, with the option
-    * --set by setting the DO_MILLER_RABIN class variable to true and
-    * recompiling-- to follow with a Miller-Rabin test.
-    *
-    * @param w the integer to test.
-    * @return <code>true</code> iff the designated number has no small prime
-    * divisor passes the Euler criterion, and optionally a Miller-Rabin test.
-    */
-   private boolean isProbablePrime(BigInteger w) {
-      // eliminate trivial case when w == 1
-      if (w.equals(BigInteger.ONE)) {
-         return true;
-      }
-
-      // trial division with first 1000 primes
-      if (Prime.hasSmallPrimeDivisor(w)) {
-         if (DEBUG && debuglevel > 4) {
-            debug(w.toString(16)+" has a small prime divisor. Rejected...");
-         }
-         return false;
-      }
-
-      // the following code is commented out since it's a special case (base 2)
-      // of Euler's criterion.
-//      if (Prime.passFermatLittleTheorem(w)) {
-//         if (DEBUG && debuglevel > 4) {
-//            debug(w.toString(16)+" passes Fermat's Little Theorem...");
-//         }
-//      } else {
-//         if (DEBUG && debuglevel > 4) {
-//            debug(w.toString(16)+" fails Fermat's Little Theorem. Rejected...");
-//         }
-//         return false;
-//      }
-
-      if (Prime.passEulerCriterion(w)) {
-         if (DEBUG && debuglevel > 4) {
-            debug(w.toString(16)+" passes Euler criterion...");
-         }
-      } else {
-         if (DEBUG && debuglevel > 4) {
-            debug(w.toString(16)+" fails Euler criterion. Rejected...");
-         }
-         return false;
-      }
-
-      // Miller-Rabin probabilistic primality test.
-      // by default this is disabled. to activate it, change the value of the
-      // variable DO_MILLER_RABIN at the top to true and _recompile_
-      if (DO_MILLER_RABIN) {
-         if (Prime.passMillerRabin(w)) {
-            if (DEBUG && debuglevel > 4) {
-               debug(w.toString(16)+" passes Miller-Rabin PPT...");
-            }
-         } else {
-            if (DEBUG && debuglevel > 4) {
-               debug(w.toString(16)+" fails Miller-Rabin PPT. Rejected...");
-            }
-            return false;
-         }
-      }
-
-      if (DEBUG && debuglevel > 4) {
-         debug(w.toString(16)+" is probable prime. Accepted...");
-      }
-      // now compare to JDK primality test
-      if (!w.isProbablePrime(100)) {
-         System.err.println("The gnu.crypto library and the JDK disagree on "
-            +"whether 0x"+w.toString(16)+" is a prime or not.");
-         System.err.println("While this library claims it is, the JDK claims "
-            +"the opposite.");
-         System.err.println("Please contact the maintainer of this library, and "
-            +"provide this message for further investigation. TIA");
-      }
-      return true;
    }
 }
