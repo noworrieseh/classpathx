@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.5 2001-07-10 22:55:41 db Exp $
+ * $Id: EventFilter.java,v 1.6 2001-07-11 16:56:24 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -103,7 +103,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-07-10 22:55:41 $
+ * @version $Date: 2001-07-11 16:56:24 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -209,7 +209,10 @@ public class EventFilter
 	    // parsers are required not to have such bugs
 	    } else if (consumer instanceof WellFormednessFilter) {
 		consumer = ((WellFormednessFilter)consumer).getNext ();
-	    }
+
+	    // stop on the first pipeline stage we can't recognize
+	    } else
+		break;
 	}
 
 	// Some SAX parsers can't handle null handlers -- bleech
