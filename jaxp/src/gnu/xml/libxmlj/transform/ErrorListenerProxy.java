@@ -1,5 +1,4 @@
 /* 
- * $Id: ErrorListenerProxy.java,v 1.2 2004-04-14 15:40:02 avdyk Exp $
  * Copyright (C) 2003 Julian Scheid
  * 
  * This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
