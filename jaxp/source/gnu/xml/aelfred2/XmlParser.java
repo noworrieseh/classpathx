@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.25 2001-11-11 23:15:55 db Exp $
+ * $Id: XmlParser.java,v 1.26 2001-11-14 21:13:44 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -54,7 +54,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.MalformedURLException;
 
 // maintaining 1.1 compatibility for now ...
 // Iterator and Hashmap ought to be faster
@@ -66,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.25 2001-11-11 23:15:55 db Exp $
+// $Id: XmlParser.java,v 1.26 2001-11-14 21:13:44 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -76,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-11 23:15:55 $
+ * @version $Date: 2001-11-14 21:13:44 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -146,21 +145,6 @@ final class XmlParser
 	if (handler == null)
 	    throw new IllegalStateException ("no callback handler");
 
-	// Insist any system ID (URI/URL) is absolute.  There's a case
-	// where it may be null:  parser was invoked without providing
-	// one, e.g. since the XML data came from a memory buffer.
-
-	if (systemId != null) {
-	    try {
-		systemId = new URL (systemId).toString ();
-	    } catch (MalformedURLException e) {
-		if (reader == null && stream == null)
-		    throw e;
-		// could be an unrecognized URI scheme
-		handler.warn ("trying to continue with bad URL: " + systemId);
-	    }
-	}
-
 	initializeVariables ();
 
 	// predeclare the built-in entities here (replacement texts)
@@ -172,8 +156,10 @@ final class XmlParser
 	setInternalEntity ("apos", "&#39;");
 	setInternalEntity ("quot", "&#34;");
 
-	pushURL (false, "[document]", publicId, systemId,
-		reader, stream, encoding);
+	pushURL (false, "[document]",
+		    // default baseURI: null
+		new String [] { publicId, systemId, null},
+		reader, stream, encoding, false);
 
 	handler.startDocument ();
 
@@ -425,11 +411,10 @@ final class XmlParser
     throws Exception
     {
         try {                                       // added by MHK
-    	    parseProlog ();
+    	    boolean sawDTD = parseProlog ();
     	    require ('<');
-    	    parseElement ();
+    	    parseElement (!sawDTD);
         } catch (EOFException ee) {                 // added by MHK
-ee.printStackTrace ();
             error("premature end of file", "[EOF]", null);
         }
         
@@ -515,16 +500,12 @@ ee.printStackTrace ();
      * <pre>
      * [22] prolog ::= XMLDecl? Misc* (Doctypedecl Misc*)?
      * </pre>
-     * <p>There are a couple of tricks here.  First, it is necessary to
-     * declare the XML default attributes after the DTD (if present)
-     * has been read. [??]  Second, it is not possible to expand general
-     * references in attribute value literals until after the entire
-     * DTD (if present) has been parsed.
      * <p>We do not look for the XML declaration here, because it was
      * handled by pushURL ().
      * @see pushURL
+     * @return true if a DTD was read.
      */
-    private void parseProlog ()
+    private boolean parseProlog ()
     throws Exception
     {
 	parseMisc ();
@@ -532,7 +513,9 @@ ee.printStackTrace ();
 	if (tryRead ("<!DOCTYPE")) {
 	    parseDoctypedecl ();
 	    parseMisc ();
+	    return true;
 	}
+	return false;
     }
 
     private void checkLegalVersion (String version)
@@ -802,18 +785,18 @@ ee.printStackTrace ();
     private void parseDoctypedecl ()
     throws Exception
     {
-	String doctypeName, ids[];
+	String rootName, ids[];
 
 	// Read the document type name.
 	requireWhitespace ();
-	doctypeName = readNmtoken (true);
+	rootName = readNmtoken (true);
 
 	// Read the External subset's IDs
 	skipWhitespace ();
 	ids = readExternalIds (false, true);
 
 	// report (a) declaration of name, (b) lexical info (ids)
-	handler.doctypeDecl (doctypeName, ids [0], ids [1]);
+	handler.doctypeDecl (rootName, ids [0], ids [1]);
 
 	// Internal subset is parsed first, if present
 	skipWhitespace ();
@@ -838,14 +821,30 @@ ee.printStackTrace ();
 	require ('>');
 
 	// Read the external subset, if any
-	if (ids [1] != null) {
+	InputSource	subset;
+
+	if (ids [1] == null)
+	    subset = handler.getExternalSubset (rootName,
+	    		handler.getSystemId ());
+	else
+	    subset = null;
+	if (ids [1] != null || subset != null) {
 	    pushString (null, ">");
 
 	    // NOTE:  [dtd] is so we say what SAX2 expects,
-	    // even though it's misleading, 
-	    pushURL (true, "[dtd]", ids [0], absolutize (ids, true),
-	    					// FIXME: ASSUMES not skipped
-	    		null, null, null);
+	    // though it's misleading (subset, not entire dtd)
+	    if (ids [1] != null)
+		pushURL (true, "[dtd]", ids, null, null, null, true);
+	    else {
+		handler.warn ("modifying document by adding external subset");
+		pushURL (true, "[dtd]",
+		    new String [] { subset.getPublicId (),
+			    subset.getSystemId (), null },
+		    subset.getCharacterStream (),
+		    subset.getByteStream (),
+		    subset.getEncoding (),
+		    false);
+	    }
 
 	    // Loop until we end up back at '>'
 	    while (true) {
@@ -860,6 +859,10 @@ ee.printStackTrace ();
 		    expandPE = false;
 		}
 	    }
+
+	    // the ">" string isn't popped yet
+	    if (inputStack.size () != 1)
+		error ("external subset has unmatched '>'");
 	}
 
 	// done dtd
@@ -917,7 +920,7 @@ ee.printStackTrace ();
      * <p>NOTE: this method actually chains onto parseContent (), if necessary,
      * and parseContent () will take care of calling parseETag ().
      */
-    private void parseElement ()
+    private void parseElement (boolean maybeGetSubset)
     throws Exception
     {
 	String	gi;
@@ -932,6 +935,50 @@ ee.printStackTrace ();
 
 	// Read the element type name.
 	gi = readNmtoken (true);
+
+	// If we saw no DTD, and this is the document root element,
+	// let the application modify the input stream by providing one.
+	if (maybeGetSubset) {
+	    InputSource	subset = handler.getExternalSubset (gi,
+	    		handler.getSystemId ());
+	    if (subset != null) {
+		String	publicId = subset.getPublicId ();
+		String	systemId = subset.getSystemId ();
+
+		handler.warn ("modifying document by adding DTD");
+		handler.doctypeDecl (gi, publicId, systemId);
+		pushString (null, ">");
+
+		// NOTE:  [dtd] is so we say what SAX2 expects,
+		// though it's misleading (subset, not entire dtd)
+		pushURL (true, "[dtd]",
+		    new String [] { publicId, systemId, null },
+		    subset.getCharacterStream (),
+		    subset.getByteStream (),
+		    subset.getEncoding (),
+		    false);
+
+		// Loop until we end up back at '>'
+		while (true) {
+		    doReport = expandPE = true;
+		    skipWhitespace ();
+		    doReport = expandPE = false;
+		    if (tryRead ('>')) {
+			break;
+		    } else {
+			expandPE = true;
+			parseMarkupdecl ();
+			expandPE = false;
+		    }
+		}
+
+		// the ">" string isn't popped yet
+		if (inputStack.size () != 1)
+		    error ("external subset has unmatched '>'");
+
+		handler.endDoctype ();
+	    }
+	}
 
 	// Determine the current content type.
 	currentElement = gi;
@@ -1149,7 +1196,7 @@ loop:
 
 		  default: 		// Found "<" followed by something else
 		    unread (c);
-		    parseElement ();
+		    parseElement (false);
 		    break;
 		}
 	    }
@@ -1742,9 +1789,8 @@ loop2:
 	    break;
 	case ENTITY_TEXT:
 	    if (externalAllowed) {
-		pushURL (false, name, getEntityPublicId (name),
-			 getEntitySystemId (name),
-			 null, null, null);
+		pushURL (false, name, getEntityIds (name),
+			null, null, null, true);
 	    } else {
 		error ("reference to external entity in attribute value.",
 			name, null);
@@ -1793,9 +1839,7 @@ loop2:
 	case ENTITY_TEXT:
 	    if (!inLiteral)
 		pushString (null, " ");
-	    pushURL (true, name, getEntityPublicId (name),
-		     getEntitySystemId (name),
-		     null, null, null);
+	    pushURL (true, name, getEntityIds (name), null, null, null, true);
 	    if (!inLiteral)
 		pushString (null, " ");
 	    break;
@@ -1857,22 +1901,19 @@ loop2:
 		    error ("whitespace required before NDATA");
 		requireWhitespace ();
 		String notationName = readNmtoken (true);
-		String absolute = absolutize (ids, false);
 		if (!skippedPE) {
-		    setEntity (name, ENTITY_NDATA, ids [0], absolute,
-			    null, notationName);
-		    handler.getDTDHandler ()
-			.unparsedEntityDecl (name, ids [0],
-				handler.resolveURIs () ? absolute : ids [1],
-				notationName);
+		    setExternalEntity (name, ENTITY_NDATA, ids, notationName);
+		    handler.unparsedEntityDecl (name, ids, notationName);
 		}
 	    } else if (!skippedPE) {
-		String absolute = absolutize (ids, true);
-	    					// FIXME: ASSUMES not skipped
-		setEntity (name, ENTITY_TEXT, ids [0], absolute, null, null);
+		setExternalEntity (name, ENTITY_TEXT, ids, null);
 		handler.getDeclHandler ()
 		    .externalEntityDecl (name, ids [0],
-			    handler.resolveURIs () ? absolute : ids [1]);
+			    handler.resolveURIs ()
+	    				// FIXME: ASSUMES not skipped
+					// "false" forces error on bad URI
+				? handler.absolutize (ids [2], ids [1], false)
+				: ids [1]);
 	    }
 	}
 
@@ -2374,37 +2415,6 @@ loop:
 	}
 
 	return ids;
-    }
-
-    // absolutize a system ID relative to the specified base URI
-    private String absolutize (String ids [], boolean parsed)
-    throws SAXException
-    {
-	// FIXME should probably normalize system IDs as follows:
-	// - Convert to UTF-8
-	// - Map reserved and non-ASCII characters to %HH
-	// Unclear if that needs to be done before passing URIs
-	// to the JVM, or how the JVM does handles non-ASCII...
-
-	try {
-	    if (ids [2] == null) {
-		handler.warn ("No base URI; hope this is absolute: "
-			+ ids [1]);
-		return new URL (ids [1]).toString ();
-	    } else
-		return new URL (new URL (ids [2]), ids [1]).toString ();
-
-	} catch (MalformedURLException e) {
-	    String message = "Can't absolutize URI: " + e.getMessage ();
-
-	    // Let unknown URI schemes pass through unless we need
-	    // the JVM to map them to i/o streams for us...
-	    if (parsed)
-		error (message);
-	    else
-		handler.warn (message);
-	    return null;
-	}
     }
 
 
@@ -3043,49 +3053,29 @@ loop:
 
 
     /**
-     * Return an external entity's public identifier, if any.
+     * Return an external entity's identifier array.
      * @param ename The name of the external entity.
-     * @return The entity's system identifier, or null if the
-     *	 entity was not declared, if it is not an
-     *	 external entity, or if no public identifier was
-     *	 provided.
+     * @return Three element array containing (in order) the entity's
+     *	public identifier, system identifier, and base URI.  Null if
+     *	 the entity was not declared as an external entity.
      * @see #getEntityType
      */
-    public String getEntityPublicId (String ename)
+    public String [] getEntityIds (String ename)
     {
 	Object entity[] = (Object[]) entityInfo.get (ename);
 	if (entity == null) {
 	    return null;
 	} else {
-	    return (String) entity [1];
+	    return (String []) entity [1];
 	}
     }
 
 
     /**
-     * Return an external entity's system identifier.
-     * @param ename The name of the external entity.
-     * @return The entity's system identifier, or null if the
-     *	 entity was not declared, or if it is not an
-     *	 external entity.
-     * @see #getEntityType
-     */
-    public String getEntitySystemId (String ename)
-    {
-	Object entity[] = (Object[]) entityInfo.get (ename);
-	if (entity == null) {
-	    return null;
-	} else {
-	    return (String) entity [2];
-	}
-    }
-
-
-    /**
-     * Return the value of an internal entity.
+     * Return an internal entity's replacement text.
      * @param ename The name of the internal entity.
-     * @return The entity's value, or null if the entity was
-     *	 not declared, or if it is not an internal entity.
+     * @return The entity's replacement text, or null if
+     *	 the entity was not declared as an internal entity.
      * @see #getEntityType
      */
     public String getEntityValue (String ename)
@@ -3108,7 +3098,13 @@ loop:
 	if (skippedPE)
 	    return;
 
-	setEntity (eName, ENTITY_INTERNAL, null, null, value, null);
+	if (entityInfo.get (eName) == null) {
+	    Object entity[] = new Object [5];
+	    entity [0] = new Integer (ENTITY_INTERNAL);
+// FIXME: shrink!!  [2] useless
+	    entity [3] = value;
+	    entityInfo.put (eName, entity);
+	}
 	if ("lt" == eName || "gt" == eName || "quot" == eName
 		|| "apos" == eName || "amp" == eName)
 	    return;
@@ -3118,22 +3114,17 @@ loop:
 
 
     /**
-     * Register an entity declaration for later retrieval.
+     * Register an external entity declaration for later retrieval.
      */
-    private void setEntity (String eName, int eClass,
-		     String pubid, String sysid,
-		     String value, String nName)
+    private void setExternalEntity (String eName, int eClass,
+		     String ids [], String nName)
     {
-	Object entity[];
-
 	if (entityInfo.get (eName) == null) {
-	    entity = new Object [5];
+	    Object entity[] = new Object [5];
 	    entity [0] = new Integer (eClass);
-	    entity [1] = pubid;
-	    entity [2] = sysid;
-	    entity [3] = value;
+	    entity [1] = ids;
+// FIXME: shrink!!  [2] no longer used, [4] irrelevant given [0]
 	    entity [4] = nName;
-
 	    entityInfo.put (eName, entity);
 	}
     }
@@ -3147,17 +3138,12 @@ loop:
      * Report a notation declaration, checking for duplicates.
      */
     private void setNotation (String nname, String ids [])
-    throws Exception
+    throws SAXException
     {
 	if (skippedPE)
 	    return;
 
-	handler.getDTDHandler ()
-	    .notationDecl (nname, ids [0],
-		(handler.resolveURIs () && ids [1] != null)
-		    ? absolutize (ids, false)
-		    : ids [1]);
-
+	handler.notationDecl (nname, ids);
 	if (notationInfo.get (nname) == null)
 	    notationInfo.put (nname, nname);
 	else
@@ -3339,38 +3325,29 @@ loop:
     private void pushURL (
         boolean		isPE,
 	String		ename,
-	String		publicId,
-	String		systemId,
-		// FIXME: encoding is null except maybe from toplevel;
-		// the only functionality it adds is UCS4 support and
-		// workarounds for encoding names the JDK doesn't know.
-		// reader/stream are likewise null except from toplevel.
+	String		ids [],		// public, system, baseURI
 	Reader		reader,
 	InputStream	stream,
-	String		encoding
+	String		encoding,
+	boolean		doResolve
     ) throws SAXException, IOException
     {
-	boolean	ignoreEncoding = false;
+	boolean		ignoreEncoding = false;
+	String		systemId;
+	InputSource	source;
 
-	// See if we should skip or substitute non-document entities.
-	// The systemID was already absolutized.
+	if (!isPE)
+	    dataBufferFlush ();
 
-	if ("[document]" == ename)
-	    handler.startExternalEntity (ename, systemId);
-	else {
-	    InputSource	source;
+	scratch.setPublicId (ids [0]);
+	scratch.setSystemId (ids [1]);
 
-	    if (!isPE)
-		dataBufferFlush ();
-
-	    // if we're not skipping, this will report startEntity()
-	    // and update the (handler's) stack of URIs
-	    scratch.setSystemId (systemId);
-	    scratch.setPublicId (publicId);
-	    scratch.setEncoding (encoding);
-	    source = handler.resolveEntity (isPE, ename, scratch);
-
-	    // Skip this entity?
+	// See if we should skip or substitute the entity.
+	// If we're not skipping, resolving reports startEntity()
+	// and updates the (handler's) stack of URIs.
+	if (doResolve) {
+	    // assert (stream == null && reader == null && encoding == null)
+	    source = handler.resolveEntity (isPE, ename, scratch, ids [2]);
 	    if (source == null) {
 		handler.warn ("Skipping entity: " + ename);
 		handler.skippedEntity (ename);
@@ -3381,26 +3358,42 @@ loop:
 
 	    // we might be using alternate IDs/encoding
 	    systemId = source.getSystemId ();
-	    publicId = source.getPublicId ();
-	    encoding = source.getEncoding ();
-
-	    // we may have been given I/O streams directly
-	    if (source.getCharacterStream () != null) {
-		if (source.getByteStream () != null)
-		    error ("resolveEntity() returned two streams");
-		reader = source.getCharacterStream ();
-	    } else if (source.getByteStream () != null) {
-		if (encoding == null)
-		    stream = source.getByteStream ();
-		else try {
-		    reader = new InputStreamReader (
-			source.getByteStream (),
-			encoding);
-		} catch (IOException e) {
-		    stream = source.getByteStream ();
-		}
+	    if (systemId == null) {
+		handler.warn ("missing system ID, using " + ids [1]);
+		systemId = ids [1];
 	    }
+	} else {
+	    // "[document]", or "[dtd]" via getExternalSubset()
+	    scratch.setCharacterStream (reader);
+	    scratch.setByteStream (stream);
+	    scratch.setEncoding (encoding);
+	    source = scratch;
+	    systemId = ids [1];
+	    handler.startExternalEntity (ename, systemId,
+		    "[document]" == ename);
 	}
+
+	// we may have been given I/O streams directly
+	if (source.getCharacterStream () != null) {
+	    if (source.getByteStream () != null)
+		error ("InputSource has two streams!");
+	    reader = source.getCharacterStream ();
+	} else if (source.getByteStream () != null) {
+	    encoding = source.getEncoding ();
+	    if (encoding == null)
+		stream = source.getByteStream ();
+	    else try {
+		reader = new InputStreamReader (
+		    source.getByteStream (),
+		    encoding);
+	    } catch (IOException e) {
+		stream = source.getByteStream ();
+	    }
+	} else if (systemId == null)
+	    error ("InputSource has no URI!");
+	scratch.setCharacterStream (null);
+	scratch.setByteStream (null);
+	scratch.setEncoding (null);
 
 	// Push the existing status.
 	pushInput (ename);
@@ -3534,7 +3527,6 @@ loop:
 		tryEncodingDecl (true);
 
 	    } catch (IOException e) {
-e.printStackTrace ();
 		error ("unsupported text encoding",
 		       encoding,
 		       null);

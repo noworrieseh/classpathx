@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.21 2001-11-11 06:49:23 db Exp $
+ * $Id: SAXDriver.java,v 1.22 2001-11-14 21:13:44 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -47,6 +47,8 @@ package gnu.xml.aelfred2;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -61,7 +63,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.21 2001-11-11 06:49:23 db Exp $
+// $Id: SAXDriver.java,v 1.22 2001-11-14 21:13:44 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -99,6 +101,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  *	<td>Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/use-attributes2</td>
  *	<td>(PRELIMINARY) Value is fixed at <em>true</em></td></tr>
+ * <tr><td>(URL)/use-entity-resolver2</td>
+ *	<td>(PRELIMINARY) Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/validation</td>
  *	<td>Value is fixed at <em>false</em></td></tr>
  *
@@ -116,7 +120,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-11 06:49:23 $
+ * @version $Date: 2001-11-14 21:13:44 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -126,6 +130,7 @@ final public class SAXDriver
     private XmlParser			parser;
 
     private EntityResolver		entityResolver = base;
+    private EntityResolver2		resolver2 = null;
     private ContentHandler		contentHandler = base;
     private DTDHandler			dtdHandler = base;
     private ErrorHandler 		errorHandler = base;
@@ -146,6 +151,7 @@ final public class SAXDriver
     private boolean			extGE = true;
     private boolean			extPE = true;
     private boolean			resolveAll = true;
+    private boolean			useResolver2 = true;
 
     private int				attributeCount = 0;
     private boolean			attributes;
@@ -194,9 +200,13 @@ final public class SAXDriver
      */
     public void setEntityResolver (EntityResolver resolver)
     {
+	if (resolver instanceof EntityResolver2)
+	    resolver2 = (EntityResolver2) resolver;
+	else
+	    resolver2 = null;
 	if (resolver == null)
 	    resolver = base;
-	this.entityResolver = resolver;
+	entityResolver = resolver;
     }
 
 
@@ -304,16 +314,7 @@ final public class SAXDriver
 	    parser.setHandler (this);
 
 	    try {
-		String	systemId = source.getSystemId ();
-
-		if (source.getByteStream () != null
-			&& source.getCharacterStream () != null)
-		    fatal ("two input streams");
-		else if (systemId == null
-			&& source.getByteStream () == null
-			&& source.getCharacterStream () == null)
-		    fatal ("no input URI");
-		parser.doParse (systemId,
+		parser.doParse (source.getSystemId (),
 			      source.getPublicId (),
 			      source.getCharacterStream (),
 			      source.getByteStream (),
@@ -402,6 +403,10 @@ final public class SAXDriver
 	if ((FEATURE + "resolve-dtd-uris").equals (featureId))
 	    return resolveAll;
 
+	// optionally use resolver2 interface methods, if possible
+	if ((FEATURE + "use-entity-resolver2").equals (featureId))
+	    return useResolver2;
+	
 	throw new SAXNotRecognizedException (featureId);
     }
 
@@ -434,13 +439,13 @@ final public class SAXDriver
      * <b>SAX2</b>:  Sets the state of feature flags in this parser.  Some
      * built-in feature flags are mutable.
      */
-    public void setFeature (String featureId, boolean state)
+    public void setFeature (String featureId, boolean value)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
-	boolean	value;
+	boolean	state;
 	
 	// Features with a defined value, we just change it if we can.
-	value = getFeature (featureId);
+	state = getFeature (featureId);
 
 	if (state == value)
 	    return;
@@ -449,7 +454,7 @@ final public class SAXDriver
 
 	if ((FEATURE + "namespace-prefixes").equals (featureId)) {
 	    // in this implementation, this only affects xmlns reporting
-	    xmlNames = state;
+	    xmlNames = value;
 	    // forcibly prevent illegal parser state
 	    if (!xmlNames)
 		namespaces = true;
@@ -457,7 +462,7 @@ final public class SAXDriver
 	}
 
 	if ((FEATURE + "namespaces").equals (featureId)) {
-	    namespaces = state;
+	    namespaces = value;
 	    // forcibly prevent illegal parser state
 	    if (!namespaces)
 		xmlNames = true;
@@ -465,15 +470,20 @@ final public class SAXDriver
 	}
 
 	if ((FEATURE + "external-general-entities").equals (featureId)) {
-	    extGE = state;
+	    extGE = value;
 	    return;
 	}
 	if ((FEATURE + "external-parameter-entities") .equals (featureId)) {
-	    extPE = state;
+	    extPE = value;
 	    return;
 	}
 	if ((FEATURE + "resolve-dtd-uris").equals (featureId)) {
-	    resolveAll = state;
+	    resolveAll = value;
+	    return;
+	}
+
+	if ((FEATURE + "use-entity-resolver2").equals (featureId)) {
+	    useResolver2 = value;
 	    return;
 	}
 
@@ -484,7 +494,7 @@ final public class SAXDriver
      * <b>SAX2</b>:  Assigns the specified property.  Like SAX1 handlers,
      * these may be changed at any time.
      */
-    public void setProperty (String propertyId, Object property)
+    public void setProperty (String propertyId, Object value)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	// see if the property is recognized
@@ -493,22 +503,22 @@ final public class SAXDriver
 	// Properties with a defined value, we just change it if we can.
 
 	if ((PROPERTY + "declaration-handler").equals (propertyId)) {
-	    if (property == null)
+	    if (value == null)
 		declHandler = base;
-	    else if (! (property instanceof DeclHandler))
+	    else if (! (value instanceof DeclHandler))
 		throw new SAXNotSupportedException (propertyId);
 	    else
-		declHandler = (DeclHandler) property;
+		declHandler = (DeclHandler) value;
 	    return ;
 	}
 
 	if ((PROPERTY + "lexical-handler").equals (propertyId)) {
-	    if (property == null)
+	    if (value == null)
 		lexicalHandler = base;
-	    else if (! (property instanceof LexicalHandler))
+	    else if (! (value instanceof LexicalHandler))
 		throw new SAXNotSupportedException (propertyId);
 	    else
-		lexicalHandler = (LexicalHandler) property;
+		lexicalHandler = (LexicalHandler) value;
 	    return ;
 	}
 
@@ -535,7 +545,18 @@ final public class SAXDriver
     throws SAXException
 	{ contentHandler.skippedEntity (name); }
 
-    InputSource resolveEntity (boolean isPE, String name, InputSource in)
+    InputSource getExternalSubset (String name, String baseURI)
+    throws SAXException, IOException
+    {
+	InputSource	source;
+
+	if (resolver2 == null || !useResolver2 || !extPE)
+	    return null;
+	return resolver2.getExternalSubset (name, baseURI);
+    }
+
+    InputSource resolveEntity (boolean isPE, String name,
+    	InputSource in, String baseURI)
     throws SAXException, IOException
     {
 	InputSource	source;
@@ -548,19 +569,64 @@ final public class SAXDriver
 
 	// ... or not
 	lexicalHandler.startEntity (name);
-	source = entityResolver.resolveEntity (
-			in.getPublicId (), in.getSystemId ());
-	if (source == null)
-	    source = in;
-	startExternalEntity (name, source.getSystemId ());
+	if (resolver2 != null && useResolver2) {
+	    source = resolver2.resolveEntity (name, in.getPublicId (),
+			baseURI, in.getSystemId ());
+	    if (source == null) {
+		in.setSystemId (absolutize (baseURI,
+				in.getSystemId (), false));
+		source = in;
+	    }
+	} else {
+	    in.setSystemId (absolutize (baseURI, in.getSystemId (), false));
+	    source = entityResolver.resolveEntity (in.getPublicId (),
+			in.getSystemId ());
+	    if (source == null)
+		source = in;
+	}
+	startExternalEntity (name, source.getSystemId (), true);
 	return source;
     }
 
-    void startExternalEntity (String name, String systemId)
+    // absolutize a system ID relative to the specified base URI
+    // (temporarily) package-visible for external entity decls
+    String absolutize (String baseURI, String systemId, boolean nice)
+    throws MalformedURLException, SAXException
+    {
+	// FIXME normalize system IDs -- when?
+	// - Convert to UTF-8
+	// - Map reserved and non-ASCII characters to %HH
+
+	try {
+	    if (baseURI == null) {
+		warn ("No base URI; hope this SYSTEM id is absolute: "
+			+ systemId);
+		return new URL (systemId).toString ();
+	    } else
+		return new URL (new URL (baseURI), systemId).toString ();
+
+	} catch (MalformedURLException e) {
+
+	    // Let unknown URI schemes pass through unless we need
+	    // the JVM to map them to i/o streams for us...
+	    if (!nice)
+		throw e;
+
+	    // sometimes sysids for notations or unparsed entities
+	    // aren't really URIs...
+	    warn ("Can't absolutize SYSTEM id: " + e.getMessage ());
+	    return systemId;
+	}
+    }
+
+    void startExternalEntity (String name, String systemId,
+    	boolean stackOnly)
     throws SAXException
     {
 	if (systemId == null)
 	    warn ("URI was not reported to parser for entity " + name);
+	if (!stackOnly)		// spliced [dtd] needs startEntity
+	    lexicalHandler.startEntity (name);
 	entityStack.push (systemId);
     }
 
@@ -595,6 +661,35 @@ final public class SAXDriver
 	// the IDs for the external subset are lexical details,
 	// as are the contents of the internal subset; but sax2
 	// doesn't provide the internal subset "pre-parse"
+    }
+
+    void notationDecl (String name, String ids [])
+    throws SAXException
+    {
+	try {
+	    dtdHandler.notationDecl (name, ids [0],
+		(resolveAll && ids [1] != null)
+			? absolutize (ids [2], ids [1], true)
+			: ids [1]);
+	} catch (IOException e) {
+	    // "can't happen"
+	    throw new SAXParseException (e.getMessage (), this, e);
+	}
+    }
+
+    void unparsedEntityDecl (String name, String ids [], String notation)
+    throws SAXException
+    {
+	try {
+	    dtdHandler.unparsedEntityDecl (name, ids [0],
+		    resolveAll
+			? absolutize (ids [2], ids [1], true)
+			: ids [1],
+		    notation);
+	} catch (IOException e) {
+	    // "can't happen"
+	    throw new SAXParseException (e.getMessage (), this, e);
+	}
     }
 
     void endDoctype ()
