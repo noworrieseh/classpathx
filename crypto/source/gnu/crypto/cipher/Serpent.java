@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Serpent.java,v 1.2 2002-06-28 13:14:28 raif Exp $
+// $Id: Serpent.java,v 1.3 2002-09-04 09:56:39 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -63,7 +63,7 @@ import java.util.Iterator;
  *    Candidate Block Cipher for the Advanced Encryption Standard.</a></li>
  * </ol>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Serpent extends BaseCipher {
 
@@ -72,7 +72,7 @@ public class Serpent extends BaseCipher {
 
    private static final String NAME = "serpent";
 
-   private static final int DEFAULT_KEY_SIZE = 32;
+   private static final int DEFAULT_KEY_SIZE = 16;
    private static final int DEFAULT_BLOCK_SIZE = 16;
    private static final int ROUNDS = 32;
 
