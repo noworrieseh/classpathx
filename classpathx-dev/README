@@ -6,15 +6,19 @@ developers of Classpathx projects might need.
 Here's the description of what all the files do or are for:
 
 
+  footer.html		the GNU webpages footer, used during javadoc
+			generation.
 
   templateGPL.java  	the comment code to put at the very top 
   templateLGPL.jav	of all source files. Usage isn't mandatory
 			but it helps if all projects use the same 
 			header.
 
+  tools.el		some emacs lisp tools for handling code 
+			submitted to the classpathx project.
 
 
 
 
 $Author: nferrier $
-$Date: 2001-05-30 01:23:30 $
+$Date: 2001-06-14 15:04:11 $
