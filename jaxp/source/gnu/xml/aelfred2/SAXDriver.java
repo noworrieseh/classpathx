@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.20 2001-11-09 22:55:43 db Exp $
+ * $Id: SAXDriver.java,v 1.21 2001-11-11 06:49:23 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -61,7 +61,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.20 2001-11-09 22:55:43 db Exp $
+// $Id: SAXDriver.java,v 1.21 2001-11-11 06:49:23 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -116,7 +116,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-09 22:55:43 $
+ * @version $Date: 2001-11-11 06:49:23 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -559,10 +559,8 @@ final public class SAXDriver
     void startExternalEntity (String name, String systemId)
     throws SAXException
     {
-	if (systemId == null) {
+	if (systemId == null)
 	    warn ("URI was not reported to parser for entity " + name);
-	    systemId = "[unidentified data stream]";
-	}
 	entityStack.push (systemId);
     }
 
