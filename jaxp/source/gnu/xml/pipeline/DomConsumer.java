@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.10 2001-11-16 08:37:16 db Exp $
+ * $Id: DomConsumer.java,v 1.11 2001-11-16 23:12:06 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +79,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-11-16 08:37:16 $
+ * @version $Date: 2001-11-16 23:12:06 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -588,6 +588,8 @@ public class DomConsumer implements EventConsumer
 	    top = element;
 	}
 
+	final static String	xmlnsURI = "http://www.w3.org/2000/xmlns";
+
 	private void populateAttributes (Element element, Attributes attrs)
 	throws SAXParseException
 	{
@@ -621,22 +623,26 @@ public class DomConsumer implements EventConsumer
 		// xmlns="" is legal (undoes default NS)
 		// xmlns:foo="" is illegal
 		String prefix = getPrefix (name);
-
-		if ("xmlns".equals (prefix) && "".equals (value))
-		    namespaceError ("illegal null namespace decl, " + name);
-
-		// no attribute defaulting -- yes, bizarre, but
-		// it's what the namespace spec demands.
 		String namespace;
 
-		if (prefix == null)
+		if ("xmlns".equals (prefix)) {
+		    if ("".equals (value))
+			namespaceError ("illegal null namespace decl, " + name);
+		    namespace = xmlnsURI;
+		} else if ("xmlns".equals (name))
+		    namespace = xmlnsURI;
+
+		else if (prefix == null)
 		    namespace = null;
 		else if (uri != "" && uri.length () != 0)
 		    namespace = uri;
 		else
 		    namespace = getNamespace (prefix, attrs);
 
-		element.setAttributeNS (namespace, name, value);
+		if (namespace == null)
+		    element.setAttribute (name, value);
+		else
+		    element.setAttributeNS (namespace, name, value);
 	    }
 	}
 
