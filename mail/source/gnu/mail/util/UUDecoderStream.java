@@ -20,13 +20,13 @@
 */
 package gnu.mail.util;
 
-import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 
 
-/** a stream that does UU Decoding.
+/** 
+ * A stream that does UU Decoding.
  * UU-Decoding is defined in the MIME rfcs.
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
@@ -34,7 +34,7 @@ import java.io.IOException;
  * @version 1.0
  */
 public class UUDecoderStream
-extends FilterInputStream
+  extends FilterInputStream
 {
 
   /** buffer of bytes to be decoded.
@@ -63,15 +63,17 @@ extends FilterInputStream
 
   /** permission mode of file.
    */
-  protected  int mode;
+  protected int mode;
 
   /** create a new UU-Decoding stream.
    *
    * @param stream Input stream
    */
-  public UUDecoderStream(InputStream stream) 
+  public UUDecoderStream(InputStream in) 
   {
-    super(stream);
+    super(in);
+    if (!(in instanceof LineInputStream))
+      this.in = new LineInputStream(in);
     this.name = null;
     this.mode = -1;
     hasPrefix = false;
@@ -84,17 +86,20 @@ extends FilterInputStream
   /** @return Name of file
    * @throws IOException IO Exception occurred
    */
-  public String getName() throws IOException 
+  public String getName()
+    throws IOException 
   {
-    if (hasPrefix == false) 
-    readPrefix();
+    if (!hasPrefix) 
+      readPrefix();
     return name;
   }
 
-  /** decode bytes in decode_buffer to buffer for reading.
+  /**
+   * Decode bytes in decode_buffer to buffer for reading.
    * @throws IOException IO Exception occurred
    */
-  private void decode() throws IOException 
+  private void decode()
+    throws IOException 
   {
     int decode_index;
     int c1;
@@ -129,7 +134,8 @@ extends FilterInputStream
     }
   }
 
-  /** read byte from decoded buffer.
+  /** 
+   * Read byte from decoded buffer.
    * If buffer empty, the next line of encoded bytes
    * is read and decoded.
    *
@@ -137,7 +143,7 @@ extends FilterInputStream
    * @throws IOException IO Exception occurred
    */
   public int read()
-  throws IOException 
+    throws IOException 
   {
     int next;
     int lengthByte;
@@ -147,30 +153,32 @@ extends FilterInputStream
     String line;
     // Check for Read Prefix
     if (hasPrefix == false) 
-    readPrefix();
+      readPrefix();
     // Check for Reading in Decoding buffer
+    LineInputStream lin = (LineInputStream)in;
     if (index == bufsize) 
     {
       // Read Line
-      line = readLine(in);
+      line = lin.readLine();
       // Get Length
       lengthByte = line.getBytes()[0];
       length = (lengthByte - ' ') & 0x3f;
       // Check for Decoded length
       if (length > 45) 
-      throw new IOException("UUDecode error: line length to large (" + length + ")");
+        throw new IOException("UUDecode error: line length to large ("
+            + length + ")");
       // Check for End
       if (length == 0) 
       {
-	readSuffix();
-	return -1;
+        readSuffix();
+        return -1;
       }
       // Get Encoded Line Size
       decodeLength = line.length() - 1;
       // Check for encoded line length multiple of 4
       if ((decodeLength % 4) != 0) 
-      throw new IOException("UUDecode error: line length not multiple of 4 ("
-			    +decodeLength + ")");
+        throw new IOException("UUDecode error: line length not multiple of 4 ("
+            + decodeLength + ")");
       // Get Encoded Line
       decode_buffer = line.substring(1).getBytes();
       // Decode Buffer
@@ -183,7 +191,8 @@ extends FilterInputStream
     return next;
   }
 
-  /** read byte from decoded buffer.
+  /**
+   * Read byte from decoded buffer.
    * If buffer empty, the next line of encoded bytes is read and decoded.
    *
    * @param bytes Byte array to write bytes into
@@ -193,7 +202,7 @@ extends FilterInputStream
    * @throws IOException IO Exception occurred
    */
   public int read(byte[] bytes, int offset, int length)
-  throws IOException 
+    throws IOException 
   {
     // FIXME: This implementation is not as efficient as
     // it could be.  Instead of delegating the work to
@@ -203,7 +212,7 @@ extends FilterInputStream
     int index;
     // Write Bytes
     for (index = offset; index < length; index++) 
-    bytes[index] = (byte) read();
+      bytes[index] = (byte) read();
     // Return Number of bytes
     return length - offset;
   }
@@ -212,7 +221,7 @@ extends FilterInputStream
    * @throws IOException IO Exception occurred
    */
   public int available()
-  throws IOException 
+    throws IOException 
   {
     if (hasPrefix == false) 
     {
@@ -236,30 +245,31 @@ extends FilterInputStream
    * @return File permission mode
    * @throws IOException IO Exception occurred
    */
-  public int getMode() throws IOException 
+  public int getMode()
+    throws IOException 
   {
-    if (hasPrefix == false) 
-    readPrefix();
+    if (!hasPrefix) 
+      readPrefix();
     return mode;
   }
 
-  /** read prefix.
+  /** 
+   * Read prefix.
    *
    * @throws IOException IO Exception occurred
    */
   private void readPrefix()
-  throws IOException 
+    throws IOException 
   {
     // Note: One enhancement for this is to scan lines
     // until we find a 'begin'.  This way, it is fine
     // if there are a number of newlines before the
     // stream begins.
-    String line;
     // Get First line
-    line = readLine(in);
+    String line = ((LineInputStream)in).readLine();
     // Check for 'begin'
-    if (line.startsWith("begin") == false) 
-    throw new IOException("UUDecoder error: No Begin");
+    if (!line.startsWith("begin") == false) 
+      throw new IOException("UUDecoder error: No Begin");
     // Check for Mode
     try 
     {
@@ -282,43 +292,19 @@ extends FilterInputStream
     hasPrefix = true;
   }
 
-  /** read suffix.
+  /** 
+   * Read suffix.
    *
    * @throws IOException IO Exception occurred
    */
   private void readSuffix()
-  throws IOException 
+    throws IOException 
   {
-    String line;
     // Get First line
-    line = ((DataInputStream) in).readLine();
+    String line = ((LineInputStream)in).readLine();
     // Check for 'end'
-    if (line.startsWith("end") == false) 
-    throw new IOException("UUDecoder error: No End" + line);
-  }
-
-  /** read a line of text from the input stream.
-   * Ensures 7bit transport.
-   *
-   * @param in the stream to read
-   * @return the line or null if the stream ran out.
-   */
-  String readLine(InputStream in)
-  throws IOException
-  {
-    StringBuffer sb=new StringBuffer();
-    int ch=in.read();
-    if(ch==-1)
-    return null;
-    while(true)
-    {
-      if(ch==-1 || ((char)ch)=='\n')
-      break;
-      sb.append((char)ch);
-      ch=in.read();
-    }
-    // System.err.println(">>>readLine="+sb.toString());
-    return sb.toString();
+    if (!line.startsWith("end")) 
+      throw new IOException("UUDecoder error: No End: " + line);
   }
 
 }
