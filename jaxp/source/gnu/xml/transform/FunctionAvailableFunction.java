@@ -43,10 +43,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Function;
 
 /**
  * The XSLT <code>function-available</code> function.

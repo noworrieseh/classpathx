@@ -1,3 +1,11 @@
+2004-12-04  Dalibor Topic  <robilad@kaffe.org>
+
+   	* ElementAvailableFunction.java,FunctionAvailableFunction.java,
+	KeyFunction.java,SortKey.java,Stylesheet.java,
+	SystemPropertyFunction.java,TransformerImpl.java,XSLComparator.java,
+	NameTest.java,NamespaceTest.java,XPathParser.java,QName.java:
+   	Corrected QName.getLocalName to getLocalPart. Fixed missing imports.
+   	
 2004-12-02  Chris Burdess  <dog@gnu.org>
 
    	* TransformerImpl.java: Implemented JAXP user output properties.

@@ -51,8 +51,9 @@ public class QName
 {
 
   private final String namespaceURI;
-  private final String localName;
+  private final String localPart;
   private final String prefix;
+  private final String qName;
 
   public QName(String namespaceURI, String localPart)
   {
@@ -74,48 +75,9 @@ public class QName
         prefix = XMLConstants.DEFAULT_NS_PREFIX;
       }
     this.namespaceURI = namespaceURI;
-    this.localName = localPart;
+    this.localPart = localPart;
     this.prefix = prefix;
-  }
-
-  public QName(String localPart)
-  {
-    this(null, localPart, null);
-  }
-
-  public String getNamespaceURI()
-  {
-    return namespaceURI;
-  }
-
-  public String getLocalName()
-  {
-    return localName;
-  }
-
-  public String getPrefix()
-  {
-    return prefix;
-  }
-
-  public boolean equals(Object obj)
-  {
-    if (obj instanceof QName)
-      {
-        QName qname = (QName) obj;
-        return qname.getLocalName().equals(localName) &&
-          qname.getNamespaceURI().equals(namespaceURI);
-      }
-    return false;
-  }
-
-  public final int hashCode()
-  {
-    return toString().hashCode();
-  }
-
-  public String toString()
-  {
+    
     StringBuffer buf = new StringBuffer();
     if (namespaceURI != null && namespaceURI.length() > 0)
       {
@@ -128,8 +90,49 @@ public class QName
         buf.append(prefix);
         buf.append(':');
       }
-    buf.append(localName);
-    return buf.toString();
+    buf.append(localPart);
+    qName = buf.toString();
+  }
+
+  public QName(String localPart)
+  {
+    this(null, localPart, null);
+  }
+
+  public String getNamespaceURI()
+  {
+    return namespaceURI;
+  }
+
+  public String getLocalPart()
+  {
+    return localPart;
+  }
+
+  public String getPrefix()
+  {
+    return prefix;
+  }
+
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof QName)
+      {
+        QName qname = (QName) obj;
+        return qname.getLocalPart().equals(localPart) &&
+          qname.getNamespaceURI().equals(namespaceURI);
+      }
+    return false;
+  }
+
+  public final int hashCode()
+  {
+    return qName.hashCode();
+  }
+
+  public String toString()
+  {
+    return qName;
   }
 
   public static QName valueOf(String qNameAsString)

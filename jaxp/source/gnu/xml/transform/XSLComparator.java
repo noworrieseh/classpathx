@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.text.Collator;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
  * Comparator for sorting lists of nodes according to a list of sort keys.

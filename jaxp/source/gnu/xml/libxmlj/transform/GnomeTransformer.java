@@ -1,5 +1,5 @@
 /* 
- * $Id: GnomeTransformer.java,v 1.4 2004-12-05 23:43:09 dog Exp $
+ * GnomeTransformer.java
  * Copyright (C) 2003, 2004 Free Software Foundation, Inc.
  * 
  * This file is part of GNU Classpathx/jaxp.
