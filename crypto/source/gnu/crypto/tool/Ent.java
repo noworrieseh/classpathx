@@ -1,7 +1,7 @@
 package gnu.crypto.tool;
 
 // ----------------------------------------------------------------------------
-// $Id: Ent.java,v 1.1 2002-08-07 10:05:25 raif Exp $
+// $Id: Ent.java,v 1.2 2002-08-11 04:03:02 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -118,7 +118,7 @@ import java.util.Iterator;
  *    See [Knuth, pp. 64-65] for more details.</li>
  * </ul>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Ent {
 
@@ -360,16 +360,39 @@ public class Ent {
       int b;
       for (int i = 0; i < buffer.length; i++) {
          b = buffer[i] & 0xFF; // process a byte at a time
-         updateBitCount(b);
+//         updateBitCount(b);
+         updateBitCountAndSCC(b);
          updateMonteCarloPI(b);
-         updateSerialCorrelation(b);
+//         updateSerialCorrelation(b);
       }
    }
 
-   private void updateBitCount(int b) {
-      totalBits += 8;
-      for (int i = 0; i < 8; i++) {
-         counters[(b >>> i) & 0x01]++;
+//   private void updateBitCount(int b) {
+//      totalBits += 8;
+//      for (int i = 0; i < 8; i++) {
+//         counters[(b >>> i) & 0x01]++;
+//      }
+//   }
+
+   private void updateBitCountAndSCC(int b) {
+      int limit = (int) Math.min(8.0, Double.MAX_VALUE - totalBits);
+      for (int i = 0; i < limit; i++) {
+         totalBits++;
+
+         counters[(b >>> 7) & 0x01]++;
+
+         sccUn = b & 0x80;
+         if (sccFirst) {
+            sccFirst = false;
+            sccLast = 0.0;
+            sccU0 = sccUn;
+         } else {
+            sccT1 += sccLast * sccUn;
+         }
+         sccT2 += sccUn;
+         sccT3 += sccUn * sccUn;
+         sccLast = sccUn;
+         b <<= 1;
       }
    }
 
@@ -395,22 +418,22 @@ public class Ent {
       }
    }
 
-   private void updateSerialCorrelation(int b) {
-      for (int i = 0; i < 8; i++) {
-         sccUn = b & 0x80;
-         if (sccFirst) {
-            sccFirst = false;
-            sccLast = 0.0;
-            sccU0 = sccUn;
-         } else {
-            sccT1 += sccLast * sccUn;
-         }
-         sccT2 += sccUn;
-         sccT3 += sccUn * sccUn;
-         sccLast = sccUn;
-         b <<= 1;
-      }
-   }
+//   private void updateSerialCorrelation(int b) {
+//      for (int i = 0; i < 8; i++) {
+//         sccUn = b & 0x80;
+//         if (sccFirst) {
+//            sccFirst = false;
+//            sccLast = 0.0;
+//            sccU0 = sccUn;
+//         } else {
+//            sccT1 += sccLast * sccUn;
+//         }
+//         sccT2 += sccUn;
+//         sccT3 += sccUn * sccUn;
+//         sccLast = sccUn;
+//         b <<= 1;
+//      }
+//   }
 
    private void computeResults() {
       // complete calculation of serial correlation coefficient
