@@ -2,7 +2,7 @@
 // http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
-// $Id: DefaultHandler.java,v 1.6 2001-11-21 01:36:54 db Exp $
+// $Id: DefaultHandler.java,v 1.7 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -50,7 +50,7 @@ import org.xml.sax.SAXParseException;
  *
  * @since SAX 2.0
  * @author David Megginson,
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.EntityResolver
  * @see org.xml.sax.DTDHandler
  * @see org.xml.sax.ContentHandler

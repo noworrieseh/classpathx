@@ -1,5 +1,5 @@
 <HTML><HEAD>
-
+<!-- $Id: package.html,v 1.7 2002-02-01 20:06:20 db Exp $ -->
 </HEAD><BODY>
 
 <p>
@@ -15,17 +15,20 @@ That independence has several consequences:</p>
 
 <ul>
 
-<li>SAX2 drivers are <em>not</em> required to recognize these handlers,
-and you cannot assume that the class files will be present in every SAX2
+<li>SAX2 drivers are <em>not</em> required to recognize these handlers.
+</li>
+
+<li>You cannot assume that the class files will be present in every SAX2
 installation.</li>
 
 <li>This package may be updated independently of SAX2 (i.e. new
-handlers may be added without updating SAX2 itself).</li>
+handlers and classes may be added without updating SAX2 itself).</li>
 
-<li>The handlers are not implemented by the SAX2
+<li>The new handlers are not implemented by the SAX2
 <code>org.xml.sax.helpers.DefaultHandler</code> or
 <code>org.xml.sax.helpers.XMLFilterImpl</code> classes.
-You can subclass these if you need such behavior.</li>
+You can subclass these if you need such behavior, or
+use the helper classes found here.</li>
 
 <li>The handlers need to be registered differently than core SAX2
 handlers.</li>

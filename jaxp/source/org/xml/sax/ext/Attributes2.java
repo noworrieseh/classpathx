@@ -1,6 +1,7 @@
 // Attributes2.java - extended Attributes
+// http://www.saxproject.org
 // Public Domain: no warranty.
-// $Id: Attributes2.java,v 1.2 2001-11-21 01:36:54 db Exp $
+// $Id: Attributes2.java,v 1.3 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.ext;
 
@@ -54,7 +55,7 @@ public interface Attributes2 extends Attributes
      * @exception java.lang.IllegalArgumentException When the
      *            supplied names do not identify an attribute.
      */
-    public boolean isSpecified (String uri, String lname);
+    public boolean isSpecified (String uri, String localName);
 
     /**
      * Returns true unless the attribute value was provided
@@ -66,5 +67,5 @@ public interface Attributes2 extends Attributes
      * @exception java.lang.IllegalArgumentException When the
      *            supplied name does not identify an attribute.
      */
-    public boolean isSpecified (String qname);
+    public boolean isSpecified (String qName);
 }

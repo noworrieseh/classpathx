@@ -1,6 +1,7 @@
 // Locator2.java - extended Locator
+// http://www.saxproject.org
 // Public Domain: no warranty.
-// $Id: Locator2.java,v 1.3 2001-11-21 01:36:54 db Exp $
+// $Id: Locator2.java,v 1.4 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.ext;
 
@@ -55,6 +56,10 @@ public interface Locator2 extends Locator
      * Otherwise the encoding will been inferred (normally to be UTF-8, or
      * some UTF-16 variant), and that inferred name will be returned.
      *
+     * <p>When an {@link org.xml.sax.InputSource InputSource} is used
+     * to provide an entity's character stream, this method returns the
+     * encoding provided in that input stream.
+     *
      * <p> Note that some recent W3C specifications require that text
      * in some encodings be normalized, using Unicode Normalization
      * Form C, before processing.  Such normalization must be performed
@@ -65,7 +70,8 @@ public interface Locator2 extends Locator
      * and comparisons should be case-insensitive.
      *
      * @return Name of the character encoding being used to interpret
-     *	the entity's text.
+     *	the entity's text, or null if this was not provided for a
+     *	character stream passed through an InputSource.
      */
     public String getEncoding ();
 }

@@ -1,7 +1,7 @@
 // SAX exception class.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: SAXException.java,v 1.5 2001-11-21 01:36:54 db Exp $
+// $Id: SAXException.java,v 1.6 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax;
 
@@ -31,7 +31,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.SAXParseException
  */
 public class SAXException extends Exception {

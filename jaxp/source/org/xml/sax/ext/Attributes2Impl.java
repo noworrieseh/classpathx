@@ -1,6 +1,7 @@
 // Attributes2Impl.java - extended AttributesImpl
+// http://www.saxproject.org
 // Public Domain: no warranty.
-// $Id: Attributes2Impl.java,v 1.2 2001-11-21 01:36:54 db Exp $
+// $Id: Attributes2Impl.java,v 1.3 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.ext;
 
@@ -87,13 +88,13 @@ public class Attributes2Impl extends AttributesImpl implements Attributes2
      * @exception java.lang.IllegalArgumentException When the
      *            supplied names do not identify an attribute.
      */
-    public boolean isSpecified (String uri, String lname)
+    public boolean isSpecified (String uri, String localName)
     {
-	int index = getIndex (uri, lname);
+	int index = getIndex (uri, localName);
 
 	if (index < 0)
 	    throw new IllegalArgumentException (
-		"No such attribute: local=" + lname
+		"No such attribute: local=" + localName
 		+ ", namespace=" + uri);
 	return flags [index];
     }
@@ -107,13 +108,13 @@ public class Attributes2Impl extends AttributesImpl implements Attributes2
      * @exception java.lang.IllegalArgumentException When the
      *            supplied name does not identify an attribute.
      */
-    public boolean isSpecified (String qname)
+    public boolean isSpecified (String qName)
     {
-	int index = getIndex (qname);
+	int index = getIndex (qName);
 
 	if (index < 0)
 	    throw new IllegalArgumentException (
-		"No such attribute: " + qname);
+		"No such attribute: " + qName);
 	return flags [index];
     }
 

@@ -2,7 +2,7 @@
 // http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
-// $Id: ContentHandler.java,v 1.5 2001-11-21 01:36:54 db Exp $
+// $Id: ContentHandler.java,v 1.6 2002-02-01 20:06:19 db Exp $
 
 package org.xml.sax;
 
@@ -51,7 +51,7 @@ package org.xml.sax;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.DTDHandler
  * @see org.xml.sax.ErrorHandler
@@ -91,8 +91,7 @@ public interface ContentHandler
      * Receive notification of the beginning of a document.
      *
      * <p>The SAX parser will invoke this method only once, before any
-     * other methods in this interface or in {@link org.xml.sax.DTDHandler
-     * DTDHandler} (except for {@link #setDocumentLocator 
+     * other event callbacks (except for {@link #setDocumentLocator 
      * setDocumentLocator}).</p>
      *
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
@@ -150,6 +149,8 @@ public interface ContentHandler
      * "xml" prefix, since it is predeclared and immutable.</p>
      *
      * @param prefix The Namespace prefix being declared.
+     *	An empty string is used for the default element namespace,
+     *	which has no prefix.
      * @param uri The Namespace URI the prefix is mapped to.
      * @exception org.xml.sax.SAXException The client may throw
      *            an exception during processing.
@@ -169,7 +170,8 @@ public interface ContentHandler
      * {@link #endPrefixMapping endPrefixMapping} events is not otherwise
      * guaranteed.</p>
      *
-     * @param prefix The prefix that was being mapping.
+     * @param prefix The prefix that was being mapped.
+     *	This is the empty string when a default mapping scope ends.
      * @exception org.xml.sax.SAXException The client may throw
      *            an exception during processing.
      * @see #startPrefixMapping
@@ -222,6 +224,9 @@ public interface ContentHandler
      * property is true (it is false by default, and support for a 
      * true value is optional).</p>
      *
+     * <p>Like {@link #characters characters()}, attribute values may have
+     * characters that need more than one <code>char</code> value.  </p>
+     *
      * @param uri The Namespace URI, or the empty string if the
      *        element has no Namespace URI or if Namespace
      *        processing is not being performed.
@@ -238,7 +243,7 @@ public interface ContentHandler
      * @see #endElement
      * @see org.xml.sax.Attributes
      */
-    public void startElement (String namespaceURI, String localName,
+    public void startElement (String uri, String localName,
 			      String qName, Attributes atts)
 	throws SAXException;
 
@@ -264,7 +269,7 @@ public interface ContentHandler
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
      */
-    public void endElement (String namespaceURI, String localName,
+    public void endElement (String uri, String localName,
 			    String qName)
 	throws SAXException;
 
@@ -281,6 +286,23 @@ public interface ContentHandler
      *
      * <p>The application must not attempt to read from the array
      * outside of the specified range.</p>
+     *
+     * <p>Individual characters may consist of more than one Java
+     * <code>char</code> value.  There are two important cases where this
+     * happens, because characters can't be represented in just sixteen bits.
+     * In one case, characters are represented in a <em>Surrogate Pair</em>,
+     * using two special Unicode values. Such characters are in the so-called
+     * "Astral Planes", with a code point above U+FFFF.  A second case involves
+     * composite characters, such as a base character combining with one or
+     * more accent characters. </p>
+     *
+     * <p> Your code should not assume that algorithms using
+     * <code>char</code>-at-a-time idioms will be working in character
+     * units; in some cases they will split characters.  This is relevant
+     * wherever XML permits arbitrary characters, such as attribute values,
+     * processing instruction data, and comments as well as in data reported
+     * from this method.  It's also generally relevant whenever Java code
+     * manipulates internationalized text; the issue isn't unique to XML.</p>
      *
      * <p>Note that some parsers will report whitespace in element
      * content using the {@link #ignorableWhitespace ignorableWhitespace}
@@ -338,6 +360,10 @@ public interface ContentHandler
      * section 2.8) or a text declaration (XML 1.0, section 4.3.1)
      * using this method.</p>
      *
+     * <p>Like {@link #characters characters()}, processing instruction
+     * data may have characters that need more than one <code>char</code>
+     * value. </p>
+     *
      * @param target The processing instruction target.
      * @param data The processing instruction data, or null if
      *        none was supplied.  The data does not include any
@@ -351,8 +377,13 @@ public interface ContentHandler
 
     /**
      * Receive notification of a skipped entity.
+     * This is not called for entity references within markup constructs
+     * such as element start tags or markup declarations.  (The XML
+     * recommendation requires reporting skipped external entities.
+     * SAX also reports internal entity expansion/non-expansion, except
+     * within markup constructs.)
      *
-     * <p>The Parser will invoke this method once for each entity
+     * <p>The Parser will invoke this method each time the entity is
      * skipped.  Non-validating processors may skip entities if they
      * have not seen the declarations (because, for example, the
      * entity was declared in an external DTD subset).  All processors

@@ -1,7 +1,5 @@
 <html><head>
-
-<!-- $Id: package.html,v 1.9 2001-11-21 01:36:54 db Exp $ -->
-
+<!-- $Id: package.html,v 1.10 2002-02-01 20:06:20 db Exp $ -->
 </head><body>
 
 <p> This package provides the core SAX APIs.
@@ -200,6 +198,8 @@ the standard property URIs have the prefix
 	<td> For "DOM Walker" style parsers, which ignore their
 	    <em>parser.parse()</em> parameters, this is used to
 	    specify the DOM (sub)tree being walked by the parser.
+	    The Object must implement the
+	    <em>org.w3c.dom.Node</em> interface.
 	    </td>
 	</tr>
 
@@ -216,7 +216,7 @@ the standard property URIs have the prefix
 
     <tr>
 	<td>xml-string</td>
-	<td> Readable only during a parser callback, this exposes a TBS
+	<td> Readable only during a parser callback, this exposes a <b>TBS</b>
 	    chunk of characters responsible for the current event. </td>
 	</tr>
 

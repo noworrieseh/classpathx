@@ -3,7 +3,7 @@
 // Written by Edwin Goei, edwingo@apache.org
 // and by David Brownell, dbrownell@users.sourceforge.net
 // NO WARRANTY!  This class is in the Public Domain.
-// $Id: NewInstance.java,v 1.4 2001-11-21 01:36:54 db Exp $
+// $Id: NewInstance.java,v 1.5 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -29,7 +29,7 @@ import java.lang.reflect.InvocationTargetException;
  * including versions of Java 2.</p>
  *
  * @author Edwin Goei, David Brownell
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  */
 class NewInstance {
 

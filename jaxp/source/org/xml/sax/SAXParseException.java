@@ -1,7 +1,7 @@
 // SAX exception class.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: SAXParseException.java,v 1.5 2001-11-21 01:36:54 db Exp $
+// $Id: SAXParseException.java,v 1.6 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax;
 
@@ -15,8 +15,9 @@ package org.xml.sax;
  * for further information.
  * </blockquote>
  *
- * <p>This exception will include information for locating the error
- * in the original XML document.  Note that although the application
+ * <p>This exception may include information for locating the error
+ * in the original XML document, as if it came from a {@link Locator}
+ * object.  Note that although the application
  * will receive a SAXParseException as the argument to the handlers
  * in the {@link org.xml.sax.ErrorHandler ErrorHandler} interface, 
  * the application is not actually required to throw the exception; 
@@ -28,7 +29,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.SAXException
  * @see org.xml.sax.Locator
  * @see org.xml.sax.ErrorHandler
@@ -96,8 +97,11 @@ public class SAXParseException extends SAXException {
      *
      * <p>This constructor is most useful for parser writers.</p>
      *
-     * <p>If the system identifier is a URL, the parser must resolve it
-     * fully before creating the exception.</p>
+     * <p>All parameters except the message are as if
+     * they were provided by a {@link Locator}.  For example, if the
+     * system identifier is a URL (including relative filename), the
+     * caller must resolve it fully before creating the exception.</p>
+     *
      *
      * @param message The error or warning message.
      * @param publicId The public identifer of the entity that generated
@@ -124,8 +128,10 @@ public class SAXParseException extends SAXException {
      * need to wrap an exception that is not a subclass of
      * {@link org.xml.sax.SAXException SAXException}.</p>
      *
-     * <p>If the system identifier is a URL, the parser must resolve it
-     * fully before creating the exception.</p>
+     * <p>All parameters except the message and exception are as if
+     * they were provided by a {@link Locator}.  For example, if the
+     * system identifier is a URL (including relative filename), the
+     * caller must resolve it fully before creating the exception.</p>
      *
      * @param message The error or warning message, or null to use
      *                the message from the embedded exception.
@@ -183,7 +189,7 @@ public class SAXParseException extends SAXException {
     /**
      * Get the system identifier of the entity where the exception occurred.
      *
-     * <p>If the system identifier is a URL, it will be resolved
+     * <p>If the system identifier is a URL, it will have been resolved
      * fully.</p>
      *
      * @return A string containing the system identifier, or null
@@ -198,6 +204,8 @@ public class SAXParseException extends SAXException {
     
     /**
      * The line number of the end of the text where the exception occurred.
+     *
+     * <p>The first line is line 1.</p>
      *
      * @return An integer representing the line number, or -1
      *         if none is available.

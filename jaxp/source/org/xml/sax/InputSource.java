@@ -1,7 +1,7 @@
 // SAX input source.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: InputSource.java,v 1.7 2001-11-21 01:36:54 db Exp $
+// $Id: InputSource.java,v 1.8 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax;
 
@@ -30,9 +30,9 @@ import java.io.InputStream;
  *
  * <p>The SAX parser will use the InputSource object to determine how
  * to read XML input.  If there is a character stream available, the
- * parser will read that stream directly, ignoring any text encoding
- * declaration found in that stream as well as any encoding specified
- * in the InputSource.  If there is no character stream, but there is
+ * parser will read that stream directly, disregarding any text
+ * encoding declaration found in that stream.
+ * If there is no character stream, but there is
  * a byte stream, the parser will use that byte stream, using the
  * encoding specified in the InputSource or else (if no encoding is
  * specified) autodetecting the character encoding using an algorithm
@@ -51,7 +51,7 @@ import java.io.InputStream;
  *
  * @since SAX 1.0
  * @author David Megginson
- * @version 2.0r2pre3
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.XMLReader#parse(org.xml.sax.InputSource)
  * @see org.xml.sax.EntityResolver#resolveEntity
  * @see java.io.InputStream

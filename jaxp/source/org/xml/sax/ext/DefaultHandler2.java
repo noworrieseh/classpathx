@@ -1,7 +1,7 @@
-// DeclHandler.java - Optional handler for DTD declaration events.
-// http://sax.sourceforge.net
+// DefaultHandler2.java - extended DefaultHandler
+// http://www.saxproject.org
 // Public Domain: no warranty.
-// $Id: DefaultHandler2.java,v 1.3 2001-11-21 01:36:54 db Exp $
+// $Id: DefaultHandler2.java,v 1.4 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.ext;
 
@@ -11,13 +11,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-// $Id: DefaultHandler2.java,v 1.3 2001-11-21 01:36:54 db Exp $
-
 /**
  * This class extends the SAX2 base handler class to support the
- * SAX2 {@link LexicalHandler} and {@link DeclHandler} extensions.
- * The added handler methods just return; subclassers may override
- * on a method-by-method basis.
+ * SAX2 {@link LexicalHandler}, {@link DeclHandler}, and
+ * {@link EntityResolver2} extensions.  Except for overriding the
+ * original SAX1 {@link DefaultHandler#resolveEntity resolveEntity()}
+ * method the added handler methods just return.  Subclassers may
+ * override everything on a method-by-method basis.
  *
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
@@ -92,7 +92,7 @@ public class DefaultHandler2 extends DefaultHandler
     throws SAXException
 	{}
 
-    // SAX2 ext-1.1 EntityResolver
+    // SAX2 ext-1.1 EntityResolver2
 
     /**
      * Tells the parser that if no external subset has been declared
@@ -105,14 +105,26 @@ public class DefaultHandler2 extends DefaultHandler
     /**
      * Tells the parser to resolve the systemId against the baseURI
      * and read the entity text from that resulting absolute URI.
-     * Note that you should also override both this method and
+     * Note that because the older
      * {@link DefaultHandler#resolveEntity DefaultHandler.resolveEntity()},
-     * rather than only one of them, so that no matter what kind of SAX2
-     * parser you use, it will have an appropriate entity resolution policy.
+     * method is overridden to call this one, this method may sometimes 
+     * be invoked with null <em>name</em> and <em>baseURI</em>, and
+     * with the <em>systemId</em> already absolutized.
      */
     public InputSource resolveEntity (String name, String publicId,
 	    String baseURI, String systemId)
     throws SAXException, IOException
 	{ return null; }
+    
+    // SAX1 EntityResolver
 
+    /**
+     * Invokes
+     * {@link EntityResolver2#resolveEntity EntityResolver2.resolveEntity()}
+     * with null entity name and base URI.
+     * You only need to override that method to use this class.
+     */
+    public InputSource resolveEntity (String publicId, String systemId)
+    throws SAXException, IOException
+	{ return resolveEntity (null, publicId, null, systemId); }
 }

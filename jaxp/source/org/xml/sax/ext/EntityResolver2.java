@@ -1,7 +1,7 @@
-// SAX entity resolver.
-// http://sax.sourceforge.net
+// EntityResolver2.java - Extended SAX entity resolver.
+// http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
-// $Id: EntityResolver2.java,v 1.2 2001-11-21 01:36:54 db Exp $
+// $Id: EntityResolver2.java,v 1.3 2002-02-01 20:06:20 db Exp $
 
 package org.xml.sax.ext;
 
@@ -74,7 +74,8 @@ public interface EntityResolver2 extends EntityResolver
      * are reported.</p>
      *
      * <p>This method can also be used with documents that have no DOCTYPE
-     * declaration.  When the root element is encountered, this method is
+     * declaration.  When the root element is encountered,
+     * but no DOCTYPE declaration has been seen, this method is
      * invoked.  If it returns a value for the external subset, that root
      * element is declared to be the root element, giving the effect of
      * splicing a DOCTYPE declaration at the end the prolog of a document
@@ -162,17 +163,20 @@ public interface EntityResolver2 extends EntityResolver
      * @param name Identifies the external entity being resolved.
      *	Either "[dtd]" for the external subset, or a name starting
      *	with "%" to indicate a parameter entity, or else the name of
-     *	a general entity.
+     *	a general entity.  This is never null when invoked by a SAX2
+     *	parser.
      * @param publicId The public identifier of the external entity being
-     *	referenced (normalized as required by the XML specification, or
+     *	referenced (normalized as required by the XML specification), or
      *	null if none was supplied.
      * @param baseURI The URI with respect to which relative systemIDs
      *	are interpreted.  This is always an absolute URI, unless it is
-     *	null because the XMLReader was given an InputSource without one.
-     *  This URI is defined by the XML specification to be the one
+     *	null (likely because the XMLReader was given an InputSource without
+     *  one).  This URI is defined by the XML specification to be the one
      *	associated with the "&lt;" starting the relevant declaration.
      * @param systemId The system identifier of the external entity
      *	being referenced; either a relative or absolute URI.
+     *  This is never null when invoked by a SAX2 parser; only declared
+     *	entities, and any external subset, are resolved by such parsers.
      *
      * @return An InputSource object describing the new input source to
      *	be used by the parser.  Returning null directs the parser to
