@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.9 2001-07-11 17:09:26 db Exp $
+ * $Id: XmlParser.java,v 1.10 2001-07-18 17:03:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.9 2001-07-11 17:09:26 db Exp $
+// $Id: XmlParser.java,v 1.10 2001-07-18 17:03:17 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-11 17:09:26 $
+ * @version $Date: 2001-07-18 17:03:17 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -3694,6 +3694,16 @@ loop:
 	    // ASCII derived
 	    // 0x3c 0x3f 0x78 0x6d: UTF-8 or other 8-bit markup (read ENCODING)
 	    encoding = ENCODING_UTF_8;
+	    read8bitEncodingDeclaration ();
+
+	} else if (signature [0] == 0xef
+		&& signature [1] == 0xbb
+		&& signature [2] == 0xbf) {
+	    // 0xef 0xbb 0xbf: UTF-8 BOM
+	    // this un-needed notion slipped into XML 2nd ed through a
+	    // "non-normative" erratum; now required by MSFT and UDDI
+	    encoding = ENCODING_UTF_8;
+	    is.read (); is.read (); is.read ();
 	    read8bitEncodingDeclaration ();
 
 	} else {
