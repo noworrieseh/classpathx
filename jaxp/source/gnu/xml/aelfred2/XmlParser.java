@@ -2480,6 +2480,13 @@ loop:
 	                                         error ("Not a name start character, U+"
 	                          		        + Integer.toHexString (c));
 	                                break;
+	                                case 0x0060:
+		                             if (c == 0x1162 || c == 0x1164
+		                             	 || c == 0x1166 || c == 0x116b
+						 || c == 0x116f)
+		                                 error ("Not a name start character, U+"
+		                          		 + Integer.toHexString (c));
+		                                break;
 	                                case 0x00b0:
 	                                     if (c == 0x11b6 || c == 0x11b9
 	                                         || c == 0x11bb || c == 0x116f)
@@ -2496,7 +2503,8 @@ loop:
 	                        break;
 	                        default:
 	                           if (c == 0x0e46 || c == 0x1011 
-	                               || c == 0x212f || c == 0x0587)
+	                               || c == 0x212f || c == 0x0587
+				       || c == 0x0230 )
 	                	       error ("Not a name start character, U+"
 	          		              + Integer.toHexString (c));
 	                    }
