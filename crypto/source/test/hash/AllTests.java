@@ -1,7 +1,7 @@
 package test.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: AllTests.java,v 1.3 2001-12-08 21:32:59 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import junit.textui.TestRunner;
 /**
  * TestSuite that runs all tests of the hash package.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AllTests extends TestCase {
 
@@ -67,6 +67,8 @@ public class AllTests extends TestCase {
       result.addTest(TestOfRipeMD128.suite());
       result.addTest(TestOfRipeMD160.suite());
       result.addTest(TestOfWhirlpool.suite());
+      result.addTest(TestOfSha160.suite());
+      result.addTest(TestOfMD5.suite());
 
       return result;
    }
