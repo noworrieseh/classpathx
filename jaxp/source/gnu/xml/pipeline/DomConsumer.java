@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.9 2001-11-04 01:11:44 db Exp $
+ * $Id: DomConsumer.java,v 1.10 2001-11-16 08:37:16 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -79,7 +79,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 01:11:44 $
+ * @version $Date: 2001-11-16 08:37:16 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -688,6 +688,8 @@ public class DomConsumer implements EventConsumer
 	    for (Node n = top;
 		    n != null && n.getNodeType () != Node.DOCUMENT_NODE;
 		    n = (Node) n.getParentNode ()) {
+		if (n.getNodeType () == Node.ENTITY_REFERENCE_NODE)
+		    continue;
 		Element e = (Element) n;
 		Attr attr = e.getAttributeNode (decl);
 		if (attr != null)
