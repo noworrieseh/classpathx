@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.16 2001-10-23 17:42:25 db Exp $
+ * $Id: XmlParser.java,v 1.17 2001-11-04 00:49:06 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -64,7 +64,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.16 2001-10-23 17:42:25 db Exp $
+// $Id: XmlParser.java,v 1.17 2001-11-04 00:49:06 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-04 00:49:06 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -829,10 +829,14 @@ final class XmlParser
 		}
 	    }
 	}
+	skipWhitespace ();
+	require ('>');
 
 	// Read the external subset, if any
 	if (ids [1] != null) {
 	    ids [1] = absolutize (ids [1]);
+
+	    pushString (null, ">");
 
 	    // NOTE:  [dtd] is so we say what SAX2 expects,
 	    // even though it's misleading, 
@@ -851,15 +855,12 @@ final class XmlParser
 		    expandPE = false;
 		}
 	    }
-	} else {
-	    // No external subset.
-	    skipWhitespace ();
-	    require ('>');
 	}
 
 	// done dtd
 	handler.endDoctype ();
 	expandPE = false;
+	doReport = true;
     }
 
 
@@ -2190,15 +2191,14 @@ loop:
 
 	// Find the first delimiter.
 	delim = readCh ();
-	if (delim != '"' && delim != '\'' && delim != (char) 0) {
+	if (delim != '"' && delim != '\'') {
 	    error ("expected '\"' or \"'\"", delim, null);
 	    return null;
 	}
 	inLiteral = true;
 	if ((flags & LIT_DISABLE_PE) != 0)
 	    expandPE = false;
-	if ((flags & LIT_ATTRIBUTE) != 0)
-	    doReport = false;
+	doReport = false;
 
 	// Each level of input source has its own buffer; remember
 	// ours, so we won't read the ending delimiter from any
@@ -2358,6 +2358,9 @@ loop:
 	    ids [1] = readLiteral (flags);
 	} else if (!isSubset) 
 		error ("missing SYSTEM or PUBLIC keyword");
+	
+	if (ids [1] != null && ids [1].indexOf ('#') != -1)
+	    handler.verror ("SYSTEM id has a URI fragment: " + ids [1]);
 
 	return ids;
     }
@@ -2518,7 +2521,7 @@ loop:
 		&& !inCDATA
 		) {
 	    // We can't just trust the buffer to be whitespace, there
-	    // are cases when it isn't
+	    // are (error) cases when it isn't
 	    for (int i = 0; i < dataBufferPos; i++) {
 		if (!isWhitespace (dataBuffer [i])) {
 		    handler.charData (dataBuffer, 0, dataBufferPos);
@@ -2954,7 +2957,6 @@ loop:
 	return (String) attribute [4];
     }
 
-
     /**
      * Retrieve the default value type of a declared attribute.
      * @see #ATTRIBUTE_DEFAULT_SPECIFIED
@@ -2979,6 +2981,8 @@ loop:
      * - String type
      * - String default value
      * - int value type
+     * - enumeration
+     * - processed default value
      */
     private void setAttribute (String elName, String name, String type,
 			String enumeration,
@@ -3812,8 +3816,10 @@ loop:
     {
 	// Push the existing status
 	pushInput (ename);
-	if (ename != null && doReport)
+	if (ename != null && doReport) {
+	    dataBufferFlush ();
 	    handler.startInternalEntity (ename);
+	}
 	sourceType = INPUT_INTERNAL;
 	readBuffer = ch;
 	readBufferPos = start;
@@ -3910,6 +3916,8 @@ loop:
     {
 	String ename = (String) entityStack.pop ();
 
+	if (ename != null && doReport)
+	    dataBufferFlush ();
 	switch (sourceType) {
 	case INPUT_STREAM:
 	    handler.endExternalEntity (ename);
