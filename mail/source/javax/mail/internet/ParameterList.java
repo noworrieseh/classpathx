@@ -20,7 +20,8 @@
 package javax.mail.internet;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * This class holds MIME parameters (attribute-value pairs).
@@ -31,7 +32,7 @@ public class ParameterList
   /*
    * The underlying storage.
    */
-  private Hashtable list = new Hashtable();
+  private HashMap list = new HashMap();
 
   /**
    * No-arg Constructor.
@@ -131,7 +132,7 @@ public class ParameterList
    */
   public Enumeration getNames()
   {
-    return list.keys();
+    return new ParameterEnumeration(list.keySet().iterator());
   }
 
   /**
@@ -157,9 +158,9 @@ public class ParameterList
   public String toString(int used)
   {
     StringBuffer buffer = new StringBuffer();
-    for (Enumeration e = list.keys(); e.hasMoreElements(); )
+    for (Iterator i = list.keySet().iterator(); i.hasNext(); )
     {
-      String key = (String)e.nextElement();
+      String key = (String)i.next();
       String value = MimeUtility.quote((String)list.get(key), 
           HeaderTokenizer.MIME);
       
@@ -181,6 +182,32 @@ public class ParameterList
       buffer.append(value);
     }
     return buffer.toString();
+  }
+  
+  /*
+   * Needed to provide an enumeration interface for the key iterator.
+   */
+  static class ParameterEnumeration
+    implements Enumeration
+  {
+
+    Iterator source;
+
+    ParameterEnumeration(Iterator source)
+    {
+      this.source = source;
+    }
+
+    public boolean hasMoreElements()
+    {
+      return source.hasNext();
+    }
+
+    public Object nextElement()
+    {
+      return source.next();
+    }
+    
   }
 
 }

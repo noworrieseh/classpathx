@@ -1,6 +1,6 @@
 /*
  * Part.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -67,6 +67,8 @@ import javax.activation.DataHandler;
  * <p>
  * Message and BodyPart implement the Part interface. 
  * Note that in MIME parlance, Part models an Entity (RFC 2045, Section 2.4).
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public interface Part
 {

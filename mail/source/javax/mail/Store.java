@@ -1,6 +1,6 @@
 /*
  * Store.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,7 @@
 
 package javax.mail;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.mail.event.FolderEvent;
 import javax.mail.event.FolderListener;
 import javax.mail.event.StoreEvent;
@@ -34,13 +33,15 @@ import javax.mail.event.StoreListener;
  * Note that Store extends the Service class, which provides many common 
  * methods for naming stores, connecting to stores, and listening to 
  * connection events.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class Store 
   extends Service
 {
 
-  private Vector storeListeners;
-  private Vector folderListeners;
+  private ArrayList storeListeners;
+  private ArrayList folderListeners;
 
   /**
    * Constructor.
@@ -166,20 +167,28 @@ public abstract class Store
   /**
    * Add a listener for StoreEvents on this Store.
    */
-  public synchronized void addStoreListener(StoreListener l)
+  public void addStoreListener(StoreListener l)
   {
     if (storeListeners==null)
-      storeListeners = new Vector();
-    storeListeners.addElement(l);
+      storeListeners = new ArrayList();
+    synchronized (storeListeners)
+    {
+      storeListeners.add(l);
+    }
   }
 
   /**
    * Remove a listener for Store events.
    */
-  public synchronized void removeStoreListener(StoreListener l)
+  public void removeStoreListener(StoreListener l)
   {
     if (storeListeners!=null)
-      storeListeners.removeElement(l);
+    {
+      synchronized (storeListeners)
+      {
+        storeListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -200,9 +209,14 @@ public abstract class Store
   {
     if (storeListeners!=null)
     {
-      for (Enumeration e = storeListeners.elements(); 
-          e.hasMoreElements(); )
-        ((StoreListener)e.nextElement()).notification(event);
+      StoreListener[] l = null;
+      synchronized (storeListeners)
+      {
+        l = new StoreListener[storeListeners.size()];
+        storeListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].notification(event);
     }
   }
 
@@ -213,20 +227,28 @@ public abstract class Store
    * Store. FolderEvents are delivered to FolderListeners on the affected 
    * Folder as well as to FolderListeners on the containing Store.
    */
-  public synchronized void addFolderListener(FolderListener l)
+  public void addFolderListener(FolderListener l)
   {
     if (folderListeners==null)
-      folderListeners = new Vector();
-    folderListeners.addElement(l);
+      folderListeners = new ArrayList();
+    synchronized (folderListeners)
+    {
+      folderListeners.add(l);
+    }
   }
 
   /**
    * Remove a listener for Folder events.
    */
-  public synchronized void removeFolderListener(FolderListener l)
+  public void removeFolderListener(FolderListener l)
   {
     if (folderListeners!=null)
-      folderListeners.removeElement(l);
+    {
+      synchronized (folderListeners)
+      {
+        folderListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -267,9 +289,14 @@ public abstract class Store
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderCreated(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderCreated(event);
     }
   }
 
@@ -280,9 +307,14 @@ public abstract class Store
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderDeleted(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderDeleted(event);
     }
   }
 
@@ -293,9 +325,14 @@ public abstract class Store
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderRenamed(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderRenamed(event);
     }
   }
 

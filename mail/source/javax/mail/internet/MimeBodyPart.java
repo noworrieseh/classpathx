@@ -20,8 +20,8 @@
 package javax.mail.internet;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
 import javax.activation.DataHandler;
 import javax.mail.*;
 import gnu.mail.util.CRLFOutputStream;
@@ -408,7 +408,7 @@ public class MimeBodyPart
     if (header!=null)
     {
       HeaderTokenizer ht = new HeaderTokenizer(header, HeaderTokenizer.MIME);
-      Vector acc = new Vector();
+      ArrayList acc = new ArrayList();
       for (boolean done = false; !done; )
       {
         HeaderTokenizer.Token token = ht.next();
@@ -418,14 +418,14 @@ public class MimeBodyPart
             done = true;
             break;
           case HeaderTokenizer.Token.ATOM:
-            acc.addElement(token.getValue());
+            acc.add(token.getValue());
             break;
         }
       } 
       if (acc.size()>0)
       {
         String[] languages = new String[acc.size()];
-        acc.copyInto(languages);
+        acc.toArray(languages);
         return languages;
       }
     }

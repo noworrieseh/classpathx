@@ -19,9 +19,10 @@
 
 package javax.mail;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 
@@ -40,7 +41,7 @@ public abstract class Transport
   /*
    * Transport listener list.
    */
-  private Vector transportListeners;
+  private ArrayList transportListeners;
 
   /**
    * Constructor.
@@ -116,16 +117,16 @@ public abstract class Transport
     if (addresses==null || addresses.length==0)
       throw new SendFailedException("No recipient addresses");
 
-    Hashtable addressesByType = new Hashtable();
+    HashMap addressesByType = new HashMap();
     for (int i = 0; i<addresses.length; i++)
     {
       String type = addresses[i].getType();
       if (addressesByType.containsKey(type))
-        ((Vector)addressesByType.get(type)).addElement(addresses[i]);
+        ((ArrayList)addressesByType.get(type)).add(addresses[i]);
       else
       {
-        Vector addressList = new Vector();
-        addressList.addElement(addresses[i]);
+        ArrayList addressList = new ArrayList();
+        addressList.add(addresses[i]);
         addressesByType.put(type, addressList);
       }
     }
@@ -140,25 +141,22 @@ public abstract class Transport
 
     MessagingException ex = null;
     boolean error = false;
-    Vector validSent = new Vector();
-    Vector validUnsent = new Vector();
-    Vector invalid = new Vector();
+    ArrayList validSent = new ArrayList();
+    ArrayList validUnsent = new ArrayList();
+    ArrayList invalid = new ArrayList();
     
-    for (Enumeration e = addressesByType.elements(); e.hasMoreElements();)
+    for (Iterator i = addressesByType.values().iterator(); i.hasNext();)
     {
-      Vector addressList = (Vector)e.nextElement();
+      ArrayList addressList = (ArrayList)i.next();
       Address[] addressArray = new Address[addressList.size()];
-      addressList.copyInto(addressArray);
+      addressList.toArray(addressArray);
 
       if (addressArray.length<1)
         break;
       
       Transport transport = session.getTransport(addressArray[0]);
       if (transport==null)
-      {
-        for (int i = 0; i<addressArray.length; i++)
-          invalid.addElement(addressArray[i]);
-      }
+        invalid.addAll(Arrays.asList(addressArray));
       else
       {
         try
@@ -178,24 +176,13 @@ public abstract class Transport
           
           a = sfex.getValidSentAddresses();
           if (a!=null)
-          {
-            for (int i = 0; i<a.length; i++)
-              validSent.addElement(a[i]);
-
-          }
+            validSent.addAll(Arrays.asList(a));
           a = sfex.getValidUnsentAddresses();
           if (a!=null)
-          {
-            for (int i = 0; i<a.length; i++)
-              validUnsent.addElement(a[i]);
-
-          }
+            validUnsent.addAll(Arrays.asList(a));
           a = sfex.getInvalidAddresses();
           if (a!=null)
-          {
-            for (int i = 0; i<a.length; i++)
-              invalid.addElement(a[i]);
-          }
+            invalid.addAll(Arrays.asList(a));
         }
         catch (MessagingException mex)
         {
@@ -221,17 +208,17 @@ public abstract class Transport
       if (validSent.size() > 0)
       {
         validSentAddresses = new Address[validSent.size()];
-        validSent.copyInto(validSentAddresses);
+        validSent.toArray(validSentAddresses);
       }
       if (validUnsent.size() > 0)
       {
         validUnsentAddresses = new Address[validUnsent.size()];
-        validUnsent.copyInto(validUnsentAddresses);
+        validUnsent.toArray(validUnsentAddresses);
       }
       if (invalid.size() > 0)
       {
         invalidAddresses = new Address[invalid.size()];
-        invalid.copyInto(invalidAddresses);
+        invalid.toArray(invalidAddresses);
       }
       throw new SendFailedException("Send failed", ex,
           validSentAddresses, validUnsentAddresses, invalidAddresses);
@@ -280,20 +267,28 @@ public abstract class Transport
   /**
    * Add a listener for Transport events.
    */
-  public synchronized void addTransportListener(TransportListener l)
+  public void addTransportListener(TransportListener l)
   {
     if (transportListeners==null)
-      transportListeners = new Vector();
-    transportListeners.addElement(l);
+      transportListeners = new ArrayList();
+    synchronized (transportListeners)
+    {
+      transportListeners.add(l);
+    }
   }
 
   /**
    * Remove a listener for Transport events.
    */
-  public synchronized void removeTransportListener(TransportListener l)
+  public void removeTransportListener(TransportListener l)
   {
     if (transportListeners!=null)
-      transportListeners.removeElement(l);
+    {
+      synchronized (transportListeners)
+      {
+        transportListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -328,9 +323,14 @@ public abstract class Transport
   {
     if (transportListeners!=null)
     {
-      for (Enumeration e = transportListeners.elements(); 
-          e.hasMoreElements(); )
-        ((TransportListener)e.nextElement()).messageDelivered(event);
+      TransportListener[] l = null;
+      synchronized (transportListeners)
+      {
+        l = new TransportListener[transportListeners.size()];
+        transportListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messageDelivered(event);
     }
   }
   
@@ -342,9 +342,14 @@ public abstract class Transport
   {
     if (transportListeners!=null)
     {
-      for (Enumeration e = transportListeners.elements(); 
-          e.hasMoreElements(); )
-        ((TransportListener)e.nextElement()).messageNotDelivered(event);
+      TransportListener[] l = null;
+      synchronized (transportListeners)
+      {
+        l = new TransportListener[transportListeners.size()];
+        transportListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messageNotDelivered(event);
     }
   }
   
@@ -356,9 +361,14 @@ public abstract class Transport
   {
     if (transportListeners!=null)
     {
-      for (Enumeration e = transportListeners.elements(); 
-          e.hasMoreElements(); )
-        ((TransportListener)e.nextElement()).messagePartiallyDelivered(event);
+      TransportListener[] l = null;
+      synchronized (transportListeners)
+      {
+        l = new TransportListener[transportListeners.size()];
+        transportListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messagePartiallyDelivered(event);
     }
   }
   

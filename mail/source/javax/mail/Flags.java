@@ -1,6 +1,6 @@
 /*
  * Flags.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,9 @@
 package javax.mail;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * The Flags class represents the set of flags on a Message.
@@ -62,9 +64,11 @@ import java.util.*;
       ......
  }
  </pre>
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class Flags
-implements Cloneable, Serializable
+  implements Cloneable, Serializable
 {
 
   /**
@@ -79,7 +83,7 @@ implements Cloneable, Serializable
      * flag objects.
      * It is used internally by the Flags class.
      */
-    private static final Hashtable flag2flag = new Hashtable(7);
+    private static final HashMap flag2flag = new HashMap(7);
     
     /**
      * This message has been answered.
@@ -156,7 +160,7 @@ implements Cloneable, Serializable
 
   private int systemFlags;
 
-  private Hashtable userFlags;
+  private HashMap userFlags;
   
   /**
    * Construct an empty Flags object.
@@ -173,7 +177,7 @@ implements Cloneable, Serializable
   {
     systemFlags = flags.systemFlags;
     if (flags.userFlags!=null)
-      userFlags = (Hashtable)flags.userFlags.clone();
+      userFlags = (HashMap)flags.userFlags.clone();
   }
 
   /**
@@ -191,7 +195,7 @@ implements Cloneable, Serializable
    */
   public Flags(String flag)
   {
-    userFlags = new Hashtable(1);
+    userFlags = new HashMap(1);
     userFlags.put(flag.toLowerCase(), flag);
   }
 
@@ -211,8 +215,11 @@ implements Cloneable, Serializable
   public void add(String flag)
   {
     if (userFlags==null)
-      userFlags = new Hashtable(1);
-    userFlags.put(flag.toLowerCase(), flag);
+      userFlags = new HashMap(1);
+    synchronized (userFlags)
+    {
+      userFlags.put(flag.toLowerCase(), flag);
+    }
   }
 
   /**
@@ -221,15 +228,20 @@ implements Cloneable, Serializable
    */
   public void add(Flags flags)
   {
-    systemFlags = systemFlags|flags.systemFlags;
+    systemFlags = systemFlags | flags.systemFlags;
     if (flags.userFlags!=null)
     {
-      if (userFlags==null)
-        userFlags = new Hashtable(1);
-      for (Enumeration e = flags.userFlags.keys(); e.hasMoreElements(); )
+      synchronized (flags.userFlags)
       {
-        String flag = (String)e.nextElement();
-        userFlags.put(flag, flags.userFlags.get(flag));
+        if (userFlags==null)
+          userFlags = new HashMap(flags.userFlags);
+        else
+        {
+          synchronized (userFlags)
+          {
+            userFlags.putAll(flags.userFlags);
+          }
+        }
       }
     }
   }
@@ -250,7 +262,12 @@ implements Cloneable, Serializable
   public void remove(String flag)
   {
     if (userFlags!=null)
-      userFlags.remove(flag.toLowerCase());
+    {
+      synchronized (userFlags)
+      {
+        userFlags.remove(flag.toLowerCase());
+      }
+    }
   }
 
   /**
@@ -260,13 +277,15 @@ implements Cloneable, Serializable
   public void remove(Flags flags)
   {
     systemFlags = systemFlags & ~flags.systemFlags;
-    if (flags.userFlags!=null)
+    if (userFlags!=null && flags.userFlags!=null)
     {
-      if (userFlags==null)
-        return;
-      for (Enumeration e = flags.userFlags.keys(); e.hasMoreElements(); )
+      synchronized (flags.userFlags)
       {
-        userFlags.remove(e.nextElement());
+        synchronized (userFlags)
+        {
+          for (Iterator i = flags.userFlags.keySet().iterator(); i.hasNext(); )
+            userFlags.remove(i.next());
+        }
       }
     }
   }
@@ -303,10 +322,16 @@ implements Cloneable, Serializable
     {
       if (userFlags==null)
         return false;
-      for (Enumeration e = flags.userFlags.keys(); e.hasMoreElements(); )
+      synchronized (flags.userFlags)
       {
-        if (!userFlags.containsKey(e.nextElement()))
-          return false;
+        synchronized (userFlags)
+        {
+          for (Iterator i = flags.userFlags.keySet().iterator(); i.hasNext(); )
+          {
+            if (!userFlags.containsKey(i.next()))
+              return false;
+          }
+        }
       }
     }
     return true;
@@ -324,18 +349,8 @@ implements Cloneable, Serializable
       return false;
     if (flags.userFlags==null && userFlags==null)
       return true;
-    if (flags.userFlags != null && userFlags != null &&
-        flags.userFlags.size()==userFlags.size())
-    {
-      for (Enumeration e = flags.userFlags.keys(); e.hasMoreElements(); )
-      {
-        if (!userFlags.containsKey(e.nextElement()))
-          return false;
-      }
-      return true;
-    }
-    else
-      return false;
+    return (flags.userFlags!=null && userFlags!=null &&
+        flags.userFlags.equals(userFlags));
   }
 
   /**
@@ -345,10 +360,7 @@ implements Cloneable, Serializable
   {
     int hashCode = systemFlags;
     if (userFlags!=null)
-    {
-      for (Enumeration e = userFlags.keys(); e.hasMoreElements();)
-        hashCode += e.nextElement().hashCode();
-    }
+      hashCode += userFlags.hashCode();
     return hashCode;
   }
 
@@ -358,15 +370,15 @@ implements Cloneable, Serializable
    */
   public Flag[] getSystemFlags()
   {
-    Vector acc = new Vector(7);
-    for (Enumeration e = Flag.flag2flag.keys(); e.hasMoreElements(); )
+    ArrayList acc = new ArrayList(7);
+    for (Iterator i = Flag.flag2flag.keySet().iterator(); i.hasNext(); )
     {
-      Integer flag = (Integer)e.nextElement();
+      Integer flag = (Integer)i.next();
       if ((systemFlags & flag.intValue())!=0)
-        acc.addElement(Flag.flag2flag.get(flag));
+        acc.add(Flag.flag2flag.get(flag));
     }
     Flag[] f = new Flag[acc.size()];
-    acc.copyInto(f);
+    acc.toArray(f);
     return f;
   }
 
@@ -380,11 +392,14 @@ implements Cloneable, Serializable
       return new String[0];
     else
     {
-      String[] f = new String[userFlags.size()];
-      int index = 0;
-      for (Enumeration e = userFlags.elements(); e.hasMoreElements(); )
-        f[index++] = (String)e.nextElement();
-      return f;
+      synchronized (userFlags)
+      {
+        String[] f = new String[userFlags.size()];
+        int index = 0;
+        for (Iterator i = userFlags.keySet().iterator(); i.hasNext(); )
+          f[index++] = (String)i.next();
+        return f;
+      }
     }
   }
 

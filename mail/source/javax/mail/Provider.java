@@ -1,6 +1,6 @@
 /*
- * MessagingException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Provider.java
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,10 @@ package javax.mail;
 
 /**
  * The Provider is a class that describes a protocol implementation.
- * The values come from the javamail.providers &amp; 
- * javamail.default.providers resource files.
+ * The values come from the <code>javamail.providers</code> &amp; 
+ * <code>javamail.default.providers</code> resource files.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class Provider
 {

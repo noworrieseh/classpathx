@@ -1,6 +1,6 @@
 /*
  * Message.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -50,7 +50,9 @@ import javax.mail.search.SearchTerm;
  * Message (e.g., MimeMessage) is instantiated, the attributes and content 
  * are filled in, and the message is sent using the <code>Transport.send</code>
  * method.
+ *
  * @see Part
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class Message
   implements Part

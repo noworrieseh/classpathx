@@ -1,6 +1,6 @@
 /*
  * NoSuchProviderException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ package javax.mail;
 /**
  * This exception is thrown when Session attempts to instantiate a 
  * Provider that doesn't exist.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class NoSuchProviderException
   extends MessagingException

@@ -1,6 +1,6 @@
 /*
  * MessageContext.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ package javax.mail;
  * method of the MessageAware interface. MessageAware is typically 
  * implemented by DataSources to allow a DataContentHandler to pass on 
  * information about the context in which a data content object is operating.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MessageContext
 {

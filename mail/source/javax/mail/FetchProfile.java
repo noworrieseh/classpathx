@@ -1,6 +1,6 @@
 /*
  * FetchProfile.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 
 package javax.mail;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * Clients use a FetchProfile to list the Message attributes that it 
@@ -49,6 +49,8 @@ import java.util.Vector;
       fp.add("X-mailer");
       folder.fetch(msgs, fp);
    </pre>
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class FetchProfile
 {
@@ -111,8 +113,8 @@ public class FetchProfile
   }
 
 
-  private Vector items;
-  private Vector headers;
+  private ArrayList items;
+  private ArrayList headers;
 
   /**
    * Create an empty FetchProfile.
@@ -128,8 +130,11 @@ public class FetchProfile
   public void add(Item item)
   {
     if (items==null)
-      items = new Vector();
-    items.addElement(item);
+      items = new ArrayList();
+    synchronized (items)
+    {
+      items.add(item);
+    }
   }
 
   /**
@@ -139,8 +144,11 @@ public class FetchProfile
   public void add(String header)
   {
     if (headers==null)
-      headers = new Vector();
-    headers.addElement(header);
+      headers = new ArrayList();
+    synchronized (headers)
+    {
+      headers.add(header);
+    }
   }
 
   /**
@@ -168,9 +176,12 @@ public class FetchProfile
       return new Item[0];
     else
     {
-      Item[] i = new Item[items.size()];
-      items.copyInto(i);
-      return i;
+      synchronized (items)
+      {
+        Item[] i = new Item[items.size()];
+        items.toArray(i);
+        return i;
+      }
     }
   }
 
@@ -183,9 +194,12 @@ public class FetchProfile
       return new String[0];
     else
     {
-      String[] h = new String[headers.size()];
-      headers.copyInto(h);
-      return h;
+      synchronized (headers)
+      {
+        String[] h = new String[headers.size()];
+        headers.toArray(h);
+        return h;
+      }
     }
   }
   

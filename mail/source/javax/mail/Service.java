@@ -1,6 +1,6 @@
 /*
  * Service.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,7 @@ package javax.mail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.ConnectionListener;
 import javax.mail.event.MailEvent;
@@ -34,6 +33,8 @@ import javax.mail.event.MailEvent;
  * A messaging service is created from a Session and is named using a URLName.
  * A service must be connected before it can be used.
  * Connection events are sent to reflect its connection status.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class Service
 {
@@ -59,7 +60,7 @@ public abstract class Service
    */
   private boolean connected;
 
-  private Vector connectionListeners;
+  private ArrayList connectionListeners;
 
   /**
    * Constructor.
@@ -411,20 +412,28 @@ public abstract class Service
   /**
    * Add a listener for Connection events on this service.
    */
-  public synchronized void addConnectionListener(ConnectionListener l)
+  public void addConnectionListener(ConnectionListener l)
   {
     if (connectionListeners==null)
-      connectionListeners = new Vector();
-    connectionListeners.addElement(l);
+      connectionListeners = new ArrayList();
+    synchronized (connectionListeners)
+    {
+      connectionListeners.add(l);
+    }
   }
 
   /**
    * Remove a Connection event listener.
    */
-  public synchronized void removeConnectionListener(ConnectionListener l)
+  public void removeConnectionListener(ConnectionListener l)
   {
     if (connectionListeners!=null)
-      connectionListeners.removeElement(l);
+    {
+      synchronized (connectionListeners)
+      {
+        connectionListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -456,9 +465,14 @@ public abstract class Service
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).opened(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].opened(event);
     }
   }
 
@@ -469,9 +483,14 @@ public abstract class Service
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).disconnected(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].disconnected(event);
     }
   }
 
@@ -482,9 +501,14 @@ public abstract class Service
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).closed(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].closed(event);
     }
   }
 

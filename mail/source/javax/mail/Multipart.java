@@ -1,6 +1,6 @@
 /*
  * Mulipart.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,8 @@ package javax.mail;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import javax.activation.DataSource;
 
 /**
@@ -39,14 +40,16 @@ import javax.activation.DataSource;
  * "alternative", "mixed", "related", "parallel", "signed", etc.
  * <p>
  * Multipart is an abstract class. Subclasses provide actual implementations.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class Multipart
 {
 
   /**
-   * Vector of BodyPart objects.
+   * List of BodyPart objects.
    */
-  protected Vector parts;
+  protected List parts;
 
   /**
    * This field specifies the content-type of this multipart object.
@@ -64,7 +67,7 @@ public abstract class Multipart
    */
   protected Multipart()
   {
-    parts = new Vector();
+    parts = new ArrayList();
     contentType = "multipart/mixed";
   }
 
@@ -122,7 +125,7 @@ public abstract class Multipart
   {
     if (parts==null)
       throw new IndexOutOfBoundsException();
-    return (BodyPart)parts.elementAt(index);
+    return (BodyPart)parts.get(index);
   }
 
   /**
@@ -139,10 +142,13 @@ public abstract class Multipart
   {
     if (parts==null)
       throw new MessagingException("No such BodyPart");
-    boolean success = parts.removeElement(part);
-    if (success)
-      part.setParent(null);
-    return success;
+    synchronized (parts)
+    {
+      boolean success = parts.remove(part);
+      if (success)
+        part.setParent(null);
+      return success;
+    }
   }
 
   /**
@@ -158,9 +164,12 @@ public abstract class Multipart
   {
     if (parts==null)
       throw new IndexOutOfBoundsException("No such BodyPart");
-    BodyPart part = (BodyPart)parts.elementAt(index);
-    parts.removeElementAt(index);
-    part.setParent(null);
+    synchronized (parts)
+    {
+      BodyPart part = (BodyPart)parts.get(index);
+      parts.remove(index);
+      part.setParent(null);
+    }
   }
 
   /**
@@ -174,9 +183,12 @@ public abstract class Multipart
     throws MessagingException
   {
     if (parts==null)
-      parts = new Vector();
-    parts.addElement(part);
-    part.setParent(this);
+      parts = new ArrayList();
+    synchronized (parts)
+    {
+      parts.add(part);
+      part.setParent(this);
+    }
   }
 
   /**
@@ -193,9 +205,12 @@ public abstract class Multipart
     throws MessagingException
   {
     if (parts==null)
-      parts = new Vector();
-    parts.insertElementAt(part, index);
-    part.setParent(this);
+      parts = new ArrayList();
+    synchronized (parts)
+    {
+      parts.add(index, part);
+      part.setParent(this);
+    }
   }
 
   /**

@@ -20,7 +20,6 @@
 package javax.mail.internet;
 
 import java.io.*;
-import java.util.Vector;
 import javax.activation.DataSource;
 import javax.mail.*;
 import gnu.mail.util.CRLFInputStream;
@@ -224,8 +223,11 @@ public class MimeMultipart
   protected void updateHeaders()
     throws MessagingException
   {
-    for (int i = 0; i<parts.size(); i++)
-      ((MimeBodyPart)parts.elementAt(i)).updateHeaders();
+    synchronized (parts)
+    {
+      for (int i = 0; i<parts.size(); i++)
+        ((MimeBodyPart)parts.get(i)).updateHeaders();
+    }
   }
 
   /**
@@ -249,13 +251,16 @@ public class MimeMultipart
     else
       crlfos = new CRLFOutputStream(os);
     
-    for (int i = 0; i<parts.size(); i++)
+    synchronized (parts)
     {
-      crlfos.write(boundary);
-      crlfos.writeln();
-      crlfos.flush();
-      ((MimeBodyPart)parts.elementAt(i)).writeTo(os);
-      crlfos.writeln();
+      for (int i = 0; i<parts.size(); i++)
+      {
+        crlfos.write(boundary);
+        crlfos.writeln();
+        crlfos.flush();
+        ((MimeBodyPart)parts.get(i)).writeTo(os);
+        crlfos.writeln();
+      }
     }
 
     buffer.append("--");

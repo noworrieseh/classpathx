@@ -1,6 +1,6 @@
 /*
  * Folder.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,7 @@
 
 package javax.mail;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.ConnectionListener;
 import javax.mail.event.FolderEvent;
@@ -85,6 +84,8 @@ import javax.mail.search.SearchTerm;
  * objects as references to messages, rather than message numbers.
  * Expunged Message objects still have to be pruned, but other Message 
  * objects in that folder are not affected by the expunge.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class Folder
 {
@@ -123,10 +124,10 @@ public abstract class Folder
 
   // -- Event listener lists --
 
-  private volatile Vector connectionListeners;
-  private volatile Vector folderListeners;
-  private volatile Vector messageCountListeners;
-  private volatile Vector messageChangedListeners;
+  private volatile ArrayList connectionListeners;
+  private volatile ArrayList folderListeners;
+  private volatile ArrayList messageCountListeners;
+  private volatile ArrayList messageChangedListeners;
 
   /**
    * Constructor that takes a Store object.
@@ -998,20 +999,20 @@ public abstract class Folder
   public Message[] search(SearchTerm term, Message[] msgs)
     throws MessagingException
   {
-    Vector acc = new Vector();
+    ArrayList acc = new ArrayList();
     for (int i = 0; i<msgs.length; i++)
     {
       try
       {
         if (msgs[i].match(term))
-          acc.addElement(msgs[i]);
+          acc.add(msgs[i]);
       }
       catch (MessageRemovedException e)
       {
       }
     }
     Message[] m = new Message[acc.size()];
-    acc.copyInto(m);
+    acc.toArray(m);
     return m;
   }
 
@@ -1037,20 +1038,28 @@ public abstract class Folder
   /**
    * Add a listener for Connection events on this Folder.
    */
-  public synchronized void addConnectionListener(ConnectionListener l)
+  public void addConnectionListener(ConnectionListener l)
   {
     if (connectionListeners==null)
-      connectionListeners = new Vector();
-    connectionListeners.addElement(l);
+      connectionListeners = new ArrayList();
+    synchronized (connectionListeners)
+    {
+      connectionListeners.add(l);
+    }
   }
 
   /**
    * Remove a Connection event listener.
    */
-  public synchronized void removeConnectionListener(ConnectionListener l)
+  public void removeConnectionListener(ConnectionListener l)
   {
     if (connectionListeners!=null)
-      connectionListeners.removeElement(l);
+    {
+      synchronized (connectionListeners)
+      {
+        connectionListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -1082,9 +1091,14 @@ public abstract class Folder
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).opened(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].opened(event);
     }
   }
 
@@ -1095,9 +1109,14 @@ public abstract class Folder
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).disconnected(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].disconnected(event);
     }
   }
 
@@ -1108,9 +1127,14 @@ public abstract class Folder
   {
     if (connectionListeners!=null)
     {
-      for (Enumeration e = connectionListeners.elements(); 
-          e.hasMoreElements(); )
-        ((ConnectionListener)e.nextElement()).closed(event);
+      ConnectionListener[] l = null;
+      synchronized (connectionListeners)
+      {
+        l = new ConnectionListener[connectionListeners.size()];
+        connectionListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].closed(event);
     }
   }
 
@@ -1119,20 +1143,28 @@ public abstract class Folder
   /**
    * Add a listener for Folder events on this Folder.
    */
-  public synchronized void addFolderListener(FolderListener l)
+  public void addFolderListener(FolderListener l)
   {
     if (folderListeners==null)
-      folderListeners = new Vector();
-    folderListeners.addElement(l);
+      folderListeners = new ArrayList();
+    synchronized (folderListeners)
+    {
+      folderListeners.add(l);
+    }
   }
 
   /**
    * Remove a Folder event listener.
    */
-  public synchronized void removeFolderListener(FolderListener l)
+  public void removeFolderListener(FolderListener l)
   {
     if (folderListeners!=null)
-      folderListeners.removeElement(l);
+    {
+      synchronized (folderListeners)
+      {
+        folderListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -1176,9 +1208,14 @@ public abstract class Folder
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderCreated(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderCreated(event);
     }
   }
 
@@ -1189,9 +1226,14 @@ public abstract class Folder
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderDeleted(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderDeleted(event);
     }
   }
 
@@ -1202,9 +1244,14 @@ public abstract class Folder
   {
     if (folderListeners!=null)
     {
-      for (Enumeration e = folderListeners.elements(); 
-          e.hasMoreElements(); )
-        ((FolderListener)e.nextElement()).folderRenamed(event);
+      FolderListener[] l = null;
+      synchronized (folderListeners)
+      {
+        l = new FolderListener[folderListeners.size()];
+        folderListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].folderRenamed(event);
     }
   }
 
@@ -1213,20 +1260,28 @@ public abstract class Folder
   /**
    * Add a listener for MessageCount events on this Folder.
    */
-  public synchronized void addMessageCountListener(MessageCountListener l)
+  public void addMessageCountListener(MessageCountListener l)
   {
     if (messageCountListeners==null)
-      messageCountListeners = new Vector();
-    messageCountListeners.addElement(l);
+      messageCountListeners = new ArrayList();
+    synchronized (messageCountListeners)
+    {
+      messageCountListeners.add(l);
+    }
   }
 
   /**
    * Remove a MessageCount listener.
    */
-  public synchronized void removeMessageCountListener(MessageCountListener l)
+  public void removeMessageCountListener(MessageCountListener l)
   {
     if (messageCountListeners!=null)
-      messageCountListeners.removeElement(l);
+    {
+      synchronized (messageCountListeners)
+      {
+        messageCountListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -1261,9 +1316,14 @@ public abstract class Folder
   {
     if (messageCountListeners!=null)
     {
-      for (Enumeration e = messageCountListeners.elements(); 
-          e.hasMoreElements(); )
-        ((MessageCountListener)e.nextElement()).messagesAdded(event);
+      MessageCountListener[] l = null;
+      synchronized (messageCountListeners)
+      {
+        l = new MessageCountListener[messageCountListeners.size()];
+        messageCountListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messagesAdded(event);
     }
   }
 
@@ -1274,33 +1334,46 @@ public abstract class Folder
   {
     if (messageCountListeners!=null)
     {
-      for (Enumeration e = messageCountListeners.elements(); 
-          e.hasMoreElements(); )
-        ((MessageCountListener)e.nextElement()).messagesRemoved(event);
+      MessageCountListener[] l = null;
+      synchronized (messageCountListeners)
+      {
+        l = new MessageCountListener[messageCountListeners.size()];
+        messageCountListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messagesRemoved(event);
     }
   }
 
-  // -- Message count events --
+  // -- Message changed events --
 
   /**
    * Add a listener for MessageChanged events on this Folder.
    */
-  public synchronized void addMessageChangedListener(
+  public void addMessageChangedListener(
       MessageChangedListener l)
   {
     if (messageChangedListeners==null)
-      messageChangedListeners = new Vector();
-    messageChangedListeners.addElement(l);
+      messageChangedListeners = new ArrayList();
+    synchronized (messageChangedListeners)
+    {
+      messageChangedListeners.add(l);
+    }
   }
 
   /**
    * Remove a MessageChanged listener.
    */
-  public synchronized void removeMessageChangedListener(
+  public void removeMessageChangedListener(
       MessageChangedListener l)
   {
     if (messageChangedListeners!=null)
-      messageChangedListeners.removeElement(l);
+    {
+      synchronized (messageChangedListeners)
+      {
+        messageChangedListeners.remove(l);
+      }
+    }
   }
 
   /**
@@ -1320,9 +1393,14 @@ public abstract class Folder
   {
     if (messageChangedListeners!=null)
     {
-      for (Enumeration e = messageChangedListeners.elements(); 
-          e.hasMoreElements(); )
-        ((MessageChangedListener)e.nextElement()).messageChanged(event);
+      MessageChangedListener[] l = null;
+      synchronized (messageChangedListeners)
+      {
+        l = new MessageChangedListener[messageChangedListeners.size()];
+        messageChangedListeners.toArray(l);
+      }
+      for (int i=0; i<l.length; i++)
+        l[i].messageChanged(event);
     }
   }
 

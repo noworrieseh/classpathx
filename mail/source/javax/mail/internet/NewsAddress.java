@@ -19,8 +19,8 @@
 
 package javax.mail.internet;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.mail.Address;
 
 /**
@@ -188,13 +188,13 @@ public class NewsAddress
     throws AddressException
   {
     StringTokenizer st = new StringTokenizer(newsgroups, ",");
-    Vector acc = new Vector();
+    ArrayList acc = new ArrayList();
     while (st.hasMoreTokens())
     {
-      acc.addElement(new NewsAddress(st.nextToken()));
+      acc.add(new NewsAddress(st.nextToken()));
     }
     NewsAddress[] addresses = new NewsAddress[acc.size()];
-    acc.copyInto(addresses);
+    acc.toArray(addresses);
     return addresses;
   }
   

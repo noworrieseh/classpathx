@@ -1,6 +1,6 @@
 /*
  * MultipartDataSource.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,9 @@ import javax.activation.DataSource;
  * <p>
  * This interface will typically be implemented by providers that preparse
  * multipart bodies, for example an IMAP provider.
+ * 
  * @see DataSource
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public interface MultipartDataSource
   extends DataSource

@@ -1,6 +1,6 @@
 /*
  * URLName.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@ package javax.mail;
 
 import java.io.*;
 import java.net.*;
-import java.util.BitSet;
 
 /**
  * The name of a URL.
@@ -30,6 +29,8 @@ import java.util.BitSet;
  * <p>
  * Note that this class differs from java.net.URL in that this class just
  * represents the name of a URL, it does not model the connection to a URL.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class URLName
 {

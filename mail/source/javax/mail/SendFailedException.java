@@ -1,6 +1,6 @@
 /*
  * SendFailedException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ package javax.mail;
  * The exception includes those addresses to which the message could not be 
  * sent as well as the valid addresses to which the message was sent 
  * and valid addresses to which the message was not sent.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class SendFailedException 
   extends MessagingException
@@ -58,7 +60,7 @@ public class SendFailedException
    * @param invalid the invalid addresses
    */
   public SendFailedException(String message, Exception exception,
-      Address[] validSent, Address[] vaildUnsent, Address[] invalid)
+      Address[] validSent, Address[] validUnsent, Address[] invalid)
   {
     super(message, exception);
     this.validSent = validSent;

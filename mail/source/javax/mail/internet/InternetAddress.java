@@ -22,8 +22,8 @@ package javax.mail.internet;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javax.mail.Address;
 import javax.mail.Session;
 
@@ -533,7 +533,7 @@ public class InternetAddress
     int pStart = -1;
     int start = -1;
     int end = -1;
-    Vector acc = new Vector();
+    ArrayList acc = new ArrayList();
 
     int pos;
     for (pos = 0; pos<len; pos++)
@@ -704,7 +704,7 @@ public class InternetAddress
                 address.encodedPersonal = unquote(personal);
                 start = end = -1;
               }
-              acc.addElement(address);
+              acc.add(address);
             }
             else
             {
@@ -715,7 +715,7 @@ public class InternetAddress
                 checkAddress(addressText, false, strict);
                 InternetAddress address = new InternetAddress();
                 address.setAddress(addressText);
-                acc.addElement(address);
+                acc.add(address);
               }
             }
           }
@@ -740,7 +740,7 @@ public class InternetAddress
             String addressText = addresslist.substring(pStart, pEnd).trim();
             InternetAddress address = new InternetAddress();
             address.setAddress(addressText);
-            acc.addElement(address);
+            acc.add(address);
           }
           gotDelimiter = false;
           pStart = pEnd = -1;
@@ -768,7 +768,7 @@ public class InternetAddress
           String personal = addresslist.substring(start, end).trim();
           address.encodedPersonal = unquote(personal);
         }
-        acc.addElement(address);
+        acc.add(address);
       }
       else
       {
@@ -779,13 +779,13 @@ public class InternetAddress
           checkAddress(addressText, false, strict);
           InternetAddress address = new InternetAddress();
           address.setAddress(addressText);
-          acc.addElement(address);
+          acc.add(address);
         }
       }
     }
     
     InternetAddress[] addresses = new InternetAddress[acc.size()];
-    acc.copyInto(addresses);
+    acc.toArray(addresses);
     return addresses;
   }
 

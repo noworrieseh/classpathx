@@ -1,6 +1,6 @@
 /*
  * BodyPart.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,19 +19,17 @@
 
 package javax.mail;
 
-import java.io.*;
-import java.util.Enumeration;
-import javax.activation.DataHandler;
-
 /**
  * This class models a Part that is contained within a Multipart.
  * This is an abstract class. Subclasses provide actual implementations.
  * <p>
  * BodyPart implements the Part interface.
  * Thus, it contains a set of attributes and a "content".
+ * 
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class BodyPart
-implements Part
+  implements Part
 {
 
 

@@ -1,6 +1,6 @@
 /*
  * MethodNotSupportedException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ package javax.mail;
 /**
  * The exception thrown when a method is not supported by the
  * implementation.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MethodNotSupportedException 
   extends MessagingException

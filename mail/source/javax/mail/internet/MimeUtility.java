@@ -20,7 +20,9 @@
 package javax.mail.internet;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+import java.util.NoSuchElementException;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
@@ -675,12 +677,12 @@ public class MimeUtility
   /*
    * Map of MIME charset names to Java charset names.
    */
-  private static Hashtable mimeCharsets;
+  private static HashMap mimeCharsets;
 
   /*
    * Map of Java charset names to MIME charset names.
    */
-  private static Hashtable javaCharsets;
+  private static HashMap javaCharsets;
 
   /*
    * Load the charset conversion tables.
@@ -691,27 +693,26 @@ public class MimeUtility
     InputStream in = (MimeUtility.class).getResourceAsStream(mappings);
     if (in!=null)
     {
-      javaCharsets = new Hashtable(20);
-      mimeCharsets = new Hashtable(10);
+      javaCharsets = new HashMap(20);
+      mimeCharsets = new HashMap(10);
       LineInputStream lin = new LineInputStream(in);
-      javaCharsets = parse(lin);
-      mimeCharsets = parse(lin);
+      parse(javaCharsets, lin);
+      parse(mimeCharsets, lin);
     }
   }
 
   /*
    * Parse a charset map stream.
    */
-  private static Hashtable parse(LineInputStream lin)
+  private static void parse(HashMap mappings, LineInputStream lin)
   {
     try
     {
-      Hashtable mappings = new Hashtable();
       while (true)
       {
         String line = lin.readLine();
         if (line==null || (line.startsWith("--") && line.endsWith("--")))
-          return mappings;
+          return;
         
         if (line.trim().length()!=0 && !line.startsWith("#"))
         {
@@ -731,7 +732,6 @@ public class MimeUtility
     catch (IOException e)
     {
       e.printStackTrace();
-      return null;
     }
   }
 

@@ -1126,7 +1126,7 @@ public class MimeMessage
     if (header!=null)
     {
       HeaderTokenizer ht = new HeaderTokenizer(header, HeaderTokenizer.MIME);
-      Vector acc = new Vector();
+      ArrayList acc = new ArrayList();
       for (boolean done = false; !done; )
       {
         HeaderTokenizer.Token token = ht.next();
@@ -1136,14 +1136,14 @@ public class MimeMessage
             done = true;
             break;
           case HeaderTokenizer.Token.ATOM:
-            acc.addElement(token.getValue());
+            acc.add(token.getValue());
             break;
         }
       } 
       if (acc.size()>0)
       {
         String[] languages = new String[acc.size()];
-        acc.copyInto(languages);
+        acc.toArray(languages);
         return languages;
       }
     }
@@ -1499,19 +1499,22 @@ public class MimeMessage
     message.setRecipients(Message.RecipientType.TO, addresses);
     if (replyToAll)
     {
-      Vector vector = new Vector();
-      addToSet(vector, addresses);
+      // We use a Set to store the addresses in order to ensure no address
+      // duplication.
+      HashSet set = new HashSet();
+      set.addAll(Arrays.asList(addresses));
 
       InternetAddress localAddress = InternetAddress.getLocalAddress(session);
       if (localAddress!=null)
-        vector.addElement(localAddress);
+        set.add(localAddress);
       String alternates = session.getProperty("mail.alternates");
       if (alternates!=null)
-        addToSet(vector, InternetAddress.parse(alternates, false));
+        set.addAll(Arrays.asList(InternetAddress.parse(alternates, false)));
       
-      addToSet(vector, getRecipients(Message.RecipientType.TO));
-      addresses = new Address[vector.size()];
-      vector.copyInto(addresses);
+      set.addAll(Arrays.asList(getRecipients(Message.RecipientType.TO)));
+      addresses = new Address[set.size()];
+      set.toArray(addresses);
+      
       boolean replyAllCC = 
         new Boolean(session.getProperty("mail.replyallcc")).booleanValue();
       if (addresses.length>0)
@@ -1520,10 +1523,11 @@ public class MimeMessage
         else
           message.addRecipients(Message.RecipientType.TO, addresses);
       
-      vector.removeAllElements();
-      addToSet(vector, getRecipients(Message.RecipientType.CC));
-      addresses = new Address[vector.size()];
-      vector.copyInto(addresses);
+      set.clear();
+      set.addAll(Arrays.asList(getRecipients(Message.RecipientType.CC)));
+      addresses = new Address[set.size()];
+      set.toArray(addresses);
+      
       if (addresses!=null && addresses.length>0)
         message.addRecipients(Message.RecipientType.CC, addresses);
       
@@ -1544,23 +1548,6 @@ public class MimeMessage
     {
     }
     return message;
-  }
-
-  /*
-   * Convenience method to add an array of addresses to a set.
-   * Since we are targeting Java 1.1 and do not have access to the
-   * Collections framework, we cannot simply use a Set object.
-   */
-  private static void addToSet(Vector vector, Address[] addresses)
-  {
-    if (addresses!=null)
-    {
-      for (int i = 0; i<addresses.length; i++)
-      {
-        if (!vector.contains(addresses[i]))
-          vector.addElement(addresses[i]);
-      }
-    }
   }
 
   /**

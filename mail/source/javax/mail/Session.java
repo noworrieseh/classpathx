@@ -1,6 +1,6 @@
 /*
  * Session.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,10 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * The Session class represents a mail session and is not subclassed.
@@ -32,8 +35,8 @@ import java.util.*;
  * the desktop. Unshared sessions can also be created.
  *
  * @author Andrew Selkirk
- * @author Chris Burdess <dog@dog.net.uk>
- * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @author <a href="mailto:nferrier@tapsellferrier.co.uk">Nic Ferrier</a>
  */
 public final class Session
 {
@@ -72,15 +75,15 @@ public final class Session
   
   private Authenticator authenticator;
 
-  private Hashtable authTable = new Hashtable();
+  private HashMap authTable = new HashMap();
   
   private boolean debug;
   
-  private Vector providers = new Vector();
+  private ArrayList providers = new ArrayList();
 
-  private Hashtable providersByProtocol = new Hashtable();
+  private HashMap providersByProtocol = new HashMap();
 
-  private Hashtable providersByClassName = new Hashtable();
+  private HashMap providersByClassName = new HashMap();
 
   private Properties addressMap = new Properties();
   
@@ -88,7 +91,7 @@ public final class Session
 
   /** Create the session object.
    */
-  private Session (Properties props, Authenticator authenticator)
+  private Session(Properties props, Authenticator authenticator)
   {
     this.props = props;
     this.authenticator = authenticator;
@@ -193,7 +196,7 @@ public final class Session
             {
               Provider provider = new Provider(type, protocol, className,
                   vendor, version);
-              providers.addElement(provider);
+              providers.add(provider);
               providersByClassName.put(className, provider);
               if (!providersByProtocol.containsKey(protocol))
                 providersByProtocol.put(protocol, provider);
@@ -382,7 +385,7 @@ public final class Session
   public Provider[] getProviders()
   {
     Provider[] p = new Provider[providers.size()];
-    providers.copyInto(p);
+    providers.toArray(p);
     return p;
   }
 
@@ -406,14 +409,17 @@ public final class Session
     Provider provider = null;
     String providerClassKey = "mail."+protocol+".class";
     String providerClassName = props.getProperty(providerClassKey);
-    if (providerClassName!=null)
+    synchronized (providers)
     {
-      if (debug)
-        System.out.println("DEBUG: "+providerClassKey+"="+providerClassName);
-      provider = (Provider)providersByClassName.get(providerClassName);
+      if (providerClassName!=null)
+      {
+        if (debug)
+          System.out.println("DEBUG: "+providerClassKey+"="+providerClassName);
+        provider = (Provider)providersByClassName.get(providerClassName);
+      }
+      if (provider==null)
+        provider = (Provider)providersByProtocol.get(protocol);
     }
-    if (provider==null)
-      provider = (Provider)providersByProtocol.get(protocol);
     if (provider==null)
       throw new NoSuchProviderException("No provider for "+protocol);
     if (debug)
@@ -430,9 +436,13 @@ public final class Session
   {
     if (provider==null)
       throw new NoSuchProviderException("Can't set null provider");
-    providersByProtocol.put(provider.getProtocol(), provider);
-    String providerClassKey = "mail."+provider.getProtocol()+".class";
-    props.put(providerClassKey, provider.getClassName());
+    synchronized (providers)
+    {
+      String protocol = provider.getProtocol();
+      providersByProtocol.put(protocol, provider);
+      String providerClassKey = "mail."+protocol+".class";
+      props.put(providerClassKey, provider.getClassName());
+    }
   }
 
   /**

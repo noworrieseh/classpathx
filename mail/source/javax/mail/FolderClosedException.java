@@ -1,6 +1,6 @@
 /*
  * FolderClosedException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,8 @@ package javax.mail;
  * <p>
  * The <code>getMessage()</code> method returns more detailed information 
  * about the error that caused this exception.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class FolderClosedException
   extends MessagingException
@@ -58,4 +60,5 @@ public class FolderClosedException
   {
     return folder;
   }
+
 }
