@@ -1,7 +1,7 @@
 package gnu.crypto;
 
 // ----------------------------------------------------------------------------
-// $Id: Registry.java,v 1.4 2002-07-06 23:30:23 raif Exp $
+// $Id: Registry.java,v 1.5 2002-08-07 09:55:46 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -33,12 +33,15 @@ package gnu.crypto;
 /**
  * <p>A placeholder for <i>names</i> used throughout this library.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public interface Registry {
 
    // Constants
    // -------------------------------------------------------------------------
+
+   /** The name of our Provider. */
+   String GNU_CRYPTO = "GNU-CRYPTO";
 
    // Names of properties to use in Maps when initialising primitives .........
 

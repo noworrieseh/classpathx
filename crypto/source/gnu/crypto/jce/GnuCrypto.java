@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuCrypto.java,v 1.4 2002-07-27 00:24:18 raif Exp $
+// $Id: GnuCrypto.java,v 1.5 2002-08-07 09:55:17 raif Exp $
 //
 // Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
@@ -42,7 +42,7 @@ import java.util.Set;
  * <p>The GNU Crypto implementation of the Java Cryptographic Extension (JCE)
  * Provider.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * @see java.security.Provider
  */
 public final class GnuCrypto extends Provider {
@@ -54,7 +54,7 @@ public final class GnuCrypto extends Provider {
    // -------------------------------------------------------------------------
 
    public GnuCrypto() {
-      super("GNU", 1.0, "GNU Crypto JCE Provider");
+      super(Registry.GNU_CRYPTO, 1.0, "GNU Crypto JCE Provider");
 
       // MessageDigest
       put("MessageDigest.MD4", "gnu.crypto.jce.MD4Spi");
