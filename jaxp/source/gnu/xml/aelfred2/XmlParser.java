@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.5 2001-06-24 20:47:25 db Exp $
+ * $Id: XmlParser.java,v 1.6 2001-07-05 02:02:51 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.5 2001-06-24 20:47:25 db Exp $
+// $Id: XmlParser.java,v 1.6 2001-07-05 02:02:51 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-24 20:47:25 $
+ * @version $Date: 2001-07-05 02:02:51 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -873,9 +873,9 @@ final class XmlParser
 
 	    // loop until the subset ends
 	    while (true) {
-		expandPE = true;
+		doReport = expandPE = true;
 		skipWhitespace ();
-		expandPE = false;
+		doReport = expandPE = false;
 		if (tryRead (']')) {
 		    break; 		// end of subset
 		} else {
@@ -895,9 +895,9 @@ final class XmlParser
 
 	    // Loop until we end up back at '>'
 	    while (true) {
-		expandPE = true;
+		doReport = expandPE = true;
 		skipWhitespace ();
-		expandPE = false;
+		doReport = expandPE = false;
 		if (tryRead ('>')) {
 		    break;
 		} else {
@@ -1563,10 +1563,7 @@ loop:
 	int	flags = LIT_ATTRIBUTE | LIT_DISABLE_CREF | LIT_ENTITY_CHECK;
 	boolean	saved = expandPE;
 
-	// Note: char refs not checked here, and input not normalized,
-	// since it's done correctly later when we actually expand any
-	// entity refs.  We ought to report char ref syntax errors now,
-	// but don't.  Cost: unused defaults mean unreported WF errs.
+	// Note: value is not normalized until we expand any entity refs.
 	
 	// LIT_ATTRIBUTE forces '<' checks now (ASAP) and turns whitespace
 	// chars to spaces (doesn't matter when that's done if it doesn't
@@ -2251,6 +2248,7 @@ loop:
 	char	delim, c;
 	int	startLine = line;
 	boolean	saved = expandPE;
+	boolean	savedReport = doReport;
 
 	// Find the first delimiter.
 	delim = readCh ();
@@ -2261,6 +2259,8 @@ loop:
 	inLiteral = true;
 	if ((flags & LIT_DISABLE_PE) != 0)
 	    expandPE = false;
+	if ((flags & LIT_ATTRIBUTE) != 0)
+	    doReport = false;
 
 	// Each level of input source has its own buffer; remember
 	// ours, so we won't read the ending delimiter from any
@@ -2359,6 +2359,7 @@ loop:
 	}
 	inLiteral = false;
 	expandPE = saved;
+	doReport = savedReport;
 
 	// Normalise whitespace if necessary.
 	if ((flags & LIT_NORMALIZE) > 0) {
@@ -3880,7 +3881,7 @@ loop:
     {
 	// Push the existing status
 	pushInput (ename);
-	if (ename != null)
+	if (ename != null && doReport)
 	    handler.startInternalEntity (ename);
 	sourceType = INPUT_INTERNAL;
 	readBuffer = ch;
@@ -4644,6 +4645,8 @@ loop:
 	expandPE = false;
 	peIsError = false;
 
+	doReport = false;
+
 	inCDATA = false;
 
 	symbolTable = new Object [SYMBOL_TABLE_LENGTH][];
@@ -4767,6 +4770,13 @@ loop:
     private boolean	inLiteral;
     private boolean	expandPE;
     private boolean	peIsError;
+
+    //
+    // can't report entity expansion inside two constructs:
+    // - attribute expansions (internal entities only)
+    // - markup declarations (parameter entities only)
+    //
+    private boolean	doReport;
 
     //
     // Symbol table, for caching interned names.
