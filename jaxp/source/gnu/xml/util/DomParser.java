@@ -1,5 +1,5 @@
 /*
- * $Id: DomParser.java,v 1.5 2001-11-09 22:58:17 db Exp $
+ * $Id: DomParser.java,v 1.6 2001-11-29 23:35:49 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -100,7 +100,7 @@ import org.w3c.dom.*;
  * by this "parser" are unspecified; don't do it! </P>
  *
  * @author David Brownell
- * @version $Date: 2001-11-09 22:58:17 $
+ * @version $Date: 2001-11-29 23:35:49 $
  */
 final public class DomParser implements XMLReader
 {
@@ -485,6 +485,9 @@ final public class DomParser implements XMLReader
 			String	prefix;
 			String	uri;
 			
+			// NOTE: DOM L2 (CR2+ and REC) violate the
+			// Namespaces REC, treat "xmlns" like a strange
+			// attribute instead of a magic token
 			if ("xmlns".equals (name))
 			    prefix = "";
 			else
