@@ -28,6 +28,8 @@ import java.util.EventObject;
  * The event source is defined as the source <code>ServletContext</code>.
  *
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
+ * @version Servlet API 2.3
+ * @since Servlet API 2.3
  */
 public class ServletContextEvent
 extends EventObject

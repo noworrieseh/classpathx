@@ -24,6 +24,8 @@ package javax.servlet;
 /** listen for <code>ServletContext</code> attribute events.
  *
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
+ * @version Servlet API 2.3
+ * @since Servlet API 2.3
  */
 public interface ServletContextAttributeListener
 {
