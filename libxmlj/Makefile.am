@@ -1,5 +1,5 @@
 # 
-# $Id: Makefile.am,v 1.1.1.1 2003-02-27 01:22:15 julian Exp $
+# $Id: Makefile.am,v 1.2 2003-02-27 13:00:37 julian Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -41,7 +41,7 @@ BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES} ${JARFILE}
 # Generate header files for classes containing native code.
 
 gnu_xml_libxmlj_transform_%.h: \
-		gnu/xml/libxmlj/transform/*.class
+		gnu/xml/libxmlj/transform/%.class
 	@JAVAH@ -force -classpath . gnu.xml.libxmlj.transform.$*
 
 javax_xml_transform_%.h:
