@@ -1,6 +1,7 @@
 /*
   GNU-Classpath Extensions:	jaxp
   Copyright (C) 2001 Andrew Selkirk
+  Copyright (C) 2001 David Brownell
 
   For more information on the classpathx please mail: classpathx-discuss@gnu.org
 
@@ -36,8 +37,8 @@ import org.xml.sax.*;
  * DocumentBuilderFactory is used to resolve the problem that the
  * W3C DOM APIs don't include portable bootstrapping.
  *
- * @author	Andrew Selkirk
- * @version	1.0
+ * @author	Andrew Selkirk, David Brownell
+ * @version	$Id: DocumentBuilderFactory.java,v 1.4 2001-07-16 16:11:59 db Exp $
  */
 public abstract class DocumentBuilderFactory {
 
@@ -71,6 +72,36 @@ public abstract class DocumentBuilderFactory {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+	public abstract Object getAttribute(String name) 
+		throws IllegalArgumentException;
+
+	public boolean isCoalescing() {
+		return coalescing;
+	} // isCoalescing()
+
+	public boolean isExpandEntityReferences() {
+		return expandEntityRef;
+	} // isExpandEntityReferences()
+
+	public boolean isIgnoringComments() {
+		return ignoreComments;
+	} // isIgnoringComments()
+
+	public boolean isIgnoringElementContentWhitespace() {
+		return whitespace;
+	} // isIgnoringElementContentWhitespace()
+
+	public boolean isNamespaceAware() {
+		return namespaceAware;
+	} // isNamespaceAware()
+
+	public boolean isValidating() {
+		return validating;
+	} // isValidating()
+
+	public abstract DocumentBuilder newDocumentBuilder()
+		throws ParserConfigurationException;
+
 	public static DocumentBuilderFactory newInstance() {
 
 		// Variables
@@ -87,7 +118,8 @@ public abstract class DocumentBuilderFactory {
 			classObject = Class.forName(foundFactory);
 
 			// Instantiate Class
-			factory = (DocumentBuilderFactory) classObject.newInstance();
+			factory = (DocumentBuilderFactory)
+				classObject.newInstance();
 
 			// Return Instance
 			return factory;
@@ -98,20 +130,12 @@ public abstract class DocumentBuilderFactory {
 
 	} // newInstance()
 
-	public abstract DocumentBuilder newDocumentBuilder()
-		throws ParserConfigurationException;
+	public abstract void setAttribute(String name, Object value) 
+		throws IllegalArgumentException;
 
-	public void setNamespaceAware(boolean value) {
-		namespaceAware = value;
-	} // setNamespaceAware()
-
-	public void setValidating(boolean value) {
-		validating = value;
-	} // setValidating()
-	
-	public void setIgnoringElementContentWhitespace(boolean value) {
-		whitespace = value;
-	} // setIgnoringElementContentWhitespace()
+	public void setCoalescing(boolean value) {
+		coalescing = value;
+	} // setCoalescing()
 
 	public void setExpandEntityReferences(boolean value) {
 		expandEntityRef = value;
@@ -121,42 +145,24 @@ public abstract class DocumentBuilderFactory {
 		ignoreComments = value;
 	} // setIgnoringComments()
 
-	public void setCoalescing(boolean value) {
-		coalescing = value;
-	} // setCoalescing()
+	public void setIgnoringElementContentWhitespace(boolean value) {
+		whitespace = value;
+	} // setIgnoringElementContentWhitespace()
 
-	public boolean isNamespaceAware() {
-		return namespaceAware;
-	} // isNamespaceAware()
+	public void setNamespaceAware(boolean value) {
+		namespaceAware = value;
+	} // setNamespaceAware()
 
-	public boolean isValidating() {
-		return validating;
-	} // isValidating()
-
-	public boolean isIgnoringElementContentWhitespace() {
-		return whitespace;
-	} // isIgnoringElementContentWhitespace()
-
-	public boolean isExpandEntityReferences() {
-		return expandEntityRef;
-	} // isExpandEntityReferences()
-
-	public boolean isIgnoringComments() {
-		return ignoreComments;
-	} // isIgnoringComments()
-
-	public boolean isCoalescing() {
-		return coalescing;
-	} // isCoalescing()
-
-	public abstract void setAttribute(String name, Object value) 
-		throws IllegalArgumentException;
-
-	public abstract Object getAttribute(String name) 
-		throws IllegalArgumentException;
-
-	private static String findFactory(String property, String defaultValue) {
-
+	public void setValidating(boolean value) {
+		validating = value;
+	} // setValidating()
+	
+	//
+	// INTERNALS
+	//
+	private static String
+	findFactory (String property, String defaultValue)
+	{
 		// Variables
 		String		factory;
 		String		javaHome;
@@ -177,7 +183,8 @@ public abstract class DocumentBuilderFactory {
 		try {
 			if (factory == null) {
 				javaHome = System.getProperty("java.home");
-				file = new File(new File(javaHome, "lib"), "jaxp.properties");
+				file = new File(new File(javaHome, "lib"),
+					"jaxp.properties");
 				if (file.exists() == true) {
 					props = new Properties();
 					props.load(new FileInputStream(file));
@@ -192,9 +199,11 @@ public abstract class DocumentBuilderFactory {
 			if (factory == null) {
 
 				// Get Class Loader for Accessing resources
-				loader = DocumentBuilderFactory.class.getClassLoader();
+				loader = DocumentBuilderFactory.class
+						.getClassLoader();
 				if (loader == null) {
-					loader = ClassLoader.getSystemClassLoader();
+					loader = ClassLoader
+						.getSystemClassLoader();
 				} // if
 			
 				// Get Resource Stream
@@ -203,7 +212,8 @@ public abstract class DocumentBuilderFactory {
 
 				// Stream Found, Read Entry
 				if (stream != null) {
-					br = new BufferedReader(new InputStreamReader(stream));
+					br = new BufferedReader(
+					    new InputStreamReader(stream));
 					factory = br.readLine();
 				} // if
 
@@ -220,8 +230,4 @@ public abstract class DocumentBuilderFactory {
 		return factory;
 
 	} // findFactory()
-
-
-} // DocumentBuilderFactory
-
-
+}

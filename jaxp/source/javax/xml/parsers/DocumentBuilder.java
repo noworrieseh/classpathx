@@ -1,6 +1,7 @@
 /*
   GNU-Classpath Extensions:	jaxp
   Copyright (C) 2001 Andrew Selkirk
+  Copyright (C) 2001 David Brownell
 
   For more information on the classpathx please mail: classpathx-discuss@gnu.org
 
@@ -22,15 +23,24 @@
 package javax.xml.parsers;
 
 // Imports
-import java.io.*;
-import java.net.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+// import java.net.*;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 
 /**
  * DocumentBuilder
- * @author	Andrew Selkirk
- * @version	1.0
+ * @author	Andrew Selkirk, David Brownell
+ * @version	$Id: DocumentBuilder.java,v 1.4 2001-07-16 16:11:59 db Exp $
  */
 public abstract class DocumentBuilder {
 
@@ -45,6 +55,24 @@ public abstract class DocumentBuilder {
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
+
+	public abstract DOMImplementation getDOMImplementation ();
+	
+	public abstract boolean isNamespaceAware();
+
+	public abstract boolean isValidating();
+
+	public abstract Document newDocument();
+
+	public Document parse(File file) 
+		throws SAXException, IOException {
+// FIXME:  map the filename to a URI,
+// without relying on the jdk 1.2 API for that 
+		return parse(new InputSource(new FileInputStream(file)));
+	} // parse()
+
+	public abstract Document parse(InputSource source) 
+		throws SAXException, IOException;
 
 	/**
 	 * Avoid using this call; provide the system ID wherever possible.
@@ -76,23 +104,7 @@ public abstract class DocumentBuilder {
 		return parse(new InputSource(uri));
 	} // parse()
 
-	public Document parse(File file) 
-		throws SAXException, IOException {
-// FIXME:  map the filename to a URI,
-// without relying on the jdk 1.2 API for that 
-		return parse(new InputSource(new FileInputStream(file)));
-	} // parse()
-
-	public abstract Document parse(InputSource source) 
-		throws SAXException, IOException;
-
-	public abstract boolean isNamespaceAware();
-	public abstract boolean isValidating();
 	public abstract void setEntityResolver(EntityResolver resolver);
+
 	public abstract void setErrorHandler(ErrorHandler handler);
-	public abstract Document newDocument();
-
-
-} // DocumentBuilder
-
-
+}
