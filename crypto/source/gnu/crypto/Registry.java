@@ -1,9 +1,9 @@
 package gnu.crypto;
 
 // ----------------------------------------------------------------------------
-// $Id: Registry.java,v 1.1 2002-01-11 21:58:27 raif Exp $
+// $Id: Registry.java,v 1.2 2002-06-08 05:30:48 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,25 +31,28 @@ package gnu.crypto;
 // ----------------------------------------------------------------------------
 
 /**
- * A placeholder for <i>names</i> used throughout this library.<p>
+ * <p>A placeholder for <i>names</i> used throughout this library.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface Registry {
 
    // Constants
    // -------------------------------------------------------------------------
 
+   // Names of properties to use in Maps when initialising primitives .........
+
    // Symmetric block cipher algorithms and synonyms...........................
 
    String ANUBIS_CIPHER =   "anubis";
    String KHAZAD_CIPHER =   "khazad";
    String RIJNDAEL_CIPHER = "rijndael";
+   String SERPENT_CIPHER =  "serpent";
    String SQUARE_CIPHER =   "square";
    String TWOFISH_CIPHER =  "twofish";
    String NULL_CIPHER =     "null";
 
-   /** AES is synonymous to Rijndael. */
+   /** AES is synonymous to Rijndael for 128-bit block size only. */
    String AES_CIPHER =      "aes";
 
    // Message digest algorithms and synonyms...................................
@@ -86,9 +89,11 @@ public interface Registry {
    /** Integer Counter Mode (David McGrew). */
    String ICM_MODE = "icm";
 
+   /** Output Feedback Mode (NIST). */
+   String OFB_MODE = "ofb";
+
 //   String CBC_MODE = "cbc";
 //   String CFB_MODE = "cfb";
-//   String OFB_MODE = "ofb";
 
    // Padding scheme names and synonyms........................................
 
@@ -106,6 +111,9 @@ public interface Registry {
    /** PRNG based on a designated hash functiopn. */
    String MD_PRNG =  "md";
 
+   /** PRNG based on UMAC's Key Derivation Function. */
+   String UMAC_PRNG = "umac-kdf";
+
    // Asymmetric keypair generators............................................
 
    String DSS_KPG = "dss";
@@ -121,6 +129,14 @@ public interface Registry {
 
    /** DSA is synonymous to DSS. */
    String DSA_SIG =     "dsa";
+
+   // Keyed-Hash Message Authentication Code ..................................
+
+   /** Name prefix of every HMAC implementation. */
+   String HMAC_NAME_PREFIX = "hmac-";
+
+   String UHASH32 = "uhash32";
+   String UMAC32 = "umac32";
 
    // Methods
    // -------------------------------------------------------------------------
