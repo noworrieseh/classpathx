@@ -5,13 +5,17 @@
 <p>
 This package contains interfaces to SAX2 facilities that
 conformant SAX drivers won't necessarily support.
-It is independent of the SAX2 core, though the functionality
+
+<p>See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
+for more information about SAX.</p>
+
+<p> This package is independent of the SAX2 core, though the functionality
 exposed generally needs to be implemented within a parser core.
 That independence has several consequences:</p>
 
 <ul>
 
-<li>SAX2 drivers are <em>not</em> required to support these handlers,
+<li>SAX2 drivers are <em>not</em> required to support these interfaces,
 and you cannot assume that the class files will be present in every SAX2
 installation.</li>
 
@@ -35,12 +39,5 @@ extension packages.  Not all such extension packages should need to
 be recognized directly by parsers, however.
 As an example, most validation systems can be cleanly layered on top
 of parsers supporting the standardized SAX2 interfaces.  </p>
-
-<p><strong>NOTE:</strong> this package alone does add any
-functionality; it simply provides optional interfaces
-and helpers for SAX2 drivers
-to use.  You must use a SAX2 driver that supports these interfaces if
-you actually want to have access to lexical and declaration
-information.</p>
 
 </BODY></HTML>
