@@ -1,6 +1,6 @@
 /*
- * $Id: DomText.java,v 1.3 2001-11-19 22:23:02 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomText.java,v 1.4 2001-11-20 04:54:32 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -30,17 +30,18 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomText.java,v 1.3 2001-11-19 22:23:02 db Exp $
+// $Id: DomText.java,v 1.4 2001-11-20 04:54:32 db Exp $
 
 /**
  * <p> "Text" implementation.  </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-11-19 22:23:02 $
+ * @version $Date: 2001-11-20 04:54:32 $
  */
 public class DomText extends DomCharacterData implements Text
 {
-    private boolean	ignorable;
+    // NOTE:  deleted unused per-instance "isIgnorable"
+    // support to reclaim its space.
 
     /**
      * Constructs a text node associated with the specified
@@ -52,24 +53,12 @@ public class DomText extends DomCharacterData implements Text
      */
     protected DomText (Document owner, String value)
     {
-	super (owner, TEXT_NODE, value);
-    }
-
-    // package private
-    DomText (Document owner, short code, String value)
-    {
-	super (owner, code, value);
+	super (owner, value);
     }
 
     protected DomText (Document owner, char buf [], int off, int len)
     {
-	super (owner, TEXT_NODE, buf, off, len);
-    }
-
-    // package private
-    DomText (Document owner, short code, char buf [], int off, int len)
-    {
-	super (owner, code, buf, off, len);
+	super (owner, buf, off, len);
     }
 
 
@@ -82,6 +71,14 @@ public class DomText extends DomCharacterData implements Text
     {
 	return "#text";
     }
+
+    /**
+     * <b>DOM L1</b>
+     * Returns the constant TEXT_NODE.
+     */
+    // would be final except DomCDATA subclasses this ...
+    public short getNodeType ()
+	{ return TEXT_NODE; }
 
 
     /**
@@ -111,33 +108,4 @@ public class DomText extends DomCharacterData implements Text
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	}
     }
-
-
-    /**
-     * Sets a flag which may be used to record whether the text contains
-     * "ignorable whitespace", which can be discarded by most applications.
-     *
-     * <p> The XML specification requires that validating processors report
-     * which whitespace separates elements with "children" content models,
-     * and so is "ignorable" (not part of character data).  In Java, most
-     * parsers, not just validating ones, make this information available
-     * through SAX callbacks. </p>
-     *
-     * <p> Where possible, configure your DOM construction code to discard
-     * ignorable whitespace reported to it by a parser, rather than trying
-     * to save it in any way.  This will reduce your memory consumption,
-     * simplifies many algorithms, and will provide various savings in
-     * execution time as well.</p>
-     */
-    final public void setIgnorable (boolean value)
-	{ ignorable = value; }
-    
-    
-    /**
-     * Returns the flag recording whether the text contains "ignorable
-     * whitespace".
-     */
-    final public boolean isIgnorable ()
-	{ return ignorable; }
-
 }
