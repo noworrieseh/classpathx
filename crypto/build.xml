@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.6 2001-12-15 02:10:57 raif Exp $
+   $Id: build.xml,v 1.7 2001-12-30 15:49:27 raif Exp $
 
-   Copyright (C) 2001 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the Free
@@ -333,7 +333,7 @@
             <A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>]]>
          </header>
          <bottom>
-            <![CDATA[Copyright &copy;2001 <A HREF="mailto:classpathx-crypto@gnu.org">
+            <![CDATA[Copyright &copy;2001, 2002 <A HREF="mailto:classpathx-crypto@gnu.org">
             Free Software Foundation, Inc..</A> All Rights Reserved.]]>
          </bottom>
          <classpath>
@@ -341,8 +341,9 @@
          </classpath>
          <group title="GNU Crypto Algorithms"
                 packages="gnu.crypto.cipher*,gnu.crypto.hash*,gnu.crypto.mode*,gnu.crypto.pad*,gnu.crypto.prng*"/>
+         <group title="GNU Crypto Signature Schemes" packages="gnu.crypto.sig*"/>
          <group title="GNU Crypto Tools" packages="gnu.crypto.tool*"/>
-         <group title="GNU Crypto utilities" packages="gnu.crypto.util*"/>
+         <group title="GNU Crypto Utilities" packages="gnu.crypto.util*"/>
       </javadoc>
    </target>
 
