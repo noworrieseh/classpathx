@@ -347,7 +347,7 @@ gnu/%.class: @srcdir@/src/gnu/%.java
 # Jar file
 
 ${JARFILE}: gnu javax org
-	@JAR@ cf ${JARFILE} -m manifest.mf $^
+	@JAR@ cfm ${JARFILE} manifest.mf $^
 
 # Remove classes and jar file
 
