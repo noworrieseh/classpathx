@@ -20,7 +20,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.util;
+package gnu.mail.treeutil;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ import java.util.*;
  * A callback interface for passing status messages.
  *
  * @author dog@dog.net.uk
- * @version 1.0.1
+ * @version 1.0.2
  */
 public interface StatusListener
 	extends EventListener 

@@ -24,7 +24,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.pop3;
+package gnu.mail.providers.pop3;
 
 import java.io.*;
 import java.util.*;
@@ -37,7 +37,7 @@ import javax.mail.internet.*;
  *
  * @author dog@dog.net.uk
  * @author nferrier@tapsellferrier.co.uk
- * @version 1.1.1
+ * @version 1.1.2
  */
 public class POP3Message 
 extends MimeMessage 

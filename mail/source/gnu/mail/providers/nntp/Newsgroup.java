@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.nntp;
+package gnu.mail.providers.nntp;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ import javax.mail.event.*;
  *
  * @author dog <dog@dog.net.uk>
  * @author Torgeir Veimo <tv@sevenmountains.no>
- * @version 1.4
+ * @version 1.4.1
  */
 public class Newsgroup 
 extends Folder 

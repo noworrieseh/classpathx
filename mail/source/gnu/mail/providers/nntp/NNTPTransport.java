@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.nntp;
+package gnu.mail.providers.nntp;
 
 import java.io.*;
 import java.net.*;
@@ -31,14 +31,16 @@ import java.util.*;
 import javax.mail.*;
 import javax.mail.event.*;
 import javax.mail.internet.*;
-import dog.mail.util.*;
-import dog.util.*;
+import gnu.mail.util.*;
+import gnu.mail.treeutil.StatusEvent;
+import gnu.mail.treeutil.StatusListener;
+import gnu.mail.treeutil.StatusSource;
 
 /**
  * The transport class implementing the NNTP Usenet news protocol.
  *
  * @author dog@dog.net.uk
- * @version 1.4
+ * @version 1.4.1
  */
 public class NNTPTransport 
 extends Transport 

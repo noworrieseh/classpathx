@@ -26,7 +26,7 @@
  *                 Sverre Huseby <sverrehu@online.no> gzipped mailboxes
  */
 
-package dog.mail.mbox;
+package gnu.mail.providers.mbox;
 
 import java.io.*;
 import java.net.*;
@@ -36,13 +36,13 @@ import java.util.zip.*;
 import javax.mail.*;
 import javax.mail.event.*;
 import javax.mail.internet.*;
-import dog.mail.util.*;
+import gnu.mail.util.*;
 
 /**
  * The folder class implementing a UNIX mbox-format mailbox.
  *
  * @author dog@dog.net.uk
- * @version 1.3.3
+ * @version 1.3.4
  */
 public class MboxFolder 
 extends Folder 

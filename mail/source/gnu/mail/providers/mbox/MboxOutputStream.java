@@ -25,7 +25,7 @@
  * Contributor(s): nil
  */
 
-package dog.mail.mbox;
+package gnu.mail.providers.mbox;
 
 import java.io.*;
 
@@ -35,7 +35,7 @@ import java.io.*;
  * It will strip out any CRs in the stream.
  *
  * @author dog@dog.net.uk
- * @version 1.3
+ * @version 1.3.1
  */
 class MboxOutputStream 
 extends FilterOutputStream 

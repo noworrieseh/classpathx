@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.mbox;
+package gnu.mail.providers.mbox;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ import javax.mail.internet.*;
  * The message class implementing the Mbox mail protocol.
  *
  * @author dog@dog.net.uk
- * @version 1.3
+ * @version 1.3.1
  */
 public class MboxMessage 
 extends MimeMessage 

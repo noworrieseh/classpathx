@@ -23,20 +23,20 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.pop3;
+package gnu.mail.providers.pop3;
 
 import java.io.*;
 import java.net.*;
 import javax.mail.*;
 import javax.mail.event.*;
-import dog.mail.util.*;
+import gnu.mail.util.*;
 
 /**
  * The storage class implementing the POP3 mail protocol.
  *
  * @author dog@dog.net.uk
  * @author nferrier@tapsellferrier.co.uk
- * @version 1.1.1
+ * @version 1.1.2
  */
 public class POP3Store
 extends Store

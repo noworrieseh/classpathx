@@ -23,20 +23,20 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.mbox;
+package gnu.mail.providers.mbox;
 
 import java.io.*;
 import java.net.*;
 import javax.mail.*;
 import javax.mail.event.*;
 import java.util.Hashtable;
-import dog.mail.util.*;
+import gnu.mail.util.*;
 
 /**
  * The storage class implementing the Mbox mailbox file format.
  *
  * @author dog@dog.net.uk
- * @version 1.3
+ * @version 1.3.1
  */
 public class MboxStore 
 extends Store 

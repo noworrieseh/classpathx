@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.mbox;
+package gnu.mail.providers.mbox;
 
 import java.io.File;
 import javax.mail.*;

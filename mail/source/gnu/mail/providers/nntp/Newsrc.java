@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.nntp;
+package gnu.mail.providers.nntp;
 
 import javax.mail.MessagingException;
 
@@ -32,7 +32,7 @@ import javax.mail.MessagingException;
  *
  * @author dog <dog@dog.net.uk>
  * @author Torgeir Veimo <tv@sevenmountains.no>
- * @version 1.3
+ * @version 1.3.1
  */
 public interface Newsrc 
 {

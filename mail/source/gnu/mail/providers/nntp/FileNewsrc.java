@@ -23,7 +23,7 @@
  * http://www.dog.net.uk/knife/
  */
 
-package dog.mail.nntp;
+package gnu.mail.providers.nntp;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ import javax.mail.URLName;
  *
  * @author Torgeir Veimo <tv@sevenmountains.no>
  * @author Gautam Mani <g_mani@vsnl.com>
- * @version 1.3.1
+ * @version 1.3.2
  */
 public class FileNewsrc 
 implements Newsrc 
