@@ -1,0 +1,158 @@
+# JCD Makefile for free JAF implementation
+# (c) Nic Ferrier - Tapsell-Ferrier Limited 2001
+#
+# You are free to redistribute this file. NO WARRANTY or fitness 
+# for purpose is implied by this notice.
+#
+# What goes on here?
+# The SOURCEFILES should be a list of all the sources in your project.
+# The CC-CLASSPATH should be the compilation classpath for your project.
+# 
+#   make compile
+#
+# Causes the classes that need to be compiled (because of changes against
+# the relevant .class file) to be compiled.
+#
+#   make recompile
+#
+# Causes all the source files within the project to be compiled.
+#
+
+##set by configure
+
+SRCDIR = @srcdir@
+SOURCEDIR=$(SRCDIR)/source
+
+##the following variables are not meant to be edited by hand - use emacs JCD mode
+
+
+#the source files belonging to the project
+#These can be altered by Emacs JCD mode.
+SOURCEFILES = 	$(SOURCEDIR)/javax/activation/ActivationDataFlavor.java \
+		$(SOURCEDIR)/javax/activation/CommandInfo.java \
+		$(SOURCEDIR)/javax/activation/CommandMap.java \
+		$(SOURCEDIR)/javax/activation/CommandObject.java \
+		$(SOURCEDIR)/javax/activation/DataContentHandler.java \
+		$(SOURCEDIR)/javax/activation/DataContentHandlerFactory.java \
+		$(SOURCEDIR)/javax/activation/DataHandler.java \
+		$(SOURCEDIR)/javax/activation/DataHandlerDataSource.java \
+		$(SOURCEDIR)/javax/activation/DataSource.java \
+		$(SOURCEDIR)/javax/activation/DataSourceDataContentHandler.java \
+		$(SOURCEDIR)/javax/activation/FileDataSource.java \
+		$(SOURCEDIR)/javax/activation/FileTypeMap.java \
+		$(SOURCEDIR)/javax/activation/MailcapCommandMap.java \
+		$(SOURCEDIR)/javax/activation/MimeType.java \
+		$(SOURCEDIR)/javax/activation/MimeTypeParameterList.java \
+		$(SOURCEDIR)/javax/activation/MimeTypeParseException.java \
+		$(SOURCEDIR)/javax/activation/MimetypesFileTypeMap.java \
+		$(SOURCEDIR)/javax/activation/ObjectDataContentHandler.java \
+		$(SOURCEDIR)/javax/activation/URLDataSource.java \
+		$(SOURCEDIR)/javax/activation/UnsupportedDataTypeException.java
+
+#a mangling of the SOURCEFILES list above
+#This is not quite perfect, we've had to harcode the 
+# $(SOURCEDIR)/ directory in the swap but if we can find a
+# way around that we'll be laughing!
+CLASSESLIST=$(subst .java,.class,$(subst $(SOURCEDIR)/,$(CC-DESTDIR)/,$(foreach dir,$(SOURCEFILES),$(dir))))
+
+#the classpath for compilations
+#If the javadev emacs package is to work then the format of this
+#list must be kept broadly the same. Each file/dir should be on 
+#it's own line and the file list should begin on the same line 
+#as the 'CC-CLASSPATH = ' statement.
+CC-CLASSPATH =  bin/
+
+#the desination directory for compilations
+CC-DESTDIR =	bin
+
+
+##variables which define some usefull constants
+
+newline:=\\n
+empty:=
+space:=$(empty) $(empty)
+
+
+
+##user defined targets
+
+#the standard distrib target
+#Users should extend this to do the "all" build in whaetver way they
+#want, eg: building jar files and javadoc
+#The default is to associate "all" with "compile"
+all: activation.jar
+
+
+##usefull rules that handle unpacking the jar files properly
+
+#build the paperclips jar file
+activation.jar: activation
+	jar cf activation.jar -C $(CC-DESTDIR) javax
+
+#developers only: compile the classes whose .java file is younger than the .class
+#This isn't a perfect compile because java dependancies can be more
+#complicated than just srcfile->classfile.... but it does work for
+#most of the time
+activation: compile
+
+
+##rules predefined by the Makefile.
+##These should be flexible enough for any project as long
+##as the project conforms to the structure required above.
+
+#the compilation target
+#This is intended for developers who are constantly compiling stuff
+#
+#NOTE: this has to use a shell if test because the GNU-Make $(wildcard) 
+#doesn't work properly. If it did we could do this:
+#
+#  compile: $(CLASSLIST)
+#  ifeq "$(wildcard filelist.mak)" "filelist.mak"
+#	javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak
+#	@rm filelist.mak
+#  else
+#	@echo Nothing to be done for compile.
+#  endif
+#
+#I think that would be a lot better and have reported the fault with
+#the $(wildcard) function to bug-make@gnu.org.
+#The problem is that it does not recognise the existance of files created
+#within commands caused by pre-requisites.
+compile: $(CLASSESLIST)
+	@if [ -e filelist.mak ] ; then \
+	  echo javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak ; \
+	  javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak  ; \
+	  rm filelist.mak ; \
+	else echo Nothing to be done for compile ; \
+	fi
+
+
+#recompile all the source files
+.PHONY: recompile
+
+recompile: clean-filelist all-source-files
+	javac -classpath  $(subst $(space),:,$(CC-CLASSPATH)) -d $(CC-DESTDIR) @filelist.mak
+	@rm filelist.mak
+
+
+#make the source file list be the list of all files
+.PHONY: all-source-files
+
+all-source-files:
+	$(foreach sourcefile,$(SOURCEFILES),$(shell echo $(sourcefile) >> filelist.mak))
+
+
+#ensures that the filelist is fresh each time
+#This simply removes the file list (after ensuring that it exists)
+.PHONY: clean-filelist
+
+clean-filelist: 
+	@echo done > filelist.mak
+	@rm filelist.mak
+
+#target matching class files to source files
+$(CC-DESTDIR)/%.class: $(SOURCEDIR)/%.java
+	@echo $? >> filelist.mak
+
+
+##End Makefile

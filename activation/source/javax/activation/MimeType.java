@@ -232,7 +232,7 @@ implements Externalizable
   public boolean match(MimeType type) 
   {
     return (getPrimaryType().equals(type.getPrimaryType())
-	    && getSubType().equals(type.getSubType()))
+	    && getSubType().equals(type.getSubType()));
   }
 
 

@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.io.IOException;
@@ -105,7 +106,7 @@ extends FileTypeMap
     //the system mime types
     try
     {
-      File javaHome=new File(properties.getProperty("java.home")+sep+"mime.types");
+      File javaHome=new File(properties.getProperty("java.home")+sep+"lib"+sep+"mime.types");
       DB[SYS] = loadMimeRegistry(new FileReader(javaHome));
     }
     catch(Exception e)
@@ -115,9 +116,9 @@ extends FileTypeMap
     //a possible jar-file local copy of the mime types
     try
     {
-      String resource="META-INF" + separator + "mime.types";
+      String resource="META-INF" +sep+ "mime.types";
       InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[JAR]=loadMimeRegistry(new InputStreamReader(stream));
+      DB[JAR]=loadMimeRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
@@ -126,9 +127,9 @@ extends FileTypeMap
     //the default providers... obtained from a possible META-INF/ location
     try
     {
-      String resource="META-INF" + separator + "mimetypes.default";
+      String resource="META-INF" + sep + "mimetypes.default";
       InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[DEF]=loadMimeRegistry(new InputStreamReader(stream));
+      DB[DEF]=loadMimeRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
@@ -145,7 +146,7 @@ extends FileTypeMap
     this();
     try 
     {
-      DB[PROG] = loadMimeRegistry(stream);
+      DB[PROG] = loadMimeRegistry(new InputStreamReader(stream));
     }
     catch (Exception e) 
     {
@@ -161,7 +162,7 @@ extends FileTypeMap
     this();
     try 
     {
-      DB[PROG] = loadMimeRegistry(new FileInputStream(mimeTypeFileName));
+      DB[PROG] = loadMimeRegistry(new FileReader(mimeTypeFileName));
     }
     catch (Exception e) 
     {
@@ -190,15 +191,13 @@ extends FileTypeMap
   public String getContentType(String filename) 
   {
     int index;
-    String mimeType;
-    String ext;
     //get the extension
     index = filename.lastIndexOf(".");
     //if the filename has no extension then just return the def type
     if (index == -1) 
     return defaultType;
     //we must know the file extension
-    ext = filename.substring(index + 1);
+    String ext = filename.substring(index + 1);
     //search each mime.type file
     for(index=0; index<DB.length; index++) 
     {
@@ -206,7 +205,7 @@ extends FileTypeMap
       if (DB[index] == null) 
       continue;
       //get the mime type from the list of types
-      mimeType = DB[index].get(ext);
+      MimeType mimeType = (MimeType)(DB[index].get(ext));
       if (mimeType != null) 
       return mimeType.getBaseType();
     }
@@ -252,10 +251,10 @@ extends FileTypeMap
       MimeType mt=null;
       //setup the tokenizer to parse a standard mime.types file
       StreamTokenizer toker=new StreamTokenizer(in);
-      toker.setCommentChar('#');
+      toker.commentChar('#');
       toker.eolIsSignificant(true);
-      toker.setOrdinaryChar('/');
-      while(toker.hasMoreTokens())
+      toker.ordinaryChar('/');
+      while(true)
       {
 	switch(toker.nextToken())
 	{

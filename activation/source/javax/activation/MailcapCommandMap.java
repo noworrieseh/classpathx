@@ -1,6 +1,6 @@
 /*
   GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
+  Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
   For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
 
@@ -23,23 +23,43 @@ package javax.activation;
 
 import java.io.*;
 import java.util.*;
-import oje.activation.registries.*;
 
 
 /** a comand map that represents the mailcap file.
+ * The <i>mailcap</i> file format is specified in RFC1524.
+ * Within the JAF it is used as an easy way to specify beans that
+ * perform certain operations on data of a particular MIME content type.
+ *
+ * <p>For example, the following mailcap file specifies 2 beans that
+ * perform different operations on the <code>text/html</code> MIME type:
+ * <pre>
+ *   text/html; ; x-java-edit=gnu.inet.html.HTMLBrowser; \
+ *      x-java-print=gnu.inet.xml.DocPrinter;
+ * </pre>
+ * </p>
+ *
+ * <p>This class provides a way to access the registry of information that
+ * is declared in such a mailcap file.</p>
+ *
+ * <p>mailcap commands that do not begin with <code>x-java-</code> are ignored.
+ * The special command: <code>x-java-content-handler</code> causes this class
+ * to intepret the command as a <code>DataContentHandler</code>. There is a
+ * special method for obtaining the content handler for a particular MIME type.
+ * Other methods provide various ways of accessing the command registry for
+ * a particular MIME type.
+ * </p>
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
+ * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
  */
 public class MailcapCommandMap
 extends CommandMap 
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
+  /** the database of mailcap registrys.
+   */
+  private Hashtable[] DB=null;
 
-  private static MailcapFile defDB = null;
-  private MailcapFile[] DB = null;
   private static final int PROG = 0;
   private static final int HOME = 1;
   private static final int SYS = 2;
@@ -48,23 +68,80 @@ extends CommandMap
   private static boolean debug = false;
 
 
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
+  /** create default MIME Types registry.
+   */
+  public MailcapCommandMap() 
+  {
+    DB = new Hashtable[5];
+    Properties properties=System.getProperties();
+    String sep=properties.getProperty("file.separator");
+    //init programmatic entries
+    DB[PROG] = new Hashtable();
+    //the user's mime types
+    try
+    {
+      File userHome=new File(properties.getProperty("user.home")+sep+".mailcap");
+      DB[HOME] = loadMailcapRegistry(new FileReader(userHome));
+    }
+    catch(Exception e)
+    {
+      DB[HOME]=new Hashtable();
+    }
+    //the system mime types
+    try
+    {
+      File javaHome=new File(properties.getProperty("java.home")+sep+"lib"+sep+"mailcap");
+      DB[SYS] = loadMailcapRegistry(new FileReader(javaHome));
+    }
+    catch(Exception e)
+    {
+      DB[SYS]=new Hashtable();
+    }
+    //a possible jar-file local copy of the mime types
+    try
+    {
+      String resource="META-INF"+sep+"mailcap";
+      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
+      DB[JAR]=loadMailcapRegistry(new InputStreamReader(str));
+    }
+    catch(Exception e)
+    {
+      DB[JAR]=new Hashtable();
+    }
+    //the default providers... obtained from a possible META-INF/ location
+    try
+    {
+      String resource="META-INF"+sep+"mailcap.default";
+      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
+      DB[DEF]=loadMailcapRegistry(new InputStreamReader(str));
+    }
+    catch(Exception e)
+    {
+      DB[DEF]=new Hashtable();
+    }
+  }
 
-  /**
-   * Create mailcap command map with entries from file.
+  /** create mailcap command map with entries from file.
+   *
    * @param fileName Name of file to read
    * @throws IOException IO exception occurred
    */
-  public MailcapCommandMap(String fileName) throws IOException 
+  public MailcapCommandMap(String fileName)
+  throws IOException 
   {
     this();
-    DB[PROG] = new MailcapFile(fileName);
-  } // MailcapCommandMap()
+    try
+    {
+      DB[PROG] = loadMailcapRegistry(new FileReader(fileName));
+    }
+    catch(Exception e)
+    {
+      //
+    }
+  }
 
-  /**
-   * Create mailcap command map with entries from stream.
+  /** create mailcap command map with entries from stream.
+   *
    * @param stream Input stream of mailcap formatted entries
    */
   public MailcapCommandMap(InputStream stream) 
@@ -72,370 +149,252 @@ extends CommandMap
     this();
     try 
     {
-      DB[PROG] = new MailcapFile(stream);
-    } catch (Exception e) 
-    {
-      DB[PROG] = new MailcapFile();
+      DB[PROG]=loadMailcapRegistry(new InputStreamReader(stream));
     }
-  } // MailcapCommandMap()
-
-  /**
-   * Create default mailcap command map.
-   */
-  public MailcapCommandMap() 
-  {
-
-    // Variables
-    String separator;
-    Properties properties;
- 
-    // Initialize Mailcap Array
-    DB = new MailcapFile[5];
-    properties = System.getProperties();
-    separator = properties.getProperty("file.separator");
- 
-    // Initialize Programmed Entries
-    DB[PROG] = new MailcapFile();
- 
-    // Initialize User Mailcap (~/.mailcap)
-    DB[HOME] = loadFile(properties.getProperty("user.home") +
-			separator + ".mailcap");
- 
-    // Initialize Java Mailcap (<java-home>/lib/mailcap)
-    DB[SYS] = loadFile(properties.getProperty("java.home") +
-		       separator + "lib" + separator + "mailcap");
-
-    // Initialize Resource Mailcap (META-INF/mailcap)
-    DB[JAR] = loadResource("META-INF" + separator + "mailcap");
- 
-    // Initialize Default Resource Mailcap (META-INF/mailcap.default)
-    DB[DEF] = loadResource("META-INF" + separator + "mailcap.default");
-
-  } // MailcapCommandMap()
-
-
-  //-------------------------------------------------------------
-  // Public Accessor Methods ------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Programmically add a mailcap entry.
-   * @param mail_cap Mailcap formatted entry
-   */
-  public synchronized void addMailcap(String mail_cap) 
-  {
-    DB[PROG].appendToMailcap(mail_cap);
-  } // addMailcap()
-
-  /**
-   * Append commands from table into vector list.
-   * @param table Hashtable
-   * @param vector Vector list of commands
-   */
-  private void appendCmdsToVector(Hashtable table, Vector vector) 
-  {
-
-    // Variables
-    Enumeration enum;
-    String verb;
-    String className;
-    Vector list;
-    int index;
-
-    // Get Enumerations of verbs
-    enum = table.keys();
-
-    // Process Each Verb
-    while (enum.hasMoreElements() == true) 
+    catch (Exception e) 
     {
-
-      // Get Verb
-      verb = (String) enum.nextElement();
-      list = (Vector) table.get(verb);
-
-      // Add Each List entry
-      for (index = 0; index < list.size(); index++) 
-      {
-	className = (String) list.elementAt(index);
-	vector.addElement(new CommandInfo(verb, className));
-      } // for: index
-
-    } // while
-
-  } // appendCmdsToVector()
-
-  /**
-   * Append preferred commands to list from table.
-   * @param table Hashtable
-   * @param vector Preferred commands list
-   */
-  private void appendPrefCmdsToVector(Hashtable table, Vector vector) 
-  {
-
-    // Variables
-    Enumeration enum;
-    String verb;
-    String className;
-    Vector list;
-
-    // Get Enumerations of verbs
-    enum = table.keys();
-
-    // Process Each Verb
-    while (enum.hasMoreElements() == true) 
-    {
-
-      // Get Verb
-      verb = (String) enum.nextElement();
-      list = (Vector) table.get(verb);
-
-      // Check For Existence
-      if (checkForVerb(vector, verb) == false) 
-      {
-	className = (String) list.elementAt(0);
-	vector.addElement(new CommandInfo(verb, className));
-      }
-
-    } // while
-
-  } // appendPrefCmdsToVector()
-
-  /**
-   * Check if command verb exists in command list.
-   * @param vector Command list
-   * @param verb Command name verb to check
-   * @returns true if exists, false otherwise
-   */
-  private boolean checkForVerb(Vector vector, String verb) 
-  {
-
-    // Variables
-    int index;
-    CommandInfo info;
-
-    // Loop Through All Elements
-    for (index = 0; index < vector.size(); index++) 
-    {
-      info = (CommandInfo) vector.elementAt(index);
-      if (info.getCommandName().equals(verb) == true) 
-      {
-	return true;
-      }
-    } // for: index
-
-    // Unable to locate
-    return false;
-
-  } // checkForVerb()
-
-  /**
-   * Check for content handler from command names for particular 
-   * MIME type.
-   * @param mimeType MIME type
-   * @returns Data content handler
-   */
-  public synchronized DataContentHandler 
-  createDataContentHandler(String mimeType) 
-  {
-
-    // Variables
-    CommandInfo info;
-    int index;
-    String primary;
-    Class classObject;
-
-    // Get Command
-    info = getCommand(mimeType, "content-handler");
-
-    // If non-existent, Check wildcard
-    index = mimeType.indexOf("/");
-    if (index != -1) 
-    {
-
-      primary = mimeType.substring(0, index);
-      info = getCommand(primary + "/*", "content-handler");
-
-    } // if
-
-    // Check if Command Info Located
-    if (info == null) 
-    {
-      return null;
+      //
     }
+  }
 
+  /** programmically add a mailcap entry.
+   * Mailcap entries added in this way achieve the highest preference
+   * for the search commands.
+   *
+   * @param mailCapEntry Mailcap formatted entry
+   */
+  public void addMailcap(String mailCapEntry) 
+  {
+    StringReader rd=new StringReader(mailCapEntry);
+    Hashtable entries=loadMailcapRegistry(rd);
+    DB[PROG].putAll(entries);
+  }
+
+  /** create a content handler for the specified MIME type.
+   * The database of registrys is searched and the most preferential
+   * content handler (commands with the name: <code>content-handler</code>)
+   * is returned.
+   *
+   * @param mimeType the MIME type to find a content handler for
+   * @return the content handler
+   */
+  public DataContentHandler createDataContentHandler(String mimeType) 
+  {
+    CommandInfo ch=getCommand(mimeType,"x-java-content-handler");
+    if(ch==null)
+    return null;
+    //we do have the content handler so return it
     try 
     {
-
-      classObject = Class.forName(info.getCommandClass());
-      return (DataContentHandler) classObject.newInstance();
-
-    } catch (Exception e) 
+      Class classObject = Class.forName(ch.getCommandClass());
+      return (DataContentHandler)classObject.newInstance();
+    }
+    catch(Exception e) 
     {
+      //perhaps the ch was not a DataContentHandler...
+      //doesn't matter what the problem is: just return null
       return null;
     }
+  }
 
-  } // createDataContentHandler()
-
-  /**
-   * Get list of all commands based on MIME type.
+  /** get the list of all commands based on MIME type.
+   * The commands in all the registries of the mailcap database
+   * are searched.
+   *
    * @param mimeType MIME type to search for
-   * @returns Listing of command information
+   * @return command information associated with the mime type
    */
-  public synchronized CommandInfo[] getAllCommands(String mimeType) 
+  public CommandInfo[] getAllCommands(String mimeType) 
   {
-
-    // Variables
-    int index;
-    Hashtable table;
-    Vector list;
-    CommandInfo[] infoList;
-
-    // Retrieve from Each Source
-    list = new Vector();
-    for (index = 0; index < DB.length; index++) 
+    CommandInfo[] allCommands=null;
+    synchronized(DB)
     {
-
-      // Get Table from Source
-      if (DB[index] != null) 
+      //first establish the number of commands across all registrys
+      int size=0;
+      for(int i=0; i<DB.length; i++)
       {
-	table = DB[index].getMailcapList(mimeType);
-	appendCmdsToVector(table, list);
+	CommandInfo[] entry=(CommandInfo[])DB[i].get(mimeType);
+	if(entry!=null)
+	size+=entry.length;
       }
-
-    } // for: index
-
-    // Create Array
-    infoList = new CommandInfo[list.size()];
-    for (index = 0; index < list.size(); index++) 
-    {
-      infoList[index] = (CommandInfo) list.elementAt(index);
-    } // for: index
-
-    // Return array
-    return infoList;
-
-  } // getAllCommands()
-
-  /**
-   * Get command information from MIME type and command name verb.
-   * @param mimeType MIME type to search for
-   * @param cmdName Command name to check
-   * @returns Command information, or null
-   */
-  public synchronized CommandInfo getCommand(String mimeType, String cmdName) 
-  {
-
-    // Variables
-    CommandInfo[] infoList;
-    String verb;
-    int index;
-    CommandInfo info;
-
-    // Get Preferred Commands
-    infoList = getPreferredCommands(mimeType);
-
-    // Search For Command name
-    for (index = 0; index < infoList.length; index++) 
-    {
-      verb = infoList[index].getCommandName();
-      if (verb.equals(cmdName) == true) 
+      //create an array big enough
+      allCommands=new CommandInfo[size];
+      //copy the contents of each array into the destination array
+      int pos=0;
+      for(int i=0; i<DB.length; i++)
       {
-	return infoList[index];
-      }
-    } // for: index
-
-    // Unable to locate
-    return null;
-
-  } // getCommand()
-
-  /**
-   * Get list of preferred commands based on MIME type.
-   * @param mimeType MIME type to search for
-   * @returns Listing of preferred command information
-   */
-  public synchronized CommandInfo[] getPreferredCommands(String mimeType) 
-  {
-    //System.out.println("getPreferredCommands: " + mimeType);
-    // Variables
-    int index;
-    Hashtable table;
-    Vector list;
-    CommandInfo[] infoList;
-
-    // Retrieve from Each Source
-    list = new Vector();
-    for (index = 0; index < DB.length; index++) 
-    {
-
-      // Get Table from Source
-      if (DB[index] != null) 
-      {
-	table = DB[index].getMailcapList(mimeType);
-	if (table != null) 
+	CommandInfo[] entry=(CommandInfo[])DB[i].get(mimeType);
+	if(entry!=null)
 	{
-	  appendPrefCmdsToVector(table, list);
+	  System.arraycopy(entry,0,allCommands,pos,entry.length);
+	  pos+=entry.length;
 	}
       }
+    }
+    return allCommands;
+  }
 
-    } // for: index
-
-    // Create Array
-    infoList = new CommandInfo[list.size()];
-    for (index = 0; index < list.size(); index++) 
-    {
-      infoList[index] = (CommandInfo) list.elementAt(index);
-    } // for: index
-
-    // Return array
-    return infoList;
-
-  } // getPreferredCommands()
-
-  /**
-   * Load mailcap file.
-   * @param filename Name of file to load
-   * @returns Mailcap file, or null
+  /** get command info for the specified MIME type and command name.
+   * The search for the command is done by order of preference.
+   *
+   * @param mimeType MIME type to search for
+   * @param cmdName Command name to check
+   * @return Command information, or null
    */
-  private MailcapFile loadFile(String filename) 
+  public CommandInfo getCommand(String mimeType, String cmdName)
+  {
+    CommandInfo[] infoList=getAllCommands(mimeType);
+    for(int i=0; i<infoList.length; i++) 
+    {
+      if(infoList[i].getCommandName().equals(cmdName))
+      return infoList[i];
+    }
+    return null;
+  }
+
+  /** get list of preferred commands based on MIME type.
+   * The registry is searched for a mailcap entry assigned to the
+   * specified MIME type. The first entry that matches the MIME
+   * type is returned.
+   *
+   * @param mimeType MIME type to search for
+   * @return listing of preferred command information
+   */
+  public CommandInfo[] getPreferredCommands(String mimeType) 
+  {
+    CommandInfo[] entry=null;
+    synchronized(DB)
+    {
+      for(int i=0; i<DB.length; i++)
+      {
+	Hashtable registry=DB[i];
+	entry=(CommandInfo[])registry.get(mimeType);
+	if(entry!=null)
+	break;
+      }
+    }
+    return entry;
+  }
+
+  /** loads a mailcap file from the specified stream.
+   *
+   * @param in the stream to load from
+   * @return map of <code>mailcaps</code> keyed by content type
+   */
+  private Hashtable loadMailcapRegistry(Reader in) 
   {
     try 
     {
-      return new MailcapFile(filename);
-    } catch (Exception e) 
-    {
-      return null;
+      Hashtable registry=new Hashtable();
+      //line states
+      final int LINE_CONTINUE=-1;
+      final int DO_LINE=0;
+      //some states that we use in this mini-FSM
+      final int STARTCAP=0;
+      final int READNAME=2;
+      final int READVALUE=3;
+      //the state register
+      int state=STARTCAP;
+      int lineState=DO_LINE;
+      //the mime type we're looking for
+      String mt=null;
+      //the command register: 2 elements store each command
+      Vector commands=new Vector();
+      //the name buffer
+      StringBuffer name=null;
+      StringBuffer value=null;
+      //setup the tokenizer to parse a standard mailcap file
+      StreamTokenizer toker=new StreamTokenizer(in);
+      toker.commentChar('#');
+      toker.eolIsSignificant(true);
+      toker.ordinaryChar('/');
+      while(true)
+      {
+	switch(toker.nextToken())
+	{
+	  case StreamTokenizer.TT_EOF:
+	    return registry;
+	  case StreamTokenizer.TT_EOL:
+	    if(lineState==LINE_CONTINUE)
+	    lineState=DO_LINE;
+	    else
+	    {
+	      //move the vect to an array
+	      CommandInfo[] com=new CommandInfo[commands.size()];
+	      commands.toArray(com);
+	      //add the array to the registry
+	      registry.put(mt,com);
+	      //change the state to start again
+	      state=STARTCAP;
+	    }
+	    continue;
+	  case StreamTokenizer.TT_WORD:
+	    switch(state)
+	    {
+	      case STARTCAP:
+		//create a new hash for storing the command tokens
+		commands.clear();
+		name=new StringBuffer();
+		value=new StringBuffer();
+		//set the mimetype for this entry
+		mt=toker.sval;
+		//update the current state
+		state=READNAME;
+		break;
+	      case READNAME:
+		if(toker.sval.equals("="))
+		state=READVALUE;
+		else if(toker.sval.equals(";"))
+		addCommand(commands,name,null);
+		else if(toker.sval.equals("\\"))
+		lineState=LINE_CONTINUE;
+		else
+		name.append(toker.sval);
+		break;
+	      case READVALUE:
+		if(toker.sval.equals(";"))
+		{
+		  addCommand(commands,name,value);
+		  state=READNAME;
+		}
+		else if(toker.sval.equals("\\"))
+		lineState=LINE_CONTINUE;
+		else
+		value.append(toker.sval);
+		break;
+	    }
+	    continue;
+	  default:
+	    //should never get called
+	    break;
+	}
+      }
     }
-  } // loadFile()
+    catch (Exception e) 
+    {
+      //this is only here for debugging
+      e.printStackTrace();
+    }
+    return null;
+  }
 
-  /**
-   * Load mailcap resource.
-   * @param filename Name of resource to load
-   * @returns Mailcap file, or null
+  /** add the specified command name and value to the list.
+   * The command is only added if the name begins with:
+   * <pre>
+   *   x-java-
+   * </pre>
+   *
+   * @param commandList the list of commands to add this one to
+   * @param name the name of the command
+   * @param value the text of the command
    */
-  private MailcapFile loadResource(String filename) 
+  private void addCommand(Vector commandList,StringBuffer name,StringBuffer value)
   {
-
-    // Variables
-    InputStream stream;
-    MailcapFile file;
- 
-    // Get Resource
-    stream = getClass().getClassLoader().getResourceAsStream(filename);
- 
-    try 
+    String comName=name.toString();
+    if(comName.startsWith("x-java-"))
     {
-      // Get Mailcap File
-      file = new MailcapFile(stream);
-    } catch (Exception e) 
-    {
-      file = null;
+      CommandInfo ci=new CommandInfo(comName,value.toString());
+      commandList.addElement(ci);
     }
- 
-    // Return File
-    return file;
-
-  } // loadResource()
-
-
-} // MailcapCommandMap
+  }
+}

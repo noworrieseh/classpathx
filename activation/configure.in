@@ -1,0 +1,2 @@
+AC_INIT(source/javax/activation/MailcapCommandMap.java)
+AC_OUTPUT(Makefile)

@@ -1,6 +1,6 @@
 /*
   GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
+  Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
   For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
 
@@ -20,37 +20,29 @@
 */
 package javax.activation;
 
-// Imports
+
 import java.io.*;
 import java.beans.Beans;
 
-/**
- * Command Info
+
+/** describes a command.
+ *
+ * @author Andrew Selkirk: aselkirk@mailandnews.com
+ * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
  */
 public class CommandInfo
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Command verb.
+  /** the command verb.
    */
   private String verb = null;
 
-  /**
-   * Command class name.
+  /** the command class name.
    */
   private String className = null;
 
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create CommandInfo object.
+  /** create the command information
+   *
    * @param verb Command verb
    * @param className Command class name
    */
@@ -58,81 +50,63 @@ public class CommandInfo
   {
     this.verb = verb;
     this.className = className;
-  } // CommandInfo()
+  }
 
+  /** @return the command name
+   * @see #getCommandName which this method uses
+   */
+  public String toString()
+  {
+    return getCommandName();
+  }
 
-  //-------------------------------------------------------------
-  // Public Accessor Methods ------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Get command class.
-   * @returns Command class
+  /** get the class of the command.
+   *
+   * @return Command class
    */
   public String getCommandClass() 
   {
     return className;
-  } // getCommandClass()
+  }
 
-  /**
-   * Get command name.
-   * @returns Command name
+  /** get the command's name.
+   *
+   * @return Command name
    */
   public String getCommandName() 
   {
     return verb;
-  } // getCommandName()
+  }
 
-  /**
-   * Instantiate command object.
+  /** instantiate the command object.
+   *
    * @param handler Data handler
    * @param loader Class loader to use
-   * @returns Command object
+   * @return Command object
    * @throws IOException IO exception occurred
    * @throws ClassNotFoundException Class not found
    */
   public Object getCommandObject(DataHandler handler, ClassLoader loader)
   throws IOException, ClassNotFoundException 
   {
-
-    // Variables
-    Object object;
-    CommandObject command;
-    Externalizable external;
-    ObjectInputStream input;
-
-    // Instantiate Object
-    object = Beans.instantiate(loader, className);
-
-    // Check for Command Object
+    //create the object
+    Object object = Beans.instantiate(loader, this.className);
+    //check for Command Object
     if (object instanceof CommandObject) 
     {
-
-      // Get Command Object
-      command = (CommandObject) object;
-
-      // Set Context
+      CommandObject command = (CommandObject)object;
+      //set the context of the command object
       command.setCommandContext(verb, handler);
-
-    } else if ((object instanceof Externalizable) &&
-	       handler != null) 
+    }
+    else if ((object instanceof Externalizable) && handler != null) 
     {
-
-      // Get Externalizable
-      external = (Externalizable) object;
-
-      // Get InputStream From DataHandler
-      input = new ObjectInputStream(handler.getInputStream());
-
-      // Send Stream to Object
+      Externalizable external = (Externalizable)object;
+      //get the stream to read the object from the handler
+      ObjectInputStream input = new ObjectInputStream(handler.getInputStream());
+      //cause the object to read itself from the stream
       external.readExternal(input);
-
-    } // if
-
-    // Return Object
+    }
     return object;
+  }
 
-  } // getCommandObject()
-
-
-} // CommandInfo
+}
