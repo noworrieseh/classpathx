@@ -1,5 +1,5 @@
 /*
- * $Id: WellFormednessFilter.java,v 1.2 2001-07-05 01:43:02 db Exp $
+ * $Id: WellFormednessFilter.java,v 1.3 2001-07-10 22:56:33 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import gnu.xml.util.DefaultHandler;
 
 /**
  * This filter reports fatal exceptions in the case of event streams that
- * are not well formed.  The following rules are currently tested: <ul>
+ * are not well formed.  The rules currently tested include: <ul>
  *
  *	<li>setDocumentLocator ... may be called only before startDocument
  *
@@ -40,22 +40,37 @@ import gnu.xml.util.DefaultHandler;
  *	<li>startElement/endElement ... must be correctly paired, and
  *	may never appear within CDATA sections.
  *
+ *	<li>comment ... can't contain "--"
+ *
+ *	<li>character data ... can't contain "]]&gt;"
+ *
+ *	<li>whitespace ... can't contain CR
+ *
+ *	<li>whitespace and character data must be within an element
+ *
+ *	<li>processing instruction ... can't contain "?&gt;" or CR
+ *
  *	<li>startCDATA/endCDATA ... must be correctly paired.
  *
  *	</ul>
  *
  * <p> Other checks for event stream correctness may be provided in
- * the future.
+ * the future.  For example, insisting that
+ * entity boundaries nest correctly,
+ * namespace scopes nest correctly,
+ * namespace values never contain relative URIs,
+ * attributes don't have "&lt;" characters;
+ * and more.
  *
  * @author David Brownell
- * @version $Date: 2001-07-05 01:43:02 $
+ * @version $Date: 2001-07-10 22:56:33 $
  */
-public class WellFormednessFilter extends EventFilter
+public final class WellFormednessFilter extends EventFilter
 {
-    private Locator		locator;
     private boolean		startedDoc;
     private Stack		elementStack = new Stack ();
     private boolean		startedCDATA;
+    private String		dtdState = "before";
 
     
     /**
@@ -63,7 +78,7 @@ public class WellFormednessFilter extends EventFilter
      */
 	// constructor used by PipelineFactory
     public WellFormednessFilter ()
-	{ super (null); }
+	{ this (null); }
 
 
     /**
@@ -76,9 +91,10 @@ public class WellFormednessFilter extends EventFilter
 	super (consumer);
 
 	setContentHandler (this);
+	setDTDHandler (this);
 	
 	try {
-	    setProperty (PROPERTY_URI + "lexical-handler", this);
+	    setProperty (LEXICAL_HANDLER, this);
 	} catch (SAXException e) { /* can't happen */ }
     }
 
@@ -89,43 +105,48 @@ public class WellFormednessFilter extends EventFilter
      */
     public void reset ()
     {
-	locator = null;
 	startedDoc = false;
 	startedCDATA = false;
 	elementStack.removeAllElements ();
     }
 
 
+    private SAXParseException getException (String message)
+    {
+	SAXParseException	e;
+	Locator			locator = getDocumentLocator ();
+
+	if (locator == null)
+	    return new SAXParseException (message, null, null, -1, -1);
+	else
+	    return new SAXParseException (message, locator);
+    }
+
     private void fatalError (String message)
     throws SAXException
     {
-	SAXParseException	e;
+	SAXParseException	e = getException (message);
 	ErrorHandler		handler = getErrorHandler ();
 
-	if (locator == null)
-	    e = new SAXParseException (message, null, null, -1, -1);
-	else
-	    e = new SAXParseException (message, locator);
 	if (handler != null)
 	    handler.fatalError (e);
 	throw e;
     }
 
-
     /**
-     * Throws a <em>RuntimeException</em> when called after startDocument.
-     * The SAX APIs do not permit a SAXException to be reported from this
-     * method.
+     * Throws an exception when called after startDocument.
      *
      * @param l the locator, to be used in error reporting or relative
      *	URI resolution.
+     *
+     * @exception IllegalStateException when called after the document
+     *	has already been started
      */
     public void setDocumentLocator (Locator l)
     {
 	if (startedDoc)
-	    throw new RuntimeException (
+	    throw new IllegalStateException (
 		    "setDocumentLocator called after startDocument");
-	locator = l;
 	super.setDocumentLocator (l);
     }
 
@@ -146,6 +167,10 @@ public class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
+	if ("inside".equals (dtdState))
+	    fatalError ("element inside DTD?");
+	else
+	    dtdState = "after";
 	if (startedCDATA)
 	    fatalError ("element inside CDATA section");
 	if (name == null || "".equals (name))
@@ -180,6 +205,7 @@ public class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
+	dtdState = "before";
 	startedDoc = false;
 	super.endDocument ();
     }
@@ -190,15 +216,109 @@ public class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
+	if ("before" != dtdState)
+	    fatalError ("two DTDs?");
+	if (!elementStack.empty ())
+	    fatalError ("DTD must precede root element");
+	dtdState = "inside";
 	super.startDTD (root, p, s);
     }
+
+    public void notationDecl (String name, String pub, String sys)
+    throws SAXException
+    {
+// FIXME: not all parsers will report startDTD() ...
+// we'd rather insist we're "inside".
+	if ("after" == dtdState)
+	    fatalError ("not inside DTD");
+	super.notationDecl (name, pub, sys);
+    }
+
+    public void unparsedEntityDecl (String name, String p, String s, String n)
+    throws SAXException
+    {
+// FIXME: not all parsers will report startDTD() ...
+// we'd rather insist we're "inside".
+	if ("after" == dtdState)
+	    fatalError ("not inside DTD");
+	super.unparsedEntityDecl (name, p, s, n);
+    }
+
+    // FIXME:  add the four DeclHandler calls too
 
     public void endDTD ()
     throws SAXException
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
+	if ("inside" != dtdState)
+	    fatalError ("DTD ends without start?");
+	dtdState = "after";
 	super.endDTD ();
+    }
+
+    public void characters (char buf [], int off, int len)
+    throws SAXException
+    {
+	int here = off, end = off + len;
+	if (elementStack.empty ())
+	    fatalError ("characters must be in an element");
+	while (here < end) {
+	    if (buf [here++] != ']')
+		continue;
+	    if (here == end)	// potential problem ...
+		continue;
+	    if (buf [here++] != ']')
+		continue;
+	    if (here == end)	// potential problem ...
+		continue;
+	    if (buf [here++] == '>')
+		fatalError ("character data can't contain \"]]>\"");
+	}
+	super.characters (buf, off, len);
+    }
+
+    public void ignorableWhitespace (char buf [], int off, int len)
+    throws SAXException
+    {
+	int here = off, end = off + len;
+	if (elementStack.empty ())
+	    fatalError ("characters must be in an element");
+	while (here < end) {
+	    if (buf [here++] == '\r')
+		fatalError ("whitespace can't contain CR");
+	}
+	super.ignorableWhitespace (buf, off, len);
+    }
+
+    public void processingInstruction (String target, String data)
+    throws SAXException
+    {
+	if (data.indexOf ('\r') > 0)
+	    fatalError ("PIs can't contain CR");
+	if (data.indexOf ("?>") > 0)
+	    fatalError ("PIs can't contain \"?>\"");
+    }
+
+    public void comment (char buf [], int off, int len)
+    throws SAXException
+    {
+	if (!startedDoc)
+	    fatalError ("callback outside of document?");
+	if (startedCDATA)
+	    fatalError ("comments can't nest in CDATA");
+	int here = off, end = off + len;
+	while (here < end) {
+	    if (buf [here] == '\r')
+		fatalError ("comments can't contain CR");
+	    if (buf [here++] != '-')
+		continue;
+	    if (here == end)
+		fatalError ("comments can't end with \"--->\"");
+	    if (buf [here++] == '-')
+		fatalError ("comments can't contain \"--\"");
+	}
+	super.comment (buf, off, len);
     }
 
     public void startCDATA ()
