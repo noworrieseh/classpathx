@@ -104,7 +104,12 @@ public interface IMAPConstants
   public static final String BODY = "BODY".intern();
   public static final String BODY_PEEK = "BODY.PEEK".intern();
   public static final String BODYHEADER = "BODYHEADER".intern();
+  public static final String BODYHEADER_FIELDS = "BODYHEADER.FIELDS".intern();
+  public static final String BODYHEADER_FIELDS_NOT =
+    "BODYHEADER.FIELDS.NOT".intern();
+  public static final String BODYMIME = "BODYMIME".intern();
   public static final String BODYSTRUCTURE = "BODYSTRUCTURE".intern();
+  public static final String BODYTEXT = "BODYTEXT".intern();
   public static final String ENVELOPE = "ENVELOPE".intern();
   public static final String INTERNALDATE = "INTERNALDATE".intern();
   public static final String RFC822 = "RFC822".intern();

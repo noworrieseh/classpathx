@@ -7,6 +7,7 @@ application/octet-stream;;x-java-content-handler=gnu.mail.handler.ApplicationOct
 message/rfc822;;x-java-content-handler=gnu.mail.handler.MessageRFC822
 multipart/alternative;;x-java-content-handler=gnu.mail.handler.MultipartAlternative
 multipart/mixed;;x-java-content-handler=gnu.mail.handler.MultipartMixed
+multipart/related;;x-java-content-handler=gnu.mail.handler.MultipartRelated
 text/plain;;x-java-content-handler=gnu.mail.handler.TextPlain
 text/html;;x-java-content-handler=gnu.mail.handler.TextHtml
 text/xml;;x-java-content-handler=gnu.mail.handler.TextXml

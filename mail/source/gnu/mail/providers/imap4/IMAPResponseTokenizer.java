@@ -254,7 +254,7 @@ public class IMAPResponseTokenizer implements IMAPConstants
           if (b==0x22) // quote delimiter
           {
             inQuote = !inQuote;
-            genericSink.write(b);
+            //genericSink.write(b);
           }
           else if (inQuote)
           {

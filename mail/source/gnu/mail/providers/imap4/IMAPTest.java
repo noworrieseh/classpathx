@@ -1,0 +1,132 @@
+package gnu.mail.providers.imap4;
+
+import java.io.IOException;
+import java.util.Properties;
+import javax.mail.BodyPart;
+import javax.mail.FetchProfile;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+import javax.mail.event.ConnectionEvent;
+import javax.mail.event.ConnectionListener;
+import javax.mail.event.FolderEvent;
+import javax.mail.event.FolderListener;
+import javax.mail.event.StoreEvent;
+import javax.mail.event.StoreListener;
+import javax.mail.internet.MimeBodyPart;
+
+/**
+ * Simple test for IMAP.
+ */
+public class IMAPTest
+  implements ConnectionListener, StoreListener, FolderListener
+{
+
+  public void opened(ConnectionEvent e)
+  {
+    System.out.println("IMAPTest.opened: "+e.getSource());
+  }
+
+  public void closed(ConnectionEvent e)
+  {
+    System.out.println("IMAPTest.closed: "+e.getSource());
+  }
+
+  public void disconnected(ConnectionEvent e)
+  {
+    System.out.println("IMAPTest.disconnected: "+e.getSource());
+  }
+
+  public void notification(StoreEvent e)
+  {
+    System.out.println("IMAPTest.notification: "+e.getSource());
+  }
+
+  public void folderCreated(FolderEvent e)
+  {
+    System.out.println("IMAPTest.folderCreated: "+e.getSource());
+  }
+
+  public void folderDeleted(FolderEvent e)
+  {
+    System.out.println("IMAPTest.folderDeleted: "+e.getSource());
+  }
+
+  public void folderRenamed(FolderEvent e)
+  {
+    System.out.println("IMAPTest.folderRenamed: "+e.getSource());
+  }
+
+  public static void main(String[] args)
+  {
+    if (args.length<1)
+    {
+      System.out.println("Syntax: IMAPTest <url>");
+      System.exit(1);
+    }
+    try
+    {
+      IMAPTest test = new IMAPTest();
+      Properties properties = System.getProperties();
+      Session session = Session.getDefaultInstance(properties);
+      URLName url = new URLName(args[0]);
+      Store store = session.getStore(url);
+      store.addConnectionListener(test);
+      store.addStoreListener(test);
+      store.addFolderListener(test);
+      store.connect();
+      Folder root = store.getDefaultFolder();
+      Folder inbox = root.getFolder("INBOX");
+      inbox.open(Folder.READ_ONLY);
+      Message[] messages = inbox.getMessages();
+      FetchProfile fp = new FetchProfile();
+      fp.add(FetchProfile.Item.ENVELOPE);
+      inbox.fetch(messages, fp);
+      for (int i=0; i<messages.length; i++)
+      {
+        int msgnum = messages[i].getMessageNumber();
+        String subject = messages[i].getSubject();
+        System.out.println("Message "+msgnum+": Subject: "+subject);
+        Object content = messages[i].getContent();
+        if (content instanceof Multipart)
+        {
+          Multipart multipart = (Multipart)content;
+          int count = multipart.getCount();
+          System.out.println("Message "+msgnum+" has "+count+" body parts");
+          for (int j=0; j<count; j++)
+          {
+            System.out.println("--");
+            BodyPart part = multipart.getBodyPart(j);
+            if (part instanceof MimeBodyPart)
+              ((MimeBodyPart)part).writeTo(System.out);
+          }
+        }
+        else if (content instanceof String)
+        {
+          System.out.println("--");
+          System.out.println((String)content);
+        }
+        else
+        {
+          System.out.println("content="+content);
+        }
+        System.out.println("----");
+      }
+      inbox.close(false);
+      store.close();
+    }
+    catch (MessagingException e)
+    {
+      e.printStackTrace(System.err);
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace(System.err);
+    }
+  }
+
+}

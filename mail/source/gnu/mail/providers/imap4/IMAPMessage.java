@@ -45,7 +45,10 @@ import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Part;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.ParameterList;
 import javax.mail.internet.MimeMessage;
 
 import gnu.mail.providers.ReadOnlyMessage;
@@ -61,7 +64,18 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
 
   static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
   static final String FETCH_CONTENT = "BODY.PEEK[]";
-  static final String HEADERFIELDS = "BODYHEADER.FIELDS";
+
+  // BODYSTRUCTURE response atom indices
+  static final int BS_CONTENT_TYPE = 0;
+  static final int BS_CONTENT_SUBTYPE = 1;
+  static final int BS_PARAMETERS = 2;
+  static final int BS_ID = 3;
+  static final int BS_DESCRIPTION = 4;
+  static final int BS_ENCODING = 5;
+  static final int BS_OCTETS = 6;
+  static final int BS_LINES = 7;
+  static final int BS_EXT_DISPOSITION = 3;
+  static final int BS_EXT_LANGUAGE = 4;
 
   /**
    * If set, this contains the string value of the received date.
@@ -80,6 +94,11 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
    * be requested from the server.
    */
   protected boolean headersComplete;
+
+  /*
+   * Parsed multipart object representing this message's content.
+   */
+  private IMAPMultipart multipart;
 
   IMAPMessage(IMAPFolder folder, InputStream in, int msgnum) 
     throws MessagingException 
@@ -122,6 +141,16 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
     throws MessagingException
   {
     String[] commands = new String[] { FETCH_CONTENT, INTERNALDATE };
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the multipart corresponding to the message body.
+   */
+  void fetchMultipart()
+    throws MessagingException
+  {
+    String[] commands = new String[] { BODYSTRUCTURE };
     fetch(commands);
   }
 
@@ -199,26 +228,200 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       }
       else if (key==INTERNALDATE)
       {
-        internalDate = (String)status.get(key);
-        // Strip quotes if necessary
-        int idlen = internalDate.length();
-        if (idlen>0 &&
-            internalDate.charAt(0)=='"' &&
-            internalDate.charAt(idlen-1)=='"')
-          internalDate = internalDate.substring(1, idlen-1).trim();
+        internalDate = parseAtom(status.get(key));
       }
-      else if (key==HEADERFIELDS)
+      else if (key==BODYHEADER_FIELDS)
       {
+        // individual header fields
         if (!headersComplete)
         {
           InputStream in = new ByteArrayInputStream(status.getContent());
           headers = createInternetHeaders(in);
         }
       }
+      else if (key==BODYSTRUCTURE)
+      {
+        if (headers==null)
+          headers = new InternetHeaders();
+        multipart = parseMultipart((List)status.get(key), this, headers, null);
+      }
       else
         throw new MessagingException("Unknown message status key: "+key);
     }
+  }
+
+  /*
+   * Parse a multipart content object for the specified multipart Part.
+   */
+  IMAPMultipart parseMultipart(List list, Part parent,
+      InternetHeaders parentHeaders, String baseSection)
+    throws MessagingException
+  {
+    int len = list.size();
+    if (len==0)
+      throw new MessagingException("Empty [MIME-IMB] structure");
+    int offset = 0;
+    // First parts, in lists
+    Object value = list.get(offset);
+    List partList = new ArrayList();
+    List sectionList = new ArrayList();
+    for (; value instanceof List; value = list.get(++offset))
+    {
+      String section = (baseSection==null) ?
+        Integer.toString(offset+1) :
+        new StringBuffer(baseSection).append('.').append(offset+1).toString();
+      partList.add(value);
+      sectionList.add(section);
+    }
+    // Next the multipart subtype
+    String subtype = parseAtom(value).toLowerCase();
+    IMAPMultipart multipart = new IMAPMultipart(this, parent, subtype);
+    ContentType ct = new ContentType(multipart.getContentType());
+    // Add the parts
+    for (int i=0; i<offset; i++)
+    {
+      List part = (List)partList.get(i);
+      String section = (String)sectionList.get(i);
+      multipart.addBodyPart(parseBodyPart(part, multipart, section));
+    }
+    // Now extension data
+    //offset++;
+    if (offset<len)
+    {
+      // Last 2 are disposition and language
+      String disposition = parseAtom(list.get(len-2));
+      String language = parseAtom(list.get(len-1));
+
+      if (disposition!=null)
+        parentHeaders.setHeader("Content-Disposition", disposition);
+      if (language!=null)
+        parentHeaders.setHeader("Content-Language", language);
+      
+      // Next any parameters
+      // Note that there should only be 1 slot containing a list,
+      // but servers sometimes return multiple lists
+      List plist = new ArrayList();
+      for (int i=offset; i<len-2; i++)
+      {
+        value = list.get(i);
+        if (value instanceof List)
+          plist.addAll((List)value);
+      }
+      if (plist.size()>0)
+      {
+        ParameterList params = parseParameterList(plist);
+        ct = new ContentType(ct.getPrimaryType(), subtype, params);
+      }
+    }
+    parentHeaders.setHeader("Content-Type", ct.toString());
+    return multipart;
+  }
+
+  /*
+   * Parse a body part for the specified multipart content object.
+   */
+  IMAPBodyPart parseBodyPart(List list, IMAPMultipart parent, String section)
+    throws MessagingException
+  {
+    int len = list.size();
+    if (len==0)
+      throw new MessagingException("Empty [MIME-IMB] structure");
+    Object arg1 = list.get(0);
+    if (arg1 instanceof List)
+    {
+      // Multipart body part
+      InternetHeaders h = new InternetHeaders();
+      IMAPBodyPart part = new IMAPBodyPart(this, parent, section, h, -1, -1);
+      IMAPMultipart multipart = parseMultipart(list, part, h, section);
+      part.multipart = multipart;
+      return part;
+    }
     
+    if (len<8)
+      throw new MessagingException("Unexpected number of fields in "+
+          "[MIME-IMB] structure: "+list);
+    int extensionCount = (len-8); // number of extension fields
+        
+    // Basic fields
+    String type = parseAtom(list.get(BS_CONTENT_TYPE)).toLowerCase();
+    String subtype = parseAtom(list.get(BS_CONTENT_SUBTYPE)).toLowerCase();
+    ParameterList params = parseParameterList(list.get(BS_PARAMETERS));
+    String id = parseAtom(list.get(BS_ID+extensionCount));
+    String description = parseAtom(list.get(BS_DESCRIPTION+extensionCount));
+    String encoding = parseAtom(list.get(BS_ENCODING+extensionCount));
+    String sizeVal = parseAtom(list.get(BS_OCTETS+extensionCount));
+    String linesVal = parseAtom(list.get(BS_LINES+extensionCount));
+
+    int size = -1;
+    int lines = -1;
+    try
+    {
+      if (sizeVal!=null)
+        size = Integer.parseInt(sizeVal);
+      if (linesVal!=null)
+        lines = Integer.parseInt(linesVal);
+    }
+    catch (NumberFormatException e)
+    {
+      throw new MessagingException("Expecting number in [MIME-IMB] "+
+          "structure: "+list);
+    }
+    
+    ContentType ct = new ContentType(type, subtype, params);
+    InternetHeaders h = new InternetHeaders();
+    h.setHeader("Content-Type", ct.toString());
+    if (id!=null)
+      h.setHeader("Content-Id", id);
+    if (description!=null)
+      h.setHeader("Content-Description", description);
+    if (encoding!=null)
+      h.setHeader("Content-Transfer-Encoding", encoding);
+    
+    // Extension fields
+    if (len>8)
+    {
+      String disposition = parseAtom(list.get(BS_EXT_DISPOSITION));
+      if (disposition!=null)
+        h.setHeader("Content-Disposition", disposition);
+    }
+    if (len>9)
+    {
+      String language = parseAtom(list.get(BS_EXT_LANGUAGE));
+      if (language!=null)
+        h.setHeader("Content-Language", language);
+    }
+
+    return new IMAPBodyPart(this, parent, section, h, size, lines);
+  }
+
+  String parseAtom(Object value)
+  {
+    if (value instanceof String && !(value.equals(NIL)))
+      return (String)value;
+    return null;
+  }
+
+  ParameterList parseParameterList(Object params)
+  {
+    if (params instanceof List)
+    {
+      List list = (List)params;
+      int len = list.size();
+      ParameterList plist = new ParameterList();
+      for (int i=0; i<len-1; i+=2)
+      {
+        Object key = list.get(i);
+        Object value = list.get(i+1);
+        if (key instanceof String && value instanceof String)
+        {
+          String atom = parseAtom(value);
+          if (atom!=null)
+            plist.set((String)key, atom);
+        }
+      }
+      return plist;
+    }
+    return null;
   }
 
   /**
@@ -249,9 +452,24 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public DataHandler getDataHandler() 
     throws MessagingException
   {
-    if (content==null)
-      fetchContent();
-    return super.getDataHandler();
+    // Hook into BODYSTRUCTURE method
+    /*
+    ContentType ct = new ContentType(getContentType());
+    // TODO message/* content-types
+    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
+    {
+      if (multipart==null)
+        fetchMultipart();
+      return new DataHandler(new IMAPMultipartDataSource(multipart));
+    }
+    else
+    {
+    */
+      if (content==null)
+        fetchContent();
+      return super.getDataHandler();
+      /*
+    }*/
   }
 
   /**

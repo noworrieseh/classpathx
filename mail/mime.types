@@ -1,5 +1,5 @@
 # Default MIME type registry
-# author: Chris Burdess: dog@dog.net.uk
+# author: Chris Burdess <dog@gnu.org>
 
 application/activemessage
 application/andrew-inset
@@ -118,6 +118,7 @@ multipart/appledouble
 multipart/digest
 multipart/mixed
 multipart/parallel
+multipart/related
 
 text/comma-separated-values	csv
 text/english
