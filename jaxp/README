@@ -1,11 +1,15 @@
 WHAT IS THIS
-    A Free Software implementation of the standard Java processing
-    APIs for XML, which include SAX2, DOM Level 2, and JAXP 1.1
-    (which, among other things, "blesses" SAX and DOM).
+    The AElfred2 implementation of a SAX2 parser, the DOM2 implementation
+    of DOM Level 2, SAX2 XML pipeline utilities (including a streaming
+    DTD validator), and JAXP glue for those standard APIs.
+
+    This is intended only to require JDK 1.1 support to compile or run;
+    that may change at some point, but for now portability to PJava and
+    other widely used Java configurations/profiles is important.
     
-    This should compile with JDK 1.2 and later.  Versions of GCJ
-    slightly more recent than the 3.0 release are needed; 3.0.1
-    may integrate the necessary fixes..
+    GCJ 3.0 has a bug (PR 3285?) preventing the "DomNode" implementation
+    class from compiling, it can't find constructors for some DomEvent
+    classes.  Newer snapshots may fix this.
 
 JAVA PACKAGES
     
@@ -34,7 +38,8 @@ LICENSING
 	file might be covered by the GNU General Public License. 
 
     As such, it can be used to run free as well as proprietary
-    applications and applets. 
+    applications and applets:  static linking is permitted, so
+    this can even be used in embedded configurations.
 
 	COPYING		... contains the GPL text.
 	COPYRIGHT.html	... contains the W3C license.
