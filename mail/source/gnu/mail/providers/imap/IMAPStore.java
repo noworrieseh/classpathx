@@ -50,6 +50,7 @@ import javax.net.ssl.TrustManager;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
 import gnu.inet.imap.Namespaces;
+import gnu.inet.imap.Quota;
 
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
@@ -488,6 +489,55 @@ public class IMAPStore
         catch (IOException e)
           {
             throw new MessagingException (e.getMessage (), e);
+          }
+      }
+  }
+
+  /**
+   * Returns the quota for the specified quota root.
+   * @param root the quota root
+   */
+  public Quota getQuota(String root)
+    throws MessagingException
+  {
+    if (!isConnected())
+      {
+        throw new StoreClosedException(this);
+      }
+    synchronized (this)
+      {
+        try
+          {
+            return connection.getquota(root);
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
+  }
+
+  /**
+   * Sets the quota resource set for the specified quota root.
+   * @param root the quota root
+   * @param resources the quota resources to set
+   */
+  public void setQuota(String root, Quota.Resource[] resources)
+    throws MessagingException
+  {
+    if (!isConnected())
+      {
+        throw new StoreClosedException(this);
+      }
+    synchronized (this)
+      {
+        try
+          {
+            connection.setquota(root, resources);
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }

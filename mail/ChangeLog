@@ -1,3 +1,8 @@
+2004-12-04  Chris Burdess  <dog@gnu.org>
+
+	* IMAPStore.java,IMAPFolder.java: Expose quota functionality of
+	underlying IMAPConnection.
+
 2004-11-01  Chris Burdess  <dog@bluezoo.org>
 
 	* ParameterList.java: Report original value which caused a parse to

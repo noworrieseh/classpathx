@@ -79,6 +79,7 @@ import gnu.inet.imap.IMAPConstants;
 import gnu.inet.imap.ListEntry;
 import gnu.inet.imap.MailboxStatus;
 import gnu.inet.imap.MessageStatus;
+import gnu.inet.imap.Quota;
 
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
@@ -1461,6 +1462,30 @@ implements UIDFolder
         m.fetchUID ();
       }
     return m.uid;
+  }
+
+  /**
+   * Returns the quotas for this folder.
+   */
+  public Quota[] getQuota()
+    throws MessagingException
+  {
+    if (mode == -1)
+      {
+        throw new FolderClosedException(this);
+      }
+    IMAPStore s = (IMAPStore) store;
+    synchronized (s)
+      {
+        try
+          {
+            return s.connection.getquotaroot(path);
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
   }
 
 }
