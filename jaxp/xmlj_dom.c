@@ -835,7 +835,12 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv * env,
   for (count = 0; attr != NULL && count < index; count++)
     attr = attr->next;
   if (attr == NULL)
-    printf ("No attribute at index %d\n", index);
+    {
+      char msg[1024];
+      sprintf (msg, "No attribute at index %d\n", index);
+      xmljThrowException (env, "java/lang/NullPointerException", msg);
+      return NULL;
+    }
   return xmljGetNodeInstance (env, (xmlNodePtr) attr);
 }
 

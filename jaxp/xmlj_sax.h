@@ -123,7 +123,7 @@ void xmljSAXProcessingInstruction(void *ctx,
 void xmljSAXComment(void *ctx,
                     const xmlChar *value);
 
-void xmljSAXCdataBlock(void *ctx,
+void xmljSAXCDataBlock(void *ctx,
                        const xmlChar *ch,
                        int len);
 

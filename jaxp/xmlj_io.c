@@ -446,17 +446,6 @@ xmljParseDocument (JNIEnv * env,
   SAXParseContext *saxCtx;
   xmlSAXHandlerPtr sax;
 
-  /*printf ("validate=%d\ncoalesce=%d\nexpandEntities=%d\ncontentHandler=%d\ndtdHandler=%d\nentityResolver=%d\nerrorHandler=%d\ndeclarationHandler=%d\nlexicalHandler=%d\n",
-          validate,
-          coalesce,
-          expandEntities,
-          contentHandler,
-          dtdHandler,
-          entityResolver,
-          errorHandler,
-          declarationHandler,
-          lexicalHandler);*/
-  
   ctx = xmljNewParserContext (env, in, detectBuffer, systemId, publicId,
                               validate, coalesce, expandEntities,
                               entityResolver);

@@ -69,9 +69,9 @@ implements XMLReader
 {
 
   static
-    {
-      System.loadLibrary("xmlj");
-    }
+  {
+    System.loadLibrary("xmlj");
+  }
 
   private static final String FEATURES_PREFIX =
     "http://xml.org/sax/features/";
@@ -139,217 +139,274 @@ implements XMLReader
   private transient String base;
 
   public GnomeXMLReader ()
-    {
-      this (true, true);
-    }
+  {
+    this (true, true);
+  }
 
   public GnomeXMLReader (boolean namespaces, boolean validation)
-    {
-      this.namespaces = namespaces;
-      this.validation = validation;
-      ns = new Namespaces ();
-    }
+  {
+    this.namespaces = namespaces;
+    this.validation = validation;
+    ns = new Namespaces ();
+  }
 
   public ContentHandler getContentHandler ()
-    {
-      return contentHandler;
-    }
+  {
+    return contentHandler;
+  }
 
   public void setContentHandler (ContentHandler handler)
-    {
-      contentHandler = handler;
-    }
+  {
+    contentHandler = handler;
+  }
 
   public DTDHandler getDTDHandler ()
-    {
-      return dtdHandler;
-    }
+  {
+    return dtdHandler;
+  }
 
   public void setDTDHandler (DTDHandler handler)
-    {
-      dtdHandler = handler;
-    }
+  {
+    dtdHandler = handler;
+  }
 
   public EntityResolver getEntityResolver ()
-    {
-      return entityResolver;
-    }
+  {
+    return entityResolver;
+  }
 
   public void setEntityResolver (EntityResolver resolver)
-    {
-      entityResolver = resolver;
-    }
+  {
+    entityResolver = resolver;
+  }
 
   public ErrorHandler getErrorHandler ()
-    {
-      return errorHandler;
-    }
+  {
+    return errorHandler;
+  }
 
   public void setErrorHandler (ErrorHandler handler)
-    {
-      errorHandler = handler;
-    }
+  {
+    errorHandler = handler;
+  }
 
   // Features
 
-  public boolean getFeature (String name) throws SAXNotRecognizedException, SAXNotSupportedException
-    {
-      checkFeatureName (name);
-      String key = name.substring (FEATURES_PREFIX.length ());
-      if ("external-general-entities".equals (key))
+  public boolean getFeature (String name)
+    throws SAXNotRecognizedException, SAXNotSupportedException
+  {
+    checkFeatureName (name);
+    String key = name.substring (FEATURES_PREFIX.length ());
+    if ("external-general-entities".equals (key))
+      {
         return validation; // TODO check this
-      else if ("external-parameter-entities".equals (key))
+      }
+    else if ("external-parameter-entities".equals (key))
+      {
         return validation; // TODO check this
-      else if ("standalone".equals (key))
+      }
+    else if ("is-standalone".equals (key))
+      {
         return standalone;
-      else if ("namespaces".equals (key))
+      }
+    else if ("namespaces".equals (key))
+      {
         return namespaces;
-      else if ("namespace-prefixes".equals (key))
+      }
+    else if ("namespace-prefixes".equals (key))
+      {
         return namespacePrefixes;
-      else if ("resolve-dtd-uris".equals (key))
-        return true; // TODO check this
-      else if ("validation".equals (key))
+      }
+    else if ("resolve-dtd-uris".equals (key))
+      {
+        return true;
+      }
+    else if ("validation".equals (key))
+      {
         return validation;
-      else
+      }
+    else
+      {
         return false;
-    }
+      }
+  }
 
-  public void setFeature (String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException
-    {
-      checkFeatureName (name);
-      String key = name.substring (FEATURES_PREFIX.length ());
-      if ("namespaces".equals (key))
+  public void setFeature (String name, boolean value)
+    throws SAXNotRecognizedException, SAXNotSupportedException
+  {
+    checkFeatureName (name);
+    String key = name.substring (FEATURES_PREFIX.length ());
+    if ("namespaces".equals (key))
+      {
         namespaces = value;
-      else if ("namespace-prefixes".equals (key))
+      }
+    else if ("namespace-prefixes".equals (key))
+      {
         namespacePrefixes = value;
-      else if ("validation".equals (key))
+      }
+    else if ("validation".equals (key))
+      {
         validation = value;
-    }
+      }
+  }
 
   /**
    * Check that the specified feature name is recognized.
    */
-  static void checkFeatureName (String name) throws SAXNotRecognizedException
-    {
-      if (name == null || !name.startsWith (FEATURES_PREFIX))
+  static void checkFeatureName (String name)
+    throws SAXNotRecognizedException
+  {
+    if (name == null || !name.startsWith (FEATURES_PREFIX))
+      {
         throw new SAXNotRecognizedException (name);
-      String key = name.substring (FEATURES_PREFIX.length ());
-      if (!RECOGNIZED_FEATURES.contains (key))
+      }
+    String key = name.substring (FEATURES_PREFIX.length ());
+    if (!RECOGNIZED_FEATURES.contains (key))
+      {
         throw new SAXNotRecognizedException (name);
-    }
+      }
+  }
 
   // Properties
 
-  public Object getProperty (String name) throws SAXNotRecognizedException, SAXNotSupportedException
-    {
-      checkPropertyName (name);
-      String key = name.substring (PROPERTIES_PREFIX.length ());
-      if ("declaration-handler".equals (key))
+  public Object getProperty (String name)
+    throws SAXNotRecognizedException, SAXNotSupportedException
+  {
+    checkPropertyName (name);
+    String key = name.substring (PROPERTIES_PREFIX.length ());
+    if ("declaration-handler".equals (key))
+      {
         return declarationHandler;
-      else if ("lexical-handler".equals (key))
+      }
+    else if ("lexical-handler".equals (key))
+      {
         return lexicalHandler;
-      else
+      }
+    else
+      {
         throw new SAXNotSupportedException (name);
-    }
+      }
+  }
 
-  public void setProperty (String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException
-    {
-      checkPropertyName (name);
-      String key = name.substring (PROPERTIES_PREFIX.length ());
-      if ("declaration-handler".equals (key))
+  public void setProperty (String name, Object value)
+    throws SAXNotRecognizedException, SAXNotSupportedException
+  {
+    checkPropertyName (name);
+    String key = name.substring (PROPERTIES_PREFIX.length ());
+    if ("declaration-handler".equals (key))
+      {
         declarationHandler = (DeclHandler) value;
-      else if ("lexical-handler".equals (key))
+      }
+    else if ("lexical-handler".equals (key))
+      {
         lexicalHandler = (LexicalHandler) value;
-    }
+      }
+  }
 
   /**
    * Check that the specified property name is recognized.
    */
-  static void checkPropertyName (String name) throws SAXNotRecognizedException
-    {
-      if (!name.startsWith (PROPERTIES_PREFIX))
+  static void checkPropertyName (String name)
+    throws SAXNotRecognizedException
+  {
+    if (!name.startsWith (PROPERTIES_PREFIX))
+      {
         throw new SAXNotRecognizedException (name);
-      String key = name.substring (PROPERTIES_PREFIX.length ());
-      if (!RECOGNIZED_PROPERTIES.contains (key))
+      }
+    String key = name.substring (PROPERTIES_PREFIX.length ());
+    if (!RECOGNIZED_PROPERTIES.contains (key))
+      {
         throw new SAXNotRecognizedException (name);
-    }
+      }
+  }
 
   // Parse
 
-  public void parse (String systemId) throws IOException, SAXException
-    {
-      URL url = null;
-      try
-        {
-          url = new URL (systemId);
-        }
-      catch (MalformedURLException e)
-        {
-          File file = new File(systemId);
-          if (!file.exists ())
+  public void parse (String systemId)
+    throws IOException, SAXException
+  {
+    URL url = null;
+    try
+      {
+        url = new URL (systemId);
+      }
+    catch (MalformedURLException e)
+      {
+        File file = new File(systemId);
+        if (!file.exists ())
+          {
             throw new FileNotFoundException (systemId);
-          String path  = file.getAbsolutePath();
-          if (File.separatorChar != '/')
+          }
+        String path  = file.getAbsolutePath();
+        if (File.separatorChar != '/')
+          {
             path = path.replace (File.separatorChar, '/');
-          if (!path.startsWith ("/"))
+          }
+        if (!path.startsWith ("/"))
+          {
             path = "/" + path;
-          if (!path.endsWith ("/") && file.isDirectory ())
+          }
+        if (!path.endsWith ("/") && file.isDirectory ())
+          {
             path = path + "/";
-          url = new URL ("file:" + path);
-        }
-      InputSource source = new InputSource(url.toString ());
-      source.setByteStream (url.openStream ());
-      parse (source);
-    }
+          }
+        url = new URL ("file:" + path);
+      }
+    InputSource source = new InputSource(url.toString ());
+    source.setByteStream (url.openStream ());
+    parse (source);
+  }
 
-  public synchronized void parse (InputSource input) throws IOException, SAXException
-    {
-      NamedInputStream in = XMLJ.getInputStream (input);
-      byte[] detectBuffer = in.getDetectBuffer ();
-      String publicId = input.getPublicId ();
-      String systemId = input.getSystemId ();
-      // Reset state
-      standalone = false;
-      seenFatalError = false;
-      seenStartDocument = false;
-      if (systemId != null)
-        {
-          base = null;
-        }
-      else
-        {
-          int lsi = systemId.lastIndexOf ('/');
-          if (lsi == -1)
-            {
-              base = null;
-            }
-          else
-            {
-              base = systemId.substring (0, lsi + 1);
-            }
-        }
-      // Handle zero-length document
-      if (detectBuffer == null)
-        {
-          startDocument (true);
-          fatalError ("No document element", 0, 0, publicId, systemId);
-          endDocument ();
-          return;
-        }
-      // Parse
-      parseStream(in,
-                  detectBuffer,
-                  publicId,
-                  systemId,
-                  validation,
-                  contentHandler != null,
-                  dtdHandler != null,
-                  entityResolver != null,
-                  errorHandler != null,
-                  declarationHandler != null,
-                  lexicalHandler != null);
-      in.close ();
-    }
+  public synchronized void parse (InputSource input)
+    throws IOException, SAXException
+  {
+    NamedInputStream in = XMLJ.getInputStream (input);
+    byte[] detectBuffer = in.getDetectBuffer ();
+    String publicId = input.getPublicId ();
+    String systemId = input.getSystemId ();
+    // Reset state
+    standalone = false;
+    seenFatalError = false;
+    seenStartDocument = false;
+    base = getDefaultBaseURL ();
+    if (systemId != null)
+      {
+        int lsi = systemId.lastIndexOf ('/');
+        if (lsi != -1)
+          {
+            base = systemId.substring (0, lsi + 1);
+          }
+      }
+    // Handle zero-length document
+    if (detectBuffer == null)
+      {
+        startDocument (true);
+        fatalError ("No document element", 0, 0, publicId, systemId);
+        endDocument ();
+        return;
+      }
+    // Parse
+    parseStream(in,
+                detectBuffer,
+                publicId,
+                systemId,
+                validation,
+                contentHandler != null,
+                dtdHandler != null,
+                entityResolver != null,
+                errorHandler != null,
+                declarationHandler != null,
+                lexicalHandler != null);
+    in.close ();
+  }
+
+  protected String getDefaultBaseURL ()
+    throws IOException
+  {
+    String base = System.getProperty ("user.dir");
+    base = "file:" + base.replace ('\\', '/');
+    return base;
+  }
 
   native void parseStream (InputStream in,
                            byte[] detectBuffer,
@@ -365,328 +422,333 @@ implements XMLReader
     throws IOException, SAXException;
 
   String getURI (String prefix)
-    {
-      if (!namespaces)
+  {
+    if (!namespaces)
+      {
         return null;
-      return ns.getURI (prefix);
-    }
+      }
+    return ns.getURI (prefix);
+  }
 
   // Callbacks from libxmlj
 
-  private void startDTD (String name,
-                         String publicId,
-                         String systemId) throws SAXException
-    {
-      if (seenFatalError || lexicalHandler == null)
-        {
-          return;
-        }
-      systemId = XMLJ.getAbsoluteURI (base, systemId);
-      lexicalHandler.startDTD (name, publicId, systemId);
-    }
+  private void startDTD (String name, String publicId, String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || lexicalHandler == null)
+      {
+        return;
+      }
+    systemId = XMLJ.getAbsoluteURI (base, systemId);
+    lexicalHandler.startDTD (name, publicId, systemId);
+  }
 
-  private void externalEntityDecl (String name,
-                                   String publicId,
-                                   String systemId) throws SAXException
-    {
-      if (seenFatalError || declarationHandler == null)
-        {
-          return;
-        }
-      systemId = XMLJ.getAbsoluteURI (base, systemId);
-      declarationHandler.externalEntityDecl (name, publicId, systemId);
-    }
+  private void externalEntityDecl (String name, String publicId,
+                                   String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || declarationHandler == null)
+      {
+        return;
+      }
+    systemId = XMLJ.getAbsoluteURI (base, systemId);
+    declarationHandler.externalEntityDecl (name, publicId, systemId);
+  }
 
-  private void internalEntityDecl (String name,
-                                   String value) throws SAXException
-    {
-      if (seenFatalError || declarationHandler == null)
-        {
-          return;
-        }
-      declarationHandler.internalEntityDecl (name, value);
-    }
+  private void internalEntityDecl (String name, String value)
+    throws SAXException
+  {
+    if (seenFatalError || declarationHandler == null)
+      {
+        return;
+      }
+    declarationHandler.internalEntityDecl (name, value);
+  }
 
-  private InputStream resolveEntity (String publicId,
-                                     String systemId) throws SAXException, IOException
-    {
-      if (entityResolver == null)
-        {
-          return null;
-        }
-      systemId = XMLJ.getAbsoluteURI (base, systemId);
-      InputSource source = entityResolver.resolveEntity (publicId, systemId);
-      return (source == null) ? null : XMLJ.getInputStream (source);
-    }
+  private InputStream resolveEntity (String publicId, String systemId)
+    throws SAXException, IOException
+  {
+    if (entityResolver == null)
+      {
+        return null;
+      }
+    systemId = XMLJ.getAbsoluteURI (base, systemId);
+    InputSource source = entityResolver.resolveEntity (publicId, systemId);
+    return (source == null) ? null : XMLJ.getInputStream (source);
+  }
 
-  private void notationDecl (String name,
-                             String publicId,
-                             String systemId) throws SAXException
-    {
-      if (seenFatalError || dtdHandler == null)
-        {
-          return;
-        }
-      systemId = XMLJ.getAbsoluteURI (base, systemId);
-      dtdHandler.notationDecl (name, publicId, systemId);
-    }
+  private void notationDecl (String name, String publicId, String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || dtdHandler == null)
+      {
+        return;
+      }
+    systemId = XMLJ.getAbsoluteURI (base, systemId);
+    dtdHandler.notationDecl (name, publicId, systemId);
+  }
 
-  private void attributeDecl (String eName,
-                              String aName,
-                              String type,
-                              String mode,
-                              String value) throws SAXException
-    {
-      if (seenFatalError || declarationHandler == null)
-        {
-          return;
-        }
-      declarationHandler.attributeDecl (eName, aName, type, mode, value);
-    }
+  private void attributeDecl (String eName, String aName, String type,
+                              String mode, String value)
+    throws SAXException
+  {
+    if (seenFatalError || declarationHandler == null)
+      {
+        return;
+      }
+    declarationHandler.attributeDecl (eName, aName, type, mode, value);
+  }
 
-  private void elementDecl (String name,
-                            String model) throws SAXException
-    {
-      if (seenFatalError || declarationHandler == null)
-        {
-          return;
-        }
-      declarationHandler.elementDecl (name, model);
-    }
+  private void elementDecl (String name, String model)
+    throws SAXException
+  {
+    if (seenFatalError || declarationHandler == null)
+      {
+        return;
+      }
+    declarationHandler.elementDecl (name, model);
+  }
 
-  private void unparsedEntityDecl (String name,
-                                   String publicId,
-                                   String systemId,
-                                   String notationName) throws SAXException
-    {
-      if (seenFatalError || dtdHandler == null)
-        {
-          return;
-        }
-      systemId = XMLJ.getAbsoluteURI (base, systemId);
-      dtdHandler.unparsedEntityDecl (name, publicId, systemId,
-                                     notationName);
-    }
+  private void unparsedEntityDecl (String name, String publicId,
+                                   String systemId, String notationName)
+    throws SAXException
+  {
+    if (seenFatalError || dtdHandler == null)
+      {
+        return;
+      }
+    systemId = XMLJ.getAbsoluteURI (base, systemId);
+    dtdHandler.unparsedEntityDecl (name, publicId, systemId,
+                                   notationName);
+  }
 
   private void setDocumentLocator (Object ctx, Object loc)
-    {
-      locator = new GnomeLocator (ctx, loc);
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      contentHandler.setDocumentLocator (locator);
-    }
+  {
+    locator = new GnomeLocator (ctx, loc);
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    contentHandler.setDocumentLocator (locator);
+  }
+  
+  private void startDocument (boolean standalone)
+    throws SAXException
+  {
+    this.standalone = standalone;
+    seenStartDocument = true;
+    if (contentHandler == null)
+      {
+        return;
+      }
+    contentHandler.startDocument ();
+  }
 
-  private void startDocument (boolean standalone) throws SAXException
-    {
-      this.standalone = standalone;
-      seenStartDocument = true;
-      if (contentHandler == null)
-        {
-          return;
-        }
-      contentHandler.startDocument ();
-    }
+  private void endDocument ()
+    throws SAXException
+  {
+    if (contentHandler == null)
+      {
+        return;
+      }
+    contentHandler.endDocument();
+  }
 
-  private void endDocument () throws SAXException
-    {
-      if (contentHandler == null)
-        {
-          return;
-        }
-      contentHandler.endDocument();
-    }
-
-  private void startElement(String name, String[] attrs) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      XMLName xName = new XMLName (this, name);
-      if (namespaces)
-        {
-          // Handle defined namespaces
-          ns.push ();
-          int len = attrs.length;
-          ArrayList filtered = new ArrayList (len);
-          for (int i = 0; i < len; i += 2)
-            {
-              String attName = attrs[i];
-              String attValue = attrs[i + 1];
-              if (attName.equals ("xmlns"))
+  private void startElement(String name, String[] attrs)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    XMLName xName = new XMLName (this, name);
+    if (namespaces)
+      {
+        // Handle defined namespaces
+        ns.push ();
+        int len = attrs.length;
+        ArrayList filtered = new ArrayList (len);
+        for (int i = 0; i < len; i += 2)
+          {
+            String attName = attrs[i];
+            String attValue = attrs[i + 1];
+            if (attName.equals ("xmlns"))
+              {
                 startPrefixMapping ("", attValue);
-              else if (attName.startsWith ("xmlns:"))
+              }
+            else if (attName.startsWith ("xmlns:"))
+              {
                 startPrefixMapping (attName.substring (6), attValue);
-              else
-                {
-                  filtered.add (attName);
-                  filtered.add (attValue);
-                }
-            }
-          // Remove xmlns attributes
-          attrs = new String[filtered.size ()];
-          filtered.toArray (attrs);
-        }
-      // Construct attributes
-      Attributes atts = new StringArrayAttributes (this, attrs);
-      contentHandler.startElement (xName.uri, xName.localName, xName.qName,
-                                   atts);
-    }
+              }
+            else
+              {
+                filtered.add (attName);
+                filtered.add (attValue);
+              }
+          }
+        // Remove xmlns attributes
+        attrs = new String[filtered.size ()];
+        filtered.toArray (attrs);
+      }
+    // Construct attributes
+    Attributes atts = new StringArrayAttributes (this, attrs);
+    contentHandler.startElement (xName.uri, xName.localName, xName.qName,
+                                 atts);
+  }
 
-  private void endElement (String name) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      XMLName xName = new XMLName (this, name);
-      String uri = (xName.uri == null) ? "" : xName.uri;
-      contentHandler.endElement (uri, xName.localName, xName.qName);
-      // Handle undefining namespaces
-      if (namespaces)
-        {
-          for (Iterator i = ns.currentPrefixes (); i.hasNext (); )
+  private void endElement (String name)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    XMLName xName = new XMLName (this, name);
+    String uri = (xName.uri == null) ? "" : xName.uri;
+    contentHandler.endElement (uri, xName.localName, xName.qName);
+    // Handle undefining namespaces
+    if (namespaces)
+      {
+        for (Iterator i = ns.currentPrefixes (); i.hasNext (); )
+          {
             endPrefixMapping ((String) i.next ());
-          ns.pop (); // releases current depth
-        }
-    }
+          }
+        ns.pop (); // releases current depth
+      }
+  }
 
-  private void startPrefixMapping (String prefix,
-                                   String uri) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      ns.define (prefix, uri);
-      contentHandler.startPrefixMapping (prefix, uri);
-    }
+  private void startPrefixMapping (String prefix, String uri)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    ns.define (prefix, uri);
+    contentHandler.startPrefixMapping (prefix, uri);
+  }
 
-  private void endPrefixMapping (String prefix) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      contentHandler.endPrefixMapping (prefix);
-    }
+  private void endPrefixMapping (String prefix)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    contentHandler.endPrefixMapping (prefix);
+  }
 
-  private void characters (String text) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null || text == null)
-        {
-          return;
-        }
-      char[] ch = text.toCharArray ();
-      contentHandler.characters (ch, 0, ch.length);
-    }
+  private void characters (String text)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null || text == null)
+      {
+        return;
+      }
+    char[] ch = text.toCharArray ();
+    contentHandler.characters (ch, 0, ch.length);
+  }
 
-  private void ignorableWhitespace (String text) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null || text == null)
-        {
-          return;
-        }
-      char[] ch = text.toCharArray ();
-      contentHandler.ignorableWhitespace (ch, 0, ch.length);
-    }
+  private void ignorableWhitespace (String text)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null || text == null)
+      {
+        return;
+      }
+    char[] ch = text.toCharArray ();
+    contentHandler.ignorableWhitespace (ch, 0, ch.length);
+  }
 
-  private void processingInstruction (String target,
-                                      String data) throws SAXException
-    {
-      if (seenFatalError || contentHandler == null)
-        {
-          return;
-        }
-      if (data == null)
+  private void processingInstruction (String target, String data)
+    throws SAXException
+  {
+    if (seenFatalError || contentHandler == null)
+      {
+        return;
+      }
+    if (data == null)
+      {
         data = "";
-      contentHandler.processingInstruction (target, data);
-    }
+      }
+    contentHandler.processingInstruction (target, data);
+  }
 
-  private void comment (String text) throws SAXException
-    {
-      if (seenFatalError || lexicalHandler == null || text == null)
-        {
-          return;
-        }
-      char[] ch = text.toCharArray ();
-      lexicalHandler.comment (ch, 0, ch.length);
-    }
+  private void comment (String text)
+    throws SAXException
+  {
+    if (seenFatalError || lexicalHandler == null || text == null)
+      {
+        return;
+      }
+    char[] ch = text.toCharArray ();
+    lexicalHandler.comment (ch, 0, ch.length);
+  }
 
-  private void cdataBlock (String text) throws SAXException
-    {
-      if (seenFatalError || text == null)
-        {
-          return;
-        }
-      if (lexicalHandler == null)
-        {
-          characters(text);
-        }
-      else
-        {
-          lexicalHandler.startCDATA();
-          characters(text);
-          lexicalHandler.endCDATA();
-        }
-    }
+  private void cdataBlock (String text)
+    throws SAXException
+  {
+    if (seenFatalError || text == null)
+      {
+        return;
+      }
+    if (lexicalHandler == null)
+      {
+        characters(text);
+      }
+    else
+      {
+        lexicalHandler.startCDATA();
+        characters(text);
+        lexicalHandler.endCDATA();
+      }
+  }
 
   private void warning (String message,
-                        int lineNumber,
-                        int columnNumber,
-                        String publicId,
-                        String systemId) throws SAXException
-    {
-      if (seenFatalError || errorHandler == null)
-        {
-          return;
-        }
-      Locator l = new StandaloneLocator (lineNumber,
-                                         columnNumber,
-                                         publicId,
-                                         systemId);
-      errorHandler.warning (new SAXParseException (message, l));
-    }
+                        int lineNumber, int columnNumber,
+                        String publicId, String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || errorHandler == null)
+      {
+        return;
+      }
+    Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                       publicId, systemId);
+    errorHandler.warning (new SAXParseException (message, l));
+  }
 
   private void error (String message,
-                      int lineNumber,
-                      int columnNumber,
-                      String publicId,
-                      String systemId) throws SAXException
-    {
-      if (seenFatalError || errorHandler == null)
-        {
-          return;
-        }
-      Locator l = new StandaloneLocator (lineNumber,
-                                         columnNumber,
-                                         publicId,
-                                         systemId);
-      errorHandler.error (new SAXParseException (message, l));
-    }
+                      int lineNumber, int columnNumber,
+                      String publicId, String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || errorHandler == null)
+      {
+        return;
+      }
+    Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                       publicId, systemId);
+    errorHandler.error (new SAXParseException (message, l));
+  }
 
   private void fatalError (String message,
-                           int lineNumber,
-                           int columnNumber,
-                           String publicId,
-                           String systemId) throws SAXException
-    {
-      if (seenFatalError || errorHandler == null)
-        {
-          return;
-        }
-      if (!seenStartDocument)
-        {
-          startDocument (false);
-        }
-      seenFatalError = true;
-      Locator l = new StandaloneLocator (lineNumber,
-                                         columnNumber,
-                                         publicId,
-                                         systemId);
-      errorHandler.fatalError (new SAXParseException (message, l));
-    }
+                           int lineNumber, int columnNumber,
+                           String publicId, String systemId)
+    throws SAXException
+  {
+    if (seenFatalError || errorHandler == null)
+      {
+        return;
+      }
+    if (!seenStartDocument)
+      {
+        startDocument (false);
+      }
+    seenFatalError = true;
+    Locator l = new StandaloneLocator (lineNumber, columnNumber,
+                                       publicId, systemId);
+    errorHandler.fatalError (new SAXParseException (message, l));
+  }
 
 }

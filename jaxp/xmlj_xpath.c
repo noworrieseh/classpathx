@@ -274,7 +274,7 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathResult_getSnapshotLength (JNIEnv *env,
     }
   if (obj->nodesetval == NULL)
     {
-      return NULL;
+      return -1;
     }
   return obj->nodesetval->nodeNr;
 }

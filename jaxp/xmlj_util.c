@@ -37,8 +37,6 @@ xmljNewString (JNIEnv * env, const xmlChar * text)
 
   if (text == NULL)
     return NULL;
-  /*s_text = (char *)malloc(sizeof(char *));
-    sprintf(s_text, "%s", text); */
   s_text = (char *) text;	/* TODO signedness? */
   ret = (*env)->NewStringUTF (env, s_text);
   /*free(s_text); */
@@ -74,13 +72,12 @@ xmljGetPrefix (const xmlChar * qName)
   prefix = (xmlChar **) malloc (sizeof (xmlChar *));
   localName = xmlSplitQName2 (qName, prefix);
   if (localName == NULL)
-    return NULL;
-  else
     {
-      ret = *prefix;
-      free (prefix);
-      return ret;
+      return NULL;
     }
+  ret = *prefix;
+  free (prefix);
+  return ret;
 }
 
 const xmlChar *
@@ -92,12 +89,11 @@ xmljGetLocalName (const xmlChar * qName)
   prefix = (xmlChar **) malloc (sizeof (xmlChar *));
   localName = xmlSplitQName2 (qName, prefix);
   if (localName == NULL)
-    return qName;
-  else
     {
-      free (prefix);
-      return localName;
+      return qName;
     }
+  free (prefix);
+  return localName;
 }
 
 jmethodID xmljGetMethodID (JNIEnv *env,
@@ -156,21 +152,11 @@ void * xmljAsPointer (JNIEnv *env, jobject ptr)
       field = (*env)->GetFieldID (env, cls, "data", "J");
       return (void *) (*env)->GetLongField (env, ptr, field);
     default:
-      printf ("sizeof(void *) = %d\n", sizeof (void *));
       xmljThrowException (env, "java/lang/RuntimeException",
                           "Unknown platform type");
       return NULL;
     }
   return (void *) field;
-  /*void * ptr;
-
-  ptr = (void *) field;
-
-  if (field != 0LL && ptr == NULL)
-    {
-      printf ("xmljAsPointer: casting killed %lld\n", field);
-    }
-  return ptr;*/
 }
 
 jobject xmljAsField (JNIEnv *env, void * ptr)
@@ -189,24 +175,9 @@ jobject xmljAsField (JNIEnv *env, void * ptr)
       method = (*env)->GetMethodID (env, cls, "<init>", "(J)V");
       return (*env)->NewObject (env, cls, method, (jlong) ptr);
     default:
-      printf ("sizeof(void *) = %d\n", sizeof (void *));
       xmljThrowException (env, "java/lang/RuntimeException",
                           "Unknown platform type");
       return NULL;
     }
-  /*jlong field;
-
-  field = (jlong) ptr;
-
-  if (ptr == NULL)
-    {
-      printf ("WARNING: ptr is null\n");
-    }
-
-  if (ptr != NULL && field == 0LL)
-    {
-      printf ("xmljAsField: casting killed %d\n", ptr);
-    }
-  return field;*/
 }
 

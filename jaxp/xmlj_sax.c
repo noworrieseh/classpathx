@@ -233,7 +233,11 @@ xmljNewSAXHandler (jboolean contentHandler,
       sax->getEntity = &xmljSAXGetEntity;
       sax->reference = &xmljSAXReference;
       sax->comment = &xmljSAXComment;
-      sax->cdataBlock = &xmljSAXCdataBlock;
+      sax->cdataBlock = &xmljSAXCDataBlock;
+    }
+  else
+    {
+      sax->cdataBlock = &xmljSAXCharacters;
     }
 
   if (errorHandler)
@@ -934,7 +938,7 @@ xmljSAXIgnorableWhitespace (void *vctx,
     {
       sax->ignorableWhitespace = xmljGetMethodID (env,
                                                   target,
-                                                  "ignorableWhitespace",
+                                                  "characters",
                                                   "(Ljava/lang/String;)V");
       if (sax->ignorableWhitespace == NULL)
         {
@@ -1037,7 +1041,7 @@ xmljSAXComment (void *vctx,
 }
 
 void
-xmljSAXCdataBlock (void *vctx,
+xmljSAXCDataBlock (void *vctx,
                    const xmlChar * ch,
                    int len)
 {
@@ -1081,6 +1085,36 @@ xmljSAXCdataBlock (void *vctx,
 }
 
 void
+xmljDispatchError (xmlParserCtxtPtr ctx,
+                   xmlSAXLocatorPtr loc,
+                   JNIEnv *env,
+                   jobject target,
+                   jmethodID method,
+                   const char *msg,
+                   va_list args)
+{
+  jint lineNumber;
+  jint columnNumber;
+  jstring publicId;
+  jstring systemId;
+  char buffer[2048] = "[Error message too long]";
+
+  vsnprintf (buffer, sizeof buffer, msg, args);
+  lineNumber = loc->getLineNumber (ctx);
+  columnNumber = loc->getColumnNumber (ctx);
+  publicId = xmljNewString (env, loc->getPublicId (ctx));
+  systemId = xmljNewString (env, loc->getSystemId (ctx));
+  (*env)->CallVoidMethod (env,
+                          target,
+                          method,
+                          (*env)->NewStringUTF (env, buffer),
+                          lineNumber,
+                          columnNumber,
+                          publicId,
+                          systemId);
+}
+
+void
 xmljSAXWarning (void *vctx,
                 const char *msg,
                 ...)
@@ -1092,16 +1126,6 @@ xmljSAXWarning (void *vctx,
   xmlSAXLocatorPtr loc;
   JNIEnv *env;
   jobject target;
-  xmlChar *x_msg;
-  jstring j_msg;
-  jint lineNumber;
-  jint columnNumber;
-  jstring publicId;
-  jstring systemId;
-
-  va_start (args, msg);
-  xmlParserWarning (vctx, msg, args);
-  va_end (args);
 
   ctx = (xmlParserCtxtPtr) vctx;
   sax = (SAXParseContext *) ctx->_private;
@@ -1122,21 +1146,10 @@ xmljSAXWarning (void *vctx,
         }
     }
 
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
-  j_msg = xmljNewString (env, x_msg);
-  lineNumber = loc->getLineNumber (ctx);
-  columnNumber = loc->getColumnNumber (ctx);
-  publicId = xmljNewString (env, loc->getPublicId (ctx));
-  systemId = xmljNewString (env, loc->getSystemId (ctx));
-
-  (*env)->CallVoidMethod (env,
-                          target,
-                          sax->warning,
-                          j_msg,
-                          lineNumber,
-                          columnNumber,
-                          publicId,
-                          systemId);
+  va_start (args, msg);
+  /* xmlParserWarning (vctx, msg, args); */
+  xmljDispatchError (ctx, loc, env, target, sax->warning, msg, args);
+  va_end (args);
 }
 
 void
@@ -1151,16 +1164,6 @@ xmljSAXError (void *vctx,
   xmlSAXLocatorPtr loc;
   JNIEnv *env;
   jobject target;
-  xmlChar *x_msg;
-  jstring j_msg;
-  jint lineNumber;
-  jint columnNumber;
-  jstring publicId;
-  jstring systemId;
-
-  va_start (args, msg);
-  xmlParserError (vctx, msg, args);
-  va_end (args);
 
   ctx = (xmlParserCtxtPtr) vctx;
   sax = (SAXParseContext *) ctx->_private;
@@ -1181,21 +1184,10 @@ xmljSAXError (void *vctx,
         }
     }
 
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
-  j_msg = xmljNewString (env, x_msg);
-  lineNumber = loc->getLineNumber (ctx);
-  columnNumber = loc->getColumnNumber (ctx);
-  publicId = xmljNewString (env, loc->getPublicId (ctx));
-  systemId = xmljNewString (env, loc->getSystemId (ctx));
-
-  (*env)->CallVoidMethod (env,
-                          target,
-                          sax->error,
-                          j_msg,
-                          lineNumber,
-                          columnNumber,
-                          publicId,
-                          systemId);
+  va_start (args, msg);
+  /* xmlParserError (vctx, msg, args); */
+  xmljDispatchError (ctx, loc, env, target, sax->error, msg, args);
+  va_end (args);
 }
 
 void
@@ -1210,16 +1202,6 @@ xmljSAXFatalError (void *vctx,
   xmlSAXLocatorPtr loc;
   JNIEnv *env;
   jobject target;
-  xmlChar *x_msg;
-  jstring j_msg;
-  jint lineNumber;
-  jint columnNumber;
-  jstring publicId;
-  jstring systemId;
-
-  va_start (args, msg);
-  xmlParserError (vctx, msg, args);
-  va_end (args);
 
   ctx = (xmlParserCtxtPtr) vctx;
   sax = (SAXParseContext *) ctx->_private;
@@ -1239,22 +1221,11 @@ xmljSAXFatalError (void *vctx,
           return;
         }
     }
-
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
-  j_msg = xmljNewString (env, x_msg);
-  lineNumber = loc->getLineNumber (ctx);
-  columnNumber = loc->getColumnNumber (ctx);
-  publicId = xmljNewString (env, loc->getPublicId (ctx));
-  systemId = xmljNewString (env, loc->getSystemId (ctx));
-
-  (*env)->CallVoidMethod (env,
-                          target,
-                          sax->fatalError,
-                          j_msg,
-                          lineNumber,
-                          columnNumber,
-                          publicId,
-                          systemId);
+  
+  va_start (args, msg);
+  /* xmlParserError (vctx, msg, args); */
+  xmljDispatchError (ctx, loc, env, target, sax->fatalError, msg, args);
+  va_end (args);
 }
 
 void

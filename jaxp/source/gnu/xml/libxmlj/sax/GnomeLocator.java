@@ -44,44 +44,44 @@ implements Locator
   private final Object loc;
 
   GnomeLocator (Object ctx, Object loc)
-    {
-      this.ctx = ctx;
-      this.loc = loc;
-      if (ctx == null)
-        {
-          throw new NullPointerException ("ctx");
-        }
-      if (loc == null)
-        {
-          throw new NullPointerException ("loc");
-        }
-    }
-
+  {
+    this.ctx = ctx;
+    this.loc = loc;
+    if (ctx == null)
+      {
+        throw new NullPointerException ("ctx");
+      }
+    if (loc == null)
+      {
+        throw new NullPointerException ("loc");
+      }
+  }
+  
   public String getPublicId ()
-    {
-      return getPublicId (ctx, loc);
-    }
+  {
+    return getPublicId (ctx, loc);
+  }
 
   private native String getPublicId (Object ctx, Object loc);
 
   public String getSystemId ()
-    {
-      return getSystemId (ctx, loc);
-    }
+  {
+    return getSystemId (ctx, loc);
+  }
 
   private native String getSystemId (Object ctx, Object loc);
 
   public int getLineNumber ()
-    {
-      return getLineNumber (ctx, loc);
-    }
+  {
+    return getLineNumber (ctx, loc);
+  }
   
   private native int getLineNumber (Object ctx, Object loc);
 
   public int getColumnNumber ()
-    {
-      return getColumnNumber (ctx, loc);
-    }
+  {
+    return getColumnNumber (ctx, loc);
+  }
   
   private native int getColumnNumber (Object ctx, Object loc);
 
