@@ -1,8 +1,0 @@
-2003-03-07  Julian Scheid <jscheid@sektor37.de>
-
-	* Makefile.am: Fixed build inconsistency.
-	* all: Added caching, fixed memory leaks.
-
-2003-02-10  Julian Scheid <jscheid@sektor37.de>
-
-	* all: First development release
