@@ -296,6 +296,20 @@ public class Consumer extends DomConsumer
 	    ((DomDocument) getDocument ()).setCheckingCharacters (false);
 	}
 
+        /**
+         * Required by DOM Level 3 to report document parameters
+         */
+        public void xmlDecl(String version,
+                            String encoding,
+                            boolean standalone)
+          throws SAXException
+        {
+          super.xmlDecl(version, encoding, standalone);
+
+          DomDocument doc = (DomDocument) getDocument();
+          doc.setXmlEncoding(encoding);
+        }
+
 	public void endDocument ()
 	throws SAXException
 	{

@@ -1,3 +1,15 @@
+2004-11-04  Chris Burdess  <dog@gnu.org>
+
+   	* ContentHandler2.java: Extension interface for reporting XML
+   	declaration.
+   	* SAXDriver.java,XmlParser.java: Report XML declaration to content
+   	handlers implementing the ContentHandler2 interface.
+   	* Consumer.java,DomConsumer.java,EventFilter.java: Pass xmlDecl
+   	events to ContentHandler2s.
+   	* JAXPFactory.java: Set document URI during parse.
+   	* transform,xpath: document() function, function calls, variable
+   	binding fixes
+   	
 2004-11-03  Chris Burdess  <dog@gnu.org>
 
  	* dom: Refactoring of DomNode for efficiency, using pointers to

@@ -71,6 +71,11 @@ public class DomDocument extends DomNode
     final static String			xmlnsURI =
 	"http://www.w3.org/2000/xmlns/";
 
+    String inputEncoding;
+    String encoding;
+    String version;
+    boolean standalone;
+    String systemId;
 
     /**
      * Constructs a Document node, associating it with an instance
@@ -798,38 +803,50 @@ nyi (); // FIXME createTreeWalker
 
     // DOM Level 3 methods
 
-    public String getInputEncoding ()
+    /**
+     * DOM L3
+     */
+    public String getInputEncoding()
     {
-      // TODO
-      return null;
+      return inputEncoding;
     }
 
-    public String getXmlEncoding ()
+    public void setInputEncoding(String inputEncoding)
     {
-      // TODO
-      return null;
+      this.inputEncoding = inputEncoding;
     }
 
-    public boolean getXmlStandalone ()
+    /**
+     * DOM L3
+     */
+    public String getXmlEncoding()
     {
-      // TODO
-      return false;
+      return encoding;
     }
 
-    public void setXmlStandalone (boolean xmlStandalone)
+    public void setXmlEncoding(String encoding)
     {
-      // TODO
+      this.encoding = encoding;
     }
 
-    public String getXmlVersion ()
+    public boolean getXmlStandalone()
     {
-      // TODO
-      return null;
+      return standalone;
     }
 
-    public void setXmlVersion (String xmlVersion)
+    public void setXmlStandalone(boolean xmlStandalone)
     {
-      // TODO
+      standalone = xmlStandalone;
+    }
+
+    public String getXmlVersion()
+    {
+      return version;
+    }
+
+    public void setXmlVersion(String xmlVersion)
+    {
+      version = xmlVersion;
     }
 
     public boolean getStrictErrorChecking ()
@@ -843,15 +860,14 @@ nyi (); // FIXME createTreeWalker
       // TODO
     }
 
-    public String getDocumentURI ()
+    public String getDocumentURI()
     {
-      // TODO
-      return null;
+      return systemId;
     }
 
-    public void setDocumentURI (String documentURI)
+    public void setDocumentURI(String documentURI)
     {
-      // TODO
+      systemId = documentURI;
     }
 
     public Node adoptNode (Node source)

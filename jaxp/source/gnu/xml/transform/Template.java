@@ -213,6 +213,8 @@ class Template
   TemplateNode parse(Node source)
     throws TransformerConfigurationException
   {
+    // Hack to associate the document function with its declaring node
+    stylesheet.current = source;
     if (source == null)
       {
         return null;
@@ -412,11 +414,12 @@ class Template
                     paramName = null;
                   }
                 String select = element.getAttribute("select");
-                if (select != null)
+                if (select != null && select.length() > 0)
                   {
                     if (content != null)
                       {
-                        String msg = "parameter has both select and content";
+                        String msg = "parameter '" + paramName +
+                          "' has both select and content";
                         DOMSourceLocator l = new DOMSourceLocator(element);
                         throw new TransformerConfigurationException(msg, l);
                       }
@@ -517,11 +520,12 @@ class Template
                     paramName = null;
                   }
                 String select = element.getAttribute("select");
-                if (select != null)
+                if (select != null && select.length() > 0)
                   {
                     if (content != null)
                       {
-                        String msg = "parameter has both select and content";
+                        String msg = "parameter '" + paramName +
+                          "' has both select and content";
                         DOMSourceLocator l = new DOMSourceLocator(element);
                         throw new TransformerConfigurationException(msg, l);
                       }

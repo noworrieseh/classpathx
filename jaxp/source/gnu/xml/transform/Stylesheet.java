@@ -143,6 +143,12 @@ class Stylesheet
   TemplateNode builtInNodeTemplate;
   TemplateNode builtInTextTemplate;
 
+  /**
+   * Holds the current node while parsing.
+   * Necessary to associate the document function with its declaring node.
+   */
+  transient Node current;
+
   Stylesheet(TransformerFactoryImpl factory, Document doc, String systemId,
              int precedence)
     throws TransformerConfigurationException
@@ -199,6 +205,7 @@ class Stylesheet
   void parse(Node node, boolean root)
     throws TransformerConfigurationException
   {
+    current = node;
     if (node == null)
       {
         return;
@@ -252,11 +259,12 @@ class Stylesheet
                     paramName = null;
                   }
                 String select = element.getAttribute("select");
-                if (select != null)
+                if (select != null && select.length() > 0)
                   {
                     if (content != null)
                       {
-                        String msg = "parameter has both select and content";
+                        String msg = "parameter '" + paramName +
+                          "' has both select and content";
                         DOMSourceLocator l = new DOMSourceLocator(element);
                         throw new TransformerConfigurationException(msg, l);
                       }
@@ -587,7 +595,7 @@ class Stylesheet
         String localName = name.getLocalName();
         if ("document".equals(localName) && (arity == 1 || arity == 2))
           {
-            return new DocumentFunction(this);
+            return new DocumentFunction(this, current);
           }
       }
     return null;

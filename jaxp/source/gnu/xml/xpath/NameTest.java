@@ -60,36 +60,45 @@ public class NameTest
   {
     this.anyLocalName = anyLocalName;
     this.any = any;
-    
-    int start = name.indexOf('{');
-    int end = name.indexOf('}');
-    if (start != -1 && end > start)
-      {
-        uri = name.substring(start + 1, end);
-        name = name.substring(end + 1);
+   
+    if (name != null)
+      { 
+        int start = name.indexOf('{');
+        int end = name.indexOf('}');
+        if (start != -1 && end > start)
+          {
+            uri = name.substring(start + 1, end);
+            name = name.substring(end + 1);
+          }
+        else
+          {
+            uri = null;
+          }
+        if (anyLocalName)
+          {
+            prefix = name;
+            this.name = null;
+          }
+        else
+          {
+            start = name.indexOf(':');
+            if (start != -1)
+              {
+                prefix = name.substring(0, start);
+                name = name.substring(start + 1);
+              }
+            else
+              {
+                prefix = null;
+              }
+            this.name = name;
+          }
       }
     else
       {
         uri = null;
-      }
-    if (anyLocalName)
-      {
-        prefix = name;
-        this.name = null;
-      }
-    else
-      {
-        start = name.indexOf(':');
-        if (start != -1)
-          {
-            prefix = name.substring(0, start);
-            name = name.substring(start + 1);
-          }
-        else
-          {
-            prefix = null;
-          }
-        this.name = name;
+        prefix = null;
+        this.name = "";
       }
   }
 

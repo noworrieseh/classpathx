@@ -38,10 +38,8 @@
 
 package gnu.xml.transform;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,8 +52,10 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.FunctionCall;
 
 /**
  * The XSLT <code>document()</code>function.
@@ -67,22 +67,19 @@ final class DocumentFunction
 {
 
   final Stylesheet stylesheet;
+  final Node base;
 
-  DocumentFunction(Stylesheet stylesheet)
+  DocumentFunction(Stylesheet stylesheet, Node base)
   {
     this.stylesheet = stylesheet;
+    this.base = base;
   }
 
   public Object evaluate(List args)
     throws XPathFunctionException
   {
-    String base = stylesheet.systemId;
     switch (args.size())
       {
-      case 2:
-        Object arg2 = args.get(1);
-        base = Expr._string(null, arg2);
-        // Fall through
       case 1:
         Object arg = args.get(0);
         if (arg instanceof Collection)
@@ -92,55 +89,139 @@ final class DocumentFunction
             for (Iterator i = ns.iterator(); i.hasNext(); )
               {
                 Node node = (Node) i.next();
-                String uri = Expr.stringValue(node);
-                acc.add(_document(uri, base));
+                String s = Expr.stringValue(node);
+                acc.addAll(document(s, baseURI(node)));
               }
             return acc;
           }
         else
           {
-            String uri = Expr._string(null, arg);
-            return Collections.singleton(_document(uri, base));
+            String s = Expr._string(null, arg);
+            return document(s, baseURI(base));
+          }
+      case 2:
+        Object arg1 = args.get(0);
+        Object arg2 = args.get(1);
+        if (!(arg2 instanceof Collection))
+          {
+            throw new XPathFunctionException("second argument is not a node-set");
+          }
+        Collection arg2ns = (Collection) arg2;
+        String base2 = arg2ns.isEmpty() ? null :
+          baseURI((Node) arg2ns.iterator().next());
+        if (arg1 instanceof Collection)
+          {
+            Collection arg1ns = (Collection) arg1;
+            Collection acc = new TreeSet();
+            for (Iterator i = arg1ns.iterator(); i.hasNext(); )
+              {
+                Node node = (Node) i.next();
+                String s = Expr.stringValue(node);
+                acc.addAll(document(s, base2));
+              }
+            return acc;
+          }
+        else
+          {
+            String s = Expr._string(null, arg1);
+            return document(s, base2);
           }
       default:
         throw new XPathFunctionException("invalid arity");
       }
   }
 
-  Node _document(String uri, String base)
+  /**
+   * Returns the XSL base URI of the specified node.
+   * @see XSLT 3.2
+   */
+  String baseURI(Node node)
+  {
+    if (node == null)
+      {
+        return null;
+      }
+    else if (node.getNodeType() == Node.DOCUMENT_NODE)
+      {
+        return ((Document) node).getDocumentURI();
+      }
+    else
+      {
+        return baseURI(node.getOwnerDocument());
+      }
+  }
+
+  /**
+   * The XSL <code>document</code> function.
+   * @see XSLT 12.1
+   * @param uri the URI from which to retrieve nodes
+   * @param base the base URI for relative URIs
+   */
+  Collection document(String uri, String base)
     throws XPathFunctionException
   {
-    InputStream in = null;
-    if (base != null)
+    if ("".equals(uri))
       {
-        try
-          {
-            try
-              {
-                URL url = new URL(new URL(base), uri);
-                uri = url.toString();
-                in = url.openStream();
-              }
-            catch (MalformedURLException e)
-              {
-                in = new FileInputStream(uri);
-              }
-          }
-        catch (IOException e2)
-          {
-            throw new XPathFunctionException("can't open " + uri);
-          }
+        uri = baseURI(this.base);
       }
+    
+    // Get fragment
+    Expr fragment = null;
+    int hi = uri.indexOf('#');
+    if (hi != -1)
+      {
+        String f = uri.substring(hi + 1);
+        uri = uri.substring(0, hi);
+        // TODO handle xpointer() here
+        // this only handles IDs
+        fragment = new FunctionCall(stylesheet, "id",
+                                    Collections.singletonList(f));
+      }
+
+    // Get document source
+    InputStream in = null;
+    try
+      {
+        URL url = (base != null) ? stylesheet.getURL(base, uri) : 
+          stylesheet.getURL(uri);
+        uri = url.toString();
+        in = url.openStream();
+      }
+    catch (IOException e2)
+      {
+        String msg = "can't open " + uri;
+        if (base != null)
+          {
+            msg += " with base " + base;
+          }
+        throw new XPathFunctionException(msg);
+      }
+    StreamSource source = new StreamSource(in);
+    source.setSystemId(uri);
+    
+    // Retrieve the document
     URIResolver uriResolver = (stylesheet.transformer == null) ? null :
       stylesheet.transformer.uriResolver;
     ErrorListener errorListener = (stylesheet.transformer == null) ? null:
       stylesheet.transformer.errorListener;
-    StreamSource source = new StreamSource(in);
-    source.setSystemId(uri);
     DOMSourceWrapper wrapper = new DOMSourceWrapper(source,
                                                     uriResolver,
                                                     errorListener);
-    return wrapper.getNode();
+    Node node = wrapper.getNode();
+    if (fragment == null)
+      {
+        return Collections.singleton(node);
+      }
+    else
+      {
+        Object ret = fragment.evaluate(node);
+        if (!(ret instanceof Collection))
+          {
+            // XXX Report error?
+            return Collections.EMPTY_SET;
+          }
+        return (Collection) ret;
+      }
   }
   
 }

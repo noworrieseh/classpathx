@@ -52,7 +52,7 @@ import gnu.xml.xpath.Expr;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class Bindings
+public class Bindings
   implements XPathVariableResolver, Cloneable
 {
 
@@ -110,26 +110,26 @@ class Bindings
       }
   }
 
-  Object get(String name)
+  public Object get(String name, Node context)
   {
     Object ret = null;
     for (Iterator i = variables.iterator(); i.hasNext() && ret == null; )
       {
-        Map context = (Map) i.next();
-        ret = context.get(name);
+        Map vctx = (Map) i.next();
+        ret = vctx.get(name);
       }
     if (ret == null)
       {
         for (Iterator i = parameters.iterator(); i.hasNext() && ret == null; )
           {
-            Map context = (Map) i.next();
-            ret = context.get(name);
+            Map pctx = (Map) i.next();
+            ret = pctx.get(name);
           }
       }
-    if (ret instanceof Expr)
+    if (ret instanceof Expr && context != null)
       {
         Expr expr = (Expr) ret;
-        ret = expr.evaluate((Node) null);
+        ret = expr.evaluate(context);
       }
     return ret;
   }
@@ -150,7 +150,7 @@ class Bindings
 
   public Object resolveVariable(QName qName)
   {
-    return get(qName.toString());
+    return get(qName.toString(), null);
   }
   
 }

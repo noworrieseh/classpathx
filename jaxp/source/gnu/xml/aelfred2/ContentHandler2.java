@@ -1,5 +1,5 @@
 /*
- * VariableReference.java
+ * ContentHandler2.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,44 +36,29 @@
  * exception statement from your version. 
  */
 
-package gnu.xml.xpath;
+package gnu.xml.aelfred2;
 
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPathVariableResolver;
-import org.w3c.dom.Node;
-import gnu.xml.transform.Bindings;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
-public class VariableReference
-  extends Expr
+/**
+ * Extension to the SAX ContentHandler interface to report parsing events
+ * and parameters required by DOM Level 3 but not supported by SAX.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
+public interface ContentHandler2
+  extends ContentHandler
 {
 
-  final XPathVariableResolver resolver;
-  final String name;
-
-  public VariableReference(XPathVariableResolver resolver, String name)
-  {
-    this.resolver = resolver;
-    this.name = name;
-  }
-
-  public Object evaluate(Node node)
-  {
-    if (resolver != null)
-      {
-        if (resolver instanceof Bindings)
-          {
-            // Needs context to operate properly
-            return ((Bindings) resolver).get(name, node);
-          }
-        QName qname = QName.valueOf(name);
-        return resolver.resolveVariable(qname);
-      }
-    throw new IllegalStateException("no variable resolver");
-  }
-
-  public String toString()
-  {
-    return "#" + name;
-  }
+  /**
+   * Reports the XML declaration.
+   * @param version the value of the version attribute in the XML
+   * declaration
+   * @param encoding the encoding specified in the XML declaration, if any
+   * @param standalone the standalone attribute from the XML declaration
+   */
+  void xmlDecl(String version, String encoding, boolean standalone)
+    throws SAXException;
   
 }

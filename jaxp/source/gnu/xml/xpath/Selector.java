@@ -147,17 +147,25 @@ extends Expr
     int tlen = tests.length;
     if (tlen > 0)
       {
+        List successful = new LinkedList();
         for (Iterator i = candidates.iterator (); i.hasNext (); )
           {
+            boolean success = true;
             Node node = (Node) i.next ();
             for (int j = 0; j < tlen; j++)
               {
                 if (!tests[j].matches (node))
                   {
-                    i.remove ();
+                    success = false;
+                    break;
                   }
               }
+            if (success)
+              {
+                successful.add(node);
+              }
           }
+        return successful;
       }
     return candidates;
   }
