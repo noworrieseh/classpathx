@@ -117,17 +117,17 @@ public class RFC2822OutputStream
       count++;
       if (b[i]==CR || b[i]==LF)
       {
-        out.write(b, d, i-d);
-        d = i;
+        out.write(b, d, i+1-d);
+        d = i + 1;
         count = 0;
       }
       else
       {
         if (count>998)
         {
-          out.write(LF);
           out.write(b, d, count);
-          d = i;
+          out.write(LF);
+          d = i + 1;
           count = 0;
         }
       }
