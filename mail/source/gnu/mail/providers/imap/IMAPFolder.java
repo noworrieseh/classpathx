@@ -265,11 +265,17 @@ implements UIDFolder
               {
                ((IMAPStore) store).processAlerts();
               }
+            type = 0;
             if (entries.length > 0)
               {
-                type = entries[0].isNoinferiors() ?
-                  Folder.HOLDS_MESSAGES :
-                  Folder.HOLDS_FOLDERS;
+                if (entries[0].isNoinferiors())
+                  {
+                    type |= Folder.HOLDS_MESSAGES;
+                  }
+                if (entries[0].isNoselect())
+                  {
+                    type |= Folder.HOLDS_FOLDERS;
+                  }
               }
             else
               {
@@ -363,7 +369,7 @@ implements UIDFolder
     try
       {
         String newPath = path;
-        if (type == HOLDS_FOLDERS)
+        if ((type & HOLDS_FOLDERS) != 0)
           {
             getSeparator();
             if (delimiter == '\u0000') // this folder cannot be created
