@@ -219,7 +219,7 @@ public class POP3Connection
 
   /**
    * Attempts to start TLS on the specified connection.
-   * @see RFC 2595
+   * See RFC 2595 for details
    * @return true if successful, false otherwise
    */
   public boolean stls()
