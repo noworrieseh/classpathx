@@ -23,6 +23,7 @@ package javax.servlet.jsp.tagext;
 import java.io.Writer;
 import java.util.Map;
 import java.io.IOException;
+import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.JspException;
 
 /**
