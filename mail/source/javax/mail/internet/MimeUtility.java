@@ -679,7 +679,14 @@ public class MimeUtility
       {
         throw new ParseException();
       }
-    String charset = javaCharset (text.substring (start, end));
+    String charset = text.substring (start, end);
+    // Allow for RFC2231 language
+    int si = charset.indexOf ('*');
+    if (si != -1)
+      {
+        charset = charset.substring (0, si);
+      }
+    charset = javaCharset (charset);
     start = end + 1;
     end = text.indexOf ('?', start);
     if (end < 0)

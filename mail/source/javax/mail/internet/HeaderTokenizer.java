@@ -307,12 +307,10 @@ public class HeaderTokenizer
         
         if (!skipComments)
           {
-            if (needsFilter)
-              {
-                return new Token (Token.COMMENT,
-                                  filter (header, start, pos - 1));
-              }
-            return new Token (Token.COMMENT, header.substring (start, pos - 1));
+            String ret = needsFilter ?
+              filter (header, start, pos - 1) :
+              header.substring (start, pos - 1);
+            return new Token (Token.COMMENT, ret);
           }
         
         if (skipWhitespace () == Token.EOF)
@@ -340,13 +338,10 @@ public class HeaderTokenizer
             else if (c == '"')
               {
                 pos++;
-                if (needsFilter)
-                  {
-                    return new Token (Token.QUOTEDSTRING, 
-                                      filter (header, start, pos - 1));
-                  }
-                return new Token (Token.QUOTEDSTRING, 
-                                  header.substring (start, pos - 1));
+                String ret = needsFilter ?
+                  filter (header, start, pos - 1) :
+                  header.substring (start, pos - 1);
+                return new Token (Token.QUOTEDSTRING, ret);
               }
             pos++;
           }
