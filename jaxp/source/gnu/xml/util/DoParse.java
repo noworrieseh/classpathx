@@ -1,5 +1,5 @@
 /*
- * $Id: DoParse.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: DoParse.java,v 1.3 2002-10-15 21:03:40 nferrier Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -33,11 +33,24 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.ext.*;
 
-import gnu.xml.pipeline.*;
+// import gnu.xml.pipeline.*;
+// Added imports directly to fix a GCJ problem.
+import gnu.xml.pipeline.CallFilter;
+import gnu.xml.pipeline.DomConsumer;
+import gnu.xml.pipeline.EventConsumer;
+import gnu.xml.pipeline.EventFilter;
+import gnu.xml.pipeline.LinkFilter;
+import gnu.xml.pipeline.NSFilter;
+import gnu.xml.pipeline.PipelineFactory;
+import gnu.xml.pipeline.TeeConsumer;
+import gnu.xml.pipeline.TextConsumer;
+import gnu.xml.pipeline.ValidationConsumer;
+import gnu.xml.pipeline.WellFormednessFilter;
+import gnu.xml.pipeline.XIncludeFilter;
+import gnu.xml.pipeline.XsltFilter;
 
 
-
-// $Id: DoParse.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DoParse.java,v 1.3 2002-10-15 21:03:40 nferrier Exp $
 
 /**
  * This class provides a driver which may be invoked from the command line
@@ -78,7 +91,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.PipelineFactory
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2002-10-15 21:03:40 $
  */
 final public class DoParse
 {
