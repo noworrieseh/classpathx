@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.31 2002-03-07 20:38:10 db Exp $
+ * $Id: XmlParser.java,v 1.32 2002-10-15 21:02:50 nferrier Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.31 2002-03-07 20:38:10 db Exp $
+// $Id: XmlParser.java,v 1.32 2002-10-15 21:02:50 nferrier Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -79,7 +79,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2002-03-07 20:38:10 $
+ * @version $Date: 2002-10-15 21:02:50 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -1921,6 +1921,7 @@ loop2:
     throws Exception
     {
 	boolean peFlag = false;
+	int flags = LIT_DISABLE_CREF;
 
 	// Check for a parameter entity.
 	expandPE = false;
@@ -1945,7 +1946,7 @@ loop2:
 	if (c == '"' || c == '\'') {
 	    // Internal entity ... replacement text has expanded refs
 	    // to characters and PEs, but not to general entities
-	    String value = readLiteral (0);
+	    String value = readLiteral (flags);
 	    setInternalEntity (name, value);
 	} else {
 	    // Read the external IDs
