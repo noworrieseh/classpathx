@@ -39,6 +39,7 @@ public class FolderTest
 	protected void setUp()
 	{
 		session = Session.getInstance(System.getProperties());
+    //session.setDebug(true);
     try
     {
       store = session.getStore(url);
@@ -54,6 +55,16 @@ public class FolderTest
 
 	protected void tearDown()
 	{
+    if (store!=null)
+    {
+      try
+      {
+        store.close();
+      }
+      catch (MessagingException e)
+      {
+      }
+    }
     url = null;
     folder = null;
     store = null;
@@ -89,6 +100,7 @@ public class FolderTest
     }
     catch (MessagingException e)
     {
+      e.printStackTrace(System.err);
       fail(e.getMessage());
     }
 	}

@@ -102,7 +102,7 @@ public class POP3Connection
 	 * The APOP timestamp, if sent by the server on connection.
 	 * Otherwise null.
 	 */
-	protected String timestamp;
+	protected byte[] timestamp;
 
   /**
    * Constructor.
@@ -150,30 +150,36 @@ public class POP3Connection
 	public boolean authenticate(String username, String password)
 		throws IOException
 	{
-		if (username==null || password==null)
+		if (username==null)
 			return false;
 		String cmd;
 		if (timestamp!=null)
 		{
 			// APOP <username> <digest>
-			// compute digest
 			try
 			{
-				String encoding = "US_ASCII";
-				byte[] timestamp_bytes = timestamp.getBytes(encoding);
-				byte[] password_bytes = password.getBytes(encoding);
+        byte[] secret = password.getBytes("US-ASCII");
+        // compute digest
+        byte[] target = new byte[timestamp.length + secret.length];
+        System.arraycopy(timestamp, 0, target, 0, timestamp.length);
+        System.arraycopy(secret, 0, target, timestamp.length, secret.length);
 				MessageDigest md5 = MessageDigest.getInstance("MD5");
-				md5.reset();
-				md5.update(timestamp_bytes);
-				md5.update(password_bytes);
-				byte[] digest_bytes = md5.digest();
-				String digest = new String(digest_bytes, encoding);
+				byte[] db = md5.digest(target);
+        // create hexadecimal representation
+				StringBuffer digest = new StringBuffer();
+        for (int i=0; i<db.length; i++)
+        {
+          int c = (int)db[i];
+          if (c<0)
+            c += 256;
+          digest.append(Integer.toHexString(c));
+        }
 				// send command
 				cmd = new StringBuffer(APOP)
 					.append(' ')
 					.append(username)
 					.append(' ')
-					.append(digest)
+					.append(digest.toString())
 					.toString();
 				send(cmd);
 				return getResponse();
@@ -184,6 +190,8 @@ public class POP3Connection
 						"to plain authentication");
 			}
 		}
+    if (password==null)
+      return false;
 		// USER <username>
 		cmd = new StringBuffer(USER)
 			.append(' ')
@@ -388,12 +396,12 @@ public class POP3Connection
       System.err.println("POP< "+response);
     if (response.indexOf(OK)==0)
     {
-      response = response.substring(4).trim();
+      response = response.substring(3).trim();
       return true;
     }
     else if (response.indexOf(ERR)==0)
 		{
-      response = response.substring(5).trim();
+      response = response.substring(4).trim();
 			return false;
 		}
 		else
@@ -403,7 +411,8 @@ public class POP3Connection
 	/*
 	 * Parse the APOP timestamp from the server's banner greeting.
 	 */
-	String parseTimestamp(String greeting)
+	byte[] parseTimestamp(String greeting)
+    throws IOException
 	{
 		int bra = greeting.indexOf('<');
 		if (bra!=-1)
@@ -414,7 +423,7 @@ public class POP3Connection
 				String mid = greeting.substring(bra+1, ket);
 				int at = mid.indexOf('@');
 				if (at!=-1) // This is a valid RFC822 msg-id
-					return mid;
+					return mid.getBytes("US-ASCII");
 			}
 		}
 		return null;

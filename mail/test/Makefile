@@ -13,7 +13,7 @@ all: test
 
 test_sourcedir=$(PROJECTROOT)/src
 test_sourcefiles=$(shell find $(test_sourcedir) -name "*.java" -print)
-test_classpath=../mail.jar ../lib/activation.jar ../lib/nntplib.jar /usr/share/java/junit.jar
+test_classpath=../gnumail.jar ../lib/activation.jar ../lib/nntplib.jar /usr/share/java/junit.jar ../smtp.jar ../imap.jar ../pop3.jar ../nntp.jar ../mbox.jar ../maildir.jar
 test_classesdest=$(PROJECTROOT)/classes
 test_otherfiles=
 test_debugclasses=$(test_sourcefiles:.java=.class)

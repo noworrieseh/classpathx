@@ -105,6 +105,11 @@ then
   exit 1
 else
   mkdir $TARGETDIR
+  mkdir ${TARGETDIR}/META-INF
+  for METAINFFILE in `cat $METAINFCONTENTS`
+  do
+    cp $METAINFFILE ${TARGETDIR}/META-INF
+  done
   # Add the target directory to the clean up list.
   CLEANUP=${CLEANUP}:${TARGETDIR}
 fi

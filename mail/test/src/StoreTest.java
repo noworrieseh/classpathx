@@ -35,6 +35,7 @@ public class StoreTest
 	protected void setUp()
 	{
 		session = Session.getInstance(System.getProperties());
+    //session.setDebug(true);
     try
     {
       store = session.getStore(url);
@@ -48,6 +49,16 @@ public class StoreTest
 
 	protected void tearDown()
 	{
+    if (store!=null)
+    {
+      try
+      {
+        store.close();
+      }
+      catch (MessagingException e)
+      {
+      }
+    }
     url = null;
     store = null;
 		session = null;

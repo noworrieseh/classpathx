@@ -191,8 +191,9 @@ NNTPLIBJAR = lib/nntplib.jar
 # The META stuff
 MAIL_META = META-INF/COPYING \
 	META-INF/mime.types \
-	META-INF/mailcap
-
+	META-INF/mailcap \
+  META-INF/javamail.default.providers \
+  META-INF/javamail.default.address.map
 
 # Tell automake that we're specifying rules for these ourselves.
 BUILT_SOURCES = $(GNUMAILJAR) imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
@@ -210,10 +211,18 @@ META-INF/mailcap: mailcap
 	mkdir -p META-INF
 	cp mailcap META-INF/
 
+META-INF/javamail.default.providers: javamail.providers.in
+	mkdir -p META-INF
+	cp javamail.providers.in META-INF/javamail.default.providers
+
+META-INF/javamail.default.address.map: javamail.address.map.in
+	mkdir -p META-INF
+	cp javamail.address.map.in META-INF/javamail.default.address.map
+
 MAIL_CLASSPATH = lib/activation.jar
 
 # Targets for the various tools
-$(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC)
+$(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH) \
 		   JARCOMPILER_JAR=@JAR@ \
@@ -262,6 +271,8 @@ clean-local:
 	rm -f $(GNUMAILJAR) 
 	rm -f imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
 	rm -f META-INF/COPYING META-INF/mime.types META-INF/mailcap
+	rm -f META-INF/javamail.default.providers
+	rm -f META-INF/javamail.default.address.map
 	rmdir META-INF
 
 # End of Makefile.am

@@ -119,7 +119,6 @@ public final class POP3Store
 			connection = null;
     }
     super.close();
-
   }
 
   /**
