@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: EMSA_PSS.java,v 1.1 2002-01-11 21:21:57 raif Exp $
+// $Id: EMSA_PSS.java,v 1.2 2002-01-21 10:10:48 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -58,7 +58,7 @@ import java.util.HashMap;
  * RSA-PSS Signature Scheme with Appendix</a>, part B. Primitive specification
  * and supporting documentation. Jakob Jonsson and Burt Kaliski.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class EMSA_PSS implements Cloneable {
 
@@ -358,10 +358,7 @@ public class EMSA_PSS implements Cloneable {
       // 3. For i = 0 to CEILING(l/hLen) ? 1, do
       int limit = ((l + hLen - 1) / hLen) - 1;
       IMessageDigest hashZ = null;
-      try {
-         hashZ = (IMessageDigest) hash.clone();
-      } catch (CloneNotSupportedException ignored) { // we always support clone
-      }
+      hashZ = (IMessageDigest) hash.clone();
       hashZ.digest();
       hashZ.update(Z, 0, Z.length);
       IMessageDigest hashZC = null;
@@ -373,10 +370,7 @@ public class EMSA_PSS implements Cloneable {
       //        I2OSP: C = I2OSP(i, 4).
       //    3.2 Concatenate the hash of the seed Z and C to the octet string T:
       //        T = T || Hash(Z || C)
-         try {
-            hashZC = (IMessageDigest) hashZ.clone();
-         } catch (CloneNotSupportedException ignored) {
-         }
+         hashZC = (IMessageDigest) hashZ.clone();
          hashZC.update((byte)(i >>> 24));
          hashZC.update((byte)(i >>> 16));
          hashZC.update((byte)(i >>>  8));
