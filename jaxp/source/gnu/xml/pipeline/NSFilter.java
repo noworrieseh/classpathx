@@ -1,6 +1,6 @@
 /*
- * $Id: NSFilter.java,v 1.1 2001-06-22 15:29:17 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: NSFilter.java,v 1.2 2001-07-08 12:29:03 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,11 +70,10 @@ import gnu.xml.util.DefaultHandler;
  * appropriate logic (perhaps adding additional heuristics).
  *
  * @author David Brownell
- * @version $Date: 2001-06-22 15:29:17 $
+ * @version $Date: 2001-07-08 12:29:03 $
  */
 public class NSFilter extends EventFilter
 {
-    private Locator		locator;
     private NamespaceSupport	nsStack = new NamespaceSupport ();
     private Stack		elementStack = new Stack ();
 
@@ -106,6 +105,7 @@ public class NSFilter extends EventFilter
     {
 	SAXParseException	e;
 	ErrorHandler		handler = getErrorHandler ();
+	Locator			locator = getDocumentLocator ();
 
 	if (locator == null)
 	    e = new SAXParseException (message, null, null, -1, -1);
@@ -116,12 +116,6 @@ public class NSFilter extends EventFilter
 	throw e;
     }
 
-
-    public void setDocumentLocator (Locator locator)
-    {
-	this.locator = locator;
-	super.setDocumentLocator (locator);
-    }
 
     public void startDocument () throws SAXException
     {
