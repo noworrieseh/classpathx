@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: IBlockCipher.java,v 1.5 2002-06-28 13:09:40 raif Exp $
+// $Id: IBlockCipher.java,v 1.6 2002-07-06 23:34:09 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -52,11 +52,21 @@ import java.util.Map;
  *    <li>The byte array containing the user supplied key material to use for
  *    generating the cipher's session key(s). This value is <b>mandatory</b>
  *    and should be included in the initialisation parameters. If it isn't,
- *    an {@link java.lang.IllegalStateException} will be thrown if any method,
- *    other than <code>reset()</code> is invoked on the instance.</li>
+ *    an {@link IllegalStateException} will be thrown if any method, other than
+ *    <code>reset()</code> is invoked on the instance. Furthermore, the size of
+ *    this key material shall be taken as an indication on the key size in which
+ *    to operate this instance.</li>
  * </ul>
  *
- * @version $Revision: 1.5 $
+ * <p><b>IMPLEMENTATION NOTE</b>: Although all the concrete classes in this
+ * package implement the {@link Cloneable} interface, it is important to note
+ * here that such an operation <b>DOES NOT</b> clone any session key material
+ * that may have been used in initialising the source cipher (the instance to be
+ * cloned). Instead a clone of an already initialised cipher is another instance
+ * that operates with the <b>same block size</b> but without any knowledge of
+ * neither key material nor key size.</p>
+ *
+ * @version $Revision: 1.6 $
  */
 public interface IBlockCipher extends Cloneable {
 
