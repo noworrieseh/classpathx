@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: CipherFactory.java,v 1.3 2002-01-11 21:57:28 raif Exp $
+// $Id: CipherFactory.java,v 1.4 2002-06-08 04:58:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,13 +34,12 @@ import gnu.crypto.Registry;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate symmetric block cipher instances.<p>
+ * <p>A <i>Factory</i> to instantiate symmetric block cipher instances.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class CipherFactory implements Registry {
 
@@ -59,9 +58,9 @@ public class CipherFactory implements Registry {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of a block cipher given its name.<p>
+    * <p>Returns an instance of a block cipher given its name.</p>
     *
-    * @param algorithm the case-insensitive name of the symmetric block cipher
+    * @param name the case-insensitive name of the symmetric-key block cipher
     * algorithm.
     * @return an instance of the cipher algorithm, or <tt>null</tt> if none
     * found.
@@ -82,6 +81,8 @@ public class CipherFactory implements Registry {
       } else if (name.equalsIgnoreCase(RIJNDAEL_CIPHER)
               || name.equalsIgnoreCase(AES_CIPHER)) {
          result = new Rijndael();
+      } else if (name.equalsIgnoreCase(SERPENT_CIPHER)) {
+         result = new Serpent();
       } else if (name.equalsIgnoreCase(SQUARE_CIPHER)) {
          result = new Square();
       } else if (name.equalsIgnoreCase(TWOFISH_CIPHER)) {
@@ -98,8 +99,8 @@ public class CipherFactory implements Registry {
    }
 
    /**
-    * Returns a {@link java.util.Set} of symmetric block cipher implementation
-    * names supported by this <i>Factory</i>.
+    * <p>Returns a {@link java.util.Set} of symmetric block cipher
+    * implementation names supported by this <i>Factory</i>.</p>
     *
     * @return a {@link java.util.Set} of block cipher names (Strings).
     */
@@ -108,6 +109,7 @@ public class CipherFactory implements Registry {
       hs.add(ANUBIS_CIPHER);
       hs.add(KHAZAD_CIPHER);
       hs.add(RIJNDAEL_CIPHER);
+      hs.add(SERPENT_CIPHER);
       hs.add(SQUARE_CIPHER);
       hs.add(TWOFISH_CIPHER);
       hs.add(NULL_CIPHER);
