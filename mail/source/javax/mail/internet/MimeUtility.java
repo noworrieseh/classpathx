@@ -473,7 +473,7 @@ public class MimeUtility
       String encoding, boolean word)
     throws UnsupportedEncodingException
   {
-    if (asciiStatus(text.getBytes())==1)
+    if (asciiStatus(text.getBytes())==ALL_ASCII)
       return text;
     String javaCharset;
     if (charset==null)
@@ -892,14 +892,16 @@ public class MimeUtility
     int asciiCount = 0;
     int nonAsciiCount = 0;
     for (int i = 0; i<bytes.length; i++)
-      if (isAscii(bytes[i] & 0xff))
+		{
+      if (isAscii((int)bytes[i]))
         asciiCount++;
       else
         nonAsciiCount++;
+		}
 
     if (nonAsciiCount==0)
       return ALL_ASCII;
-    return asciiCount<=nonAsciiCount ? MINORITY_ASCII : MAJORITY_ASCII;
+    return (asciiCount<=nonAsciiCount) ? MINORITY_ASCII : MAJORITY_ASCII;
   }
 
   static int asciiStatus(InputStream is, int len, boolean text)
@@ -961,6 +963,8 @@ public class MimeUtility
 
   private static final boolean isAscii(int c)
   {
+		if (c<0)
+			c += 0xff;
     return (c<128 && c>31) || c==13 || c==10 || c==9;
   }
 
