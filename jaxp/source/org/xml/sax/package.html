@@ -1,6 +1,6 @@
 <html><head>
 
-<!-- $Id: package.html,v 1.7 2001-11-07 02:08:21 db Exp $ -->
+<!-- $Id: package.html,v 1.8 2001-11-13 20:54:33 db Exp $ -->
 
 </head><body>
 
@@ -9,7 +9,7 @@ Some SAX1 APIs are deprecated to encourage integration of
 namespace-awareness into designs of new applications
 and into maintainance of existing infrastructure. </p>
 
-<p>See <a href='http://sax.sourceforge.net'>http://sax.sourceforge.net</a>
+<p>See <a href='http://www.saxproject.org'>http://www.saxproject.org</a>
 for more information about SAX.</p>
 
 
@@ -86,16 +86,17 @@ Currently defined standard feature URIs have the prefix
 	    be absolutized (relative to their base URIs) before reporting.
 	    (That is the default behavior for all SAX2 XML parsers.)
 	    A value of "false" indicates those IDs will not be absolutized;
-	    handlers may use the base URI from <em>Locator.getSystemId()</em>
-	    with IDs that are relative URIs.
+	    parsers will provide the base URI from
+	    <em>Locator.getSystemId()</em>.
 	    This applies to system IDs passed in <ul>
-		<li><em>LexicalHandler.startDTD()</em>,
 		<li><em>DTDHandler.notationDecl()</em>,
 		<li><em>DTDHandler.unparsedEntityDecl()</em>, and
 		<li><em>DeclHandler.externalEntityDecl()</em>.
 	    </ul>
 	    It does not apply to <em>EntityResolver.resolveEntity()</em>,
-	    which is not used to report declarations.
+	    which is not used to report declarations, or to
+	    <em>LexicalHandler.startDTD()</em>, which already provides
+	    the non-absolutized URI.
 	    </td>
 	</tr>
 
@@ -131,6 +132,17 @@ Currently defined standard feature URIs have the prefix
 	    ><em>org.xml.sax.ext.Locator2</em></a> interface.
 	    That interface exposes additional entity information,
 	    such as the character encoding and XML version used.
+	    </td>
+	</tr>
+
+    <tr>
+	<td>use-entity-resolver2</td>
+	<td><em>true</em> (when recognized)</td>
+	<td> Returns true if, when <em>setEntityResolver</em> is given
+	    an object implementing the <a href="ext/EntityResolver2.html"
+	    ><em>org.xml.sax.ext.EntityResolver2</em></a> interface,
+	    those new methods will be used.
+	    Returns false to indicate that those methods will not be used.
 	    </td>
 	</tr>
 

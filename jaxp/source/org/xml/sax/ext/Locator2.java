@@ -1,6 +1,6 @@
 // Locator2.java - extended Locator
 // Public Domain: no warranty.
-// $Id: Locator2.java,v 1.1 2001-10-18 00:39:00 db Exp $
+// $Id: Locator2.java,v 1.2 2001-11-13 20:56:10 db Exp $
 
 package org.xml.sax.ext;
 
@@ -52,7 +52,7 @@ public interface Locator2 extends Locator
      * Content-Type header), that will be the name returned.  Else if there
      * was an <em>&lt;?xml&nbsp;...encoding='...'?&gt;</em> declaration at
      * the start of the document, that encoding name will be returned.
-     * Otherwise the encoding will been inferred (norally to be UTF-8, or
+     * Otherwise the encoding will been inferred (normally to be UTF-8, or
      * some UTF-16 variant), and that inferred name will be returned.
      *
      * <p> Note that some recent W3C specifications require that text
