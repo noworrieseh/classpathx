@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.11 2004-09-09 13:33:46 dog Exp $
+$Id: build.xml,v 1.12 2004-09-30 07:57:10 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -46,7 +46,8 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
   <property name='providers' location='${META-INF}/javamail.providers'/>
   <property name='address.map' location='${META-INF}/javamail.address.map'/>
   <property name='charset.map' location='${META-INF}/javamail.charset.map'/>
-    
+  <property name='manifest' location='MANIFEST.MF'/>
+  
   <property name='install-dir' location='/usr/share/java'/>
 
   <path id='mail.classpath'>
@@ -155,13 +156,13 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
   </target>
 
   <target name='gnumail.jar' depends='gnumail,meta-inf' description='Build the GNU Javamail JAR file'>
-    <jar basedir='${dst}' destfile='${gnumail.jar}'>
-            <metainf dir='${META-INF}'>
-          <include name='COPYING'/>
-          <include name='mailcap'/>
-          <include name='mime.types'/>
-          <include name='javamail.charset.map'/>
-            </metainf>
+    <jar basedir='${dst}' destfile='${gnumail.jar}' manifest='${manifest}'>
+      <metainf dir='${META-INF}'>
+        <include name='COPYING'/>
+        <include name='mailcap'/>
+        <include name='mime.types'/>
+        <include name='javamail.charset.map'/>
+      </metainf>
       <include name='javax/mail/**/*.class'/>
       <include name='gnu/mail/util/*.class'/>
       <include name='gnu/mail/handler/*.class'/>
@@ -169,12 +170,12 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
   </target>
 
   <target name='providers.jar' depends='providers,meta-inf' description='Build the GNU JavaMail providers JAR file'>
-    <jar basedir='${dst}' destfile='${providers.jar}'>
-            <metainf dir='${META-INF}'>
-          <include name='COPYING'/>
-          <include name='javamail.providers'/>
-          <include name='javamail.address.map'/>
-            </metainf>
+    <jar basedir='${dst}' destfile='${providers.jar}' manifest='${manifest}'>
+      <metainf dir='${META-INF}'>
+        <include name='COPYING'/>
+        <include name='javamail.providers'/>
+        <include name='javamail.address.map'/>
+      </metainf>
       <include name='gnu/mail/treeutil/*.class'/>
       <include name='gnu/mail/providers/*.class'/>
       <include name='gnu/mail/providers/smtp/*.class' unless='disable-smtp'/>
