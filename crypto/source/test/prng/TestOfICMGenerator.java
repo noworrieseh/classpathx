@@ -1,7 +1,7 @@
 package test.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfICMGenerator.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TestOfICMGenerator.java,v 1.3 2002-06-08 05:35:09 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -39,6 +39,8 @@ import gnu.crypto.prng.ICMGenerator;
 import gnu.crypto.prng.IRandom;
 import gnu.crypto.prng.PRNGFactory;
 import gnu.crypto.util.Util;
+import gnu.crypto.cipher.IBlockCipher;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 
@@ -46,7 +48,7 @@ import java.util.HashMap;
  * Conformance test for the ICM implementation. Tests if the output matches
  * the values given in the draft-mcgrew-saag-icm-00.txt.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfICMGenerator extends TestCase {
 
@@ -96,40 +98,46 @@ public class TestOfICMGenerator extends TestCase {
          offset[i] = (byte) i;
       }
 
-      map.put(ICMGenerator.BLOCK_LENGTH,         new Integer(16));
+      map.put(IBlockCipher.CIPHER_BLOCK_SIZE,    new Integer(16));
+      map.put(IBlockCipher.KEY_MATERIAL,         key);
       map.put(ICMGenerator.SEGMENT_INDEX_LENGTH, new Integer(4));
-      map.put(ICMGenerator.KEY_MATERIAL,         key);
       map.put(ICMGenerator.OFFSET,               offset);
       map.put(ICMGenerator.SEGMENT_INDEX,        BigInteger.ZERO);
 
       ICMGenerator icm = new ICMGenerator();
-      byte[] data;
+//      byte[] data;
+      byte[] data = new byte[16];
       String ks, computed;
       try {
          icm.init(map);
 
          ks = "0A940BB5416EF045F1C39458C653EA5A";
-         data = icm.nextBlock();
+//         data = icm.nextBlock();
+         icm.nextBytes(data, 0, 16);
          computed = Util.toString(data);
          assertTrue(ks.equals(computed));
 
          ks = "0263EC94661872969ADAFD0F4BA40FDC";
-         data = icm.nextBlock();
+//         data = icm.nextBlock();
+         icm.nextBytes(data, 0, 16);
          computed = Util.toString(data);
          assertTrue(ks.equals(computed));
 
          ks = "1A2D94B3111CA5F8BDC2C84DCC29EC47";
-         data = icm.nextBlock();
+//         data = icm.nextBlock();
+         icm.nextBytes(data, 0, 16);
          computed = Util.toString(data);
          assertTrue(ks.equals(computed));
 
          ks = "4D0BABD2995F9F076223246847B5D30E";
-         data = icm.nextBlock();
+//         data = icm.nextBlock();
+         icm.nextBytes(data, 0, 16);
          computed = Util.toString(data);
          assertTrue(ks.equals(computed));
 
          ks = "8D33F128463B88EFD3F8A52505020379";
-         data = icm.nextBlock();
+//         data = icm.nextBlock();
+         icm.nextBytes(data, 0, 16);
          computed = Util.toString(data);
          assertTrue(ks.equals(computed));
 
@@ -165,9 +173,9 @@ public class TestOfICMGenerator extends TestCase {
          (byte) 0x44, (byte) 0xF1, (byte) 0x93, (byte) 0x2C
       };
 
-      map.put(ICMGenerator.BLOCK_LENGTH,       new Integer(16));
+      map.put(IBlockCipher.CIPHER_BLOCK_SIZE,  new Integer(16));
+      map.put(IBlockCipher.KEY_MATERIAL,       key);
       map.put(ICMGenerator.BLOCK_INDEX_LENGTH, new Integer(2));
-      map.put(ICMGenerator.KEY_MATERIAL,       key);
       map.put(ICMGenerator.OFFSET,             new BigInteger(1, offset));
       map.put(ICMGenerator.SEGMENT_INDEX,      new BigInteger("12345678", 16));
 
