@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.4 2001-07-04 16:59:20 db Exp $
+ * $Id: SAXDriver.java,v 1.5 2001-07-05 02:00:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.4 2001-07-04 16:59:20 db Exp $
+// $Id: SAXDriver.java,v 1.5 2001-07-05 02:00:42 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -99,14 +99,8 @@ import gnu.xml.util.DefaultHandler;
  *	the DTD (the internal subset is not detectible). </td></tr>
  * </table>
  *
- * <p> Note that the declaration handler doesn't suffice for showing all
- * the logical structure
- * of the DTD; it doesn't expose the name of the root element, or the values
- * that are permitted in a NOTATIONS attribute.  (The former is exposed as
- * lexical data, and SAX2 doesn't expose the latter.)
- *
  * <p> Although support for several features and properties is "built in"
- * to this parser, it support all others by storing the assigned values
+ * to this parser, it supports all others by storing the assigned values
  * and returning them.
  *
  * <p>This parser currently implements the SAX1 Parser API, but
@@ -115,7 +109,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-04 16:59:20 $
+ * @version $Date: 2001-07-05 02:00:42 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver

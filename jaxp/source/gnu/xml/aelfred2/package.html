@@ -9,7 +9,7 @@
  * Copyright (c) 1999-2001 by David Brownell.
  * This file is distributed under the GPL.
  *
- * $Id: package.html,v 1.3 2001-07-04 16:50:30 db Exp $
+ * $Id: package.html,v 1.4 2001-07-05 02:04:21 db Exp $
  */
 -->
 </head><body>
@@ -301,12 +301,13 @@ currently provided.</p>
 <p> In the 'pipeline' package in this same software distribution is an
 <a href="../pipeline/ValidationConsumer.html">XML Validation component</a>
 using any full SAX2 event stream (including all document type declarations)
-to validate.  There is now a <a href="Validator.html">Validator</a> class
+to validate.  There is now a <a href="XmlReader.html">XmlReader</a> class
 which combines that class and this enhanced &AElig;lfred parser, creating
-a validating parser. </p>
+an optionally validating SAX2 parser. </p>
 
 <p> As noted in the documentation for that validating component, certain
-validity constraints can't be tested.  These include all those relying on
+validity constraints can't reliably be tested by a layered validator.
+These include all constraints relying on
 layering violations (exposing XML at the level of tokens or below,
 required since XML isn't a context-free grammar), some that
 SAX2 doesn't support, and a few others.  The resulting validating
