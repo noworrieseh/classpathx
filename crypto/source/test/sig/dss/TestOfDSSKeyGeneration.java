@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSS.java,v 1.1 2001-12-30 16:01:58 raif Exp $
+// $Id: TestOfDSSKeyGeneration.java,v 1.1 2001-12-31 22:20:55 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,12 +35,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import gnu.crypto.sig.IKeyPairCodec;
 import gnu.crypto.sig.dss.DSSKeyPairGenerator;
-import gnu.crypto.sig.dss.DSSKeyPairRawCodec;
 import gnu.crypto.sig.dss.DSSPrivateKey;
 import gnu.crypto.sig.dss.DSSPublicKey;
-import gnu.crypto.sig.dss.DSSSignature;
 import gnu.crypto.util.Prime;
 
 import java.math.BigInteger;
@@ -53,11 +50,11 @@ import java.security.interfaces.DSAPublicKey;
 import java.util.HashMap;
 
 /**
- * Conformance tests for the DSS implementation.
+ * Conformance tests for the DSS key-pair generation implementation.
  *
  * @version $Revision: 1.1 $
  */
-public class TestOfDSS extends TestCase {
+public class TestOfDSSKeyGeneration extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -65,7 +62,7 @@ public class TestOfDSS extends TestCase {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
-   public TestOfDSS(String name) {
+   public TestOfDSSKeyGeneration(String name) {
       super(name);
    }
 
@@ -77,7 +74,7 @@ public class TestOfDSS extends TestCase {
    }
 
    public static Test suite() {
-      return new TestSuite(TestOfDSS.class);
+      return new TestSuite(TestOfDSSKeyGeneration.class);
    }
 
    // Instance methods
@@ -112,8 +109,8 @@ public class TestOfDSS extends TestCase {
       BigInteger g2 = ((DSAPrivateKey) kp.getPrivate()).getParams().getG();
       assertTrue("g1.equals(g2)", g1.equals(g2));
 
-      boolean isGnuPrime = 
-      		!Prime.hasSmallPrimeDivisor(q1)
+      boolean isGnuPrime =
+            !Prime.hasSmallPrimeDivisor(q1)
             && Prime.passEulerCriterion(q1)
             && Prime.passMillerRabin(q1);
       assertTrue("q is probable prime", isGnuPrime);
@@ -122,8 +119,8 @@ public class TestOfDSS extends TestCase {
          notifyMaintainer(q1, isGnuPrime);
       }
 
-      isGnuPrime = 
-      		!Prime.hasSmallPrimeDivisor(p1)
+      isGnuPrime =
+            !Prime.hasSmallPrimeDivisor(p1)
             && Prime.passEulerCriterion(p1)
             && Prime.passMillerRabin(p1);
       assertTrue("p is probable prime", isGnuPrime);
@@ -133,72 +130,15 @@ public class TestOfDSS extends TestCase {
       }
    }
 
-   public void testKeyPairCodec() {
-      DSSKeyPairGenerator kpg = new DSSKeyPairGenerator();
-      HashMap map = new HashMap();      
-      map.put(DSSKeyPairGenerator.MODULUS_LENGTH, new Integer(512));
-      map.put(DSSKeyPairGenerator.USE_DEFAULTS, new Boolean(false));
-      kpg.setup(map);
-      KeyPair kp = kpg.generate();
-
-      DSAPublicKey pubK = (DSAPublicKey) kp.getPublic();
-      DSAPrivateKey secK = (DSAPrivateKey) kp.getPrivate();
-
-      byte[] pk1, pk2;
-      // try an invalid format ID
-      try {
-         pk1 = ((DSSPublicKey) pubK).getEncoded(0);
-         fail("Succeeded with unknown format ID");
-      } catch (IllegalArgumentException x) {
-         assertTrue("Recognised unknown format ID", true);
-      }
-
-      pk1 = ((DSSPublicKey) pubK).getEncoded(IKeyPairCodec.RAW_FORMAT);
-      pk2 = ((DSSPrivateKey) secK).getEncoded(IKeyPairCodec.RAW_FORMAT);
-      
-      IKeyPairCodec codec = new DSSKeyPairRawCodec();
-      PublicKey newPubK = codec.decodePublicKey(pk1);
-      PrivateKey newSecK = codec.decodePrivateKey(pk2);
-
-      assertTrue("DSS public key Raw encoder/decoder test", pubK.equals(newPubK));
-      assertTrue("DSS private key Raw encoder/decoder test", secK.equals(newSecK));
-   }
-
-   public void testSignature() {
-      DSSKeyPairGenerator kpg = new DSSKeyPairGenerator();
-      HashMap map = new HashMap();      
-      map.put(DSSKeyPairGenerator.MODULUS_LENGTH, new Integer(512));
-      map.put(DSSKeyPairGenerator.USE_DEFAULTS, new Boolean(false));
-      kpg.setup(map);
-      KeyPair kp = kpg.generate();
-
-      DSAPublicKey publicK = (DSAPublicKey) kp.getPublic();
-      DSAPrivateKey privateK = (DSAPrivateKey) kp.getPrivate();
-
-      DSSSignature alice = new DSSSignature();
-      DSSSignature bob = (DSSSignature) alice.clone();
-
-      byte[] message = "1 if by land, 2 if by sea...".getBytes();
-
-      alice.setupSign(privateK);
-      alice.update(message, 0, message.length);
-      Object signature = alice.sign();
-
-      bob.setupVerify(publicK);
-      bob.update(message, 0, message.length);
-
-      assertTrue("Verify own signature", bob.verify(signature));
-   }
-
    // helper methods
    // -------------------------------------------------------------------------
 
    private static void notifyMaintainer(BigInteger n, boolean isGnuPrime) {
       System.err.println("This library and the JDK disagree on whether 0x"
-      	+n.toString(16)+" is a prime or not.");
+         +n.toString(16)+" is a prime or not.");
       System.err.println("While this library claims it is"
-      	+(isGnuPrime ? "" : " not")+", the JDK claims the opposite.");
+         +(isGnuPrime ? "" : " not")+", the JDK claims the opposite.");
       System.err.println("Please contact the maintainer of this library, and "
-      	+"provide this message for further investigation. TIA");
+         +"provide this message for further investigation. TIA");
    }
 }
