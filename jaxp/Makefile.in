@@ -349,7 +349,9 @@ javadoc:
 	    gnu.xml.dom \
 	    org.xml.sax org.xml.sax.ext org.xml.sax.helpers \
 	    org.w3c.dom \
-	    javax.xml.parsers
+	    javax.xml.parsers \
+	    javax.xml.transform javax.xml.transform.dom \
+	    javax.xml.transform.sax javax.xml.transform.stream
 	zip -9qr apidoc.zip apidoc
 
 ##useful rules that handle unpacking the jar files properly
