@@ -34,7 +34,10 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * XXX
+ * The definition of a page.
+ *
+ * @author Mark Wielaard
+ * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
  */
 public abstract class PageContext 
 {
@@ -43,72 +46,70 @@ public abstract class PageContext
   //  [mjw] We don't know what the real values are XXX!!!
 
   /**
-   * XXX
+   * Used as the key for application stuff in the PageContext table.
    */
-  public static final String APPCONTEXT = "XXX_APPCONTEXT";
+  public static final String APPLICATION = "javax.servlet.jsp.APPLICATION";
 
   /**
    * XXX
    */
-  public static final String CONFIG = "XXX_CONFIG";
+  public static final String PAGECONTEXT = "javax.servlet.jsp.PAGECONTEXT";
 
   /**
    * XXX
    */
-  public static final String EXCEPTION = "XXX_EXCEPTION";
+  public static final String CONFIG = "javax.servlet.jsp.CONFIG";
 
   /**
    * XXX
    */
-  public static final String OUT = "XXX_OUT";
+  public static final String EXCEPTION = "javax.servlet.jsp.Exception";
 
   /**
    * XXX
    */
-  public static final String PAGE = "XXX_PAGE";
+  public static final String OUT = "javax.servlet.jsp.OUT";
 
   /**
    * XXX
    */
-  public static final String PAGECONTEXT = "XXX_PAGECONTEXT";
+  public static final String PAGE = "javax.servlet.jsp.PAGE";
 
   /**
    * XXX
    */
-  public static final String REQUEST = "XXX_REQUEST";
+  public static final String REQUEST = "javax.servlet.jsp.REQUEST";
 
   /**
    * XXX
    */
-  public static final String RESPONSE = "XXX_RESPONSE";
+  public static final String RESPONSE = "javax.servlet.jsp.RESPONSE";
 
   /**
    * XXX
    */
-  public static final String SESSION = "XXX_SESSION";
+  public static final String SESSION = "javax.servlet.jsp.SESSION";
 
-  //  static final ints used to denote the scope
-  //  [mjw] We don't know what the real values are XXX!!!
 
   /**
-   * XXX
+   * Denotes application scope.
    */
-  public static final int APPLICATION_SCOPE = -1; //  XXX
+  public static final int APPLICATION_SCOPE = -1;
 
   /**
-   * XXX
+   * Denotes page scope.
    */
-  public static final int PAGE_SCOPE = -2; //  XXX
+  public static final int PAGE_SCOPE = -2;
 
   /**
-   * XXX
+   * Denotes request scope.
    */
-  public static final int REQUEST_SCOPE = -3; //  XXX
+  public static final int REQUEST_SCOPE = -3;
 
   /**
-   * XXX
+   * Denotes session scope.
    */
-  public static final int SESSION_SCOPE = -4; //  XXX
+  public static final int SESSION_SCOPE = -4;
 
   //  static final ints
   //  [mjw] We also do not know these values XXX!!!
@@ -182,56 +183,6 @@ public abstract class PageContext
    */
   public PageContext ()
   {
-  }
-  
-  /**
-   * XXX
-   *
-   * @param fac XXX
-   * @param s XXX
-   * @param req XXX
-   * @param res XXX
-   * @param needsSession XXX
-   * @param bufferSize XXX
-   * @param autoflush XXX
-   *
-   * @exception IOException XXX
-   * @exception IllegalStateException XXX
-   * @exception IllegalArgumentException XXX
-   */
-  protected PageContext (JspFactory fac,
-			 Servlet s,
-			 ServletRequest req,
-			 ServletResponse res,
-			 boolean needsSession,
-			 int bufferSize,
-			 boolean autoflush)
-    throws IOException, IllegalStateException, IllegalArgumentException 
-  {
-    // What on earth is this for? Is it GNUJSP specific?
-    this.factory = fac;
-    this.servlet = s;
-    this.request = req;
-    this.response = res;
-    this.needsSession = needsSession;
-
-    this.initialOut = createInitialOut(bufferSize, autoflush);
-    this.out = initialOut;
-
-    //  [mjw] Should we also create:
-    //  - attributes
-    attributes = new Hashtable();
-    //  - context
-    context = s.getServletConfig().getServletContext();
-    //  - session
-    if (req instanceof HttpServletRequest) 
-      {
-	session = ((HttpServletRequest)request).getSession();
-      }
-    else 
-      {
-	session = null; //  XXX [mjw] ehe...
-      }
   }
 
   //  Instance Methods
@@ -414,9 +365,9 @@ public abstract class PageContext
    * @exception IOException XXX
    * @exception IllegalArgumentException XXX
    */
-  protected abstract JspWriter createInitialOut(int bufferSize,
-						boolean autoflush)
-    throws IOException, IllegalArgumentException;
+  //protected abstract JspWriter createInitialOut(int bufferSize,
+  //					boolean autoflush)
+  //throws IOException, IllegalArgumentException;
 
   /**
    * Initialize the JSP page context.
@@ -449,14 +400,13 @@ public abstract class PageContext
    * XXX
    *
    * @param urlPath
-   * @param out
    *
    * @exception IOException
    * @exception ServletException
    * @exception IllegalArgumentException
    * @exception SecurityException
    */
-  public abstract void include(String urlPath, JspWriter out)
+  public abstract void include(String urlPath)
     throws IOException, ServletException, IllegalArgumentException, SecurityException;
 
   /**
