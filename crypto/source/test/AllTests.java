@@ -1,7 +1,7 @@
 package test;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: AllTests.java,v 1.3 2001-12-30 15:59:45 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import junit.textui.TestRunner;
 /**
  * TestSuite that runs all tests for all packages.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AllTests extends TestCase {
 
@@ -67,6 +67,7 @@ public class AllTests extends TestCase {
       result.addTest(test.pad.AllTests.suite());
       result.addTest(test.hash.AllTests.suite());
       result.addTest(test.prng.AllTests.suite());
+      result.addTest(test.sig.AllTests.suite());
 
       return result;
    }
