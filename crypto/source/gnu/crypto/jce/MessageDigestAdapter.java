@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: MessageDigestAdapter.java,v 1.1 2002-01-17 11:49:41 raif Exp $
+// $Id: MessageDigestAdapter.java,v 1.2 2002-01-21 10:13:12 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -52,7 +52,7 @@ import java.security.MessageDigestSpi;
  * All the implementations which subclass this object, and which are serviced by
  * the GNU Crypto provider implement the {@link java.lang.Cloneable} interface.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 class MessageDigestAdapter extends MessageDigestSpi implements Cloneable {
 
@@ -91,7 +91,7 @@ class MessageDigestAdapter extends MessageDigestSpi implements Cloneable {
    // java.security.MessageDigestSpi interface implementation
    // -------------------------------------------------------------------------
 
-   public Object clone() throws CloneNotSupportedException {
+   public Object clone() {
       return new MessageDigestAdapter((IMessageDigest) adaptee.clone());
    }
 

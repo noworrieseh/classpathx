@@ -1,7 +1,7 @@
 package test.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfDSSSignature.java,v 1.1 2001-12-31 22:20:55 raif Exp $
+// $Id: TestOfDSSSignature.java,v 1.2 2002-01-21 10:14:14 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -52,7 +52,7 @@ import java.util.HashMap;
  * Conformance tests for the DSS signature generation/verification
  * implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfDSSSignature extends TestCase {
 
@@ -92,7 +92,7 @@ public class TestOfDSSSignature extends TestCase {
       DSAPrivateKey privateK = (DSAPrivateKey) kp.getPrivate();
 
       DSSSignature alice = new DSSSignature();
-      DSSSignature bob = (DSSSignature) alice.clone();
+      DSSSignature bob = bob = (DSSSignature) alice.clone();
 
       byte[] message = "1 if by land, 2 if by sea...".getBytes();
 

@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: SignatureAdapter.java,v 1.1 2002-01-18 02:27:53 raif Exp $
+// $Id: SignatureAdapter.java,v 1.2 2002-01-21 10:13:12 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -59,7 +59,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * All the implementations which subclass this object, and which are serviced by
  * the GNU Crypto provider implement the {@link java.lang.Cloneable} interface.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 class SignatureAdapter extends SignatureSpi implements Cloneable {
 
@@ -104,7 +104,7 @@ class SignatureAdapter extends SignatureSpi implements Cloneable {
    // java.security.SignatureSpi interface implementation
    // -------------------------------------------------------------------------
 
-   public Object clone() throws CloneNotSupportedException {
+   public Object clone() {
       return new SignatureAdapter((ISignature) adaptee.clone(), codec);
    }
 
