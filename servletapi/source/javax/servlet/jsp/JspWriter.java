@@ -98,13 +98,6 @@ public abstract class JspWriter extends Writer
    *
    * @return XXX
    */
-  public abstract  int getRemainingSize();
-
-  /**
-   * XXX
-   *
-   * @return XXX
-   */
   public boolean isAutoFlush()
   {
     return autoFlush;
@@ -267,50 +260,6 @@ public abstract class JspWriter extends Writer
    * @throws IOException if an error occurs
    */
   public abstract  void println(String s) throws IOException;
-
-  /**
-   * XXX
-   *
-   * @param cb XXX
-   * @exception IOException if an error occurs
-   */
-  public abstract  void write(char[] cb) throws IOException;
-
-  /**
-   * XXX
-   *
-   * @param cb XXX
-   * @param off XXX
-   * @param len XXX
-   * @exception IOException if an error occurs
-   */
-  public abstract  void write(char[] cb, int off, int len) throws IOException;
-
-  /**
-   * XXX
-   *
-   * @param c XXX
-   * @exception IOException if an error occurs
-   */
-  public abstract  void write(int c) throws IOException;
-
-  /**
-   * XXX
-   *
-   * @param s XXX
-   * @exception IOException if an error occurs
-   */
-  public abstract  void write(String s) throws IOException;
-
-  /**
-   * XXX
-   *
-   * @param s XXX
-   * @param off XXX
-   * @param len XXX
-   * @exception IOException if an error occurs
-   */
-  public abstract  void write(String s, int off, int len) throws IOException;
 
 }
 
