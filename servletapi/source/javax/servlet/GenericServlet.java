@@ -134,7 +134,7 @@ implements Servlet, ServletConfig, Serializable
    */
   public void log(String message) 
   {
-    getServletContext().log(this.getClass().getName() + ": " + message);
+    servletConfig.getServletContext().log(getServletName() + ": " + message);
   }
 
 
@@ -148,7 +148,7 @@ implements Servlet, ServletConfig, Serializable
    */
   public void log(String message, Throwable th) 
   {
-    getServletContext().log(this.getClass().getName() + ": " + message, th);
+    servletConfig.getServletContext().log(getServletName() + ": " + message, th);
   }
 
 
