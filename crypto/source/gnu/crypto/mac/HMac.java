@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: HMac.java,v 1.2 2002-06-08 05:03:15 raif Exp $
+// $Id: HMac.java,v 1.3 2002-07-06 23:48:40 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -74,7 +74,7 @@ import java.util.Map;
  *    H. Krawczyk, M. Bellare, and R. Canetti.</li>
  * </ol>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class HMac extends BaseMac {
 
@@ -83,6 +83,9 @@ public class HMac extends BaseMac {
 
    private static final byte IPAD_BYTE = 0x36;
    private static final byte OPAD_BYTE = 0x5C;
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    protected int macSize;
    protected int blockSize;
@@ -139,7 +142,7 @@ public class HMac extends BaseMac {
       }
 
       // we dont use/save the key outside this method
-      K = (byte[]) attributes.get(MAC_KEY_MATERIAL);
+      byte[] K = (byte[]) attributes.get(MAC_KEY_MATERIAL);
       if (K == null) { // take it as an indication to re-use previous key if set
          if (ipadHash == null) {
             throw new InvalidKeyException("Null key");
@@ -205,46 +208,51 @@ public class HMac extends BaseMac {
    }
 
    public boolean selfTest() {
-      try {
-         IMac mac = new HMac(new MD5()); // use rfc-2104 test vectors
-         String tv1 = "9294727A3638BB1C13F48EF8158BFC9D";
-         String tv3 = "56BE34521D144C88DBB8C733F0E8B3F6";
-         byte[] k1 = new byte[] {
-            0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B,
-            0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B
-         };
-         byte[] k3 = new byte[] {
-            (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
-            (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
-            (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
-            (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA
-         };
-         byte[] data = new byte[50];
-         for (int i = 0; i < 50; ) {
-            data[i++] = (byte) 0xDD;
+      if (valid == null) {
+         try {
+            IMac mac = new HMac(new MD5()); // use rfc-2104 test vectors
+            String tv1 = "9294727A3638BB1C13F48EF8158BFC9D";
+            String tv3 = "56BE34521D144C88DBB8C733F0E8B3F6";
+            byte[] k1 = new byte[] {
+               0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B,
+               0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B, 0x0B
+            };
+            byte[] k3 = new byte[] {
+               (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
+               (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
+               (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA,
+               (byte) 0xAA, (byte) 0xAA, (byte) 0xAA, (byte) 0xAA
+            };
+            byte[] data = new byte[50];
+            for (int i = 0; i < 50; ) {
+               data[i++] = (byte) 0xDD;
+            }
+
+            HashMap map = new HashMap();
+
+            // test vector #1
+            map.put(MAC_KEY_MATERIAL, k1);
+            mac.init(map);
+            mac.update("Hi There".getBytes("ASCII"), 0, 8);
+            if (!tv1.equals(Util.toString(mac.digest()))) {
+               valid = Boolean.FALSE;
+            }
+
+            // test #2 is not used since it causes a "Key too short" exception
+
+            // test vector #3
+            map.put(MAC_KEY_MATERIAL, k3);
+            mac.init(map);
+            mac.update(data, 0, 50);
+            if (!tv3.equals(Util.toString(mac.digest()))) {
+               valid = Boolean.FALSE;
+            }
+            valid = Boolean.TRUE;
+         } catch (Exception x) {
+            x.printStackTrace(System.err);
+            valid = Boolean.FALSE;
          }
-         HashMap map = new HashMap();
-
-         // test vector #1
-         map.put(MAC_KEY_MATERIAL, k1);
-         mac.init(map);
-         mac.update("Hi There".getBytes("ASCII"), 0, 8);
-         if (!tv1.equals(Util.toString(mac.digest())))
-            return false;
-
-         // test #2 is not used since it causes a "Key too short" exception
-
-         // test vector #3
-         map.put(MAC_KEY_MATERIAL, k3);
-         mac.init(map);
-         mac.update(data, 0, 50);
-         if (!tv3.equals(Util.toString(mac.digest())))
-            return false;
-
-         return true;
-      } catch (Exception x) {
-         x.printStackTrace(System.err);
-         return false;
       }
+      return valid.booleanValue();
    }
 }
