@@ -29,6 +29,8 @@ LIBNAME = gnujaxp
 SRCDIR = @srcdir@
 SOURCEDIR=$(SRCDIR)/source
 
+GCJ = @GCJ@
+
 ##the following variables are not meant to be edited by hand
 ## use emacs JCD mode
 
@@ -40,7 +42,7 @@ SOURCEDIR=$(SRCDIR)/source
 #list must be kept broadly the same. Each file should be on it's own 
 #line and the file list should begin on the same line as the 
 #'SOURCEFILES = ' statement.
-SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
+SOURCEFILES =	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilder.java \
 	$(SOURCEDIR)/javax/xml/parsers/FactoryConfigurationError.java \
 	$(SOURCEDIR)/javax/xml/parsers/ParserConfigurationException.java \
@@ -107,6 +109,7 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/DefaultHandler.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/LocatorImpl.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/NamespaceSupport.java \
+	$(SOURCEDIR)/org/xml/sax/helpers/NewInstance.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/ParserAdapter.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/ParserFactory.java \
 	$(SOURCEDIR)/org/xml/sax/helpers/XMLFilterImpl.java \
@@ -193,8 +196,13 @@ CPATH = $(subst $(space),:,$(CC-CLASSPATH))
 #the desination directory for compilations
 CC-DESTDIR =	bin
 
-# FIXME: use autoconf to make this use gcj 3.x when it's available
-JAVAC = javac -classpath  $(CPATH) -d $(CC-DESTDIR)
+#
+# Compiler is set through autoconf
+#
+GCJ_OPTS = --encoding=8859_1 -fsyntax-only -femit-class-files 
+GCJ_COMPILE = $(GCJ) $(GCJ_OPTS) -Isource -foutput-class-dir=$(CC-DESTDIR)
+
+JAVAC_COMPILE = javac -classpath  $(CPATH) -d $(CC-DESTDIR)
 
 ##variables which define some useful constants
 
@@ -232,7 +240,9 @@ javadoc:
 	    -windowtitle "GNU JAXP Library" \
 	    -nodeprecatedlist \
 	    -version -author -use \
-	    -bottom "<p>Source code is GPL'd in the JAXP subproject at \
+	    -bottom "<p>Source code is under GPL \
+		(with 'library exception') \
+	        in the JAXP subproject at \
 		<a href='http://savannah.gnu.org/projects/classpathx'> \
 		http://savannah.gnu.org/projects/classpathx</a> \
 		<br>This documentation was derived from that\
@@ -266,6 +276,8 @@ javadoc:
 #build the $(LIBNAME) jar file
 $(LIBNAME).jar: $(LIBNAME) $(CC-DESTDIR)
 	mkdir -p $(CC-DESTDIR)/META-INF/services
+	echo -n gnu.xml.aelfred2.XmlReader > \
+	$(CC-DESTDIR)/META-INF/services/org.xml.sax.driver
 	echo -n gnu.xml.aelfred2.JAXPFactory > \
 	$(CC-DESTDIR)/META-INF/services/javax.xml.parsers.SAXParserFactory
 	echo -n gnu.xml.dom.JAXPFactory > \
@@ -294,7 +306,7 @@ $(LIBNAME): compile
 #
 #  compile: $(CLASSLIST)
 #  ifeq "$(wildcard filelist.mak)" "filelist.mak"
-#	$(JAVAC) @filelist.mak
+#	$(@COMPILER@_COMPILE) @filelist.mak
 #	@rm filelist.mak
 #  else
 #	@echo Nothing to be done for compile.
@@ -308,7 +320,7 @@ $(LIBNAME): compile
 compile: $(CLASSESLIST)
 	mkdir -p $(CC-DESTDIR)
 	if [ -e filelist.mak ] ; then \
-	  $(JAVAC) @filelist.mak  ; \
+	  $(@COMPILER@_COMPILE) @filelist.mak  ; \
 	  rm filelist.mak ; \
 	fi
 
@@ -316,7 +328,7 @@ compile: $(CLASSESLIST)
 .PHONY: recompile
 
 recompile: clean-filelist all-source-files
-	$(JAVAC) @filelist.mak
+	$(@COMPILER@_COMPILE) @filelist.mak
 	rm filelist.mak
 
 
