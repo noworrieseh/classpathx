@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.10 2001-07-18 16:39:01 db Exp $
+ * $Id: SAXDriver.java,v 1.11 2001-07-29 19:14:36 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.10 2001-07-18 16:39:01 db Exp $
+// $Id: SAXDriver.java,v 1.11 2001-07-29 19:14:36 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -108,7 +108,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-18 16:39:01 $
+ * @version $Date: 2001-07-29 19:14:36 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -309,7 +309,7 @@ final public class SAXDriver
 	    } catch (RuntimeException e) {
 		throw e;
 	    } catch (Exception e) {
-		throw new SAXException (e.getMessage (), e);
+		throw new SAXParseException (e.getMessage (), this, e);
 	    } finally {
 		contentHandler.endDocument ();
 		entityStack.removeAllElements ();
