@@ -396,6 +396,8 @@ $(src)/gnu/xml/dom/DomNotation.java \
 $(src)/gnu/xml/dom/DomNsNode.java \
 $(src)/gnu/xml/dom/DomPI.java \
 $(src)/gnu/xml/dom/DomText.java \
+$(src)/gnu/xml/dom/ImplementationSource.java \
+$(src)/gnu/xml/dom/ImplementationList.java \
 $(src)/gnu/xml/dom/JAXPFactory.java \
 $(src)/gnu/xml/pipeline/CallFilter.java \
 $(src)/gnu/xml/pipeline/DomConsumer.java \

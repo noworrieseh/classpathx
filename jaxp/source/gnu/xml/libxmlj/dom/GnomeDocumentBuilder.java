@@ -170,7 +170,7 @@ implements DOMImplementation
     if ("XML".equalsIgnoreCase (feature))
       {
         return ("3.0".equals (version) || "2.0" .equals (version) ||
-                "1.0".equals (version));
+                "1.0".equals (version) || version == null);
       }
     if ("HTML".equalsIgnoreCase (feature))
       {
@@ -179,7 +179,7 @@ implements DOMImplementation
     if ("Core".equalsIgnoreCase (feature))
       {
         return ("3.0".equals (version) || "2.0" .equals (version) ||
-                "1.0".equals (version));
+                "1.0".equals (version) || version == null);
       }
     if ("Stylesheets".equalsIgnoreCase (feature))
       {
@@ -195,7 +195,7 @@ implements DOMImplementation
       }
     if ("XPath".equalsIgnoreCase (feature))
       {
-        return ("3.0".equals (version));
+        return ("3.0".equals (version) || version ==  null);
       }
     if ("Traversal".equalsIgnoreCase (feature))
       {

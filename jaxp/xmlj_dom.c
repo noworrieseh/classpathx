@@ -462,13 +462,12 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
 }
 
 JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,
-                                                              jobject self,
-                                                              jstring
-                                                              namespaceURI,
-                                                              jstring
-                                                              qualifiedName,
-                                                              jobject doctype)
+Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
+(JNIEnv * env,
+ jobject self,
+ jstring namespaceURI,
+ jstring qualifiedName,
+ jobject doctype)
 {
   xmlDocPtr doc;
   xmlNodePtr root;
@@ -476,7 +475,23 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,
   const xmlChar *href;
   const xmlChar *prefix;
   const xmlChar *version;
+  const xmlChar *qName;
 
+  qName = xmljGetStringChars (env, qualifiedName);
+  href = xmljGetStringChars (env, namespaceURI);
+  if (qName == NULL)
+    {
+      prefix = NULL;
+    }
+  else
+    {
+      int *len;
+      
+      len = (int *) malloc (sizeof (int));
+      prefix = xmlSplitQName3 (qName, len);
+      free (len);
+    }
+  
   /* Create the document node */
   version = xmlCharStrdup ("1.0");
   doc = xmlNewDoc (version);
@@ -486,37 +501,62 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,
     {
       jclass cls;
       jmethodID method;
+      jstring ret;
       const xmlChar *name;
       const xmlChar *publicId;
       const xmlChar *systemId;
       const xmlChar *internalSubset;
       xmlDtdPtr dtd;
 
-      cls = (*env)->GetObjectClass (env, doctype);
+      cls = (*env)->FindClass (env, "org/w3c/dom/DocumentType");
+      if (cls == NULL)
+        {
+          return NULL;
+        }
+      /* name */
       method = (*env)->GetMethodID (env, cls, "getName",
                                     "()Ljava/lang/String;");
-      name =
-        xmljGetStringChars (env, (*env)->CallObjectMethod (env,
-                                                           doctype,
-                                                           method));
+      if (method == NULL)
+        {
+          return NULL;
+        }
+      printf("createDocument:1\n");
+      ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
+      name = xmljGetStringChars (env, ret);
+      
+      /* publicId */
       method = (*env)->GetMethodID (env, cls, "getPublicId",
                                     "()Ljava/lang/String;");
-      publicId =
-        xmljGetStringChars (env, (*env)->CallObjectMethod (env,
-                                                           doctype,
-                                                           method));
+      if (method == NULL)
+        {
+          return NULL;
+        }
+      printf("createDocument:2\n");
+      ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
+      publicId = xmljGetStringChars (env, ret);
+
+      /* systemId */
       method = (*env)->GetMethodID (env, cls, "getSystemId",
                                     "()Ljava/lang/String;");
-      systemId =
-        xmljGetStringChars (env, (*env)->CallObjectMethod (env,
-                                                           doctype,
-                                                           method));
+      if (method == NULL)
+        {
+          return NULL;
+        }
+      printf("createDocument:3\n");
+      ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
+      systemId = xmljGetStringChars (env, ret);
+
+      /* internalSubset */
       method = (*env)->GetMethodID (env, cls, "getInternalSubset",
                                     "()Ljava/lang/String;");
-      internalSubset =
-        xmljGetStringChars (env, (*env)->CallObjectMethod (env,
-                                                           doctype,
-                                                           method));
+      if (method == NULL)
+        {
+          return NULL;
+        }
+      printf("createDocument:4\n");
+      ret = (jstring) (*env)->CallObjectMethod (env, doctype, method);
+      internalSubset = xmljGetStringChars (env, ret);
+
       /* TODO notations */
       /* TODO entities */
       if (internalSubset == NULL)
@@ -531,9 +571,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,
     }
   
   /* Create the root element */
-  root = xmlNewNode (NULL, xmljGetStringChars (env, qualifiedName));
-  href = xmljGetStringChars (env, namespaceURI);
-  prefix = xmlSplitQName3 (root->name, NULL);
+  root = xmlNewNode (NULL, qName);
   ns = xmlNewNs (root, href, prefix);
   xmlDocSetRootElement (doc, root);
   
@@ -1053,10 +1091,24 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
   newChildNode = xmljGetNodeID (env, newChild);
   refChildNode = xmljGetNodeID (env, refChild);
 
+  if (newChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
+  if (refChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
   if (newChildNode->doc != refChildNode->doc)
-    xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    {
+      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    }
   if (!xmlAddPrevSibling (refChildNode, newChildNode))
-    xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    {
+      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    }
   return newChild;
 }
 
@@ -1072,10 +1124,24 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
   newChildNode = xmljGetNodeID (env, newChild);
   oldChildNode = xmljGetNodeID (env, oldChild);
 
+  if (newChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
+  if (oldChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
   if (newChildNode->doc != oldChildNode->doc)
-    xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    {
+      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    }
   if (!xmlReplaceNode (oldChildNode, newChildNode))
-    xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    {
+      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    }
   return newChild;
 }
 
@@ -1090,8 +1156,16 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_removeChild (JNIEnv * env,
   node = xmljGetNodeID (env, self);
   oldChildNode = xmljGetNodeID (env, oldChild);
 
+  if (oldChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
   if (oldChildNode->parent != node)
-    xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+    {
+      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+      return NULL;
+    }
   xmlUnlinkNode (oldChildNode);
   return oldChild;
 }
@@ -1106,11 +1180,20 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_appendChild (JNIEnv * env,
 
   node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
-
+  
+  if (newChildNode == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);     /* NOT_FOUND_ERR */
+      return NULL;
+    }
   if (newChildNode->doc != node->doc)
-    xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    {
+      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    }
   if (!xmlAddChild (node, newChildNode))
-    xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    {
+      xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    }
   return newChild;
 }
 
@@ -1155,9 +1238,10 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNamespaceURI (JNIEnv * env,
 
   node = xmljGetNodeID (env, self);
   if (node->ns == NULL)
-    return NULL;
-  else
-    return xmljNewString (env, node->ns->href);
+    {
+      return NULL;
+    }
+  return xmljNewString (env, node->ns->href);
 }
 
 JNIEXPORT jstring JNICALL
@@ -1167,9 +1251,10 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getPrefix (JNIEnv * env, jobject self)
 
   node = xmljGetNodeID (env, self);
   if (node->ns == NULL)
-    return NULL;
-  else
-    return xmljNewString (env, node->ns->prefix);
+    {
+      return NULL;
+    }
+  return xmljNewString (env, node->ns->prefix);
 }
 
 JNIEXPORT void JNICALL
@@ -1181,10 +1266,14 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_setPrefix (JNIEnv * env,
 
   s_prefix = xmljGetStringChars (env, prefix);
   if (xmlValidateName (s_prefix, 0))
-    xmljThrowDOMException (env, 5, NULL);	/* INVALID_CHARACTER_ERR */
+    {
+      xmljThrowDOMException (env, 5, NULL);	/* INVALID_CHARACTER_ERR */
+    }
   node = xmljGetNodeID (env, self);
   if (node->ns == NULL)
-    xmljThrowDOMException (env, 14, NULL);	/* NAMESPACE_ERR */
+    {
+      xmljThrowDOMException (env, 14, NULL);	/* NAMESPACE_ERR */
+    }
   node->ns->prefix = s_prefix;
 }
 
@@ -1192,12 +1281,25 @@ JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNode_getLocalName (JNIEnv * env, jobject self)
 {
   xmlNodePtr node;
+  int *len;
+  jstring ret;
 
   node = xmljGetNodeID (env, self);
   if (node->name == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
+  len = (int *) malloc (sizeof (int));
+  if (xmlSplitQName3 (node->name, len) != NULL)
+    {
+      ret = xmljNewString (env, node->name + (*len));
+    }
   else
-    return xmljNewString (env, node->name);
+    {
+      ret = xmljNewString (env, node->name);
+    }
+  free (len);
+  return ret;
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1237,10 +1339,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_lookupPrefix (JNIEnv * env, jobject self,
     {
       return NULL;
     }
-  else
-    {
-      return xmljNewString (env, ns->prefix);
-    }
+  return xmljNewString (env, ns->prefix);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -1258,10 +1357,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_isDefaultNamespace (JNIEnv * env,
     {
       return 0;
     }
-  else
-    {
-      return (ns->prefix == NULL || xmlStrlen (ns->prefix) == 0);
-    }
+  return (ns->prefix == NULL || xmlStrlen (ns->prefix) == 0);
 }
 
 JNIEXPORT jstring JNICALL
@@ -1278,10 +1374,7 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_lookupNamespaceURI (JNIEnv * env,
     {
       return NULL;
     }
-  else
-    {
-      return xmljNewString (env, ns->href);
-    }
+  return xmljNewString (env, ns->href);
 }
 
 /* -- GnomeNodeList -- */
@@ -1297,7 +1390,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNodeList_item (JNIEnv * env,
   node = node->children;
   count = 0;
   for (count = 0; node != NULL && count < index; count++)
-    node = node->next;
+    {
+      node = node->next;
+    }
   return xmljGetNodeInstance (env, node);
 }
 
@@ -1328,9 +1423,10 @@ Java_gnu_xml_libxmlj_dom_GnomeNotation_getPublicId (JNIEnv * env,
 
   notation = (xmlNotationPtr) xmljGetNodeID (env, self);
   if (notation->PublicID == NULL)
-    return NULL;
-  else
-    return xmljNewString (env, notation->PublicID);
+    {
+      return NULL;
+    }
+  return xmljNewString (env, notation->PublicID);
 }
 
 JNIEXPORT jstring JNICALL
@@ -1341,9 +1437,10 @@ Java_gnu_xml_libxmlj_dom_GnomeNotation_getSystemId (JNIEnv * env,
 
   notation = (xmlNotationPtr) xmljGetNodeID (env, self);
   if (notation->SystemID == NULL)
-    return NULL;
-  else
-    return xmljNewString (env, notation->SystemID);
+    {
+      return NULL;
+    }
+  return xmljNewString (env, notation->SystemID);
 }
 
 /* -- GnomeProcessingInstruction -- */
@@ -1425,9 +1522,13 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv * env,
   /* Get search criteria */
   s_name = xmljGetStringChars (env, name);
   if (ns)
-    s_uri = xmljGetStringChars (env, uri);
+    {
+      s_uri = xmljGetStringChars (env, uri);
+    }
   else
-    s_uri = NULL;
+    {
+      s_uri = NULL;
+    }
 
   node = node->children;
   count = 0;
@@ -1469,9 +1570,13 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv * env,
   /* Get search criteria */
   s_name = xmljGetStringChars (env, name);
   if (ns)
-    s_uri = xmljGetStringChars (env, uri);
+    {
+      s_uri = xmljGetStringChars (env, uri);
+    }
   else
-    s_uri = NULL;
+    {
+      s_uri = NULL;
+    }
 
   count = 0;
   node = node->children;
@@ -1480,12 +1585,16 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv * env,
       if (ns)
         {
           while (node != NULL && xmljMatchNS (s_uri, s_name, node))
-            node = node->next;
+            {
+              node = node->next;
+            }
         }
       else
         {
           while (node != NULL && xmljMatch (s_name, node))
-            node = node->next;
+            {
+              node = node->next;
+            }
         }
       count++;
     }

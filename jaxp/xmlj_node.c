@@ -40,8 +40,21 @@ xmljGetNodeID (JNIEnv * env, jobject self)
   jobject id;
   xmlNodePtr node;
 
+  if (self == NULL)
+    {
+      xmljThrowDOMException (env, 8, NULL);     /* NOT_FOUND_ERR */
+      return NULL;
+    }
   cls = (*env)->GetObjectClass (env, self);
+  if (cls == NULL)
+    {
+      return NULL;
+    }
   field = (*env)->GetFieldID (env, cls, "id", "Ljava/lang/Object;");
+  if (field == NULL)
+    {
+      return NULL;
+    }
   id = (*env)->GetObjectField (env, self, field);
   node = (xmlNodePtr) xmljAsPointer (env, id);
   if (node == NULL)

@@ -1,3 +1,7 @@
+2004-06-29  Chris Burdess <dog@gnu.org>
+
+	* dom: Added implementation of DOMImplementationSource.
+
 2004-06-28  Chris Burdess <dog@gnu.org>
 
 	* dom: Fixed name matching.
