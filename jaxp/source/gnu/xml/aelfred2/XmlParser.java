@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.17 2001-11-04 00:49:06 db Exp $
+ * $Id: XmlParser.java,v 1.18 2001-11-05 07:25:21 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -64,7 +64,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.17 2001-11-04 00:49:06 db Exp $
+// $Id: XmlParser.java,v 1.18 2001-11-05 07:25:21 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-04 00:49:06 $
+ * @version $Date: 2001-11-05 07:25:21 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -2358,7 +2358,7 @@ loop:
 	    ids [1] = readLiteral (flags);
 	} else if (!isSubset) 
 		error ("missing SYSTEM or PUBLIC keyword");
-	
+
 	if (ids [1] != null && ids [1].indexOf ('#') != -1)
 	    handler.verror ("SYSTEM id has a URI fragment: " + ids [1]);
 
@@ -2958,7 +2958,7 @@ loop:
     }
 
     /**
-     * Retrieve the default value type of a declared attribute.
+     * Retrieve the default value mode of a declared attribute.
      * @see #ATTRIBUTE_DEFAULT_SPECIFIED
      * @see #ATTRIBUTE_DEFAULT_IMPLIED
      * @see #ATTRIBUTE_DEFAULT_REQUIRED
@@ -3636,13 +3636,9 @@ loop:
      * Instead, it sets up for UTF-8, then (possibly) revises its assumption
      * later in setupDecoding ().  Any ASCII-derived 8-bit encoding
      * should work, but most will be rejected later by setupDecoding ().
-     * <p>I don't currently detect EBCDIC, since I'm concerned that it
-     * could also be a valid UTF-8 sequence; I'll have to do more checking
-     * later.
      * @see #tryEncoding (byte[], byte, byte, byte, byte)
      * @see #tryEncoding (byte[], byte, byte)
      * @see #setupDecoding
-     * @see #read8bitEncodingDeclaration
      */
     private void detectEncoding ()
     throws SAXException, IOException
@@ -3726,17 +3722,15 @@ loop:
 	    // ASCII derived
 	    // 0x3c 0x3f 0x78 0x6d: UTF-8 or other 8-bit markup (read ENCODING)
 	    encoding = ENCODING_UTF_8;
-	    read8bitEncodingDeclaration ();
 
-	} else if (signature [0] == 0xef
-		&& signature [1] == 0xbb
-		&& signature [2] == 0xbf) {
-	    // 0xef 0xbb 0xbf: UTF-8 BOM
+	} else if (signature [0] == (byte) 0xef
+		&& signature [1] == (byte) 0xbb
+		&& signature [2] == (byte) 0xbf) {
+	    // 0xef 0xbb 0xbf: UTF-8 BOM (not part of document text)
 	    // this un-needed notion slipped into XML 2nd ed through a
 	    // "non-normative" erratum; now required by MSFT and UDDI
 	    encoding = ENCODING_UTF_8;
 	    is.read (); is.read (); is.read ();
-	    read8bitEncodingDeclaration ();
 
 	} else {
 	    // 4c 6f a7 94 ... we don't understand EBCDIC flavors
@@ -4069,39 +4063,6 @@ loop:
 	    error ("end of input while looking for delimiter "
 		+ "(started on line " + startLine
 		+ ')', null, delim);
-	}
-    }
-
-
-    /**
-     * Read just the encoding declaration (or XML declaration) at the 
-     * start of an external entity.
-     * When this method is called, we know that the declaration is
-     * present (or appears to be).  We also know that the entity is
-     * in some sort of ASCII-derived 8-bit encoding.
-     * The idea of this is to let us read what the 8-bit encoding is
-     * before we've committed to converting any more of the file; the
-     * XML or encoding declaration must be in 7-bit ASCII, so we're
-     * safe as long as we don't go past it.
-     */
-    private void read8bitEncodingDeclaration ()
-    throws SAXException, IOException
-    {
-	int ch;
-	readBufferPos = readBufferLength = 0;
-
-	while (true) {
-	    ch = is.read ();
-	    readBuffer [readBufferLength++] = (char) ch;
-	    switch (ch) {
-	      case (int) '>':
-		return;
-	      case - 1:
-		error ("end of file before end of XML or encoding declaration.",
-		       null, "?>");
-	    }
-	    if (readBuffer.length == readBufferLength)
-		error ("unfinished XML or encoding declaration");
 	}
     }
 
