@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project name="servletapi" default="dist" basedir=".">
+
+  <!--
+  $Id: build.xml,v 1.1 2003-07-27 15:46:22 avdyk Exp $
+  -->
+
+  <!-- Global properties -->
+  <property name="project.name" value="servlet" />
+  <property name="project.version" value="2.4" />
+  <property name="src" value="source" />
+  <property name="build" value="build" />
+  <property name="dist" value="dist" />
+  <property name="doc" value="doc" />
+  <property name="javadoc" value="${doc}/api" />
+  <property name="time.now" value="unset"/>
+  <property name="time.file" value="unset" />
+
+  <property name="build.compiler" value="jikes"/>
+
+  <!-- Clean target -->
+  <target name="clean"
+    description="Initial State">
+    <delete dir="${build}" />
+    <delete dir="${dist}" />
+    <delete dir="${doc}" />
+  </target>
+
+  <!-- Prepare target -->
+  <target name="prepare"
+    description="Prepare the compilation">
+    <tstamp>
+      <format property="time.now" pattern="dd/MM/yyyy HH:mm"/>
+      <format property="time.file" pattern="yyyyMMdd_HHmm" />
+    </tstamp>
+    <mkdir dir="${build}" />
+  </target>
+
+  <!-- Compile target -->
+  <target name="compile" depends="prepare"
+    description="Compilation of the servletapi">
+    <javac srcdir="${src}" destdir="${build}" deprecation="on"/>
+  </target>
+
+  <!-- Prepare a distribution (jar file) -->
+  <target name="dist" depends="compile"
+    description="Prepare the jar file">
+    <mkdir dir="${dist}" />
+    <jar destfile="${dist}/${project.name}-${project.version}.jar" basedir=".">
+      <fileset dir="${build}">
+      </fileset>
+      <!--include name="LICENSE"/-->
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Signature-Version" value="${project.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Javadoc target -->
+  <target name="doc" depends="compile"
+    description="Create the documentation">
+    <mkdir dir="${doc}" />
+    <mkdir dir="${javadoc}"/>
+    <javadoc
+      packagenames="javax.servlet.*"
+      sourcepath="${src}"
+      destdir="${javadoc}"
+      author="true"
+      version="true"
+      use="true"
+      private="true"
+      noindex="true"
+      nodeprecatedlist="true"
+      >
+      <!--
+      windowtitle="${project.title} ${project.version} for www.ste.fapse.ulg.ac.be"
+	  doctitle="&lt;h1&gt;${project.title} ${project.version}&lt;/h1&gt;"
+	  bottom="&lt;i&gt;Copyright &#169; 2003 STE-Formations Informatiques, FAPSE, ULg. All Rights Reserved.&lt;/i&gt;"
+      overview="${src}/net/sourceforge/queryviewer/overview.html"
+      header="&lt;a href='http://queryviewer.sourceforge.net/'&gt;&lt;img border='0' src='{@docRoot}/../images/qvlogo.png' /&gt;&lt;/a&gt;"
+      -->
+    </javadoc>
+  </target>
+
+</project>
