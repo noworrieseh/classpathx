@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: PRNGFactory.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: PRNGFactory.java,v 1.3 2001-12-08 21:38:35 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * A Factory to instantiate pseudo random number generators.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class PRNGFactory {
 
@@ -46,6 +46,7 @@ public class PRNGFactory {
    // -------------------------------------------------------------------------
 
    public static final String ICM_PRNG = "icm";
+   public static final String MD_PRNG =  "md";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -75,6 +76,8 @@ public class PRNGFactory {
       IRandom result = null;
       if (prng.equalsIgnoreCase(ICM_PRNG)) {
          result = new ICMGenerator();
+      } else if (prng.equalsIgnoreCase(MD_PRNG)) {
+         result = new MDGenerator();
       }
 
       return result;
@@ -89,6 +92,7 @@ public class PRNGFactory {
    public static final Set getNames() {
       HashSet hs = new HashSet();
       hs.add(ICM_PRNG);
+      hs.add(MD_PRNG);
 
       return Collections.unmodifiableSet(hs);
    }
