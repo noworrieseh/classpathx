@@ -50,183 +50,210 @@ public final class NNTPMessage
   String messageId;
   
   NNTPMessage(NNTPFolder folder,
-      int msgnum,
-      String messageId)
-  {
-    super(folder, msgnum);
-    this.messageId = messageId;
-    headers = null;
-    // Set SEEN state
-    flags = folder.getPermanentFlags();
-    if (folder.isSeen(msgnum))
-      flags.add(Flags.Flag.SEEN);
-  }
+              int msgnum,
+              String messageId)
+    {
+      super (folder, msgnum);
+      this.messageId = messageId;
+      headers = null;
+      // Set SEEN state
+      flags = folder.getPermanentFlags ();
+      if (folder.isSeen (msgnum))
+        {
+          flags.add (Flags.Flag.SEEN);
+        }
+    }
 
-  public String getMessageId()
-  {
-    return messageId;
-  }
+  public String getMessageId ()
+    {
+      return messageId;
+    }
 
-  void requestHeaders()
+  void requestHeaders ()
     throws MessagingException
-  {
-    FetchProfile fp = new FetchProfile();
-    fp.add(FetchProfile.Item.ENVELOPE);
-    NNTPMessage[] messages = new NNTPMessage[1];
-    messages[0] = this;
-    folder.fetch(messages, fp);
-  }
+    {
+      FetchProfile fp = new FetchProfile ();
+      fp.add (FetchProfile.Item.ENVELOPE);
+      NNTPMessage[] messages = new NNTPMessage[1];
+      messages[0] = this;
+      folder.fetch (messages, fp);
+    }
 
   /*
    * Called by NNTPFolder
    */
-  void updateHeaders(InputStream in)
+  void updateHeaders (InputStream in)
     throws MessagingException, IOException
-  {
-    headers = new InternetHeaders(in);
-  }
+    {
+      headers = new InternetHeaders (in);
+    }
 
-  void requestContent()
+  void requestContent ()
     throws MessagingException
-  {
-    FetchProfile fp = new FetchProfile();
-    fp.add(FetchProfile.Item.CONTENT_INFO);
-    NNTPMessage[] messages = new NNTPMessage[1];
-    messages[0] = this;
-    folder.fetch(messages, fp);
-  }
+    {
+      FetchProfile fp = new FetchProfile ();
+      fp.add (FetchProfile.Item.CONTENT_INFO);
+      NNTPMessage[] messages = new NNTPMessage[1];
+      messages[0] = this;
+      folder.fetch (messages, fp);
+    }
 
   /*
    * Called by NNTPFolder
    */
-  void updateContent(byte[] content)
-  {
-    this.content = content;
-  }
+  void updateContent (byte[] content)
+    {
+      this.content = content;
+    }
 
   // -- Header retrieval --
 
-  public String[] getHeader(String name)
+  public String[] getHeader (String name)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getHeader(name);
-  }
-  
-  public String getHeader(String name, String delimiter)
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getHeader (name);
+    }
+
+  public String getHeader (String name, String delimiter)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getHeader(name, delimiter);
-  }
-  
-  public Enumeration getAllHeaders()
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getHeader (name, delimiter);
+    }
+
+  public Enumeration getAllHeaders ()
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getAllHeaders();
-  }
-  
-  public Enumeration getMatchingHeaders(String[] names)
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getAllHeaders ();
+    }
+
+  public Enumeration getMatchingHeaders (String[] names)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getMatchingHeaders(names);
-  }
-  
-  public Enumeration getNonMatchingHeaders(String[] names)
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getMatchingHeaders (names);
+    }
+
+  public Enumeration getNonMatchingHeaders (String[] names)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getNonMatchingHeaders(names);
-  }
-  
-  public Enumeration getAllHeaderLines()
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getNonMatchingHeaders (names);
+    }
+
+  public Enumeration getAllHeaderLines ()
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getAllHeaderLines();
-  }
-  
-  public Enumeration getMatchingHeaderLines(String[] names)
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getAllHeaderLines ();
+    }
+
+  public Enumeration getMatchingHeaderLines (String[] names)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getMatchingHeaderLines(names);
-  }
-  
-  public Enumeration getNonMatchingHeaderLines(String[] names)
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getMatchingHeaderLines (names);
+    }
+
+  public Enumeration getNonMatchingHeaderLines (String[] names)
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    return super.getNonMatchingHeaderLines(names);
-  }
-  
-  
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      return super.getNonMatchingHeaderLines (names);
+    }
+
   // setHeader / addHeader / removeHeader
 
   // -- Content retrieval --
-  
-  public int getSize()
-    throws MessagingException
-  {
-    if (content==null)
-      requestContent();
-    return super.getSize();
-  }
 
-  public int getLineCount()
+  public int getSize ()
     throws MessagingException
-  {
-    String value = getHeader("Lines", ",");
-    if (value!=null)
     {
-      try
-      {
-        return Integer.parseInt(value.trim());
-      }
-      catch (NumberFormatException e)
-      {
-      }
+      if (content == null)
+        {
+          requestContent ();
+        }
+      return super.getSize ();
     }
-    return -1;
-  }
 
-  public InputStream getContentStream()
+  public int getLineCount ()
     throws MessagingException
-  {
-    if (content==null)
-      requestContent();
-    return super.getContentStream();
-  }
+    {
+      String value = getHeader ("Lines", ",");
+      if (value != null)
+        {
+          try
+            {
+              return Integer.parseInt (value.trim ());
+            }
+          catch (NumberFormatException e)
+            {
+            }
+        }
+      return -1;
+    }
+
+  public InputStream getContentStream ()
+    throws MessagingException
+    {
+      if (content == null)
+        {
+          requestContent ();
+        }
+      return super.getContentStream ();
+    }
 
   // setContent(Object o, tring type), setContent(Multpart)
 
-  public void saveChanges()
+  public void saveChanges ()
     throws MessagingException
-  {
-    if (headers==null)
-      requestHeaders();
-    if (content==null)
-      requestContent();
-  }
+    {
+      if (headers == null)
+        {
+          requestHeaders ();
+        }
+      if (content == null)
+        {
+          requestContent ();
+        }
+    }
 
   // -- Update SEEN flag if necessary --
-  
-  public void setFlags(Flags flag, boolean set)
+
+  public void setFlags (Flags flag, boolean set)
     throws MessagingException
-  {
-    if (flag.contains(Flags.Flag.SEEN))
-      ((NNTPFolder)folder).setSeen(msgnum, set);
-    super.setFlags(flag, set);
-  }
-  
+    {
+      if (flag.contains (Flags.Flag.SEEN))
+        {
+          ((NNTPFolder) folder).setSeen (msgnum, set);
+        }
+      super.setFlags (flag, set);
+    }
+
 }
