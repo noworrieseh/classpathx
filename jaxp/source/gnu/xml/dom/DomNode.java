@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomNode.java,v 1.2 2001-06-23 05:19:32 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomNode.java,v 1.2 2001-06-23 05:19:32 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -56,7 +56,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-06-23 05:19:32 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -532,11 +532,10 @@ public abstract class DomNode
 	    DomNode	child = (DomNode) newChild;
 
 	    if (child.nodeType != DOCUMENT_FRAGMENT_NODE) {
+		checkMisc (child);
 		for (int i = 0; i < length; i++) {
 		    if (children [i] != refChild)
 			continue;
-
-		    checkMisc (child);
 
 		    ensureEnough (1);
 		    reparent (child);
@@ -546,7 +545,7 @@ public abstract class DomNode
 		    if (reportMutations)
 			insertionEvent (null, child);
 
-		    return refChild;
+		    return newChild;
 		}
 		throw new DomEx (DomEx.NOT_FOUND_ERR,
 		    "that's no child of mine", refChild, 0);
@@ -559,8 +558,8 @@ public abstract class DomNode
 		// yep -- do so!
 		ensureEnough (child.length);
 		for (int i = 0; i < child.length; i++)
-		    insertBefore (child.children [i], refChild);
-		return refChild;
+		    insertBefore (child.children [0], refChild);
+		return newChild;
 	    }
 	} catch (ClassCastException e) {
 	    throw new DomEx (DomEx.WRONG_DOCUMENT_ERR,
