@@ -246,14 +246,17 @@ extends FileTypeMap
       final int READTYPE=1;
       final int READEXT=2;
       //the state register
-      int state=STARTLINE;
+      int state=READTYPE;
       //the mimetype register
       MimeType mt=null;
+      StringBuffer mimeTypeBuffer=new StringBuffer();
+      StringBuffer extBuffer=new StringBuffer();
       //setup the tokenizer to parse a standard mime.types file
       StreamTokenizer toker=new StreamTokenizer(in);
       toker.commentChar('#');
       toker.eolIsSignificant(true);
-      toker.ordinaryChar('/');
+      toker.wordChars('/','/');
+      toker.wordChars('-','-');
       while(true)
       {
 	switch(toker.nextToken())
@@ -261,26 +264,29 @@ extends FileTypeMap
 	  case StreamTokenizer.TT_EOF:
 	    return registry;
 	  case StreamTokenizer.TT_EOL:
-	    state=STARTLINE;
-	    continue;
+	    switch(state)
+	    {
+	      case READEXT:
+		//set the state
+		state=READTYPE;
+		continue;
+	      default:
+		continue;
+	    }
 	  case StreamTokenizer.TT_WORD:
 	    switch(state)
 	    {
-	      case STARTLINE:
-		//create the mime type with the token we've just passed
-		mt=new MimeType(toker.sval);
-		//update the current state
-		state=READTYPE;
-		break;
 	      case READTYPE:
-		//the token must be an extension
+		//type has been read - create the object
+		mt=new MimeType(toker.sval);
+		state=READEXT;
+		continue;
+	      case READEXT:
 		registry.put(toker.sval,mt);
-		break;
+		continue;
+	      default:
+		continue;
 	    }
-	    continue;
-	  default:
-	    //should never get called
-	    break;
 	}
       }
     }

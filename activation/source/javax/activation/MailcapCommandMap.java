@@ -286,87 +286,148 @@ extends CommandMap
     try 
     {
       Hashtable registry=new Hashtable();
-      //line states
-      final int LINE_CONTINUE=-1;
-      final int DO_LINE=0;
       //some states that we use in this mini-FSM
-      final int STARTCAP=0;
-      final int READNAME=2;
-      final int READVALUE=3;
+      final int READMIMETYPE=0;
+      final int READUNIXCOMMAND=1;
+      final int READCOMMANDNAME=2;
+      final int READCOMMANDVALUE=3;
+      final int SWALLOW=4;
+      //handles line continuations
+      boolean continueLine=false;
       //the state register
-      int state=STARTCAP;
-      int lineState=DO_LINE;
-      //the mime type we're looking for
-      String mt=null;
-      //the command register: 2 elements store each command
-      Vector commands=new Vector();
-      //the name buffer
-      StringBuffer name=null;
-      StringBuffer value=null;
+      int state=READMIMETYPE;
+      //various buffers for storing temp values
+      String mimetype=null;
+      String name=null;
+      String value=null;
+      StringBuffer mtBuf=new StringBuffer();
+      StringBuffer nameBuf=new StringBuffer();
+      StringBuffer valueBuf=new StringBuffer();
       //setup the tokenizer to parse a standard mailcap file
       StreamTokenizer toker=new StreamTokenizer(in);
       toker.commentChar('#');
       toker.eolIsSignificant(true);
-      toker.ordinaryChar('/');
+      toker.wordChars('/','/');
       while(true)
       {
-	switch(toker.nextToken())
+	int token=toker.nextToken();
+	//first handle line continuations and END condition
+	switch(token)
 	{
 	  case StreamTokenizer.TT_EOF:
 	    return registry;
 	  case StreamTokenizer.TT_EOL:
-	    if(lineState==LINE_CONTINUE)
-	    lineState=DO_LINE;
-	    else
+	    if(continueLine)
 	    {
-	      //move the vect to an array
-	      CommandInfo[] com=new CommandInfo[commands.size()];
-	      commands.toArray(com);
-	      //add the array to the registry
-	      registry.put(mt,com);
-	      //change the state to start again
-	      state=STARTCAP;
+	      do
+	      token=toker.nextToken();
+	      while(token==StreamTokenizer.TT_EOL);
+	      continueLine=false;
 	    }
-	    continue;
-	  case StreamTokenizer.TT_WORD:
-	    switch(state)
-	    {
-	      case STARTCAP:
-		//create a new hash for storing the command tokens
-		commands.clear();
-		name=new StringBuffer();
-		value=new StringBuffer();
-		//set the mimetype for this entry
-		mt=toker.sval;
-		//update the current state
-		state=READNAME;
-		break;
-	      case READNAME:
-		if(toker.sval.equals("="))
-		state=READVALUE;
-		else if(toker.sval.equals(";"))
-		addCommand(commands,name,null);
-		else if(toker.sval.equals("\\"))
-		lineState=LINE_CONTINUE;
-		else
-		name.append(toker.sval);
-		break;
-	      case READVALUE:
-		if(toker.sval.equals(";"))
-		{
-		  addCommand(commands,name,value);
-		  state=READNAME;
-		}
-		else if(toker.sval.equals("\\"))
-		lineState=LINE_CONTINUE;
-		else
-		value.append(toker.sval);
-		break;
-	    }
-	    continue;
-	  default:
-	    //should never get called
 	    break;
+	  case '\\':
+	    continueLine=true;
+	    continue;
+	}
+	//now the main state machine
+	switch(state)
+	{
+	  case READMIMETYPE:
+	    switch(token)
+	    {
+	      case StreamTokenizer.TT_EOL:
+		//the mailcap entry has finished without specifying beans
+		mtBuf.setLength(0);
+		break;
+	      case ';':
+		//the mime type has been specified
+		mimetype=mtBuf.toString();
+		mtBuf.setLength(0);
+		state=READUNIXCOMMAND;
+		break;
+	      case StreamTokenizer.TT_WORD:
+		mtBuf.append(toker.sval);
+		break;
+	      default:
+		mtBuf.append((char)token);
+	    }
+	    continue;
+	  case READUNIXCOMMAND:
+	    switch(token)
+	    {
+	      case ';':
+		//the command has been read - start reading the beans
+		state=READCOMMANDNAME;
+		break;
+	      case StreamTokenizer.TT_EOL:
+		//the mailcap entry has finished without specifying beans
+		state=READMIMETYPE;
+		break;
+	      default:
+		break;
+	    }
+	    continue;
+	  case READCOMMANDNAME:
+	    switch(token)
+	    {
+	      case StreamTokenizer.TT_EOL:
+		//the entry has finished without specifying a bean
+		state=READMIMETYPE;
+		break;
+	      case ';':
+		//the field has finished without specifying a bean...
+		//... carry on looking for one
+		nameBuf.setLength(0);
+		break;
+	      case '=':
+		//the field name has finished correctly
+		name=nameBuf.toString();
+		nameBuf.setLength(0);
+		//if we read a bean specifying field name then move on
+		if(name.startsWith("x-java-"))
+		state=READCOMMANDVALUE;
+		else
+		state=READUNIXCOMMAND;
+		break;
+	      case StreamTokenizer.TT_WORD:
+		nameBuf.append(toker.sval);
+		break;
+	      default:
+		nameBuf.append((char)token);
+	    }
+	    continue;
+	  case READCOMMANDVALUE:
+	    switch(token)
+	    {
+	      case StreamTokenizer.TT_EOL:
+		value=valueBuf.toString();
+		valueBuf.setLength(0);
+		addCommand(registry,mimetype,name,value);
+		state=READMIMETYPE;
+		break;
+	      case ';':
+		value=valueBuf.toString();
+		valueBuf.setLength(0);
+		addCommand(registry,mimetype,name,value);
+		state=SWALLOW;
+		break;
+	      case StreamTokenizer.TT_WORD:
+		valueBuf.append(toker.sval);
+		break;
+	      default:
+		valueBuf.append((char)token);
+	    }
+	    continue;
+	  case SWALLOW:
+	    switch(token)
+	    {
+	      case StreamTokenizer.TT_EOL:
+		state=READMIMETYPE;
+		break;
+	      default:
+		break;
+	    }
+	    continue;
 	}
       }
     }
@@ -378,23 +439,51 @@ extends CommandMap
     return null;
   }
 
-  /** add the specified command name and value to the list.
-   * The command is only added if the name begins with:
-   * <pre>
-   *   x-java-
-   * </pre>
+  /** add the specified command name and value to the registry.
    *
-   * @param commandList the list of commands to add this one to
+   * @param reg the registry of MIME types against <code>CommandInfo[]</code>
+   * @param mimetype the name of the mime type
    * @param name the name of the command
    * @param value the text of the command
    */
-  private void addCommand(Vector commandList,StringBuffer name,StringBuffer value)
+  private void addCommand(Hashtable reg,String mimetype,String name,String value)
   {
-    String comName=name.toString();
-    if(comName.startsWith("x-java-"))
+    System.out.println("mimetype="+mimetype+" command="+name+"="+value);
+    if(name.startsWith("x-java-"))
     {
-      CommandInfo ci=new CommandInfo(comName,value.toString());
-      commandList.addElement(ci);
+      CommandInfo ci=new CommandInfo(name,value);
+      //get the existing array
+      CommandInfo[] list=(CommandInfo[])reg.get(mimetype);
+      if(list==null)
+      {
+	list=new CommandInfo[1];
+	list[0]=ci;
+	reg.put(mimetype,list);
+	return;
+      }
+      //the list exists - we have to add our action at the end
+      CommandInfo[] bigger=new CommandInfo[list.length+1];
+      System.arraycopy(list,0,bigger,0,list.length);
+      bigger[list.length]=ci;
+      reg.put(mimetype,bigger);
+    }
+  }
+
+
+  public static void main(String[] argv)
+  {
+    try
+    {
+      MailcapCommandMap map=new MailcapCommandMap();
+      CommandInfo[] pref=map.getPreferredCommands("text/*");
+      for(int i=0; i<pref.length; i++)
+      {
+	System.err.println("command="+pref[i]);
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace(System.err);
     }
   }
 }
