@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: MDGenerator.java,v 1.5 2002-06-08 05:21:28 raif Exp $
+// $Id: MDGenerator.java,v 1.6 2002-07-06 23:56:47 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -44,7 +44,7 @@ import java.util.Map;
  * SHA-160 algorithm is used as the underlying hash function. Also, if no
  * <code>seed</code> is given, an empty octet sequence is used.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MDGenerator extends BasePRNG {
 
@@ -68,20 +68,44 @@ public class MDGenerator extends BasePRNG {
       super(Registry.MD_PRNG);
    }
 
+   /**
+    * <p>Private constructor for cloning purposes.</p>
+    *
+    * @param that the instance to clone.
+    */
+   private MDGenerator(MDGenerator that) {
+      this();
+
+      this.md = (that.md == null ? null : (IMessageDigest) that.md.clone());
+   }
+
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Implementation of abstract methods in BaseRandom
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
+   public Object clone() {
+      return new MDGenerator(this);
+   }
+
+   // Implementation of abstract methods in BaseRandom ------------------------
 
    public void setup(Map attributes) {
       // find out which hash to use
       String underlyingMD = (String) attributes.get(MD_NAME);
       if (underlyingMD == null) {
-         underlyingMD = "sha-160";
+         if (md == null) { // happy birthday
+            // ensure we have a reliable implementation of this hash
+            md = HashFactory.getInstance(Registry.SHA160_HASH);
+         } else { // a clone. reset it for reuse
+            md.reset();
+         }
+      } else { // ensure we have a reliable implementation of this hash
+         md = HashFactory.getInstance(underlyingMD);
       }
-      // ensure we have a reliable implementation of this hash
-      md = HashFactory.getInstance(underlyingMD);
 
       // get the seeed
       byte[] seed = (byte[]) attributes.get(SEEED);
