@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: UMac32.java,v 1.2 2002-07-06 23:50:57 raif Exp $
+// $Id: UMac32.java,v 1.3 2002-07-14 01:39:58 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -120,7 +120,7 @@ import java.util.Map;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class UMac32 extends BaseMac {
 
@@ -135,6 +135,7 @@ public class UMac32 extends BaseMac {
 
    /** Known test vector. */
    private static final String TV1 = "5FD764A6D3A9FD9D";
+//   private static final String TV1 = "3E5A0E09198B0F94";
 
    private static final BigInteger MAX_NONCE_ITERATIONS =
          BigInteger.ONE.shiftLeft(16*8);
@@ -384,7 +385,9 @@ public class UMac32 extends BaseMac {
       IRandom kdf = new UMacGenerator();
       Map map = new HashMap();
       map.put(IBlockCipher.KEY_MATERIAL, K);
+//      map.put(IBlockCipher.CIPHER_BLOCK_SIZE, new Integer(128/8));
       map.put(UMacGenerator.INDEX, new Integer(128));
+//      map.put(UMacGenerator.CIPHER, Registry.AES_CIPHER);
       kdf.init(map);
       byte[] Kp = new byte[KEY_LEN];
       try {
