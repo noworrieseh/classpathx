@@ -316,7 +316,6 @@ public class MimeMultipart
         try
           {
             is = ds.getInputStream ();
-            System.out.println("ds="+ds+"; is="+is);
             if (is instanceof SharedInputStream)
               {
                 sis = (SharedInputStream) is;
@@ -339,7 +338,6 @@ public class MimeMultipart
             
             LineInputStream lis = new LineInputStream (is);
             String line;
-            System.out.println("looking for "+boundary);
             while ((line = lis.readLine ()) != null)
               {
                 System.out.println(line);
@@ -360,8 +358,11 @@ public class MimeMultipart
                 if (sis != null)
                   {
                     start = sis.getPosition ();
-                    while ((line = lis.readLine ()) != null &&
-                           line.length () > 0);
+                    do
+                      {
+                        line = trim (lis.readLine ());
+                      }
+                    while (line != null && line.length () > 0);
                     if (line == null)
                       {
                         throw new IOException ("EOF before content body");
@@ -507,6 +508,10 @@ public class MimeMultipart
    */
   private static String trim (String line)
   {
+    if (line == null)
+      {
+        return null;
+      }
     line = line.trim ();
     int len = line.length ();
     if (len > 0 && line.charAt (len - 1) == '\r')
