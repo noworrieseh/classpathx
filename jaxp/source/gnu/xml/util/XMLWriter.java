@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.6 2001-11-03 23:28:01 db Exp $
+ * $Id: XMLWriter.java,v 1.7 2001-11-04 01:38:52 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -91,7 +91,7 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-11-03 23:28:01 $
+ * @version $Date: 2001-11-04 01:38:52 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -1381,11 +1381,16 @@ public class XMLWriter
 		return;
 	    if (entityNestLevel != 0)
 		return;
-	    rawWrite ("<!ENTITY " + name + ' ');
+	    rawWrite ("<!ENTITY ");
+	    if (name.startsWith ("%")) {
+		rawWrite ("% ");
+		rawWrite (name.substring (1));
+	    } else
+		rawWrite (name);
 	    if (publicId != null)
-		rawWrite ("PUBLIC \"" + publicId + '"');
+		rawWrite (" PUBLIC \"" + publicId + '"');
 	    else
-		rawWrite ("SYSTEM ");
+		rawWrite (" SYSTEM ");
 	    rawWrite ('"' + systemId + "\">");
 	    newline ();
 	} catch (IOException e) {
@@ -1405,7 +1410,13 @@ public class XMLWriter
 		return;
 	    if (entityNestLevel != 0)
 		return;
-	    rawWrite ("<!ENTITY " + name + ' ');
+	    rawWrite ("<!ENTITY ");
+	    if (name.startsWith ("%")) {
+		rawWrite ("% ");
+		rawWrite (name.substring (1));
+	    } else
+		rawWrite (name);
+	    rawWrite (' ');
 	    writeQuotedValue (value, CTX_ENTITY);
 	    rawWrite ('>');
 	    newline ();
