@@ -39,13 +39,15 @@ import javax.xml.transform.TransformerConfigurationException;
  *	objects used as SAX handlers, and passing the transformed data
  *	through a {@link SAXResult} encapsulating SAX ContentHandler and
  *	LexicalHandler objects;
- * <li> Pipeline Terminus, like a normal pipeline stage but using some other
- *	kind of {@link Result} to store transformed data as text;
+ * <li> Pipeline Termination, like a normal pipeline stage but using some
+ *	other kind of {@link Result} to store transformed data rather than
+ *	passing it to another stage;
  * <li> Event producer, an {@link XMLFilter} object taking data from a URI
  *	or from a SAX {@link InputSource} input object and delivering it
  *	to a SAX ContentHandler;
  * <li>	Transformer objects produced by this factory will usually be able
- *	to accept {@link SAXSource} objects as inputs.
+ *	to accept {@link SAXSource} objects as inputs, and the XMLReader
+ *	object in such a source could be an XMLFilter.
  * </ul>
  *
  * <p>Transformer objects produced by this factory will of course be
@@ -77,29 +79,58 @@ public abstract class SAXTransformerFactory extends TransformerFactory
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
+
+	/** Constructor, for use with subclasses */
 	protected SAXTransformerFactory() {
-	} // SAXTransformerFactory()
+	}
 
 
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
-	public abstract TransformerHandler newTransformerHandler(Source source)
+	/**
+	 * Returns a SAX event consumer sending its inputs to some Result
+	 * after transforming them according to a stylesheet.
+	 */
+	public abstract TransformerHandler
+	newTransformerHandler (Source stylesheet)
 		throws TransformerConfigurationException;
 
-	public abstract TransformerHandler newTransformerHandler(Templates templates)
+	/**
+	 * Returns a SAX event consumer sending its inputs to some Result
+	 * after transforming them according to a pre-parsed stylesheet.
+	 */
+	public abstract TransformerHandler
+	newTransformerHandler (Templates stylesheet)
 		throws TransformerConfigurationException;
 
+	/**
+	 * Returns a SAX event consumer sending its inputs to some Result
+	 * without transforming them (null transformation).
+	 */
 	public abstract TransformerHandler newTransformerHandler()
 		throws TransformerConfigurationException;
 
+	/**
+	 * Returns a SAX parser that transforms XML data according 
+	 * to a stylesheet before reporting SAX events.
+	 */
+	public abstract XMLFilter newXMLFilter (Source stylesheet)
+		throws TransformerConfigurationException;
+
+	/**
+	 * Returns a SAX parser that transforms XML data according 
+	 * to a pre-parsed stylesheet before reporting SAX events.
+	 */
+	public abstract XMLFilter newXMLFilter (Templates stylesheet)
+		throws TransformerConfigurationException;
+
+	/**
+	 * Returns a SAX event consumer collecting its inputs into
+	 * a pre-parsed stylesheet.
+	 */
 	public abstract TemplatesHandler newTemplatesHandler()
 		throws TransformerConfigurationException;
 
-	public abstract XMLFilter newXMLFilter(Source source)
-		throws TransformerConfigurationException;
-
-	public abstract XMLFilter newXMLFilter(Templates templates)
-		throws TransformerConfigurationException;
 }
