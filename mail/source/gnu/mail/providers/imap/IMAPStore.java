@@ -85,26 +85,34 @@ public class IMAPStore
       String password)
     throws MessagingException
   {
-    if (host==null || username==null || password==null)
-      return false;
     if (connection!=null)
       return true;
+    if (host==null)
+      host = getProperty("host");
+    if (username==null)
+      username = getProperty("user");
+    if (port<0)
+      port = getIntProperty("port");
+    if (host==null || username==null || password==null)
+      return false;
     synchronized (this)
     {
       try
       {
-        if (port<0)
-          port = DEFAULT_PORT;
-        connection = new IMAPConnection(host, port);
+        int connectionTimeout = getIntProperty("connectiontimeout");
+        int timeout = getIntProperty("timeout");
+        connection = new IMAPConnection(host, port,
+            connectionTimeout, timeout, session.getDebug());
         
-        if (session.getDebug())
-          connection.setDebug(true);
-        if (new Boolean(session.getProperty("mail.debug.ansi")).booleanValue())
+        if (propertyIsTrue("debug.ansi"))
           connection.setAnsiDebug(true);
         
         List capabilities = connection.capability();
-        if (capabilities.contains(STARTTLS))
-          connection.starttls();
+        if (!propertyIsFalse("tls"))
+        {
+          if (capabilities.contains(STARTTLS))
+            connection.starttls();
+        }
         if (capabilities.contains("AUTH="+CRAM_MD5))
           return connection.authenticate_CRAM_MD5(username, password);
         else if (!capabilities.contains(LOGINDISABLED))
@@ -216,6 +224,46 @@ public class IMAPStore
     String[] alerts = connection.getAlerts();
     for (int i=0; i<alerts.length; i++)
       notifyStoreListeners(StoreEvent.ALERT, alerts[i]);
+  }
+
+  // -- Utility methods --
+  
+  private int getIntProperty(String key)
+  {
+    String value = getProperty(key);
+    if (value!=null)
+    {
+      try
+      {
+        return Integer.parseInt(value);
+      }
+      catch (Exception e)
+      {
+      }
+    }
+    return -1;
+  }
+
+  private boolean propertyIsFalse(String key)
+  {
+    return "false".equals(getProperty(key));
+  }
+
+  private boolean propertyIsTrue(String key)
+  {
+    return "true".equals(getProperty(key));
+  }
+
+  /*
+   * Returns the provider-specific or general mail property corresponding to
+   * the specified key.
+   */
+  private String getProperty(String key)
+  {
+    String value = session.getProperty("mail.imap."+key);
+    if (value==null)
+      value = session.getProperty("mail."+key);
+    return value;
   }
 
 }

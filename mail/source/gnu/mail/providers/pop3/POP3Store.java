@@ -75,28 +75,35 @@ public final class POP3Store
 		 	String password)
     throws MessagingException
   {
-    if (host==null || username==null || password==null)
-      return false;
     if (connection!=null)
       return true;
+    if (host==null)
+            host = getProperty("host");
+    if (username==null)
+      username = getProperty("user");
+    if (port<0)
+      port = getIntProperty("port");
+    if (host==null || username==null || password==null)
+      return false;
     synchronized (this)
     {
       try
       {
-				int connectionTimeout =
-					getIntProperty(session.getProperty("mail.pop3.connectiontimeout"));
-				int timeout =
-					getIntProperty(session.getProperty("mail.pop3.timeout"));
+				int connectionTimeout = getIntProperty("connectiontimeout");
+				int timeout = getIntProperty("timeout");
 				connection = new POP3Connection(host, port,
 						connectionTimeout, timeout, session.getDebug());
         // Disable APOP if necessary
-        if ("false".equals(session.getProperty("mail.pop3.apop")))
+        if (propertyIsFalse("apop"))
           connection.timestamp = null;
-        List capa = connection.capa();
-        if (capa!=null)
+        if (!propertyIsFalse("tls"))
         {
-          if (capa.contains(POP3Connection.STLS))
-            connection.stls();
+          List capa = connection.capa();
+          if (capa!=null)
+          {
+            if (capa.contains(POP3Connection.STLS))
+              connection.stls();
+          }
         }
 				return connection.authenticate(username, password);
       }
@@ -111,21 +118,6 @@ public final class POP3Store
     }
   }
 
-	private int getIntProperty(String property)
-	{
-		if (property!=null)
-		{
-			try
-			{
-				return Integer.parseInt(property);
-			}
-			catch (Exception e)
-			{
-			}
-		}
-		return -1;
-	}
-
   /**
    * Closes the connection.
    */
@@ -134,13 +126,11 @@ public final class POP3Store
   {
     if (connection!=null)
     {
-			boolean rsetBeforeQuit =
-				"true".equals(session.getProperty("mail.pop3.rsetbeforequit"));
       synchronized (connection)
       {
         try
         {
-					if (rsetBeforeQuit)
+					if (propertyIsTrue("rsetbeforequit"))
 						connection.rset();
 					connection.quit();
         }
@@ -184,6 +174,46 @@ public final class POP3Store
     throws MessagingException
   {
     return getDefaultFolder().getFolder(urlname.getFile());
+  }
+
+  // -- Utility methods --
+
+	private int getIntProperty(String key)
+	{
+    String value = getProperty(key);
+		if (value!=null)
+		{
+			try
+			{
+				return Integer.parseInt(value);
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		return -1;
+	}
+
+  private boolean propertyIsFalse(String key)
+  {
+    return "false".equals(getProperty(key));
+  }
+
+  private boolean propertyIsTrue(String key)
+  {
+    return "true".equals(getProperty(key));
+  }
+
+  /*
+   * Returns the provider-specific or general mail property corresponding to
+   * the specified key.
+   */
+  private String getProperty(String key)
+  {
+    String value = session.getProperty("mail.pop3."+key);
+    if (value==null)
+      value = session.getProperty("mail."+key);
+    return value;
   }
 
 }

@@ -4,8 +4,8 @@ as detailed in RFC 1939.
 </p>
 
 <p>
-This provider supports transport layer security (TLS), as decribed in RFC
-2595.
+This provider supports transport layer security (TLS), as described in RFC
+2595, and uses APOP authentication if the server advertises this capability.
 </p>
 
 <p>
@@ -56,11 +56,12 @@ This provider supports the following properties:
 <td>The default username for POP3.</td>
 </tr>
 
-<tr>
+<!-- TODO -->
+<!--tr>
 <td>mail.pop3.connectiontimeout</td>
 <td>integer (&gt;=1)</td>
 <td>Socket connection timeout, in milliseconds. Default is no timeout.</td>
-</tr>
+</tr-->
 
 <tr>
 <td>mail.pop3.timeout</td>

@@ -42,8 +42,8 @@ Session properties
 
 The following session properties may be set:
 
-mail.pop3.disable-apop            boolean  if true, disable all attempts at
-                                           APOP authentication
+mail.pop3.apop            boolean  if false, disable all attempts at
+                                   APOP authentication
 
 
-Chris Burdess, August 2001
+Chris Burdess, September 2003

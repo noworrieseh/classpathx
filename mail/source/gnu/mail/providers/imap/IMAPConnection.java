@@ -93,7 +93,7 @@ public class IMAPConnection implements IMAPConstants
   /*
    * Print debugging output to stderr.
    */
-  private boolean debug = false;
+  private boolean debug;
 
   /*
    * Print debugging output using ANSI colour escape sequences.
@@ -101,26 +101,37 @@ public class IMAPConnection implements IMAPConstants
   private boolean ansiDebug = false;
 
   /**
-   * Constructor.
+   * Creates a new connection.
 	 * @param host the name of the host to connect to
 	 * @param port the port to connect to
    */
   public IMAPConnection(String host, int port)
     throws UnknownHostException, IOException
   {
+    this(host, port, -1, -1, false);
+  }
+  
+  /**
+   * Creates a new connection.
+	 * @param host the name of the host to connect to
+	 * @param port the port to connect to
+   */
+  public IMAPConnection(String host, int port,
+      int connectionTimeout, int timeout, boolean debug)
+    throws UnknownHostException, IOException
+  {
+    this.debug = debug;
+    // TODO connectionTimeout
+    
+    // Set up socket
     socket = new Socket(host, port);
+    if (timeout>0)
+      socket.setSoTimeout(timeout);
+    
     in = new IMAPResponseTokenizer(socket.getInputStream());
     out = socket.getOutputStream();
     asyncResponses = new ArrayList();
     alerts = new ArrayList();
-  }
-
-  /**
-   * Sets whether to log debugging output to stderr.
-   */
-  public void setDebug(boolean flag)
-  {
-    debug = flag;
   }
 
   /**

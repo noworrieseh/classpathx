@@ -21,20 +21,13 @@
 
 package gnu.mail.providers.smtp;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import javax.mail.Address;
 import javax.mail.Message;
@@ -46,57 +39,27 @@ import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import gnu.mail.util.CRLFInputStream;
-import gnu.mail.util.CRLFOutputStream;
 
 /** 
  * This transport handles communications with an SMTP server.
  *
- * <P><B>Important System Properties</B><BR>
- * 
- * <UL>
- *   <LI><code>mail.smtp.port</code> - the port used to connect
- *       to the SMTP server.
- *   <LI><code>mail.smtp.timeout</code> - milliseconds
- *       to wait for a reply from the server before timing out.
- *   <LI><code>mail.smtp.ehlo</code> - if true, will attempt
- *       to connect to SMTP server with "EHLO" first.
- *   <LI><code>mail.smtp.host</code> - the SMTP server to connect
- *       with.
- *   <LI><code>mail.smtp.user</code> - the user name to connect as
- *       (not yet implemented)
- *   <LI><code>mail.smtp.from</code> - the RFC 2822 address to use 
- *       as the message sender
- *   <LI><code>mail.smtp.localhost</code> - the hostname to use
- *       when identifying the local host to the SMTP server
- * </UL>
- *
- *
- * @author      Andrew Selkirk
- * @author      Ben Speakmon
+ * @author Andrew Selkirk
+ * @author Ben Speakmon
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version     2.0
+ * @version 2.0
  */
 public class SMTPTransport
   extends Transport
 {
 
-  public static final int SMTP_PORT = 25;
+  /**
+   * The connection used to communicate with the server.
+   */
+  protected SMTPConnection connection;
   
-  public static final int READY = 220;
-  public static final int OK = 250;
-  public static final int OK_NOT_LOCAL = 251;
-  public static final int OK_UNVERIFIED = 252;
-  public static final int SEND_DATA = 354;
+  protected String localHostName;
   
-  private static final byte[] CRLF = {13, 10};
-
-  private Socket socket = null;
-  private CRLFInputStream in = null;
-  private CRLFOutputStream out = null;
-  
-  private String localHostName;
-
+  private List extensions = null;
   private List authenticationMechanisms = null;
 
   /**
@@ -110,7 +73,7 @@ public class SMTPTransport
     super(session, urlName);
    
     // Check for mail.smtp.localhost property
-    localHostName = session.getProperty("mail.smtp.localhost");
+    localHostName = getProperty("localhost");
     if (localHostName==null)
     {
       try
@@ -125,127 +88,102 @@ public class SMTPTransport
   }
 
   /**
-   * Describe <code>protocolConnect</code> method here.
-   *
-   * @param host the SMTP server to connect to
-   * @param port the port to attempt connection on
-   * @param user the user to connect as 
-   * @param password the password to use for authenticating user
-   * @return true if the connection attempt succeeds.
-   * @exception MessagingException if an error occurs
+   * Connects to the SMTP server.
    */
-  protected boolean protocolConnect(String host, int port, String user,
-                                    String password)
+  protected boolean protocolConnect(String host, int port, String username,
+      String password)
     throws MessagingException 
   {
-
+    if (connection!=null)
+      return true;
     if (host==null)
-      host = session.getProperty("mail.smtp.host");
-    if (port==-1)
-    {
-      String smtpPort = session.getProperty("mail.smtp.port");
-      if (smtpPort!=null)
-      {
-        try
-        {
-          port = Integer.parseInt(smtpPort);
-        }
-        catch (NumberFormatException e)
-        {
-          throw new MessagingException("Invalid mail.smtp.port value: "+
-              smtpPort);
-        }
-      }
-      else
-          port = SMTP_PORT;
-    }
-    if (user==null)
-      user = session.getProperty("mail.smtp.user");
+      host = getProperty("host");
+    if (port<0)
+      port = getIntProperty("port");
+    if (username==null)
+      username = getProperty("user");
     
     // Check host
     if (host==null) 
-      throw new MessagingException("No SMTP host has been set "+
-          "(mail.smtp.host)");
+      throw new MessagingException("No SMTP host set (mail.smtp.host)");
     
-    try 
+    try
     {	
-      // Create Server Socket
-      socket = new Socket(host, port);
+      int connectionTimeout = getIntProperty("connectiontimeout");
+      int timeout = getIntProperty("timeout");
+      connection = new SMTPConnection(host, port,
+          connectionTimeout, timeout, session.getDebug());
     
-      // Check for "mail.smtp.timeout" option
-      String smtpTimeout = session.getProperty("mail.smtp.timeout");
-      if (smtpTimeout!=null) 
+      // EHLO/HELO
+      if (propertyIsFalse("ehlo"))
       {
-        try
+        if (!connection.helo(localHostName))
+          throw new MessagingException("HELO failed: "+connection.response);
+      }
+      else
+      {
+        extensions = connection.ehlo(localHostName);
+        if (extensions==null)
         {
-          socket.setSoTimeout(Integer.parseInt(smtpTimeout));
-        } 
-        catch (SocketException se)
-        {
-          System.err.println("smtp: WARNING: unable to set socket timeout property");
+          if (!connection.helo(localHostName))
+            throw new MessagingException("HELO failed: "+connection.response);
         }
-        catch (NumberFormatException e)
+        else
         {
-          throw new MessagingException("Invalid mail.smtp.timeout value: "+
-              smtpTimeout);
+          for (Iterator i=extensions.iterator(); i.hasNext(); )
+          {
+            String extension = (String)i.next();
+            if (extension.startsWith("AUTH "))
+            {
+              // Populate authenticationMechanisms
+              authenticationMechanisms = new ArrayList();
+              StringTokenizer st = new StringTokenizer(extension.substring(5));
+              while (st.hasMoreTokens())
+                authenticationMechanisms.add(st.nextToken());
+            }
+            else if (SMTPConnection.STARTTLS.equals(extension))
+            {
+              if (!propertyIsFalse("tls"))
+              {
+                connection.starttls();
+              }
+            }
+          }
         }
       }
-    
-      in = new CRLFInputStream(
-          new BufferedInputStream(
-            socket.getInputStream()));
-      out = new CRLFOutputStream(
-          new BufferedOutputStream(
-            socket.getOutputStream()));
-      
-      // Greeting
-      Response greeting = readResponse();
-      if (greeting.code!=READY)
-        throw new MessagingException("Server not ready");
-      
-      // EHLO/HELO
-      String smtpEhlo = session.getProperty("mail.smtp.ehlo");
-      if ("false".equals(smtpEhlo))
-        helo(localHostName);
-      else if (!ehlo(localHostName)) 
-        helo(localHostName);
       
       // User authentication
       if (authenticationMechanisms!=null &&
-          !authenticationMechanisms.isEmpty())
+          !authenticationMechanisms.isEmpty() &&
+          propertyIsTrue("auth"))
       {
-        if (user!=null && password!=null)
+        if (username!=null && password!=null)
         {
           // TODO more authentication mechanisms eg CRAM-MD5
           if (authenticationMechanisms.contains("LOGIN"))
-            return authLogin(user, password);
+          {
+            if (connection.authLogin(username, password))
+              return (connection.ehlo(localHostName)!=null);
+          }
           else if (authenticationMechanisms.contains("PLAIN"))
-            return authPlain(user, password);
+            return connection.authPlain(username, password);
           else
             System.err.println("smtp: No supported authentication mechanisms");
         }
         return false;
       }
+      return true;
     } 
     catch (IOException e)
     {
-      if (session.getDebug())
-        System.err.println("smtp: "+e.getMessage());
-      return false;
+      throw new MessagingException(e.getMessage(), e);
     }
-    return true;
   }
   
   /**
-   * Sends the SMTP message to the server.
-   *
-   * @param message the Message to send
-   * @param addresses the Addresses to send the Message to 
-   * @exception MessagingException if an error occurs
-   * @exception SendFailedException if an error occurs
+   * Send the specified message to the server.
    */
-  public void sendMessage(Message message,
-      Address[] addresses)
+  public void sendMessage(Message message, Address[] addresses)
     throws MessagingException, SendFailedException 
   {
     if (!(message instanceof MimeMessage))
@@ -258,32 +196,138 @@ public class SMTPTransport
     List unsent = new ArrayList(len);
     List invalid = new ArrayList(len);
     int deliveryStatus = 0;
+    ParameterList params = null; // ESMTP parameters
     
-    synchronized (this)
+    synchronized (connection)
     {
       if (!isConnected())
         throw new MessagingException("not connected");
       
-      // MAIL FROM
-      mailFrom(mimeMessage);
-      
-      // RCPT TO
-      rcptTo(addresses, sent, invalid);
-      
-      // DATA
       try
       {
-        if (simpleCommand("DATA")!=SEND_DATA)
-          throw new MessagingException("Error sending data");
-        SMTPOutputStream sout = new SMTPOutputStream(out);
-        mimeMessage.writeTo(sout);
-        sout.flush();
+        // reverse-path
+        String from0 = getProperty("from");
+        InternetAddress from = null;
+        if (from0!=null)
+        {
+          InternetAddress[] from1 = InternetAddress.parse(from0);
+          if (from1!=null && from1.length>0)
+            from = from1[0];
+        }
+        if (from==null)
+        {
+          Address[] from2 = mimeMessage.getFrom();
+          if (from2!=null && from2.length>0 &&
+              from2[0] instanceof InternetAddress)
+            from = (InternetAddress)from2[0];
+        }
+        if (from==null)
+          from = InternetAddress.getLocalAddress(session);
+        String reversePath = from.getAddress();
+        // DSN RET
+        String dsnRet = getProperty("dsn.ret");
+        if (dsnRet!=null)
+        {
+          String FULL = "FULL", HDRS = "HDRS";
+          String value = null;
+          if (FULL.equalsIgnoreCase(dsnRet))
+            value = FULL;
+          else if (HDRS.equalsIgnoreCase(dsnRet))
+            value = HDRS;
+          if (value!=null)
+          {
+            params = new ParameterList();
+            params.add(new Parameter("RET", value));
+          }
+        }
+        // MAIL FROM
+        if (!connection.mailFrom(reversePath, params))
+          throw new SendFailedException(connection.response);
+        params = null;
+       
+        // DSN NOTIFY
+        String dsnNotify = getProperty("dsn.notify");
+        if (dsnNotify!=null)
+        {
+          String NEVER = "NEVER", SUCCESS = "SUCCESS";
+          String FAILURE = "FAILURE", DELAY = "DELAY";
+          String value = null;
+          if (NEVER.equalsIgnoreCase(dsnNotify))
+            value = NEVER;
+          else
+          {
+            StringBuffer buf = new StringBuffer();
+            StringTokenizer st = new StringTokenizer(dsnNotify, " ,");
+            while (st.hasMoreTokens())
+            {
+              String token = st.nextToken();
+              if (SUCCESS.equalsIgnoreCase(token))
+              {
+                if (buf.length()>0)
+                  buf.append(',');
+                buf.append(SUCCESS);
+              }
+              else if (FAILURE.equalsIgnoreCase(token))
+              {
+                if (buf.length()>0)
+                  buf.append(',');
+                buf.append(FAILURE);
+              }
+              else if (DELAY.equalsIgnoreCase(token))
+              {
+                if (buf.length()>0)
+                  buf.append(',');
+                buf.append(DELAY);
+              }
+            }
+            if (buf.length()>0)
+              value = buf.toString();
+          }
+          if (value!=null)
+          {
+            params = new ParameterList();
+            params.add(new Parameter("NOTIFY", value));
+          }
+        }
+        // RCPT TO
+        for (int i=0; i<addresses.length; i++)
+        {
+          Address address = addresses[i];
+          if (address instanceof InternetAddress)
+          {
+            String forwardPath = ((InternetAddress)address).getAddress();
+            if (connection.rcptTo(forwardPath, params))
+              sent.add(address);
+            else
+              invalid.add(address);
+          }
+          else
+            invalid.add(address);
+        }
+        
+        // DATA
+        OutputStream dataStream = connection.data();
+        if (dataStream==null)
+          throw new MessagingException(connection.response);
+        mimeMessage.writeTo(dataStream);
+        dataStream.flush();
+        if (connection.finishData())
+        {
+          unsent.addAll(sent);
+          sent.clear();
+          deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+        }
+        else 
+        {
+          deliveryStatus = invalid.isEmpty() ?
+            TransportEvent.MESSAGE_DELIVERED :
+            TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
+        }
       }
       catch (IOException e)
       {
         throw new SendFailedException(e.getMessage());
       }
-      deliveryStatus = finishData(sent, unsent, invalid);
     }
   
     // Notify transport listeners
@@ -299,389 +343,70 @@ public class SMTPTransport
   }
 
   /**
-   * Close our streams and sockets. This will be called by
-   * the superclass after our sendMessage() returns.
-   *
-   * @exception MessagingException if an error occurs
+   * Close this transport.
    */
-  public synchronized void close()
+  public void close()
     throws MessagingException 
   {
-    // Check if connection is Open
     if (isConnected()) 
     {
-      try 
+      synchronized (connection)
       {
-        simpleCommand("QUIT");
+        try 
+        {
+          connection.quit();
+        }
+        catch (IOException e) 
+        {
+          throw new MessagingException(e.getMessage(), e);
+        }
+        finally
+        {
+          connection = null;
+        }
       }
-      catch (MessagingException e) 
-      {
-      }
-        
-      try 
-      {
-        // Close streams
-        out.close();
-        in.close();
-        socket.close();
-        out = null;
-        in = null;
-        socket = null;
-      } 
-      catch (IOException e) 
-      {
-      }
-    } 
+    }
     super.close();
   }
+  
+  // -- Utility methods --
 
-  /**
-   * Checks lines of input from the server and returns true
-   * if the server has finished sending this reply to us.
-   * This may happen in response to EHLO or HELP commands.
-   *
-   * @param value a line of input from the SMTP server
-   * @return true if the server is waiting for us now.
-   */
-  private boolean isNotLastLine(String value) 
+  private int getIntProperty(String key)
   {
-    // Check for space after code
-    return (value.charAt(3)!=' ');
-  }
-
-  /**
-   * Send a ELHO command to the SMTP server.  Since it is possible
-   * that the SMTP server doesn't support extensions, false would be
-   * returned in such a scenario.  Otherwise, if there is a problem,
-   * an exception should be thrown.
-   *
-   * @param domain EHLO domain for handshaking
-   * @returns true if SMTP extensions are supported, false otherwise
-   * @exception MessagingException Problem has occurred
-   */
-  private boolean ehlo(String domain)
-    throws MessagingException 
-  {
-    String command = new StringBuffer("EHLO ")
-      .append(domain)
-      .toString();
-    sendCommand(command);
-    while (true)
-    {
-      Response response = readResponse();
-      if (response.text.startsWith("AUTH "))
-      {
-        authenticationMechanisms = new ArrayList();
-        StringTokenizer st = new StringTokenizer(response.text.substring(5));
-        while (st.hasMoreTokens())
-          authenticationMechanisms.add(st.nextToken());
-      }
-      if ("STARTTLS".equals(response.text))
-        starttls();
-      if (response.last)
-        return (response.code==OK);
-    }
-  }
-
-  private boolean starttls()
-    throws MessagingException
-  {
-    sendCommand("STARTTLS");
-    Response response = readResponse();
-    if (response.code!=OK)
-      return false;
-    try
-    {
-      // Attempt to instantiate an SSLSocketFactory
-      // This requires introspection, as the class may not be available in
-      // all runtimes.
-      Class factoryClass = Class.forName("javax.net.ssl.SSLSocketFactory");
-      java.lang.reflect.Method getDefault =
-        factoryClass.getMethod("getDefault", new Class[0]);
-      Object factory = getDefault.invoke(null, new Object[0]);
-      // Use the factory to negotiate a TLS session and wrap the current
-      // socket.
-      Class[] pt = new Class[4];
-      pt[0] = Socket.class;
-      pt[1] = String.class;
-      pt[2] = Integer.TYPE;
-      pt[3] = Boolean.TYPE;
-      java.lang.reflect.Method createSocket =
-        factoryClass.getMethod("createSocket", pt);
-      Object[] args = new Object[4];
-      args[0] = socket;
-      args[1] = socket.getInetAddress().getHostName();
-      args[2] = new Integer(socket.getPort());
-      args[3] = Boolean.TRUE;
-      socket = (Socket)createSocket.invoke(factory, args);
-      // Set up streams
-      in = new CRLFInputStream(
-          new BufferedInputStream(
-            socket.getInputStream()));
-      out = new CRLFOutputStream(
-          new BufferedOutputStream(
-            socket.getOutputStream()));
-      return true;
-    }
-    catch (Exception e)
-    {
-      return false;
-    }
-  }
-
-  /**
-   * Send a HELO command to the SMTP server.  If there is a problem,
-   * an exception should be thrown.
-   * @param domain HELO domain for handshaking
-   * @exception MessagingException Problem has occurred
-   */
-  private void helo(String domain) throws MessagingException 
-  {
-    String command = new StringBuffer("HELO ")
-      .append(domain)
-      .toString();
-    simpleCommand(command);
-  }
-
-  /**
-   * LOGIN authentication mechanism.
-   */
-  private boolean authLogin(String username, String password)
-    throws MessagingException
-  {
-    if (simpleCommand("AUTH LOGIN")==334)
+    String value = getProperty(key);
+    if (value!=null)
     {
       try
       {
-        String US_ASCII = "US-ASCII";
-        byte[] bytes = username.getBytes(US_ASCII);
-        String encoded = new String(BASE64.encode(bytes), US_ASCII);
-        if (simpleCommand(encoded)==334)
-        {
-          bytes = password.getBytes(US_ASCII);
-          encoded = new String(BASE64.encode(bytes), US_ASCII);
-          if (simpleCommand(encoded)==235)
-            return ehlo(localHostName); // Re-issue EHLO
-        }
+        return Integer.parseInt(value);
       }
-      catch (UnsupportedEncodingException e)
-      {
-        // Should not happen according to JDK docs
-        throw new MessagingException(e.getMessage(), e);
-      }
+      catch (Exception e)
+                                            {
+                                            }
     }
-    return false;
-  }
-
-  /**
-   * PLAIN authentication mechanism.
-   */
-  private boolean authPlain(String username, String password)
-    throws MessagingException
-  {
-    try
-    {
-      String plain = new StringBuffer(username)
-        .append('\u0000')
-        .append(username)
-        .append('\u0000')
-        .append(password)
-        .toString();
-      String US_ASCII = "US-ASCII";
-      byte[] bytes = plain.getBytes(US_ASCII);
-      String encoded = new String(BASE64.encode(bytes), US_ASCII);
-      String command = new StringBuffer("AUTH PLAIN ")
-        .append(encoded)
-        .toString();
-      return (simpleCommand(command)==235);
-    }
-    catch (UnsupportedEncodingException e)
-    {
-      // Should not happen according to JDK docs
-      throw new MessagingException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Offers our mail sender(s) to the SMTP server.
-   *
-   * @exception SendFailedException if no valid message sender is found.
-   * @exception MessagingException for any other error cause.
-   */
-  private void mailFrom(MimeMessage message)
-    throws SendFailedException, MessagingException 
-  {
-    Address from = null;
-    String smtpFrom = session.getProperty("mail.smtp.from");
-    if (smtpFrom!=null)
-      from = new InternetAddress(smtpFrom);
-    if (from==null)
-    {
-      Address[] f = message.getFrom(); // returns Sender if From absent
-      if (f!=null && f.length>0)
-        from = f[0];
-    }
-    if (from==null)
-      throw new SendFailedException("No valid message sender specified");
-    
-    String command = new StringBuffer("MAIL FROM:<")
-      .append(from.toString())
-      .append(">")
-      .toString();
-    switch (simpleCommand(command))
-    {
-      case OK:
-      case OK_NOT_LOCAL:
-      case OK_UNVERIFIED:
-        break;
-      default:
-        throw new SendFailedException("Sender "+from+" rejected");
-    }
-  }
-
-  /**
-   * Send list of mail recipients to SMTP server.  Keeps track
-   * of which messages are valid/invalid.
-   *
-   * @exception SendFailedException Problem has occurred
-   */
-  private void rcptTo(Address[] addresses, List sent, List invalid)
-    throws SendFailedException, MessagingException 
-  {
-    for (int i=0; i<addresses.length; i++) 
-    {
-      String command = new StringBuffer("RCPT TO:<")
-        .append(addresses[i].toString())
-        .append(">")
-        .toString();
-      switch (simpleCommand(command))
-      {
-        case OK:
-        case OK_NOT_LOCAL:
-        case OK_UNVERIFIED:
-          sent.add(0, addresses[i]);
-          break;
-        default:
-          invalid.add(0, addresses[i]);
-      }
-    }
-    if (sent.isEmpty())
-      throw new SendFailedException("No valid mail recipients specified");	
-  }
-
-  /**
-   * Send end-of-data tag to SMTP server.
-   * @exception MessagingException Problem has occurred
-   */
-  private int finishData(List sent, List unsent, List invalid)
-    throws MessagingException 
-  {
-    String dataEnd = "\r\n.\r\n";
-    if (simpleCommand(dataEnd)!=OK)
-    {
-      unsent.addAll(sent);
-      sent.clear();
-      return TransportEvent.MESSAGE_NOT_DELIVERED;
-    }
-    else 
-    {
-      return invalid.isEmpty() ?
-        TransportEvent.MESSAGE_DELIVERED :
-        TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
-    }
+                    return -1;
   }
   
-  private Response readResponse()
-    throws MessagingException
+  private boolean propertyIsFalse(String key)
   {
-    String line = null;
-    try
-    {
-      line = in.readLine();
-      // Handle special case eg 334 where CRLF occurs after code.
-      if (line.length()<4)
-        line = new StringBuffer(line)
-          .append('\n')
-          .append(in.readLine())
-          .toString();
-      return new Response(line);
-    } 
-    catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
-    catch (NumberFormatException e)
-    {
-      throw new MessagingException("Unexpected response: "+line);
-    }
-    finally
-    {
-      if (session.getDebug())
-        System.err.println("smtp: < " + line);
-    }
+    return "false".equals(getProperty(key));
   }
-
-  /**
-   * Write a command to the SMTP server and parse the response.
-   * @param command Command to send
-   * @returns Return code from SMTP server
-   * @exception MessagingException Problem has occurred
+  
+  private boolean propertyIsTrue(String key)
+  {
+    return "true".equals(getProperty(key));
+  }
+  
+  /*
+   * Returns the provider-specific or general mail property corresponding to
+   * the specified key.
    */
-  private int simpleCommand(String command)
-    throws MessagingException 
+  private String getProperty(String key)
   {
-    sendCommand(command);
-    Response response = readResponse();
-    while (!response.last)
-      response = readResponse();
-    return response.code;
+    String value = session.getProperty("mail.pop3."+key);
+    if (value==null)
+      value = session.getProperty("mail."+key);
+    return value;
   }
-
-  /**
-   * Send command to SMTP server.
-   * @param command Command to send
-   * @exception MessagingException Problem has occurred
-   */
-  private void sendCommand(String command)
-    throws MessagingException 
-  {
-    try 
-    {
-      out.write(command.getBytes());
-      out.write(CRLF);
-      out.flush();
-    } 
-    catch (IOException e) 
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
-    finally
-    {
-      if (session.getDebug()) 
-        System.err.println("smtp: > " + command);
-    }
-  }
-
-  /**
-   * Models and parses an SMTP server response.
-   */
-  static class Response
-  {
-    int code;
-    boolean last;
-    String text;
-
-    Response(String line)
-    {
-      code = Integer.parseInt(line.substring(0, 3));
-      last = (line.charAt(3)!='-');
-      text = line.substring(4);
-    }
-
-    boolean success()
-    {
-      return (code>=200 && code<300);
-    }
-  }
-
+  
 }

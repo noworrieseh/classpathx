@@ -65,6 +65,9 @@ public class SMTPConnection
   protected static final String EXPN = "EXPN";
   protected static final String HELP = "HELP";
   protected static final String QUIT = "QUIT";
+  protected static final String HELO = "HELO";
+  protected static final String EHLO = "EHLO";
+  protected static final String STARTTLS = "STARTTLS";
 
   protected static final int READY = 220;
   protected static final int OK = 250;
@@ -123,7 +126,7 @@ public class SMTPConnection
   public SMTPConnection(String host, int port)
     throws IOException
   {
-    this(host, port, false);
+    this(host, port, -1, -1, false);
   }
   
   /**
@@ -131,9 +134,12 @@ public class SMTPConnection
    * port.
    * @param host the server hostname
    * @param port the port to connect to
+   * @param connectionTimeout the connection timeout in milliseconds
+   * @param timeout the I/O timeout in milliseconds
    * @param debug whether to log progress
    */
-  public SMTPConnection(String host, int port, boolean debug)
+  public SMTPConnection(String host, int port, 
+      int connectionTimeout, int timeout, boolean debug)
     throws IOException
   {
     if (port<=0)
@@ -143,7 +149,11 @@ public class SMTPConnection
     this.debug = debug;
     
     // Initialise socket
+    // TODO connectionTimeout
     socket = new Socket(host, port);
+    if (timeout>0)
+      socket.setSoTimeout(timeout);
+    
     // Initialise streams
     InputStream in = socket.getInputStream();
     in = new BufferedInputStream(in);
@@ -347,12 +357,170 @@ public class SMTPConnection
   public void quit()
     throws IOException
   {
-    send(QUIT);
-    if (getResponse()!=OK)
-      throw new ProtocolException(response);
-    socket.close();
+    try
+    {
+      send(QUIT);
+      getResponse();
+      /* RFC 2821 states that the server MUST send an OK reply here, but
+       * many don't: postfix, for instance, sends 221.
+       * In any case we have done our best. */
+    }
+    catch (IOException e)
+    {
+    }
+    finally
+    {
+      // Close the socket anyway.
+      socket.close();
+    }
   }
-  
+
+  /**
+   * Issues a HELO command.
+   * @param hostname the local host name
+   */
+  public boolean helo(String hostname)
+    throws IOException
+  {
+    String command = new StringBuffer(HELO)
+      .append(' ')
+      .append(hostname)
+      .toString();
+    send(command);
+    return (getResponse()==OK);
+  }
+
+  /**
+   * Issues an EHLO command.
+   * If successful, returns a list of the SMTP extensions supported by the
+   * server.
+   * Otherwise returns null, and HELO should be called.
+   * @param hostname the local host name
+   */
+  public List ehlo(String hostname)
+    throws IOException
+  {
+    String command = new StringBuffer(EHLO)
+      .append(' ')
+      .append(hostname)
+      .toString();
+    send(command);
+    List extensions = new ArrayList();
+    do
+    {
+      switch (getResponse())
+      {
+        case OK:
+          extensions.add(response);
+          break;
+        default:
+          return null;
+      }
+    }
+    while (continuation);
+    return Collections.unmodifiableList(extensions);
+  }
+
+  /**
+   * Negotiate TLS over the current connection.
+   * This depends on many features, such as the JSSE classes being in the
+   * classpath. Returns true if successful, false otherwise.
+   */
+  public boolean starttls()
+    throws IOException
+  {
+    send(STARTTLS);
+    if (getResponse()!=OK)
+      return false;
+    try
+    {
+      // Attempt to instantiate an SSLSocketFactory
+      // This requires introspection, as the class may not be available in
+      // all runtimes.
+      Class factoryClass = Class.forName("javax.net.ssl.SSLSocketFactory");
+      java.lang.reflect.Method getDefault =
+        factoryClass.getMethod("getDefault", new Class[0]);
+      Object factory = getDefault.invoke(null, new Object[0]);
+      // Use the factory to negotiate a TLS session and wrap the current
+      // socket.
+      Class[] pt = new Class[4];
+      pt[0] = Socket.class;
+      pt[1] = String.class;
+      pt[2] = Integer.TYPE;
+      pt[3] = Boolean.TYPE;
+      java.lang.reflect.Method createSocket =
+        factoryClass.getMethod("createSocket", pt);
+      Object[] args = new Object[4];
+      args[0] = socket;
+      args[1] = socket.getInetAddress().getHostName();
+      args[2] = new Integer(socket.getPort());
+      args[3] = Boolean.TRUE;
+      socket = (Socket)createSocket.invoke(factory, args);
+      // Set up streams
+      InputStream in = socket.getInputStream();
+      in = new BufferedInputStream(in);
+      this.in = new CRLFInputStream(in);
+      OutputStream out = socket.getOutputStream();
+      out = new BufferedOutputStream(out);
+      this.out = new CRLFOutputStream(out);
+      return true;
+    }
+    catch (Exception e)
+    {
+      return false;
+    }
+  }
+
+  // -- Authentication --
+
+  /**
+   * LOGIN authentication mechanism.
+   * If this returns true, EHLO should be re-issued.
+   */
+  public boolean authLogin(String username, String password)
+    throws IOException
+  {
+    send("AUTH LOGIN");
+    if (getResponse()==334)
+    {
+      String US_ASCII = "US-ASCII";
+      byte[] bytes = username.getBytes(US_ASCII);
+      String encoded = new String(BASE64.encode(bytes), US_ASCII);
+      send(encoded);
+      if (getResponse()==334)
+      {
+        bytes = password.getBytes(US_ASCII);
+        encoded = new String(BASE64.encode(bytes), US_ASCII);
+        send(encoded);
+        if (getResponse()==235)
+          return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * PLAIN authentication mechanism.
+   */
+  public boolean authPlain(String username, String password)
+    throws IOException
+  {
+    String plain = new StringBuffer(username)
+      .append('\u0000')
+      .append(username)
+      .append('\u0000')
+      .append(password)
+      .toString();
+    String US_ASCII = "US-ASCII";
+    byte[] bytes = plain.getBytes(US_ASCII);
+    String encoded = new String(BASE64.encode(bytes), US_ASCII);
+    String command = new StringBuffer("AUTH PLAIN ")
+      .append(encoded)
+      .toString();
+    send(command);
+    return (getResponse()==235);
+  }
+
   // -- Utility methods --
 
   /**
@@ -361,41 +529,41 @@ public class SMTPConnection
    */
   protected void send(String command)
     throws IOException
-  {
-    if (debug)
-      System.err.println("smtp: > "+command);
-    out.write(command.getBytes("US-ASCII")); // TODO check encoding
-    out.write('\n'); // This is automatically converted to CRLF
-    out.flush();
-  }
+    {
+      if (debug)
+        System.err.println("smtp: > "+command);
+      out.write(command.getBytes("US-ASCII")); // TODO check encoding
+      out.write('\n'); // This is automatically converted to CRLF
+      out.flush();
+    }
 
   /**
    * Returns the next response from the server.
    */
   protected int getResponse()
     throws IOException
-  {
-    String line = null;
-    try
     {
-      line = in.readLine();
-      // Handle special case eg 334 where CRLF occurs after code.
-      if (line.length()<4)
-        line = new StringBuffer(line)
-          .append('\n')
-          .append(in.readLine())
-          .toString();
-      if (debug)
-        System.err.println("smtp: < "+line);
-      int code = Integer.parseInt(line.substring(0, 3));
-      continuation = (line.charAt(3)=='-');
-      response = line.substring(4);
-      return code;
+      String line = null;
+      try
+      {
+        line = in.readLine();
+        // Handle special case eg 334 where CRLF occurs after code.
+        if (line.length()<4)
+          line = new StringBuffer(line)
+            .append('\n')
+            .append(in.readLine())
+            .toString();
+        if (debug)
+          System.err.println("smtp: < "+line);
+        int code = Integer.parseInt(line.substring(0, 3));
+        continuation = (line.charAt(3)=='-');
+        response = line.substring(4);
+        return code;
+      }
+      catch (NumberFormatException e)
+      {
+        throw new ProtocolException("Unexpected response: "+line);
+      }
     }
-    catch (NumberFormatException e)
-    {
-      throw new ProtocolException("Unexpected response: "+line);
-    }
-  }
-  
+
 }
