@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.16 2001-10-23 17:42:25 db Exp $
+ * $Id: SAXDriver.java,v 1.17 2001-11-05 22:38:09 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.16 2001-10-23 17:42:25 db Exp $
+// $Id: SAXDriver.java,v 1.17 2001-11-05 22:38:09 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -81,9 +81,9 @@ import gnu.xml.util.DefaultHandler;
  * <b>http://xml.org/sax/features/</b></em></center></td></tr>
  *
  * <tr><td>(URL)/external-general-entities</td>
- *	<td>Value is fixed at <em>true</em></td></tr>
+ *	<td>Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/external-parameter-entities</td>
- *	<td>Value is fixed at <em>true</em></td></tr>
+ *	<td>Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/is-standalone</td>
  *	<td>(PRELIMINARY) Returns true iff the document's parsing
  *	has started (some non-error event after <em>startDocument()</em>
@@ -116,7 +116,7 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-05 22:38:09 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -143,6 +143,8 @@ final public class SAXDriver
 
     private boolean			namespaces = true;
     private boolean			xmlNames = false;
+    private boolean			extGE = true;
+    private boolean			extPE = true;
 
     private int				attributeCount = 0;
     private boolean			attributes;
@@ -305,7 +307,9 @@ final public class SAXDriver
 
 		if (source.getByteStream () != null
 			&& source.getCharacterStream () != null)
-		    fatal ("resolveEntity() returned two streams");
+		    fatal ("two input streams");
+		else if (systemId == null)
+		    fatal ("no input URI");
 		parser.doParse (systemId,
 			      source.getPublicId (),
 			      source.getCharacterStream (),
@@ -356,11 +360,11 @@ final public class SAXDriver
 	if ((FEATURE + "validation").equals (featureId))
 	    return false;
 
-	// external entities (both types) are currently always included
-	if ((FEATURE + "external-general-entities").equals (featureId)
-		|| (FEATURE + "external-parameter-entities")
-		    .equals (featureId))
-	    return true;
+	// external entities (both types) are optionally included
+	if ((FEATURE + "external-general-entities").equals (featureId))
+	    return extGE;
+	if ((FEATURE + "external-parameter-entities") .equals (featureId))
+	    return extPE;
 
 	// element/attribute names are as written in document; no mangling
 	if ((FEATURE + "namespace-prefixes").equals (featureId))
@@ -450,6 +454,15 @@ final public class SAXDriver
 	    return;
 	}
 
+	if ((FEATURE + "external-general-entities").equals (featureId)) {
+	    extGE = state;
+	    return;
+	}
+	if ((FEATURE + "external-parameter-entities") .equals (featureId)) {
+	    extPE = state;
+	    return;
+	}
+
 	throw new SAXNotSupportedException (featureId);
     }
 
@@ -504,35 +517,22 @@ final public class SAXDriver
 	attributeValues.removeAllElements ();
     }
 
-    Object resolveEntity (String publicId, String systemId)
+    void skippedEntity (String name)
+    throws SAXException
+	{ contentHandler.skippedEntity (name); }
+
+    InputSource resolveEntity (boolean isPE, InputSource in)
     throws SAXException, IOException
     {
-	InputSource source = entityResolver.resolveEntity (publicId,
-			     systemId);
-
-	if (source == null) {
+	// external entities might be skipped
+	if (isPE && !extPE)
 	    return null;
-	} else if (source.getCharacterStream () != null) {
-	    if (source.getByteStream () != null)
-		fatal ("resolveEntity() returned two streams");
-	    return source.getCharacterStream ();
-	} else if (source.getByteStream () != null) {
-	    if (source.getEncoding () == null)
-		return source.getByteStream ();
-	    else try {
-		return new InputStreamReader (
-		    source.getByteStream (),
-		    source.getEncoding ()
-		    );
-	    } catch (IOException e) {
-		return source.getByteStream ();
-	    }
-	} else {
-	    return source.getSystemId ();
-	}
-	// XXX no way to tell AElfred about new public
-	// or system ids ... so relative URL resolution
-	// through that entity could be less than reliable.
+	if (!isPE && !extGE)
+	    return null;
+
+	InputSource source = entityResolver.resolveEntity (
+			in.getPublicId (), in.getSystemId ());
+	return (source == null) ? in : source;
     }
 
 
@@ -1025,7 +1025,7 @@ final public class SAXDriver
      */
     public String getPublicId ()
     {
-	return null; 		// XXX track public IDs too
+	return null; 		// FIXME track public IDs too
     }
 
     /**

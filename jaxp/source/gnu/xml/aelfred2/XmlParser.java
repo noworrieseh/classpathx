@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.18 2001-11-05 07:25:21 db Exp $
+ * $Id: XmlParser.java,v 1.19 2001-11-05 22:38:09 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -61,10 +61,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Stack;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.18 2001-11-05 07:25:21 db Exp $
+// $Id: XmlParser.java,v 1.19 2001-11-05 22:38:09 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -74,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-05 07:25:21 $
+ * @version $Date: 2001-11-05 22:38:09 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -167,7 +168,7 @@ final class XmlParser
 	setInternalEntity ("apos", "&#39;");
 	setInternalEntity ("quot", "&#34;");
 
-	pushURL ("[document]", basePublicId, baseURI,
+	pushURL (false, "[document]", basePublicId, baseURI,
 		baseReader, baseInputStream, encoding);
 
 	handler.startDocument ();
@@ -189,6 +190,7 @@ final class XmlParser
 		    reader.close ();
 		} catch (IOException e) { /* ignore */
 		}
+	    scratch = null;
 	}
     }
 
@@ -341,8 +343,6 @@ final class XmlParser
     private final static int LIT_DISABLE_CREF = 32;
 	// don't parse general entity refs
     private final static int LIT_DISABLE_EREF = 64;
-	// don't expand general entities, but make sure we _could_
-    private final static int LIT_ENTITY_CHECK = 128;
 	// literal is a public ID value 
     private final static int LIT_PUBID = 256;
 
@@ -425,6 +425,7 @@ final class XmlParser
     	    require ('<');
     	    parseElement ();
         } catch (EOFException ee) {                 // added by MHK
+ee.printStackTrace ();
             error("premature end of file", "[EOF]", null);
         }
         
@@ -840,7 +841,7 @@ final class XmlParser
 
 	    // NOTE:  [dtd] is so we say what SAX2 expects,
 	    // even though it's misleading, 
-	    pushURL ("[dtd]", ids [0], ids [1], null, null, null);
+	    pushURL (true, "[dtd]", ids [0], ids [1], null, null, null);
 
 	    // Loop until we end up back at '>'
 	    while (true) {
@@ -960,7 +961,8 @@ loop:
 		    }
 		}
 		// ... or has a default
-		String value = getAttributeExpandedValue (gi, aname);
+		// String value = getAttributeExpandedValue (gi, aname);
+		String value = getAttributeDefaultValue (gi, aname);
 
 		if (value == null)
 		    continue;
@@ -1185,13 +1187,16 @@ loop:
     private void parseContentspec (String name)
     throws Exception
     {
+// FIXME: move elementDecl() into setElement(), pass EMTPY/ANY ...
 	if (tryRead ("EMPTY")) {
 	    setElement (name, CONTENT_EMPTY, null, null);
-	    handler.getDeclHandler ().elementDecl (name, "EMPTY");
+	    if (!skippedPE)
+		handler.getDeclHandler ().elementDecl (name, "EMPTY");
 	    return;
 	} else if (tryRead ("ANY")) {
 	    setElement (name, CONTENT_ANY, null, null);
-	    handler.getDeclHandler ().elementDecl (name, "ANY");
+	    if (!skippedPE)
+		handler.getDeclHandler ().elementDecl (name, "ANY");
 	    return;
 	} else {
 	    String model;
@@ -1208,7 +1213,8 @@ loop:
 		model = dataBufferToString ();
 		setElement (name, CONTENT_ELEMENTS, model, null);
 	    }
-	    handler.getDeclHandler ().elementDecl (name, model);
+	    if (!skippedPE)
+		handler.getDeclHandler ().elementDecl (name, model);
 	}
     }
 
@@ -1504,15 +1510,19 @@ loop:
     {
 	int	valueType = ATTRIBUTE_DEFAULT_SPECIFIED;
 	String	value = null;
-	int	flags = LIT_ATTRIBUTE | LIT_DISABLE_CREF | LIT_ENTITY_CHECK;
+	int	flags = LIT_ATTRIBUTE;
 	boolean	saved = expandPE;
 	String	defaultType = null;
 
-	// Note: value is not normalized until we expand any entity refs.
-	
 	// LIT_ATTRIBUTE forces '<' checks now (ASAP) and turns whitespace
 	// chars to spaces (doesn't matter when that's done if it doesn't
 	// interfere with char refs expanding to whitespace).
+
+	if (!skippedPE) {
+	    flags |= LIT_ENTITY_REF;
+	    if ("CDATA" != type)
+		flags |= LIT_NORMALIZE;
+	}
 
 	expandPE = false;
 	if (tryRead ('#')) {
@@ -1538,7 +1548,7 @@ loop:
 	    type = enum;
 	else if ("NOTATION" == type)
 	    type = "NOTATION " + enum;
-	handler.getDeclHandler ()
+	if (!skippedPE) handler.getDeclHandler ()
 	    .attributeDecl (elementName, name, type, defaultType, value);
     }
 
@@ -1718,14 +1728,17 @@ loop2:
 	require (';');
 	switch (getEntityType (name)) {
 	case ENTITY_UNDECLARED:
-	    error ("reference to undeclared entity", name, null);
+	    if (skippedPE)
+		handler.warn ("reference to undeclared entity " + name);
+	    else
+		error ("reference to undeclared entity", name, null);
 	    break;
 	case ENTITY_INTERNAL:
 	    pushString (name, getEntityValue (name));
 	    break;
 	case ENTITY_TEXT:
 	    if (externalAllowed) {
-		pushURL (name, getEntityPublicId (name),
+		pushURL (false, name, getEntityPublicId (name),
 			 getEntitySystemId (name),
 			 null, null, null);
 	    } else {
@@ -1776,7 +1789,7 @@ loop2:
 	case ENTITY_TEXT:
 	    if (!inLiteral)
 		pushString (null, " ");
-	    pushURL (name, getEntityPublicId (name),
+	    pushURL (true, name, getEntityPublicId (name),
 		     getEntitySystemId (name),
 		     null, null, null);
 	    if (!inLiteral)
@@ -1841,11 +1854,14 @@ loop2:
 		    error ("whitespace required before NDATA");
 		requireWhitespace ();
 		String notationName = readNmtoken (true);
-		setEntity (name, ENTITY_NDATA, ids [0], absolute,
-			null, notationName);
-		handler.getDTDHandler ()
-		    .unparsedEntityDecl (name, ids [0], ids [1], notationName);
-	    } else {
+		if (!skippedPE) {
+		    setEntity (name, ENTITY_NDATA, ids [0], absolute,
+			    null, notationName);
+		    handler.getDTDHandler ()
+			.unparsedEntityDecl (name, ids [0], ids [1],
+				notationName);
+		}
+	    } else if (!skippedPE) {
 		setEntity (name, ENTITY_TEXT, ids [0], absolute, null, null);
 		handler.getDeclHandler ()
 		    .externalEntityDecl (name, ids [0], ids [1]);
@@ -1930,7 +1946,7 @@ loop:
 		    dataBufferAppend (readBuffer, start, i - start);
 		    return;
 		case ']':
-		    // XXX missing two end-of-buffer cases
+		    // FIXME missing two end-of-buffer cases
 		    if ((i + 2) < readBufferLength) {
 			if (readBuffer [i + 1] == ']'
 				&& readBuffer [i + 2] == '>') {
@@ -1960,7 +1976,7 @@ loop:
 	    case '&':
 		unread (c);
 		return;
-	    // XXX "]]>" precluded ...
+	    // FIXME "]]>" precluded ...
 	    default:
 		dataBufferAppend (c);
 		break;
@@ -2252,26 +2268,6 @@ loop:
 			} else {
 			    String name = readNmtoken (true);
 			    require (';');
-			    if ((flags & LIT_ENTITY_CHECK) != 0
-				    && getEntityType (name) ==
-					    ENTITY_UNDECLARED) {
-				String message = "General entity '"
-				    + name
-				    + "' must be declared before use";
-
-// FIXME
-				// XML 2nd Ed is no less confusing on
-				// the distinction here ... the rule
-				// is far too complex to be useful.
-
-				// WFC: Entity Declared
-				if (false)
-				    error (message);
-
-				// VC: Entity Declared
-				else
-				    handler.verror (message);
-			    }
 			    dataBufferAppend ('&');
 			    dataBufferAppend (name);
 			    dataBufferAppend (';');
@@ -2369,7 +2365,7 @@ loop:
     private String absolutize (String uri)
     throws SAXException
     {
-	// XXX should probably normalize system IDs as follows:
+	// FIXME should probably normalize system IDs as follows:
 	// - Convert to UTF-8
 	// - Map reserved and non-ASCII characters to %HH
 	// Unclear if that needs to be done before passing URIs
@@ -2778,6 +2774,9 @@ loop:
 	Hashtable	attributes
     ) throws SAXException 
     {
+	if (skippedPE)
+	    return;
+
 	Object element [] = (Object []) elementInfo.get (name);
 
 	// first <!ELEMENT ...> or <!ATTLIST ...> for this type?
@@ -2922,8 +2921,16 @@ loop:
 	}
     }
 
+    /*
 
-    /**
+// FIXME:  Leaving this in, until W3C finally resolves the confusion
+// between parts of the XML 2nd REC about when entity declararations
+// are guaranteed to be known.  Current code matches what section 5.1
+// (conformance) describes, but some readings of the self-contradicting
+// text in 4.1 (the "Entity Declared" WFC and VC) seem to expect that
+// attribute expansion/normalization must be deferred in some cases
+// (just TRY to identify them!).
+
      * Retrieve the expanded value of a declared attribute.
      * <p>General entities (and char refs) will be expanded (once).
      * @param name The name of the associated element.
@@ -2931,7 +2938,6 @@ loop:
      * @return The expanded default value, or null if the attribute was
      *	 #IMPLIED or simply undeclared
      * @see #getAttributeDefaultValue
-     */
     public String getAttributeExpandedValue (String name, String aname)
     throws Exception
     {
@@ -2956,6 +2962,7 @@ loop:
 	}
 	return (String) attribute [4];
     }
+     */
 
     /**
      * Retrieve the default value mode of a declared attribute.
@@ -2990,6 +2997,9 @@ loop:
     throws Exception
     {
 	Hashtable attlist;
+
+	if (skippedPE)
+	    return;
 
 	// Create a new hashtable if necessary.
 	attlist = getElementAttributes (elName);
@@ -3135,6 +3145,9 @@ loop:
     private void setInternalEntity (String eName, String value)
     throws SAXException
     {
+	if (skippedPE)
+	    return;
+
 	setEntity (eName, ENTITY_INTERNAL, null, null, value, null);
 	if ("lt" == eName || "gt" == eName || "quot" == eName
 		|| "apos" == eName || "amp" == eName)
@@ -3218,6 +3231,9 @@ loop:
     throws Exception
     {
 	Object notation[];
+
+	if (skippedPE)
+	    return;
 
 	handler.getDTDHandler ()
 	    .notationDecl (nname, pubid, sysid);
@@ -3390,13 +3406,10 @@ loop:
 
 
     /**
-     * Push a new external input source.
+     * Push, or skip, a new external input source.
      * The source will be some kind of parsed entity, such as a PE
      * (including the external DTD subset) or content for the body.
-     * <p>TODO: Right now, this method always attempts to autodetect
-     * the encoding; in the future, it should allow the caller to 
-     * request an encoding explicitly, and it should also look at the
-     * headers with an HTTP connection.
+     *
      * @param url The java.net.URL object for the entity.
      * @see SAXDriver#resolveEntity
      * @see #pushString
@@ -3407,15 +3420,63 @@ loop:
      * @see #readBuffer
      */
     private void pushURL (
+        boolean		isPE,
 	String		ename,
 	String		publicId,
 	String		systemId,
+		// FIXME: encoding is null except maybe from toplevel;
+		// the only functionality it adds is UCS4 support and
+		// workarounds for encoding names the JDK doesn't know.
+		// reader/stream are likewise null in most cases.
 	Reader		reader,
 	InputStream	stream,
 	String		encoding
     ) throws SAXException, IOException
     {
 	boolean	ignoreEncoding = false;
+
+	// See if we should skip or substitue non-document entities.
+	// The systemID was already absolutized.
+
+	if ("[document]" != ename) {
+	    InputSource	source;
+
+	    scratch.setSystemId (systemId);
+	    scratch.setPublicId (publicId);
+	    scratch.setEncoding (encoding);
+	    source = handler.resolveEntity (isPE, scratch);
+
+	    // Skip this entity?
+	    if (source == null) {
+		handler.warn ("Skipping entity: " + ename);
+		handler.skippedEntity (ename);
+		if (isPE)
+		    skippedPE = true;
+		return;
+	    }
+
+	    // we might be using alternate IDs/encoding
+	    systemId = source.getSystemId ();
+	    publicId = source.getPublicId ();
+	    encoding = source.getEncoding ();
+
+	    // we may have been given I/O streams directly
+	    if (source.getCharacterStream () != null) {
+		if (source.getByteStream () != null)
+		    error ("resolveEntity() returned two streams");
+		reader = source.getCharacterStream ();
+	    } else if (source.getByteStream () != null) {
+		if (encoding == null)
+		    stream = source.getByteStream ();
+		else try {
+		    reader = new InputStreamReader (
+			source.getByteStream (),
+			encoding);
+		} catch (IOException e) {
+		    stream = source.getByteStream ();
+		}
+	    }
+	}
 
 	// Push the existing status.
 	pushInput (ename);
@@ -3430,28 +3491,6 @@ loop:
 	line = 1;
 	column = 0;
 	currentByteCount = 0;
-
-	// systemID was already absolutized
-
-	// See if the application wants to
-	// redirect the system ID and/or
-	// supply its own character stream.
-
-// FIXME resolver might provide stream/reader _and_ a URI
-// ... remember that URI as the base URI, not the original!!
-
-	if (reader == null && stream == null && systemId != null) {
-	    Object input = handler.resolveEntity (publicId, systemId);
-	    if (input != null) {
-		if (input instanceof String) {
-		    systemId = (String) input;
-		} else if (input instanceof InputStream) {
-		    stream = (InputStream) input;
-		} else if (input instanceof Reader) {
-		    reader = (Reader) input;
-		}
-	    }
-	}
 
 	// Start the entity.
 	if (systemId != null) {
@@ -3545,7 +3584,7 @@ loop:
 	    setupDecoding (encoding);
 	    ignoreEncoding = true;
 	
-	// ... else autodetect
+	// ... else autodetect from first bytes.
 	} else {
 	    detectEncoding ();
 	    ignoreEncoding = false;
@@ -3553,6 +3592,7 @@ loop:
 	is.mark (100);
 
 	// Read any XML or text declaration.
+	// If we autodetected, it may tell us the "real" encoding.
 	try {
 	    tryEncodingDecl (ignoreEncoding);
 	} catch (EncodingException x) {
@@ -3578,6 +3618,7 @@ loop:
 		tryEncodingDecl (true);
 
 	    } catch (IOException e) {
+e.printStackTrace ();
 		error ("unsupported text encoding",
 		       encoding,
 		       null);
@@ -3851,8 +3892,6 @@ loop:
     private void pushInput (String ename)
     throws SAXException
     {
-	Object input[] = new Object [12];
-
 	// Check for entity recursion.
 	if (ename != null) {
 	    Enumeration entities = entityStack.elements ();
@@ -3872,6 +3911,8 @@ loop:
 
 	// Set up a snapshot of the current
 	// input source.
+	Object input[] = new Object [12];
+
 	input [0] = new Integer (sourceType);
 	input [1] = externalEntity;
 	input [2] = readBuffer;
@@ -4519,6 +4560,7 @@ loop:
 	elementInfo = new Hashtable ();
 	entityInfo = new Hashtable ();
 	notationInfo = new Hashtable ();
+	skippedPE = false;
 
 	// Set up the variables for the current
 	// element context.
@@ -4534,6 +4576,8 @@ loop:
 	tagAttributes = new String [100];
 	rawReadBuffer = new byte [READ_BUFFER_MAX];
 	readBufferOverflow = -1;
+
+	scratch = new InputSource ();
 
 	inLiteral = false;
 	expandPE = false;
@@ -4570,6 +4614,7 @@ loop:
     private URLConnection externalEntity; // current external entity
     private int		encoding; 	// current character encoding
     private int		currentByteCount; // bytes read from current source
+    private InputSource	scratch;	// temporary
 
     //
     // Buffers for decoded but unparsed character input.
@@ -4608,10 +4653,12 @@ loop:
 
     //
     // Hashtables for DTD information on elements, entities, and notations.
+    // Populated until we start ignoring decls (because of skipping a PE)
     //
     private Hashtable	elementInfo;
     private Hashtable	entityInfo;
     private Hashtable	notationInfo;
+    private boolean	skippedPE;
 
 
     //
