@@ -38,3 +38,27 @@ LICENSING
     The SAX/SAX2 files, originally in the public domain, have
     been updated; those updates are under the GPL.  SAX2 APIs
     remain unchanged.
+
+BUILDING
+    This software uses autoconf; eventually it should learn how to figure
+    out the right Java compiler (JDK, GCJ, Kaffe, etc) to use when building
+    this software.
+
+    1 - "autoconf" ... generates "configure"
+    
+    2 - "configure" ... generates Makefile matching the build environment
+
+    3 - "make" ... builds gnujaxp.jar
+
+    Also see the Makefile.  Targets include:
+
+	- "clean" (expecting rebuild from scratch)
+
+	- "distclean" (expecting "configure" to be run)
+
+	- "mrproper" (expecting autoconf to be run)
+    
+    So far there's no way to package a source distribution; stick to CVS.
+
+TESTING
+
