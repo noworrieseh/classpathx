@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.22 2001-11-09 21:03:42 db Exp $
+ * $Id: XmlParser.java,v 1.23 2001-11-10 18:36:23 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
@@ -65,7 +66,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.22 2001-11-09 21:03:42 db Exp $
+// $Id: XmlParser.java,v 1.23 2001-11-10 18:36:23 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +76,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-09 21:03:42 $
+ * @version $Date: 2001-11-10 18:36:23 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -714,7 +715,7 @@ ee.printStackTrace ();
 		return;
 	    } else if (encoding != ENCODING_EXTERNAL) {
 		// used to start with a new reader ...
-		throw new EncodingException (encodingName);
+		throw new UnsupportedEncodingException (encodingName);
 	    }
 	    // else fallthrough ...
 	    // it's ASCII-ish and something other than a builtin
@@ -3358,6 +3359,9 @@ loop:
 	else {
 	    InputSource	source;
 
+	    if (!isPE)
+		dataBufferFlush ();
+
 	    // if we're not skipping, this will report startEntity()
 	    scratch.setSystemId (systemId);
 	    scratch.setPublicId (publicId);
@@ -3500,13 +3504,12 @@ loop:
 	    detectEncoding ();
 	    ignoreEncoding = false;
 	}
-	is.mark (100);
 
 	// Read any XML or text declaration.
 	// If we autodetected, it may tell us the "real" encoding.
 	try {
 	    tryEncodingDecl (ignoreEncoding);
-	} catch (EncodingException x) {
+	} catch (UnsupportedEncodingException x) {
 	    encoding = x.getMessage ();
 
 	    // if we don't handle the declared encoding,
@@ -3557,7 +3560,6 @@ e.printStackTrace ();
     {
 	// Read the XML/text declaration.
 	if (tryRead ("<?xml")) {
-	    dataBufferFlush ();		// for reading external entities
 	    if (tryWhitespace ()) {
 		if (inputStack.size () > 0) {
 		    return parseTextDecl (ignoreEncoding);
@@ -3674,13 +3676,15 @@ e.printStackTrace ();
 	    // ASCII derived
 	    // 0x3c 0x3f 0x78 0x6d: UTF-8 or other 8-bit markup (read ENCODING)
 	    encoding = ENCODING_UTF_8;
+	    prefetchASCIIEncodingDecl ();
 
 	} else if (signature [0] == (byte) 0xef
 		&& signature [1] == (byte) 0xbb
 		&& signature [2] == (byte) 0xbf) {
 	    // 0xef 0xbb 0xbf: UTF-8 BOM (not part of document text)
 	    // this un-needed notion slipped into XML 2nd ed through a
-	    // "non-normative" erratum; now required by MSFT and UDDI
+	    // "non-normative" erratum; now required by MSFT and UDDI,
+	    // and E22 made it normative.
 	    encoding = ENCODING_UTF_8;
 	    is.read (); is.read (); is.read ();
 
@@ -4023,6 +4027,35 @@ e.printStackTrace ();
     // Low-level I/O.
     //////////////////////////////////////////////////////////////////////
 
+
+    /**
+     * Prefetch US-ASCII XML/text decl from input stream into read buffer.
+     * Doesn't buffer more than absolutely needed, so that when an encoding
+     * decl says we need to create an InputStreamReader, we can discard our
+     * buffer and reset().  Caller knows the first chars of the decl exist
+     * in the input stream.
+     */
+    private void prefetchASCIIEncodingDecl ()
+    throws SAXException, IOException
+    {
+	int ch;
+	readBufferPos = readBufferLength = 0;
+
+	is.mark (readBuffer.length);
+	while (true) {
+	    ch = is.read ();
+	    readBuffer [readBufferLength++] = (char) ch;
+	    switch (ch) {
+	      case (int) '>':
+		return;
+	      case -1:
+		error ("file ends before end of XML or encoding declaration.",
+		       null, "?>");
+	    }
+	    if (readBuffer.length == readBufferLength)
+		error ("unfinished XML or encoding declaration");
+	}
+    }
 
     /**
      * Read a chunk of data from an external input source.
@@ -4501,12 +4534,6 @@ loop:
 	symbolTable = new Object [SYMBOL_TABLE_LENGTH][];
     }
 
-
-    /* used to restart reading with some InputStreamReader */
-    static class EncodingException extends IOException
-    {
-	EncodingException (String encoding) { super (encoding); }
-    }
 
     //
     // The current XML handler interface.
