@@ -18,10 +18,9 @@ package javax.infobus;
 /**
  * Data Item Revoked event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final	class	DataItemRevokedEvent
-		extends	DataItemChangeEvent {
+public final class DataItemRevokedEvent extends DataItemChangeEvent {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------

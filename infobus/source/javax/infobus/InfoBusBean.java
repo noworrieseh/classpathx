@@ -18,15 +18,18 @@ package javax.infobus;
 /**
  * InfoBus Bean.interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	interface	InfoBusBean
-	extends		InfoBusMember {
+		extends		InfoBusMember {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * TODO
+	 */
 	public static final String USER_DEFAULT_INFOBUS	= "-default";
 
 
@@ -36,7 +39,7 @@ public	interface	InfoBusBean
 
 	/**
 	 * Get InfoBus name.
-	 * @returns InfoBus name
+	 * @return InfoBus name
 	 */
 	public String getInfoBusName();
 

@@ -21,7 +21,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * InfoBus Consumer Proxy.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class		InfoBusDataConsumerProxy
 		implements	InfoBusDataConsumer {
@@ -33,7 +33,7 @@ public	class		InfoBusDataConsumerProxy
 	/**
 	 * Proxied InfoBus Data Consumer
 	 */
-	private	InfoBusDataConsumer	m_parent	= null;
+	private	InfoBusDataConsumer	parent	= null;
 
 
 	//-------------------------------------------------------------
@@ -45,7 +45,7 @@ public	class		InfoBusDataConsumerProxy
 	 * @param parent Proxied consumer
 	 */
 	public InfoBusDataConsumerProxy(InfoBusDataConsumer parent) {
-		m_parent = parent;
+		this.parent = parent;
 	} // InfoBusDataConsumerProxy()
 
 
@@ -58,7 +58,7 @@ public	class		InfoBusDataConsumerProxy
 	 * @param event Item available event
 	 */
 	public void dataItemAvailable(InfoBusItemAvailableEvent event) {
-		m_parent.dataItemAvailable(event);
+		parent.dataItemAvailable(event);
 	} // dataItemAvailable()
 
 	/**
@@ -66,7 +66,7 @@ public	class		InfoBusDataConsumerProxy
 	 * @param event Item revoked event
 	 */
 	public void dataItemRevoked(InfoBusItemRevokedEvent event) {
-		m_parent.dataItemRevoked(event);
+		parent.dataItemRevoked(event);
 	} // dataItemRevoked()
 
 	/**
@@ -74,7 +74,7 @@ public	class		InfoBusDataConsumerProxy
 	 * @param event Property change event
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
-		m_parent.propertyChange(event);
+		parent.propertyChange(event);
 	} // propertyChange()
 
 

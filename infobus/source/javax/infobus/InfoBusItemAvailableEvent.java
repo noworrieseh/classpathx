@@ -21,10 +21,10 @@ import java.awt.datatransfer.DataFlavor;
 /**
  * InfoBus Item Available Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	InfoBusItemAvailableEvent
-		extends	InfoBusEvent {
+				extends	InfoBusEvent {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -33,7 +33,7 @@ public final	class	InfoBusItemAvailableEvent
 	/**
 	 * Data flavors
 	 */
-	private	DataFlavor[]	m_flavors	= null;
+	private	DataFlavor[]	flavors	= null;
 
 
 	//-------------------------------------------------------------
@@ -46,11 +46,11 @@ public final	class	InfoBusItemAvailableEvent
 	 * @param dataFlavor Data flavor
 	 * @param producer InfoBus Data Producer
 	 */
-	protected InfoBusItemAvailableEvent(String				dataItemName, 
+	protected InfoBusItemAvailableEvent(String			dataItemName,
 									DataFlavor[]		dataFlavor, 
 									InfoBusDataProducer	producer) {
 		super(dataItemName, producer);
-		m_flavors = dataFlavor;
+		this.flavors = dataFlavor;
 	} // InfoBusItemAvailableEvent()
 
 
@@ -60,41 +60,42 @@ public final	class	InfoBusItemAvailableEvent
 
 	/**
 	 * Get Data flavors.
-	 * @returns Data flavors
+	 * @return Data flavors
 	 */
 	public DataFlavor[] getDataFlavors() {
-		return m_flavors;
+		return flavors;
 	} // getDataFlavors()
 
 	/**
 	 * Request Data Item.
 	 * @param consumer Data Consumer
 	 * @param flavors Data flavors
+	 * @return TODO
 	 */
 	public Object requestDataItem(InfoBusDataConsumer	consumer, 
-							  DataFlavor[]			flavors) {
+							  	DataFlavor[]			flavors) {
 
 		// Variables
-  		String				itemName;
-  		InfoBusItemRequestedEvent	event;
-    		InfoBusDataProducer		producer;
+		String						itemName;
+		InfoBusItemRequestedEvent	event;
+		InfoBusDataProducer			producer;
 
-    		// Create Event
-      		itemName = getDataItemName();
-      		event = new InfoBusItemRequestedEvent(itemName, flavors, consumer);
+		// Create Event
+		itemName = getDataItemName();
+		event = new InfoBusItemRequestedEvent(itemName, flavors, consumer);
 
-        	// Send Event
-         	producer = getSourceAsProducer();
-          	producer.dataItemRequested(event);
+		// Send Event
+		producer = getSourceAsProducer();
+		producer.dataItemRequested(event);
 
-          	// Return Data Item
+		// Return Data Item
 		return event.getDataItem();
 
 	} // requestDataItem()
 
 	/**
 	 * Get source as a Data Producer.  Convience method.
-	 * @returns InfoBus Data Producer
+	 * @return InfoBus Data Producer
 	 */
 	public InfoBusDataProducer getSourceAsProducer() {
 		return (InfoBusDataProducer) getSource();

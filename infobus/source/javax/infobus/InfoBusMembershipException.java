@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * InfoBus Membership Exception.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class	InfoBusMembershipException
-	extends	Exception {
+		extends	Exception {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -29,10 +29,10 @@ public	class	InfoBusMembershipException
 
 	/**
 	 * Create InfoBusMembershipException with description.
-	 * @param s Description string
+	 * @param message Description string
 	 */
-	public InfoBusMembershipException(String s) {
-		super(s);
+	public InfoBusMembershipException(String message) {
+		super(message);
 	} // InfoBusMembershipException()
 
 

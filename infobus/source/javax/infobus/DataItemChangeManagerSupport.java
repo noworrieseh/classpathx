@@ -22,7 +22,7 @@ import java.util.Enumeration;
 /**
  * Data Item Change Manager support.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class DataItemChangeManagerSupport {
 
@@ -33,12 +33,12 @@ public class DataItemChangeManagerSupport {
 	/**
 	 * Source object.
 	 */
-	protected	Object	m_source			= null;
+	protected	Object	source			= null;
 
 	/**
 	 * List of change listeners.
 	 */
-	protected	Vector	m_changeListeners	= new Vector();
+	protected	Vector	changeListeners	= new Vector();
 
 
 	//-------------------------------------------------------------
@@ -50,7 +50,7 @@ public class DataItemChangeManagerSupport {
 	 * @param source Source object
 	 */
 	public DataItemChangeManagerSupport(Object source) {
-		m_source = source;
+		this.source = source;
 	} // DataItemChangeManagerSupport()
 
 
@@ -62,35 +62,37 @@ public class DataItemChangeManagerSupport {
 	 * Add data item change listener.
 	 * @param listener Data item change listener
 	 */
-	public synchronized void addDataItemChangeListener(DataItemChangeListener listener) {
-		if (m_changeListeners.contains(listener) == false) {
-			m_changeListeners.add(listener);
-		}
+	public synchronized void addDataItemChangeListener(
+			DataItemChangeListener listener) {
+		if (changeListeners.contains(listener) == false) {
+			changeListeners.add(listener);
+		} // if
 	} // addDataItemChangeListener()
 
 	/**
 	 * Remove data item change listener.
 	 * @param listener Data item change listener
 	 */
-	public synchronized void removeDataItemChangeListener(DataItemChangeListener listener) {
-		if (m_changeListeners.contains(listener) == true) {
-			m_changeListeners.remove(listener);
-		}
+	public synchronized void removeDataItemChangeListener(
+			DataItemChangeListener listener) {
+		if (changeListeners.contains(listener) == true) {
+			changeListeners.remove(listener);
+		} // if
 	} // removeDataItemChangeListener()
 
 	/**
 	 * Remove all change listeners.
 	 */
 	public synchronized void removeAllListeners() {
-		m_changeListeners.clear();
+		changeListeners.clear();
 	} // removeAllListeners()
 
 	/**
 	 * Get enumerated list of change listeners
-	 * @returns Enumeration of change listeners
+	 * @return Enumeration of change listeners
 	 */
 	protected synchronized Enumeration enumerateListeners() {
-		return m_changeListeners.elements();
+		return changeListeners.elements();
 	} // enumerateListeners()
 
 	/**
@@ -98,7 +100,8 @@ public class DataItemChangeManagerSupport {
 	 * @param changedItem Changed item
 	 * @param propertyMap Property map
 	 */
-	public void fireItemValueChanged(Object changedItem, InfoBusPropertyMap propertyMap) {
+	public void fireItemValueChanged(Object changedItem,
+			InfoBusPropertyMap propertyMap) {
 
 		// Variables
 		Enumeration					list;
@@ -109,7 +112,8 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new DataItemValueChangedEvent(m_source, changedItem, propertyMap);
+		event = new DataItemValueChangedEvent(source,
+						changedItem, propertyMap);
 
 		// Loop through all Listeners
 		while (list.hasMoreElements() == true) {
@@ -143,7 +147,7 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new DataItemAddedEvent(m_source, changedItem,
+		event = new DataItemAddedEvent(source, changedItem,
 					changedCollection, propertyMap);
 
 		// Loop through all Listeners
@@ -178,7 +182,7 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new DataItemDeletedEvent(m_source, changedItem,
+		event = new DataItemDeletedEvent(source, changedItem,
 					changedCollection, propertyMap);
 
 		// Loop through all Listeners
@@ -211,7 +215,7 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new DataItemRevokedEvent(m_source, changedItem,
+		event = new DataItemRevokedEvent(source, changedItem,
 						propertyMap);
 
 		// Loop through all Listeners
@@ -233,7 +237,7 @@ public class DataItemChangeManagerSupport {
 	 * @param propertyMap Property map
 	 */
 	public void fireRowsetCursorMoved(Object				changedItem, 
-								  InfoBusPropertyMap	propertyMap) {
+									  InfoBusPropertyMap	propertyMap) {
 
 		// Variables
 		Enumeration					list;
@@ -244,7 +248,7 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new RowsetCursorMovedEvent(m_source, changedItem,
+		event = new RowsetCursorMovedEvent(source, changedItem,
 						propertyMap);
 
 		// Loop through all Listeners
@@ -278,7 +282,7 @@ public class DataItemChangeManagerSupport {
 		list = enumerateListeners();
 
 		// Create Event
-		event = new DataItemShapeChangedEvent(m_source, changedItem,
+		event = new DataItemShapeChangedEvent(source, changedItem,
 						propertyMap);
 
 		// Loop through all Listeners
@@ -291,7 +295,7 @@ public class DataItemChangeManagerSupport {
 			if (listener instanceof DataItemShapeChangeListener) {
 				shapeListener = (DataItemShapeChangeListener) listener;
 				shapeListener.dataItemShapeChanged(event);
-			}
+			} // if
 
 		} // while
 

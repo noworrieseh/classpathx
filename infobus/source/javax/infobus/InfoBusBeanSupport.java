@@ -25,12 +25,12 @@ import java.io.IOException;
 /**
  * InfoBus Bean Support.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class		InfoBusBeanSupport
-	extends		InfoBusMemberSupport
-	implements	InfoBusBean,
-			Serializable {
+		extends		InfoBusMemberSupport
+		implements	InfoBusBean,
+					Serializable {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -39,7 +39,7 @@ public	class		InfoBusBeanSupport
 	/**
 	 * InfoBus name.
 	 */
-	protected	String	m_infoBusName	= null;
+	protected	String	infoBusName	= null;
 
 
 	//-------------------------------------------------------------
@@ -68,7 +68,7 @@ public	class		InfoBusBeanSupport
 	 */
 	public InfoBusBeanSupport(InfoBusMember parent, String initialBusName) {
 		super(parent);
-		m_infoBusName = initialBusName;
+		infoBusName = initialBusName;
 	} // InfoBusBeanSupport()
 
 
@@ -107,41 +107,45 @@ public	class		InfoBusBeanSupport
 	/**
 	 * Set InfoBus.
 	 * @param newInfoBus New InfoBus reference
+	 * @throws PropertyVetoException TODO
 	 */
 	public void setInfoBus(InfoBus newInfoBus) 
 			throws PropertyVetoException {
 		super.setInfoBus(newInfoBus);
 		if (newInfoBus != null) {
-			m_infoBusName = newInfoBus.getName();
+			infoBusName = newInfoBus.getName();
 		}
 	} // setInfoBus()
 
 	/**
 	 * Get InfoBus name.
-	 * @returns InfoBus name
+	 * @return InfoBus name
 	 */
 	public String getInfoBusName() {
-		if (m_infoBusName == null) {
+		if (infoBusName == null) {
 			return "";
-		}
-		return m_infoBusName;
+		} // if
+		return infoBusName;
 	} // getInfoBusName()
 
 	/**
 	 * Set InfoBus name.
 	 * @param newBusName New bus name
+	 * @throws InfoBusMembershipException TODO
 	 */
 	public void setInfoBusName(String newBusName) 
 			throws InfoBusMembershipException {
 		if (newBusName.equals("-default") == true) {
 			//TODO
 		} else {
-			m_infoBusName = newBusName;
-		}
+			infoBusName = newBusName;
+		} // if
 	} // setInfoBusName()
 
 	/**
 	 * Leave InfoBus.
+	 * @throws InfoBusMembershipException TODO
+	 * @throws PropertyVetoException TODO
 	 */
 	public void leaveInfoBus() 
 			throws InfoBusMembershipException, PropertyVetoException {
@@ -155,9 +159,9 @@ public	class		InfoBusBeanSupport
 	public void rejoinInfoBus() throws InfoBusMembershipException {
 		if (getInfoBusName().equals("") == false) {
 			try {
-				joinInfoBus(m_infoBusName);
+				joinInfoBus(infoBusName);
 			} catch (PropertyVetoException e) {
-			}
+			} // try
 		}
 	} // rejoinInfoBus()
 

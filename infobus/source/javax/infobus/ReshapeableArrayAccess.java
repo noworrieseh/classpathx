@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Reshapeable Array Access.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	interface	ReshapeableArrayAccess
-	extends		ArrayAccess {
+		extends		ArrayAccess {
 
 	//-------------------------------------------------------------
 	// Interface: ReshapeableArrayAccess --------------------------

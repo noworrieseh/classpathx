@@ -18,7 +18,7 @@ package javax.infobus;
 /**
  * Array Access interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface ArrayAccess {
 
@@ -26,10 +26,34 @@ public interface ArrayAccess {
 	// Interface: ArrayAccess -------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * Get item by coordinates
+	 * @param coordinates TODO
+	 * @return TODO
+	 */
 	public Object getItemByCoordinates(int[] coordinates);
+
+	/**
+	 * Set item by coordinates
+	 * @param coordinates TODO
+	 * @param newValue TODO
+	 * @throws InvalidDataException TODO
+	 */
 	public void setItemByCoordinates(int[] coordinates, Object newValue)
 		throws InvalidDataException;
+
+	/**
+	 * Subdivide
+	 * @param startCoordinates TODO
+	 * @param endCoordinates TODO
+	 * @return TODO
+	 */
 	public ArrayAccess subdivide(int[] startCoordinates, int[] endCoordinates);
+
+	/**
+	 * Get the dimensions of the array
+	 * @return TODO
+	 */
 	public int[] getDimensions();
 
 

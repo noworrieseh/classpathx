@@ -21,10 +21,9 @@ import java.util.EventObject;
 /**
  * Data Item Change Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public 	class	DataItemChangeEvent
-	extends	EventObject {
+public class DataItemChangeEvent extends EventObject {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -71,7 +70,7 @@ public 	class	DataItemChangeEvent
 
 	/**
 	 * Get source object.
-	 * @returns Source object
+	 * @return Source object
 	 */
 	public Object getSource() {
 		return source;
@@ -79,7 +78,7 @@ public 	class	DataItemChangeEvent
 
 	/**
 	 * Get changed item.
-	 * @returns Changed item object
+	 * @return Changed item object
 	 */
 	public Object getChangedItem() {
 		return changedItem;
@@ -88,6 +87,7 @@ public 	class	DataItemChangeEvent
 	/**
 	 * Get property value
 	 * @param propertyName Property name key
+	 * @return TODO
 	 */
 	public Object getProperty(String propertyName) {
 		return map.get(propertyName);

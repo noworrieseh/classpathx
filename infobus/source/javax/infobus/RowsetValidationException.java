@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Rowset Validation Exception.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class	RowsetValidationException
-	extends	InvalidDataException {
+		extends	InvalidDataException {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -49,8 +49,8 @@ public	class	RowsetValidationException
 	 * @param map Infobus property map
 	 */
 	public RowsetValidationException(String				message, 
-								 RowsetAccess		rowset, 
-								 InfoBusPropertyMap map) {
+									 RowsetAccess		rowset,
+									 InfoBusPropertyMap map) {
 		super(message);
 		this.rowset = rowset;
 		this.map = map;
@@ -63,7 +63,7 @@ public	class	RowsetValidationException
 
 	/**
 	 * Get rowset.
-	 * @returns Rowset
+	 * @return Rowset
 	 */
 	public RowsetAccess getRowset() {
 		return rowset;
@@ -72,7 +72,7 @@ public	class	RowsetValidationException
 	/**
 	 * Get property
 	 * @param propertyName Name of property to retrieve
-	 * @returns Property value
+	 * @return Property value
 	 */
 	public Object getProperty(String propertyName) {
 		return map.get(propertyName);

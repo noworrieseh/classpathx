@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Data Item Value Changed event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	DataItemValueChangedEvent
-		extends	DataItemChangeEvent {
+				extends	DataItemChangeEvent {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -33,7 +33,7 @@ public final	class	DataItemValueChangedEvent
 	 * @param changedItem Item that changed
 	 * @param propertyMap Property map
 	 */
-	public DataItemValueChangedEvent(Object				source, 
+	public DataItemValueChangedEvent(Object			source, 
 								 Object				changedItem, 
 								 InfoBusPropertyMap	propertyMap) {
 		super(source, changedItem, propertyMap);

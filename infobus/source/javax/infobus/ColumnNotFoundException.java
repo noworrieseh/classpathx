@@ -16,23 +16,24 @@
 package javax.infobus;
 
 /**
- * Column Not Found exception.
+ * The ColumnNotFoundException is thrown by a RowsetAccess instance
+ * when a specified column does not exist.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public	class	ColumnNotFoundException
-	extends	Exception {
+public class ColumnNotFoundException extends	Exception {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
 
 	/**
-	 * Create columns not found exception with description.
-	 * @param s Description string
+	 * Creates a ColumnsNotFoundException with a detailed
+	 * description of the problem.
+	 * @param message Detailed description of the exception
 	 */
-	public ColumnNotFoundException(String s) {
-		super(s);
+	public ColumnNotFoundException(String message) {
+		super(message);
 	} // ColumnNotFoundException()
 
 

@@ -22,11 +22,10 @@ import java.beans.PropertyChangeListener;
 /**
  * InfoBus Event Listener.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	interface	InfoBusEventListener
-	extends		EventListener,
-			PropertyChangeListener {
+		extends		EventListener,
+					PropertyChangeListener {
 
 } // InfoBusEventListener
-

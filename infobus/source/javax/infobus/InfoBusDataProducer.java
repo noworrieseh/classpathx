@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * InfoBus Data Producer.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	interface	InfoBusDataProducer
-	extends		InfoBusEventListener {
+		extends		InfoBusEventListener {
 
 	//-------------------------------------------------------------
 	// Interface: InfoBusDataProducer -----------------------------

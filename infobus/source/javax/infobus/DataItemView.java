@@ -18,7 +18,7 @@ package javax.infobus;
 /**
  * Data Item View interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface DataItemView {
 
@@ -26,9 +26,29 @@ public interface DataItemView {
 	// Interface: DataItemView ------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * Get view start
+	 * @return TODO
+	 */
 	public int getViewStart();
+
+	/**
+	 * Set view start
+	 * @param absoluteRow TODO
+	 */
 	public void setViewStart(int absoluteRow);
+
+	/**
+	 * Scroll View
+	 * @param relativeAmount TODO
+	 */
 	public void scrollView(int relativeAmount);
+
+	/**
+	 * Get view
+	 * @param viewSize TODO
+	 * @return TODO
+	 */
 	public ArrayAccess getView(int viewSize);
 
 

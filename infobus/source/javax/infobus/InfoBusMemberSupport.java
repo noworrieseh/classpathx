@@ -17,17 +17,20 @@ package javax.infobus;
 
 // Imports
 import java.awt.Component;
-import java.beans.*;
-import java.util.*;
-import java.beans.*;
+import java.beans.VetoableChangeListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeSupport;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeEvent;
 
 /**
  * InfoBus Member Support.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public 	class		InfoBusMemberSupport
-	implements	InfoBusMember {
+		implements	InfoBusMember {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -36,27 +39,27 @@ public 	class		InfoBusMemberSupport
 	/**
 	 * Member of this Infobus.
 	 */
-	protected	InfoBus					m_infoBus		= null;
+	protected	InfoBus					infoBus		= null;
 
 	/**
 	 * Property change support.
 	 */
-	protected	PropertyChangeSupport	m_propSupport	= null;
+	protected	PropertyChangeSupport	propSupport	= null;
 
 	/**
 	 * Vetoable change support.
 	 */
-	protected	VetoableChangeSupport	m_vetoSupport	= null;
+	protected	VetoableChangeSupport	vetoSupport	= null;
 
 	/**
 	 * Proxy for this InfoBus member
 	 */
-	protected	InfoBusMember			m_sourceRef		= null;
+	protected	InfoBusMember			sourceRef		= null;
 
 	/**
 	 * Synchronization object
 	 */
-	protected	Object					m_syncLock		= null;
+	protected	Object					syncLock		= null;
 
 
 	//-------------------------------------------------------------
@@ -77,12 +80,12 @@ public 	class		InfoBusMemberSupport
 	 */
 	public InfoBusMemberSupport(InfoBusMember member) {
 		if (member == null) {
-			m_sourceRef = this;
+			sourceRef = this;
 		} else {
-			m_sourceRef = member;
-		}
-		m_propSupport = new PropertyChangeSupport(m_sourceRef);
-		m_vetoSupport = new VetoableChangeSupport(m_sourceRef);
+			sourceRef = member;
+		} // if
+		propSupport = new PropertyChangeSupport(sourceRef);
+		vetoSupport = new VetoableChangeSupport(sourceRef);
 	} // InfoBusMemberSupport()
 
 
@@ -92,10 +95,10 @@ public 	class		InfoBusMemberSupport
 
 	/**
 	 * Get Infobus
-	 * @returns Infobus instance. Null is possible
+	 * @return Infobus instance. Null is possible
 	 */
 	public InfoBus getInfoBus() {
-		return m_infoBus;
+		return infoBus;
 	} // getInfoBus()
 
 	/**
@@ -109,21 +112,21 @@ public 	class		InfoBusMemberSupport
 		PropertyChangeEvent		event;
 
 		// Create Event
-		event = new PropertyChangeEvent(m_sourceRef, "InfoBus", 
-										m_infoBus, infoBus);
+		event = new PropertyChangeEvent(sourceRef, "InfoBus",
+										infoBus, infoBus);
 
 		// Notify Vetoable Change Listeners
-		m_vetoSupport.fireVetoableChange(event);
+		vetoSupport.fireVetoableChange(event);
 
 		// Set InfoBus member
-		m_infoBus = infoBus;
+		infoBus = infoBus;
 
 		// Notify Property Change Listeners
-		m_propSupport.firePropertyChange(event);
+		propSupport.firePropertyChange(event);
 
-		if (m_infoBus != null) {
-			m_infoBus.register(m_sourceRef);
-		}
+		if (infoBus != null) {
+			infoBus.register(sourceRef);
+		} // if
 
 	} // setInfoBus()
 
@@ -140,19 +143,19 @@ public 	class		InfoBusMemberSupport
   		InfoBus	infoBus;
 
 		// Check For Membership
-		if (m_infoBus != null) {
+		if (this.infoBus != null) {
 			throw new InfoBusMembershipException("already member of" +
 												" infobus");
-		}
+		} // if
 
 		// Get InfoBus instance
 		infoBus = InfoBus.get(busName);
 
 		// Join InfoBus
    		if (infoBus != null) {
-			infoBus.join(m_sourceRef);
+			infoBus.join(sourceRef);
 			infoBus.release();
-   		}
+   		} // if
 
 	} // joinInfoBus()
 
@@ -169,19 +172,19 @@ public 	class		InfoBusMemberSupport
   		InfoBus infoBus;
 
 		// Check For Membership
-		if (m_infoBus != null) {
+		if (this.infoBus != null) {
 			throw new InfoBusMembershipException("already member " +
 												"of infobus");
-		}
+		} // if
 
 		// Get InfoBus instance
 		infoBus = InfoBus.get(component);
 
 		// Join InfoBus
 		if (infoBus != null) {
-			infoBus.join(m_sourceRef);
+			infoBus.join(sourceRef);
 			infoBus.release();
-		}
+		} // if
 
 	} // joinInfoBus()
 
@@ -192,7 +195,7 @@ public 	class		InfoBusMemberSupport
 	 */
 	public void leaveInfoBus()
 			throws InfoBusMembershipException, PropertyVetoException {
-		m_infoBus.leave(m_sourceRef);
+		infoBus.leave(sourceRef);
 	} // leaveInfoBus()
 
 	/**
@@ -200,7 +203,7 @@ public 	class		InfoBusMemberSupport
 	 * @param listener Vetoable change listener
 	 */
 	public void addInfoBusVetoableListener(VetoableChangeListener listener) {
-		m_vetoSupport.addVetoableChangeListener(listener);
+		vetoSupport.addVetoableChangeListener(listener);
 	} // addInfoBusVetoableListener()
 
 	/**
@@ -208,7 +211,7 @@ public 	class		InfoBusMemberSupport
 	 * @param listener Vetoable change listener
 	 */
 	public void removeInfoBusVetoableListener(VetoableChangeListener listener) {
-		m_vetoSupport.removeVetoableChangeListener(listener);
+		vetoSupport.removeVetoableChangeListener(listener);
 	} // removeInfoBusVetoableListener()
 
 	/**
@@ -216,7 +219,7 @@ public 	class		InfoBusMemberSupport
 	 * @param listener Property change listener
 	 */
 	public void addInfoBusPropertyListener(PropertyChangeListener listener) {
-		m_propSupport.addPropertyChangeListener(listener);
+		propSupport.addPropertyChangeListener(listener);
 	} // addInfoBusPropertyListener()
 
 	/**
@@ -224,7 +227,7 @@ public 	class		InfoBusMemberSupport
 	 * @param listener Property change listener
 	 */
 	public void removeInfoBusPropertyListener(PropertyChangeListener listener) {
-		m_propSupport.removePropertyChangeListener(listener);
+		propSupport.removePropertyChangeListener(listener);
 	} // removeInfoBusPropertyListener()
 
 

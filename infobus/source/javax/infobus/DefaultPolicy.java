@@ -23,10 +23,10 @@ import java.beans.PropertyChangeEvent;
 /**
  * Default Policy.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class		DefaultPolicy
-	implements	InfoBusPolicyHelper {
+		implements	InfoBusPolicyHelper {
 
 	//-------------------------------------------------------------
 	// Public Accessor Methods ------------------------------------
@@ -35,12 +35,12 @@ public	class		DefaultPolicy
 	/**
 	 * Generate default InfoBus name from object.
 	 * @param object Object to generate name from
-	 * @returns Generated InfoBus name, or null
+	 * @return Generated InfoBus name, or null
 	 */
 	public String generateDefaultName(Object object) {
 		if (object instanceof Component) {
 			return retrieveID((Component) object);
-		}
+		} // if
 
 		// Unable to process
 		return null;
@@ -50,7 +50,7 @@ public	class		DefaultPolicy
 	/**
 	 * Generate applet context InfoBus name.
 	 * @param component Component in applet
-	 * @returns InfoBus name, or null
+	 * @return InfoBus name, or null
 	 */
 	private static String retrieveID(Component component) {
 
@@ -101,7 +101,8 @@ public	class		DefaultPolicy
 	 * @param infobus InfoBus
 	 * @param event Property Change event
 	 */
-	public void canPropertyChange(InfoBus infobus, PropertyChangeEvent event) {
+	public void canPropertyChange(InfoBus				infobus,
+								  PropertyChangeEvent	event) {
 	} // canPropertyChange()
 
 	/**
@@ -110,7 +111,9 @@ public	class		DefaultPolicy
 	 * @param controller Data controller
 	 * @param priority Priority of controller
 	 */
-	public void canAddDataController(InfoBus infobus, InfoBusDataController controller, int priority) {
+	public void canAddDataController(InfoBus				infobus,
+									 InfoBusDataController	controller,
+									 int					priority) {
 	} // canAddDataController()
 
 	/**
@@ -118,7 +121,8 @@ public	class		DefaultPolicy
 	 * @param infobus InfoBus
 	 * @param producer Data Producer
 	 */
-	public void canAddDataProducer(InfoBus infobus, InfoBusDataProducer producer) {
+	public void canAddDataProducer(InfoBus				infobus,
+								   InfoBusDataProducer	producer) {
 	} // canAddDataProducer()
 
 	/**
@@ -126,7 +130,8 @@ public	class		DefaultPolicy
 	 * @param infobus InfoBus
 	 * @param consumer Data Consumer
 	 */
-	public void canAddDataConsumer(InfoBus infobus, InfoBusDataConsumer consumer) {
+	public void canAddDataConsumer(InfoBus				infobus,
+								   InfoBusDataConsumer	consumer) {
 	} // canAddDataConsumer()
 
 	/**
@@ -135,7 +140,9 @@ public	class		DefaultPolicy
 	 * @param dataItemName Data item name
 	 * @param producer Data Producer
 	 */
-	public void canFireItemAvailable(InfoBus infobus, String dataItemName, InfoBusDataProducer producer) {
+	public void canFireItemAvailable(InfoBus				infobus,
+									 String					dataItemName,
+									 InfoBusDataProducer	producer) {
 	} // canFireItemAvailable()
 
 	/**
@@ -144,7 +151,9 @@ public	class		DefaultPolicy
 	 * @param dataItemName Data item name
 	 * @param producer Data Producer
 	 */
-	public void canFireItemRevoked(InfoBus infobus, String dataItemName, InfoBusDataProducer producer) {
+	public void canFireItemRevoked(InfoBus				infobus,
+								   String				dataItemName,
+								   InfoBusDataProducer	producer) {
 	} // canFireItemRevoked()
 
 	/**
@@ -153,7 +162,9 @@ public	class		DefaultPolicy
 	 * @param dataItemName Data item name
 	 * @param consumer Data Consumer
 	 */
-	public void canRequestItem(InfoBus infobus, String dataItemName, InfoBusDataConsumer consumer) {
+	public void canRequestItem(InfoBus				infobus,
+							   String				dataItemName,
+							   InfoBusDataConsumer	consumer) {
 	} // canRequestItem()
 
 

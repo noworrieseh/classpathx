@@ -18,9 +18,9 @@ package javax.infobus;
 /**
  * Data Item Change Listener support.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class DataItemChangeListenerSupport {
+public class DataItemChangeListenerSupport { // TODO
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------

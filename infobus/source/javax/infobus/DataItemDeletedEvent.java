@@ -18,10 +18,9 @@ package javax.infobus;
 /**
  * Data Item Deleted event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final	class	DataItemDeletedEvent
-		extends	DataItemChangeEvent {
+public final class DataItemDeletedEvent extends	DataItemChangeEvent {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -58,7 +57,7 @@ public final	class	DataItemDeletedEvent
 
 	/**
 	 * Get changed collection.
-	 * @returns Changed collection
+	 * @return Changed collection
 	 */
 	public Object getChangedCollection() {
 		return changedCollection;

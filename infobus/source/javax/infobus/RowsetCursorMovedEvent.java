@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Rowset Cursor Moved Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	RowsetCursorMovedEvent
-		extends	DataItemChangeEvent {
+				extends	DataItemChangeEvent {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -30,12 +30,12 @@ public final	class	RowsetCursorMovedEvent
 	/**
 	 * Create Rowset Cursor Moved event.
 	 * @param source Source of event
-	 * @Param changedItem Item that changed
+	 * @param changedItem Item that changed
 	 * @param propertyMap Property map
 	 */
-	public RowsetCursorMovedEvent(Object 				source, 
-							  Object 				changedItem,
-							  InfoBusPropertyMap 	propertyMap) {
+	public RowsetCursorMovedEvent(Object 				source,
+								  Object 				changedItem,
+								  InfoBusPropertyMap 	propertyMap) {
 		super(source, changedItem, propertyMap);
 	} // RowsetCursorMovedEvent()
 

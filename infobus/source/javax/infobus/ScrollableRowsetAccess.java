@@ -21,10 +21,10 @@ import java.sql.SQLException;
 /**
  * Scrollable Rowset Access.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	interface	ScrollableRowsetAccess
-	extends		RowsetAccess {
+		extends		RowsetAccess {
 
 	//-------------------------------------------------------------
 	// Interface: ScrollableRowsetAccess --------------------------
@@ -32,7 +32,7 @@ public	interface	ScrollableRowsetAccess
 
 	/**
 	 * Get new cursor instance
-	 * @returns New scrollable rowset access cursor
+	 * @return New scrollable rowset access cursor
 	 */
 	public ScrollableRowsetAccess newCursor();
 
@@ -44,61 +44,63 @@ public	interface	ScrollableRowsetAccess
 
 	/**
 	 * Get buffer size
-	 * @returns Buffer size
+	 * @return Buffer size
 	 */
 	public int getBufferSize();
 
 	/**
 	 * Move to previous row.
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */
 	public boolean previous() throws	SQLException, 
-									RowsetValidationException;
+										RowsetValidationException;
 
 	/**
 	 * Move to first row.
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */
 	public boolean first() throws	SQLException, 
-								RowsetValidationException;
+									RowsetValidationException;
 
 	/**
 	 * Move to last row.
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */
 	public boolean last() throws	SQLException, 
-								RowsetValidationException;
+									RowsetValidationException;
 
 	/**
-	 * ????
-	 * @returns true if successful, false otherwise
+	 * ???? TODO
+	 * @param numRows TODO
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */
-	public boolean relative(int numRows) throws	SQLException, 
-											RowsetValidationException;
+	public boolean relative(int numRows) throws	SQLException,
+												RowsetValidationException;
 
 	/**
 	 * Get current row index
-	 * @returns Row index
+	 * @return Row index
 	 */
 	public int getRow();
 
 	/**
 	 * Get row count.
-	 * @returns Row count
+	 * @return Row count
 	 */
 	public int getRowCount();
 
 	/**
-	 * ????
-	 * @returns true if successful, false otherwise
+	 * ???? TODO
+	 * @param rowIndex TODO
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */

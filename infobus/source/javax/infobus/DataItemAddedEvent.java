@@ -18,7 +18,7 @@ package javax.infobus;
 /**
  * Data Item Added event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	DataItemAddedEvent
 		extends	DataItemChangeEvent {
@@ -58,7 +58,7 @@ public final	class	DataItemAddedEvent
 
 	/**
 	 * Get changed collection.
-	 * @returns Changed collection
+	 * @return Changed collection
 	 */
 	public Object getChangedCollection() {
 		return changedCollection;

@@ -23,7 +23,7 @@ import java.beans.PropertyChangeListener;
 /**
  * InfoBus Member interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface InfoBusMember {
 
@@ -33,13 +33,13 @@ public interface InfoBusMember {
 
 	/**
 	 * Get Infobus
-	 * @returns Infobus instance. Null is possible
+	 * @return Infobus instance. Null is possible
 	 */
 	public InfoBus getInfoBus();
 
 	/**
 	 * Set InfoBus.  Do not call this directly.  Set by InfoBus.
-	 * @param infoBus InfoBus
+	 * @param newInfoBus InfoBus
 	 * @throws PropertyVetoException Veto exception
 	 */
 	public void setInfoBus(InfoBus newInfoBus)

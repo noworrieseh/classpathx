@@ -16,12 +16,12 @@
 package javax.infobus;
 
 // Imports
-import java.sql.*;
+import java.sql.SQLException;
 
 /**
  * Rowset Access
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface RowsetAccess {
 
@@ -31,14 +31,14 @@ public interface RowsetAccess {
 
 	/**
 	 * Get column count.
-	 * @returns Column count
+	 * @return Column count
 	 */
 	public int getColumnCount();
 
 	/**
 	 * Get column name
 	 * @param columnIndex Column index
-	 * @returns Name of column
+	 * @return Name of column
 	 * @throws IndexOutOfBoundsException Invalid index
 	 */
 	public String getColumnName(int columnIndex)
@@ -47,7 +47,7 @@ public interface RowsetAccess {
 	/**
 	 * Get data type of column
 	 * @param columnIndex Column index
-	 * @returns SQL data type number
+	 * @return SQL data type number
 	 * @throws IndexOutOfBoundsException Invalid index
 	 */
 	public int getColumnDatatypeNumber(int columnIndex)
@@ -56,7 +56,7 @@ public interface RowsetAccess {
 	/**
 	 * Get data type name of column
 	 * @param columnIndex Column index
-	 * @returns SQL data type name
+	 * @return SQL data type name
 	 * @throws IndexOutOfBoundsException Invalid index
 	 */
 	public String getColumnDatatypeName(int columnIndex)
@@ -64,7 +64,7 @@ public interface RowsetAccess {
 
 	/**
 	 * Move to next row.
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 * @throws SQLException SQL exception
 	 * @throws RowsetValidationException Rowset validation exception
 	 */
@@ -73,19 +73,20 @@ public interface RowsetAccess {
 
 	/**
 	 * TODO
-	 * @returns TODO
+	 * @return TODO
 	 */
 	public int getHighWaterMark();
 
 	/**
 	 * Check if there are more rows.
-	 * @returns true if more rows, false otherwise
+	 * @return true if more rows, false otherwise
+	 */
 	public boolean hasMoreRows();
 
 	/**
 	 * Get column item value.
 	 * @param columnIndex Column index
-	 * @returns Object value
+	 * @return Object value
 	 * @throws IndexOutOfBoundsException Invalid index
 	 * @throws SQLException SQL Exception
 	 */
@@ -95,8 +96,9 @@ public interface RowsetAccess {
 	/**
 	 * Get column item value.
 	 * @param columnName Column name
-	 * @returns Object value
-	 * @throws IndexOutOfBoundsException Invalid index
+	 * @return Object value
+	 * @throws ColumnNotFoundException Invalid index
+	 * @throws DuplicateColumnException Invalid index
 	 * @throws SQLException SQL Exception
 	 */
 	public Object getColumnItem(String columnName)
@@ -166,20 +168,20 @@ public interface RowsetAccess {
 
 	/**
 	 * Check if insert possible.
-	 * @returns true if possible, false otherwise
+	 * @return true if possible, false otherwise
 	 */
 	public boolean canInsert();
 
 	/**
 	 * Check if update possible.
-	 * @returns true if possible, false otherwise
+	 * @return true if possible, false otherwise
 	 */
 	public boolean canUpdate();
 
 	/**
 	 * Check if update of column possible.
 	 * @param columnName Column name
-	 * @returns true if possible, false otherwise
+	 * @return true if possible, false otherwise
 	 * @throws ColumnNotFoundException Column not found
 	 * @throws DuplicateColumnException Duplicate column exception
 	 */
@@ -188,8 +190,8 @@ public interface RowsetAccess {
 
 	/**
 	 * Check if update of column possible.
-	 * @param columnIndex Column index
-	 * @returns true if possible, false otherwise
+	 * @param columnNumber Column index
+	 * @return true if possible, false otherwise
 	 * @throws IndexOutOfBoundsException Invalid index
 	 */
 	public boolean canUpdate(int columnNumber)
@@ -197,13 +199,13 @@ public interface RowsetAccess {
 
 	/**
 	 * Check if delete possible.
-	 * @returns true if possible, false otherwise
+	 * @return true if possible, false otherwise
 	 */
 	public boolean canDelete();
 
 	/**
 	 * Get DB Access.
-	 * @returns DB Access
+	 * @return DB Access
 	 */
 	public DbAccess getDb();
 

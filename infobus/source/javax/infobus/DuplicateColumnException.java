@@ -18,21 +18,20 @@ package javax.infobus;
 /**
  * Duplicate Column Exception.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public	class	DuplicateColumnException
-	extends	Exception {
+public class DuplicateColumnException extends Exception {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
 
 	/**
-	 * Create Duplicate column exception with description.
-	 * @param s Description string
+	 * Create DuplicateColumnException with a description.
+	 * @param message Detailed description of the exception
 	 */
-	public DuplicateColumnException(String s) {
-		super(s);
+	public DuplicateColumnException(String message) {
+		super(message);
 	} // DuplicateColumnException()
 
 

@@ -21,7 +21,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * InfoBus Policy Helper.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface InfoBusPolicyHelper {
 
@@ -32,7 +32,7 @@ public interface InfoBusPolicyHelper {
 	/**
 	 * Generate default InfoBus name from object.
 	 * @param object Object to generate name from
-	 * @returns Generated InfoBus name, or null
+	 * @return Generated InfoBus name, or null
 	 */
 	public String generateDefaultName(Object object);
 
@@ -62,7 +62,7 @@ public interface InfoBusPolicyHelper {
 	 * @param event Property Change event
 	 */
 	public void canPropertyChange(InfoBus				infobus, 
-							  PropertyChangeEvent	event);
+								  PropertyChangeEvent	event);
 
 	/**
 	 * Check permission to add Data Controller to InfoBus.
@@ -71,8 +71,8 @@ public interface InfoBusPolicyHelper {
 	 * @param priority Priority of controller
 	 */
 	public void canAddDataController(InfoBus				infobus, 
-								 InfoBusDataController	controller, 
-								 int					priority);
+									 InfoBusDataController	controller,
+									 int					priority);
 
 	/**
 	 * Check permission to add Data Producer to InfoBus.
@@ -80,7 +80,7 @@ public interface InfoBusPolicyHelper {
 	 * @param producer Data Producer
 	 */
 	public void canAddDataProducer(InfoBus 				infobus, 
-							   InfoBusDataProducer	producer);
+								   InfoBusDataProducer	producer);
 
 	/**
 	 * Check permission to add Data Consumer to InfoBus.
@@ -88,7 +88,7 @@ public interface InfoBusPolicyHelper {
 	 * @param consumer Data Consumer
 	 */
 	public void canAddDataConsumer(InfoBus				infobus, 
-							   InfoBusDataConsumer	consumer);
+								   InfoBusDataConsumer	consumer);
 
 	/**
 	 * Check permission to fire available item on InfoBus.
@@ -97,8 +97,8 @@ public interface InfoBusPolicyHelper {
 	 * @param producer Data Producer
 	 */
 	public void canFireItemAvailable(InfoBus				infobus, 
-								 String					dataItemName, 
-								 InfoBusDataProducer	producer);
+									 String					dataItemName,
+									 InfoBusDataProducer	producer);
 
 	/**
 	 * Check permission to fire revokoed item on InfoBus.
@@ -107,8 +107,8 @@ public interface InfoBusPolicyHelper {
 	 * @param producer Data Producer
 	 */
 	public void canFireItemRevoked(InfoBus				infobus, 
-							   String				dataItemName, 
-							   InfoBusDataProducer	producer);
+								   String				dataItemName,
+								   InfoBusDataProducer	producer);
 
 	/**
 	 * Check permission to request item on InfoBus.
@@ -117,8 +117,8 @@ public interface InfoBusPolicyHelper {
 	 * @param consumer Data Consumer
 	 */
 	public void canRequestItem(InfoBus				infobus, 
-						   String				dataItemName, 
-						   InfoBusDataConsumer	consumer);
+							   String				dataItemName,
+							   InfoBusDataConsumer	consumer);
 
 
 } // InfoBusPolicyHelper

@@ -18,7 +18,7 @@ package javax.infobus;
 /**
  * Data Item interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface DataItem {
 
@@ -29,12 +29,13 @@ public interface DataItem {
 	/**
 	 * Get property value.
 	 * @param propertyName Property key name
+	 * @return TODO
 	 */
 	public Object getProperty(String propertyName);
 
 	/**
 	 * Get event listener source.
-	 * @returns InfoBus event listener source
+	 * @return InfoBus event listener source
 	 */
 	public InfoBusEventListener getSource();
 

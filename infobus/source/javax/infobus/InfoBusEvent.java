@@ -21,10 +21,10 @@ import java.util.EventObject;
 /**
  * InfoBus Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class	InfoBusEvent
-	extends	EventObject {
+		extends	EventObject {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -33,7 +33,7 @@ public	class	InfoBusEvent
 	/**
 	 * Data Item name.
 	 */
-	private String m_dataItemName	= "";
+	private String dataItemName	= "";
 
 
 	//-------------------------------------------------------------
@@ -47,7 +47,7 @@ public	class	InfoBusEvent
 	 */
 	protected InfoBusEvent(String dataItemName, InfoBusEventListener listener) {
 		super(listener);
-		m_dataItemName = dataItemName;
+		this.dataItemName = dataItemName;
 	} // InfoBusEvent()
 
 
@@ -57,10 +57,10 @@ public	class	InfoBusEvent
 
 	/**
 	 * Get Data Item name.
-	 * @returns Data Item name
+	 * @return Data Item name
 	 */
 	public String getDataItemName() {
-		return m_dataItemName;
+		return dataItemName;
 	} // getDataItemName()
 
 

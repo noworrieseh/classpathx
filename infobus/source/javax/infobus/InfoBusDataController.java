@@ -22,7 +22,7 @@ import java.awt.datatransfer.DataFlavor;
 /**
  * InfoBus Data Controller.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface InfoBusDataController {
 
@@ -71,9 +71,9 @@ public interface InfoBusDataController {
 	 * @param dataItemName Data item name
 	 * @param flavors Data flavors
 	 * @param source Data producer source
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 */
-	public boolean fireItemAvailable(String					dataItemName, 
+	public boolean fireItemAvailable(String				dataItemName,
 								 DataFlavor[]			flavors, 
 								 InfoBusDataProducer	source);
 
@@ -81,9 +81,9 @@ public interface InfoBusDataController {
 	 * Fire item revoked.
 	 * @param dataItemName Data item name
 	 * @param source Data producer source
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 */
-	public boolean fireItemRevoked(String				dataItemName, 
+	public boolean fireItemRevoked(String			dataItemName,
 							   InfoBusDataProducer	source);
 
 	/**
@@ -92,9 +92,9 @@ public interface InfoBusDataController {
 	 * @param flavors Data flavors
 	 * @param consumer Data consumer source
 	 * @param foundItem List of found items
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 */
-	public boolean findDataItem(String				dataItemName, 
+	public boolean findDataItem(String			dataItemName,
 							DataFlavor[]		flavors, 
 							InfoBusDataConsumer	consumer, 
 							Vector				foundItem);
@@ -105,9 +105,9 @@ public interface InfoBusDataController {
 	 * @param flavors Data flavors
 	 * @param consumer Data consumer source
 	 * @param foundItem List of found items
-	 * @returns true if successful, false otherwise
+	 * @return true if successful, false otherwise
 	 */
-	public boolean findMultipleDataItems(String					dataItemName, 
+	public boolean findMultipleDataItems(String				dataItemName,
 									 DataFlavor[]			flavors, 
 									 InfoBusDataConsumer	consumer, 
 									 Vector					foundItem);

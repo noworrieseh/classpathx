@@ -18,7 +18,7 @@ package javax.infobus;
 /**
  * InfoBus Property Map.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface InfoBusPropertyMap {
 
@@ -29,7 +29,7 @@ public interface InfoBusPropertyMap {
 	/**
 	 * Get value mapped from specified key.
 	 * @param key Property key
-	 * @returns Mapped value
+	 * @return Mapped value
 	 */
 	public Object get(Object key);
 

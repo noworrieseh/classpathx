@@ -21,10 +21,10 @@ import java.awt.datatransfer.DataFlavor;
 /**
  * InfoBus Item Requested Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	InfoBusItemRequestedEvent
-		extends	InfoBusEvent {
+				extends	InfoBusEvent {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -33,12 +33,12 @@ public final	class	InfoBusItemRequestedEvent
 	/**
 	 * Data Item object
 	 */
-	private	Object			m_dataItem	= null;
+	private	Object			dataItem	= null;
 
 	/**
 	 * Data flavors
 	 */
-	private	DataFlavor[]	m_flavors	= null;
+	private	DataFlavor[]	flavors	= null;
 
 
 	//-------------------------------------------------------------
@@ -51,11 +51,11 @@ public final	class	InfoBusItemRequestedEvent
 	 * @param dataFlavor Data flavor
 	 * @param consumer InfoBus Data Consumer
 	 */
-	protected InfoBusItemRequestedEvent(String				dataItemName, 
+	protected InfoBusItemRequestedEvent(String			dataItemName,
 									DataFlavor[]		dataFlavor, 
 									InfoBusDataConsumer	consumer) {
 		super(dataItemName, consumer);
-		m_flavors = dataFlavor;
+		this.flavors = dataFlavor;
 	} // InfoBusItemRequestedEvent()
 
 
@@ -65,18 +65,18 @@ public final	class	InfoBusItemRequestedEvent
 
 	/**
 	 * Get Data flavors.
-	 * @returns Data flavors
+	 * @return Data flavors
 	 */
 	public DataFlavor[] getDataFlavors() {
-		return m_flavors;
+		return flavors;
 	} // getDataFlavors()
 
 	/**
 	 * Get Data Item.
-	 * @returns Data item
+	 * @return Data item
 	 */
 	public Object getDataItem() {
-		return m_dataItem;
+		return dataItem;
 	} // getDataItem()
 
 	/**
@@ -86,9 +86,9 @@ public final	class	InfoBusItemRequestedEvent
 	public void setDataItem(Object item) {
 
 		// Write-once property
-		if (m_dataItem == null) {
-			m_dataItem = item;
-		}
+		if (dataItem == null) {
+			dataItem = item;
+		} // if
 
 	} // setDataItem()
 
@@ -101,7 +101,7 @@ public final	class	InfoBusItemRequestedEvent
 
 	/**
 	 * Get source as a Data Consumer.  Convience method.
-	 * @returns InfoBus Data Consumer
+	 * @return InfoBus Data Consumer
 	 */
 	public InfoBusDataConsumer getSourceAsConsumer() {
 		return (InfoBusDataConsumer) getSource();

@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * Immediate Access.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface ImmediateAccess {
 
@@ -31,13 +31,13 @@ public interface ImmediateAccess {
 
 	/**
 	 * Get value as a string.
-	 * @returns Value as string
+	 * @return Value as string
 	 */
 	public String getValueAsString();
 
 	/**
 	 * Get value as an object.
-	 * @returns Value as an object
+	 * @return Value as an object
 	 */
 	public Object getValueAsObject();
 
@@ -51,6 +51,7 @@ public interface ImmediateAccess {
 	/**
 	 * Set value.
 	 * @param newValue New value
+	 * @throws InvalidDataException TODO
 	 */
 	public void setValue(Object newValue)
 		throws InvalidDataException;

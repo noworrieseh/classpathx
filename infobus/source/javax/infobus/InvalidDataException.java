@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Invalid Data Exception
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class	InvalidDataException
-	extends	Exception {
+		extends	Exception {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -29,10 +29,10 @@ public	class	InvalidDataException
 
 	/**
 	 * Create InvalidDataException with description.
-	 * @param s Description string
+	 * @param message Description string
 	 */
-	public InvalidDataException(String s) {
-		super(s);
+	public InvalidDataException(String message) {
+		super(message);
 	} // InvalidDataException()
 
 

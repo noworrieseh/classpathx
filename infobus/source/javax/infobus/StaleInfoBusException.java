@@ -19,10 +19,10 @@ package javax.infobus;
  * Stale Infobus Exception.  Thrown when action performed on an
  * Infobus instance that is no longer active.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class	StaleInfoBusException
-	extends	RuntimeException {
+		extends	RuntimeException {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -30,10 +30,10 @@ public	class	StaleInfoBusException
 
 	/**
 	 * Create exception with description
-	 * @param s Description string
+	 * @param message Description string
 	 */
-	public StaleInfoBusException(String s) {
-		super(s);
+	public StaleInfoBusException(String message) {
+		super(message);
 	} // StaleInfoBusException()
 
 

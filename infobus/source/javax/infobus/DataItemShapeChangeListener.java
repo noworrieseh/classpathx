@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * Data Item Shape Change listener interface.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public	interface	DataItemShapeChangeListener
-	extends		DataItemChangeListener {
+public interface DataItemShapeChangeListener
+	extends DataItemChangeListener {
 
 	//-------------------------------------------------------------
 	// Interface: DataItemShapeChangeListener ---------------------

@@ -21,10 +21,10 @@ import java.beans.PropertyChangeEvent;
 /**
  * InfoBus Producer Proxy.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public	class		InfoBusDataProducerProxy
-	implements	InfoBusDataProducer {
+		implements	InfoBusDataProducer {
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -33,7 +33,7 @@ public	class		InfoBusDataProducerProxy
 	/**
 	 * Proxied InfoBus Data Producer
 	 */
-	private	InfoBusDataProducer	m_parent	= null;
+	private	InfoBusDataProducer	parent	= null;
 
 
 	//-------------------------------------------------------------
@@ -45,7 +45,7 @@ public	class		InfoBusDataProducerProxy
 	 * @param parent Proxied producer
 	 */
 	public InfoBusDataProducerProxy(InfoBusDataProducer parent) {
-		m_parent = parent;
+		this.parent = parent;
 	} // InfoBusDataProducerProxy()
 
 
@@ -58,7 +58,7 @@ public	class		InfoBusDataProducerProxy
 	 * @param event Item requested event
 	 */
 	public void dataItemRequested(InfoBusItemRequestedEvent event) {
-		m_parent.dataItemRequested(event);
+		parent.dataItemRequested(event);
 	} // dataItemRequested()
 
 	/**
@@ -66,7 +66,7 @@ public	class		InfoBusDataProducerProxy
 	 * @param event Property change event
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
-		m_parent.propertyChange(event);
+		parent.propertyChange(event);
 	} // propertyChange()
 
 

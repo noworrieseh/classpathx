@@ -16,23 +16,25 @@
 package javax.infobus;
 
 /**
- * Unsupported operation exception
+ * The UnsupportedOperationException is available to be thrown when
+ * a participating InfoBus consumer/producer, or data item does not
+ * support a particular method call.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public	class	UnsupportedOperationException
-	extends	RuntimeException {
+public class UnsupportedOperationException extends RuntimeException {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
 
 	/**
-	 * Create exception with description.
-	 * @param s Description string
+	 * Create an UnsupportedOperationException with a detailed
+	 * description of the problem.
+	 * @param message Detailed description of the exception
 	 */
-	public UnsupportedOperationException(String s) {
-		super(s);
+	public UnsupportedOperationException(String message) {
+		super(message);
 	} // UnsupportedOperationException()
 
 

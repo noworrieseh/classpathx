@@ -18,10 +18,10 @@ package javax.infobus;
 /**
  * InfoBus Item Revoked Event.
  * @author Andrew Selkirk
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final	class	InfoBusItemRevokedEvent
-		extends	InfoBusEvent {
+				extends	InfoBusEvent {
 
 	//-------------------------------------------------------------
 	// Initialization ---------------------------------------------
@@ -32,8 +32,8 @@ public final	class	InfoBusItemRevokedEvent
 	 * @param dataItemName Data item name
 	 * @param producer InfoBus Data Producer
 	 */
-	protected InfoBusItemRevokedEvent(String				dataItemName, 
-								  InfoBusDataProducer	producer) {
+	protected InfoBusItemRevokedEvent(String				dataItemName,
+									  InfoBusDataProducer	producer) {
 		super(dataItemName, producer);
 	} // InfoBusItemRevokedEvent()
 
@@ -44,7 +44,7 @@ public final	class	InfoBusItemRevokedEvent
 
 	/**
 	 * Get source as a Data Producer.  Convience method.
-	 * @returns InfoBus Data Producer
+	 * @return InfoBus Data Producer
 	 */
 	public InfoBusDataProducer getSourceAsProducer() {
 		return (InfoBusDataProducer) getSource();
