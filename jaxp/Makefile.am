@@ -1,5 +1,5 @@
 # 
-# $Id: Makefile.am,v 1.1.2.2 2004-04-07 22:22:04 avdyk Exp $
+# $Id: Makefile.am,v 1.1.2.3 2004-04-07 22:32:12 avdyk Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -337,16 +337,13 @@ javax_xml_transform_%.h:
 ##		@srcdir@/src/javax/xml/transform/%.java \
 # Rule for compiling Java source files
 org/%.class: @srcdir@/src/org/%.java
-	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
 
 javax/%.class: @srcdir@/src/javax/%.java
-	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
 
 gnu/%.class: @srcdir@/src/gnu/%.java
-	echo "Compiling $*.java..."
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:." $<
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
 
 # Jar file
 
