@@ -240,10 +240,12 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/TextConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/ValidationConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/WellFormednessFilter.java \
-	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
 	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
-	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
+	$(SOURCEDIR)/gnu/xml/util/DoParse.java \
+	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
+	$(SOURCEDIR)/gnu/xml/util/Resolver.java \
 	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java \
+	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
 	$(SOURCEDIR)/gnu/xml/dom/Consumer.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomAttr.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomCDATA.java \
@@ -322,7 +324,7 @@ javadoc:
 	    -windowtitle "GNU JAXP Library" \
 	    -nodeprecatedlist \
 	    -version -author \
-	    -footer "<p>Source code is GPL'd at \
+	    -footer "<p>Source code is GPL'd in the JAXP subproject at \
 		<a href='http://savannah.gnu.org/projects/classpathx'> \
 		http://savannah.gnu.org/projects/classpathx</a> \
 		<br>This documentation was derived from that\
@@ -330,12 +332,12 @@ javadoc:
 		</p>" \
 	    -classpath "$(SOURCEDIR)" \
 	    \
-	    -group "SAX2/AElfred2 XML Utilities (Free Software)" \
+	    -group "AElfred2 and SAX2 Utilities" \
 	    	"gnu.xml.aelfred2:gnu.xml.pipeline:gnu.xml.util" \
-	    -group "DOM2, implementing DOM Level 2 (Free Software)" \
+	    -group "DOM2, implementing DOM Level 2" \
 	    	"gnu.xml.dom" \
 	    \
-	    -group "SAX and SAX2 (Free Software)" \
+	    -group "SAX and SAX2" \
 	    	"org.xml.sax:org.xml.sax.ext:org.xml.sax.helpers" \
 	    -group "DOM Level 2 (W3C)" \
 	    	"org.w3c.*" \
