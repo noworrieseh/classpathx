@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseHash.java,v 1.1.1.1 2001-11-20 13:40:34 raif Exp $
+// $Id: BaseHash.java,v 1.2 2001-11-22 10:30:13 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -24,13 +24,10 @@ package gnu.crypto.hash;
 //    USA
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.hash.IMessageDigest;
-import java.io.PrintWriter;
-
 /**
  * A base abstract class to facilitate hash implementations.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class BaseHash implements IMessageDigest {
 
@@ -55,6 +52,13 @@ public abstract class BaseHash implements IMessageDigest {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
+   /**
+    * Trivial constructor for use by concrete subclasses.<p>
+    *
+    * @param name the canonical name prefix of this instance.
+    * @param hashSize the block size of the output in bytes.
+    * @param blockSize the block size of the internal transform.
+    */
    protected BaseHash(String name, int hashSize, int blockSize) {
       super();
 
@@ -126,17 +130,27 @@ public abstract class BaseHash implements IMessageDigest {
 
    public abstract boolean selfTest();
 
-   /** Returns the byte[] to use as padding before completing a hash operation. */
+   /**
+    * Returns the byte array to use as padding before completing a hash
+    * operation.<p>
+    *
+    * @return the bytes to pad the remaining bytes in the buffer before
+    * completing a hash operation.
+    */
    protected abstract byte[] padBuffer();
 
-   /** Constructs the result from the contents of the current context. */
+   /**
+    * Constructs the result from the contents of the current context.<p>
+    *
+    * @return the output of the completed hash operation.
+    */
    protected abstract byte[] getResult();
 
    /** Resets the instance for future re-use. */
    protected abstract void resetContext();
 
    /**
-    * The block digest transformation per se.
+    * The block digest transformation per se.<p>
     *
     * @param in the <i>blockSize</i> long block, as an array of bytes to digest.
     * @param offset the index where the data to digest is located within the

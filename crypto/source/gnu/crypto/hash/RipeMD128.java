@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD128.java,v 1.1.1.1 2001-11-20 13:40:34 raif Exp $
+// $Id: RipeMD128.java,v 1.2 2001-11-22 10:30:13 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -24,7 +24,6 @@ package gnu.crypto.hash;
 //    USA
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.util.Util;
 import java.io.PrintWriter;
 
@@ -35,7 +34,7 @@ import java.io.PrintWriter;
  * <a href="../ripemd160.ps">RIPEMD160: A Strengthened Version of RIPEMD.<br>
  * Hans Dobbertin, Antoon Bosselaers and Bart Preneel.</a>
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RipeMD128 extends BaseHash {
 

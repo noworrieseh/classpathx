@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: IMessageDigest.java,v 1.2 2001-11-21 19:55:29 raif Exp $
+// $Id: IMessageDigest.java,v 1.3 2001-11-22 10:30:13 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -24,13 +24,10 @@ package gnu.crypto.hash;
 //    USA
 // ----------------------------------------------------------------------------
 
-import java.math.BigInteger;
-import java.io.PrintWriter;
-
 /**
  * The basic visible methods of any hash algorithm.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface IMessageDigest extends Cloneable {
 
@@ -40,18 +37,22 @@ public interface IMessageDigest extends Cloneable {
    // Methods
    // -------------------------------------------------------------------------
 
-   /** @return the canonical name of this instance. */
+   /**
+    * Returns the canonical name of this algorithm.<p>
+    *
+    * @return the canonical name of this instance.
+    */
    String name();
 
    /**
-    * Return the output length in bytes of this message digest algorithm.
+    * Returns the output length in bytes of this message digest algorithm.<p>
     *
     * @return the output length in bytes of this message digest algorithm.
     */
    int hashSize();
 
    /**
-    * Continues a message digest operation using the input byte.
+    * Continues a message digest operation using the input byte.<p>
     *
     * @param b the input byte to digest.
     */
@@ -60,7 +61,8 @@ public interface IMessageDigest extends Cloneable {
    /**
     * Continues a message digest operation, by filling the buffer, processing
     * data in the algorithm's HASH_SIZE-bit block(s), updating the context and
-    * count, and buffering the remaining bytes in buffer for the next operation.
+    * count, and buffering the remaining bytes in buffer for the next
+    * operation.<p>
     *
     * @param in the input block.
     * @param offset start of meaningful bytes in input block.
@@ -70,7 +72,7 @@ public interface IMessageDigest extends Cloneable {
 
    /**
     * Completes the message digest by performing final operations such as
-    * padding and resetting the instance.
+    * padding and resetting the instance.<p>
     *
     * @return the array of bytes representing the hash value.
     */
@@ -78,7 +80,7 @@ public interface IMessageDigest extends Cloneable {
 
    /**
     * A basic test. Ensures that the digest of a pre-determined message is equal
-    * to a known pre-computed value.
+    * to a known pre-computed value.<p>
     *
     * @return <tt>true</tt> if the implementation passes a basic self-test.
     * Returns <tt>false</tt> otherwise.

@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Whirlpool.java,v 1.1.1.1 2001-11-20 13:40:38 raif Exp $
+// $Id: Whirlpool.java,v 1.2 2001-11-22 10:30:13 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -24,7 +24,6 @@ package gnu.crypto.hash;
 //    USA
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.util.Util;
 import java.io.PrintWriter;
 
@@ -41,7 +40,7 @@ import java.io.PrintWriter;
  * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class Whirlpool extends BaseHash {
 
