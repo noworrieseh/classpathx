@@ -1,9 +1,9 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfProvider.java,v 1.1 2002-01-17 11:54:47 raif Exp $
+// $Id: TestOfProvider.java,v 1.2 2002-07-27 00:21:31 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,11 +40,15 @@ import java.security.MessageDigest;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
- * Conformance tests for the JCE Provider implementation.
+ * <p>Conformance tests for the JCE Provider implementation.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfProvider extends TestCase {
 
@@ -116,6 +120,23 @@ public class TestOfProvider extends TestCase {
       } catch (Exception x) {
          x.printStackTrace(System.err);
          fail("testWhirlpoolPRNG()");
+      }
+   }
+
+   public void testGNUSecureRandoms() {
+      String rand;
+      Random algorithm;
+      for (Iterator it = GnuCrypto.getSecureRandomNames().iterator(); it.hasNext(); ) {
+         rand = (String) it.next();
+         try {
+            algorithm = null;
+            algorithm = SecureRandom.getInstance(rand, GNU);
+            assertNotNull("getInstance("+String.valueOf(rand)+")", algorithm);
+         } catch (NoSuchProviderException x) {
+            fail("getInstance("+String.valueOf(rand)+"): "+String.valueOf(x));
+         } catch (NoSuchAlgorithmException x) {
+            fail("getInstance("+String.valueOf(rand)+"): "+String.valueOf(x));
+         }
       }
    }
 
