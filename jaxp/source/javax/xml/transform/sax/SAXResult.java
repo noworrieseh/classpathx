@@ -27,7 +27,7 @@ import org.xml.sax.ext.LexicalHandler;
 import javax.xml.transform.Result;
 
 /**
- * SAX Result
+ * Collects the result of a SAX transform.
  * @author	Andrew Selkirk
  * @version	1.0
  */
@@ -61,30 +61,28 @@ public class SAXResult implements Result {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
-	public void setHandler(ContentHandler handler) {
-		this.handler = handler;
-	} // setHandler()
-
 	public ContentHandler getHandler() {
 		return handler;
-	} // getHandler()
-
-	void setLexicalHandler(LexicalHandler lexHandler) {
-		this.lexhandler = lexHandler;
-	} // setLexicalHandler()
-
-	LexicalHandler getLexicalHandler() {
-		return lexhandler;
-	} // getLexicalHandler()
-
-	public void setSystemId(String systemID) {
-		this.systemId = systemID;
-	} // setSystemId()
+	}
 
 	public String getSystemId() {
 		return systemId;
-	} // getSystemId()
+	}
+
+	public LexicalHandler getLexicalHandler() {
+		return lexhandler;
+	}
 
 
-} // SAXResult
+	public void setHandler(ContentHandler handler) {
+		this.handler = handler;
+	}
 
+	public void setSystemId(String systemID) {
+		this.systemId = systemID;
+	}
+
+	public void setLexicalHandler(LexicalHandler lexHandler) {
+		this.lexhandler = lexHandler;
+	}
+}
