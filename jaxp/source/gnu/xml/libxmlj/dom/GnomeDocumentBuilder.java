@@ -196,7 +196,7 @@ implements DOMImplementation
 
   // Callback hooks from JNI
   
-  private void setDocumentLocator (long ctx, long loc)
+  private void setDocumentLocator (Object ctx, Object loc)
     {
       // ignore
     }
@@ -208,7 +208,7 @@ implements DOMImplementation
         {
           InputSource source = entityResolver.resolveEntity(publicId,
                                                             systemId);
-          return XMLJ.getInputStream(source);
+          return (source == null) ? null : XMLJ.getInputStream(source);
         }
       else
         {

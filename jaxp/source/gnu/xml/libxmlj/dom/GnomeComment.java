@@ -38,7 +38,7 @@ extends GnomeCharacterData
 implements Comment
 {
 
-  GnomeComment (long id)
+  GnomeComment (Object id)
     {
       super (id);
     }

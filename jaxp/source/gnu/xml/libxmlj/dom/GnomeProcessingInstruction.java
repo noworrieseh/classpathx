@@ -39,7 +39,7 @@ extends GnomeNode
 implements ProcessingInstruction
 {
 
-  GnomeProcessingInstruction (long id)
+  GnomeProcessingInstruction (Object id)
     {
       super (id);
     }

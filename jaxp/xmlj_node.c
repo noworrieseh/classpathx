@@ -37,25 +37,17 @@ xmljGetNodeID (JNIEnv * env, jobject self)
 {
   jclass cls;
   jfieldID field;
-  jlong id;
+  jobject id;
   xmlNodePtr node;
 
   cls = (*env)->GetObjectClass (env, self);
-  if (cls == NULL)
+  field = (*env)->GetFieldID (env, cls, "id", "Ljava/lang/Object;");
+  id = (*env)->GetObjectField (env, self, field);
+  if (id == NULL)
     {
-      return NULL;
+      printf ("id is NULL\n");
     }
-  field = (*env)->GetFieldID (env, cls, "id", "J");
-  if (field == NULL)
-    {
-      return NULL;
-    }
-  id = (*env)->GetLongField (env, self, field);
-  if (id == 0LL)
-    {
-      printf ("id is 0LL!\n");
-    }
-  node = (xmlNodePtr) xmljAsPointer (id);
+  node = (xmlNodePtr) xmljAsPointer (env, id);
   if (node == NULL)
     {
       printf ("node is null!\n");
@@ -83,14 +75,15 @@ xmljGetNodeInstance (JNIEnv * env, xmlNodePtr node)
       return NULL;
     }
   method = (*env)->GetStaticMethodID (env, cls, "newInstance",
-                                      "(JJI)Lgnu/xml/libxmlj/dom/GnomeNode;");
+                                      "(Ljava/lang/Object;Ljava/lang/Object;I)Lgnu/xml/libxmlj/dom/GnomeNode;");
+  
   if (method == NULL)
     {
       return NULL;
     }
   return (*env)->CallStaticObjectMethod (env, cls, method,
-                                         xmljAsField (node->doc),
-                                         xmljAsField (node),
+                                         xmljAsField (env, node->doc),
+                                         xmljAsField (env, node),
                                          node->type);
 }
 
@@ -106,12 +99,13 @@ xmljFreeDoc (JNIEnv * env, xmlDocPtr doc)
     {
       return;
     }
-  method = (*env)->GetStaticMethodID (env, cls, "freeDocument", "(J)V");
+  method = (*env)->GetStaticMethodID (env, cls, "freeDocument",
+                                      "(Ljava/lang/Object;)V");
   if (method == NULL)
     {
       return;
     }
-  (*env)->CallStaticVoidMethod (env, cls, method, xmljAsField (doc));
+  (*env)->CallStaticVoidMethod (env, cls, method, xmljAsField (env, doc));
 }
 
 int

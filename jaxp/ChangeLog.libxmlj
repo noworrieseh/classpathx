@@ -1,3 +1,8 @@
+2004-06-23  Chris Burdess <dog@gnu.org>
+
+	* all: Use RawData for native pointers.
+	* xmlj_sax.c: Fixed entity resolution.
+
 2004-06-03  Chris Burdess <dog@gnu.org>
 
 	* all: Use longs for native pointers.

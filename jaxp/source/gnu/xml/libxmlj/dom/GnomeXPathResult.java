@@ -43,9 +43,9 @@ implements XPathResult
   /**
    * xmlXPathObjectPtr
    */
-  final long obj;
+  final Object obj;
 
-  GnomeXPathResult (long obj)
+  GnomeXPathResult (Object obj)
     {
       this.obj = obj;
     }
@@ -55,7 +55,7 @@ implements XPathResult
       free (obj);
     }
 
-  private native void free (long obj);
+  private native void free (Object obj);
   
   public native short getResultType ();
 

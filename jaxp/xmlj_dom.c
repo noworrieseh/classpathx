@@ -95,11 +95,11 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_isId (JNIEnv * env, jobject self)
 
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocument_free (JNIEnv * env,
-                                             jobject self, jlong id)
+                                             jobject self, jobject id)
 {
   xmlDocPtr doc;
 
-  doc = (xmlDocPtr) xmljAsPointer (id);
+  doc = (xmlDocPtr) xmljAsPointer (env, id);
   xmljFreeDoc (env, doc);
   xmlFree (doc);
 }

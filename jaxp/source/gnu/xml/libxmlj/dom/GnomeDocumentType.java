@@ -39,7 +39,7 @@ extends GnomeNode
 implements DocumentType
 {
 
-  GnomeDocumentType (long id)
+  GnomeDocumentType (Object id)
     {
       super (id);
     }

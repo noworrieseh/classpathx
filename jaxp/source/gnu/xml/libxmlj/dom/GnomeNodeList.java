@@ -41,9 +41,9 @@ implements NodeList
   /**
    * The node id.
    */
-  private final long id;
+  private final Object id;
 
-  GnomeNodeList (long id)
+  GnomeNodeList (Object id)
     {
       this.id = id;
     }

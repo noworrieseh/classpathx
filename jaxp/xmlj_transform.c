@@ -247,12 +247,7 @@ xmljDocumentFunction (xmlXPathParserContextPtr ctxt, int nargs)
   }
 }
 
-/*
- * Class:     gnu_xml_libxmlj_transform_LibxsltStylesheet
- * Method:    newLibxsltStylesheet
- * Signature: ([B)J
- */
-JNIEXPORT jlong JNICALL
+JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   JNIEnv * env, jclass clazz, jobject inputStream, jbyteArray detectBuffer,
   jstring inSystemId,
@@ -280,7 +275,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
       return 0;
     }
   
-  sax = xmljNewSAXHandler (ctx->sax, 0, 0, 0, 0, 0, 0);
+  sax = xmljNewSAXHandler (0, 0, 0, 0, 0, 0);
   if (sax == NULL)
     {
       xmljFreeSAXParseContext (saxParseContext);
@@ -434,17 +429,12 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   /*xmljFreeParserContext (ctx);*/
   
   /* Return handle/address casted to Java int value */
-  return xmljAsField (nativeStylesheetHandle);
+  return xmljAsField (env, nativeStylesheetHandle);
 }
 
-/*
- * Class:     gnu_xml_libxmlj_transform_LibxsltStylesheet
- * Method:    freeLibxsltStylesheet
- * Signature: (J)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_freeLibxsltStylesheet
-(JNIEnv * env, jclass clazz, jlong nativeStylesheetHandle)
+(JNIEnv * env, jclass clazz, jobject nativeStylesheetHandle)
 {
 
   /* Cast Java int value to handle/address and free associated
@@ -453,7 +443,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_freeLibxsltStylesheet
 
   xsltStylesheetPtr stylesheet;
  
-  stylesheet = (xsltStylesheetPtr) xmljAsPointer (nativeStylesheetHandle);
+  stylesheet = (xsltStylesheetPtr) xmljAsPointer (env, nativeStylesheetHandle);
   stylesheet->_private = NULL;
   xmlFreeDoc (stylesheet->doc);
   stylesheet->doc = NULL;
@@ -479,14 +469,9 @@ xmljXPathFuncLookupFunc (void * ctxt,
   return f;
 }
 
-/*
- * Class:     gnu_xml_libxmlj_transform_LibxsltStylesheet
- * Method:    libxsltTransform
- * Signature: ([B[BLjava/io/OutputStream;[Ljava/lang/String;)V
- */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
-  JNIEnv *env, jclass clazz, jlong xsltSource, jobject jdocument,
+  JNIEnv *env, jclass clazz, jobject xsltSource, jobject jdocument,
   jstring inSystemId, jstring inPublicId, jobject outputStream,
   jobjectArray parametersArray, jobject javaContext)
 {
@@ -494,7 +479,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
   xmlDocPtr sourceDoc;
   xmlDocPtr resultDoc;
   
-  stylesheet = (xsltStylesheetPtr) xmljAsPointer (xsltSource);
+  stylesheet = (xsltStylesheetPtr) xmljAsPointer (env, xsltSource);
   sourceDoc = (xmlDocPtr) xmljGetNodeID (env, jdocument);
   
   if (!(*env)->ExceptionOccurred (env) && NULL != sourceDoc)

@@ -411,13 +411,16 @@ xmljFreeParserContext (xmlParserCtxtPtr ctx)
 {
   InputStreamContext *inputStreamContext;
 
-  inputStreamContext
-    = (InputStreamContext *) ctx->input->buf->context;
+  if (ctx->input != NULL && ctx->input->buf != NULL)
+    {
+      inputStreamContext
+        = (InputStreamContext *) ctx->input->buf->context;
+      
+      if (inputStreamContext != NULL)
+        xmljFreeInputStreamContext (inputStreamContext);
+    }
 
-  if (inputStreamContext != NULL)
-    xmljFreeInputStreamContext (inputStreamContext);
-
-  /* TODO xmlFreeParserCtxt (ctx); */
+  xmlFreeParserCtxt (ctx);
 }
 
 xmlDocPtr
@@ -461,8 +464,7 @@ xmljParseDocument (JNIEnv * env,
       saxCtx = xmljNewSAXParseContext (env, self, ctx, publicId, systemId);
       if (saxCtx != NULL)
         {
-          sax = xmljNewSAXHandler (contentHandler ? NULL : ctx->sax,
-                                   contentHandler,
+          sax = xmljNewSAXHandler (contentHandler,
                                    dtdHandler,
                                    entityResolver,
                                    errorHandler,
@@ -503,12 +505,10 @@ xmljParseDocument2 (JNIEnv * env,
   ctx->userData = ctx;
   orig = ctx->sax;
   ctx->sax = sax;
-              
+  
   xmljSetThreadContext (saxCtx);
 
-  /*printf ("xmljParseDocument2 loadsubset=%d\n", ctx->loadsubset);*/
   ret = xmlParseDocument (ctx);
-  /*printf ("xmlParseDocument done\n");*/
   doc = ctx->myDoc;
   if (ret)
     {
@@ -530,7 +530,7 @@ xmljParseDocument2 (JNIEnv * env,
   xmljClearThreadContext ();
               
   ctx->sax = orig;
-  free (sax);
+  free(sax);
   xmljFreeSAXParseContext (saxCtx);
   xmljFreeParserContext (ctx);
   return doc;

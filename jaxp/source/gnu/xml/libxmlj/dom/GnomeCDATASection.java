@@ -38,7 +38,7 @@ extends GnomeText
 implements CDATASection
 {
 
-  GnomeCDATASection (long id)
+  GnomeCDATASection (Object id)
     {
       super (id);
     }

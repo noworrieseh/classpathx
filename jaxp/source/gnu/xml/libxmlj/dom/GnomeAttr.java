@@ -42,7 +42,7 @@ extends GnomeNode
 implements Attr
 {
 
-  GnomeAttr (long id)
+  GnomeAttr (Object id)
     {
       super (id);
     }

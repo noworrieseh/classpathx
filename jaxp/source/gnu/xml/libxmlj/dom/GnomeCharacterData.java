@@ -39,7 +39,7 @@ extends GnomeNode
 implements CharacterData
 {
 
-  GnomeCharacterData (long id)
+  GnomeCharacterData (Object id)
     {
       super (id);
     }

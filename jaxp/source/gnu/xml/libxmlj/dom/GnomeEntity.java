@@ -38,7 +38,7 @@ extends GnomeNode
 implements Entity
 {
 
-  GnomeEntity (long id)
+  GnomeEntity (Object id)
     {
       super (id);
     }

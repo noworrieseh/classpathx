@@ -38,7 +38,7 @@ extends GnomeNode
 implements Notation
 {
 
-  GnomeNotation (long id)
+  GnomeNotation (Object id)
     {
       super (id);
     }

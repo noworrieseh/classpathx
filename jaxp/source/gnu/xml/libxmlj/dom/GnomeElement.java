@@ -42,7 +42,7 @@ extends GnomeNode
 implements Element
 {
 
-  GnomeElement (long id)
+  GnomeElement (Object id)
     {
       super (id);
     }

@@ -58,13 +58,13 @@ implements Node
    * @param node the node pointer
    * @param type the node type
    */
-  static GnomeNode newInstance (final long doc, final long node, final int type)
+  static GnomeNode newInstance (final Object doc, final Object node, final int type)
     {
-      if (doc == 0L)
+      if (doc == null)
         {
           throw new NullPointerException ("doc");
         }
-      if (node == 0L)
+      if (node == null)
         {
           throw new NullPointerException ("node");
         }
@@ -72,15 +72,13 @@ implements Node
         {
           instances = new HashMap ();
         }
-      Long docKey = new Long (doc);
-      Map docNodes = (Map) instances.get (docKey);
+      Map docNodes = (Map) instances.get (doc);
       if (docNodes == null)
         {
           docNodes = new HashMap (1024); // TODO review optimal initial capacity
-          instances.put (docKey, docNodes);
+          instances.put (doc, docNodes);
         }
-      Long nodeKey = new Long (node);
-      GnomeNode nodeInstance = (GnomeNode) docNodes.get (nodeKey);
+      GnomeNode nodeInstance = (GnomeNode) docNodes.get (node);
       if (nodeInstance != null)
         {
           return nodeInstance; // Return cached version
@@ -128,7 +126,7 @@ implements Node
         }
       if (type != DOCUMENT_NODE)
         {
-          docNodes.put (nodeKey, nodeInstance);
+          docNodes.put (node, nodeInstance);
         }
       return nodeInstance;
     }
@@ -137,25 +135,24 @@ implements Node
    * Frees the specified document.
    * This removes all its nodes from the cache.
    */
-  static void freeDocument (final long doc)
+  static void freeDocument (final Object doc)
     {
-      if (instances == null)
+      if (instances == null || doc == null)
         {
           return;
         }
-      Long docKey = new Long (doc);
-      instances.remove (docKey);
-      //System.out.println("Freed "+instances.remove(docKey));
+      instances.remove (doc);
+      //System.out.println("Freed "+instances.remove(doc));
     }
 
   /**
    * xmlNodePtr
    */
-  final long id;
+  final Object id;
 
   Map userData;
 
-  GnomeNode (final long id)
+  GnomeNode (final Object id)
     {
       this.id = id;
     }
@@ -225,7 +222,7 @@ implements Node
 
   public int hashCode ()
     {
-      return (int) id;
+      return id.hashCode ();
     }
 
   public boolean equals (Object other)
@@ -236,11 +233,6 @@ implements Node
         }
       return (other instanceof GnomeNode &&
               ((GnomeNode) other).id == id);
-    }
-
-  public String toString ()
-    {
-      return getClass ().getName () + '#' + Long.toHexString(id);
     }
 
   // DOM Level 3 methods

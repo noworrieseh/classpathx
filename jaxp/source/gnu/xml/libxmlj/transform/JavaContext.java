@@ -123,7 +123,7 @@ class JavaContext
         }
     }
 
-  private void setDocumentLocator (long ctx, long loc)
+  private void setDocumentLocator (Object ctx, Object loc)
     {
     }
 

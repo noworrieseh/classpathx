@@ -302,6 +302,9 @@ $(src)/gnu/xml/util/SAXNullTransformerFactory.java \
 $(src)/gnu/xml/util/XCat.java \
 $(src)/gnu/xml/util/XHTMLWriter.java \
 $(src)/gnu/xml/util/XMLWriter.java \
+$(src)/gnu/xml/libxmlj/RawData.java \
+$(src)/gnu/xml/libxmlj/RawData32.java \
+$(src)/gnu/xml/libxmlj/RawData64.java \
 $(src)/gnu/xml/libxmlj/sax/GnomeLocator.java \
 $(src)/gnu/xml/libxmlj/sax/GnomeSAXParser.java \
 $(src)/gnu/xml/libxmlj/sax/GnomeSAXParserFactory.java \
@@ -380,7 +383,7 @@ xmlj_transform.c \
 xmlj_util.c \
 xmlj_xpath.c
 
-libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
+libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic -D_JNI_IMPLEMENTATION_
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
 package_names = \

@@ -24,18 +24,23 @@ xmljGetXPathObject (JNIEnv *env, xmlXPathObjectPtr obj)
 {
   jclass cls;
   jmethodID method;
+  jobject ret;
+  jobject val;
   
   cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeXPathResult");
   if (cls == NULL)
     {
       return NULL;
     }
-  method = (*env)->GetMethodID (env, cls, "<init>", "(J)V");
+  method = (*env)->GetMethodID (env, cls, "<init>", "(Ljava/lang/Object;)V");
   if (method == NULL)
     {
       return NULL;
     }
-  return (*env)->NewObject (env, cls, method, xmljAsField (obj));
+  val = xmljAsField (env, obj);
+  ret = (*env)->NewObject (env, cls, method, val);
+  
+  return ret;
 }
 
 xmlXPathObjectPtr
@@ -43,20 +48,23 @@ xmljGetXPathObjectID (JNIEnv *env, jobject obj)
 {
   jclass cls;
   jfieldID field;
-  jlong val;
+  jobject val;
+  xmlXPathObjectPtr ret;
 
   cls = (*env)->GetObjectClass (env, obj);
   if (cls == NULL)
     {
       return NULL;
     }
-  field = (*env)->GetFieldID (env, cls, "obj", "J");
+  field = (*env)->GetFieldID (env, cls, "obj", "Ljava/lang/Object;");
   if (field == NULL)
     {
       return NULL;
     }
-  val = (*env)->GetLongField (env, obj, field);
-  return (xmlXPathObjectPtr) xmljAsPointer (val);
+  val = (*env)->GetObjectField (env, obj, field);
+  ret = (xmlXPathObjectPtr) xmljAsPointer (env, val);
+
+  return ret;
 }
 
 JNIEXPORT jobject JNICALL
@@ -90,7 +98,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_evaluate (JNIEnv *env,
   return ret;
 }
 
-JNIEXPORT jlong JNICALL
+JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_init (JNIEnv *env,
                                                     jobject self,
                                                     jstring expression)
@@ -98,24 +106,24 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_init (JNIEnv *env,
   const xmlChar *str;
 
   str = xmljGetStringChars (env, expression);
-  return xmljAsField (xmlXPathCompile (str));
+  return xmljAsField (env, xmlXPathCompile (str));
 }
 
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_free (JNIEnv *env,
                                                     jobject self,
-                                                    jlong ptr)
+                                                    jobject ptr)
 {
   xmlXPathCompExprPtr expr;
 
-  expr = (xmlXPathCompExprPtr) xmljAsPointer (ptr);
+  expr = (xmlXPathCompExprPtr) xmljAsPointer (env, ptr);
   xmlXPathFreeCompExpr (expr);
 }
 
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_evaluate (JNIEnv *env,
                                                         jobject self,
-                                                        jlong ptr,
+                                                        jobject ptr,
                                                         jobject contextNode,
                                                         jshort type,
                                                         jobject result)
@@ -126,7 +134,7 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_evaluate (JNIEnv *env,
   xmlXPathObjectPtr eval;
   jobject ret = NULL;
 
-  expr = (xmlXPathCompExprPtr) xmljAsPointer (ptr);
+  expr = (xmlXPathCompExprPtr) xmljAsPointer (env, ptr);
   node = xmljGetNodeID (env, contextNode);
   if (node == NULL)
     {
@@ -145,9 +153,9 @@ Java_gnu_xml_libxmlj_dom_GnomeXPathExpression_evaluate (JNIEnv *env,
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeXPathResult_free (JNIEnv *env,
                                                 jobject self,
-                                                jlong obj)
+                                                jobject obj)
 {
-  xmlXPathFreeObject ((xmlXPathObjectPtr) xmljAsPointer (obj));
+  xmlXPathFreeObject ((xmlXPathObjectPtr) xmljAsPointer (env, obj));
 }
 
 JNIEXPORT jshort JNICALL

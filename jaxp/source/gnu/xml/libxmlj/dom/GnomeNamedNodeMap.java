@@ -42,9 +42,9 @@ implements NamedNodeMap
   /**
    * The node id.
    */
-  private final long id;
+  private final Object id;
 
-  GnomeNamedNodeMap (long id)
+  GnomeNamedNodeMap (Object id)
     {
       this.id = id;
     }

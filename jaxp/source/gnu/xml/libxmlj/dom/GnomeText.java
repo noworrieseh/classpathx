@@ -40,7 +40,7 @@ extends GnomeCharacterData
 implements Text
 {
 
-  GnomeText (long id)
+  GnomeText (Object id)
     {
       super (id);
     }

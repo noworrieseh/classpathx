@@ -122,26 +122,47 @@ jmethodID xmljGetMethodID (JNIEnv *env,
                              signature);
   if (ret == NULL)
     {
-      jclass clscls = (*env)->FindClass(env, "java/lang/Class");
-      jmethodID nm = (*env)->GetMethodID(env, clscls, "getName", "()Ljava/lang/String;");
-      jstring clsname = (jstring)(*env)->CallObjectMethod(env,
-                                                          (jobject)cls,
-                                                          nm);
-      const char * c_clsName = (*env)->GetStringUTFChars(env, clsname, 0);
-      char * cat = (char *)malloc(sizeof(char));
-      sprintf(cat, "%s.%s %s", c_clsName, name, signature);
+      jclass clscls = (*env)->FindClass (env, "java/lang/Class");
+      jmethodID nm = (*env)->GetMethodID (env, clscls, "getName",
+                                          "()Ljava/lang/String;");
+      jstring clsname = (jstring) (*env)->CallObjectMethod (env,
+                                                            (jobject)cls,
+                                                            nm);
+      const char * c_clsName = (*env)->GetStringUTFChars (env, clsname, 0);
+      char * cat = (char *) malloc (sizeof (char));
+      sprintf (cat, "%s.%s %s", c_clsName, name, signature);
       xmljThrowException (env,
                           "java/lang/NoSuchMethodException",
                           cat);
       free (cat);
-      (*env)->ReleaseStringUTFChars(env, clsname, c_clsName);
+      (*env)->ReleaseStringUTFChars (env, clsname, c_clsName);
     }
   return ret;
 }
 
-void * xmljAsPointer (jlong field)
+void * xmljAsPointer (JNIEnv *env, jobject ptr)
 {
-  void * ptr;
+  jclass cls;
+  jfieldID field;
+  
+  switch (sizeof (void *))
+    {
+    case 4: /* 32-bit */
+      cls = (*env)->FindClass (env, "gnu/xml/libxmlj/RawData32");
+      field = (*env)->GetFieldID (env, cls, "data", "I");
+      return (void *) (*env)->GetIntField (env, ptr, field);
+    case 8: /* 64-bit */
+      cls = (*env)->FindClass (env, "gnu/xml/libxmlj/RawData64");
+      field = (*env)->GetFieldID (env, cls, "data", "J");
+      return (void *) (*env)->GetLongField (env, ptr, field);
+    default:
+      printf ("sizeof(void *) = %d\n", sizeof (void *));
+      xmljThrowException (env, "java/lang/RuntimeException",
+                          "Unknown platform type");
+      return NULL;
+    }
+  return (void *) field;
+  /*void * ptr;
 
   ptr = (void *) field;
 
@@ -149,12 +170,31 @@ void * xmljAsPointer (jlong field)
     {
       printf ("xmljAsPointer: casting killed %lld\n", field);
     }
-  return ptr;
+  return ptr;*/
 }
 
-jlong xmljAsField (void * ptr)
+jobject xmljAsField (JNIEnv *env, void * ptr)
 {
-  jlong field;
+  jclass cls;
+  jmethodID method;
+
+  switch (sizeof (void *))
+    {
+    case 4: 
+      cls = (*env)->FindClass (env, "gnu/xml/libxmlj/RawData32");
+      method = (*env)->GetMethodID (env, cls, "<init>", "(I)V");
+      return (*env)->NewObject (env, cls, method, (jint) ptr);
+    case 8:
+      cls = (*env)->FindClass (env, "gnu/xml/libxmlj/RawData64");
+      method = (*env)->GetMethodID (env, cls, "<init>", "(J)V");
+      return (*env)->NewObject (env, cls, method, (jlong) ptr);
+    default:
+      printf ("sizeof(void *) = %d\n", sizeof (void *));
+      xmljThrowException (env, "java/lang/RuntimeException",
+                          "Unknown platform type");
+      return NULL;
+    }
+  /*jlong field;
 
   field = (jlong) ptr;
 
@@ -167,6 +207,6 @@ jlong xmljAsField (void * ptr)
     {
       printf ("xmljAsField: casting killed %d\n", ptr);
     }
-  return field;
+  return field;*/
 }
 

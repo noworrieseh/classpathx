@@ -63,7 +63,7 @@ implements Document, XPathEvaluator
    */
   boolean strictErrorChecking;
   
-  GnomeDocument(long id)
+  GnomeDocument(Object id)
     {
       super(id);
       strictErrorChecking = true;
@@ -74,7 +74,7 @@ implements Document, XPathEvaluator
       free(id);
     }
   
-  private native void free(long id);
+  private native void free(Object id);
 
   public native DocumentType getDoctype();
 

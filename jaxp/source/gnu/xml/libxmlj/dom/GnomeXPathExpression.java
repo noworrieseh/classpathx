@@ -44,7 +44,7 @@ implements XPathExpression
   /**
    * xmlXPathCompExprPtr
    */
-  final long expr;
+  final Object expr;
 
   GnomeXPathExpression (GnomeDocument doc, String expression,
                         XPathNSResolver resolver)
@@ -58,9 +58,9 @@ implements XPathExpression
       free (expr);
     }
 
-  private native long init (String expression);
+  private native Object init (String expression);
 
-  private native void free (long expr);
+  private native void free (Object expr);
 
   public Object evaluate (Node contextNode,
                           short type,
@@ -70,7 +70,7 @@ implements XPathExpression
       return evaluate (expr, contextNode, type, result);
     }
   
-  private native Object evaluate (long expr,
+  private native Object evaluate (Object expr,
                                   Node contextNode,
                                   short type,
                                   Object result)

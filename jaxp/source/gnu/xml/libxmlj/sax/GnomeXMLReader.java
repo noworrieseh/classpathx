@@ -416,7 +416,7 @@ implements XMLReader
         }
       systemId = XMLJ.getAbsoluteURI (base, systemId);
       InputSource source = entityResolver.resolveEntity (publicId, systemId);
-      return XMLJ.getInputStream (source);
+      return (source == null) ? null : XMLJ.getInputStream (source);
     }
 
   private void notationDecl (String name,
@@ -468,7 +468,7 @@ implements XMLReader
                                      notationName);
     }
 
-  private void setDocumentLocator (long ctx, long loc)
+  private void setDocumentLocator (Object ctx, Object loc)
     {
       locator = new GnomeLocator (ctx, loc);
       if (seenFatalError || contentHandler == null)

@@ -38,20 +38,20 @@ implements Locator
 {
 
   // An xmlParserCtxtPtr
-  private final long ctx;
+  private final Object ctx;
 
   // An xmlSAXLocatorPtr
-  private final long loc;
+  private final Object loc;
 
-  GnomeLocator (long ctx, long loc)
+  GnomeLocator (Object ctx, Object loc)
     {
       this.ctx = ctx;
       this.loc = loc;
-      if (ctx == 0L)
+      if (ctx == null)
         {
           throw new NullPointerException ("ctx");
         }
-      if (loc == 0L)
+      if (loc == null)
         {
           throw new NullPointerException ("loc");
         }
@@ -62,27 +62,27 @@ implements Locator
       return getPublicId (ctx, loc);
     }
 
-  private native String getPublicId (long ctx, long loc);
+  private native String getPublicId (Object ctx, Object loc);
 
   public String getSystemId ()
     {
       return getSystemId (ctx, loc);
     }
 
-  private native String getSystemId (long ctx, long loc);
+  private native String getSystemId (Object ctx, Object loc);
 
   public int getLineNumber ()
     {
       return getLineNumber (ctx, loc);
     }
   
-  private native int getLineNumber (long ctx, long loc);
+  private native int getLineNumber (Object ctx, Object loc);
 
   public int getColumnNumber ()
     {
       return getColumnNumber (ctx, loc);
     }
   
-  private native int getColumnNumber (long ctx, long loc);
+  private native int getColumnNumber (Object ctx, Object loc);
 
 }

@@ -57,7 +57,7 @@ import gnu.xml.libxmlj.util.XMLJ;
 
 public class LibxsltStylesheet
 {
-  private long nativeStylesheetHandle;
+  private Object nativeStylesheetHandle;
   private Properties outputProperties;
   private static int unfinalized = 0;
 
@@ -100,7 +100,7 @@ public class LibxsltStylesheet
       }
   }
 
-  public long getNativeStylesheetHandle ()
+  public Object getNativeStylesheetHandle ()
   {
     return this.nativeStylesheetHandle;
   }
@@ -112,10 +112,10 @@ public class LibxsltStylesheet
 
   public void finalize ()
   {
-    if (0 != nativeStylesheetHandle)
+    if (nativeStylesheetHandle != null)
       {
 	freeLibxsltStylesheet (nativeStylesheetHandle);
-	nativeStylesheetHandle = 0;
+	nativeStylesheetHandle = null;
       }
   }
 
@@ -163,7 +163,7 @@ public class LibxsltStylesheet
   /*
    *  Native interface to libxslt.
    */
-  private static synchronized native long
+  private static synchronized native Object
   newLibxsltStylesheet (InputStream in,
                         byte[] detectBuffer,
                         String inSystemId,
@@ -173,10 +173,10 @@ public class LibxsltStylesheet
                         outputProperties);
 
   private static synchronized native void 
-  freeLibxsltStylesheet (long handle);
+  freeLibxsltStylesheet (Object handle);
 
   private static synchronized native void 
-  libxsltTransform (long nativeStylesheetHandle,
+  libxsltTransform (Object nativeStylesheetHandle,
                     GnomeDocument document,
                     String inSystemId,
                     String inPublicId,
