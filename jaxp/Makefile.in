@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 # 
-# $Id: Makefile.in,v 1.26.2.4 2004-04-07 22:34:04 avdyk Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -984,10 +983,10 @@ uninstall-am: uninstall-dataDATA uninstall-info-am \
 # Generate header files for classes containing native code.
 # I did remove the -force argument (not available in gcjh nor in kaffe)
 gnu_xml_libxmlj_transform_%.h: 
-	@JAVAH@ -classpath . gnu.xml.libxmlj.transform.$*
+	@JAVAH@ -jni -classpath . gnu.xml.libxmlj.transform.$*
 
 javax_xml_transform_%.h:
-	@JAVAH@ javax.xml.transform.$*
+	@JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 org/%.class: @srcdir@/src/org/%.java
