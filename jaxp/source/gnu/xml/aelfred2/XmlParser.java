@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.27 2001-11-18 23:29:05 db Exp $
+ * $Id: XmlParser.java,v 1.28 2001-11-20 22:23:07 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.27 2001-11-18 23:29:05 db Exp $
+// $Id: XmlParser.java,v 1.28 2001-11-20 22:23:07 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-18 23:29:05 $
+ * @version $Date: 2001-11-20 22:23:07 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -1681,32 +1681,17 @@ loop:
 loop1:
 	    while (true) {
 		c = readCh ();
+		int n;
 		switch (c) {
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		case 'a':
-		case 'A':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 'C':
-		case 'd':
-		case 'D':
-		case 'e':
-		case 'E':
-		case 'f':
-		case 'F':
-		    value *= 16;
-		    value += Integer.parseInt (new Character (c).toString (),
-				    16);
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+		    n = c - '0';
+		    break;
+		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+		    n = (c - 'a') + 10;
+		    break;
+		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+		    n = (c - 'A') + 10;
 		    break;
 		case ';':
 		    break loop1;
@@ -1714,25 +1699,18 @@ loop1:
 		    error ("illegal character in character reference", c, null);
 		    break loop1;
 		}
+		value *= 16;
+		value += n;
 	    }
 	} else {
 loop2:
 	    while (true) {
 		c = readCh ();
 		switch (c) {
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
 		    value *= 10;
-		    value += Integer.parseInt (new Character (c).toString (),
-				    10);
+		    value += c - '0';
 		    break;
 		case ';':
 		    break loop2;
