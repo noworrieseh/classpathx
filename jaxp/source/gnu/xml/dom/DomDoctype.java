@@ -1,6 +1,6 @@
 /*
- * $Id: DomDoctype.java,v 1.4 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomDoctype.java,v 1.5 2001-11-16 20:09:33 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -29,8 +29,10 @@ package gnu.xml.dom;
 
 import org.w3c.dom.*;
 
+import java.util.Hashtable;
 
-// $Id: DomDoctype.java,v 1.4 2001-10-23 17:42:25 db Exp $
+
+// $Id: DomDoctype.java,v 1.5 2001-11-16 20:09:33 db Exp $
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -59,7 +61,7 @@ import org.w3c.dom.*;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-16 20:09:33 $
  */
 public class DomDoctype extends DomExtern implements DocumentType
 {
@@ -67,6 +69,9 @@ public class DomDoctype extends DomExtern implements DocumentType
     private DomNamedNodeMap	entities;
     private DOMImplementation	implementation;
     private String		subset;
+
+    private Hashtable		elements = new Hashtable ();
+    private boolean		ids;
 
 
     /**
@@ -295,5 +300,54 @@ public class DomDoctype extends DomExtern implements DocumentType
     final public DOMImplementation getImplementation ()
     {
 	return implementation;
+    }
+
+
+    // Yeech.  Package-private hooks, I don't like this.
+    // For all that it's better than making this stuff a
+    // public API...
+
+
+    // package private
+    ElementInfo getElementInfo (String element)
+    {
+	ElementInfo	info = (ElementInfo) elements.get (element);
+
+	if (info != null)
+	    return info;
+	info = new ElementInfo ();
+	elements.put (element, info);
+	return info;
+    }
+
+    boolean hasIds () { return ids; }
+
+
+    // package private
+    class ElementInfo extends Hashtable
+    {
+	private String		idAttrName;
+
+	// is-a vs has-a ... just to minimize number of objects.
+	// keys in table are attribute names, values are defaults.
+
+	ElementInfo () { super (5, 5); }
+
+	void setAttrDefault (String attName, String value)
+	{
+	    if (getAttrDefault (attName) == null)
+		put (attName, value);
+	}
+	String getAttrDefault (String attName)
+	    { return (String) get (attName); }
+
+	void setIdAttr (String attName)
+	{
+	    if (idAttrName == null)
+		idAttrName = attName;
+	    ids = true;
+	}
+	String getIdAttr ()
+	    { return idAttrName; }
     }
 }
