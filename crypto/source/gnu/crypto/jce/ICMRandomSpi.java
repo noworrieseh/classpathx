@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMRandomSpi.java,v 1.1 2002-07-27 00:23:20 raif Exp $
+// $Id: ICMRandomSpi.java,v 1.2 2002-08-07 09:59:20 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -45,7 +45,7 @@ import java.util.Random;
  * <p>An <em>Adapter</em> class around {@link ICMGenerator} to allow using this
  * algorithm as a JCE {@link java.security.SecureRandom}.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ICMRandomSpi extends SecureRandomSpi {
 
@@ -54,6 +54,7 @@ public class ICMRandomSpi extends SecureRandomSpi {
 
    private static final String NAME = "ICMRandomSpi";
    private static final boolean DEBUG = true;
+   private static final int debuglevel = 0;
    private static final PrintWriter err = new PrintWriter(System.out, true);
    private static void debug(String s) {
       err.println(">>> "+NAME+": "+s);
@@ -73,6 +74,8 @@ public class ICMRandomSpi extends SecureRandomSpi {
    private static final String MSG =
          "Exception while setting up an "+Registry.ICM_PRNG+" SPI: ";
    private static final String RETRY = "Retry...";
+   private static final String LIMIT_REACHED_MSG = "Limit reached: ";
+   private static final String RESEED = "Re-seed...";
 
    /** Our underlying prng instance. */
    private ICMGenerator adaptee = new ICMGenerator();
@@ -86,6 +89,7 @@ public class ICMRandomSpi extends SecureRandomSpi {
    // -------------------------------------------------------------------------
 
    private static void resetLocalPRNG() {
+      if (DEBUG && debuglevel > 8) debug(">>> resetLocalPRNG()");
       HashMap attributes = new HashMap();
       attributes.put(ICMGenerator.CIPHER, Registry.AES_CIPHER);
       byte[] key = new byte[128 / 8]; // AES default key size
@@ -108,6 +112,7 @@ public class ICMRandomSpi extends SecureRandomSpi {
       attributes.put(ICMGenerator.SEGMENT_INDEX, new BigInteger(1, index));
 
       prng.setup(attributes);
+      if (DEBUG && debuglevel > 8) debug("<<< resetLocalPRNG()");
    }
 
    // Instance methods
@@ -116,15 +121,19 @@ public class ICMRandomSpi extends SecureRandomSpi {
    // java.security.SecureRandomSpi interface implementation ------------------
 
    public byte[] engineGenerateSeed(int numBytes) {
+      if (DEBUG && debuglevel > 8) debug(">>> engineGenerateSeed()");
       if (numBytes < 1) {
+         if (DEBUG && debuglevel > 8) debug("<<< engineGenerateSeed()");
          return new byte[0];
       }
       byte[] result = new byte[numBytes];
       this.engineNextBytes(result);
+      if (DEBUG && debuglevel > 8) debug("<<< engineGenerateSeed()");
       return result;
    }
 
    public void engineNextBytes(byte[] bytes) {
+      if (DEBUG && debuglevel > 8) debug(">>> engineNextBytes()");
       if (!adaptee.isInitialised()) {
          this.engineSetSeed(new byte[0]);
       }
@@ -134,13 +143,19 @@ public class ICMRandomSpi extends SecureRandomSpi {
             adaptee.nextBytes(bytes, 0, bytes.length);
             break;
          } catch (LimitReachedException x) { // reseed the generator
+            if (DEBUG) {
+               debug(LIMIT_REACHED_MSG + String.valueOf(x));
+               x.printStackTrace(err);
+               debug(RESEED);
+            }
             resetLocalPRNG();
          }
       }
+      if (DEBUG && debuglevel > 8) debug("<<< engineNextBytes()");
    }
 
    public void engineSetSeed(byte[] seed) {
-
+      if (DEBUG && debuglevel > 8) debug(">>> engineSetSeed()");
       // compute the total number of random bytes required to setup adaptee
       int materialLength = 0;
       materialLength += 16; // key material size
@@ -178,8 +193,8 @@ public class ICMRandomSpi extends SecureRandomSpi {
 
       // use AES cipher with 128-bit block size
       attributes.put(ICMGenerator.CIPHER, Registry.AES_CIPHER);
-      // use an index the size of half an AES block
-      attributes.put(ICMGenerator.SEGMENT_INDEX_LENGTH, new Integer(8));
+      // use an index the size of quarter of an AES block
+      attributes.put(ICMGenerator.SEGMENT_INDEX_LENGTH, new Integer(4));
       // specify the key
       byte[] key = new byte[16];
       System.arraycopy(material, 0, key, 0, 16);
@@ -193,6 +208,7 @@ public class ICMRandomSpi extends SecureRandomSpi {
       System.arraycopy(material, 32, index, 0, 8);
       attributes.put(ICMGenerator.SEGMENT_INDEX, new BigInteger(1, index));
 
-      adaptee.setup(attributes);
+      adaptee.init(attributes);
+      if (DEBUG && debuglevel > 8) debug("<<< engineSetSeed()");
    }
 }
