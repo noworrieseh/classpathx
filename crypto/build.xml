@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.8 2002-01-18 02:25:43 raif Exp $
+   $Id: build.xml,v 1.9 2002-05-14 08:57:49 raif Exp $
 
-   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the Free
@@ -35,13 +35,10 @@
    <!--
    global properties ..........................................................
    -->
-   <property name="package" value="gnu-crypto"/>
-   <property name="version" value="1.0.0"/>
-   <property name="oneliner" value="GNU cryptographic primitives and tools"/>
 
    <!-- give user a chance to override with personal settings -->
-   <property file=".ant.properties" />
    <property file="${user.home}/.ant.properties" />
+   <property file=".ant.properties" />
 
    <property name="debug" value="true"/>
    <property name="optimize" value="false"/>
