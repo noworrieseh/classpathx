@@ -1,6 +1,6 @@
 /*
  * Base64OuputStream.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,8 @@ import java.io.*;
  * readable.  The encoding and decoding algorithms are simple, but the
  * encoded data are consistently only about 33 percent larger than the
  * unencoded data.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class Base64OutputStream
   extends FilterOutputStream

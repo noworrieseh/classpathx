@@ -1,6 +1,6 @@
 /*
  * MimeMultipart.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,8 @@ import gnu.mail.util.CRLFOutputStream;
  * subtype by using the MimeMultipart(String subtype) constructor.
  * For example, to create a "multipart/alternative" object,
  * use <code>new MimeMultipart("alternative")</code>.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MimeMultipart
   extends Multipart

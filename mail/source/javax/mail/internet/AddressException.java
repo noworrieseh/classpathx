@@ -1,6 +1,6 @@
 /*
  * AddressException.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,8 @@ package javax.mail.internet;
 
 /**
  * The exception thrown when a wrongly formatted address is encountered.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class AddressException
   extends ParseException

@@ -1,6 +1,6 @@
 /*
  * MimePartDataSource.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,8 @@ import javax.mail.*;
 /**
  * A utility class that implements a DataSource out of a MimePart.
  * This class is primarily meant for service providers.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MimePartDataSource
   implements DataSource, MessageAware

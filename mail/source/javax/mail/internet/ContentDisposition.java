@@ -1,6 +1,6 @@
 /*
  * ContentDisposition.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ package javax.mail.internet;
  * It provides methods to parse a ContentDisposition string into 
  * individual components and to generate a MIME style ContentDisposition 
  * string.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class ContentDisposition
 {

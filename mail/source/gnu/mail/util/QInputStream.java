@@ -1,6 +1,6 @@
 /*
  * QInputStream.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -47,6 +47,8 @@ import java.io.*;
  * characters.  (But see section 5 for restrictions.)  In
  * particular, SPACE and TAB MUST NOT be represented as themselves
  * within encoded words.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class QInputStream
   extends QPInputStream

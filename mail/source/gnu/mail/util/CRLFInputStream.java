@@ -1,36 +1,33 @@
 /*
-  GNU-Classpath Extensions: javamail
-  Copyright (C) 1999  Chris Burdess
+ * CRLFInputStream.java
+ * Copyright (C) 2002 The Free Software Foundation
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
 package gnu.mail.util;
-
 
 import java.io.*;
 
-
-/** an input stream that filters out CR/LF pairs into LFs.
+/**
+ * An input stream that filters out CR/LF pairs into LFs.
  *
- * @author dog: dog@dog.net.uk
- * @version 1.1
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class CRLFInputStream
-extends PushbackInputStream
+  extends PushbackInputStream
 {
 
   /**
@@ -44,7 +41,8 @@ extends PushbackInputStream
   public static final int LF = 10;
 
   /**
-   * Constructs a CR/LF input stream connected to the specified input stream.
+   * Constructs a CR/LF input stream connected to the specified input
+   * stream.
    */
   public CRLFInputStream(InputStream in) 
   {
@@ -52,7 +50,8 @@ extends PushbackInputStream
   }
 
   /**
-   * Constructs a CR/LF input stream connected to the specified input stream, with the specified pushback buffer size.
+   * Constructs a CR/LF input stream connected to the specified input
+   * stream, with the specified pushback buffer size.
    */
   public CRLFInputStream(InputStream in, int bufsize)
   {
@@ -65,11 +64,11 @@ extends PushbackInputStream
    * @exception IOException if an I/O error occurs
    */
   public int read()
-  throws IOException
+    throws IOException
   {
     int c = super.read();
     if (c==CR) // skip CR
-    return super.read();
+      return super.read();
     return c;
   }
 
@@ -80,7 +79,7 @@ extends PushbackInputStream
    * @exception IOException if an I/O error occurs
    */
   public int read(byte[] b)
-  throws IOException
+    throws IOException
   {
     return read(b, 0, b.length);
   }
@@ -92,23 +91,23 @@ extends PushbackInputStream
    * @exception IOException if an I/O error occurs
    */
   public int read(byte[] b, int off, int len)
-  throws IOException
+    throws IOException
   {
     int l = doRead(b, off, len);
     l = removeCRs(b, off, l);
-    //perr("read", new String(b, off, l));
     return l;
   }
 
   /*
-   * Slight modification of PushbackInputStream.read() 
-   * not to do a blocking read on the underlying stream if there are bytes in the buffer.
+   * Slight modification of PushbackInputStream.read() not to do a
+   * blocking read on the underlying stream if there are bytes in the
+   * buffer.
    */
   private int doRead(byte[] b, int off, int len)
-  throws IOException
+    throws IOException
   {
     if (len<=0)
-    return 0;
+      return 0;
     int avail = buf.length-pos;
     if (avail>0)
     {
@@ -123,7 +122,7 @@ extends PushbackInputStream
     {
       len = super.read(b, off, len);
       if (len==-1)
-      return avail == 0 ? -1 : avail;
+        return avail == 0 ? -1 : avail;
       return avail + len;
     }
     return avail;
@@ -134,7 +133,7 @@ extends PushbackInputStream
    * @exception IOException if an I/O error occurs
    */
   public String readLine()
-  throws IOException
+    throws IOException
   {
     StringBuffer sb = new StringBuffer();
     boolean done = false, eos = false;
@@ -144,39 +143,41 @@ extends PushbackInputStream
       int l = read(b);
       if (l==-1)
       {
-	done = true;
-	eos = true;
+        done = true;
+        eos = true;
       }
       else
       {
-	for (int i=0; i<l; i++)
-	{
-	  if (b[i]==LF)
-	  {
-	    if (i>0)
-	    sb.append(new String(b, 0, i));
-	    if (l-(i+1)>0)
-	    unread(b, i+1, (l-i)-1);
-	    done = true;
-	    break;
-	  }
-	}
-	if (!done && l>0)
-	sb.append(new String(b, 0, l));
+        for (int i=0; i<l; i++)
+        {
+          if (b[i]==LF)
+          {
+            if (i>0)
+              sb.append(new String(b, 0, i));
+            if (l-(i+1)>0)
+              unread(b, i+1, (l-i)-1);
+            done = true;
+            break;
+          }
+        }
+        if (!done && l>0)
+          sb.append(new String(b, 0, l));
       }
     }
     if (eos && sb.length()<1)
-    return null;
+      return null;
     else
-    return sb.toString();
+      return sb.toString();
   }
 
   private int removeCRs(byte[] b, int off, int len)
   {
-    for (int index = indexOfCR(b, off, len); index>-1; index = indexOfCR(b, off, len))
+    for (int index = indexOfCR(b, off, len);
+        index>-1;
+        index = indexOfCR(b, off, len))
     {
       for (int i=index; i<b.length-1; i++)
-      b[i] = b[i+1];
+        b[i] = b[i+1];
       len--;
     }
     return len;
@@ -185,7 +186,8 @@ extends PushbackInputStream
   private int indexOfCR(byte[] b, int off, int len)
   {
     for (int i=off; i<off+len; i++)
-    if (b[i]==CR) return i;
+      if (b[i]==CR)
+        return i;
     return -1;
   }
 

@@ -1,6 +1,6 @@
 /*
  * InternetHeaders.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,6 +53,8 @@ import gnu.mail.util.LineInputStream;
  * (1000 bytes for SMTP). Received headers may have been folded.
  * The application is responsible for folding and unfolding headers 
  * as appropriate.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class InternetHeaders
 {

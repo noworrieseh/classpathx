@@ -1,6 +1,6 @@
 /*
  * StringTerm.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ package javax.mail.search;
  * This class implements the match method for Strings.
  * The current implementation provides only for substring matching.
  * We could add comparisons (like strcmp ...).
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class StringTerm
   extends SearchTerm

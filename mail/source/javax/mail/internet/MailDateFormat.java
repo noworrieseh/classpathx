@@ -1,6 +1,6 @@
 /*
  * MailDateFormat.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -101,6 +101,8 @@ zone = (( "+" / "-" ) 4DIGIT) / obs-zone
  * time-of-day MUST be in the range 00:00:00 through 23:59:60 (the number 
  * of seconds allowing for a leap second; see [STD-12]), and the zone MUST 
  * be within the range -9959 through +9959.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MailDateFormat
   extends SimpleDateFormat

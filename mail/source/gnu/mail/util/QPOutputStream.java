@@ -29,7 +29,7 @@ import java.io.IOException;
  * Quoted Printable Encoding stream.
  *
  * @author Andrew Selkirk
- * @author dog
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.0
  * @see java.io.FilterOutputStream
  **/

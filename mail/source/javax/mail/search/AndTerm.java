@@ -1,6 +1,6 @@
 /*
  * AndTerm.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import javax.mail.Message;
 
 /**
  * This class implements the logical AND operator on individual SearchTerms.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public final class AndTerm
   extends SearchTerm

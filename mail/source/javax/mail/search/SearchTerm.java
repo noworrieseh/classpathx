@@ -1,6 +1,6 @@
 /*
  * SearchTerm.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -40,6 +40,8 @@ import javax.mail.Message;
  * exceptions, the resulting objects violate the type-safe enum contract of 
  * the Message.RecipientType class. Proper deserialization of these objects 
  * depends on support for the readReplace method, added in JDK 1.2.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class SearchTerm
   implements Serializable

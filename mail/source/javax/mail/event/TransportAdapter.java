@@ -1,6 +1,6 @@
 /*
  * TransportAdapter.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ package javax.mail.event;
  * The methods in this class are empty; this class is provided as 
  * a convenience for easily creating listeners by extending this class 
  * and overriding only the methods of interest.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public abstract class TransportAdapter
   implements TransportListener

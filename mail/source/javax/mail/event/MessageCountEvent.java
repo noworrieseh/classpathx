@@ -1,6 +1,6 @@
 /*
  * MessageCountEvent.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,8 @@ import javax.mail.Message;
  * A client may want "poll" the folder by occasionally calling the 
  * <code>getMessageCount</code> or <code>isConnected</code> methods
  * to solicit any such notifications.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MessageCountEvent
   extends MailEvent

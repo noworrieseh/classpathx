@@ -1,6 +1,6 @@
 /*
  * StoreEvent.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,8 @@ import javax.mail.Store;
  * These notifications can be ALERTS or NOTICES.
  * ALERTS must be presented to the user in a fashion that calls 
  * the user's attention to the message.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class StoreEvent
   extends MailEvent

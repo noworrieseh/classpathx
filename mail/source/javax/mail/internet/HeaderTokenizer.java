@@ -1,6 +1,6 @@
 /*
  * HeaderTokenizer.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ package javax.mail.internet;
  * <p>
  * This class handles folded headers (ie headers with embedded CRLF SPACE
  * sequences). The folds are removed in the returned tokens.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class HeaderTokenizer
 {

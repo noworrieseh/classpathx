@@ -1,6 +1,6 @@
 /*
  * MessageChangeListener.java
- * Copyright (C) 2001 dog <dog@dog.net.uk>
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import java.util.EventListener;
 
 /**
  * This is the Listener interface for MessageChanged events.
+ *
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public interface MessageChangedListener
   extends EventListener
