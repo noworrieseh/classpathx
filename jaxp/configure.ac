@@ -1,7 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.5 2004-05-06 14:30:05 dog Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
