@@ -135,7 +135,6 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/xml/pipeline/WellFormednessFilter.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/XIncludeFilter.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/XsltFilter.java \
-	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
 	$(SOURCEDIR)/gnu/xml/util/DoParse.java \
 	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
 	$(SOURCEDIR)/gnu/xml/util/Resolver.java \
