@@ -6,6 +6,7 @@ JAVAC = @JAVAC@
 #JAVACFLAGS = @JAVACFLAGS@
 JAVACFLAGS = -g
 JAVADOC = javadoc
+JAVADOCFLAGS =
 
 src = @srcdir@/source
 dst = @srcdir@/classes
@@ -85,8 +86,8 @@ $(classes): $(dst)/%.class: $(src)/%.java
 
 javadoc:
 	mkdir -p $(doc)
-	$(JAVADOC) -d $(doc) -windowtitle "GNU JAF API documentation" \
-		-sourcepath $(src) $(package_names)
+	$(JAVADOC) $(JAVADOCFLAGS) -d $(doc) -sourcepath $(src) \
+          -windowtitle "GNU JAF API documentation" $(package_names)
 
 clean-local:
 	rm -rf $(META_INF_FILES) $(META_INF) $(doc) $(activation_jar)
@@ -96,7 +97,7 @@ distclean-local: clean-local
 	rm -f config.log config.status
 
 install-data-local:
-	@srcdir@/mkinstalldirs $(prefix)/share/java
-	$(INSTALL_DATA) $(activation_jar) $(prefix)/share/java
+	@srcdir@/mkinstalldirs $(DESTDIR)/$(datadir)/java
+	$(INSTALL_DATA) $(activation_jar) $(DESTDIR)/$(datadir)/java
 
 # End of Makefile.am
