@@ -59,10 +59,10 @@ public final class ReceivedDateTerm
   {
     try
       {
-        Date date = msg.getReceivedDate();
-        if (date != null)
+        Date d = msg.getReceivedDate();
+        if (d != null)
           {
-            return super.match(date);
+            return super.match(d);
           }
       }
     catch (Exception e)

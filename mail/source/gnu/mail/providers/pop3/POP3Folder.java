@@ -141,6 +141,7 @@ extends Folder
         readonly = true;
         break;
       }
+    this.mode = mode;
     open = true;
     notifyConnectionListeners(ConnectionEvent.OPENED);
   }

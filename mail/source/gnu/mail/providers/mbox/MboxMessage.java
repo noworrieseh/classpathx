@@ -60,9 +60,9 @@ public class MboxMessage
    * This is called by the MboxStore.
    */
   protected MboxMessage(MboxFolder folder, 
-      String fromLine,
-      InputStream in,
-      int msgnum)
+                        String fromLine,
+                        InputStream in,
+                        int msgnum)
     throws MessagingException 
   {
     super(folder, in, msgnum);
@@ -76,8 +76,8 @@ public class MboxMessage
    * It creates a copy of the specified message for the new folder.
    */
   protected MboxMessage(MboxFolder folder,
-      MimeMessage message,
-      int msgnum) 
+                        MimeMessage message,
+                        int msgnum) 
     throws MessagingException 
   {
     super(message);
@@ -101,9 +101,13 @@ public class MboxMessage
     throws MessagingException 
   {
     if (set)
-      flags.add(flag);
+      {
+        flags.add(flag);
+      }
     else
-      flags.remove(flag);
+      {
+        flags.remove(flag);
+      }
   }
     
   /**
@@ -121,16 +125,26 @@ public class MboxMessage
     boolean answered = flags.contains(Flags.Flag.ANSWERED);
     boolean deleted = flags.contains(Flags.Flag.DELETED);
     if (seen)
-      buffer.append('R');
+      {
+        buffer.append('R');
+      }
     if (!recent)
-      buffer.append('O');
+      {
+        buffer.append('O');
+      }
     if (answered)
-      buffer.append('A');
+      {
+        buffer.append('A');
+      }
     if (deleted)
-      buffer.append('D');
+      {
+        buffer.append('D');
+      }
     String status = buffer.toString();
     if (!(status.equals(old)))
-      setHeader(STATUS, status);
+      {
+        setHeader(STATUS, status);
+      }
   }
 
 
@@ -142,17 +156,25 @@ public class MboxMessage
   {
     String[] currentStatus = this.getHeader(STATUS);
     if (currentStatus != null && currentStatus.length > 0) 
-    {
-      flags = new Flags();
-      if (currentStatus[0].indexOf('R') >= 0)
-        flags.add(Flags.Flag.SEEN);
-      if (currentStatus[0].indexOf('O') < 0)
-        flags.add(Flags.Flag.RECENT);
-      if (currentStatus[0].indexOf('A') >= 0)
-        flags.add(Flags.Flag.ANSWERED);
-      if (currentStatus[0].indexOf('D') >= 0)
-        flags.add(Flags.Flag.DELETED);
-    }
+      {
+        flags = new Flags();
+        if (currentStatus[0].indexOf('R') >= 0)
+          {
+            flags.add(Flags.Flag.SEEN);
+          }
+        if (currentStatus[0].indexOf('O') < 0)
+          {
+            flags.add(Flags.Flag.RECENT);
+          }
+        if (currentStatus[0].indexOf('A') >= 0)
+          {
+            flags.add(Flags.Flag.ANSWERED);
+          }
+        if (currentStatus[0].indexOf('D') >= 0)
+          {
+            flags.add(Flags.Flag.DELETED);
+          }
+      }
   }
 
   // -- Utility methods --
@@ -160,12 +182,13 @@ public class MboxMessage
   public boolean equals(Object other) 
   {
     if (other instanceof MimeMessage) 
-    {
-      MimeMessage message = (MimeMessage)other;
-      return (message.getFolder()==getFolder() &&
-          message.getMessageNumber()==getMessageNumber());
-    }
+      {
+        MimeMessage message = (MimeMessage) other;
+        return (message.getFolder() == getFolder() &&
+                message.getMessageNumber() == getMessageNumber());
+      }
     return false;
   }
 
 }
+

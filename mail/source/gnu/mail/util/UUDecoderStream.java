@@ -217,10 +217,20 @@ public class UUDecoderStream
     // read(), the bytes should be read in bulk
     // to the buffer and initiating decoding if necessary.
     // This idea does introduce some duplication of code.
-    int index;
     // Write Bytes
-    for (index = offset; index < length; index++) 
-      bytes[index] = (byte) read();
+    for (int i = offset; i < length; i++)
+      {
+        int c = read();
+        if (c == -1)
+          {
+            if (length - offset == 0)
+              {
+                return -1;
+              }
+            break;
+          }
+        bytes[i] = (byte) c;
+      }
     // Return Number of bytes
     return length - offset;
   }

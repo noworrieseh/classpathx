@@ -279,9 +279,9 @@ public class URLName
       {
         return false;
       }
-    String file = (this.file != null) ? this.file : "";
+    String fileNormalized = (file != null) ? file : "";
     String otherFile = (url.file != null) ? url.file : "";
-    if (!file.equals(otherFile))
+    if (!fileNormalized.equals(otherFile))
       {
         return false;
       }

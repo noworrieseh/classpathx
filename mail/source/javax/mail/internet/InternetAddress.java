@@ -141,11 +141,11 @@ public class InternetAddress
    */
   public Object clone()
   {
-    InternetAddress address = new InternetAddress();
-    address.address = this.address;
-    address.personal = personal;
-    address.encodedPersonal = encodedPersonal;
-    return address;
+    InternetAddress clone = new InternetAddress();
+    clone.address = this.address;
+    clone.personal = personal;
+    clone.encodedPersonal = encodedPersonal;
+    return clone;
   }
 
   /**

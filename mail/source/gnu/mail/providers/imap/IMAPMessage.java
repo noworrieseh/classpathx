@@ -386,14 +386,14 @@ extends ReadOnlyMessage
       }
     // Next the multipart subtype
     String subtype = parseAtom(value).toLowerCase();
-    IMAPMultipart multipart = new IMAPMultipart(this, parent, subtype);
-    ContentType ct = new ContentType(multipart.getContentType());
+    IMAPMultipart m = new IMAPMultipart(this, parent, subtype);
+    ContentType ct = new ContentType(m.getContentType());
     // Add the parts
     for (int i = 0; i < offset; i++)
       {
         List part = (List) partList.get(i);
         String section = (String) sectionList.get(i);
-        multipart.addBodyPart(parseBodyPart(part, multipart, section));
+        m.addBodyPart(parseBodyPart(part, m, section));
       }
     // Now extension data
     //offset++;
@@ -431,7 +431,7 @@ extends ReadOnlyMessage
           }
       }
     parentHeaders.setHeader("Content-Type", ct.toString());
-    return multipart;
+    return m;
   }
 
   /*
@@ -451,8 +451,8 @@ extends ReadOnlyMessage
         // Multipart body part
         InternetHeaders h = new InternetHeaders();
         IMAPBodyPart part = new IMAPBodyPart(this, parent, section, h, -1, -1);
-        IMAPMultipart multipart = parseMultipart(list, part, h, section);
-        part.multipart = multipart;
+        IMAPMultipart m = parseMultipart(list, part, h, section);
+        part.multipart = m;
         return part;
       }
     

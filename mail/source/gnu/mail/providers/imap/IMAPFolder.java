@@ -362,22 +362,22 @@ implements UIDFolder
     IMAPConnection connection = s.getConnection();
     try
       {
-        String path = this.path;
+        String newPath = path;
         if (type == HOLDS_FOLDERS)
           {
             getSeparator();
             if (delimiter == '\u0000') // this folder cannot be created
               {
-                throw new FolderNotFoundException(this, path);
+                throw new FolderNotFoundException(this, newPath);
               }
-            path = new StringBuffer(path)
+            newPath = new StringBuffer(newPath)
               .append(delimiter)
               .toString();
           }
         boolean ret = false;
         synchronized (connection)
           {
-            ret = connection.create(path);
+            ret = connection.create(newPath);
           }
         if (ret)
           {
@@ -980,17 +980,17 @@ implements UIDFolder
           }
         else if (term instanceof RecipientTerm)
           {
-            Message.RecipientType type =
+            Message.RecipientType rt =
              ((RecipientTerm) term).getRecipientType();
-            if (type == Message.RecipientType.TO)
+            if (rt == Message.RecipientType.TO)
               {
                 criterion.append(IMAPConstants.SEARCH_TO);
               }
-            else if (type == Message.RecipientType.CC)
+            else if (rt == Message.RecipientType.CC)
               {
                 criterion.append(IMAPConstants.SEARCH_CC);
               }
-            else if (type == Message.RecipientType.BCC)
+            else if (rt == Message.RecipientType.BCC)
               {
                 criterion.append(IMAPConstants.SEARCH_BCC);
               }
@@ -1231,13 +1231,13 @@ implements UIDFolder
     for (int i = 0; i < entries.length; i++)
       {
         ListEntry entry = entries[i];
-        int type = entry.isNoinferiors() ?
+        int etype = entry.isNoinferiors() ?
           Folder.HOLDS_MESSAGES :
           Folder.HOLDS_FOLDERS;
         if (!entry.isNoselect())
           {
             IMAPFolder f = new IMAPFolder(store, entry.getMailbox(),
-                                           type, entry.getDelimiter());
+                                           etype, entry.getDelimiter());
             if (!unique.contains(f))
               {
                 unique.add(f);

@@ -96,9 +96,13 @@ public class MboxFolder
     
     file = new File(filename);
     if (file.exists() && file.isDirectory())
-      type = HOLDS_FOLDERS;
+      {
+        type = HOLDS_FOLDERS;
+      }
     else
-      type = HOLDS_MESSAGES;
+      {
+        type = HOLDS_MESSAGES;
+      }
     this.inbox = inbox;
     open = false;
     readOnly = true;
@@ -119,7 +123,9 @@ public class MboxFolder
   public String getName() 
   {
     if (inbox)
-      return "INBOX";
+      {
+        return "INBOX";
+      }
     return file.getName();
   }
 	
@@ -129,7 +135,9 @@ public class MboxFolder
   public String getFullName() 
   {
     if (inbox)
-      return "INBOX";
+      {
+        return "INBOX";
+      }
     return file.getPath();
   }
 
@@ -141,8 +149,8 @@ public class MboxFolder
   {
     URLName url = super.getURLName();
     return new URLName(url.getProtocol(), 
-        null, -1, url.getFile(),
-        null, null);
+                       null, -1, url.getFile(),
+                       null, null);
   }
 
   /**
@@ -172,7 +180,7 @@ public class MboxFolder
   public boolean hasNewMessages() 
     throws MessagingException 
   {
-    return getNewMessageCount()>0;
+    return getNewMessageCount() > 0;
   }
 
   /**
@@ -185,108 +193,122 @@ public class MboxFolder
     throws MessagingException 
   {
     String filename = file.getAbsolutePath();
-    if (mode==READ_WRITE) 
-    {
-      if (!file.canWrite())
-        throw new MessagingException("Folder is read-only");
-      if (!acquireLock())
-        throw new MessagingException("Unable to acquire lock: "+filename);
-      readOnly = false;
-    }
+    if (mode == READ_WRITE) 
+      {
+        if (!file.canWrite())
+          {
+            throw new MessagingException("Folder is read-only");
+          }
+        if (!acquireLock())
+          {
+            throw new MessagingException("Unable to acquire lock: " + filename);
+          }
+        readOnly = false;
+      }
 
     if (!file.canRead())
-      throw new MessagingException("Can't read folder: "+file.getName());
+      {
+        throw new MessagingException("Can't read folder: " + file.getName());
+      }
 
     LineInputStream in = null;
     try 
-    {
-      // Read messages
-      MboxStore store = (MboxStore)this.store;
-      store.log("reading "+filename);
-      
-      List acc = new ArrayList(256);
-      in = new LineInputStream(getInputStream());
-      int count = 1;
-      String line, fromLine = null;
-      ByteArrayOutputStream buf = null;
-
-      // notify listeners
-      store.processStatusEvent(new StatusEvent(store,
-            StatusEvent.OPERATION_START,
-            "open"));
-          
-      for (line = in.readLine(); line!=null; line = in.readLine()) 
       {
-        if (line.indexOf(FROM)==0) 
-        {
-          if (buf!=null)
+        // Read messages
+        MboxStore mstore = (MboxStore) this.store;
+        mstore.log("reading " + filename);
+        
+        List acc = new ArrayList(256);
+        in = new LineInputStream(getInputStream());
+        int count = 1;
+        String line, fromLine = null;
+        ByteArrayOutputStream buf = null;
+        
+        // notify listeners
+        StatusEvent event;
+        event = new StatusEvent(mstore,
+                                StatusEvent.OPERATION_START,
+                                "open");
+        mstore.processStatusEvent(event);
+        
+        for (line = in.readLine(); line != null; line = in.readLine()) 
+          {
+            if (line.indexOf(FROM) == 0) 
+              {
+                if (buf != null)
+                  {
+                    byte[] bytes = buf.toByteArray();
+                    ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+                    MboxMessage m =
+                      new MboxMessage(this, fromLine, bin, count++);
+                    acc.add(m);
+                    
+                    event = new StatusEvent(mstore,
+                                            StatusEvent.OPERATION_UPDATE,
+                                            "open",
+                                            1,
+                                            StatusEvent.UNKNOWN,
+                                            count - 1);
+                    mstore.processStatusEvent(event);
+                  }
+                fromLine = line;
+                buf = new ByteArrayOutputStream();
+              }
+            else if (buf != null)
+              {
+                byte[] bytes = decodeFrom(line).getBytes();
+                buf.write(bytes, 0, bytes.length);
+                buf.write(10); // LF
+              }
+          }
+        if (buf != null)
           {
             byte[] bytes = buf.toByteArray();
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
             acc.add(m);
-
-            store.processStatusEvent(new StatusEvent(store,
-                  StatusEvent.OPERATION_UPDATE,
-                  "open",
-                  1,
-                  StatusEvent.UNKNOWN,
-                  count-1));
+            
+            event = new StatusEvent(mstore,
+                                    StatusEvent.OPERATION_UPDATE,
+                                    "open",
+                                    1,
+                                    StatusEvent.UNKNOWN,
+                                    count - 1);
+            mstore.processStatusEvent(event);
           }
-          fromLine = line;
-          buf = new ByteArrayOutputStream();
-        }
-        else if (buf!=null)
-        {
-          byte[] bytes = decodeFrom(line).getBytes();
-          buf.write(bytes, 0, bytes.length);
-          buf.write(10); // LF
-        }
+        messages = new MboxMessage[acc.size()];
+        acc.toArray(messages);
+        buf = null;
+        acc = null;
+        
+        event = new StatusEvent(mstore,
+                                StatusEvent.OPERATION_END,
+                                "open");
+        mstore.processStatusEvent(event);
+        
+        // OK
+        open = true;
+        notifyConnectionListeners(ConnectionEvent.OPENED);
       }
-      if (buf!=null)
-      {
-        byte[] bytes = buf.toByteArray();
-        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-        MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
-        acc.add(m);
-
-        store.processStatusEvent(new StatusEvent(store,
-              StatusEvent.OPERATION_UPDATE,
-              "open",
-              1,
-              StatusEvent.UNKNOWN,
-              count-1));
-      }
-      messages = new MboxMessage[acc.size()];
-      acc.toArray(messages);
-      buf = null;
-      acc = null;
-
-      store.processStatusEvent(new StatusEvent(store,
-            StatusEvent.OPERATION_END,
-            "open"));
-
-      // OK
-      open = true;
-      notifyConnectionListeners(ConnectionEvent.OPENED);
-    }
     catch (IOException e) 
-    {
-      throw new MessagingException("Unable to open folder: "+filename, e);
-    }
+      {
+        throw new MessagingException("Unable to open folder: " + filename, e);
+      }
     finally
-    {
-      // release any file descriptors
-      try
       {
-        if (in!=null)
-          in.close();
+        // release any file descriptors
+        try
+          {
+            if (in != null)
+              {
+                in.close();
+              }
+          }
+        catch (IOException e)
+          {
+            // we tried
+          }
       }
-      catch (IOException e)
-      {
-        // we tried
-      }
-    }
   }
 
   /**
@@ -294,23 +316,27 @@ public class MboxFolder
    */
   public static String decodeFrom(String line)
   {
-    if (line!=null)
-    {
-      int len = line.length();
-      for (int i=0; i<(len-5); i++)
+    if (line != null)
       {
-        char c = line.charAt(i);
-        if (i>0 &&
-           (c=='F' &&
-             line.charAt(i+1)=='r' &&
-             line.charAt(i+2)=='o' &&
-             line.charAt(i+3)=='m' &&
-             line.charAt(i+4)==' '))
-          return line.substring(1);
-        if (c!='>')
-          break;
+        int len = line.length();
+        for (int i = 0; i < (len - 5); i++)
+          {
+            char c = line.charAt(i);
+            if (i > 0 &&
+                (c == 'F' &&
+                 line.charAt(i+1) == 'r' &&
+                 line.charAt(i+2) == 'o' &&
+                 line.charAt(i+3) == 'm' &&
+                 line.charAt(i+4) == ' '))
+              {
+                return line.substring(1);
+              }
+            if (c != '>')
+              {
+                break;
+              }
+          }
       }
-    }
     return line;
   }
   
@@ -323,74 +349,85 @@ public class MboxFolder
     throws MessagingException 
   {
     if (open) 
-    {
-      if (expunge)
-        expunge();
-    
-      if (!readOnly)
       {
-        // Save messages
-        MboxStore store = (MboxStore)this.store;
-        store.log("saving "+file.getAbsolutePath());
-        synchronized (this) 
-        {
-          OutputStream os = null;
-          try 
+        if (expunge)
           {
-            os = getOutputStream();
-            BufferedOutputStream bos = new BufferedOutputStream(os);
-            MboxOutputStream mos = new MboxOutputStream(bos);
-
-            store.processStatusEvent(new StatusEvent(store,
-                  StatusEvent.OPERATION_START,
-                  "close"));
-            for (int i=0; i<messages.length; i++) 
-            {
-              String fromLine = fromLine(messages[i]);
-              bos.write(fromLine.getBytes());
-              bos.write('\n');
-              bos.flush();
-              messages[i].writeTo(mos);
-              mos.flush();
-
-              store.processStatusEvent(new StatusEvent(store,
-                    StatusEvent.OPERATION_UPDATE,
-                    "close",
-                    1,
-                    messages.length,
-                    i+1));
-            }
-
-            store.processStatusEvent(new StatusEvent(store,
-                  StatusEvent.OPERATION_END,
-                  "close"));
-          } 
-          catch (IOException e) 
-          {
-            throw new MessagingException("I/O error writing mailbox", e);
+            expunge();
           }
-          finally
+    
+        if (!readOnly)
           {
-            // close any file descriptors
-            try
-            {
-              if (os!=null)
-                os.close();
-            }
-            catch (IOException e)
-            {
-              // we tried
-            }
+            // Save messages
+            MboxStore mstore = (MboxStore) this.store;
+            StatusEvent event;
+            mstore.log("saving " + file.getAbsolutePath());
+            synchronized (this) 
+              {
+                OutputStream os = null;
+                try 
+                  {
+                    os = getOutputStream();
+                    BufferedOutputStream bos = new BufferedOutputStream(os);
+                    MboxOutputStream mos = new MboxOutputStream(bos);
+                    
+                    event = new StatusEvent(mstore,
+                                            StatusEvent.OPERATION_START,
+                                            "close");
+                    mstore.processStatusEvent(event);
+                    for (int i = 0; i < messages.length; i++) 
+                      {
+                        String fromLine = fromLine(messages[i]);
+                        bos.write(fromLine.getBytes());
+                        bos.write('\n');
+                        bos.flush();
+                        messages[i].writeTo(mos);
+                        mos.flush();
+                        
+                        event = new StatusEvent(mstore,
+                                                StatusEvent.OPERATION_UPDATE,
+                                                "close",
+                                                1,
+                                                messages.length,
+                                                i + 1);
+                        mstore.processStatusEvent(event);
+                      }
+                    
+                    event = new StatusEvent(mstore,
+                                            StatusEvent.OPERATION_END,
+                                            "close");
+                    mstore.processStatusEvent(event);
+                  } 
+                catch (IOException e) 
+                  {
+                    throw new MessagingException("I/O error writing mailbox",
+                                                 e);
+                  }
+                finally
+                  {
+                    // close any file descriptors
+                    try
+                      {
+                        if (os != null)
+                          {
+                            os.close();
+                          }
+                      }
+                    catch (IOException e)
+                      {
+                        // we tried
+                      }
+                  }
+              }
+            if (!releaseLock())
+              {
+                mstore.log("unable to clear up lock file!");
+              }
           }
-        }
-        if (!releaseLock())
-          store.log("unable to clear up lock file!");
+        
+        open = false;
+        messages = new MboxMessage[0]; // release memory
+        notifyConnectionListeners(ConnectionEvent.CLOSED);
       }
-      
-      open = false;
-      messages = new MboxMessage[0]; // release memory
-      notifyConnectionListeners(ConnectionEvent.CLOSED);
-    }
   }
 
   /**
@@ -403,38 +440,46 @@ public class MboxFolder
     throws MessagingException
   {
     String fromLine = message.fromLine;
-    if (fromLine==null)
-    {
-      StringBuffer buf = new StringBuffer("From ");
-      
-      String from = "-";
-      try
+    if (fromLine == null)
       {
-        Address[] f = message.getFrom();
-        if (f!=null && f.length>0) 
-        {
-          if (f[0] instanceof InternetAddress)
-            from = ((InternetAddress)f[0]).getAddress();
-          else
-            from = f[0].toString();
-        }
+        StringBuffer buf = new StringBuffer("From ");
+        
+        String from = "-";
+        try
+          {
+            Address[] f = message.getFrom();
+            if (f != null && f.length > 0) 
+              {
+                if (f[0] instanceof InternetAddress)
+                  {
+                    from = ((InternetAddress) f[0]).getAddress();
+                  }
+                else
+                  {
+                    from = f[0].toString();
+                  }
+              }
+          }
+        catch (AddressException e)
+          {
+            // these things happen...
+          }
+        buf.append(from);
+        buf.append(' ');
+        
+        Date date = message.getSentDate();
+        if (date==null)
+          {
+            date = message.getReceivedDate();
+          }
+        if (date==null)
+          {
+            date = new Date();
+          }
+        buf.append(df.format(date));
+        
+        fromLine = buf.toString();
       }
-      catch (AddressException e)
-      {
-        // these things happen...
-      }
-      buf.append(from);
-      buf.append(' ');
-      
-      Date date = message.getSentDate();
-      if (date==null)
-        date = message.getReceivedDate();
-      if (date==null)
-        date = new Date();
-      buf.append(df.format(date));
-      
-      fromLine = buf.toString();
-    }
     return fromLine;
   }
 	
@@ -448,31 +493,37 @@ public class MboxFolder
   {
     Message[] expunged;
     synchronized (this)
-    {
-      List elist = new ArrayList();
-      if (open) 
       {
-        List mlist = new ArrayList();
-        for (int i=0; i<messages.length; i++) 
-        {
-          Flags flags = messages[i].getFlags();
-          if (flags.contains(Flags.Flag.DELETED))
+        List elist = new ArrayList();
+        if (open) 
           {
-            elist.add(messages[i]);
-            if (messages[i] instanceof MboxMessage)
-             ((MboxMessage)messages[i]).setExpunged(true);
+            List mlist = new ArrayList();
+            for (int i=0; i<messages.length; i++) 
+              {
+                Flags flags = messages[i].getFlags();
+                if (flags.contains(Flags.Flag.DELETED))
+                  {
+                    elist.add(messages[i]);
+                    if (messages[i] instanceof MboxMessage)
+                      {
+                        ((MboxMessage)messages[i]).setExpunged(true);
+                      }
+                  }
+                else
+                  {
+                    mlist.add(messages[i]);
+                  }
+              }
+            messages = new MboxMessage[mlist.size()];
+            mlist.toArray(messages);
           }
-          else
-            mlist.add(messages[i]);
-        }
-        messages = new MboxMessage[mlist.size()];
-        mlist.toArray(messages);
+        expunged = new Message[elist.size()];
+        elist.toArray(expunged);
       }
-      expunged = new Message[elist.size()];
-      elist.toArray(expunged);
-    }
-    if (expunged.length>0)
-      notifyMessageRemovedListeners(true, expunged);
+    if (expunged.length > 0)
+      {
+        notifyMessageRemovedListeners(true, expunged);
+      }
     return expunged;
   }
   
@@ -490,13 +541,13 @@ public class MboxFolder
   public Flags getPermanentFlags() 
   {
     if (permanentFlags == null) 
-    {
-      Flags flags = new Flags(); 
-      flags.add(Flags.Flag.DELETED);
-      flags.add(Flags.Flag.SEEN);
-      flags.add(Flags.Flag.RECENT);
-      permanentFlags = flags;
-    }
+      {
+        Flags flags = new Flags(); 
+        flags.add(Flags.Flag.DELETED);
+        flags.add(Flags.Flag.SEEN);
+        flags.add(Flags.Flag.RECENT);
+        permanentFlags = flags;
+      }
     return permanentFlags;
   }
 	
@@ -518,8 +569,10 @@ public class MboxFolder
     throws MessagingException 
   {
     int index = msgnum-1;
-    if (index<0 || index>=messages.length)
-      throw new MessagingException("No such message: "+msgnum);
+    if (index < 0 || index >= messages.length)
+      {
+        throw new MessagingException("No such message: "+msgnum);
+      }
     return messages[index];
   }
 	
@@ -547,36 +600,40 @@ public class MboxFolder
   {
     MboxMessage[] n;
     synchronized (this)
-    {
-      List appended = new ArrayList(m.length);
-      int count = messages.length;
-      for (int i=0; i<m.length; i++) 
       {
-        if (m[i] instanceof MimeMessage) 
-        {
-          MimeMessage mimem = (MimeMessage)m[i];
-          MboxMessage mboxm = new MboxMessage(this, mimem, count++);
-          if (mimem instanceof MboxMessage)
-            mboxm.fromLine = ((MboxMessage)mimem).fromLine;
-          appended.add(mboxm);
-        }
+        List appended = new ArrayList(m.length);
+        int count = messages.length;
+        for (int i = 0; i < m.length; i++) 
+          {
+            if (m[i] instanceof MimeMessage) 
+              {
+                MimeMessage mimem = (MimeMessage) m[i];
+                MboxMessage mboxm = new MboxMessage(this, mimem, count++);
+                if (mimem instanceof MboxMessage)
+                  {
+                    mboxm.fromLine = ((MboxMessage) mimem).fromLine;
+                  }
+                appended.add(mboxm);
+              }
+          }
+        n = new MboxMessage[appended.size()];
+        if (n.length>0) 
+          {
+            appended.toArray(n);
+            // copy into the messages array
+            List acc = new ArrayList(messages.length+n.length);
+            acc.addAll(Arrays.asList(messages));
+            acc.addAll(Arrays.asList(n));
+            messages = new MboxMessage[acc.size()];
+            acc.toArray(messages);
+            acc = null;
+          }
       }
-      n = new MboxMessage[appended.size()];
-      if (n.length>0) 
-      {
-        appended.toArray(n);
-        // copy into the messages array
-        List acc = new ArrayList(messages.length+n.length);
-        acc.addAll(Arrays.asList(messages));
-        acc.addAll(Arrays.asList(n));
-        messages = new MboxMessage[acc.size()];
-        acc.toArray(messages);
-        acc = null;
-      }
-    }
     // propagate event
-    if (n.length>0)
-      notifyMessageAddedListeners(n);
+    if (n.length > 0)
+      {
+        notifyMessageAddedListeners(n);
+      }
   }
 
   /**
@@ -594,21 +651,26 @@ public class MboxFolder
   public Folder[] list() 
     throws MessagingException 
   {
-    if (type!=HOLDS_FOLDERS)
-      throw new MessagingException("This folder can't contain subfolders");
+    if (type != HOLDS_FOLDERS)
+      {
+        throw new MessagingException("This folder can't contain subfolders");
+      }
     try 
-    {
-      String[] files = file.list();
-      Folder[] folders = new Folder[files.length];
-      for (int i=0; i<files.length; i++)
-      folders[i] =
-        store.getFolder(file.getAbsolutePath()+File.separator+files[i]);
-      return folders;
-    }
+      {
+        String[] files = file.list();
+        Folder[] folders = new Folder[files.length];
+        for (int i = 0; i < files.length; i++)
+          {
+            folders[i] = store.getFolder(file.getAbsolutePath() +
+                                         File.separator +
+                                         files[i]);
+          }
+        return folders;
+      }
     catch (SecurityException e) 
-    {
-      throw new MessagingException("Access denied", e);
-    }
+      {
+        throw new MessagingException("Access denied", e);
+      }
   }
 
   /**
@@ -617,21 +679,26 @@ public class MboxFolder
   public Folder[] list(String pattern) 
     throws MessagingException 
   {
-    if (type!=HOLDS_FOLDERS)
-      throw new MessagingException("This folder can't contain subfolders");
+    if (type != HOLDS_FOLDERS)
+      {
+        throw new MessagingException("This folder can't contain subfolders");
+      }
     try 
-    {
-      String[] files = file.list(new MboxFilenameFilter(pattern));
-      Folder[] folders = new Folder[files.length];
-      for (int i=0; i<files.length; i++)
-      folders[i] =
-        store.getFolder(file.getAbsolutePath()+File.separator+files[i]);
-      return folders;
-    } 
+      {
+        String[] files = file.list(new MboxFilenameFilter(pattern));
+        Folder[] folders = new Folder[files.length];
+        for (int i = 0; i < files.length; i++)
+          {
+            folders[i] = store.getFolder(file.getAbsolutePath() +
+                                         File.separator +
+                                         files[i]);
+          }
+        return folders;
+      } 
     catch (SecurityException e) 
-    {
-      throw new MessagingException("Access denied", e);
-    }
+      {
+        throw new MessagingException("Access denied", e);
+      }
   }
 
   /**
@@ -650,41 +717,43 @@ public class MboxFolder
     throws MessagingException 
   {
     if (file.exists())
-      throw new MessagingException("Folder already exists");
+      {
+        throw new MessagingException("Folder already exists");
+      }
     switch (type) 
-    {
+      {
       case HOLDS_FOLDERS:
         try 
-        {
-          file.mkdirs();
-          this.type = type;
-          notifyFolderListeners(FolderEvent.CREATED);
-          return true;
-        }
+          {
+            file.mkdirs();
+            this.type = type;
+            notifyFolderListeners(FolderEvent.CREATED);
+            return true;
+          }
         catch (SecurityException e) 
-        {
-          throw new MessagingException("Access denied", e);
-        }
+          {
+            throw new MessagingException("Access denied", e);
+          }
       case HOLDS_MESSAGES:
         try 
-        {
-          synchronized (this) 
           {
-            createNewFile(file);
-          }
-          this.type = type;
-          notifyFolderListeners(FolderEvent.CREATED);
-          return true;
-        } 
+            synchronized (this) 
+              {
+                createNewFile(file);
+              }
+            this.type = type;
+            notifyFolderListeners(FolderEvent.CREATED);
+            return true;
+          } 
         catch (IOException e) 
-        {
-          throw new MessagingException("I/O error writing mailbox", e);
-        }
+          {
+            throw new MessagingException("I/O error writing mailbox", e);
+          }
         catch (SecurityException e) 
-        {
-          throw new MessagingException("Access denied", e);
-        }
-    }
+          {
+            throw new MessagingException("Access denied", e);
+          }
+      }
     return false;
   }
 
@@ -695,52 +764,66 @@ public class MboxFolder
     throws MessagingException 
   {
     if (recurse) 
-    {
-      try 
       {
-        if (type==HOLDS_FOLDERS) 
-        {
-          Folder[] folders = list();
-          for (int i=0; i<folders.length; i++)
-            if (!folders[i].delete(recurse))
-              return false;
-        }
-        if (!readOnly)
-          releaseLock();
-        if (!file.delete())
-          return false;
-        notifyFolderListeners(FolderEvent.DELETED);
-        return true;
+        try 
+          {
+            if (type == HOLDS_FOLDERS) 
+              {
+                Folder[] folders = list();
+                for (int i = 0; i < folders.length; i++)
+                  {
+                    if (!folders[i].delete(recurse))
+                      {
+                        return false;
+                      }
+                  }
+              }
+            if (!readOnly)
+              {
+                releaseLock();
+              }
+            if (!file.delete())
+              {
+                return false;
+              }
+            notifyFolderListeners(FolderEvent.DELETED);
+            return true;
+          } 
+        catch (SecurityException e) 
+          {
+            throw new MessagingException("Access denied", e);
+          }
       } 
-      catch (SecurityException e) 
-      {
-        throw new MessagingException("Access denied", e);
-      }
-    } 
     else 
-    {
-      try 
       {
-        if (type==HOLDS_FOLDERS) 
-        {
-          Folder[] folders = list();
-          if (folders.length>0)
-            return false;
-        }
-        if (!readOnly)
-          releaseLock();
-        if (!file.delete())
-          return false;
-        notifyFolderListeners(FolderEvent.DELETED);
-        return true;
-      } 
-      catch (SecurityException e) 
-      {
-        throw new MessagingException("Access denied", e);
+        try 
+          {
+            if (type == HOLDS_FOLDERS) 
+              {
+                Folder[] folders = list();
+                if (folders.length > 0)
+                  {
+                    return false;
+                  }
+              }
+            if (!readOnly)
+              {
+                releaseLock();
+              }
+            if (!file.delete())
+              {
+                return false;
+              }
+            notifyFolderListeners(FolderEvent.DELETED);
+            return true;
+          } 
+        catch (SecurityException e) 
+          {
+            throw new MessagingException("Access denied", e);
+          }
       }
-    }
   }
-
+  
   /**
    * Renames this folder.
    */
@@ -748,22 +831,26 @@ public class MboxFolder
     throws MessagingException 
   {
     try 
-    {
-      String filename = folder.getFullName();
-      if (filename!=null) 
       {
-        if (!file.renameTo(new File(filename)))
-          return false;
-        notifyFolderRenamedListeners(folder);
-        return true;
+        String filename = folder.getFullName();
+        if (filename != null) 
+          {
+            if (!file.renameTo(new File(filename)))
+              {
+                return false;
+              }
+            notifyFolderRenamedListeners(folder);
+            return true;
+          } 
+        else
+          {
+            throw new MessagingException("Illegal filename: null");
+          }
       } 
-      else
-        throw new MessagingException("Illegal filename: null");
-    } 
     catch (SecurityException e) 
-    {
-      throw new MessagingException("Access denied", e);
-    }
+      {
+        throw new MessagingException("Access denied", e);
+      }
   }
 
   /**
@@ -774,17 +861,17 @@ public class MboxFolder
   {
     String INBOX = "INBOX";
     if (INBOX.equalsIgnoreCase(filename))
-    {
-      try
       {
-        return store.getFolder(INBOX);
+        try
+          {
+            return store.getFolder(INBOX);
+          }
+        catch (MessagingException e)
+          {
+            // fall back to standard behaviour
+          }
       }
-      catch (MessagingException e)
-      {
-        // fall back to standard behaviour
-      }
-    }
-    return store.getFolder(file.getAbsolutePath()+File.separator+filename);
+    return store.getFolder(file.getAbsolutePath() + File.separator + filename);
   }
 
   /**
@@ -805,7 +892,9 @@ public class MboxFolder
   {
     InputStream in = new FileInputStream(file);
     if (isGzip())
-      in = new GZIPInputStream(in);
+      {
+        in = new GZIPInputStream(in);
+      }
     return in;
   }
 
@@ -818,7 +907,9 @@ public class MboxFolder
   {
     OutputStream out = new FileOutputStream(file);
     if (isGzip())
-      out = new GZIPOutputStream(out);
+      {
+        out = new GZIPOutputStream(out);
+      }
     return out;
   }
 	
@@ -832,29 +923,31 @@ public class MboxFolder
   public synchronized boolean acquireLock() 
   {
     try
-    {
-      String filename = file.getPath();
-      String lockFilename = filename+".lock";
-      File lock = new File(lockFilename);
-      MboxStore store = (MboxStore)this.store;
-      store.log("creating "+lock.getPath());
-      if (lock.exists())
-        return false;
-      //if (!lock.canWrite())
-      //  return false;
-      createNewFile(lock);
-      return true;
-    }
+      {
+        String filename = file.getPath();
+        String lockFilename = filename + ".lock";
+        File lock = new File(lockFilename);
+        MboxStore mstore = (MboxStore) this.store;
+        mstore.log("creating " + lock.getPath());
+        if (lock.exists())
+          {
+            return false;
+          }
+        //if (!lock.canWrite())
+        //  return false;
+        createNewFile(lock);
+        return true;
+      }
     catch (IOException e)
-    {
-      MboxStore store = (MboxStore)this.store;
-      store.log("I/O exception acquiring lock on "+file.getPath());
-    }
+      {
+        MboxStore mstore = (MboxStore)this.store;
+        mstore.log("I/O exception acquiring lock on " + file.getPath());
+      }
     catch (SecurityException e)
-    {
-      MboxStore store = (MboxStore)this.store;
-      store.log("Security exception acquiring lock on "+file.getPath());
-    }
+      {
+        MboxStore mstore = (MboxStore)this.store;
+        mstore.log("Security exception acquiring lock on " + file.getPath());
+      }
     return false;
   }
 
@@ -872,11 +965,10 @@ public class MboxFolder
   {
     // there may be another, more efficient way to do this.
     // certainly just setLastModified() does not work.
-    BufferedOutputStream out = new BufferedOutputStream(new 
-        FileOutputStream(file));
+    BufferedOutputStream out =
+      new BufferedOutputStream(new FileOutputStream(file));
     out.flush();
     out.close();
-    
   }
 	
   /**
@@ -887,24 +979,26 @@ public class MboxFolder
   public synchronized boolean releaseLock() 
   {
     try
-    {
-      String filename = file.getPath();
-      String lockFilename = filename+".lock";
-      File lock = new File(lockFilename);
-      MboxStore store = (MboxStore)this.store;
-      store.log("removing "+lock.getPath());
-      if (lock.exists())
       {
-        if (!lock.delete())
-          return false;
+        String filename = file.getPath();
+        String lockFilename = filename + ".lock";
+        File lock = new File(lockFilename);
+        MboxStore mstore = (MboxStore) this.store;
+        mstore.log("removing "+lock.getPath());
+        if (lock.exists())
+          {
+            if (!lock.delete())
+              {
+                return false;
+              }
+          }
+        return true;
       }
-      return true;
-    }
     catch (SecurityException e)
-    {
-      MboxStore store = (MboxStore)this.store;
-      store.log("Security exception releasing lock on "+file.getPath());
-    }
+      {
+        MboxStore mstore = (MboxStore) this.store;
+        mstore.log("Security exception releasing lock on " + file.getPath());
+      }
     return false;
   }
 
@@ -925,20 +1019,20 @@ public class MboxFolder
     public boolean accept(File directory, String name) 
     {
       if (asteriskIndex>-1) 
-      {
-        String start = pattern.substring(0, asteriskIndex);
-        String end = pattern.substring(asteriskIndex+1, pattern.length());
-        return (name.startsWith(start) &&
-            name.endsWith(end));
-      } 
+        {
+          String start = pattern.substring(0, asteriskIndex);
+          String end = pattern.substring(asteriskIndex+1, pattern.length());
+          return (name.startsWith(start) &&
+                  name.endsWith(end));
+        } 
       else if (percentIndex>-1) 
-      {
-        String start = pattern.substring(0, percentIndex);
-        String end = pattern.substring(percentIndex+1, pattern.length());
-        return (directory.equals(file) &&
-            name.startsWith(start) &&
-            name.endsWith(end));
-      }
+        {
+          String start = pattern.substring(0, percentIndex);
+          String end = pattern.substring(percentIndex+1, pattern.length());
+          return (directory.equals(file) &&
+                  name.startsWith(start) &&
+                  name.endsWith(end));
+        }
       return name.equals(pattern);
     }
   }

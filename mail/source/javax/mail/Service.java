@@ -173,7 +173,7 @@ public abstract class Service
         throw new MessagingException("already connected");
       }
     
-    boolean connected = false;
+    boolean success = false;
     boolean authenticated = false;
     String protocol = null;
     String file = null;
@@ -260,13 +260,13 @@ public abstract class Service
     AuthenticationFailedException afex = null;
     try
       {
-        connected = protocolConnect(host, port, user, password);
+        success = protocolConnect(host, port, user, password);
       }
     catch (AuthenticationFailedException afex2)
       {
         afex = afex2;
       }
-    if (!connected)
+    if (!success)
       {
         InetAddress address = null;
         try
@@ -283,10 +283,10 @@ public abstract class Service
           {
             user = auth.getUserName();
             password = auth.getPassword();
-            connected = protocolConnect(host, port, user, password);
+            success = protocolConnect(host, port, user, password);
           }
       }
-    if (!connected)
+    if (!success)
       {
         if (afex!=null)
           {
@@ -565,8 +565,8 @@ public abstract class Service
    */
   public String toString()
   {
-    URLName url = getURLName();
-    return (url != null) ? url.toString() : super.toString();
+    URLName urlName = getURLName();
+    return (urlName != null) ? urlName.toString() : super.toString();
   }
 
 }

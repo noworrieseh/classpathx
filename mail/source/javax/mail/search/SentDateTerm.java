@@ -59,10 +59,10 @@ public final class SentDateTerm
   {
     try
       {
-        Date date = msg.getSentDate();
-        if (date != null)
+        Date d = msg.getSentDate();
+        if (d != null)
           {
-            return super.match(date);
+            return super.match(d);
           }
       }
     catch (Exception e)

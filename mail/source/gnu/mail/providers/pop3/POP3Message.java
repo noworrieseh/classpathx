@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import javax.activation.DataHandler;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.IllegalWriteException;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
 
@@ -354,6 +357,44 @@ extends ReadOnlyMessage
         fetchUid();
       }
     return uid;
+  }
+  
+  /**
+   * Set flags (but only DELETED is supported)
+   * add or remove the message from the folder deleted message list.
+   */
+  public void setFlags(Flags flags, boolean set)
+    throws MessagingException
+  {
+    Flags.Flag[] tabFlags = flags.getSystemFlags();
+    for (int i = 0; i < tabFlags.length; i++)
+      {
+        Flags.Flag flagToSet = tabFlags[i];
+        if (set && !this.flags.contains(flagToSet))
+          {
+            this.flags.add(flagToSet);
+          }
+        else if (!set && this.flags.contains(flagToSet))
+          {
+            this.flags.remove(flagToSet);
+          }
+        if (flagToSet.equals(Flags.Flag.DELETED))
+          {
+            POP3Folder pf = (POP3Folder) folder;
+            if (set && !pf.deleted.contains(this))
+              {
+                if (!(Folder.READ_WRITE==folder.getMode()))
+                  {
+                    throw new IllegalWriteException();
+                  }
+                pf.deleted.add(this);
+              }
+            else if (!set && pf.deleted.contains(this))
+              {
+                pf.deleted.remove(this);
+              }
+          }
+      }
   }
   
 }

@@ -66,18 +66,19 @@ public final class MboxStore
   {
     super(session, urlname);
     String af = session.getProperty("mail.mbox.attemptfallback");
-    if (af!=null) 
-      attemptFallback = Boolean.valueOf(af).booleanValue();
+    if (af != null) 
+      {
+        attemptFallback = Boolean.valueOf(af).booleanValue();
+      }
   }
 	
   /**
    * There isn't a protocol to implement, so this method just returns.
    */
-  protected boolean protocolConnect(
-      String host, 
-      int port, 
-      String username,
-      String password) 
+  protected boolean protocolConnect(String host, 
+                                    int port, 
+                                    String username,
+                                    String password) 
     throws MessagingException 
   {
     return true;
@@ -92,30 +93,36 @@ public final class MboxStore
     // If the url used to contruct the store references a file directly,
     // return this file.
     if (url!=null) 
-    {
-      String file = url.getFile();
-      if (file!=null && file.length()>0) 
-        return getFolder(file);
-    }
+      {
+        String file = url.getFile();
+        if (file != null && file.length() > 0) 
+          {
+            return getFolder(file);
+          }
+      }
     // Otherwise attempt to return a sensible root folder.
     String mailhome = session.getProperty("mail.mbox.mailhome");
     if (mailhome == null)
-    {
-      try
       {
-        String userhome = System.getProperty("user.home");
-        mailhome = userhome+"/Mail"; // elm
-        if (!exists(mailhome))
-          mailhome = userhome+"/mail";
-        if (!exists(mailhome))
-          mailhome = null;
-      } 
-      catch (SecurityException e) 
-      {
-        log("access denied reading system properties");
-        mailhome = "/";
+        try
+          {
+            String userhome = System.getProperty("user.home");
+            mailhome = userhome + "/Mail"; // elm
+            if (!exists(mailhome))
+              {
+                mailhome = userhome + "/mail";
+              }
+            if (!exists(mailhome))
+              {
+                mailhome = null;
+              }
+          } 
+        catch (SecurityException e) 
+          {
+            log("access denied reading system properties");
+            mailhome = "/";
+          }
       }
-    }
     return getFolder(mailhome);
   }
 
@@ -125,55 +132,70 @@ public final class MboxStore
   public Folder getFolder(String filename) 
     throws MessagingException
   {
-    if (filename==null)
-      filename = "";
+    if (filename == null)
+      {
+        filename = "";
+      }
     boolean inbox = false;
     if (INBOX.equalsIgnoreCase(filename)) 
-    {
-      // First try the session property mail.mbox.inbox.
-      String inboxname = session.getProperty("mail.mbox.inbox");
-      if (!exists(inboxname))
-        inboxname = null;
-      if (inboxname==null && attemptFallback) 
       {
-        // Try some common(UNIX) locations.
-        try 
-        {
-          String username = System.getProperty("user.name");
-          inboxname = "/var/mail/"+username; // GNU
-          if (!exists(inboxname))
-            inboxname = "/var/spool/mail/"+username; // common alternative
-          if (!exists(inboxname))
+        // First try the session property mail.mbox.inbox.
+        String inboxname = session.getProperty("mail.mbox.inbox");
+        if (!exists(inboxname))
           {
             inboxname = null;
-            String userhome = System.getProperty("user.home");
-            inboxname = userhome+"/Mailbox"; // qmail etc
           }
-          if (!exists(inboxname))
-            inboxname = null;
-        } 
-        catch (SecurityException e) 
-        {
-          // not allowed to read system properties
-          log("unable to access system properties");
-        }
+        if (inboxname == null && attemptFallback) 
+          {
+            // Try some common(UNIX) locations.
+            try 
+              {
+                String username = System.getProperty("user.name");
+                inboxname = "/var/mail/" + username; // GNU
+                if (!exists(inboxname))
+                  {
+                    inboxname = "/var/spool/mail/" + username;
+                    // common alternative
+                  }
+                if (!exists(inboxname))
+                  {
+                    inboxname = null;
+                    String userhome = System.getProperty("user.home");
+                    inboxname = userhome + "/Mailbox"; // qmail etc
+                  }
+                if (!exists(inboxname))
+                  {
+                    inboxname = null;
+                  }
+              } 
+            catch (SecurityException e) 
+              {
+                // not allowed to read system properties
+                log("unable to access system properties");
+              }
+          }
+        if (inboxname!=null)
+          {
+            filename = inboxname;
+            inbox = true;
+          }
+        // otherwise we assume it is actually a file called "inbox"
       }
-      if (inboxname!=null)
-      {
-        filename = inboxname;
-        inbox = true;
-      }
-      // otherwise we assume it is actually a file called "inbox"
-    }
     
     // convert into a valid filename for this platform
     StringBuffer buf = new StringBuffer();
-    if (filename.length()<1 || filename.charAt(0)!=separatorChar)
-      buf.append(File.separator);
+    if (filename.length() < 1 || filename.charAt(0) != separatorChar)
+      {
+        buf.append(File.separator);
+      }
     if (separatorChar!=File.separatorChar)
-      buf.append(filename.replace(separatorChar, File.separatorChar));
+      {
+        buf.append(filename.replace(separatorChar, File.separatorChar));
+      }
     else
-      buf.append(filename);
+      {
+        buf.append(filename);
+      }
     filename = buf.toString();
     
     return new MboxFolder(this, filename, inbox);
@@ -185,12 +207,15 @@ public final class MboxStore
   private boolean exists(String filename)
   {
     if (filename!=null)
-    {
-      File file = new File(filename);
-      if (separatorChar!=File.separatorChar)
-        file = new File(filename.replace(separatorChar, File.separatorChar));
-      return file.exists();
-    }
+      {
+        File file = new File(filename);
+        if (separatorChar != File.separatorChar)
+          {
+            file = new File(filename.replace(separatorChar,
+                                             File.separatorChar));
+          }
+        return file.exists();
+      }
     return false;
   }
 
@@ -214,10 +239,10 @@ public final class MboxStore
   void log(String message)
   {
     if (session.getDebug())
-		{
-			Logger logger = Logger.getInstance();
-      logger.log("mbox", message);
-		}
+      {
+        Logger logger = Logger.getInstance();
+        logger.log("mbox", message);
+      }
   }
 
   // -- StatusSource --
@@ -232,9 +257,9 @@ public final class MboxStore
   public void addStatusListener(StatusListener l) 
   {
     synchronized (statusListeners) 
-    {
-      statusListeners.add(l);
-    }
+      {
+        statusListeners.add(l);
+      }
   }
 			
   /**
@@ -245,9 +270,9 @@ public final class MboxStore
   public void removeStatusListener(StatusListener l) 
   {
     synchronized (statusListeners) 
-    {
-      statusListeners.remove(l);
-    }
+      {
+        statusListeners.remove(l);
+      }
   }
 
   /**
@@ -259,25 +284,32 @@ public final class MboxStore
   {
     StatusListener[] listeners;
     synchronized (statusListeners) 
-    {
-      listeners = new StatusListener[statusListeners.size()];
-      statusListeners.toArray(listeners);
-    }
+      {
+        listeners = new StatusListener[statusListeners.size()];
+        statusListeners.toArray(listeners);
+      }
     switch (event.getType()) 
-    {
+      {
       case StatusEvent.OPERATION_START:
-        for (int i=0; i<listeners.length; i++)
-          listeners[i].statusOperationStarted(event);
+        for (int i = 0; i < listeners.length; i++)
+          {
+            listeners[i].statusOperationStarted(event);
+          }
         break;
       case StatusEvent.OPERATION_UPDATE:
-        for (int i=0; i<listeners.length; i++)
-          listeners[i].statusProgressUpdate(event);
+        for (int i = 0; i < listeners.length; i++)
+          {
+            listeners[i].statusProgressUpdate(event);
+          }
         break;
       case StatusEvent.OPERATION_END:
-        for (int i=0; i<listeners.length; i++)
-          listeners[i].statusOperationEnded(event);
+        for (int i = 0; i < listeners.length; i++)
+          {
+            listeners[i].statusOperationEnded(event);
+          }
         break;
     }
   }
 
 }
+
