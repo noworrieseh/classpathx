@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.17 2001-11-05 22:38:09 db Exp $
+ * $Id: SAXDriver.java,v 1.18 2001-11-07 01:12:46 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.17 2001-11-05 22:38:09 db Exp $
+// $Id: SAXDriver.java,v 1.18 2001-11-07 01:12:46 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -95,6 +95,8 @@ import gnu.xml.util.DefaultHandler;
  *	<td>Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/namespaces</td>
  *	<td>Value defaults to <em>true</em></td></tr>
+ * <tr><td>(URL)/resolve-dtd-uris</td>
+ *	<td>(PRELIMINARY) Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/string-interning</td>
  *	<td>Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/use-attributes2</td>
@@ -116,7 +118,7 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-05 22:38:09 $
+ * @version $Date: 2001-11-07 01:12:46 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -145,6 +147,7 @@ final public class SAXDriver
     private boolean			xmlNames = false;
     private boolean			extGE = true;
     private boolean			extPE = true;
+    private boolean			resolveAll = true;
 
     private int				attributeCount = 0;
     private boolean			attributes;
@@ -395,11 +398,18 @@ final public class SAXDriver
 	    return parser.isStandalone ();
 	}
 
+	// optionally don't absolutize URIs in declarations
+	if ((FEATURE + "resolve-dtd-uris").equals (featureId))
+	    return resolveAll;
+
 	throw new SAXNotRecognizedException (featureId);
     }
 
     // package private
     DeclHandler getDeclHandler () { return declHandler; }
+
+    // package private
+    boolean resolveURIs () { return resolveAll; }
 
     /**
      * <b>SAX2</b>:  Returns the specified property.
@@ -411,10 +421,10 @@ final public class SAXDriver
     throws SAXNotRecognizedException
     {
 	if ((PROPERTY + "declaration-handler").equals (propertyId))
-	    return declHandler;
+	    return declHandler == base ? null : declHandler;
 
 	if ((PROPERTY + "lexical-handler").equals (propertyId))
-	    return lexicalHandler;
+	    return lexicalHandler == base ? null : lexicalHandler;
 	
 	// unknown properties
 	throw new SAXNotRecognizedException (propertyId);
@@ -460,6 +470,10 @@ final public class SAXDriver
 	}
 	if ((FEATURE + "external-parameter-entities") .equals (featureId)) {
 	    extPE = state;
+	    return;
+	}
+	if ((FEATURE + "resolve-dtd-uris").equals (featureId)) {
+	    resolveAll = state;
 	    return;
 	}
 
