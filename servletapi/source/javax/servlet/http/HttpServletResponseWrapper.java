@@ -55,6 +55,11 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     _impl = wrappedResponse;
   }
 
+  public String getContentType()
+  {
+    return _impl.getContentType();
+  }
+
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
@@ -89,18 +94,20 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
 
   /**
    * By default passes the call to the underlying HttpServletResponse
+   * @deprecated use <code>encodeURL()</code>
    */
   public String encodeUrl (String url)
   {
-    return _impl.encodeUrl (url);
+    return _impl.encodeURL (url);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
+   * @deprecated use <code>encodeRedirectURL()</code>
    */
   public String encodeRedirectUrl (String url)
   {
-    return _impl.encodeRedirectUrl (url);
+    return _impl.encodeRedirectURL (url);
   }
   
   /**
@@ -188,6 +195,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
   
   /**
    * By default passes the call to the underlying HttpServletResponse
+   * @deprecated only errors should give an extra error message,
    */
   public void setStatus (int status,String msg)
   {
