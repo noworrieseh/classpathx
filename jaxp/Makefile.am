@@ -296,6 +296,7 @@ gnu/xml/libxmlj/dom/GnomeNodeList.class \
 gnu/xml/libxmlj/dom/GnomeNotation.class \
 gnu/xml/libxmlj/dom/GnomeProcessingInstruction.class \
 gnu/xml/libxmlj/dom/GnomeText.class \
+gnu/xml/libxmlj/dom/MatchingNodeList.class \
 gnu/xml/libxmlj/dom/StandaloneDocumentType.class \
 gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.class \
 gnu/xml/libxmlj/transform/DefaultURIResolverImpl.class \
@@ -324,6 +325,7 @@ $(jni)/gnu_xml_libxmlj_dom_GnomeNode.h \
 $(jni)/gnu_xml_libxmlj_dom_GnomeNodeList.h \
 $(jni)/gnu_xml_libxmlj_dom_GnomeNotation.h \
 $(jni)/gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+$(jni)/gnu_xml_libxmlj_dom_MatchingNodeList.h \
 $(jni)/javax_xml_transform_OutputKeys.h \
 $(jni)/gnu_xml_libxmlj_transform_LibxsltStylesheet.h \
 $(jni)/gnu_xml_libxmlj_transform_TransformerFactoryImpl.h \

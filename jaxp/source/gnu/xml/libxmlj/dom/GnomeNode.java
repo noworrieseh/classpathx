@@ -60,7 +60,10 @@ implements Node
 
   public native Node getParentNode();
 
-  public native NodeList getChildNodes();
+  public NodeList getChildNodes()
+  {
+    return new GnomeNodeList(id);
+  }
 
   public native Node getFirstChild();
 

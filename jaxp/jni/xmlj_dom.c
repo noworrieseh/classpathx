@@ -275,20 +275,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createEntityReference (JNIEnv *env,
 
 /*
  * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    getElementsByTagName
- * Signature: (Ljava/lang/String;)Lorg/w3c/dom/NodeList;
- */
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagName (JNIEnv *env,
-    jobject self,
-    jstring qName)
-{
-  /* TODO */
-  return NULL;
-}
-
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
  * Method:    importNode
  * Signature: (Lorg/w3c/dom/Node;Z)Lorg/w3c/dom/Node;
  */
@@ -374,21 +360,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv *env,
     attr = (xmlNodePtr)xmlNewNsProp((xmlNodePtr)doc, NULL, s_qName, NULL);
   xmljReleaseStringChars(env, qName, s_qName);
   return xmljGetNodeInstance(env, attr);
-}
-
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeDocument
- * Method:    getElementsByTagNameNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/NodeList;
- */
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagNameNS (JNIEnv *env,
-    jobject self,
-    jstring uri,
-    jstring localName)
-{
-  /* TODO */
-  return NULL;
 }
 
 /*
@@ -878,21 +849,6 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNodeNS (JNIEnv *env,
 
 /*
  * Class:     gnu_xml_libxmlj_dom_GnomeElement
- * Method:    getElementsByTagNameNS
- * Signature: (Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/NodeList;
- */
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagNameNS (JNIEnv *env,
-    jobject self,
-    jstring uri,
-    jstring localName)
-{
-  /* TODO */
-  return NULL;
-}
-
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeElement
  * Method:    hasAttributeNS
  * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
  */
@@ -1244,27 +1200,6 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getParentNode (JNIEnv *env,
 
   node = xmljGetNodeID(env, self);
   return xmljGetNodeInstance(env, node->parent);
-}
-
-/*
- * Class:     gnu_xml_libxmlj_dom_GnomeNode
- * Method:    getChildNodes
- * Signature: ()Lorg/w3c/dom/NodeList;
- */
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeNode_getChildNodes (JNIEnv *env,
-    jobject self)
-{
-  xmlNodePtr node;
-  jclass cls;
-  jmethodID method;
-
-  node = xmljGetNodeID(env, self);
-
-  /* Construct node list object */
-  cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeNodeList");
-  method = (*env)->GetMethodID(env, cls, "<init>", "(I)V");
-  return (*env)->NewObject(env, cls, method, node);
 }
 
 /*
@@ -1728,6 +1663,108 @@ Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_setData (JNIEnv *env,
   s_data = xmljGetStringChars(env, data);
   xmlNodeSetContent(node, s_data);
   xmljReleaseStringChars(env, data, s_data);
+}
+
+/*
+ * Class:     gnu_xml_libxmlj_dom_MatchingNodeList
+ * Method:    item
+ * Signature: (I)Lorg/w3c/dom/Node;
+ */
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv *env,
+    jobject self,
+    jint index,
+    jstring uri,
+    jstring name,
+    jboolean ns)
+{
+  xmlNodePtr node;
+  const xmlChar *s_uri;
+  const xmlChar *s_name;
+  jint count;
+
+  /* Get parent node */
+  node = xmljGetNodeID(env, self);
+
+  /* Get search criteria */
+  s_name = xmljGetStringChars(env, name);
+  if (ns)
+    s_uri = xmljGetStringChars(env, uri);
+  else
+    s_uri = NULL;
+  
+  node = node->children;
+  count = 0;
+  while (node != NULL && count < index)
+  {
+    if (ns)
+    {
+      while (node != NULL && xmljMatchNS(s_uri, s_name, node))
+        node = node->next;
+    }
+    else
+    {
+      while (node != NULL && xmljMatch(s_name, node))
+        node = node->next;
+    }
+    count++;
+  }
+
+  xmljReleaseStringChars(env, name, s_name);
+  if (ns)
+    xmljReleaseStringChars(env, uri, s_uri);
+  
+  return xmljGetNodeInstance(env, node);
+}
+
+/*
+ * Class:     gnu_xml_libxmlj_dom_MatchingNodeList
+ * Method:    getLength
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv *env,
+    jobject self,
+    jstring uri,
+    jstring name,
+    jboolean ns)
+{
+  xmlNodePtr node;
+  const xmlChar *s_uri;
+  const xmlChar *s_name;
+  jint count;
+
+  /* Get parent node */
+  node = xmljGetNodeID(env, self);
+  /* Get search criteria */
+  s_name = xmljGetStringChars(env, name);
+  if (ns)
+    s_uri = xmljGetStringChars(env, uri);
+  else
+    s_uri = NULL;
+  
+  count = 0;
+  node = node->children;
+  while (node != NULL)
+  {
+    if (ns)
+    {
+      while (node != NULL && xmljMatchNS(s_uri, s_name, node))
+        node = node->next;
+    }
+    else
+    {
+      while (node != NULL && xmljMatch(s_name, node))
+        node = node->next;
+    }
+    count++;
+  }
+
+  xmljReleaseStringChars(env, name, s_name);
+  if (ns)
+    xmljReleaseStringChars(env, uri, s_uri);
+  
+  return count;
 }
 
 /* -- Utility -- */

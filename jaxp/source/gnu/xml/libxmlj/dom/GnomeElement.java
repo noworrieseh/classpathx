@@ -84,7 +84,7 @@ implements Element
 
   public NodeList getElementsByTagName(String name)
   {
-    return getElementsByTagNameNS(null, name);
+    return new MatchingNodeList(id, null, name, false);
   }
 
   public native String getAttributeNS(String namespaceURI, String localName);
@@ -103,8 +103,11 @@ implements Element
   public native Attr setAttributeNodeNS(Attr newAttr)
     throws DOMException;
 
-  public native NodeList getElementsByTagNameNS(String namespaceURI, String
-      localName);
+  public NodeList getElementsByTagNameNS(String namespaceURI, String
+      localName)
+  {
+    return new MatchingNodeList(id, namespaceURI, localName, true);
+  }
   
   public boolean hasAttribute(String name)
   {

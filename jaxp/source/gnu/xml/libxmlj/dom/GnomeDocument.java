@@ -97,7 +97,10 @@ implements Document
   public native EntityReference createEntityReference(String name)
     throws DOMException;
 
-  public native NodeList getElementsByTagName(String tagName);
+  public NodeList getElementsByTagName(String tagName)
+  {
+    return new MatchingNodeList(id, null, tagName, false);
+  }
 
   public native Node importNode(Node importedNode, boolean deep)
     throws DOMException;
@@ -110,8 +113,11 @@ implements Document
       qualifiedName)
     throws DOMException;
 
-  public native NodeList getElementsByTagNameNS(String namespaceURI,
-      String localName);
+  public NodeList getElementsByTagNameNS(String namespaceURI,
+      String localName)
+  {
+    return new MatchingNodeList(id, namespaceURI, localName, true);
+  }
 
   public native Element getElementById(String elementId);
 
