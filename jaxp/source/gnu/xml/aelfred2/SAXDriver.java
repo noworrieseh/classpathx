@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.7 2001-07-11 17:09:26 db Exp $
+ * $Id: SAXDriver.java,v 1.8 2001-07-14 20:14:30 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.7 2001-07-11 17:09:26 db Exp $
+// $Id: SAXDriver.java,v 1.8 2001-07-14 20:14:30 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -112,7 +112,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-11 17:09:26 $
+ * @version $Date: 2001-07-14 20:14:30 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -600,6 +600,18 @@ final public class SAXDriver
 	lexicalHandler.endDTD ();
     }
 
+    private void declarePrefix (String prefix, String uri)
+    throws SAXException
+    {
+	int index = uri.indexOf (':');
+	if (index < 1)
+	    verror ("illegal namespace URI: " + uri);
+	// FIXME:  char [0] must be ascii alpha; chars [1..index]
+	// must be ascii alphanumeric or in "+-." [RFC 2396]
+	uri = uri.intern ();
+	prefixStack.declarePrefix (prefix, uri);
+	contentHandler.startPrefixMapping (prefix, uri);
+    }
 
 // FIXME  SAX2 has no way to say which attributes are specified
 
@@ -626,11 +638,8 @@ final public class SAXDriver
 			if (value.length () == 0) {
 			    verror ("missing URI in namespace decl attribute: "
 					+ aname);
-			} else {
-// FIXME:  if the URI is relative, error
-			    prefixStack.declarePrefix (prefix, value);
-			    contentHandler.startPrefixMapping (prefix, value);
-			}
+			} else
+			    declarePrefix (prefix, value);
 			if (!xmlNames)
 			    return;
 			nsTemp [0] = "";
@@ -651,9 +660,7 @@ final public class SAXDriver
 		} else {
 		    // default declaration?
 		    if ("xmlns".equals (aname)) {
-// FIXME:  if the URI is relative, error
-			prefixStack.declarePrefix ("", value);
-			contentHandler.startPrefixMapping ("", value);
+			declarePrefix ("", value);
 			if (!xmlNames)
 			    return;
 		    }
