@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: Consumer.java,v 1.6 2001-10-24 22:37:59 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import gnu.xml.pipeline.EventConsumer;
  * using this API.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-24 22:37:59 $
  */
 public class Consumer extends DomConsumer
 {
@@ -97,11 +97,17 @@ public class Consumer extends DomConsumer
      * implied by the DOM specification (needed to implement testable
      * behavior) but which are excluded from the DOM specification.
      */
-    static final class Backdoor extends DomConsumer.Handler
+    public static class Backdoor extends DomConsumer.Handler
     {
-	Backdoor (DomConsumer c)
+	/**
+	 * Constructor.
+	 * @param consumer must have been initialized to use the
+	 *	{@link DomDocument} class (or a subclass) for
+	 *	constructing DOM trees
+	 */
+	protected Backdoor (DomConsumer consumer)
 	throws SAXException
-	    { super (c); }
+	    { super (consumer); }
 
 	// helper routine
 	private DomDoctype getDoctype ()
@@ -116,14 +122,14 @@ public class Consumer extends DomConsumer
 	}
 
 	// SAX2 "lexical" event
-	public void startDTD (String name, String pubid, String sysid)
+	public void startDTD (String name, String publicId, String systemId)
 	throws SAXException
 	{
 	    DomDocument		doc = (DomDocument) getDocument ();
 
-	    super.startDTD (name, pubid, sysid);
+	    super.startDTD (name, publicId, systemId);
 	    // DOM L2 doctype creation model is bizarre
-	    doc.appendChild (new DomDoctype (doc, name, pubid, sysid));
+	    doc.appendChild (new DomDoctype (doc, name, publicId, systemId));
 	}
 
 	// SAX2 "lexical" event
@@ -138,22 +144,23 @@ public class Consumer extends DomConsumer
 	// SAX1 DTD event
 	public void notationDecl (
 	    String name,
-	    String pubid, String sysid
+	    String publicId, String systemId
 	) throws SAXException
 	{
 	    // DOM L2 can't create/save notation nodes
-	    getDoctype ().declareNotation (name, pubid, sysid);
+	    getDoctype ().declareNotation (name, publicId, systemId);
 	}
 
 	// SAX1 DTD event
 	public void unparsedEntityDecl (
 	    String name,
-	    String pubid, String sysid,
-	    String notation
+	    String publicId, String systemId,
+	    String notationName
 	) throws SAXException
 	{
 	    // DOM L2 can't create/save entity nodes
-	    getDoctype ().declareEntity (name, pubid, sysid, notation);
+	    getDoctype ().declareEntity (name, publicId, systemId,
+	    	notationName);
 	}
 
 	// SAX2 declaration event
@@ -167,47 +174,50 @@ public class Consumer extends DomConsumer
 	}
 
 	// SAX2 declaration event
-	public void externalEntityDecl (String name, String pubid, String sysid)
-	throws SAXException
+	public void externalEntityDecl (
+	    String name,
+	    String publicId,
+	    String systemId
+	) throws SAXException
 	{
 	    // DOM L2 can't create/save entity nodes
 	    // NOTE:  DOM allows for these to have children, if
 	    // they don't have unbound namespace references.
-	    getDoctype ().declareEntity (name, pubid, sysid, null);
+	    getDoctype ().declareEntity (name, publicId, systemId, null);
 	}
 
 	// SAX2 element
 	public void startElement (
 	    String uri,
-	    String local,
-	    String name,
-	    Attributes attrs
+	    String localName,
+	    String qName,
+	    Attributes atts
 	) throws SAXException
 	{
 	    Node		top;
 
-	    super.startElement (uri, local, name, attrs);
+	    super.startElement (uri, localName, qName, atts);
 
 	    // might there be more work?
 	    top = getTop ();
-	    if (!top.hasAttributes () || !(attrs instanceof Attributes2))
+	    if (!top.hasAttributes () || !(atts instanceof Attributes2))
 		return;
 
 	    // remember any attributes that got defaulted
 	    DomNamedNodeMap	map = (DomNamedNodeMap) top.getAttributes ();
-	    Attributes2		atts = (Attributes2) attrs;
+	    Attributes2		attrs = (Attributes2) atts;
 	    int			length = atts.getLength ();
 
 	    for (int i = 0; i < length; i++) {
-		if (atts.isSpecified (i))
+		if (attrs.isSpecified (i))
 		    continue;
 		
 		// value was defaulted.
-		String		temp = atts.getQName (i);
+		String		temp = attrs.getQName (i);
 		DomAttr		attr;
 
 		if ("".equals (temp))
-		    attr = (DomAttr) map.getNamedItemNS (atts.getURI (i),
+		    attr = (DomAttr) map.getNamedItemNS (attrs.getURI (i),
 			    atts.getLocalName (i));
 		else
 		    attr = (DomAttr) map.getNamedItem (temp);
@@ -230,6 +240,9 @@ public class Consumer extends DomConsumer
 
 // override clearDocument(), delegate then:
 // doc.setCheckingCharacters (true);
+
+// FIXME: we should be able to put entity ref nodes on the stack
+// and populate them (mark readonly when done) ...
 
     }
 }
