@@ -1,5 +1,5 @@
 /*
- * $Id: Resolver.java,v 1.5 2001-10-29 21:49:10 db Exp $
+ * $Id: Resolver.java,v 1.6 2002-02-08 19:15:48 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import java.util.Hashtable;
 import org.xml.sax.*;
 
 
-// $Id: Resolver.java,v 1.5 2001-10-29 21:49:10 db Exp $
+// $Id: Resolver.java,v 1.6 2002-02-08 19:15:48 db Exp $
 
 /**
  * Utility implementation of a SAX resolver, which can be used to improve
@@ -43,9 +43,9 @@ import org.xml.sax.*;
  * supporting local caches of external entities.
  * SAX parsers <em>should</em> use such local caches when possible.
  *
- * <p><b>FIXME:</b> This needs to leverage a catalog facility.
+ * @see XCat
  *
- * @version $Date: 2001-10-29 21:49:10 $
+ * @version $Date: 2002-02-08 19:15:48 $
  */
 public class Resolver implements EntityResolver, Cloneable
 {
@@ -111,6 +111,10 @@ public class Resolver implements EntityResolver, Cloneable
     {
 	String	temp;
 
+	// NOTE:  the javax.xml.parsers.DocumentBuilder and
+	// javax.xml.transform.stream.StreamSource versions
+	// of this don't have this test.  Some JVM versions
+	// don't report this error sanely through URL code. 
 	if (!f.exists ())
 	    throw new IOException ("no such file: " + f.getName ());
 
