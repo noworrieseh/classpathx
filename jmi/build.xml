@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GNU-Classpath Extensions: JMI
+  Copyright (C) 2004 Free Software Foundation, Inc.
+
+  For more information on the GNU Classpathx project please mail:
+  classpathx-discuss@gnu.org
+
+  This file is part of GNU JMI
+
+  GNU JMI is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
+
+  GNU JMI is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with program; see the file COPYING. If not, write to the Free
+  Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+  02111-1307, USA.
+-->
+<project name="gnujmi" default="dist" basedir=".">
+  <description>
+    LGPL'ed interface for the Java Metadata Interface
+  </description>
+  
+  <!-- set global properties for this build -->
+  <property name="VERSION" value="1.0" />
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="docs" location="docs"/>
+
+  <property name="build.compiler" value="jikes"/>
+  
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+  </target>
+  
+  <target name="compile" depends="init"
+    description="compile the sources" >
+    <javac srcdir="${src}" destdir="${build}"/>
+  </target>
+  
+  <target name="dist" depends="compile"
+    description="generate the distribution" >
+    <mkdir dir="${dist}"/>
+    
+    <jar jarfile="${dist}/${project.name}-${VERSION}.jar" basedir="${build}"/>
+  </target>
+  
+  <target name="clean"
+    description="clean up" >
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${docs}"/>
+  </target>
+  
+  <!-- TODO: javadoc task -->
+
+</project>

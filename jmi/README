@@ -1,0 +1,11 @@
+GNU JMI - Metadata Interface
+---------------------------
+
+GNU JMI is a free implementation of the JSR-000040 The JavaTM Metadata
+Interface (JMI).
+
+It consist of an API to solve the problem of incompatible metadata.
+
+Arnaud Vandyck
+May 31 2004
+Nov 21 2004
