@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 2002-07-06 07:56:16 olf Exp $
+## $Id: Makefile.am,v 1.7 2002-08-14 16:12:03 raif Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -44,6 +44,8 @@ test-vectors:
 	@ test -e tv/nist/rijndael || mkdir tv/nist/rijndael
 	@ test -e tv/nist/serpent || mkdir tv/nist/serpent
 	@ test -e tv/nist/twofish || mkdir tv/nist/twofish
+	@ test -e tv/nist/khazad || mkdir tv/nist/khazad
+	@ test -e tv/nist/square || mkdir tv/nist/square
 	source/nessieCipherTVEmitter anubis 128 > tv/nessie/anubis-128-tv.txt
 	source/nessieCipherTVEmitter anubis 160 > tv/nessie/anubis-160-tv.txt
 	source/nessieCipherTVEmitter anubis 192 > tv/nessie/anubis-192-tv.txt
@@ -61,6 +63,10 @@ test-vectors:
 	source/nistKat -t serpent > tv/nist/serpent/ecb_vt.txt
 	source/nistKat -k twofish > tv/nist/twofish/ecb_vk.txt
 	source/nistKat -t twofish > tv/nist/twofish/ecb_vt.txt
+	source/nistKat -k khazad 128 > tv/nist/khazad/ecb_vk.txt
+	source/nistKat -t khazad 128 > tv/nist/khazad/ecb_vt.txt
+	source/nistKat -k square 128 > tv/nist/square/ecb_vk.txt
+	source/nistKat -t square 128 > tv/nist/square/ecb_vt.txt
 	source/nistMCT -E -e anubis > tv/nist/anubis/ecb_e_m.txt
 	source/nistMCT -E -d anubis > tv/nist/anubis/ecb_d_m.txt
 	source/nistMCT -C -e anubis > tv/nist/anubis/cbc_e_m.txt
@@ -79,6 +85,7 @@ test-vectors:
 	source/nistMCT -C -d twofish > tv/nist/twofish/cbc_d_m.txt
 	source/cipherSpeed
 	source/hashSpeed
+	source/ent
 
 ###############################################################################
 # Remove internal automake dependencies.
