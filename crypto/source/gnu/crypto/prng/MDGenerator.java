@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: MDGenerator.java,v 1.3 2002-01-17 11:51:15 raif Exp $
+// $Id: MDGenerator.java,v 1.4 2002-01-21 10:12:33 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -90,12 +90,7 @@ public class MDGenerator extends BasePRNG {
    }
 
    public byte[] nextBlock() throws LimitReachedException {
-      IMessageDigest mdc = null;
-      try {
-         mdc = (IMessageDigest) md.clone();
-      } catch (CloneNotSupportedException ignored) {
-         // should not happen with our implementations
-      }
+      IMessageDigest mdc = (IMessageDigest) md.clone();
       byte[] result = mdc.digest();
       md.update(result, 0, result.length);
 
