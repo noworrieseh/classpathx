@@ -84,6 +84,10 @@ public final class POP3Store
       {
 				connection = new POP3Connection(host, port);
 				connection.setDebug(session.getDebug());
+        // Disable APOP if necessary
+        String disableApop = session.getProperty("mail.pop3.disable-apop");
+        if ("true".equals(disableApop))
+          connection.timestamp = null;
 				return connection.authenticate(username, password);
       }
       catch (UnknownHostException e)

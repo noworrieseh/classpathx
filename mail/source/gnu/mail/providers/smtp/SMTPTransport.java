@@ -318,6 +318,7 @@ public class SMTPTransport
       try 
       {
         simpleCommand("QUIT");
+      }
       catch (MessagingException e) 
       {
       }
