@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.1 2001-06-23 21:13:31 db Exp $
+ * $Id: Consumer.java,v 1.2 2001-06-24 04:12:23 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ import gnu.xml.pipeline.DomConsumer;
  * using this API.
  *
  * @author David Brownell
- * @version $Date: 2001-06-23 21:13:31 $
+ * @version $Date: 2001-06-24 04:12:23 $
  */
 public class Consumer extends DomConsumer
 {
@@ -100,6 +100,7 @@ public class Consumer extends DomConsumer
 	public void endDTD ()
 	throws SAXException
 	{
+	    super.endDTD ();
 	    getDoctype ().makeReadonly ();
 	}
 

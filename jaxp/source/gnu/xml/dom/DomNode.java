@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.2 2001-06-23 05:19:32 db Exp $
+ * $Id: DomNode.java,v 1.3 2001-06-24 04:12:23 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.2 2001-06-23 05:19:32 db Exp $
+// $Id: DomNode.java,v 1.3 2001-06-24 04:12:23 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -56,7 +56,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-06-23 05:19:32 $
+ * @version $Date: 2001-06-24 04:12:23 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -495,8 +495,8 @@ public abstract class DomNode
 
 		// yep -- do so!
 		ensureEnough (child.length);
-		for (int i = 0; i < child.length; i++)
-		    appendChild (child.children [i]);
+		for (int i = 0; i <= child.length; i++)
+		    appendChild (child.children [0]);
 	    }
 	    return child;
 
@@ -539,6 +539,8 @@ public abstract class DomNode
 
 		    ensureEnough (1);
 		    reparent (child);
+		    if (children [i] != refChild)
+			i--;
 		    for (int j = ++length; j > i; j--)
 			children [j] = children [j - 1];
 		    children [i] = child;
@@ -557,7 +559,7 @@ public abstract class DomNode
 
 		// yep -- do so!
 		ensureEnough (child.length);
-		for (int i = 0; i < child.length; i++)
+		for (int i = 0; i <= child.length; i++)
 		    insertBefore (child.children [0], refChild);
 		return newChild;
 	    }
@@ -595,45 +597,49 @@ public abstract class DomNode
      */
     public Node replaceChild (Node newChild, Node refChild)
     {
-	for (int i = 0; i < length; i++) {
-	    if (children [i] != refChild)
-		continue;
+	try {
+	    DomNode		child = (DomNode) newChild;
 
-	    try {
-		DomNode				child = (DomNode) newChild;
-		DomNode				rmchild = (DomNode) refChild;
-		DomEvent.DomMutationEvent	event = getMutationEvent ();
-		boolean				doFree;
-
-		// XXX implement me
-		if (child.nodeType == DOCUMENT_FRAGMENT_NODE)
-		    throw new DomEx (DomEx.NOT_SUPPORTED_ERR,
-			    "replacing with fragment, NYI", null, 0);
-
-		if (event != null)
-		    doFree = true;
-		else
-		    doFree = false;
+	    if (child.nodeType != DOCUMENT_FRAGMENT_NODE) {
 		checkMisc (child);
-		if (reportMutations)
-		    removalEvent (event, rmchild);
-		reparent (child);
-		children [i] = child;
-		rmchild.parent = null;
-		if (reportMutations)
-		    insertionEvent (event, child);
-		if (doFree)
-		    freeMutationEvent ();
+		for (int i = 0; i < length; i++) {
+		    if (children [i] != refChild)
+			continue;
 
-		return refChild;
+		    DomNode			rmchild = (DomNode) refChild;
+		    DomEvent.DomMutationEvent	event;
+		    boolean			doFree;
 
-	    } catch (ClassCastException e) {
-		throw new DomEx (DomEx.WRONG_DOCUMENT_ERR,
-		    null, newChild, 0);
+		    event = getMutationEvent ();
+		    if (event != null)
+			doFree = true;
+		    else
+			doFree = false;
+		    if (reportMutations)
+			removalEvent (event, rmchild);
+		    reparent (child);
+		    if (children [i] != refChild)
+			i--;
+		    children [i] = child;
+		    rmchild.parent = null;
+		    if (reportMutations)
+			insertionEvent (event, child);
+		    if (doFree)
+			freeMutationEvent ();
+
+		    return refChild;
+		}
+		throw new DomEx (DomEx.NOT_FOUND_ERR,
+			"that's no child of mine", newChild, 0);
+	    } else {
+// XXX implement me
+		throw new DomEx (DomEx.NOT_SUPPORTED_ERR,
+			"replacing with fragment, NYI", null, 0);
 	    }
+	} catch (ClassCastException e) {
+	    throw new DomEx (DomEx.WRONG_DOCUMENT_ERR,
+		null, newChild, 0);
 	}
-	throw new DomEx (DomEx.NOT_FOUND_ERR,
-		"that's no child of mine", newChild, 0);
     }
 
 
@@ -1007,14 +1013,18 @@ public abstract class DomNode
 
 	public short acceptNode (Node element)
 	{
+	    if (element == DomNode.this)
+		return FILTER_SKIP;
+
 	    if (elementURI != null
 		    && !elementURI.equals (element.getNamespaceURI ()))
 		return FILTER_SKIP;
-	    if (!elementName.equals (element.getNodeName ())
-		    && !"*".equals (elementName))
-		return FILTER_SKIP;
 
-	    return FILTER_ACCEPT;
+	    if (elementName.equals (element.getNodeName ())
+		    || "*".equals (elementName))
+		return FILTER_ACCEPT;
+	    else
+		return FILTER_SKIP;
 	}
 
 	private DomIterator createIterator ()

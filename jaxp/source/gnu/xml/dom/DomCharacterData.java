@@ -1,5 +1,5 @@
 /*
- * $Id: DomCharacterData.java,v 1.2 2001-06-23 05:23:00 db Exp $
+ * $Id: DomCharacterData.java,v 1.3 2001-06-24 04:12:23 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomCharacterData.java,v 1.2 2001-06-23 05:23:00 db Exp $
+// $Id: DomCharacterData.java,v 1.3 2001-06-24 04:12:23 db Exp $
 
 /**
  * <p> Abstract "CharacterData" implementation.  This
@@ -38,7 +38,7 @@ import org.w3c.dom.events.MutationEvent;
  * (For example, it could be defined through a new "feature" module.)
  *
  * @author David Brownell
- * @version $Date: 2001-06-23 05:23:00 $
+ * @version $Date: 2001-06-24 04:12:23 $
  */
 public abstract class DomCharacterData extends DomNode
     implements CharacterData
@@ -186,35 +186,18 @@ public abstract class DomCharacterData extends DomNode
 
     /**
      * <b>DOM L1</b>
-     * Modifies the value of this node.  Causes a DOMCharacterDataModified
-     * mutation event to be reported.
+     * Modifies the value of this node.  Causes DOMCharacterDataModified
+     * mutation events to be reported (at least one).
      */
     public void replaceData (int offset, int count, String arg)
     {
-	char		chars [], src [];
-	StringBuffer	buf;
-	String		newValue;
-
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	buf = new StringBuffer (data.length ());
-	try {
-	    chars = data.toCharArray ();
-	    src = arg.toCharArray ();
-	    buf.append (chars, 0, offset);
-	    if (src.length < count)
-		buf.append (src, 0, src.length);
-	    else
-		buf.append (src, 0, count);
-	    if ((offset + count) < chars.length)
-		buf.append (chars, offset + count,
-			chars.length - (offset + count));
-	    newValue = new String (buf);
-	    mutating (newValue);
-	    data = newValue;
-	} catch (IndexOutOfBoundsException x) {
-	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
-	}
+
+	// this could be rewritten to be faster,
+	// and to report only one mutation event
+	deleteData (offset, count);
+	insertData (offset, arg);
     }
     
 
