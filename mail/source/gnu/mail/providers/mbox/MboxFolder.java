@@ -96,14 +96,7 @@ public class MboxFolder
   {
     super(store);
     this.name = name;
-    if (0 < name.length() && name.charAt(0) == '/')
-      {
-        file = new File(canonicalNameToLocal(name));
-      }
-    else
-      {
-        file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
-      }
+    file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
     if (file.exists() && file.isDirectory())
       {
         type = HOLDS_FOLDERS;
@@ -217,7 +210,7 @@ public class MboxFolder
 
     if (!file.canRead())
       {
-        throw new MessagingException("Can't read folder: " + file.getName());
+        throw new MessagingException("Can't read folder: " + filename);
       }
 
     LineInputStream in = null;
@@ -899,19 +892,6 @@ public class MboxFolder
   public Folder getFolder(String fname)
     throws MessagingException 
   {
-/*    String INBOX = "/INBOX";
-    if (INBOX.equalsIgnoreCase(fname))
-      {
-        try
-          {
-            return store.getFolder(INBOX);
-          }
-        catch (MessagingException e)
-          {
-            // fall back to standard behaviour
-          }
-      } */
-
     if (!fname.startsWith("/"))
       {
         fname = makeName(name, fname);

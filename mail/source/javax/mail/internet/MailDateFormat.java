@@ -243,16 +243,16 @@ public class MailDateFormat
         // Advance to date
         if (Character.isLetter(text.charAt(start)))
           {
-            start = skipNonWhitespace(text, start);
+            start = skipNonWhitespace(text, start, len);
           }
-        start = skipWhitespace(text, start);
+        start = skipWhitespace(text, start, len);
         pos.setIndex(start);
-        end = skipNonWhitespace(text, start + 1);
+        end = skipNonWhitespace(text, start + 1, len);
         int date = Integer.parseInt(text.substring(start, end));
         // Advance to month
-        start = skipWhitespace(text, end + 1);
+        start = skipWhitespace(text, end + 1, len);
         pos.setIndex(start);
-        end = skipNonWhitespace(text, start + 1);
+        end = skipNonWhitespace(text, start + 1, len);
         String monthText = text.substring(start, end);
         int month = -1;
         for (int i = 0; i < 12; i++)
@@ -269,65 +269,64 @@ public class MailDateFormat
             return null;
           }
         // Advance to year
-        start = skipWhitespace(text, end + 1);
+        start = skipWhitespace(text, end + 1, len);
         pos.setIndex(start);
-        end = skipNonWhitespace(text, start + 1);
+        end = skipNonWhitespace(text, start + 1, len);
         int year = Integer.parseInt(text.substring(start, end));
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.DAY_OF_MONTH, date);
         // Advance to hour
-        start = skipWhitespace(text, end + 1);
+        start = skipWhitespace(text, end + 1, len);
         pos.setIndex(start);
-        end = skipToColon(text, start + 1);
+        end = skipToColon(text, start + 1, len);
         int hour = Integer.parseInt(text.substring(start, end));
         calendar.set(Calendar.HOUR, hour);
         // Advance to minute
         start = end + 1;
         pos.setIndex(start);
-        end = skipToColon(text, start + 1);
+        end = skipToColon(text, start + 1, len);
         int minute = Integer.parseInt(text.substring(start, end));
         calendar.set(Calendar.MINUTE, minute);
         // Advance to second
         start = end + 1;
         pos.setIndex(start);
-        end = start + 1;
-        while (end < len && !Character.isWhitespace(text.charAt(end)))
-          {
-            end++;
-          }
+        end = skipNonWhitespace(text, start + 1, len);
         int second = Integer.parseInt(text.substring(start, end));
         calendar.set(Calendar.SECOND, second);
         
         if (end != len)
           {
-            // Timezone
-            start = skipWhitespace(text, end + 1);
-            end = start + 1;
-            while (end < len && !Character.isWhitespace(text.charAt(end)))
+            start = skipWhitespace(text, end + 1, len);
+            if (start != len)
               {
-                end++;
-              }
-            char pm = text.charAt(start);
-            if (Character.isLetter(pm))
-              {
-                TimeZone tz =
-                  TimeZone.getTimeZone(text.substring(start, end));
-                calendar.set(Calendar.ZONE_OFFSET, tz.getRawOffset());
-              }
-            else
-              {
-                int zoneOffset = 0;
-                zoneOffset += 600 * Character.digit(text.charAt(++start), 10);
-                zoneOffset += 60 * Character.digit(text.charAt(++start), 10);
-                zoneOffset += 10 * Character.digit(text.charAt(++start), 10);
-                zoneOffset += Character.digit(text.charAt(++start), 10);
-                zoneOffset *= 60000; // minutes -> ms
-                if ('-' == pm)
+                // Trailing characters, therefore timezone
+                end = skipNonWhitespace(text, start + 1, len);
+                char pm = text.charAt(start);
+                if (Character.isLetter(pm))
                   {
-                    zoneOffset = -zoneOffset;
+                    TimeZone tz =
+                      TimeZone.getTimeZone(text.substring(start, end));
+                    calendar.set(Calendar.ZONE_OFFSET, tz.getRawOffset());
                   }
-                calendar.set(Calendar.ZONE_OFFSET, zoneOffset);
+                else
+                  {
+                    int zoneOffset = 0;
+                    zoneOffset +=
+                      600 * Character.digit(text.charAt(++start), 10);
+                    zoneOffset +=
+                      60 * Character.digit(text.charAt(++start), 10);
+                    zoneOffset +=
+                      10 * Character.digit(text.charAt(++start), 10);
+                    zoneOffset +=
+                      Character.digit(text.charAt(++start), 10);
+                    zoneOffset *= 60000; // minutes -> ms
+                    if ('-' == pm)
+                      {
+                        zoneOffset = -zoneOffset;
+                      }
+                    calendar.set(Calendar.ZONE_OFFSET, zoneOffset);
+                  }
               }
           }
         pos.setIndex(end);
@@ -345,27 +344,27 @@ public class MailDateFormat
     return null;
   }
 
-  private int skipWhitespace(String text, int pos)
+  private int skipWhitespace(final String text, int pos, final int len)
   {
-    while (Character.isWhitespace(text.charAt(pos)))
+    while (pos < len && Character.isWhitespace(text.charAt(pos)))
       {
         pos++;
       }
     return pos;    
   }
 
-  private int skipNonWhitespace(String text, int pos)
+  private int skipNonWhitespace(final String text, int pos, final int len)
   {
-    while (!Character.isWhitespace(text.charAt(pos)))
+    while (pos < len && !Character.isWhitespace(text.charAt(pos)))
       {
         pos++;
       }
     return pos;    
   }
 
-  private int skipToColon(String text, int pos)
+  private int skipToColon(final String text, int pos, final int len)
   {
-    while (text.charAt(pos) != ':')
+    while (pos < len && text.charAt(pos) != ':')
       {
         pos++;
       }

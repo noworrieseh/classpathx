@@ -1,6 +1,6 @@
 /*
  * MboxStore.java
- * Copyright(C) 1999 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999,2005 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -30,12 +30,15 @@ package gnu.mail.providers.mbox;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
 
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
@@ -106,7 +109,15 @@ public final class MboxStore
         String file = url.getFile();
         if (file != null && file.length() > 0) 
           {
-            return new File(file);
+            File f = new File(file);
+            if (f.exists())
+              {
+                if (!f.isDirectory())
+                  {
+                    f = f.getParentFile();
+                  }
+                return f;
+              }
           }
       }
     // Otherwise attempt to return a sensible root folder.
@@ -132,7 +143,7 @@ public final class MboxStore
             mailhome = "/";
           }
       }
-    return new File(mailhome);
+    return (mailhome == null) ? null : new File(mailhome);
   }
 
   /**
@@ -160,7 +171,8 @@ public final class MboxStore
             // Try some common(UNIX) locations.
             try 
               {
-                String username = System.getProperty("user.name");
+                PrivilegedAction a = new GetSystemPropertyAction("user.name");
+                String username = (String) AccessController.doPrivileged(a);
                 inboxname = "/var/mail/" + username; // GNU
                 if (!exists(inboxname))
                   {
@@ -169,8 +181,8 @@ public final class MboxStore
                   }
                 if (!exists(inboxname))
                   {
-                    inboxname = null;
-                    String userhome = System.getProperty("user.home");
+                    a = new GetSystemPropertyAction("user.home");
+                    String userhome = (String) AccessController.doPrivileged(a);
                     inboxname = userhome + "/Mailbox"; // qmail etc
                   }
                 if (!exists(inboxname))
@@ -199,7 +211,7 @@ public final class MboxStore
    */
   private boolean exists(String filename)
   {
-    if (filename!=null)
+    if (filename != null)
       {
         File file = new File(filename);
         if (separatorChar != File.separatorChar)

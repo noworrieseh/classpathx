@@ -5,12 +5,12 @@ space:=$(empty) $(empty)
 # Set by configure.
 PROJECTROOT = .
 JAVA = java
-JAVAC = gcj
-JAVAC_OPTS = -C
+JAVAC = javac
+JAVAC_OPTS = 
 JAR = jar
 
 prefix = /usr/local/share/java
-extra = /usr/share/java
+extra = /usr/local/share/java
 
 OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true -Djavax.net.debug=true \
 -Dmail.smtp.host=bluezoo.org -Dmail.smtp.auth=required

@@ -1,6 +1,7 @@
 2005-02-17  Chris Burdess  <dog@bluezoo.org>
 
 	* MboxFolder.java: Clarification of canonical function.
+	* MailDateFormat.java: Handle trailing whitespace.
 
 2005-02-15  Countach  <yahoo@canberracity.org>
 

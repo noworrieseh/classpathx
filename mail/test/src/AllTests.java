@@ -4,24 +4,31 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 public class AllTests
+  extends TestSuite
 {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(SessionTest.suite());
-		suite.addTest(TransportTest.suite());
-		suite.addTest(StoreTest.suite());
-		suite.addTest(FolderTest.suite());
-		suite.addTest(NonFolderTest.suite());
-		suite.addTest(MimeMessageTest.suite());
-		return suite;
-	}
-
-	public static void main(String[] args)
-	{
-		//TestRunner.run(AllTests.class);
-		TestRunner.run(suite());
-	}
+  public AllTests()
+    throws Exception
+  {
+    addTest(SessionTest.suite());
+    addTest(TransportTest.suite());
+    addTest(StoreTest.suite());
+    addTest(FolderTest.suite());
+    addTest(NonFolderTest.suite());
+    addTest(MimeMessageTest.suite());
+  }
+  
+  public static void main(String[] args)
+  {
+    try
+      {
+        TestRunner.run(new AllTests());
+      }
+    catch (Exception e)
+      {
+        e.printStackTrace(System.err);
+        System.exit(1);
+      }
+  }
 	
 }

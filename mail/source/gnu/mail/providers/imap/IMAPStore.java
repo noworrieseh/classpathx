@@ -89,7 +89,7 @@ public class IMAPStore
    * parameters.
    */
   protected boolean protocolConnect(String host, int port, String username,
-                                     String password)
+                                    String password)
     throws MessagingException
   {
     if (connection != null)
@@ -119,8 +119,8 @@ public class IMAPStore
             int connectionTimeout = getIntProperty("connectiontimeout");
             int timeout = getIntProperty("timeout");
             connection = new IMAPConnection(host, port,
-                                             connectionTimeout, timeout,
-                                             session.getDebug());
+                                            connectionTimeout, timeout,
+                                            session.getDebug());
         
             if (propertyIsTrue("debug.ansi"))
               {

@@ -14,6 +14,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class FolderTest
   implements ConnectionListener
 {
 	
-	private Session session;
+  private Session session;
   private URLName url;
   private Store store;
   private Folder folder;
@@ -30,80 +31,69 @@ public class FolderTest
   private ConnectionEvent connectionEvent;
   private FolderEvent folderEvent;
 	
-	public FolderTest(String name, String url)
-	{
+  public FolderTest(String name, String url)
+  {
     super(name);
     this.url = new URLName(url);
-	}
-
-	protected void setUp()
-	{
-		session = Session.getInstance(System.getProperties());
+  }
+  
+  protected void setUp()
+    throws Exception
+  {
+    session = Session.getInstance(System.getProperties());
     //session.setDebug(true);
-    try
-    {
-      store = session.getStore(url);
-      assertNotNull(store);
-      folder = store.getFolder(url.getFile());
-      assertNotNull(folder);
-    }
-    catch (MessagingException e)
-    {
-      fail(e.getMessage());
-    }
-	}
+    store = session.getStore(url);
+    assertNotNull(store);
+  }
 
-	protected void tearDown()
-	{
+  void getFolder()
+    throws Exception
+  {
+    folder = store.getDefaultFolder();
+    assertNotNull(folder);
+    String file = url.getFile();
+    if (file != null && file.length() > 0)
+      {
+        folder = folder.getFolder(file);
+      }
+    assertNotNull(folder);
+  }
+
+  protected void tearDown()
+    throws Exception
+  {
     if (store!=null)
-    {
-      try
       {
         store.close();
       }
-      catch (MessagingException e)
-      {
-      }
-    }
     url = null;
     folder = null;
     store = null;
-		session = null;
-	}
-
-	public void testOpen()
-	{
-    try
-    {
-      store.connect();
-      folder.addConnectionListener(this);
-      folder.open(Folder.READ_ONLY);
-      assertNotNull(connectionEvent);
-      assertEquals(connectionEvent.getType(), ConnectionEvent.OPENED);
-    }
-    catch (MessagingException e)
-    {
-      fail(e.getMessage());
-    }
-	}
-
-	public void testClose()
-	{
-    try
-    {
-      store.connect();
-      folder.addConnectionListener(this);
-      folder.open(Folder.READ_ONLY);
-      folder.close(false);
-      assertNotNull(connectionEvent);
-      assertEquals(connectionEvent.getType(), ConnectionEvent.CLOSED);
-    }
-    catch (MessagingException e)
-    {
-      e.printStackTrace(System.err);
-      fail(e.getMessage());
-    }
-	}
+    session = null;
+  }
+  
+  public void testOpen()
+    throws Exception
+  {
+    store.connect();
+    getFolder();
+    folder.addConnectionListener(this);
+    folder.open(Folder.READ_ONLY);
+    assertNotNull(connectionEvent);
+    assertEquals(connectionEvent.getType(), ConnectionEvent.OPENED);
+  }
+  
+  public void testClose()
+    throws Exception
+  {
+    store.connect();
+    getFolder();
+    folder.addConnectionListener(this);
+    folder.open(Folder.READ_ONLY);
+    folder.close(false);
+    assertNotNull(connectionEvent);
+    assertEquals(connectionEvent.getType(), ConnectionEvent.CLOSED);
+  }
 
   public void closed(ConnectionEvent e)
   {
@@ -143,21 +133,30 @@ public class FolderTest
     return suite;
   }
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite();
+  public static Test suite()
+  {
+    TestSuite suite = new TestSuite();
     try
-    {
-      BufferedReader r = new BufferedReader(new FileReader("folder-urls"));
-      for (String line = r.readLine(); line!=null; line = r.readLine())
-        suite.addTest(suite(line));
-      r.close();
-    }
+      {
+        BufferedReader r = new BufferedReader(new FileReader("folder-urls"));
+        for (String line = r.readLine(); line!=null; line = r.readLine())
+          {
+            if (!line.startsWith("#"))
+              {
+                suite.addTest(suite(line));
+              }
+          }
+        r.close();
+      }
+    catch (FileNotFoundException e)
+      {
+        System.err.println("No folder URLs");
+      }
     catch (IOException e)
-    {
-      System.err.println("No folder URLs");
-    }
+      {
+        e.printStackTrace(System.err);
+      }
     return suite;
-	}
-	
+  }
+  
 }
