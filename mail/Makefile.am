@@ -118,6 +118,7 @@ source/gnu/mail/util/Base64OutputStream.java \
 source/gnu/mail/util/CRLFInputStream.java \
 source/gnu/mail/util/CRLFOutputStream.java \
 source/gnu/mail/util/LineInputStream.java \
+source/gnu/mail/util/Logger.java \
 source/gnu/mail/util/MessageInputStream.java \
 source/gnu/mail/util/MessageOutputStream.java \
 source/gnu/mail/util/QInputStream.java \
@@ -125,9 +126,9 @@ source/gnu/mail/util/QOutputStream.java \
 source/gnu/mail/util/QPInputStream.java \
 source/gnu/mail/util/QPOutputStream.java \
 source/gnu/mail/util/RFC2822OutputStream.java \
-source/gnu/mail/util/UUDecoderStream.java \
-source/gnu/mail/util/Logger.java \
 source/gnu/mail/util/StderrLogger.java \
+source/gnu/mail/util/UUDecoderStream.java \
+source/gnu/mail/util/UUEncoderStream.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
 # The SMTP provider
