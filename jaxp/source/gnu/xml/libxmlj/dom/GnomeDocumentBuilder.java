@@ -181,6 +181,10 @@ public class GnomeDocumentBuilder
 
   public boolean hasFeature(String name, String version)
   {
+    if (name.length() == 0)
+      {
+        return false;
+      }
     name = name.toLowerCase();
     if (name.charAt(0) == '+')
       {

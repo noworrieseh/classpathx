@@ -611,6 +611,7 @@ public abstract class DomNode
       {
         DomNode	child = (DomNode) newChild;
         DomNode ref = (DomNode) refChild;
+        
         if (child.nodeType == DOCUMENT_FRAGMENT_NODE)
           {
             // Append all nodes in the fragment to this node
@@ -628,7 +629,7 @@ public abstract class DomNode
         else
           {
             checkMisc(child);
-            if (ref.parent != this)
+            if (ref == null || ref.parent != this)
               {
                 throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
               }
@@ -719,6 +720,10 @@ public abstract class DomNode
               {
                 checkMisc(ctx);
               }
+            if (ref == null || ref.parent != this)
+              {
+                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+              }
             
             if (reportMutations)
               {
@@ -778,6 +783,10 @@ public abstract class DomNode
         else
           {
             checkMisc(child);
+            if (ref == null || ref.parent != this)
+              {
+                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+              }
         
             if (reportMutations)
               {
@@ -821,7 +830,7 @@ public abstract class DomNode
           }
         ref.parent = null;
         ref.index = 0;
-        ref.depth = 0;
+        ref.setDepth(0);
         ref.previous = null;
         ref.next = null;
         
@@ -850,8 +859,7 @@ public abstract class DomNode
       {
         DomNode ref = (DomNode) refChild;
 
-        if (ref == null ||
-            (ref.parent != this && nodeType != ENTITY_REFERENCE_NODE))
+        if (ref == null || ref.parent != this)
           {
             throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
           }
@@ -894,7 +902,7 @@ public abstract class DomNode
                     ctx.index = i++;
                   }
                 ref.parent = null;
-                ref.depth = 0;
+                ref.setDepth(0);
                 ref.index = 0;
                 ref.previous = null;
                 ref.next = null;
@@ -1751,8 +1759,11 @@ public abstract class DomNode
    * relevant) merge adjacent text nodes.  This is done while ignoring
    * text which happens to use CDATA delimiters).
    */
-  public void normalize()
+  public final void normalize()
   {
+    // Suspend readonly status
+    boolean saved = readonly;
+    readonly = false;
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
         switch (ctx.nodeType)
@@ -1775,12 +1786,13 @@ public abstract class DomNode
             // Fall through
           case DOCUMENT_NODE:
           case DOCUMENT_FRAGMENT_NODE:
-          case ENTITY_REFERENCE_NODE:
           case ATTRIBUTE_NODE:
+          case ENTITY_REFERENCE_NODE:
             ctx.normalize();
             break;
           }
       }
+    readonly = saved;
   }
 
   /**
@@ -1885,7 +1897,7 @@ public abstract class DomNode
    */
   final int compareTo2(DomNode n1, DomNode n2)
   {
-    if (n1.depth == 0 || n1 == n2)
+    if (n1 == n2 || n1.depth == 0 || n2.depth == 0)
       {
         return 0;
       }
@@ -1905,7 +1917,6 @@ public abstract class DomNode
     switch (nodeType)
       {
       case ELEMENT_NODE:
-      case ATTRIBUTE_NODE:
       case ENTITY_NODE:
       case ENTITY_REFERENCE_NODE:
       case DOCUMENT_FRAGMENT_NODE:
@@ -1925,6 +1936,8 @@ public abstract class DomNode
           {
             return "";
           }
+        return getNodeValue();
+      case ATTRIBUTE_NODE:
         return getNodeValue();
       case COMMENT_NODE:
       case PROCESSING_INSTRUCTION_NODE:
@@ -2009,6 +2022,7 @@ public abstract class DomNode
       }
     // Children
     Node argCtx = arg.getFirstChild();
+    getFirstChild(); // because of DomAttr lazy children
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
         if (!ctx.isEqualNode(argCtx))

@@ -281,6 +281,15 @@ public class DomDoctype
   {
     return subset;
   }
+
+  /**
+   * The base URI of a DocumentType is always <code>null</code>.
+   * See the Infoset Mapping, appendix C.
+   */
+  public final String getBaseURI()
+  {
+    return null;
+  }
     
   /**
    * Sets the internal "readonly" flag so the node and its associated

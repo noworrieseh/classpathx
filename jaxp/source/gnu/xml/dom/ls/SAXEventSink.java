@@ -401,12 +401,6 @@ class SAXEventSink
       {
         Node entityReference = doc.createEntityReference(name);
         ctx.appendChild(entityReference);
-        // Copy entity content
-        for (Node child = entity.getFirstChild(); child != null;
-             child = child.getNextSibling())
-          {
-            entityReference.appendChild(child.cloneNode(true));
-          }
       }
   }
 

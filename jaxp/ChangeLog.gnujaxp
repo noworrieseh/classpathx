@@ -1,3 +1,11 @@
+2004-12-07  Chris Burdess  <dog@gnu.org>
+
+	* dom: Minor DOM Level 3 Core conformance improvements.
+
+2004-12-07  Mark Wielaard  <mark@klomp.org>
+
+   	* ReaderInputStream.java: Mark and reset implementation.
+   	
 2004-12-06  Chris Burdess  <dog@gnu.org>
 
 	* dom: Minor DOM Level 3 Core conformance improvements.
