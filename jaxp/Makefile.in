@@ -52,10 +52,10 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/javax/xml/transform/Source.java \
 	$(SOURCEDIR)/javax/xml/transform/SourceLocator.java \
 	$(SOURCEDIR)/javax/xml/transform/Templates.java \
-	$(SOURCEDIR)/javax/xml/transform/TFactoryConfigurationError.java \
 	$(SOURCEDIR)/javax/xml/transform/TransformerConfigurationException.java \
 	$(SOURCEDIR)/javax/xml/transform/TransformerException.java \
 	$(SOURCEDIR)/javax/xml/transform/TransformerFactory.java \
+	$(SOURCEDIR)/javax/xml/transform/TransformerFactoryConfigurationError.java \
 	$(SOURCEDIR)/javax/xml/transform/Transformer.java \
 	$(SOURCEDIR)/javax/xml/transform/URIResolver.java \
 	$(SOURCEDIR)/javax/xml/transform/dom/DOMLocator.java \
