@@ -85,4 +85,10 @@ public abstract class JspFactory
     defaultFactory = fac;
   }
 
+  /**
+   * 
+   * @return 
+   */
+  public abstract JspEngineInfo getEngineInfo();
+
 }
