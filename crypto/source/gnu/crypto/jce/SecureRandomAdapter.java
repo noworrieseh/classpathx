@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: SecureRandomAdapter.java,v 1.2 2002-07-27 00:25:44 raif Exp $
+// $Id: SecureRandomAdapter.java,v 1.3 2002-08-07 09:57:30 raif Exp $
 //
 // Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
@@ -48,7 +48,7 @@ import java.util.HashMap;
  * <p>All the abstract methods in the {@link SecureRandomSpi} class are
  * implemented by this class and all its sub-classes.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 abstract class SecureRandomAdapter extends SecureRandomSpi {
 
@@ -106,6 +106,6 @@ abstract class SecureRandomAdapter extends SecureRandomSpi {
       HashMap attributes = new HashMap();
       attributes.put(MDGenerator.MD_NAME, mdName);
       attributes.put(MDGenerator.SEEED, seed);
-      adaptee.setup(attributes);
+      adaptee.init(attributes);
    }
 }
