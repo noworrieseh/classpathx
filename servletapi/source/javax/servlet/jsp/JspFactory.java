@@ -44,6 +44,7 @@ public abstract class JspFactory
    */
   public JspFactory() {}
 
+
   //  Methods
 
   /**
@@ -63,6 +64,11 @@ public abstract class JspFactory
 					       boolean needsSession,
 					       int bufferSize,
 					       boolean autoflush);
+
+  /**
+   * Release a PageContext.
+   */
+  public abstract void releasePageContext (PageContext ctx);
 
   /**
    * XXX
