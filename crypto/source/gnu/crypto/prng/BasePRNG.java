@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: BasePRNG.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: BasePRNG.java,v 1.3 2002-01-11 21:49:29 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * An abstract class to facilitate implementing PRNG algorithms.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public abstract class BasePRNG implements IRandom {
 
@@ -95,7 +95,11 @@ public abstract class BasePRNG implements IRandom {
       if (!initialised) {
          throw new IllegalStateException();
       }
-      for (int i = 0; i < length; i++) {
+      if (offset < 0 || offset >= out.length || length < 1) {
+         return;
+      }
+      int limit = ((offset+length) > out.length ? out.length-offset : length);
+      for (int i = 0; i < limit; i++) {
          out[offset++] = nextByteInternal();
       }
    }
