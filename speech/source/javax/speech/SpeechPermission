@@ -1,0 +1,11 @@
+package javax.speech;
+
+public class SpeechPermission extends java.security.BasicPermission {
+	public SpeechPermission(String name) {
+		super(name);
+	}
+	
+	public SpeechPermission(String name, String actions) {
+		super(name, actions);
+	}
+}
