@@ -1,5 +1,5 @@
 /*
- * Application.java
+ * Multipart.java
  * Copyright (C) 2002 dog <dog@dog.net.uk>
  * 
  * This library is free software; you can redistribute it and/or
@@ -23,18 +23,17 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.*;
 import javax.activation.*;
-import javax.mail.internet.ContentType;
-import javax.mail.internet.MimeUtility;
-import javax.mail.internet.ParseException;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMultipart;
 
 /**
- * A JAF data content handler for the application/* family of MIME content
+ * A JAF data content handler for the multipart/* family of MIME content
  * types.
- * This provides the basic behaviour for any number of byte-array-handling
+ * This provides the basic behaviour for any number of MimeMultipart-handling
  * subtypes which simply need to override their default constructor to provide
  * the correct MIME content-type and description.
  */
-public abstract class Application
+public abstract class Multipart
   implements DataContentHandler
 {
 
@@ -48,10 +47,10 @@ public abstract class Application
    * @param mimeType the MIME content type
    * @param description the description of the content type
    */
-  protected Application(String mimeType, String description)
+  protected Multipart(String mimeType, String description)
   {
-    flavor = new ActivationDataFlavor(byte[].class, mimeType,
-        description);
+    flavor = new ActivationDataFlavor(javax.mail.internet.MimeMultipart.class,
+        mimeType, description);
   }
 
   /**
@@ -92,18 +91,15 @@ public abstract class Application
   public Object getContent(DataSource source)
     throws IOException
   {
-    InputStream in = source.getInputStream();
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    byte[] buf = new byte[4096]; // TODO make configurable
-    while (true)
+    try
     {
-      int len = in.read(buf);
-      if (len > -1)
-        out.write(buf, 0, len);
-      else
-        break;
+      return new MimeMultipart(source);
     }
-    return out.toByteArray();
+    catch (MessagingException e)
+    {
+      /* This loses any attached exception */
+      throw new IOException(e.getMessage());
+    }
   }
 
   /**
@@ -116,12 +112,20 @@ public abstract class Application
   public void writeTo(Object object, String mimeType, OutputStream out)
     throws IOException
   {
-    // We only handle arrays of byte
-    byte[] bytes = null;
-    if (object instanceof byte[])
-      bytes = (byte[])object;
-    out.write(bytes);
-    out.flush();
+    if (object instanceof MimeMultipart)
+    {
+      try
+      {
+        ((MimeMultipart)object).writeTo(out);
+      }
+      catch (MessagingException e)
+      {
+        /* This loses any attached exception */
+        throw new IOException(e.getMessage());
+      }
+    }
+    else
+      throw new UnsupportedDataTypeException();
   }
 
 }

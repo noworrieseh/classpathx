@@ -23,7 +23,7 @@ package gnu.mail.handler;
  * A JAF data content handler for the application/octet-stream MIME content
  * type.
  */
-public class ApplicationOctetStream
+public final class ApplicationOctetStream
   extends Application
 {
 

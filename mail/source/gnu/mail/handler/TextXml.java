@@ -22,7 +22,7 @@ package gnu.mail.handler;
 /**
  * A JAF data content handler for the text/xml MIME content type.
  */
-public class TextXml
+public final class TextXml
   extends Text
 {
 

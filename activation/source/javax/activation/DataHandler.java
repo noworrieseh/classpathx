@@ -35,7 +35,7 @@ import java.net.URL;
 /**
  * Data Handler.
  * @author Andrew Selkirk
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class DataHandler implements Transferable 
 {
@@ -47,62 +47,62 @@ public class DataHandler implements Transferable
   /**
    * TODO
    */
-  private DataSource dataSource = null;
+  private DataSource dataSource;
 
   /**
    * TODO
    */
-  private DataSource objDataSource = null;
+  private DataSource objDataSource;
 
   /**
    * TODO
    */
-  private Object object = null;
+  private Object object;
 
   /**
    * TODO
    */
-  private String objectMimeType = null;
+  private String objectMimeType;
 
   /**
    * TODO
    */
-  private CommandMap currentCommandMap = null;
+  private CommandMap currentCommandMap;
 
   /**
    * TODO
    */
-  private static final DataFlavor[] emptyFlavors = null;
+  private static final DataFlavor[] emptyFlavors = new DataFlavor[0];
 
   /**
    * TODO
    */
-  private DataFlavor[] transferFlavors = null;
+  private DataFlavor[] transferFlavors = emptyFlavors;
 
   /**
    * TODO
    */
-  private DataContentHandler dataContentHandler = null;
+  private DataContentHandler dataContentHandler;
 
   /**
    * TODO
    */
-  private DataContentHandler factoryDCH = null;
+  private DataContentHandler factoryDCH;
 
   /**
    * TODO
    */
-  private static DataContentHandlerFactory factory = null;
+  private static DataContentHandlerFactory factory;
 
   /**
    * TODO
    */
-  private DataContentHandlerFactory oldFactory = null;
+  private DataContentHandlerFactory oldFactory = factory;
 
   /**
    * TODO
    */
-  private String shortType = null;
+  private String shortType;
 
 
   //-------------------------------------------------------------
@@ -116,9 +116,7 @@ public class DataHandler implements Transferable
   public DataHandler(DataSource source) 
   {
     dataSource = source;
-    dataContentHandler = new DataSourceDataContentHandler(null, source);
-    currentCommandMap = CommandMap.getDefaultCommandMap();
-  } // DataHandler()
+  }
 
   /**
    * Create data handler based on object and MIME type.
@@ -129,9 +127,7 @@ public class DataHandler implements Transferable
   {
     this.object = object;
     this.objectMimeType = mimeType;
-    dataContentHandler = new ObjectDataContentHandler(null, object, mimeType);
-    currentCommandMap = CommandMap.getDefaultCommandMap();
-  } // DataHandler()
+  }
 
   /**
    * Create data handler based on URL.
@@ -140,7 +136,7 @@ public class DataHandler implements Transferable
   public DataHandler(URL url) 
   {
     this(new URLDataSource(url));
-  } // DataHandler()
+  }
 
 
   //-------------------------------------------------------------
@@ -153,19 +149,19 @@ public class DataHandler implements Transferable
    */
   public String getName() 
   {
-    if (dataSource != null) 
-    {
+    if (dataSource!=null) 
       return dataSource.getName();
-    }
-    return null;
-  } // getName()
+    else
+      return null;
+  }
 
   /**
    * Get content.
    * @return Content object
    * @throws IOException IO exception occurred
    */
-  public Object getContent() throws IOException 
+  public Object getContent()
+    throws IOException 
   {
 
     // Variables
@@ -193,77 +189,97 @@ public class DataHandler implements Transferable
    * @return Input stream
    * @throws IOException IO exception occurred
    */
-  public InputStream getInputStream() throws IOException 
+  public InputStream getInputStream()
+    throws IOException 
   {
-
-    // Variables
-    DataContentHandler handler;
-    PipedInputStream input;
-    PipedOutputStream output;
-    Thread writeThread;
-
-    if (dataSource != null) 
-    {
+    if (dataSource!=null)
       return dataSource.getInputStream();
-    }
     else
     {
       // Get Data Content Handler
-      handler = getCommandMap().createDataContentHandler(objectMimeType);
+      DataContentHandler handler = getDataContentHandler();
       // Check Handler
-      if (handler != null)
+      if (handler==null)
+        throw new UnsupportedDataTypeException("No data content handler for "+
+            "MIME content type: "+getBaseType());
+      if (handler instanceof ObjectDataContentHandler)
       {
-        input = new PipedInputStream();
-        output = new PipedOutputStream(input);
-        input.connect(output);
+        if (((ObjectDataContentHandler)handler).getDCH()==null)
+          throw new UnsupportedDataTypeException("No object data content "+
+              "handler for MIME content type: "+getBaseType());
+      }
+      PipedOutputStream out = new PipedOutputStream();
+      PipedInputStream in = new PipedInputStream(out);
+      InputStreamWriter writer = this.new InputStreamWriter(handler, in, out);
+      Thread writerThread = new Thread(writer);
+      writerThread.setName("DataHandler.getInputStream");
+      writerThread.start();
+      return in;
+    }
+  }
+
+  class InputStreamWriter
+    implements Runnable
+  {
+
+    DataContentHandler handler;
+    PipedInputStream in;
+    PipedOutputStream out;
+
+    InputStreamWriter(DataContentHandler handler, 
+        PipedInputStream in,
+        PipedOutputStream out)
+    {
+      this.handler = handler;
+      this.in = in;
+      this.out = out;
+    }
+
+    public void run()
+    {
+      try
+      {
+        handler.writeTo(object, objectMimeType, out);
+      }
+      catch (IOException e)
+      {
         try
         {
-          handler.writeTo(object, objectMimeType, output);
+          out.close();
         }
-        catch (Exception e)
+        catch (IOException e2)
         {
         }
-        return input;
       }
-      else
-      {
-        throw new UnsupportedDataTypeException();
-      } // if: handler
-    } // if: dataSource
-
-  } // getInputStream()
+    }
+  }
 
   /**
    * Write to output stream.
    * @param stream Output stream 
    * @throws IOException IO exception occurred
    */
-  public void writeTo(OutputStream stream) throws IOException 
+  public void writeTo(OutputStream stream)
+    throws IOException 
   {
-
-    // Variables
-    InputStream input;
-    int data;
-
     // Check For Data Source
-    if (dataSource != null) 
+    if (dataSource!=null) 
     {
-
       // Get Input Stream
-      input = getInputStream();
-
-      while ((data = input.read()) != -1) 
-      {
-        stream.write(data);
-      }
-
-    } // if: dataSource
+      InputStream in = dataSource.getInputStream();
+      int max = 16384; // TODO make configurable
+      byte[] bytes = new byte[max];
+      int len;
+      while ((len = in.read(bytes)) > 0)
+        stream.write(bytes, 0, len);
+      in.close();
+    }
     else
     {
       DataContentHandler handler = getDataContentHandler();
       handler.writeTo(object, objectMimeType, stream);
     }
-  } // writeTo()
+  }
 
   /**
    * Get content type of data handler.
@@ -271,27 +287,25 @@ public class DataHandler implements Transferable
    */
   public String getContentType() 
   {
-    if (dataSource != null) 
-    {
+    if (dataSource!=null)
       return dataSource.getContentType();
-    }
-    return objectMimeType;
-  } // getContentType()
+    else
+      return objectMimeType;
+  }
 
   /**
    * Get output stream.
    * @return Output stream
    * @throws IOException IO exception occurred
    */
-  public OutputStream getOutputStream() throws IOException 
+  public OutputStream getOutputStream()
+    throws IOException 
   {
-
-    if (dataSource != null) 
-    {
+    if (dataSource!=null) 
       return dataSource.getOutputStream();
-    }
-    return null;
-  } // getOutputStream()
+    else
+      return null;
+  }
 
   /**
    * Get all commands.
@@ -299,8 +313,9 @@ public class DataHandler implements Transferable
    */
   public CommandInfo[] getAllCommands() 
   {
-    return getCommandMap().getAllCommands(getContentType());
-  } // getAllCommands()
+    CommandMap map = getCommandMap();
+    return map.getAllCommands(getBaseType());
+  }
 
   /**
    * Get base type.
@@ -347,8 +362,9 @@ public class DataHandler implements Transferable
    */
   public CommandInfo getCommand(String command) 
   {
-    return getCommandMap().getCommand(getContentType(), command);
-  } // getCommand()
+    CommandMap map = getCommandMap();
+    return map.getCommand(getBaseType(), command);
+  }
 
   /**
    * Get command map.
@@ -356,8 +372,10 @@ public class DataHandler implements Transferable
    */
   private synchronized CommandMap getCommandMap() 
   {
+    if (currentCommandMap==null)
+      return CommandMap.getDefaultCommandMap();
     return currentCommandMap;
-  } // getCommandMap()
+  }
 
   /**
    * Get data content handler.
@@ -365,13 +383,33 @@ public class DataHandler implements Transferable
    */
   private synchronized DataContentHandler getDataContentHandler() 
   {
-    if (factory != null) 
+    if (factory!=oldFactory)
     {
-      dataContentHandler =
-        factory.createDataContentHandler(getContentType());
+      dataContentHandler = null;
+      factoryDCH = null;
+      oldFactory = factory;
+      transferFlavors = emptyFlavors;
     }
+    if (dataContentHandler!=null)
+      return dataContentHandler;
+    String contentType = getBaseType();
+    if (factory!=null && factoryDCH==null)
+      factoryDCH = factory.createDataContentHandler(contentType);
+    if (factoryDCH!=null)
+      dataContentHandler = factoryDCH;
+    else
+    {
+      CommandMap map = getCommandMap();
+      dataContentHandler = map.createDataContentHandler(contentType);
+    }
+    if (dataSource!=null)
+      dataContentHandler = 
+          new DataSourceDataContentHandler(dataContentHandler, dataSource);
+    else
+      dataContentHandler = 
+          new ObjectDataContentHandler(dataContentHandler, object, objectMimeType);
     return dataContentHandler; 
-  } // getDataContentHandler()
+  }
 
   /**
    * Get data source.
@@ -379,8 +417,15 @@ public class DataHandler implements Transferable
    */
   public DataSource getDataSource() 
   {
+    if (dataSource==null)
+    {
+      if (objDataSource==null)
+        objDataSource = new DataHandlerDataSource(this);
+      else
+        return objDataSource;
+    }
     return dataSource;
-  } // getDataSource()
+  }
 
   /**
    * Get list of preferred commands.
@@ -388,8 +433,9 @@ public class DataHandler implements Transferable
    */
   public CommandInfo[] getPreferredCommands() 
   {
-    return getCommandMap().getPreferredCommands(getContentType());
-  } // getPreferredCommands()
+    CommandMap map = getCommandMap();
+    return map.getPreferredCommands(getBaseType());
+  }
 
   /**
    * Get transfer data based on data flavor.
@@ -399,45 +445,11 @@ public class DataHandler implements Transferable
    * @throws IOException IO exception occurred
    */
   public Object getTransferData(DataFlavor dataFlavor)
-  throws UnsupportedFlavorException, IOException 
+    throws UnsupportedFlavorException, IOException 
   {
-    // Needs testing...
-    // Variables
-    DataContentHandler handler;
-    try
-    {
-
-      if (dataSource != null)
-      {
-        handler = getCommandMap().createDataContentHandler(getContentType());
-        if (handler != null)
-        {
-          return handler.getTransferData(dataFlavor, dataSource);
-        } else if (dataFlavor.getMimeType().equals(getContentType()) == true &&
-          dataFlavor.getRepresentationClass().equals(
-            Class.forName("java.io.InputStream")) == true)
-        {
-          return dataSource.getInputStream();
-        } else
-        {
-          throw new UnsupportedDataTypeException();
-        }
-      } else
-      {
-        if (dataFlavor.getMimeType().equals(getContentType()) == true &&
-          dataFlavor.getRepresentationClass().equals(object.getClass()) == true)
-        {
-          return object;
-        } else
-        {
-          throw new UnsupportedDataTypeException();
-        }
-      }
-    } catch (Exception e)
-    {
-      return null;
-    }
-  } // getTransferData()
+    DataContentHandler handler = getDataContentHandler();
+    return handler.getTransferData(dataFlavor, dataSource);
+  }
 
   /**
    * Get transfer data flavors.
@@ -445,20 +457,12 @@ public class DataHandler implements Transferable
    */
   public synchronized DataFlavor[] getTransferDataFlavors()
   {
-
-    // Variables
-    DataContentHandler handler;
-
-    // Get Data Content Handler
-    handler = getDataContentHandler();
-
-    // Get Transfer Data Flavors
-    if (handler != null)
-    {
-      return handler.getTransferDataFlavors();
-    }
-    return null;
-  } // getTransferDataFlavors()
+    if (factory!=oldFactory)
+      transferFlavors = emptyFlavors;
+    if (transferFlavors==emptyFlavors)
+      transferFlavors = getDataContentHandler().getTransferDataFlavors();
+    return transferFlavors;
+  }
 
   /**
    * Determine if data flavor is supported.
@@ -467,29 +471,12 @@ public class DataHandler implements Transferable
    */
   public boolean isDataFlavorSupported(DataFlavor dataFlavor)
   {
-
-    // Variables
-    int index;
-    DataFlavor[] list;
-    DataFlavor element;
-
-    // Get List of Data Flavors
-    list = getTransferDataFlavors();
-
-    // Loop through List
-    for (index = 0; index < list.length; index++)
-    {
-      element = list[index];
-      if (element.equals(dataFlavor) == true)
-      {
+    DataFlavor[] flavors = getTransferDataFlavors();
+    for (int i=0; i<flavors.length; i++)
+      if (flavors[i].equals(dataFlavor))
         return true;
-      }
-    }
-
-    // Unable to locate Flavor, return false
     return false;
-
-  } // isDataFlavorSupported()
+  }
 
   /**
    * Set command map.  If null, command map is reset to default.
@@ -497,14 +484,14 @@ public class DataHandler implements Transferable
    */
   public synchronized void setCommandMap(CommandMap map)
   {
-    if (map == null) 
+    if (map==null || map!=currentCommandMap) 
     {
-      currentCommandMap = CommandMap.getDefaultCommandMap();
-    } else 
-    {
+      // Assume nowt
       currentCommandMap = map;
+      dataContentHandler = null;
+      transferFlavors = emptyFlavors;
     }
-  } // setCommandMap()
+  }
 
   /**
    * Set the data content factory for data handler.  Note that this
@@ -514,7 +501,6 @@ public class DataHandler implements Transferable
   public static synchronized void setDataContentHandlerFactory(
       DataContentHandlerFactory newFactory)
   {
-
     // Check For existing Factory
     if (factory != null) 
     {
@@ -522,65 +508,22 @@ public class DataHandler implements Transferable
     }
 
     // Set Factory
-    factory = newFactory;
-
-  } // setDataContentHandlerFactory()
-
-
-} // DataHandler
-
-/**
- * Experiment data writer.  I'm going to do away with this.  Data Handler
- * actually uses this in writeTo as an anonymous inner class.  To stay
- * consistent with Sun's implementation, so will this be.
- * @author Andrew Selkirk
- */
-class DataHandlerWriter implements Runnable 
-{
-
-  /**
-   * TODO
-   */
-  private final PipedOutputStream pos;
-
-  /**
-   * TODO
-   */
-  private final DataHandler dh;
-
-  /**
-   * TODO
-   */
-  private final DataContentHandler fdch;
-
-  /**
-   * DatahandlerWriter
-   * @param contentHandler TODO
-   * @param stream TODO
-   * @param handler TODO
-   */
-  DataHandlerWriter(DataContentHandler contentHandler,
-    PipedOutputStream stream, DataHandler handler)
-  {
-    fdch = contentHandler;
-    pos = stream;
-    dh = handler;
-  } // DataHandler()
-
-  /**
-   * Run
-   */
-  public void run()
-  {
-/*
-    try
+    SecurityManager sm = System.getSecurityManager();
+    if (sm!=null)
     {
-      // handler.writeTo(object, objectMimeType, pos);
-    } catch (Exception e)
-    {
+      try
+      {
+        sm.checkSetFactory();
+      }
+      catch (SecurityException e)
+      {
+        Class dataHandlerClazz = javax.activation.DataHandler.class;
+        Class factoryClazz = newFactory.getClass();
+        if (factoryClazz!=dataHandlerClazz)
+          throw e;
+      }
+      factory = newFactory;
     }
-*/
-  } // run()
+  }
 
-
-} // DataHandlerWriter
+}

@@ -1,5 +1,5 @@
 /*
- * TextPlain.java
+ * MultipartMixed.java
  * Copyright (C) 2002 dog <dog@dog.net.uk>
  * 
  * This library is free software; you can redistribute it and/or
@@ -20,18 +20,19 @@
 package gnu.mail.handler;
 
 /**
- * A JAF data content handler for the text/plain MIME content type.
+ * A JAF data content handler for the multipart/mixed MIME content
+ * type.
  */
-public final class TextPlain
-  extends Text
+public final class MultipartMixed
+  extends Application
 {
 
   /**
-   * Constructor for text/plain.
+   * Constructor for multipart/mixed.
    */
-  public TextPlain()
+  public MultipartMixed()
   {
-    super("text/plain", "plaintext");
+    super("multipart/mixed", "multipart");
   }
   
 }
