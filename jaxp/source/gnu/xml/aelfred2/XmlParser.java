@@ -163,7 +163,10 @@ final class XmlParser
 		    reader, stream, encoding, false);
 
 	    parseDocument ();
-	} finally {
+	} catch (EOFException e){
+	    //empty input
+	    error("empty document, with no root element.");
+	}finally {
 	    if (reader != null)
 		try { reader.close ();
 		} catch (IOException e) { /* ignore */ }
