@@ -86,6 +86,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/org/xml/sax/ext/Attributes2.java \
 	$(SOURCEDIR)/org/xml/sax/ext/Attributes2Impl.java \
 	$(SOURCEDIR)/org/xml/sax/ext/DeclHandler.java \
+	$(SOURCEDIR)/org/xml/sax/ext/DefaultHandler2.java \
 	$(SOURCEDIR)/org/xml/sax/ext/LexicalHandler.java \
 	$(SOURCEDIR)/org/xml/sax/ext/Locator2.java \
 	$(SOURCEDIR)/org/xml/sax/ext/Locator2Impl.java \

@@ -1,6 +1,6 @@
 <html><head>
 
-<!-- $Id: package.html,v 1.6 2001-10-18 00:36:10 db Exp $ -->
+<!-- $Id: package.html,v 1.7 2001-11-07 02:08:21 db Exp $ -->
 
 </head><body>
 
@@ -77,6 +77,26 @@ Currently defined standard feature URIs have the prefix
 	<td>false</td>
 	<td> true indicates XML 1.0 names (with prefixes) and attributes
 	    (including <em>xmlns*</em> attributes) will be available </td>
+	</tr>
+
+    <tr>
+	<td>resolve-dtd-uris</td>
+	<td><em>true</em></td>
+	<td> A value of "true" indicates that system IDs in declarations will
+	    be absolutized (relative to their base URIs) before reporting.
+	    (That is the default behavior for all SAX2 XML parsers.)
+	    A value of "false" indicates those IDs will not be absolutized;
+	    handlers may use the base URI from <em>Locator.getSystemId()</em>
+	    with IDs that are relative URIs.
+	    This applies to system IDs passed in <ul>
+		<li><em>LexicalHandler.startDTD()</em>,
+		<li><em>DTDHandler.notationDecl()</em>,
+		<li><em>DTDHandler.unparsedEntityDecl()</em>, and
+		<li><em>DeclHandler.externalEntityDecl()</em>.
+	    </ul>
+	    It does not apply to <em>EntityResolver.resolveEntity()</em>,
+	    which is not used to report declarations.
+	    </td>
 	</tr>
 
     <tr>
