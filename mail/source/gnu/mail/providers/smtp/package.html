@@ -82,13 +82,15 @@ attempted.</td>
 <td>mail.smtp.dsn.notify</td>
 <td>string</td>
 <td>The RCPT NOTIFY option. Should be set to either "never", or one or more
-of "success", "failure", or "delay" (separated by commas and/or spaces)</td>
+of "success", "failure", or "delay" (separated by commas and/or spaces). See
+RFC 3461 for details. This feature may not be supported by all servers.</td>
 </tr>
 
 <tr>
 <td>mail.smtp.dsn.ret</td>
 <td>string</td>
-<td>The MAIL RET option. Should be set to "full" or "hdrs".</td>
+<td>The MAIL RET option. Should be set to "full" or "hdrs". See RFC 3461 for
+details. This feature may not be supported by all servers.</td>
 </tr>
 
 <tr>
