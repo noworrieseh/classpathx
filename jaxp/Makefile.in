@@ -165,6 +165,24 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/xml/dom/DomText.java \
 	$(SOURCEDIR)/gnu/xml/dom/JAXPFactory.java \
 
+PKGFILES = \
+	$(SOURCEDIR)/gnu/xml/aelfred2/package.html \
+	$(SOURCEDIR)/gnu/xml/dom/package.html \
+	$(SOURCEDIR)/gnu/xml/pipeline/package.html \
+	$(SOURCEDIR)/gnu/xml/util/package.html \
+	$(SOURCEDIR)/javax/xml/parsers/package.html \
+	$(SOURCEDIR)/javax/xml/transform/package.html \
+	$(SOURCEDIR)/javax/xml/transform/dom/package.html \
+	$(SOURCEDIR)/javax/xml/transform/sax/package.html \
+	$(SOURCEDIR)/javax/xml/transform/stream/package.html \
+	$(SOURCEDIR)/org/w3c/dom/package.html \
+	$(SOURCEDIR)/org/w3c/dom/events/package.html \
+	$(SOURCEDIR)/org/w3c/dom/traversal/package.html \
+	$(SOURCEDIR)/org/w3c/dom/views/package.html \
+	$(SOURCEDIR)/org/xml/sax/package.html \
+	$(SOURCEDIR)/org/xml/sax/ext/package.html \
+	$(SOURCEDIR)/org/xml/sax/helpers/package.html \
+
 
 #a mangling of the SOURCEFILES list above
 #This is not quite perfect, we've had to hardcode the 
@@ -344,10 +362,10 @@ DIST_DIR =	gnujaxp-$(VERSION)
 FILES		:= \
 	LICENSE COPYING COPYRIGHT.html README \
 	gnujaxp.jar \
-	configure Makefile.in manifest.mf
+	configure Makefile.in manifest.mf 
 
-gnujaxp-$(VERSION).zip: $(FILES) apidoc.zip $(SOURCEFILES)
-	for F in $(FILES) $(SOURCEFILES) ;\
+gnujaxp-$(VERSION).zip: $(FILES) apidoc.zip $(SOURCEFILES) $(PKGFILES)
+	for F in $(FILES) $(SOURCEFILES) $(PKGFILES) ;\
 	do \
 	    mkdir -p `dirname $(DIST_DIR)/$$F` ;\
 	    cp $$F $(DIST_DIR)/$$F ;\
