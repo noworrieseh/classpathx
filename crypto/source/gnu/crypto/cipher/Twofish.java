@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Twofish.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: Twofish.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,22 +40,25 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Twofish is a balanced 128-bit Feistel cipher, consisting of 16 rounds. In
+ * <p>Twofish is a balanced 128-bit Feistel cipher, consisting of 16 rounds. In
  * each round, a 64-bit S-box value is computed from 64 bits of the block, and
  * this value is xored into the other half of the block. The two half-blocks are
  * then exchanged, and the next round begins. Before the first round, all input
  * bits are xored with key-dependent "whitening" subkeys, and after the final
  * round the output bits are xored with other key-dependent whitening subkeys;
- * these subkeys are not used anywhere else in the algorithm.<p>
+ * these subkeys are not used anywhere else in the algorithm.</p>
  *
- * Twofish is designed by Bruce Schneier, Doug Whiting, John Kelsey, Chris Hall,
- * David Wagner and Niels Ferguson.<p>
+ * <p>Twofish is designed by Bruce Schneier, Doug Whiting, John Kelsey, Chris
+ * Hall, David Wagner and Niels Ferguson.</p>
  *
- * Reference:<br>
- * <a href="http://www.counterpane.com/twofish-paper.html">Twofish: A 128-bit
- * Block Cipher</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://www.counterpane.com/twofish-paper.html">Twofish: A
+ *    128-bit Block Cipher</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public final class Twofish extends BaseCipher {
 
@@ -174,8 +177,21 @@ public final class Twofish extends BaseCipher {
       '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
    };
 
-   // Static code - to intialise the MDS matrix and lookup tables
-   // -------------------------------------------------------------------------
+   /**
+    * KAT vector (from ecb_vk):
+    * I=183
+    * KEY=0000000000000000000000000000000000000000000002000000000000000000
+    * CT=F51410475B33FBD3DB2117B5C17C82D4
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("0000000000000000000000000000000000000000000002000000000000000000");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("F51410475B33FBD3DB2117B5C17C82D4");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
+
+   // Static code - to intialise the MDS matrix and lookup tables -------------
 
    static {
       long time = System.currentTimeMillis();
@@ -307,8 +323,123 @@ public final class Twofish extends BaseCipher {
       super(Registry.TWOFISH_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
-   // java.lang.Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   private static final int b0(int x) {
+      return  x & 0xFF;
+   }
+
+   private static final int b1(int x) {
+      return (x >>> 8) & 0xFF;
+   }
+
+   private static final int b2(int x) {
+      return (x >>> 16) & 0xFF;
+   }
+
+   private static final int b3(int x) {
+      return (x >>> 24) & 0xFF;
+   }
+
+   /**
+    * Use (12, 8) Reed-Solomon code over GF(256) to produce a key S-box 32-bit
+    * entity from two key material 32-bit entities.
+    *
+    * @param k0 1st 32-bit entity.
+    * @param k1 2nd 32-bit entity.
+    * @return remainder polynomial generated using RS code
+    */
+   private static final int RS_MDS_Encode(int k0, int k1) {
+      int r = k1;
+      int i;
+      for (i = 0; i < 4; i++) { // shift 1 byte at a time
+         r = RS_rem(r);
+      }
+      r ^= k0;
+      for (i = 0; i < 4; i++) {
+         r = RS_rem(r);
+      }
+      return r;
+   }
+
+   /**
+    * Reed-Solomon code parameters: (12, 8) reversible code:<p>
+    * <pre>
+    *   g(x) = x**4 + (a + 1/a) x**3 + a x**2 + (a + 1/a) x + 1
+    * </pre>
+    * where a = primitive root of field generator 0x14D
+    */
+   private static final int RS_rem(int x) {
+      int b  =  (x >>> 24) & 0xFF;
+      int g2 = ((b  <<  1) ^ ( (b & 0x80) != 0 ? RS_GF_FDBK : 0 )) & 0xFF;
+      int g3 =  (b >>>  1) ^ ( (b & 0x01) != 0 ? (RS_GF_FDBK >>> 1) : 0 ) ^ g2 ;
+      int result = (x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b;
+      return result;
+   }
+
+   private static final int F32(int k64Cnt, int x, int[] k32) {
+      int b0 = b0(x);
+      int b1 = b1(x);
+      int b2 = b2(x);
+      int b3 = b3(x);
+      int k0 = k32[0];
+      int k1 = k32[1];
+      int k2 = k32[2];
+      int k3 = k32[3];
+
+      int result = 0;
+      switch (k64Cnt & 3) {
+      case 1:
+         result =
+            MDS[0][(P[P_01][b0] & 0xFF) ^ b0(k0)] ^
+            MDS[1][(P[P_11][b1] & 0xFF) ^ b1(k0)] ^
+            MDS[2][(P[P_21][b2] & 0xFF) ^ b2(k0)] ^
+            MDS[3][(P[P_31][b3] & 0xFF) ^ b3(k0)];
+         break;
+      case 0:  // same as 4
+         b0 = (P[P_04][b0] & 0xFF) ^ b0(k3);
+         b1 = (P[P_14][b1] & 0xFF) ^ b1(k3);
+         b2 = (P[P_24][b2] & 0xFF) ^ b2(k3);
+         b3 = (P[P_34][b3] & 0xFF) ^ b3(k3);
+      case 3:
+         b0 = (P[P_03][b0] & 0xFF) ^ b0(k2);
+         b1 = (P[P_13][b1] & 0xFF) ^ b1(k2);
+         b2 = (P[P_23][b2] & 0xFF) ^ b2(k2);
+         b3 = (P[P_33][b3] & 0xFF) ^ b3(k2);
+      case 2:                           // 128-bit keys (optimize for this case)
+         result =
+            MDS[0][(P[P_01][(P[P_02][b0] & 0xFF) ^ b0(k1)] & 0xFF) ^ b0(k0)] ^
+            MDS[1][(P[P_11][(P[P_12][b1] & 0xFF) ^ b1(k1)] & 0xFF) ^ b1(k0)] ^
+            MDS[2][(P[P_21][(P[P_22][b2] & 0xFF) ^ b2(k1)] & 0xFF) ^ b2(k0)] ^
+            MDS[3][(P[P_31][(P[P_32][b3] & 0xFF) ^ b3(k1)] & 0xFF) ^ b3(k0)];
+         break;
+      }
+      return result;
+   }
+
+   private static final int Fe32(int[] sBox, int x, int R) {
+      return sBox[        2*_b(x, R  )    ] ^
+             sBox[        2*_b(x, R+1) + 1] ^
+             sBox[0x200 + 2*_b(x, R+2)    ] ^
+             sBox[0x200 + 2*_b(x, R+3) + 1];
+   }
+
+   private static final int _b(int x, int N) {
+      int result = 0;
+      switch (N%4) {
+      case 0: result = b0(x); break;
+      case 1: result = b1(x); break;
+      case 2: result = b2(x); break;
+      case 3: result = b3(x); break;
+      }
+      return result;
+   }
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       Twofish result = new Twofish();
@@ -317,8 +448,7 @@ public final class Twofish extends BaseCipher {
       return result;
    }
 
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipherSpi interface implementation --------------------------------
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -338,8 +468,8 @@ public final class Twofish extends BaseCipher {
    }
 
    /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.
+    * <p>Expands a user-supplied key material into a session key for a designated
+    * <i>block size</i>.</p>
     *
     * @param k the 64/128/192/256-bit user-key to use.
     * @param bs the desired block size in bytes.
@@ -678,116 +808,14 @@ public final class Twofish extends BaseCipher {
       }
    }
 
-   // Twofish own methods
-   // -------------------------------------------------------------------------
-
-   private static final int b0(int x) {
-      return  x & 0xFF;
-   }
-
-   private static final int b1(int x) {
-      return (x >>> 8) & 0xFF;
-   }
-
-   private static final int b2(int x) {
-      return (x >>> 16) & 0xFF;
-   }
-
-   private static final int b3(int x) {
-      return (x >>> 24) & 0xFF;
-   }
-
-   /**
-    * Use (12, 8) Reed-Solomon code over GF(256) to produce a key S-box 32-bit
-    * entity from two key material 32-bit entities.
-    *
-    * @param k0 1st 32-bit entity.
-    * @param k1 2nd 32-bit entity.
-    * @return remainder polynomial generated using RS code
-    */
-   private static final int RS_MDS_Encode(int k0, int k1) {
-      int r = k1;
-      int i;
-      for (i = 0; i < 4; i++) { // shift 1 byte at a time
-         r = RS_rem(r);
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
+         }
+         valid = new Boolean(result);
       }
-      r ^= k0;
-      for (i = 0; i < 4; i++) {
-         r = RS_rem(r);
-      }
-      return r;
-   }
-
-   /**
-    * Reed-Solomon code parameters: (12, 8) reversible code:<p>
-    * <pre>
-    *   g(x) = x**4 + (a + 1/a) x**3 + a x**2 + (a + 1/a) x + 1
-    * </pre>
-    * where a = primitive root of field generator 0x14D
-    */
-   private static final int RS_rem(int x) {
-      int b  =  (x >>> 24) & 0xFF;
-      int g2 = ((b  <<  1) ^ ( (b & 0x80) != 0 ? RS_GF_FDBK : 0 )) & 0xFF;
-      int g3 =  (b >>>  1) ^ ( (b & 0x01) != 0 ? (RS_GF_FDBK >>> 1) : 0 ) ^ g2 ;
-      int result = (x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b;
-      return result;
-   }
-
-   private static final int F32(int k64Cnt, int x, int[] k32) {
-      int b0 = b0(x);
-      int b1 = b1(x);
-      int b2 = b2(x);
-      int b3 = b3(x);
-      int k0 = k32[0];
-      int k1 = k32[1];
-      int k2 = k32[2];
-      int k3 = k32[3];
-
-      int result = 0;
-      switch (k64Cnt & 3) {
-      case 1:
-         result =
-            MDS[0][(P[P_01][b0] & 0xFF) ^ b0(k0)] ^
-            MDS[1][(P[P_11][b1] & 0xFF) ^ b1(k0)] ^
-            MDS[2][(P[P_21][b2] & 0xFF) ^ b2(k0)] ^
-            MDS[3][(P[P_31][b3] & 0xFF) ^ b3(k0)];
-         break;
-      case 0:  // same as 4
-         b0 = (P[P_04][b0] & 0xFF) ^ b0(k3);
-         b1 = (P[P_14][b1] & 0xFF) ^ b1(k3);
-         b2 = (P[P_24][b2] & 0xFF) ^ b2(k3);
-         b3 = (P[P_34][b3] & 0xFF) ^ b3(k3);
-      case 3:
-         b0 = (P[P_03][b0] & 0xFF) ^ b0(k2);
-         b1 = (P[P_13][b1] & 0xFF) ^ b1(k2);
-         b2 = (P[P_23][b2] & 0xFF) ^ b2(k2);
-         b3 = (P[P_33][b3] & 0xFF) ^ b3(k2);
-      case 2:                           // 128-bit keys (optimize for this case)
-         result =
-            MDS[0][(P[P_01][(P[P_02][b0] & 0xFF) ^ b0(k1)] & 0xFF) ^ b0(k0)] ^
-            MDS[1][(P[P_11][(P[P_12][b1] & 0xFF) ^ b1(k1)] & 0xFF) ^ b1(k0)] ^
-            MDS[2][(P[P_21][(P[P_22][b2] & 0xFF) ^ b2(k1)] & 0xFF) ^ b2(k0)] ^
-            MDS[3][(P[P_31][(P[P_32][b3] & 0xFF) ^ b3(k1)] & 0xFF) ^ b3(k0)];
-         break;
-      }
-      return result;
-   }
-
-   private static final int Fe32(int[] sBox, int x, int R) {
-      return sBox[        2*_b(x, R  )    ] ^
-             sBox[        2*_b(x, R+1) + 1] ^
-             sBox[0x200 + 2*_b(x, R+2)    ] ^
-             sBox[0x200 + 2*_b(x, R+3) + 1];
-   }
-
-   private static final int _b(int x, int N) {
-      int result = 0;
-      switch (N%4) {
-      case 0: result = b0(x); break;
-      case 1: result = b1(x); break;
-      case 2: result = b2(x); break;
-      case 3: result = b3(x); break;
-      }
-      return result;
+      return valid.booleanValue();
    }
 }

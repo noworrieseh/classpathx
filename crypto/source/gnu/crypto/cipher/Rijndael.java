@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Rijndael.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: Rijndael.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,17 +40,20 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Rijndael --pronounced Reindaal-- is the AES. It is a variable block-size
+ * <p>Rijndael --pronounced Reindaal-- is the AES. It is a variable block-size
  * (128-, 192- and 256-bit), variable key-size (128-, 192- and 256-bit)
- * symmetric block cipher.<p>
+ * symmetric key block cipher.</p>
  *
- * References:<br>
- * <a href="http://www.esat.kuleuven.ac.be/~rijmen/rijndael/">The Rijndael
- * Block Cipher - AES Proposal</a>.<br>
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a> and
- * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://www.esat.kuleuven.ac.be/~rijmen/rijndael/">The
+ *    Rijndael Block Cipher - AES Proposal</a>.<br>
+ *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a> and
+ *    <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public final class Rijndael extends BaseCipher {
 
@@ -110,8 +113,21 @@ public final class Rijndael extends BaseCipher {
       { {0, 0}, {1, 7}, {3, 5}, {4, 4} }
    };
 
-   // Static code - to intialise lookup tables
-   // -------------------------------------------------------------------------
+   /**
+    * KAT vector (from ecb_vk):
+    * I=96
+    * KEY=0000000000000000000000010000000000000000000000000000000000000000
+    * CT=E44429474D6FC3084EB2A6B8B46AF754
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("0000000000000000000000010000000000000000000000000000000000000000");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("E44429474D6FC3084EB2A6B8B46AF754");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
+
+   // Static code - to intialise lookup tables --------------------------------
 
    static {
       long time = System.currentTimeMillis();
@@ -316,154 +332,12 @@ public final class Rijndael extends BaseCipher {
       super(Registry.RIJNDAEL_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
-   // java.lang.Cloneable interface implementation
-   // -------------------------------------------------------------------------
-
-   public Object clone() {
-      Rijndael result = new Rijndael();
-      result.currentBlockSize = this.currentBlockSize;
-
-      return result;
-   }
-
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
-
-   public Iterator blockSizes() {
-      ArrayList al = new ArrayList();
-      al.add(new Integer(128 / 8));
-      al.add(new Integer(192 / 8));
-      al.add(new Integer(256 / 8));
-
-      return Collections.unmodifiableList(al).iterator();
-   }
-
-   public Iterator keySizes() {
-      ArrayList al = new ArrayList();
-      al.add(new Integer(128 / 8));
-      al.add(new Integer(192 / 8));
-      al.add(new Integer(256 / 8));
-
-      return Collections.unmodifiableList(al).iterator();
-   }
-
-   /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.
-    *
-    * @param k the 128/192/256-bit user-key to use.
-    * @param bs the block size in bytes of this Rijndael.
-    * @return an Object encapsulating the session key.
-    * @exception IllegalArgumentException if the block size is not 16, 24 or 32.
-    * @exception InvalidKeyException if the key data is invalid.
-    */
-   public Object makeKey(byte[] k, int bs) throws InvalidKeyException {
-      if (k == null) {
-         throw new InvalidKeyException("Empty key");
-      }
-      if (!(k.length == 16 || k.length == 24 || k.length == 32)) {
-         throw new InvalidKeyException("Incorrect key length");
-      }
-      if (!(bs == 16 || bs == 24 || bs == 32)) {
-         throw new IllegalArgumentException();
-      }
-
-      int ROUNDS = getRounds(k.length, bs);
-      int BC = bs / 4;
-      int[][] Ke = new int[ROUNDS + 1][BC]; // encryption round keys
-      int[][] Kd = new int[ROUNDS + 1][BC]; // decryption round keys
-      int ROUND_KEY_COUNT = (ROUNDS + 1) * BC;
-      int KC = k.length / 4;
-      int[] tk = new int[KC];
-      int i, j;
-
-      // copy user material bytes into temporary ints
-      for (i = 0, j = 0; i < KC; ) {
-         tk[i++] =  k[j++]         << 24 |
-                   (k[j++] & 0xFF) << 16 |
-                   (k[j++] & 0xFF) <<  8 |
-                   (k[j++] & 0xFF);
-      }
-      // copy values into round key arrays
-      int t = 0;
-      for (j = 0; (j < KC) && (t < ROUND_KEY_COUNT); j++, t++) {
-         Ke[t / BC][t % BC] = tk[j];
-         Kd[ROUNDS - (t / BC)][t % BC] = tk[j];
-      }
-      int tt, rconpointer = 0;
-      while (t < ROUND_KEY_COUNT) {
-         // extrapolate using phi (the round key evolution function)
-         tt = tk[KC - 1];
-         tk[0] ^= (S[(tt >>> 16) & 0xFF] & 0xFF) << 24 ^
-                  (S[(tt >>>  8) & 0xFF] & 0xFF) << 16 ^
-                  (S[ tt         & 0xFF] & 0xFF) <<  8 ^
-                  (S[(tt >>> 24)       ] & 0xFF)       ^
-                   rcon[rconpointer++]           << 24;
-         if (KC != 8) {
-            for (i = 1, j = 0; i < KC; ) {
-               tk[i++] ^= tk[j++];
-            }
-         } else {
-            for (i = 1, j = 0; i < KC / 2; ) {
-               tk[i++] ^= tk[j++];
-            }
-            tt = tk[KC / 2 - 1];
-            tk[KC / 2] ^= (S[ tt         & 0xFF] & 0xFF)       ^
-                          (S[(tt >>>  8) & 0xFF] & 0xFF) <<  8 ^
-                          (S[(tt >>> 16) & 0xFF] & 0xFF) << 16 ^
-                           S[(tt >>> 24) & 0xFF]         << 24;
-            for (j = KC / 2, i = j + 1; i < KC; ) {
-               tk[i++] ^= tk[j++];
-            }
-         }
-         // copy values into round key arrays
-         for (j = 0; (j < KC) && (t < ROUND_KEY_COUNT); j++, t++) {
-            Ke[t / BC][t % BC] = tk[j];
-            Kd[ROUNDS - (t / BC)][t % BC] = tk[j];
-         }
-      }
-      for (int r = 1; r < ROUNDS; r++) { // inverse MixColumn where needed
-         for (j = 0; j < BC; j++) {
-            tt = Kd[r][j];
-            Kd[r][j] = U1[(tt >>> 24)       ] ^
-                       U2[(tt >>> 16) & 0xFF] ^
-                       U3[(tt >>>  8) & 0xFF] ^
-                       U4[ tt         & 0xFF];
-         }
-      }
-
-      return new Object[] {Ke, Kd};
-   }
-
-   public void encrypt(byte[] in, int i, byte[] out, int j, Object k, int bs) {
-      if (!(bs == 16 || bs == 24 || bs == 32)) {
-         throw new IllegalArgumentException();
-      }
-
-      if (bs == DEFAULT_BLOCK_SIZE) {
-         aesEncrypt(in, i, out, j, k);
-      } else {
-         rijndaelEncrypt(in, i, out, j, k, bs);
-      }
-   }
-
-   public void decrypt(byte[] in, int i, byte[] out, int j, Object k, int bs) {
-      if (!(bs == 16 || bs == 24 || bs == 32)) {
-         throw new IllegalArgumentException();
-      }
-
-      if (bs == DEFAULT_BLOCK_SIZE) {
-         aesDecrypt(in, i, out, j, k);
-      } else {
-         rijndaelDecrypt(in, i, out, j, k, bs);
-      }
-   }
-
-   // Rijndael own methods
+   // Class methods
    // -------------------------------------------------------------------------
 
    /**
-    * Returns the number of rounds for a given Rijndael's key and block sizes.
+    * <p>Returns the number of rounds for a given Rijndael's key and block
+    * sizes.</p>
     *
     * @param ks the size of the user key material in bytes.
     * @param bs the desired block size in bytes.
@@ -748,5 +622,160 @@ public final class Rijndael extends BaseCipher {
          System.out.println("PT="+Util.toString(out, j-15, 16));
          System.out.println();
       }
+   }
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
+   public Object clone() {
+      Rijndael result = new Rijndael();
+      result.currentBlockSize = this.currentBlockSize;
+
+      return result;
+   }
+
+   // IBlockCipherSpi interface implementation --------------------------------
+
+   public Iterator blockSizes() {
+      ArrayList al = new ArrayList();
+      al.add(new Integer(128 / 8));
+      al.add(new Integer(192 / 8));
+      al.add(new Integer(256 / 8));
+
+      return Collections.unmodifiableList(al).iterator();
+   }
+
+   public Iterator keySizes() {
+      ArrayList al = new ArrayList();
+      al.add(new Integer(128 / 8));
+      al.add(new Integer(192 / 8));
+      al.add(new Integer(256 / 8));
+
+      return Collections.unmodifiableList(al).iterator();
+   }
+
+   /**
+    * Expands a user-supplied key material into a session key for a designated
+    * <i>block size</i>.
+    *
+    * @param k the 128/192/256-bit user-key to use.
+    * @param bs the block size in bytes of this Rijndael.
+    * @return an Object encapsulating the session key.
+    * @exception IllegalArgumentException if the block size is not 16, 24 or 32.
+    * @exception InvalidKeyException if the key data is invalid.
+    */
+   public Object makeKey(byte[] k, int bs) throws InvalidKeyException {
+      if (k == null) {
+         throw new InvalidKeyException("Empty key");
+      }
+      if (!(k.length == 16 || k.length == 24 || k.length == 32)) {
+         throw new InvalidKeyException("Incorrect key length");
+      }
+      if (!(bs == 16 || bs == 24 || bs == 32)) {
+         throw new IllegalArgumentException();
+      }
+
+      int ROUNDS = getRounds(k.length, bs);
+      int BC = bs / 4;
+      int[][] Ke = new int[ROUNDS + 1][BC]; // encryption round keys
+      int[][] Kd = new int[ROUNDS + 1][BC]; // decryption round keys
+      int ROUND_KEY_COUNT = (ROUNDS + 1) * BC;
+      int KC = k.length / 4;
+      int[] tk = new int[KC];
+      int i, j;
+
+      // copy user material bytes into temporary ints
+      for (i = 0, j = 0; i < KC; ) {
+         tk[i++] =  k[j++]         << 24 |
+                   (k[j++] & 0xFF) << 16 |
+                   (k[j++] & 0xFF) <<  8 |
+                   (k[j++] & 0xFF);
+      }
+      // copy values into round key arrays
+      int t = 0;
+      for (j = 0; (j < KC) && (t < ROUND_KEY_COUNT); j++, t++) {
+         Ke[t / BC][t % BC] = tk[j];
+         Kd[ROUNDS - (t / BC)][t % BC] = tk[j];
+      }
+      int tt, rconpointer = 0;
+      while (t < ROUND_KEY_COUNT) {
+         // extrapolate using phi (the round key evolution function)
+         tt = tk[KC - 1];
+         tk[0] ^= (S[(tt >>> 16) & 0xFF] & 0xFF) << 24 ^
+                  (S[(tt >>>  8) & 0xFF] & 0xFF) << 16 ^
+                  (S[ tt         & 0xFF] & 0xFF) <<  8 ^
+                  (S[(tt >>> 24)       ] & 0xFF)       ^
+                   rcon[rconpointer++]           << 24;
+         if (KC != 8) {
+            for (i = 1, j = 0; i < KC; ) {
+               tk[i++] ^= tk[j++];
+            }
+         } else {
+            for (i = 1, j = 0; i < KC / 2; ) {
+               tk[i++] ^= tk[j++];
+            }
+            tt = tk[KC / 2 - 1];
+            tk[KC / 2] ^= (S[ tt         & 0xFF] & 0xFF)       ^
+                          (S[(tt >>>  8) & 0xFF] & 0xFF) <<  8 ^
+                          (S[(tt >>> 16) & 0xFF] & 0xFF) << 16 ^
+                           S[(tt >>> 24) & 0xFF]         << 24;
+            for (j = KC / 2, i = j + 1; i < KC; ) {
+               tk[i++] ^= tk[j++];
+            }
+         }
+         // copy values into round key arrays
+         for (j = 0; (j < KC) && (t < ROUND_KEY_COUNT); j++, t++) {
+            Ke[t / BC][t % BC] = tk[j];
+            Kd[ROUNDS - (t / BC)][t % BC] = tk[j];
+         }
+      }
+      for (int r = 1; r < ROUNDS; r++) { // inverse MixColumn where needed
+         for (j = 0; j < BC; j++) {
+            tt = Kd[r][j];
+            Kd[r][j] = U1[(tt >>> 24)       ] ^
+                       U2[(tt >>> 16) & 0xFF] ^
+                       U3[(tt >>>  8) & 0xFF] ^
+                       U4[ tt         & 0xFF];
+         }
+      }
+
+      return new Object[] {Ke, Kd};
+   }
+
+   public void encrypt(byte[] in, int i, byte[] out, int j, Object k, int bs) {
+      if (!(bs == 16 || bs == 24 || bs == 32)) {
+         throw new IllegalArgumentException();
+      }
+
+      if (bs == DEFAULT_BLOCK_SIZE) {
+         aesEncrypt(in, i, out, j, k);
+      } else {
+         rijndaelEncrypt(in, i, out, j, k, bs);
+      }
+   }
+
+   public void decrypt(byte[] in, int i, byte[] out, int j, Object k, int bs) {
+      if (!(bs == 16 || bs == 24 || bs == 32)) {
+         throw new IllegalArgumentException();
+      }
+
+      if (bs == DEFAULT_BLOCK_SIZE) {
+         aesDecrypt(in, i, out, j, k);
+      } else {
+         rijndaelDecrypt(in, i, out, j, k, bs);
+      }
+   }
+
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
+         }
+         valid = new Boolean(result);
+      }
+      return valid.booleanValue();
    }
 }

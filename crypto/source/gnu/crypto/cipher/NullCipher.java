@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: NullCipher.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: NullCipher.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,22 +31,20 @@ package gnu.crypto.cipher;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
-import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * The implementation of a Null block cipher.<p>
+ * <p>The implementation of a Null block cipher.</p>
  *
- * This cipher does not alter its input at all, claims to process block sizes
+ * <p>This cipher does not alter its input at all, claims to process block sizes
  * 128-, 192- and 256-bit long, and key sizes from 64- to 512-bit in 8-bit
- * increments.<p>
+ * increments.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class NullCipher extends BaseCipher {
 
@@ -61,8 +59,13 @@ public final class NullCipher extends BaseCipher {
       super(Registry.NULL_CIPHER, 16, 16);
    }
 
-   // java.lang.Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       NullCipher result = new NullCipher();
@@ -71,8 +74,7 @@ public final class NullCipher extends BaseCipher {
       return result;
    }
 
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipherSpi interface implementation --------------------------------
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -102,5 +104,9 @@ public final class NullCipher extends BaseCipher {
 
    public void decrypt(byte[] in, int i, byte[] out, int j, Object k, int bs) {
       System.arraycopy(in, i, out, j, bs);
+   }
+
+   public boolean selfTest() {
+      return true;
    }
 }

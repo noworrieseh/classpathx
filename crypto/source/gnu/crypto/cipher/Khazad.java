@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Khazad.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: Khazad.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,19 +40,22 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Khazad is a 64-bit (legacy-level) block cipher that accepts a 128-bit key.
+ * <p>Khazad is a 64-bit (legacy-level) block cipher that accepts a 128-bit key.
  * The cipher is a uniform substitution-permutation network whose inverse only
  * differs from the forward operation in the key schedule. The overall cipher
  * design follows the Wide Trail strategy, favours component reuse, and permits
- * a wide variety of implementation trade-offs.<p>
+ * a wide variety of implementation trade-offs.</p>
  *
- * References:<br>
- * <a href="http://planeta.terra.com.br/informatica/paulobarreto/KhazadPage.html">
- * The Khazad Block Cipher</a>.<br>
- * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://planeta.terra.com.br/informatica/paulobarreto/KhazadPage.html">The
+ *    Khazad Block Cipher</a>.<br>
+ *    <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
+ *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public final class Khazad extends BaseCipher {
 
@@ -105,8 +108,21 @@ public final class Khazad extends BaseCipher {
 
    private static final int[][] rc = new int[R + 1][2]; // round constants
 
-   // Static code - to intialise lookup tables
-   // -------------------------------------------------------------------------
+   /**
+    * KAT vector (from ecb_vk):
+    * I=120
+    * KEY=00000000000000000000000000000100
+    * CT=A0C86A1BBE2CBF4C
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("00000000000000000000000000000100");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("A0C86A1BBE2CBF4C");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
+
+   // Static code - to intialise lookup tables --------------------------------
 
    static {
       long time = System.currentTimeMillis();
@@ -243,8 +259,74 @@ public final class Khazad extends BaseCipher {
       super(Registry.KHAZAD_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
-   // java.lang.Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   private static void khazad(byte[] in, int i, byte[] out, int j, int[][] K) {
+      // sigma(K[0])
+      int k0 = K[0][0];
+      int k1 = K[0][1];
+      int a0 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i++] & 0xFF)        ) ^ k0;
+      int a1 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i  ] & 0xFF)        ) ^ k1;
+
+      int b0, b1;
+      // round function
+      for (int r = 1; r < R; r++) {
+         k0 = K[r][0];
+         k1 = K[r][1];
+         b0 = T0[ a0 >>> 24        ] ^
+              T1[(a0 >>> 16) & 0xFF] ^
+              T2[(a0 >>>  8) & 0xFF] ^
+              T3[ a0         & 0xFF] ^
+              T4[ a1 >>> 24        ] ^
+              T5[(a1 >>> 16) & 0xFF] ^
+              T6[(a1 >>>  8) & 0xFF] ^
+              T7[ a1         & 0xFF] ^ k0;
+         b1 = T0[ a1 >>> 24        ] ^
+              T1[(a1 >>> 16) & 0xFF] ^
+              T2[(a1 >>>  8) & 0xFF] ^
+              T3[ a1         & 0xFF] ^
+              T4[ a0 >>> 24        ] ^
+              T5[(a0 >>> 16) & 0xFF] ^
+              T6[(a0 >>>  8) & 0xFF] ^
+              T7[ a0         & 0xFF] ^ k1;
+         a0 = b0;
+         a1 = b1;
+
+         if (DEBUG && debuglevel > 6) {
+            System.out.println("T"+r+"="+Util.toString(a0)+Util.toString(a1));
+         }
+      }
+
+      // sigma(K[R]) o gamma applied to previous output
+      k0 = K[R][0];
+      k1 = K[R][1];
+
+      out[j++] = (byte)(S[ a0 >>> 24        ] ^ (k0 >>> 24));
+      out[j++] = (byte)(S[(a0 >>> 16) & 0xFF] ^ (k0 >>> 16));
+      out[j++] = (byte)(S[(a0 >>>  8) & 0xFF] ^ (k0 >>>  8));
+      out[j++] = (byte)(S[ a0         & 0xFF] ^  k0        );
+      out[j++] = (byte)(S[ a1 >>> 24        ] ^ (k1 >>> 24));
+      out[j++] = (byte)(S[(a1 >>> 16) & 0xFF] ^ (k1 >>> 16));
+      out[j++] = (byte)(S[(a1 >>>  8) & 0xFF] ^ (k1 >>>  8));
+      out[j  ] = (byte)(S[ a1         & 0xFF] ^  k1        );
+
+      if (DEBUG && debuglevel > 6) {
+         System.out.println("T="+Util.toString(out, j-7, 8));
+         System.out.println();
+      }
+   }
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       Khazad result = new Khazad();
@@ -253,8 +335,7 @@ public final class Khazad extends BaseCipher {
       return result;
    }
 
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipherSpi interface implementation --------------------------------
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -271,8 +352,8 @@ public final class Khazad extends BaseCipher {
    }
 
    /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.
+    * <p>Expands a user-supplied key material into a session key for a
+    * designated <i>block size</i>.</p>
     *
     * @param uk the 128-bit user-supplied key material.
     * @param bs the desired block size in bytes.
@@ -404,67 +485,14 @@ public final class Khazad extends BaseCipher {
       khazad(in, i, out, j, K);
    }
 
-   // Khazad own methods
-   // -------------------------------------------------------------------------
-
-   private static void khazad(byte[] in, int i, byte[] out, int j, int[][] K) {
-      // sigma(K[0])
-      int k0 = K[0][0];
-      int k1 = K[0][1];
-      int a0 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i++] & 0xFF)        ) ^ k0;
-      int a1 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i  ] & 0xFF)        ) ^ k1;
-
-      int b0, b1;
-      // round function
-      for (int r = 1; r < R; r++) {
-         k0 = K[r][0];
-         k1 = K[r][1];
-         b0 = T0[ a0 >>> 24        ] ^
-              T1[(a0 >>> 16) & 0xFF] ^
-              T2[(a0 >>>  8) & 0xFF] ^
-              T3[ a0         & 0xFF] ^
-              T4[ a1 >>> 24        ] ^
-              T5[(a1 >>> 16) & 0xFF] ^
-              T6[(a1 >>>  8) & 0xFF] ^
-              T7[ a1         & 0xFF] ^ k0;
-         b1 = T0[ a1 >>> 24        ] ^
-              T1[(a1 >>> 16) & 0xFF] ^
-              T2[(a1 >>>  8) & 0xFF] ^
-              T3[ a1         & 0xFF] ^
-              T4[ a0 >>> 24        ] ^
-              T5[(a0 >>> 16) & 0xFF] ^
-              T6[(a0 >>>  8) & 0xFF] ^
-              T7[ a0         & 0xFF] ^ k1;
-         a0 = b0;
-         a1 = b1;
-
-         if (DEBUG && debuglevel > 6) {
-            System.out.println("T"+r+"="+Util.toString(a0)+Util.toString(a1));
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
          }
+         valid = new Boolean(result);
       }
-
-      // sigma(K[R]) o gamma applied to previous output
-      k0 = K[R][0];
-      k1 = K[R][1];
-
-      out[j++] = (byte)(S[ a0 >>> 24        ] ^ (k0 >>> 24));
-      out[j++] = (byte)(S[(a0 >>> 16) & 0xFF] ^ (k0 >>> 16));
-      out[j++] = (byte)(S[(a0 >>>  8) & 0xFF] ^ (k0 >>>  8));
-      out[j++] = (byte)(S[ a0         & 0xFF] ^  k0        );
-      out[j++] = (byte)(S[ a1 >>> 24        ] ^ (k1 >>> 24));
-      out[j++] = (byte)(S[(a1 >>> 16) & 0xFF] ^ (k1 >>> 16));
-      out[j++] = (byte)(S[(a1 >>>  8) & 0xFF] ^ (k1 >>>  8));
-      out[j  ] = (byte)(S[ a1         & 0xFF] ^  k1        );
-
-      if (DEBUG && debuglevel > 6) {
-         System.out.println("T="+Util.toString(out, j-7, 8));
-         System.out.println();
-      }
+      return valid.booleanValue();
    }
 }

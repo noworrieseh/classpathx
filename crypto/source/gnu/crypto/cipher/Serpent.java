@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Serpent.java,v 1.1 2002-06-08 05:01:27 raif Exp $
+// $Id: Serpent.java,v 1.2 2002-06-28 13:14:28 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -31,10 +31,11 @@ package gnu.crypto.cipher;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
+import gnu.crypto.util.Util;
 
+import java.security.InvalidKeyException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.security.InvalidKeyException;
 
 /**
  * <p>Serpent is a 32-round substitution-permutation network block cipher,
@@ -62,7 +63,7 @@ import java.security.InvalidKeyException;
  *    Candidate Block Cipher for the Advanced Encryption Standard.</a></li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Serpent extends BaseCipher {
 
@@ -77,6 +78,20 @@ public class Serpent extends BaseCipher {
 
    /** The fractional part of the golden ratio, (sqrt(5)+1)/2. */
    private static final int PHI = 0x9e3779b9;
+
+   /**
+    * KAT vector (from ecb_vk):
+    * I=9
+    * KEY=008000000000000000000000000000000000000000000000
+    * CT=5587B5BCB9EE5A28BA2BACC418005240
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("008000000000000000000000000000000000000000000000");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("5587B5BCB9EE5A28BA2BACC418005240");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -753,6 +768,17 @@ public class Serpent extends BaseCipher {
          out[o++] = (byte) (x[j] >>>  8);
          out[o++] = (byte)  x[j];
       }
+   }
+
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
+         }
+         valid = new Boolean(result);
+      }
+      return valid.booleanValue();
    }
 }
 

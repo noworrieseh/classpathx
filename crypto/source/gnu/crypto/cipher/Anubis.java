@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Anubis.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: Anubis.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,19 +40,22 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Anubis is a 128-bit block cipher that accepts a variable-length key. The
+ * <p>Anubis is a 128-bit block cipher that accepts a variable-length key. The
  * cipher is a uniform substitution-permutation network whose inverse only
  * differs from the forward operation in the key schedule. The design of both
  * the round transformation and the key schedule is based upon the Wide Trail
- * strategy and permits a wide variety of implementation trade-offs.<p>
+ * strategy and permits a wide variety of implementation trade-offs.</p>
  *
- * References:<br>
- * <a href="http://planeta.terra.com.br/informatica/paulobarreto/AnubisPage.html">
- * The ANUBIS Block Cipher</a>.<br>
- * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://planeta.terra.com.br/informatica/paulobarreto/AnubisPage.html">The
+ *    ANUBIS Block Cipher</a>.<br>
+ *    <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
+ *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public final class Anubis extends BaseCipher {
 
@@ -106,8 +109,21 @@ public final class Anubis extends BaseCipher {
     */
    private static final int[] rc = new int[18];
 
-   // Static code - to intialise lookup tables
-   // -------------------------------------------------------------------------
+   /**
+    * KAT vector (from ecb_vk):
+    * I=83
+    * KEY=000000000000000000002000000000000000000000000000
+    * CT=2E66AB15773F3D32FB6C697509460DF4
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("000000000000000000002000000000000000000000000000");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("2E66AB15773F3D32FB6C697509460DF4");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
+
+   // Static code - to initialise lookup tables -------------------------------
 
    static {
       long time = System.currentTimeMillis();
@@ -230,8 +246,95 @@ public final class Anubis extends BaseCipher {
       super(Registry.ANUBIS_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
-   // java.lang.Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   private static void anubis(byte[] in, int i, byte[] out, int j, int[][] K) {
+      // extract encryption round keys
+      int R = K.length - 1;
+      int[] Ker = K[0];
+
+      // mu function + affine key addition
+      int a0 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i++] & 0xFF)        ) ^ Ker[0];
+      int a1 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i++] & 0xFF)        ) ^ Ker[1];
+      int a2 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i++] & 0xFF)        ) ^ Ker[2];
+      int a3 = ( in[i++]         << 24 |
+                (in[i++] & 0xFF) << 16 |
+                (in[i++] & 0xFF) <<  8 |
+                (in[i  ] & 0xFF)        ) ^ Ker[3];
+
+      int b0, b1, b2, b3;
+      // round function
+      for (int r = 1; r < R; r++) {
+         Ker = K[r];
+         b0 = T0[ a0 >>> 24        ] ^
+              T1[ a1 >>> 24        ] ^
+              T2[ a2 >>> 24        ] ^
+              T3[ a3 >>> 24        ] ^ Ker[0];
+         b1 = T0[(a0 >>> 16) & 0xFF] ^
+              T1[(a1 >>> 16) & 0xFF] ^
+              T2[(a2 >>> 16) & 0xFF] ^
+              T3[(a3 >>> 16) & 0xFF] ^ Ker[1];
+         b2 = T0[(a0 >>>  8) & 0xFF] ^
+              T1[(a1 >>>  8) & 0xFF] ^
+              T2[(a2 >>>  8) & 0xFF] ^
+              T3[(a3 >>>  8) & 0xFF] ^ Ker[2];
+         b3 = T0[ a0         & 0xFF] ^
+              T1[ a1         & 0xFF] ^
+              T2[ a2         & 0xFF] ^
+              T3[ a3         & 0xFF] ^ Ker[3];
+         a0 = b0;
+         a1 = b1;
+         a2 = b2;
+         a3 = b3;
+         if (DEBUG && debuglevel > 6) {
+            System.out.println("T"+r+"="+Util.toString(a0)+Util.toString(a1)
+               +Util.toString(a2)+Util.toString(a3));
+         }
+      }
+
+      // last round function
+      Ker = K[R];
+      int tt = Ker[0];
+      out[j++] = (byte)(S[ a0 >>> 24        ] ^ (tt >>> 24));
+      out[j++] = (byte)(S[ a1 >>> 24        ] ^ (tt >>> 16));
+      out[j++] = (byte)(S[ a2 >>> 24        ] ^ (tt >>>  8));
+      out[j++] = (byte)(S[ a3 >>> 24        ] ^  tt        );
+      tt = Ker[1];
+      out[j++] = (byte)(S[(a0 >>> 16) & 0xFF] ^ (tt >>> 24));
+      out[j++] = (byte)(S[(a1 >>> 16) & 0xFF] ^ (tt >>> 16));
+      out[j++] = (byte)(S[(a2 >>> 16) & 0xFF] ^ (tt >>>  8));
+      out[j++] = (byte)(S[(a3 >>> 16) & 0xFF] ^  tt        );
+      tt = Ker[2];
+      out[j++] = (byte)(S[(a0 >>>  8) & 0xFF] ^ (tt >>> 24));
+      out[j++] = (byte)(S[(a1 >>>  8) & 0xFF] ^ (tt >>> 16));
+      out[j++] = (byte)(S[(a2 >>>  8) & 0xFF] ^ (tt >>>  8));
+      out[j++] = (byte)(S[(a3 >>>  8) & 0xFF] ^  tt        );
+      tt = Ker[3];
+      out[j++] = (byte)(S[ a0         & 0xFF] ^ (tt >>> 24));
+      out[j++] = (byte)(S[ a1         & 0xFF] ^ (tt >>> 16));
+      out[j++] = (byte)(S[ a2         & 0xFF] ^ (tt >>>  8));
+      out[j  ] = (byte)(S[ a3         & 0xFF] ^  tt        );
+
+      if (DEBUG && debuglevel > 6) {
+         System.out.println("T="+Util.toString(out, j-15, 16));
+         System.out.println();
+      }
+   }
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       Anubis result = new Anubis();
@@ -240,8 +343,7 @@ public final class Anubis extends BaseCipher {
       return result;
    }
 
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipherSpi interface implementation --------------------------------
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -260,8 +362,8 @@ public final class Anubis extends BaseCipher {
    }
 
    /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.
+    * <p>Expands a user-supplied key material into a session key for a
+    * designated <i>block size</i>.</p>
     *
     * @param uk the 32N-bit user-supplied key material; 4 &lt;= N &lt;= 10.
     * @param bs the desired block size in bytes.
@@ -434,88 +536,14 @@ public final class Anubis extends BaseCipher {
       anubis(in, i, out, j, K);
    }
 
-   // Anubis own methods
-   // -------------------------------------------------------------------------
-
-   private static void anubis(byte[] in, int i, byte[] out, int j, int[][] K) {
-      // extract encryption round keys
-      int R = K.length - 1;
-      int[] Ker = K[0];
-
-      // mu function + affine key addition
-      int a0 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i++] & 0xFF)        ) ^ Ker[0];
-      int a1 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i++] & 0xFF)        ) ^ Ker[1];
-      int a2 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i++] & 0xFF)        ) ^ Ker[2];
-      int a3 = ( in[i++]         << 24 |
-                (in[i++] & 0xFF) << 16 |
-                (in[i++] & 0xFF) <<  8 |
-                (in[i  ] & 0xFF)        ) ^ Ker[3];
-
-      int b0, b1, b2, b3;
-      // round function
-      for (int r = 1; r < R; r++) {
-         Ker = K[r];
-         b0 = T0[ a0 >>> 24        ] ^
-              T1[ a1 >>> 24        ] ^
-              T2[ a2 >>> 24        ] ^
-              T3[ a3 >>> 24        ] ^ Ker[0];
-         b1 = T0[(a0 >>> 16) & 0xFF] ^
-              T1[(a1 >>> 16) & 0xFF] ^
-              T2[(a2 >>> 16) & 0xFF] ^
-              T3[(a3 >>> 16) & 0xFF] ^ Ker[1];
-         b2 = T0[(a0 >>>  8) & 0xFF] ^
-              T1[(a1 >>>  8) & 0xFF] ^
-              T2[(a2 >>>  8) & 0xFF] ^
-              T3[(a3 >>>  8) & 0xFF] ^ Ker[2];
-         b3 = T0[ a0         & 0xFF] ^
-              T1[ a1         & 0xFF] ^
-              T2[ a2         & 0xFF] ^
-              T3[ a3         & 0xFF] ^ Ker[3];
-         a0 = b0;
-         a1 = b1;
-         a2 = b2;
-         a3 = b3;
-         if (DEBUG && debuglevel > 6) {
-            System.out.println("T"+r+"="+Util.toString(a0)+Util.toString(a1)
-               +Util.toString(a2)+Util.toString(a3));
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
          }
+         valid = new Boolean(result);
       }
-
-      // last round function
-      Ker = K[R];
-      int tt = Ker[0];
-      out[j++] = (byte)(S[ a0 >>> 24        ] ^ (tt >>> 24));
-      out[j++] = (byte)(S[ a1 >>> 24        ] ^ (tt >>> 16));
-      out[j++] = (byte)(S[ a2 >>> 24        ] ^ (tt >>>  8));
-      out[j++] = (byte)(S[ a3 >>> 24        ] ^  tt        );
-      tt = Ker[1];
-      out[j++] = (byte)(S[(a0 >>> 16) & 0xFF] ^ (tt >>> 24));
-      out[j++] = (byte)(S[(a1 >>> 16) & 0xFF] ^ (tt >>> 16));
-      out[j++] = (byte)(S[(a2 >>> 16) & 0xFF] ^ (tt >>>  8));
-      out[j++] = (byte)(S[(a3 >>> 16) & 0xFF] ^  tt        );
-      tt = Ker[2];
-      out[j++] = (byte)(S[(a0 >>>  8) & 0xFF] ^ (tt >>> 24));
-      out[j++] = (byte)(S[(a1 >>>  8) & 0xFF] ^ (tt >>> 16));
-      out[j++] = (byte)(S[(a2 >>>  8) & 0xFF] ^ (tt >>>  8));
-      out[j++] = (byte)(S[(a3 >>>  8) & 0xFF] ^  tt        );
-      tt = Ker[3];
-      out[j++] = (byte)(S[ a0         & 0xFF] ^ (tt >>> 24));
-      out[j++] = (byte)(S[ a1         & 0xFF] ^ (tt >>> 16));
-      out[j++] = (byte)(S[ a2         & 0xFF] ^ (tt >>>  8));
-      out[j  ] = (byte)(S[ a3         & 0xFF] ^  tt        );
-
-      if (DEBUG && debuglevel > 6) {
-         System.out.println("T="+Util.toString(out, j-15, 16));
-         System.out.println();
-      }
+      return valid.booleanValue();
    }
 }

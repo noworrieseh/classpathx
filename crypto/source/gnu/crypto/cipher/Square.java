@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Square.java,v 1.5 2002-01-11 21:57:28 raif Exp $
+// $Id: Square.java,v 1.6 2002-06-28 13:14:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -40,17 +40,20 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Square is a 128-bit key, 128-bit block cipher algorithm developed by Joan
- * Daemen, Lars Knudsen and Vincent Rijmen.<p>
+ * <p>Square is a 128-bit key, 128-bit block cipher algorithm developed by Joan
+ * Daemen, Lars Knudsen and Vincent Rijmen.</p>
  *
- * <b>References:</b>
- * <a href="http://www.esat.kuleuven.ac.be/~rijmen/square/">The block cipher
- * Square</a>.<br>
- * <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>,
- * <a href="mailto:lars.knudsen@esat.kuleuven.ac.be">Lars Knudsen</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://www.esat.kuleuven.ac.be/~rijmen/square/">The block
+ *    cipher Square</a>.<br>
+ *    <a href="mailto:daemen.j@protonworld.com">Joan Daemen</a>,
+ *    <a href="mailto:lars.knudsen@esat.kuleuven.ac.be">Lars Knudsen</a> and
+ *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public final class Square extends BaseCipher {
 
@@ -100,6 +103,20 @@ public final class Square extends BaseCipher {
    /** Transposition boxes for encryption and decryption. */
    private static final int[] Te = new int[256];
    private static final int[] Td = new int[256];
+
+   /**
+    * KAT vector (from ecb_vk):
+    * I=87
+    * KEY=00000000000000000000020000000000
+    * CT=A9DF031B4E25E89F527EFFF89CB0BEBA
+    */
+   private static final byte[] KAT_KEY =
+         Util.toBytesFromString("00000000000000000000020000000000");
+   private static final byte[] KAT_CT =
+         Util.toBytesFromString("A9DF031B4E25E89F527EFFF89CB0BEBA");
+
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
 
    // Static code - to intialise lookup tables
    // -------------------------------------------------------------------------
@@ -207,8 +224,184 @@ public final class Square extends BaseCipher {
       super(Registry.SQUARE_CIPHER, DEFAULT_BLOCK_SIZE, DEFAULT_KEY_SIZE);
    }
 
-   // java.lang.Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   private static void
+   square(byte[] in, int i, byte[] out, int j, int[][] K, int[] T, byte[] S) {
+      int a = ((in[i++] & 0xFF) << 24 |
+               (in[i++] & 0xFF) << 16 |
+               (in[i++] & 0xFF) <<  8 |
+               (in[i++] & 0xFF)       ) ^ K[0][0];
+      int b = ((in[i++] & 0xFF) << 24 |
+               (in[i++] & 0xFF) << 16 |
+               (in[i++] & 0xFF) <<  8 |
+               (in[i++] & 0xFF)       ) ^ K[0][1];
+      int c = ((in[i++] & 0xFF) << 24 |
+               (in[i++] & 0xFF) << 16 |
+               (in[i++] & 0xFF) <<  8 |
+               (in[i++] & 0xFF)       ) ^ K[0][2];
+      int d = ((in[i++] & 0xFF) << 24 |
+               (in[i++] & 0xFF) << 16 |
+               (in[i++] & 0xFF) <<  8 |
+               (in[i  ] & 0xFF)       ) ^ K[0][3];
+
+      int r, aa, bb, cc, dd;
+      for (r = 1; r < ROUNDS; r++) { // R - 1 full rounds
+         aa =      T[(a >>> 24) & 0xFF]      ^
+            rot32R(T[(b >>> 24) & 0xFF],  8) ^
+            rot32R(T[(c >>> 24) & 0xFF], 16) ^
+            rot32R(T[(d >>> 24) & 0xFF], 24) ^ K[r][0];
+         bb =      T[(a >>> 16) & 0xFF]      ^
+            rot32R(T[(b >>> 16) & 0xFF],  8) ^
+            rot32R(T[(c >>> 16) & 0xFF], 16) ^
+            rot32R(T[(d >>> 16) & 0xFF], 24) ^ K[r][1];
+         cc =      T[(a >>>  8) & 0xFF]      ^
+            rot32R(T[(b >>>  8) & 0xFF],  8) ^
+            rot32R(T[(c >>>  8) & 0xFF], 16) ^
+            rot32R(T[(d >>>  8) & 0xFF], 24) ^ K[r][2];
+         dd =      T[ a         & 0xFF]      ^
+            rot32R(T[ b         & 0xFF],  8) ^
+            rot32R(T[ c         & 0xFF], 16) ^
+            rot32R(T[ d         & 0xFF], 24) ^ K[r][3];
+
+         a = aa;
+         b = bb;
+         c = cc;
+         d = dd;
+      }
+
+      // last round (diffusion becomes only transposition)
+      aa = ((S[(a >>> 24) & 0xFF] & 0xFF) << 24 |
+            (S[(b >>> 24) & 0xFF] & 0xFF) << 16 |
+            (S[(c >>> 24) & 0xFF] & 0xFF) <<  8 |
+            (S[(d >>> 24) & 0xFF] & 0xFF)       ) ^ K[r][0];
+      bb = ((S[(a >>> 16) & 0xFF] & 0xFF) << 24 |
+            (S[(b >>> 16) & 0xFF] & 0xFF) << 16 |
+            (S[(c >>> 16) & 0xFF] & 0xFF) <<  8 |
+            (S[(d >>> 16) & 0xFF] & 0xFF)       ) ^ K[r][1];
+      cc = ((S[(a >>>  8) & 0xFF] & 0xFF) << 24 |
+            (S[(b >>>  8) & 0xFF] & 0xFF) << 16 |
+            (S[(c >>>  8) & 0xFF] & 0xFF) <<  8 |
+            (S[(d >>>  8) & 0xFF] & 0xFF)       ) ^ K[r][2];
+      dd = ((S[ a         & 0xFF] & 0xFF) << 24 |
+            (S[ b         & 0xFF] & 0xFF) << 16 |
+            (S[ c         & 0xFF] & 0xFF) <<  8 |
+            (S[ d         & 0xFF] & 0xFF)       ) ^ K[r][3];
+
+      out[j++] = (byte)(aa >>> 24);
+      out[j++] = (byte)(aa >>> 16);
+      out[j++] = (byte)(aa >>>  8);
+      out[j++] = (byte) aa;
+      out[j++] = (byte)(bb >>> 24);
+      out[j++] = (byte)(bb >>> 16);
+      out[j++] = (byte)(bb >>>  8);
+      out[j++] = (byte) bb;
+      out[j++] = (byte)(cc >>> 24);
+      out[j++] = (byte)(cc >>> 16);
+      out[j++] = (byte)(cc >>>  8);
+      out[j++] = (byte) cc;
+      out[j++] = (byte)(dd >>> 24);
+      out[j++] = (byte)(dd >>> 16);
+      out[j++] = (byte)(dd >>>  8);
+      out[j  ] = (byte) dd;
+   }
+
+   /**
+    * <p>Applies the Theta function to an input <i>in</i> in order to produce in
+    * <i>out</i> an internal session sub-key.</p>
+    *
+    * <p>Both <i>in</i> and <i>out</i> are arrays of four ints.</p>
+    *
+    * <p>Pseudo-code is:</p>
+    *
+    * <pre>
+    *    for (i = 0; i < 4; i++) {
+    *       out[i] = 0;
+    *       for (j = 0, n = 24; j < 4; j++, n -= 8) {
+    *          k = mul(in[i] >>> 24, G[0][j]) ^
+    *              mul(in[i] >>> 16, G[1][j]) ^
+    *              mul(in[i] >>>  8, G[2][j]) ^
+    *              mul(in[i]       , G[3][j]);
+    *          out[i] ^= k << n;
+    *       }
+    *    }
+    * </pre>
+    */
+   private static void transform(int[] in, int[] out) {
+      int l3, l2, l1, l0, m;
+      for (int i = 0; i < 4; i++) {
+         l3 = in[i];
+         l2 = l3 >>>  8;
+         l1 = l3 >>> 16;
+         l0 = l3 >>> 24;
+         m  = ((mul(l0, 2) ^ mul(l1, 3) ^ l2         ^ l3        ) & 0xFF) << 24;
+         m ^= ((l0         ^ mul(l1, 2) ^ mul(l2, 3) ^ l3        ) & 0xFF) << 16;
+         m ^= ((l0         ^ l1         ^ mul(l2, 2) ^ mul(l3, 3)) & 0xFF) <<  8;
+         m ^= ((mul(l0, 3) ^ l1         ^ l2         ^ mul(l3, 2)) & 0xFF);
+         out[i] = m;
+      }
+   }
+
+   /**
+    * <p>Left rotate a 32-bit chunk.</p>
+    *
+    * @param x the 32-bit data to rotate
+    * @param s number of places to left-rotate by
+    * @return the newly permutated value.
+    */
+   private static int rot32L(int x, int s) {
+      return x << s | x >>> (32 - s);
+   }
+
+   /**
+    * <p>Right rotate a 32-bit chunk.</p>
+    *
+    * @param x the 32-bit data to rotate
+    * @param s number of places to right-rotate by
+    * @return the newly permutated value.
+    */
+   private static int rot32R(int x, int s) {
+      return x >>> s | x << (32 - s);
+   }
+
+   /**
+    * <p>Returns the product of two binary numbers a and b, using the generator
+    * ROOT as the modulus: p = (a * b) mod ROOT. ROOT Generates a suitable
+    * Galois Field in GF(2**8).</p>
+    *
+    * <p>For best performance call it with abs(b) &lt; abs(a).</p>
+    *
+    * @param a operand for multiply.
+    * @param b operand for multiply.
+    * @return the result of (a * b) % ROOT.
+    */
+   private static final int mul(int a, int b) {
+      if (a == 0) {
+         return 0;
+      }
+
+      a &= 0xFF;
+      b &= 0xFF;
+      int result = 0;
+      while (b != 0) {
+         if ((b & 0x01) != 0) {
+            result ^= a;
+         }
+
+         b >>>= 1;
+         a <<= 1;
+         if (a > 0xFF) {
+            a ^= ROOT;
+         }
+      }
+      return result & 0xFF;
+   }
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       Square result = new Square();
@@ -217,8 +410,7 @@ public final class Square extends BaseCipher {
       return result;
    }
 
-   // IBlockCipherSpi interface implementation
-   // -------------------------------------------------------------------------
+   // IBlockCipherSpi interface implementation --------------------------------
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
@@ -310,176 +502,14 @@ public final class Square extends BaseCipher {
       square(in, i, out, j, K, Td, Sd);
    }
 
-   // Square own methods
-   // -------------------------------------------------------------------------
-
-   private static void
-   square(byte[] in, int i, byte[] out, int j, int[][] K, int[] T, byte[] S) {
-      int a = ((in[i++] & 0xFF) << 24 |
-               (in[i++] & 0xFF) << 16 |
-               (in[i++] & 0xFF) <<  8 |
-               (in[i++] & 0xFF)       ) ^ K[0][0];
-      int b = ((in[i++] & 0xFF) << 24 |
-               (in[i++] & 0xFF) << 16 |
-               (in[i++] & 0xFF) <<  8 |
-               (in[i++] & 0xFF)       ) ^ K[0][1];
-      int c = ((in[i++] & 0xFF) << 24 |
-               (in[i++] & 0xFF) << 16 |
-               (in[i++] & 0xFF) <<  8 |
-               (in[i++] & 0xFF)       ) ^ K[0][2];
-      int d = ((in[i++] & 0xFF) << 24 |
-               (in[i++] & 0xFF) << 16 |
-               (in[i++] & 0xFF) <<  8 |
-               (in[i  ] & 0xFF)       ) ^ K[0][3];
-
-      int r, aa, bb, cc, dd;
-      for (r = 1; r < ROUNDS; r++) { // R - 1 full rounds
-         aa =      T[(a >>> 24) & 0xFF]      ^
-            rot32R(T[(b >>> 24) & 0xFF],  8) ^
-            rot32R(T[(c >>> 24) & 0xFF], 16) ^
-            rot32R(T[(d >>> 24) & 0xFF], 24) ^ K[r][0];
-         bb =      T[(a >>> 16) & 0xFF]      ^
-            rot32R(T[(b >>> 16) & 0xFF],  8) ^
-            rot32R(T[(c >>> 16) & 0xFF], 16) ^
-            rot32R(T[(d >>> 16) & 0xFF], 24) ^ K[r][1];
-         cc =      T[(a >>>  8) & 0xFF]      ^
-            rot32R(T[(b >>>  8) & 0xFF],  8) ^
-            rot32R(T[(c >>>  8) & 0xFF], 16) ^
-            rot32R(T[(d >>>  8) & 0xFF], 24) ^ K[r][2];
-         dd =      T[ a         & 0xFF]      ^
-            rot32R(T[ b         & 0xFF],  8) ^
-            rot32R(T[ c         & 0xFF], 16) ^
-            rot32R(T[ d         & 0xFF], 24) ^ K[r][3];
-
-         a = aa;
-         b = bb;
-         c = cc;
-         d = dd;
-      }
-
-      // last round (diffusion becomes only transposition)
-      aa = ((S[(a >>> 24) & 0xFF] & 0xFF) << 24 |
-            (S[(b >>> 24) & 0xFF] & 0xFF) << 16 |
-            (S[(c >>> 24) & 0xFF] & 0xFF) <<  8 |
-            (S[(d >>> 24) & 0xFF] & 0xFF)       ) ^ K[r][0];
-      bb = ((S[(a >>> 16) & 0xFF] & 0xFF) << 24 |
-            (S[(b >>> 16) & 0xFF] & 0xFF) << 16 |
-            (S[(c >>> 16) & 0xFF] & 0xFF) <<  8 |
-            (S[(d >>> 16) & 0xFF] & 0xFF)       ) ^ K[r][1];
-      cc = ((S[(a >>>  8) & 0xFF] & 0xFF) << 24 |
-            (S[(b >>>  8) & 0xFF] & 0xFF) << 16 |
-            (S[(c >>>  8) & 0xFF] & 0xFF) <<  8 |
-            (S[(d >>>  8) & 0xFF] & 0xFF)       ) ^ K[r][2];
-      dd = ((S[ a         & 0xFF] & 0xFF) << 24 |
-            (S[ b         & 0xFF] & 0xFF) << 16 |
-            (S[ c         & 0xFF] & 0xFF) <<  8 |
-            (S[ d         & 0xFF] & 0xFF)       ) ^ K[r][3];
-
-      out[j++] = (byte)(aa >>> 24);
-      out[j++] = (byte)(aa >>> 16);
-      out[j++] = (byte)(aa >>>  8);
-      out[j++] = (byte) aa;
-      out[j++] = (byte)(bb >>> 24);
-      out[j++] = (byte)(bb >>> 16);
-      out[j++] = (byte)(bb >>>  8);
-      out[j++] = (byte) bb;
-      out[j++] = (byte)(cc >>> 24);
-      out[j++] = (byte)(cc >>> 16);
-      out[j++] = (byte)(cc >>>  8);
-      out[j++] = (byte) cc;
-      out[j++] = (byte)(dd >>> 24);
-      out[j++] = (byte)(dd >>> 16);
-      out[j++] = (byte)(dd >>>  8);
-      out[j  ] = (byte) dd;
-   }
-
-   /**
-    * Applies the Theta function to an input <i>in</i> in order to produce in
-    * <i>out</i> an internal session sub-key.<p>
-    *
-    * Both <i>in</i> and <i>out</i> are arrays of four ints.<p>
-    *
-    * Pseudo-code is:
-    * <pre>
-    *    for (i = 0; i < 4; i++) {
-    *       out[i] = 0;
-    *       for (j = 0, n = 24; j < 4; j++, n -= 8) {
-    *          k = mul(in[i] >>> 24, G[0][j]) ^
-    *              mul(in[i] >>> 16, G[1][j]) ^
-    *              mul(in[i] >>>  8, G[2][j]) ^
-    *              mul(in[i]       , G[3][j]);
-    *          out[i] ^= k << n;
-    *       }
-    *    }
-    * </pre>
-    */
-   private static void transform(int[] in, int[] out) {
-      int l3, l2, l1, l0, m;
-      for (int i = 0; i < 4; i++) {
-         l3 = in[i];
-         l2 = l3 >>>  8;
-         l1 = l3 >>> 16;
-         l0 = l3 >>> 24;
-         m  = ((mul(l0, 2) ^ mul(l1, 3) ^ l2         ^ l3        ) & 0xFF) << 24;
-         m ^= ((l0         ^ mul(l1, 2) ^ mul(l2, 3) ^ l3        ) & 0xFF) << 16;
-         m ^= ((l0         ^ l1         ^ mul(l2, 2) ^ mul(l3, 3)) & 0xFF) <<  8;
-         m ^= ((mul(l0, 3) ^ l1         ^ l2         ^ mul(l3, 2)) & 0xFF);
-         out[i] = m;
-      }
-   }
-
-   /**
-    * Left rotate a 32-bit chunk.
-    *
-    * @param x the 32-bit data to rotate
-    * @param s number of places to left-rotate by
-    * @return the newly permutated value.
-    */
-   private static int rot32L(int x, int s) {
-      return x << s | x >>> (32 - s);
-   }
-
-   /**
-    * Right rotate a 32-bit chunk.
-    *
-    * @param x the 32-bit data to rotate
-    * @param s number of places to right-rotate by
-    * @return the newly permutated value.
-    */
-   private static int rot32R(int x, int s) {
-      return x >>> s | x << (32 - s);
-   }
-
-   /**
-    * Returns the product of two binary numbers a and b, using the generator
-    * ROOT as the modulus: p = (a * b) mod ROOT. ROOT Generates a suitable
-    * Galois Field in GF(2**8).<p>
-    *
-    * For best performance call it with abs(b) &lt; abs(a).
-    *
-    * @param a operand for multiply.
-    * @param b operand for multiply.
-    * @return the result of (a * b) % ROOT.
-    */
-   private static final int mul(int a, int b) {
-      if (a == 0) {
-         return 0;
-      }
-
-      a &= 0xFF;
-      b &= 0xFF;
-      int result = 0;
-      while (b != 0) {
-         if ((b & 0x01) != 0) {
-            result ^= a;
+   public boolean selfTest() {
+      if (valid == null) {
+         boolean result = super.selfTest(); // do symmetry tests
+         if (result) {
+            result = testKat(KAT_KEY, KAT_CT);
          }
-
-         b >>>= 1;
-         a <<= 1;
-         if (a > 0xFF) {
-            a ^= ROOT;
-         }
+         valid = new Boolean(result);
       }
-      return result & 0xFF;
+      return valid.booleanValue();
    }
 }
