@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.21 2001-11-09 20:24:02 db Exp $
+ * $Id: XmlParser.java,v 1.22 2001-11-09 21:03:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.21 2001-11-09 20:24:02 db Exp $
+// $Id: XmlParser.java,v 1.22 2001-11-09 21:03:42 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-09 20:24:02 $
+ * @version $Date: 2001-11-09 21:03:42 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -149,8 +149,16 @@ final class XmlParser
 	// where it may be null:  parser was invoked without providing
 	// one, e.g. since the XML data came from a memory buffer.
 
-	if (systemId != null)
-	    systemId = new URL (systemId).toString ();
+	if (systemId != null) {
+	    try {
+		systemId = new URL (systemId).toString ();
+	    } catch (MalformedURLException e) {
+		if (reader == null && stream == null)
+		    throw e;
+		// could be an unrecognized URI scheme
+		handler.warn ("trying to continue with bad URL: " + systemId);
+	    }
+	}
 
 	basePublicId = publicId;
 	baseURI = systemId;
