@@ -1,0 +1,49 @@
+LibxmlJ 0.1.1
+------------------------------------------------------------------------
+
+CAVEAT: LibxmlJ's current incarnation is incomplete and partly
+incorrect and may leak memory. Highly experimental.
+
+The shortcomings listed below partly result from architectural
+limitations in libxml/libxslt, removing which would be a time
+consuming task. This means that these problems will probably not be
+fixed anytime soon.
+
+Update: it may be possible to make LibxmlJ thread-safe nonetheless
+using thread context variables.
+
+- Thread-safe, but effectively runs single-threaded.
+
+- It may be possible that this version leaks memory and/or prevents
+  the garbage collector from collecting some otherwise unreachable
+  objects.
+
+- Native code passes incorrect URIs to URIResolver.resolve.
+
+- Default output properties accessible through JAXP always assume XML
+  output (in violation of the XSLT 1.0 specification, section 16)
+  Correction: LibxmlJ always assumes XML output.
+
+- OutputProperties are not properly implemented, compare code and API
+  documentation.
+
+- TransformerFactory.getAttribute() and
+  TransformerFactory.setAttribute() not implemented, i.e. low-level
+  libxslt settings can currently not be accessed from Java.
+
+- TransformerFactory.getFeature() not implemented, i.e. currently no
+  low-level features of libxslt are advertised.
+
+FIXME:
+
+- Use LRU cache instead of HashMap in JavaContext.
+
+- Check that entries released from cache are freed, including native
+  part.
+
+- Check whether <?xml encoding="..."?> headers are honored.
+
+- DefaultURIResolver uses naive approach.
+
+- TransformerFactory.getAssociatedStyleSheet() unfinished.
+
