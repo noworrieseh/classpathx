@@ -1,3 +1,7 @@
+2004-09-03  Chris Burdess	<dog@gnu.org>
+
+	* all: Replaced GPL exception with new exception text.
+
 2004-09-01  Chris Burdess	<dog@gnu.org>
 
 	* all: Reassigned David Brownell's copyright to FSF.
