@@ -1,0 +1,20 @@
+The Classpathx developers files
+
+This module exists to maintain various common files that all
+developers of Classpathx projects might need.
+
+Here's the description of what all the files do or are for:
+
+
+
+  templateGPL.java  	the comment code to put at the very top 
+  templateLGPL.jav	of all source files. Usage isn't mandatory
+			but it helps if all projects use the same 
+			header.
+
+
+
+
+
+$Author: nferrier $
+$Date: 2001-05-30 01:23:30 $
