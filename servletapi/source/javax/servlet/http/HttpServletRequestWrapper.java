@@ -248,9 +248,11 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper
 
   /**
    * By default passes the call to the underlying HttpServletRequest
+   * @deprecated Use {@link #isRequestedSessionIdFromURL}
+   * @since Servlet API 2.0
    */
   public boolean isRequestedSessionIdFromUrl ()
   {
-    return _impl.isRequestedSessionIdFromUrl ();
+    return _impl.isRequestedSessionIdFromURL ();
   }
 }
