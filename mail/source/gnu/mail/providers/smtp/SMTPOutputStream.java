@@ -1,8 +1,9 @@
 /*
-  GNU-Classpath Extensions: GNU Javamail - SMTP Service Provider
-  Copyright (C) 2001 Benjamin A. Speakmon
+  GNU-Classpath Extensions: javamail
+  Copyright (C) 2002  Chris Burdess
 
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -14,96 +15,105 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License
+  You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
-
 package gnu.mail.providers.smtp;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import gnu.mail.util.CRLFOutputStream;
 
 /** 
- * A stream to handle SMTP's concept of full stop.
- * This stream wraps the Output stream that is generated in
- * SMTPTransport for data transmission of the message contents.
- * Since it is possible to include a '.' on a single line in a
- * message (which in the SMTP protocol refers to the end of the
- * data stream), this stream protects the out bound data by
- * prepending another '.' according to the SMTP rfc.
+ * An output stream implementing the SMTP specification for dot escaping.
+ * Objects of this class are intended to be chained with CRLFOutputStream
+ * instances as all SMTP output is intended to be CRLF-escaped.
  *
- * @author      Andrew Selkirk
- * @author      Ben Speakmon
- * @version     1.0
+ * @author dog@gnu.org
+ * @version 0.1
  */
 public class SMTPOutputStream
-  extends CRLFOutputStream
+  extends FilterOutputStream
 {
 
-  private int lastb;
-
-  /** make the SMTP stream, pointing to another stream.
-   * @param stream the stream connected to the SMTP layer
+  /**
+   * The LF octet.
    */
-  public SMTPOutputStream(OutputStream stream) 
+  public static final int LF = 0x0a;
+
+  /**
+   * The dot octet.
+   */
+  public static final int DOT = 0x2e;
+
+  /**
+   * The last octet read.
+   */
+  protected int last;
+
+  /**
+   * Constructs an SMTP output stream connected to the specified output stream.
+   * The underlying output stream should coordinate proper CRLF pairs at
+   * line ends.
+   * @param out a CRLFOutputStream
+   */
+  public SMTPOutputStream(CRLFOutputStream out)
   {
-    super(stream);
+    super(out);
   }
 
-  /** 
-   * Write a byte to the SMTP output stream.
-   * If '.' is found according to the end-of-data guidelines,
-   * then the byte is doubled.
-   * @param b Byte to write
-   * @throws IOException IO exception occurred
+  /**
+   * Writes a character to the underlying stream.
+   * @exception IOException if an I/O error occurred
    */
-  public void write(int b) throws IOException 
+  public void write(int ch)
+    throws IOException
   {
-    //check for '.' that was preceeded by eol character
-    if (b == '.' && (lastb == '\r' || lastb == '\n')) 
-      {
-	out.write(new byte[]{46, 46}, 0, 2);
-	lastb = b;
-      }
-    else 
-      {
-	super.write(b);
-      }
+    if (ch==DOT)
+    {
+      if (last==LF)
+        out.write(DOT);
+    }
+    out.write(ch);
+    last = ch;
   }
 
-  /** 
-   * Write a byte array to the SMTP output stream.
-   * If '.' is found according to the end-of-data guidelines,
-   * then the byte is doubled.
-   * @param bytes Byte array to write
-   * @param offset Offset of bytes to write
-   * @param length Number of bytes to write
-   * @throws IOException IO exception occurred
+  /**
+   * Writes a byte array to the underlying stream.
+   * @exception IOException if an I/O error occurred
    */
-  public void write(byte[] bytes, int offset, int length)
-    throws IOException 
+  public void write(byte b[])
+    throws IOException
   {
-    int index;
-    int writeStart;
-    //process Each Byte
-    writeStart = offset;
-    for (index = offset; index < length; index++) 
+    write(b, 0, b.length);
+  }
+
+  /**
+   * Writes a portion of a byte array to the underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  public void write(byte b[], int off, int len)
+    throws IOException
+  {
+    int d = off;
+    len += off;
+    for (int i=off; i<len; i++)
+    {
+      switch (b[i])
       {
-	if (bytes[index] == '.') 
-	  {
-	    // Output Previous bytes to CRLF layer
-	    super.write(bytes, writeStart, index - writeStart);
-	    // Write '.'
-	    write('.');
-	    // Track new Start
-	    writeStart = index + 1;
-	  }
+        case DOT:
+          int l = (i-d);
+          if (l>0)
+            out.write(b, d, l);
+          d = i;
+          if (last==LF)
+            out.write(DOT);
+          break;
       }
-    // Check for Remaining bytes
-    if (writeStart < length) 
-      super.write(bytes, writeStart, length - writeStart);
+      last = b[i];
+    }
+    if (len-d>0)
+      out.write(b, d, len-d);
   }
 
 }

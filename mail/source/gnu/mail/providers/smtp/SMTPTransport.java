@@ -81,7 +81,7 @@ public class SMTPTransport
   private boolean noAuth;
   private String name;
   private BufferedReader serverInput;
-  private SMTPOutputStream serverOutput;
+  private CRLFOutputStream serverOutput;
   private String lastServerResponse;
   private Socket socket;
   private static String localHostName;
@@ -196,8 +196,9 @@ public class SMTPTransport
     try 
     {
       InputStream sin = socket.getInputStream();
+      OutputStream sout = socket.getOutputStream();
       serverInput = new BufferedReader(new InputStreamReader(sin));
-      serverOutput = new SMTPOutputStream(socket.getOutputStream());
+      serverOutput = new CRLFOutputStream(sout);
     } 
     catch (IOException ioe)
     {
@@ -531,11 +532,11 @@ public class SMTPTransport
       
       if (response == 250) 
       {
-        validSentAddrList.add(0, addresses[i]);
+        validSentAddrList.insertElementAt(addresses[i], 0);
       }
       else
       {
-        invalidAddrList.add(0, addresses[i]);
+        invalidAddrList.insertElementAt(addresses[i], 0);
       }
     }
     
@@ -570,8 +571,19 @@ public class SMTPTransport
     /* Process address Lists depending on result of DATA command. */
     if (response != 250)
     {
+      /* The following method is not present in JDK1.1
       validUnsentAddrList.addAll(validSentAddrList);
+      */
+      int size = validSentAddrList.size();
+      validUnsentAddrList.ensureCapacity(size);
+      for (int i=0; i<size; i++)
+        validUnsentAddrList.addElement(validSentAddrList.elementAt(i));
+      
+      /* The following method is not present in JDK1.1
       validSentAddrList.clear();
+      */
+      validSentAddrList.removeAllElements();
+      
       deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
     }
     else 

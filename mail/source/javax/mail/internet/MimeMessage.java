@@ -1519,7 +1519,7 @@ public class MimeMessage
         else
           message.addRecipients(Message.RecipientType.TO, addresses);
       
-      vector.clear();
+      vector.removeAllElements();
       addToSet(vector, getRecipients(Message.RecipientType.CC));
       addresses = new Address[vector.size()];
       vector.copyInto(addresses);

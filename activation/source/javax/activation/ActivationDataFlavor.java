@@ -27,7 +27,7 @@ import java.awt.datatransfer.DataFlavor;
 /**
  * Activation Data Flavor.
  * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ActivationDataFlavor
 extends DataFlavor
@@ -94,9 +94,9 @@ extends DataFlavor
 			      String mimeType, 
 			      String humanPresentableName) 
   {
-    this.representationClass = representationClass;
+    /* In JDK1.1 we must use the DataFlavor(Class, String) constructor */
+    super(representationClass, humanPresentableName);
     this.mimeType = mimeType;
-    this.humanPresentableName = humanPresentableName;
   } // ActivationDataFlavor()
 
 

@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Properties;
@@ -72,7 +73,7 @@ import java.util.Properties;
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class MailcapCommandMap
 extends CommandMap 
@@ -212,7 +213,16 @@ extends CommandMap
   {
     StringReader rd = new StringReader(mailCapEntry);
     Hashtable entries = loadMailcapRegistry(rd);
+    /* This method:
     DB[PROG].putAll(entries);
+    would work as well as the following, but is not present in JDK 1.1.
+    */
+    for (Enumeration k = entries.keys(); k.hasMoreElements(); )
+    {
+      Object key = k.nextElement();
+      Object value = entries.get(key);
+      DB[PROG].put(key, value);
+    }
   } // addMailcap()
 
   /** create a content handler for the specified MIME type.

@@ -62,7 +62,7 @@ import gnu.activation.MIMETypeParser;
  *
  * @author Andrew Selkirk
  * @author Nic Ferrier
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class MimetypesFileTypeMap extends FileTypeMap
 {
@@ -323,7 +323,17 @@ public class MimetypesFileTypeMap extends FileTypeMap
 
     try {
       reader = new StringReader(mimeTypes);
+      /* This method:
       registry[PROG].putAll(MIMETypeParser.parseStream(reader));
+      would work as well as the following, but is not present in JDK1.1.
+      */
+      Hashtable typeHash = MIMETypeParser.parseStream(reader);
+      for (Enumeration k = typeHash.keys(); k.hasMoreElements(); )
+      {
+        Object key = k.nextElement();
+        Object value = typeHash.get(key);
+        registry[PROG].put(key, value);
+      }
     } catch(Exception e) {
       // Don't bother with errors
     } // try
