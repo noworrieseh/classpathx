@@ -25,8 +25,10 @@ package javax.xml.transform;
 import java.util.Properties;
 
 /**
- * Transformer
- * @author	Andrew Selkirk
+ * Apply a transformation from a source, populating a result.
+ * Transformers may be reused, but not concurrently.
+ *
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
 public abstract class Transformer {
@@ -35,6 +37,7 @@ public abstract class Transformer {
 	// Initialization ---------------------------------------------
 	//-------------------------------------------------------------
 
+	/** Default constructor, for use only by subclasses. */
 	protected Transformer() {
 	} // Transformer()
 
@@ -43,35 +46,89 @@ public abstract class Transformer {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * Clears all parameter settings.
+	 * @see #setParameter
+	 */
 	public abstract void clearParameters();
 
-
+	/** Returns the error handler used as documents are transformed. */
 	public abstract ErrorListener getErrorListener();
 
+	/**
+	 * Returns a copy of the transformer's non-default output properties.
+	 * That is, properties set in the stylesheet or through
+	 * methods on this class are not set.
+	 * @see OutputKeys
+	 * @see #setOutputProperties
+	 */
 	public abstract Properties getOutputProperties();
 
+	/**
+	 * Returns the value of a property applying to this transform.
+	 * Values returned by this method are only those that have
+	 * been set explicitly.
+	 * @see OutputKeys
+	 * @see #setOutputProperty
+	 */
 	public abstract String getOutputProperty(String name) 
 		throws IllegalArgumentException;
 
+	/**
+	 * Returns the value of a parameter passed to this transform.
+	 * These are primarily for use access within transformations
+	 * and extensions.
+	 * @see #setParameter
+	 */
 	public abstract Object getParameter(String name);
 
+	/** Returns the resolver applied to documents being transformed. */
 	public abstract URIResolver getURIResolver();
 
-
+	/** Assigns the error handler used as documents are transformed. */
 	public abstract void setErrorListener(ErrorListener listener) 
 		throws IllegalArgumentException;
-
+	/**
+	 * Assigns a set of output properties, as if made by multiple
+	 * calls to {@link #setOutputProperty}.
+	 * @see OutputKeys
+	 * @param outputformat set of properties, or null to reset all
+	 *	properties to their default values
+	 */
 	public abstract void setOutputProperties(Properties outputformat) 
 		throws IllegalArgumentException;
 
+	/**
+	 * Assigns the value of a transformation property, affecting
+	 * generation of output (mostly text syntax).  Parameters include
+	 * those defined by the xslt:output element.  Default settings may
+	 * be explicitly overridden.
+	 * @see OutputKeys
+	 * @see #getOutputProperty
+	 * @see #setOutputProperties
+	 * @param name an XML name, or a namespace-scoped XML name
+	 *	encoded as <em>{uri}localName</em>.
+	 * @param value associated with the name
+	 */
 	public abstract void setOutputProperty(String name, String value) 
 		throws IllegalArgumentException;
 
+	/**
+	 * Assigns the value of a parameter passed to this transform.
+	 * These are primarily for use access within transformations
+	 * and extensions.
+	 * @see #getParameter
+	 * @see #clearParameters
+	 * @param name an XML name, or a namespace-scoped XML name
+	 *	encoded as <em>{uri}localName</em>.
+	 * @param value associated with the name
+	 */
 	public abstract void setParameter(String name, Object value);
 
+	/** Assigns the resolver applied to documents being transformed. */
 	public abstract void setURIResolver(URIResolver resolver);
 
-
+	/** Apply the appropriate transformation */
 	public abstract void transform(Source source, Result result) 
 		throws TransformerException;
 
