@@ -1,5 +1,6 @@
 2004-05-24  Chris Burdess  <dog@bluezoo.org>
 
+	* MimeUtility.java: Fixed MIME-Java character conversion (#8658)
 	* SMTPTransport.java: Fixed typo propagating wrong delivery event
 	    type.
 

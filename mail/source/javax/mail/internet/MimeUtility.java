@@ -808,11 +808,11 @@ public class MimeUtility
     InputStream in = (MimeUtility.class).getResourceAsStream(mappings);
     if (in!=null)
     {
-      javaCharsets = new HashMap(20);
       mimeCharsets = new HashMap(10);
+      javaCharsets = new HashMap(20);
       LineInputStream lin = new LineInputStream(in);
-      parse(javaCharsets, lin);
       parse(mimeCharsets, lin);
+      parse(javaCharsets, lin);
     }
   }
 
