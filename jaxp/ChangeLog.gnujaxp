@@ -1,3 +1,7 @@
+2005-02-08  Chris Burdess  <dog@gnu.org>
+
+	* validation: Continuation of XML Schema processing work.
+
 2005-02-07  Chris Burdess  <dog@gnu.org>
 
 	* validation: Experimental framework for XML Schema processing.

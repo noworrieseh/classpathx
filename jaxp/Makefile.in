@@ -382,12 +382,17 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/validation/datatype/UnsignedLongType.lo \
 	source/gnu/xml/validation/datatype/UnsignedShortType.lo \
 	source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo \
+	source/gnu/xml/validation/xmlschema/AnyAttribute.lo \
 	source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo \
 	source/gnu/xml/validation/xmlschema/AttributeUse.lo \
 	source/gnu/xml/validation/xmlschema/ElementDeclaration.lo \
 	source/gnu/xml/validation/xmlschema/Particle.lo \
+	source/gnu/xml/validation/xmlschema/ValidationException.lo \
 	source/gnu/xml/validation/xmlschema/XMLSchema.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo \
 	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo \
 	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo
@@ -1395,12 +1400,17 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/validation/datatype/UnsignedLongType.java \
 	source/gnu/xml/validation/datatype/UnsignedShortType.java \
 	source/gnu/xml/validation/datatype/WhiteSpaceFacet.java \
+	source/gnu/xml/validation/xmlschema/AnyAttribute.java \
 	source/gnu/xml/validation/xmlschema/AttributeDeclaration.java \
 	source/gnu/xml/validation/xmlschema/AttributeUse.java \
 	source/gnu/xml/validation/xmlschema/ElementDeclaration.java \
 	source/gnu/xml/validation/xmlschema/Particle.java \
+	source/gnu/xml/validation/xmlschema/ValidationException.java \
 	source/gnu/xml/validation/xmlschema/XMLSchema.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java
@@ -2409,6 +2419,9 @@ source/gnu/xml/validation/xmlschema/$(am__dirstamp):
 source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp):
 	@$(mkdir_p) source/gnu/xml/validation/xmlschema/$(DEPDIR)
 	@: > source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/AnyAttribute.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo:  \
 	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
 	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
@@ -2421,10 +2434,22 @@ source/gnu/xml/validation/xmlschema/ElementDeclaration.lo:  \
 source/gnu/xml/validation/xmlschema/Particle.lo:  \
 	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
 	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/ValidationException.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/validation/xmlschema/XMLSchema.lo:  \
 	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
 	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo:  \
 	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
 	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo:  \
@@ -3731,6 +3756,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/validation/datatype/UnsignedShortType.lo
 	-rm -f source/gnu/xml/validation/datatype/WhiteSpaceFacet.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo
+	-rm -f source/gnu/xml/validation/xmlschema/AnyAttribute.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/AnyAttribute.lo
 	-rm -f source/gnu/xml/validation/xmlschema/AttributeDeclaration.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo
 	-rm -f source/gnu/xml/validation/xmlschema/AttributeUse.$(OBJEXT)
@@ -3739,10 +3766,18 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/validation/xmlschema/ElementDeclaration.lo
 	-rm -f source/gnu/xml/validation/xmlschema/Particle.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/xmlschema/Particle.lo
+	-rm -f source/gnu/xml/validation/xmlschema/ValidationException.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/ValidationException.lo
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchema.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchema.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.$(OBJEXT)
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo
 	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaValidator.$(OBJEXT)
@@ -4570,12 +4605,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/AnyAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/ValidationException.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaAttributeTypeInfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaElementTypeInfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Plo@am__quote@
@@ -6963,6 +7003,13 @@ source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo: source/gnu/xml/validation
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo `test -f 'source/gnu/xml/validation/datatype/WhiteSpaceFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/WhiteSpaceFacet.java
 
+source/gnu/xml/validation/xmlschema/AnyAttribute.lo: source/gnu/xml/validation/xmlschema/AnyAttribute.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/AnyAttribute.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AnyAttribute.Tpo" -c -o source/gnu/xml/validation/xmlschema/AnyAttribute.lo `test -f 'source/gnu/xml/validation/xmlschema/AnyAttribute.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AnyAttribute.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AnyAttribute.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AnyAttribute.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AnyAttribute.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/AnyAttribute.java' object='source/gnu/xml/validation/xmlschema/AnyAttribute.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/AnyAttribute.lo `test -f 'source/gnu/xml/validation/xmlschema/AnyAttribute.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AnyAttribute.java
+
 source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo: source/gnu/xml/validation/xmlschema/AttributeDeclaration.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo" -c -o source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo `test -f 'source/gnu/xml/validation/xmlschema/AttributeDeclaration.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AttributeDeclaration.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo"; exit 1; fi
@@ -6991,6 +7038,13 @@ source/gnu/xml/validation/xmlschema/Particle.lo: source/gnu/xml/validation/xmlsc
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/Particle.lo `test -f 'source/gnu/xml/validation/xmlschema/Particle.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/Particle.java
 
+source/gnu/xml/validation/xmlschema/ValidationException.lo: source/gnu/xml/validation/xmlschema/ValidationException.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/ValidationException.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ValidationException.Tpo" -c -o source/gnu/xml/validation/xmlschema/ValidationException.lo `test -f 'source/gnu/xml/validation/xmlschema/ValidationException.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/ValidationException.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ValidationException.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ValidationException.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ValidationException.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/ValidationException.java' object='source/gnu/xml/validation/xmlschema/ValidationException.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/ValidationException.lo `test -f 'source/gnu/xml/validation/xmlschema/ValidationException.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/ValidationException.java
+
 source/gnu/xml/validation/xmlschema/XMLSchema.lo: source/gnu/xml/validation/xmlschema/XMLSchema.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchema.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchema.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchema.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchema.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo"; exit 1; fi
@@ -6998,12 +7052,33 @@ source/gnu/xml/validation/xmlschema/XMLSchema.lo: source/gnu/xml/validation/xmls
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchema.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchema.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchema.java
 
+source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo: source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaAttributeTypeInfo.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaAttributeTypeInfo.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaAttributeTypeInfo.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaAttributeTypeInfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java
+
 source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo: source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo: source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaElementTypeInfo.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaElementTypeInfo.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaElementTypeInfo.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaElementTypeInfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo: source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfo.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfo.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfo.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java
 
 source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo: source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java; \

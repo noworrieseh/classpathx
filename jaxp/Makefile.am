@@ -648,12 +648,17 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/validation/datatype/UnsignedLongType.java \
 	source/gnu/xml/validation/datatype/UnsignedShortType.java \
 	source/gnu/xml/validation/datatype/WhiteSpaceFacet.java \
+	source/gnu/xml/validation/xmlschema/AnyAttribute.java \
 	source/gnu/xml/validation/xmlschema/AttributeDeclaration.java \
 	source/gnu/xml/validation/xmlschema/AttributeUse.java \
 	source/gnu/xml/validation/xmlschema/ElementDeclaration.java \
 	source/gnu/xml/validation/xmlschema/Particle.java \
+	source/gnu/xml/validation/xmlschema/ValidationException.java \
 	source/gnu/xml/validation/xmlschema/XMLSchema.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaAttributeTypeInfo.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaElementTypeInfo.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfo.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java \
 	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java

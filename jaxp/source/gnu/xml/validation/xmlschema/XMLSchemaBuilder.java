@@ -7,6 +7,7 @@ import gnu.xml.validation.datatype.SimpleType;
 import gnu.xml.validation.datatype.Type;
 import gnu.xml.validation.datatype.UnionSimpleType;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -131,7 +132,7 @@ class XMLSchemaBuilder
     String use = getAttribute(attrs, "use");
     String type = getAttribute(attrs, "type");
     SimpleType datatype = (type == null) ? null :
-      parseSimpleType(type);
+      parseSimpleType(asQName(type, node));
     Annotation annotation = null;
     for (Node child = node.getFirstChild(); child != null;
          child = child.getNextSibling())
@@ -139,7 +140,7 @@ class XMLSchemaBuilder
         String uri = child.getNamespaceURI();
         String name = child.getLocalName();
         if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
-            node.getNodeType() == Node.ELEMENT_NODE)
+            child.getNodeType() == Node.ELEMENT_NODE)
           {
             if ("annotation".equals(name))
               {
@@ -222,7 +223,9 @@ class XMLSchemaBuilder
     int ret = XMLSchema.FINAL_NONE;
     if ("#all".equals(value))
       {
-        ret = XMLSchema.FINAL_ALL;
+        ret = XMLSchema.FINAL_LIST |
+          XMLSchema.FINAL_UNION |
+          XMLSchema.FINAL_RESTRICTION;
       }
     else
       {
@@ -237,6 +240,32 @@ class XMLSchemaBuilder
             else if ("union".equals(token))
               {
                 ret |= XMLSchema.FINAL_UNION;
+              }
+            else if ("restriction".equals(token))
+              {
+                ret |= XMLSchema.FINAL_RESTRICTION;
+              }
+          }
+      }
+    return ret;
+  }
+
+  int parseComplexTypeDerivationSet(String value)
+  {
+    int ret = XMLSchema.FINAL_NONE;
+    if ("#all".equals(value))
+      {
+        ret = XMLSchema.FINAL_EXTENSION | XMLSchema.FINAL_RESTRICTION;
+      }
+    else
+      {
+        StringTokenizer st = new StringTokenizer(value, " ");
+        while (st.hasMoreTokens())
+          {
+            String token = st.nextToken();
+            if ("extension".equals(token))
+              {
+                ret |= XMLSchema.FINAL_EXTENSION;
               }
             else if ("restriction".equals(token))
               {
@@ -277,6 +306,32 @@ class XMLSchemaBuilder
     return ret;
   }
 
+  int parseComplexTypeBlockSet(String value)
+  {
+    int ret = XMLSchema.BLOCK_NONE;
+    if ("#all".equals(value))
+      {
+        ret = XMLSchema.BLOCK_EXTENSION | XMLSchema.BLOCK_RESTRICTION;
+      }
+    else
+      {
+        StringTokenizer st = new StringTokenizer(value, " ");
+        while (st.hasMoreTokens())
+          {
+            String token = st.nextToken();
+            if ("extension".equals(token))
+              {
+                ret |= XMLSchema.BLOCK_EXTENSION;
+              }
+            else if ("restriction".equals(token))
+              {
+                ret |= XMLSchema.BLOCK_RESTRICTION;
+              }
+          }
+      }
+    return ret;
+  }
+
   Object parseElement(Node node, ElementDeclaration parent)
   {
     NamedNodeMap attrs = node.getAttributes();
@@ -299,7 +354,8 @@ class XMLSchemaBuilder
     String elementName = getAttribute(attrs, "name");
     String elementNamespace = getAttribute(attrs, "targetNamespace");
     String type = getAttribute(attrs, "type");
-    Type datatype = (type != null) ? parseSimpleType(type) : null;
+    Type datatype = (type != null) ?
+      parseSimpleType(asQName(type, node)) : null;
     int scope = (parent == null) ?
       XMLSchema.GLOBAL :
       XMLSchema.LOCAL;
@@ -373,7 +429,7 @@ class XMLSchemaBuilder
         String uri = child.getNamespaceURI();
         String name = child.getLocalName();
         if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
-            node.getNodeType() == Node.ELEMENT_NODE)
+            child.getNodeType() == Node.ELEMENT_NODE)
           {
             if ("annotation".equals(name))
               {
@@ -420,9 +476,15 @@ class XMLSchemaBuilder
       }
   }
 
-  SimpleType parseSimpleType(String name)
+  SimpleType parseSimpleType(QName typeName)
   {
-    return (SimpleType) Type.forName(name);
+    SimpleType type = (SimpleType) schema.types.get(typeName);
+    if (type == null &&
+        XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(typeName.getNamespaceURI()))
+      {
+        type = (SimpleType) Type.forName(typeName.getLocalPart());
+      }
+    return type;
   }
 
   SimpleType parseSimpleType(Node simpleType)
@@ -443,15 +505,261 @@ class XMLSchemaBuilder
           }
       }
     int typeFinality = parseSimpleTypeDerivationSet(typeFinal);
-    String typeName = getAttribute(attrs, "name");
-    // TODO
-    return null;
+    QName typeName = asQName(getAttribute(attrs, "name"), simpleType);
+    int variety = 0;
+    Set facets = new LinkedHashSet();
+    int fundamentalFacets = 0; // TODO
+    SimpleType baseType = null; // TODO
+    Annotation annotation = null;
+    for (Node child = simpleType.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("annotation".equals(name))
+              {
+                annotation = parseAnnotation(child);
+              }
+            else if ("restriction".equals(name))
+              {
+                // TODO
+              }
+            else if ("list".equals(name))
+              {
+                variety = SimpleType.LIST;
+                // TODO
+              }
+            else if ("union".equals(name))
+              {
+                variety = SimpleType.UNION;
+                // TODO
+              }
+          }
+      }
+    return new SimpleType(typeName, variety, facets, fundamentalFacets,
+                          baseType, annotation);
   }
 
   Type parseComplexType(Node complexType, ElementDeclaration parent)
   {
-    // TODO
-    return null;
+    NamedNodeMap attrs = complexType.getAttributes();
+    QName typeName = asQName(getAttribute(attrs, "name"), complexType);
+    boolean isAbstract = "true".equals(getAttribute(attrs, "abstract"));
+    String block = getAttribute(attrs, "block");
+    int prohibitedSubstitutions = (block == null) ?
+      schema.blockDefault :
+      parseComplexTypeBlockSet(block);
+    String final_ = getAttribute(attrs, "final");
+    int finality = (final_ == null) ?
+      schema.finalDefault :
+      parseComplexTypeDerivationSet(final_);
+    ComplexType type = new ComplexType(typeName, isAbstract,
+                                       prohibitedSubstitutions, finality);
+    boolean mixed = "true".equals(getAttribute(attrs, "mixed"));
+    for (Node child = complexType.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("simpleContent".equals(name))
+              {
+                parseSimpleContent(child, type);
+              }
+          }
+      }
+    if (mixed)
+      {
+        type.contentType = XMLSchema.CONTENT_MIXED;
+      } 
+    return type;
+  }
+
+  void parseSimpleContent(Node simpleContent, ComplexType type)
+  {
+    for (Node child = simpleContent.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("annotation".equals(name))
+              {
+                type.annotations.add(parseAnnotation(child));
+              }
+            else if ("restriction".equals(name))
+              {
+                type.derivationMethod = XMLSchema.FINAL_RESTRICTION;
+                parseRestriction(child, type);
+              }
+            else if ("extension".equals(name))
+              {
+                type.derivationMethod = XMLSchema.FINAL_EXTENSION;
+                parseExtension(child, type);
+              }
+          }
+      }
+  }
+
+  void parseRestriction(Node restriction, ComplexType type)
+  {
+    NamedNodeMap attrs = restriction.getAttributes();
+    String base = getAttribute(attrs, "base");
+    QName baseType = asQName(base, restriction);
+    SimpleType simpleType = null;
+    for (Node child = restriction.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("annotation".equals(name))
+              {
+                type.annotations.add(parseAnnotation(child));
+              }
+            else if ("simpleType".equals(name))
+              {
+                type.contentType = XMLSchema.CONTENT_SIMPLE;
+                simpleType = parseSimpleType(child);
+              }
+            else if ("minExclusive".equals(name))
+              {
+              }
+            else if ("minInclusive".equals(name))
+              {
+              }
+            else if ("maxExclusive".equals(name))
+              {
+              }
+            else if ("maxInclusive".equals(name))
+              {
+              }
+            else if ("totalDigits".equals(name))
+              {
+              }
+            else if ("fractionDigits".equals(name))
+              {
+              }
+            else if ("length".equals(name))
+              {
+              }
+            else if ("minLength".equals(name))
+              {
+              }
+            else if ("maxLength".equals(name))
+              {
+              }
+            else if ("enumeration".equals(name))
+              {
+              }
+            else if ("whiteSpace".equals(name))
+              {
+              }
+            else if ("pattern".equals(name))
+              {
+              }
+            else if ("attribute".equals(name))
+              {
+                AttributeUse use =
+                  (AttributeUse) parseAttribute(child, false);
+                schema.attributeDeclarations.put(use.declaration.name,
+                                                 use.declaration);
+                type.attributeUses.add(use);
+              }
+            else if ("attributeGroup".equals(name))
+              {
+                NamedNodeMap agAttrs = child.getAttributes();
+                String ref = getAttribute(agAttrs, "ref");
+                QName ag = asQName(ref, child);
+                type.attributeUses.add(ag);
+              }
+            else if ("anyAttribute".equals(name))
+              {
+                type.attributeWildcard = parseAnyAttribute(child);
+              }
+          }
+      }
+  }
+
+  void parseExtension(Node extension, ComplexType type)
+  {
+    NamedNodeMap attrs = extension.getAttributes();
+    String base = getAttribute(attrs, "base");
+    QName baseType = asQName(base, extension);
+    for (Node child = extension.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("annotation".equals(name))
+              {
+                type.annotations.add(parseAnnotation(child));
+              }
+            else if ("attribute".equals(name))
+              {
+                AttributeUse use =
+                  (AttributeUse) parseAttribute(child, false);
+                schema.attributeDeclarations.put(use.declaration.name,
+                                                 use.declaration);
+                type.attributeUses.add(use);
+              }
+            else if ("attributeGroup".equals(name))
+              {
+                NamedNodeMap agAttrs = child.getAttributes();
+                String ref = getAttribute(agAttrs, "ref");
+                QName ag = asQName(ref, child);
+                type.attributeUses.add(ag);
+              }
+            else if ("anyAttribute".equals(name))
+              {
+                type.attributeWildcard = parseAnyAttribute(child);
+              }
+          }
+      }
+  }
+
+  AnyAttribute parseAnyAttribute(Node node)
+  {
+    NamedNodeMap attrs = node.getAttributes();
+    String namespace = getAttribute(attrs, "namespace");
+    String pc = getAttribute(attrs, "processContents");
+    int processContents = AnyAttribute.STRICT;
+    if ("lax".equals(pc))
+      {
+        processContents = AnyAttribute.LAX;
+      }
+    else if ("skip".equals(pc))
+      {
+        processContents = AnyAttribute.SKIP;
+      }
+    AnyAttribute ret = new AnyAttribute(namespace, processContents);
+    for (Node child = node.getFirstChild(); child != null;
+         child = child.getNextSibling())
+      {
+        String uri = child.getNamespaceURI();
+        String name = child.getLocalName();
+        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri) &&
+            child.getNodeType() == Node.ELEMENT_NODE)
+          {
+            if ("annotation".equals(name))
+              {
+                ret.annotation = parseAnnotation(child);
+              }
+          }
+      }
+    return ret;
   }
 
   Annotation parseAnnotation(Node node)
@@ -464,6 +772,18 @@ class XMLSchemaBuilder
   {
     Node attr = attrs.getNamedItem(name);
     return (attr == null) ? null : attr.getNodeValue();
+  }
+
+  private static QName asQName(String text, Node resolver)
+  {
+    QName name = QName.valueOf(text);
+    String prefix = name.getPrefix();
+    if (prefix != null && prefix.length() > 0)
+      {
+        String uri = resolver.lookupNamespaceURI(prefix);
+        name = new QName(uri, name.getLocalPart());
+      }
+    return name;
   }
   
 }

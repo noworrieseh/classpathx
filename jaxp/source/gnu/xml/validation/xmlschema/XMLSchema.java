@@ -32,6 +32,15 @@ final class XMLSchema
   static final int LOCAL = 0x01;
   static final int ABSENT = 0x02;
 
+  static final int CONSTRAINT_NONE = 0x00;
+  static final int CONSTRAINT_DEFAULT = 0x01;
+  static final int CONSTRAINT_FIXED = 0x02;
+
+  static final int CONTENT_EMPTY = 0x00;
+  static final int CONTENT_SIMPLE = 0x01;
+  static final int CONTENT_MIXED = 0x02;
+  static final int CONTENT_ELEMENT_ONLY = 0x03;
+
   final String targetNamespace;
   final String version;
   final int finalDefault;
@@ -49,7 +58,10 @@ final class XMLSchema
    */
   final Map attributeDeclarations;
 
-  // TODO type declarations
+  /**
+   * The type declarations in this schema.
+   */
+  final Map types;
 
   XMLSchema(String targetNamespace, String version,
             int finalDefault, int blockDefault,
@@ -64,6 +76,7 @@ final class XMLSchema
     this.elementFormQualified = elementFormQualified;
     elementDeclarations = new LinkedHashMap();
     attributeDeclarations = new LinkedHashMap();
+    types = new LinkedHashMap();
   }
 
   public Validator newValidator()
