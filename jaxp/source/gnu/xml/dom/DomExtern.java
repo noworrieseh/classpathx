@@ -38,8 +38,7 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
-
+import org.w3c.dom.Document;
 
 /**
  * <p> Abstract implemention of nodes describing external DTD-related
@@ -57,60 +56,59 @@ import org.w3c.dom.*;
 public abstract class DomExtern
   extends DomNode
 {
-    private String	name;
-    private String	publicId;
-    private String	systemId;
+ 
+  private String name;
+  private String publicId;
+  private String systemId;
+  
+  /**
+   * Constructs a node associated with the specified document,
+   * with the specified descriptive data.
+   *
+   * @param owner The document with which this object is associated
+   * @param name Name of this object
+   * @param publicId If non-null, provides the entity's PUBLIC identifier
+   * @param systemId If non-null, provides the entity's SYSTEM identifier
+   */
+  // package private
+  DomExtern(short nodeType,
+            Document owner,
+            String name,
+            String publicId,
+            String systemId)
+  {
+    super(nodeType, owner);
+    this.name = name;
+    this.publicId = publicId;
+    this.systemId = systemId;
+  }
 
+  /**
+   * <b>DOM L1</b>
+   * Returns the SYSTEM identifier associated with this object, if any.
+   */
+  final public String getSystemId()
+  {
+    return systemId;
+  }
 
-    /**
-     * Constructs a node associated with the specified document,
-     * with the specified descriptive data.
-     *
-     * @param owner The document with which this object is associated
-     * @param name Name of this object
-     * @param publicId If non-null, provides the entity's PUBLIC identifier
-     * @param systemId If non-null, provides the entity's SYSTEM identifier
-     */
-    // package private
-    DomExtern(short nodeType,
-              Document owner,
-              String name,
-              String publicId,
-              String systemId)
-    {
-	super (nodeType, owner);
-	this.name = name;
-	this.publicId = publicId;
-	this.systemId = systemId;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the SYSTEM identifier associated with this object, if any.
-     */
-    final public String getSystemId ()
-    {
-	return systemId;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the PUBLIC identifier associated with this object, if any.
-     */
-    final public String getPublicId ()
-    {
-	return publicId;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the object's name.
-     */
-    final public String getNodeName ()
-    {
-	return name;
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns the PUBLIC identifier associated with this object, if any.
+   */
+  final public String getPublicId()
+  {
+    return publicId;
+  }
+  
+  /**
+   * <b>DOM L1</b>
+   * Returns the object's name.
+   */
+  final public String getNodeName()
+  {
+    return name;
+  }
+  
 }
+

@@ -125,7 +125,7 @@ public class DomDocument
    */
   protected DomDocument(DOMImplementation impl)
   {
-	super(DOCUMENT_NODE, null);
+  super(DOCUMENT_NODE, null);
     implementation = impl;
   }
 
@@ -144,13 +144,13 @@ public class DomDocument
    */
   final public Element getDocumentElement()
   {
-	for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+  for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
         if (ctx.nodeType == ELEMENT_NODE)
           {
             return (Element) ctx;
           }
-	}
+  }
     return null;
   }
 
@@ -160,14 +160,14 @@ public class DomDocument
    */
   final public DocumentType getDoctype()
   {
-	for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+  for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
-	    if (ctx.nodeType == DOCUMENT_TYPE_NODE)
+      if (ctx.nodeType == DOCUMENT_TYPE_NODE)
           {
             return (DocumentType) ctx;
           }
       }
-	return null;
+  return null;
   }
 
   /**
@@ -190,30 +190,30 @@ public class DomDocument
    */
   public Element getElementById(String id)
   {
-	DomDoctype doctype = (DomDoctype) getDoctype();
+  DomDoctype doctype = (DomDoctype) getDoctype();
 
-	if (doctype == null || !doctype.hasIds()
-		|| id == null || id.length() == 0)
+  if (doctype == null || !doctype.hasIds()
+    || id == null || id.length() == 0)
       {
-	    return null;
+      return null;
       }
-	
-	// yes, this is linear in size of document.
-	// it'd be easy enough to maintain a hashtable.
-	Node current = getDocumentElement();
-	Node temp;
+  
+  // yes, this is linear in size of document.
+  // it'd be easy enough to maintain a hashtable.
+  Node current = getDocumentElement();
+  Node temp;
 
-	if (current == null)
+  if (current == null)
       {
-	    return null;
+      return null;
       }
-	while (current != this)
+  while (current != this)
       {
-	    // done?
-	    if (current.getNodeType() == ELEMENT_NODE)
+      // done?
+      if (current.getNodeType() == ELEMENT_NODE)
           {
             Element element = (Element) current;
-            DomDoctype.ElementInfo	info;
+            DomDoctype.ElementInfo  info;
 
             info = doctype.getElementInfo(current.getNodeName());
             if (id.equals(element.getAttribute(info.getIdAttr())))
@@ -222,23 +222,23 @@ public class DomDocument
               }
           }
 
-	    // descend?
-	    if (current.hasChildNodes())
+      // descend?
+      if (current.hasChildNodes())
           {
             current = current.getFirstChild();
             continue;
           }
-	    
-	    // lateral?
-	    temp = current.getNextSibling();
-	    if (temp != null)
+      
+      // lateral?
+      temp = current.getNextSibling();
+      if (temp != null)
           {
             current = temp;
             continue;
           }
-	    
-	    // back up ... 
-	    do
+      
+      // back up ... 
+      do
           {
             temp = current.getParentNode();
             if (temp == null)
@@ -249,22 +249,22 @@ public class DomDocument
             temp = current.getNextSibling();
           }
         while (temp == null);
-	    current = temp;
-	}
-	return null;
+      current = temp;
+  }
+  return null;
   }
 
   private void checkNewChild(Node newChild)
   {
-	if (newChild.getNodeType() == ELEMENT_NODE
-		&& getDocumentElement() != null)
+  if (newChild.getNodeType() == ELEMENT_NODE
+    && getDocumentElement() != null)
       {
-	    throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR, null, newChild, 0);
+      throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR, null, newChild, 0);
       }
-	if (newChild.getNodeType() == DOCUMENT_TYPE_NODE
-		&& getDoctype() != null)
+  if (newChild.getNodeType() == DOCUMENT_TYPE_NODE
+    && getDoctype() != null)
       {
-	    throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR, null, newChild, 0);
+      throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR, null, newChild, 0);
       }
   }
 
@@ -288,8 +288,8 @@ public class DomDocument
    */
   public Node insertBefore (Node newChild, Node refChild)
   {
-	checkNewChild(newChild);
-	return super.insertBefore(newChild, refChild);
+  checkNewChild(newChild);
+  return super.insertBefore(newChild, refChild);
   }
 
   /**
@@ -300,14 +300,14 @@ public class DomDocument
    */
   public Node replaceChild(Node newChild, Node refChild)
   {
-	if (!(newChild.getNodeType() == ELEMENT_NODE
-		    && refChild.getNodeType() != ELEMENT_NODE)
-		&& !(newChild.getNodeType() == DOCUMENT_TYPE_NODE
-		    && refChild.getNodeType() != ELEMENT_NODE))
+  if (!(newChild.getNodeType() == ELEMENT_NODE
+        && refChild.getNodeType() != ELEMENT_NODE)
+    && !(newChild.getNodeType() == DOCUMENT_TYPE_NODE
+        && refChild.getNodeType() != ELEMENT_NODE))
       {
-	    checkNewChild(newChild);
+      checkNewChild(newChild);
       }
-	return super.replaceChild(newChild, refChild);
+  return super.replaceChild(newChild, refChild);
   }
  
   // NOTE:  DOM can't really tell when the name of an entity,
@@ -323,31 +323,31 @@ public class DomDocument
    * end of the XML 1.0 specification.
    *
    * @exception DomException INVALID_CHARACTER_ERR if the name isn't
-   *	legal as an XML name.
+   *  legal as an XML name.
    */
   public static void verifyXmlName(String name)
   {
     char c;
     int len = name.length();
 
-	if (len == 0)
+  if (len == 0)
       {
-	    throw new DomEx (DomEx.NAMESPACE_ERR, name, null, 0);
+      throw new DomEx (DomEx.NAMESPACE_ERR, name, null, 0);
       }
 
-	// NOTE:  these aren't really the XML rules, but they're
-	// a close approximation that's simple to implement.
-	c = name.charAt(0);
-	if (!Character.isUnicodeIdentifierStart(c)
-		&& c != ':' && c != '_')
+  // NOTE:  these aren't really the XML rules, but they're
+  // a close approximation that's simple to implement.
+  c = name.charAt(0);
+  if (!Character.isUnicodeIdentifierStart(c)
+    && c != ':' && c != '_')
       {
-	    throw new DomEx(DomEx.INVALID_CHARACTER_ERR, name, null, c);
+      throw new DomEx(DomEx.INVALID_CHARACTER_ERR, name, null, c);
       }
-	for (int i = 1; i < len; i++)
+  for (int i = 1; i < len; i++)
       {
-	    c = name.charAt(i);
-	    if (!Character.isUnicodeIdentifierPart(c)
-		     && c != ':'&& c != '_' && c != '.' && c != '-'
+      c = name.charAt(i);
+      if (!Character.isUnicodeIdentifierPart(c)
+         && c != ':'&& c != '_' && c != '.' && c != '-'
              && !isExtender (c))
           {
             throw new DomEx(DomEx.INVALID_CHARACTER_ERR, name, null, c);
@@ -357,7 +357,7 @@ public class DomDocument
 
   private static boolean isExtender(char c)
   {
-	// [88] Extender ::= ...
+  // [88] Extender ::= ...
     return c == 0x00b7 || c == 0x02d0 || c == 0x02d1 || c == 0x0387
       || c == 0x0640 || c == 0x0e46 || c == 0x0ec6 || c == 0x3005
       || (c >= 0x3031 && c <= 0x3035)
@@ -368,62 +368,62 @@ public class DomDocument
   // package private
   static void verifyNamespaceName(String name)
   {
-	int index = name.indexOf(':');
+  int index = name.indexOf(':');
 
-	if (index < 0)
+  if (index < 0)
       {
-	    verifyXmlName(name);
-	    return;
+      verifyXmlName(name);
+      return;
       }
-	if (name.lastIndexOf(':') != index)
+  if (name.lastIndexOf(':') != index)
       {
-	    throw new DomEx(DomEx.NAMESPACE_ERR, name, null, 0);
+      throw new DomEx(DomEx.NAMESPACE_ERR, name, null, 0);
       }
-	verifyXmlName(name.substring(0, index));
-	verifyXmlName(name.substring(index + 1));
+  verifyXmlName(name.substring(0, index));
+  verifyXmlName(name.substring(index + 1));
   }
 
   // package private
   static void verifyXmlCharacters(String value)
   {
-	int len = value.length();
+  int len = value.length();
 
-	for (int i = 0; i < len; i++)
+  for (int i = 0; i < len; i++)
       {
-	    char c = value.charAt(i);
+      char c = value.charAt(i);
 
-	    // assume surrogate pairing checks out OK, for simplicity
-	    if (c >= 0x0020 && c <= 0xFFFD)
+      // assume surrogate pairing checks out OK, for simplicity
+      if (c >= 0x0020 && c <= 0xFFFD)
           {
             continue;
           }
-	    if (c == '\n' || c == '\t' || c == '\r')
+      if (c == '\n' || c == '\t' || c == '\r')
           {
             continue;
           }
 
-	    throw new DomEx(DomEx.INVALID_CHARACTER_ERR, value, null, c);
+      throw new DomEx(DomEx.INVALID_CHARACTER_ERR, value, null, c);
       }
   }
 
   // package private
   static void verifyXmlCharacters(char[] buf, int off, int len)
   {
-	for (int i = 0; i < len; i++)
+  for (int i = 0; i < len; i++)
       {
-	    char c = buf[off + i];
+      char c = buf[off + i];
 
-	    // assume surrogate pairing checks out OK, for simplicity
-	    if (c >= 0x0020 && c <= 0xFFFD)
+      // assume surrogate pairing checks out OK, for simplicity
+      if (c >= 0x0020 && c <= 0xFFFD)
           {
             continue;
           }
-	    if (c == '\n' || c == '\t' || c == '\r')
+      if (c == '\n' || c == '\t' || c == '\r')
           {
             continue;
           }
 
-	    throw new DomEx(DomEx.INVALID_CHARACTER_ERR,
+      throw new DomEx(DomEx.INVALID_CHARACTER_ERR,
                         new String(buf, off, len), null, c);
       }
   }
@@ -434,21 +434,21 @@ public class DomDocument
    */
   public Element createElement(String name)
   {
-	Element element;
+  Element element;
 
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlName(name);
+      verifyXmlName(name);
       }
-	if (name.startsWith("xml:"))
+  if (name.startsWith("xml:"))
       {
-	    element = createElementNS(null, name);
+      element = createElementNS(null, name);
       }
-	else
+  else
       {
-	    element = new DomElement(this, null, name);
+      element = new DomElement(this, null, name);
       }
-	defaultAttributes(element, name);
+  defaultAttributes(element, name);
     return element;
   }
 
@@ -459,62 +459,62 @@ public class DomDocument
    */
   public Element createElementNS(String namespaceURI, String name)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyNamespaceName(name);
+      verifyNamespaceName(name);
       }
 
-	if ("".equals(namespaceURI))
+  if ("".equals(namespaceURI))
       {
-	    namespaceURI = null;
+      namespaceURI = null;
       }
-	if (name.startsWith("xml:"))
+  if (name.startsWith("xml:"))
       {
-	    if (namespaceURI != null
+      if (namespaceURI != null
             && !xmlNamespace.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
                             "xml namespace is always " + xmlNamespace,
                             this, 0);
           }
-	    namespaceURI = xmlNamespace;
+      namespaceURI = xmlNamespace;
       }
-	else if (name.startsWith("xmlns:"))
+  else if (name.startsWith("xmlns:"))
       {
-	    throw new DomEx(DomEx.NAMESPACE_ERR,
+      throw new DomEx(DomEx.NAMESPACE_ERR,
                         "xmlns is reserved", this, 0);
       }
-	else if (namespaceURI == null && name.indexOf(':') != -1)
+  else if (namespaceURI == null && name.indexOf(':') != -1)
       {
-	    throw new DomEx(DomEx.NAMESPACE_ERR,
+      throw new DomEx(DomEx.NAMESPACE_ERR,
                         "prefixed name needs a URI", this, 0);
       }
 
-	Element	element = new DomElement(this, namespaceURI, name);
-	defaultAttributes(element, name);
-	return element;
+  Element  element = new DomElement(this, namespaceURI, name);
+  defaultAttributes(element, name);
+  return element;
   }
 
   private void defaultAttributes(Element element, String name)
   {
-	DomDoctype doctype = (DomDoctype) getDoctype();
-	DomDoctype.ElementInfo info;
+  DomDoctype doctype = (DomDoctype) getDoctype();
+  DomDoctype.ElementInfo info;
 
-	if (doctype == null)
+  if (doctype == null)
       {
-	    return;
+      return;
       }
 
-	// default any attributes that need it
-	info = doctype.getElementInfo(name);
-	for (Iterator i = info.keySet().iterator(); i.hasNext(); )
+  // default any attributes that need it
+  info = doctype.getElementInfo(name);
+  for (Iterator i = info.keySet().iterator(); i.hasNext(); )
       {
-	    String	attr = (String) i.next();
-	    DomAttr	node = (DomAttr) createAttribute(attr);
+      String  attr = (String) i.next();
+      DomAttr  node = (DomAttr) createAttribute(attr);
 
-	    node.setValue((String) info.get(attr));
-	    node.setSpecified(false);
-	    element.setAttributeNode(node);
+      node.setValue((String) info.get(attr));
+      node.setSpecified(false);
+      element.setAttributeNode(node);
       }
   }
 
@@ -533,11 +533,11 @@ public class DomDocument
    */
   public Text createTextNode(String value)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlCharacters(value);
+      verifyXmlCharacters(value);
       }
-	return new DomText(this, value);
+  return new DomText(this, value);
   }
 
   /**
@@ -545,11 +545,11 @@ public class DomDocument
    */
   public Text createTextNode(char[] buf, int off, int len)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlCharacters(buf, off, len);
+      verifyXmlCharacters(buf, off, len);
       }
-	return new DomText(this, buf, off, len);
+  return new DomText(this, buf, off, len);
   }
 
   /**
@@ -558,11 +558,11 @@ public class DomDocument
    */
   public Comment createComment(String value)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlCharacters(value);
+      verifyXmlCharacters(value);
       }
-	return new DomComment(this, value);
+  return new DomComment(this, value);
   }
 
   /**
@@ -571,11 +571,11 @@ public class DomDocument
    */
   public CDATASection createCDATASection(String value)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlCharacters(value);
+      verifyXmlCharacters(value);
       }
-	return new DomCDATA(this, value);
+  return new DomCDATA(this, value);
   }
 
   /**
@@ -583,11 +583,11 @@ public class DomDocument
    */
   public CDATASection createCDATASection(char[] buf, int off, int len)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlCharacters(buf, off, len);
+      verifyXmlCharacters(buf, off, len);
       }
-	return new DomCDATA(this, buf, off, len);
+  return new DomCDATA(this, buf, off, len);
   }
 
   /**
@@ -597,17 +597,17 @@ public class DomDocument
   public ProcessingInstruction createProcessingInstruction(String target,
                                                            String data)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlName(target);
-	    verifyXmlCharacters(data);
-	    if ("xml".equalsIgnoreCase(target))
+      verifyXmlName(target);
+      verifyXmlCharacters(data);
+      if ("xml".equalsIgnoreCase(target))
           {
             throw new DomEx(DomEx.SYNTAX_ERR,
                             "illegal PI target name", this, 0);
           }
       }
-	return new DomPI(this, target, data);
+  return new DomPI(this, target, data);
   }
 
   /**
@@ -616,17 +616,17 @@ public class DomDocument
    */
   public Attr createAttribute(String name)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlName(name);
+      verifyXmlName(name);
       }
-	if (name.startsWith("xml:") || name.startsWith("xmlns:"))
+  if (name.startsWith("xml:") || name.startsWith("xmlns:"))
       {
-	    return createAttributeNS(null, name);
+      return createAttributeNS(null, name);
       }
-	else
+  else
       {
-	    return new DomAttr(this, null, name);
+      return new DomAttr(this, null, name);
       }
   }
 
@@ -637,32 +637,32 @@ public class DomDocument
    */
   public Attr createAttributeNS(String namespaceURI, String name)
   {
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyNamespaceName(name);
+      verifyNamespaceName(name);
       }
 
-	if ("".equals(namespaceURI))
+  if ("".equals(namespaceURI))
       {
-	    namespaceURI = null;
+      namespaceURI = null;
       }
-	if (name.startsWith ("xml:"))
+  if (name.startsWith ("xml:"))
       {
-	    if (namespaceURI == null)
+      if (namespaceURI == null)
           {
             namespaceURI = xmlNamespace;
           }
-	    else if (!xmlNamespace.equals(namespaceURI))
+      else if (!xmlNamespace.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
                             "xml namespace is always " + xmlNamespace,
                             this, 0);
           }
-	    namespaceURI = xmlNamespace;
+      namespaceURI = xmlNamespace;
       }
     else if (name.startsWith("xmlns:") || name.equals("xmlns"))
       {
-	    if (!xmlnsURI.equals(namespaceURI))
+      if (!xmlnsURI.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
                             "xmlns is reserved", this, 0);
@@ -671,7 +671,7 @@ public class DomDocument
       }
     else if (namespaceURI == null && name.indexOf(':') != -1)
       {
-	    throw new DomEx(DomEx.NAMESPACE_ERR,
+      throw new DomEx(DomEx.NAMESPACE_ERR,
                         "prefixed name needs a URI: " + name, this, 0);
       }
     return new DomAttr(this, namespaceURI, name);
@@ -687,21 +687,21 @@ public class DomDocument
    */
   public EntityReference createEntityReference(String name)
   {
-	DomEntityReference retval;
+  DomEntityReference retval;
 
-	if (checkingCharacters)
+  if (checkingCharacters)
       {
-	    verifyXmlName(name);
+      verifyXmlName(name);
       }
-	retval = new DomEntityReference(this, name);
-	//
-	// If we have such an entity, it's allowed that one arrange that
-	// the children of this reference be "the same as" (in an undefined
-	// sense of "same", clearly not identity) the children of the entity.
-	// That can be immediate or deferred.  It's also allowed that nothing
-	// be done -- we take that option here.
-	//
-	retval.makeReadonly();
+  retval = new DomEntityReference(this, name);
+  //
+  // If we have such an entity, it's allowed that one arrange that
+  // the children of this reference be "the same as" (in an undefined
+  // sense of "same", clearly not identity) the children of the entity.
+  // That can be immediate or deferred.  It's also allowed that nothing
+  // be done -- we take that option here.
+  //
+  retval.makeReadonly();
     return retval;
   }
 
@@ -724,7 +724,7 @@ public class DomDocument
   public Node importNode(Node copiedNode, boolean deep)
   {
     String name, ns;
-	switch (copiedNode.getNodeType())
+  switch (copiedNode.getNodeType())
       {
       case TEXT_NODE:
         return createTextNode(copiedNode.getNodeValue());
@@ -766,24 +766,24 @@ public class DomDocument
           }
         return fragment;
       case ATTRIBUTE_NODE:
-        DomAttr	attr;
+        DomAttr  attr;
         name = copiedNode.getNodeName();
         ns = copiedNode.getNamespaceURI();
 
         if (ns != null)
           {
-			attr = (DomAttr) createAttributeNS(ns, name);
+      attr = (DomAttr) createAttributeNS(ns, name);
           }
         else
           {
-			attr = (DomAttr) createAttribute(name);
+      attr = (DomAttr) createAttribute(name);
           }
 
         // this is _always_ done regardless of "deep" setting
         for (Node ctx = copiedNode.getFirstChild(); ctx != null;
              ctx = ctx.getNextSibling())
           {
-			attr.appendChild(importNode(ctx, false));
+      attr.appendChild(importNode(ctx, false));
           }
         return attr;
       case ELEMENT_NODE:
@@ -861,7 +861,7 @@ public class DomDocument
                                          NodeFilter filter,
                                          boolean expandEntities)
   {
-	return new DomIterator(root, whatToShow, filter, expandEntities);
+  return new DomIterator(root, whatToShow, filter, expandEntities);
   }
 
   public TreeWalker createTreeWalker(Node root,
@@ -870,7 +870,7 @@ public class DomDocument
                                      boolean entityReferenceExpansion)
   {
     nyi(); // FIXME createTreeWalker
-	return null;
+    return null;
   }
 
   // DOM Level 3 methods
@@ -931,6 +931,11 @@ public class DomDocument
     checkingCharacters = strictErrorChecking;
   }
 
+  public String getBaseURI()
+  {
+    return systemId;
+  }
+  
   public String getDocumentURI()
   {
     return systemId;

@@ -64,9 +64,9 @@ final class CallTemplateNode
     this.withParams = withParams;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
     throws TransformerException
   {
     if (withParams != null)

@@ -40,9 +40,11 @@ package gnu.xml.transform;
 
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
  * A template node representing an XSL <code>attribute</code> instruction.
@@ -53,10 +55,10 @@ final class AttributeNode
   extends TemplateNode
 {
 
-  final String name;
+  final TemplateNode name;
   final String namespace;
   
-  AttributeNode(TemplateNode children, TemplateNode next, String name,
+  AttributeNode(TemplateNode children, TemplateNode next, TemplateNode name,
                 String namespace)
   {
     super(children, next);
@@ -64,16 +66,25 @@ final class AttributeNode
     this.namespace = namespace;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
     throws TransformerException
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
+    // Create a document fragment to hold the text
+    DocumentFragment fragment = doc.createDocumentFragment();
+    // Apply children to the fragment
+    name.apply(stylesheet, mode,
+               context, pos, len,
+               fragment, null);
+    // Use XPath string-value of fragment
+    String value = Expr.stringValue(fragment);
+    // Insert attribute
     Attr attr = (namespace != null) ?
-      doc.createAttributeNS(namespace, name) :
-      doc.createAttribute(name);
+      doc.createAttributeNS(namespace, value) :
+      doc.createAttribute(value);
     NamedNodeMap attrs = parent.getAttributes();
     if (attrs != null)
       {

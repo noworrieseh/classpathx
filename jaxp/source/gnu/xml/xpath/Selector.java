@@ -98,6 +98,71 @@ public final class Selector
     return tests;
   }
 
+  public boolean matches(Node context)
+  {
+    short nodeType = context.getNodeType();
+    switch (axis)
+      {
+      case CHILD:
+        if (nodeType == Node.ATTRIBUTE_NODE)
+          {
+            return false;
+          }
+        break;
+      case ATTRIBUTE:
+        if (nodeType != Node.ATTRIBUTE_NODE)
+          {
+            return false;
+          }
+        break;
+      case DESCENDANT_OR_SELF:
+        return true;
+      default:
+        return false;
+      }
+    int tlen = tests.length;
+    if (tlen > 0)
+      {
+        int pos = getContextPosition(context);
+        int len = getContextSize(context);
+        for (int j = 0; j < tlen && len > 0; j++)
+          {
+            Test test = tests[j];
+            if (!test.matches(context, pos, len))
+              {
+                return false;
+              }
+          }
+      }
+    return true;
+  }
+
+  private int getContextPosition(Node ctx)
+  {
+    int pos = 1;
+    for (ctx = ctx.getPreviousSibling(); ctx != null;
+         ctx = ctx.getPreviousSibling())
+      {
+        pos++;
+      }
+    return pos;
+  }
+
+  private int getContextSize(Node ctx)
+  {
+    if (ctx.getNodeType() == Node.ATTRIBUTE_NODE)
+      {
+        Node parent = ((Attr) ctx).getOwnerElement();
+        return parent.getAttributes().getLength();
+      }
+    Node parent = ctx.getParentNode();
+    if (parent != null)
+      {
+        return parent.getChildNodes().getLength();
+      }
+    return 1;
+  }
+
   public Object evaluate(Node context, int pos, int len)
   {
     Set acc = new HashSet();

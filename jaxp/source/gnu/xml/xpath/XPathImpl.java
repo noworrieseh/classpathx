@@ -122,7 +122,7 @@ public class XPathImpl
       }
     catch (XPathParser.yyException e)
       {
-        throw new XPathExpressionException(e);
+        throw new XPathExpressionException(expression);
       }
   }
   

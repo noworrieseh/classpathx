@@ -468,7 +468,6 @@ $(src)/gnu/xml/xpath/ContainsFunction.java \
 $(src)/gnu/xml/xpath/CountFunction.java \
 $(src)/gnu/xml/xpath/EqualityExpr.java \
 $(src)/gnu/xml/xpath/Expr.java \
-$(src)/gnu/xml/xpath/ExpressionTest.java \
 $(src)/gnu/xml/xpath/FalseFunction.java \
 $(src)/gnu/xml/xpath/FloorFunction.java \
 $(src)/gnu/xml/xpath/Function.java \
@@ -488,12 +487,13 @@ $(src)/gnu/xml/xpath/NumberFunction.java \
 $(src)/gnu/xml/xpath/OrExpr.java \
 $(src)/gnu/xml/xpath/ParenthesizedExpr.java \
 $(src)/gnu/xml/xpath/Path.java \
+$(src)/gnu/xml/xpath/Predicate.java \
 $(src)/gnu/xml/xpath/PositionFunction.java \
 $(src)/gnu/xml/xpath/RelationalExpr.java \
 $(src)/gnu/xml/xpath/Root.java \
 $(src)/gnu/xml/xpath/RoundFunction.java \
 $(src)/gnu/xml/xpath/Selector.java \
-$(src)/gnu/xml/xpath/Step.java \
+$(src)/gnu/xml/xpath/Steps.java \
 $(src)/gnu/xml/xpath/StartsWithFunction.java \
 $(src)/gnu/xml/xpath/StringFunction.java \
 $(src)/gnu/xml/xpath/StringLengthFunction.java \
@@ -522,7 +522,6 @@ $(src)/gnu/xml/transform/CopyOfNode.java \
 $(src)/gnu/xml/transform/CurrentFunction.java \
 $(src)/gnu/xml/transform/DocumentFunction.java \
 $(src)/gnu/xml/transform/DOMSourceLocator.java \
-$(src)/gnu/xml/transform/DummyNode.java \
 $(src)/gnu/xml/transform/ElementNode.java \
 $(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
 $(src)/gnu/xml/transform/ForEachNode.java \

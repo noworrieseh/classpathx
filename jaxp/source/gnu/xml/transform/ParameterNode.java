@@ -71,7 +71,7 @@ final class ParameterNode
     this.global = global;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, String mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
@@ -130,6 +130,25 @@ final class ParameterNode
       {
         return null;
       }
+  }
+  
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("name=");
+    buf.append(name);
+    if (select != null)
+      {
+        buf.append(",select=");
+      }
+    buf.append(select);
+    if (global)
+      {
+        buf.append(",global");
+      }
+    buf.append(']');
+    return buf.toString();
   }
 
 }

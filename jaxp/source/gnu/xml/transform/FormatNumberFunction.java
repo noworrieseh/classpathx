@@ -38,6 +38,8 @@
 
 package gnu.xml.transform;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.xpath.XPathFunction;
@@ -56,6 +58,23 @@ final class FormatNumberFunction
   implements XPathFunction, Function
 {
 
+  static final DecimalFormat defaultDecimalFormat = new DecimalFormat();
+  static
+  {
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+    symbols.setDecimalSeparator('.');
+    symbols.setGroupingSeparator(',');
+    symbols.setPercent('%');
+    symbols.setPerMill('\u2030');
+    symbols.setZeroDigit('0');
+    symbols.setDigit('#');
+    symbols.setPatternSeparator(';');
+    symbols.setInfinity("Infinity");
+    symbols.setNaN("NaN");
+    symbols.setMinusSign('-');
+    defaultDecimalFormat.setDecimalFormatSymbols(symbols);
+  }
+  
   final Stylesheet stylesheet;
   List values;
 
@@ -78,8 +97,25 @@ final class FormatNumberFunction
 
   public Object evaluate(Node context, int pos, int len)
   {
-    // TODO
-    throw new UnsupportedOperationException();
+    double number = _number(context, values.get(0));
+    String pattern = _string(context, values.get(1));
+    DecimalFormat df;
+    if (values.size() > 2)
+      {
+        String dfName = _string(context, values.get(2));
+        df = (DecimalFormat) stylesheet.decimalFormats.get(dfName);
+        if (df == null)
+          {
+            throw new IllegalArgumentException("No such decimal-format: " +
+                                               dfName);
+          }
+      }
+    else
+      {
+        df = defaultDecimalFormat;
+      }
+    df.applyPattern(pattern);
+    return df.format(number);
   }
 
 }

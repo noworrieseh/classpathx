@@ -52,6 +52,11 @@ public final class Root
   extends Path
 {
 
+  public boolean matches(Node node)
+  {
+    return (node.getNodeType() == Node.DOCUMENT_NODE);
+  }
+
   public Object evaluate(Node context, int pos, int len)
   {
     return evaluate(context, Collections.EMPTY_SET);

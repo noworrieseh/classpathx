@@ -1,3 +1,8 @@
+2004-11-11  Chris Burdess  <dog@gnu.org>
+
+   	* transform: Implemented decimal-formats and number formatting.
+   	* xpath: Implemented XSL-style pattern matching.
+   	
 2004-11-10  Chris Burdess  <dog@gnu.org>
 
    	* transform: Additional XSLT XPath extension functions. More output

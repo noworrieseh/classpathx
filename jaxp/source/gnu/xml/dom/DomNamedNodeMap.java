@@ -38,7 +38,8 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * <p> "NamedNodeMap" implementation. </p>

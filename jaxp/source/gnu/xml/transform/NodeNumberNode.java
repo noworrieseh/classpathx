@@ -48,6 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.NodeTypeTest;
+import gnu.xml.xpath.Pattern;
 import gnu.xml.xpath.Selector;
 import gnu.xml.xpath.Test;
 import gnu.xml.xpath.UnionExpr;
@@ -68,18 +69,18 @@ final class NodeNumberNode
   static final int ANY = 2;
 
   final int level;
-  final Expr count;
+  final Pattern count;
   final Expr from;
 
   NodeNumberNode(TemplateNode children, TemplateNode next,
-                 int level, Expr count, Expr from,
+                 int level, Pattern count, Expr from,
                  String format, String lang,
                  int letterValue, String groupingSeparator, int groupingSize)
   {
     super(children, next, format, lang, letterValue, groupingSeparator,
           groupingSize);
     this.level = level;
-    this.count = Template.patternToXPath(count);
+    this.count = count;
     this.from = from;
   }
 

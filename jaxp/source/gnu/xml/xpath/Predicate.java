@@ -1,5 +1,5 @@
 /*
- * DummyNode.java
+ * Predicate.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -36,36 +36,34 @@
  * exception statement from your version. 
  */
 
-package gnu.xml.transform;
+package gnu.xml.xpath;
 
-import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 
 /**
- * A template node that simply continues processing the next node.
+ * Tests whether an expression matches against a given context node.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class DummyNode
-  extends TemplateNode
+class Predicate
+  extends Test
 {
 
-  DummyNode(TemplateNode children, TemplateNode next)
+  final Expr expr;
+
+  Predicate(Expr expr)
   {
-    super(children, next);
+    this.expr = expr;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
-    throws TransformerException
+  public boolean matches(Node node, int pos, int len)
   {
-    if (next != null)
-      {
-        next.apply(stylesheet, mode,
-                   context, pos, len,
-                   parent, nextSibling);
-      }
+    return expr._boolean(node, expr.evaluate(node, pos, len));
+  }
+
+  public String toString()
+  {
+    return "[" + expr + "]";
   }
   
 }

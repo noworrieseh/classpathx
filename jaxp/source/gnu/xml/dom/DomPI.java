@@ -38,8 +38,8 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.*;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.ProcessingInstruction;
 
 /**
  * <p> "ProcessingInstruction" (PI) implementation.
@@ -62,87 +62,85 @@ public class DomPI
   extends DomNode
   implements ProcessingInstruction
 {
-    private String	target;
-    private String	data;
+  
+  private String target;
+  private String data;
+  
+  /**
+   * Constructs a ProcessingInstruction node associated with the
+   * specified document, with the specified data.
+   *
+   * <p>This constructor should only be invoked by a Document object as
+   * part of its createProcessingInstruction functionality, or through
+   * a subclass which is similarly used in a "Sub-DOM" style layer. 
+   */
+  protected DomPI(Document owner, String target, String data)
+  {
+    super(PROCESSING_INSTRUCTION_NODE, owner);
+    this.target = target;
+    this.data = data;
+  }
 
+  /**
+   * <b>DOM L1</b>
+   * Returns the target of the processing instruction.
+   */
+  public final String getTarget()
+  {
+    return target;
+  }
 
-    /**
-     * Constructs a ProcessingInstruction node associated with the
-     * specified document, with the specified data.
-     *
-     * <p>This constructor should only be invoked by a Document object as
-     * part of its createProcessingInstruction functionality, or through
-     * a subclass which is similarly used in a "Sub-DOM" style layer. 
-     */
-    protected DomPI (Document owner, String target, String data)
-    {
-	super (PROCESSING_INSTRUCTION_NODE, owner);
-	this.target = target;
-	this.data = data;
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns the target of the processing instruction
+   * (same as getTarget).
+   */
+  public final String getNodeName()
+  {
+    return target;
+  }
 
+  /**
+   * <b>DOM L1</b>
+   * Returns the data associated with the processing instruction.
+   */
+  public final String getData()
+  {
+    return data;
+  }
 
-    /**
-     * <b>DOM L1</b>
-     * Returns the target of the processing instruction.
-     */
-    final public String getTarget ()
-    {
-	return target;
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns the data associated with the processing instruction
+   * (same as getData).
+   */
+  public final String getNodeValue()
+  {
+    return data;
+  }
 
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the target of the processing instruction
-     * (same as getTarget).
-     */
-    final public String getNodeName ()
-    {
-	return target;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the data associated with the processing instruction.
-     */
-    final public String getData ()
-    {
-	return data;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the data associated with the processing instruction
-     * (same as getData).
-     */
-    final public String getNodeValue ()
-    {
-	return data;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Assigns the data associated with the processing instruction;
-     * same as setNodeValue.
-     */
-    final public void setData (String data)
-    {
-	setNodeValue (data);
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Assigns the data associated with the processing instruction.
-     */
-    final public void setNodeValue (String data)
-    {
-	if (isReadonly ())
-	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	this.data = data;
-    }
+  /**
+   * <b>DOM L1</b>
+   * Assigns the data associated with the processing instruction;
+   * same as setNodeValue.
+   */
+  public final void setData(String data)
+  {
+    setNodeValue(data);
+  }
+  
+  /**
+   * <b>DOM L1</b>
+   * Assigns the data associated with the processing instruction.
+   */
+  public final void setNodeValue(String data)
+  {
+    if (isReadonly())
+      {
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      }
+    this.data = data;
+  }
+  
 }
+

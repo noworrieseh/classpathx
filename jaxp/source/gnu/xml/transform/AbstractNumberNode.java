@@ -75,9 +75,9 @@ abstract class AbstractNumberNode
     this.groupingSize = groupingSize;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
     throws TransformerException
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
@@ -103,11 +103,158 @@ abstract class AbstractNumberNode
 
   String format(int[] number)
   {
-    // TODO
-    return null;
+    int start = 0, end = 0, len = format.length(); // region of format
+    int pos = 0; // number index
+    StringBuffer buf = new StringBuffer();
+    
+    while (pos < number.length)
+      {
+        while (end < len && !isAlphanumeric(format.charAt(end)))
+          {
+            end++;
+          }
+        if (end > start)
+          {
+            buf.append(format.substring(start, end));
+          }
+        else
+          {
+            buf.append('.');
+          }
+        start = end;
+        while (end < len && isAlphanumeric(format.charAt(end)))
+          {
+            end++;
+          }
+        if (end > start)
+          {
+            format(buf, number[pos], format.substring(start, end));
+          }
+        else
+          {
+            format(buf, number[pos], "1");
+          }
+        pos++;
+      }
+    return buf.toString();
   }
 
+  void format(StringBuffer buf, int number, String formatToken)
+  {
+    int len = formatToken.length();
+    char c = formatToken.charAt(len - 1);
+    if (Character.digit(c, 10) == 1)
+      {
+        // Check preceding characters
+        for (int i = len - 2; i >= 0; i--)
+          {
+            if (formatToken.charAt(i) != (c - 1))
+              {
+                format(buf, number, "1");
+              }
+          }
+        // Decimal representation
+        String val = Integer.toString(number);
+        for (int d = len - val.length(); d > 0; d--)
+          {
+            buf.append('0');
+          }
+        buf.append(val);
+      }
+    else if ("A".equals(formatToken))
+      {
+        buf.append(alphabetic('@', number));
+      }
+    else if ("a".equals(formatToken))
+      {
+        buf.append(alphabetic('`', number));
+      }
+    else if ("i".equals(formatToken))
+      {
+        buf.append(roman(false, number));
+      }
+    else if ("I".equals(formatToken))
+      {
+        buf.append(roman(true, number));
+      }
+    else
+      {
+        // Unknown numbering sequence
+        format(buf, number, "1");
+      }
+  }
+
+  static final boolean isAlphanumeric(char c)
+  {
+    switch (Character.getType(c))
+      {
+      case Character.DECIMAL_DIGIT_NUMBER: // Nd
+      case Character.LETTER_NUMBER: // Nl
+      case Character.OTHER_NUMBER: // No
+      case Character.UPPERCASE_LETTER: // Lu
+      case Character.LOWERCASE_LETTER: // Ll
+      case Character.TITLECASE_LETTER: // Lt
+      case Character.MODIFIER_LETTER: // Lm
+      case Character.OTHER_LETTER: // Lo
+        return true;
+      default:
+        return false;
+      }
+  }
+
+  static final String alphabetic(char offset, int number)
+  {
+    StringBuffer buf = new StringBuffer();
+    while (number > 0)
+      {
+        int r = number % 26;
+        number = number / 26;
+        buf.insert(0, (char) offset + r);
+      }
+    return buf.toString();
+  }
+
+  static final int[] roman_numbers = {1, 5, 10, 50, 100, 500, 1000};
+  static final char[] roman_chars = {'i', 'v', 'x', 'l', 'c', 'd', 'm'};
+
+  static final String roman(boolean upper, int number)
+  {
+    StringBuffer buf = new StringBuffer();
+    int pos = roman_numbers.length - 1;
+    while (pos >= 0)
+      {
+        int f = number / roman_numbers[pos];
+        if (f != 0)
+          {
+            number = number % (f * roman_numbers[pos]);
+          }
+        if (f > 4 && f < 9)
+          {
+            buf.append(roman_chars[pos + 1]);
+            f -= 5;
+          }
+        if (f == 4)
+          {
+            buf.append(roman_chars[pos]);
+            buf.append(roman_chars[pos + 1]);
+          }
+        else if (f == 9)
+          {
+            buf.append(roman_chars[pos]);
+            buf.append(roman_chars[pos + 2]);
+          }
+        else
+          {
+            for (; f > 0; f--)
+              {
+                buf.append(roman_chars[pos]);
+              }
+          }
+      }
+    return upper ? buf.toString().toUpperCase() : buf.toString();
+  }
+  
   abstract int[] compute(Stylesheet stylesheet, Node context)
     throws TransformerException;
-  
+
 }

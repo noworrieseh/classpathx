@@ -64,7 +64,7 @@ final class LiteralNode
     this.source = source;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, String mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException

@@ -116,11 +116,17 @@ public final class NameTest
   {
     switch (node.getNodeType())
       {
+      case Node.ELEMENT_NODE:
+      case Node.ATTRIBUTE_NODE:
+        break;
       case Node.DOCUMENT_TYPE_NODE:
       case Node.ENTITY_NODE:
       case Node.ENTITY_REFERENCE_NODE:
       case Node.NOTATION_NODE:
         // XPath doesn't recognise these
+        return false;
+      default:
+        // Only process elements and attributes
         return false;
       }
     if (any)

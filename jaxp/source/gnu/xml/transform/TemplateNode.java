@@ -57,16 +57,25 @@ abstract class TemplateNode
 
   final TemplateNode children;
   final TemplateNode next;
-  
+
+
   TemplateNode(TemplateNode children, TemplateNode next)
   {
     this.children = children;
     this.next = next;
   }
 
-  abstract void apply(Stylesheet stylesheet, String mode,
-                      Node context, int pos, int len,
-                      Node parent, Node nextSibling)
+  final void apply(Stylesheet stylesheet, String mode,
+                   Node context, int pos, int len,
+                   Node parent, Node nextSibling)
+    throws TransformerException
+  {
+    doApply(stylesheet, mode, context, pos, len, parent, nextSibling);
+  }
+
+  abstract void doApply(Stylesheet stylesheet, String mode,
+                        Node context, int pos, int len,
+                        Node parent, Node nextSibling)
     throws TransformerException;
 
   /**

@@ -59,7 +59,7 @@ final class WhenNode
     this.test = test;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, String mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException

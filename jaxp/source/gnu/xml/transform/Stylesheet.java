@@ -38,6 +38,8 @@
 
 package gnu.xml.transform;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -67,6 +69,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.NameTest;
+import gnu.xml.xpath.Pattern;
 import gnu.xml.xpath.Selector;
 import gnu.xml.xpath.Root;
 import gnu.xml.xpath.XPathImpl;
@@ -122,7 +125,11 @@ class Stylesheet
   String outputMediaType;
 
   // TODO keys
-  // TODO decimal-format
+
+  /**
+   * Decimal formats.
+   */
+  Map decimalFormats;
   
   /**
    * Namespace aliases.
@@ -168,6 +175,7 @@ class Stylesheet
     preserveSpace = new LinkedHashSet();
     attributeSets = new LinkedHashMap();
     usedAttributeSets = new LinkedHashMap();
+    decimalFormats = new LinkedHashMap();
     namespaceAliases = new LinkedHashMap();
     outputCdataSectionElements = new LinkedHashSet();
     if (parent == null)
@@ -220,6 +228,179 @@ class Stylesheet
       }
   }
 
+  /**
+   * template
+   */
+  final Template parseTemplate(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException, XPathExpressionException
+  {
+    String name = getAttribute(attrs, "name");
+    String m = getAttribute(attrs, "match");
+    Pattern match = (m != null) ? (Pattern) xpath.compile(m) : null;
+    String p = getAttribute(attrs, "priority");
+    String mode = getAttribute(attrs, "mode");
+    double priority = (p == null) ? Template.DEFAULT_PRIORITY :
+      Double.parseDouble(p);
+    return new Template(this, name, match,
+                        node.getFirstChild(),
+                        precedence, priority, mode);
+  }
+
+  /**
+   * output
+   */
+  final void parseOutput(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException
+  {
+    String method = getAttribute(attrs, "method");
+    if ("xml".equals(method) || method == null)
+      {
+        outputMethod = OUTPUT_XML;
+      }
+    else if ("html".equals(method))
+      {
+        outputMethod = OUTPUT_HTML;
+      }
+    else if ("text".equals(method))
+      {
+        outputMethod = OUTPUT_TEXT;
+      }
+    else
+      {
+        String msg = "unsupported output method: " + method;
+        DOMSourceLocator l = new DOMSourceLocator(node);
+        throw new TransformerConfigurationException(msg, l);
+      }
+    outputPublicId = getAttribute(attrs, "public-id");
+    outputSystemId = getAttribute(attrs, "system-id");
+    outputEncoding = getAttribute(attrs, "encoding");
+    String indent = getAttribute(attrs, "indent");
+    if (indent != null)
+      {
+        outputIndent = "yes".equals(indent);
+      }
+    outputVersion = getAttribute(attrs, "version");
+    String omitXmlDecl = getAttribute(attrs, "omit-xml-declaration");
+    if (omitXmlDecl != null)
+      {
+        outputOmitXmlDeclaration = "yes".equals(omitXmlDecl);
+      }
+    String standalone = getAttribute(attrs, "standalone");
+    if (standalone != null)
+      {
+        outputStandalone = "yes".equals(standalone);
+      }
+    outputMediaType = getAttribute(attrs, "media-type");
+    String cdataSectionElements =
+      getAttribute(attrs, "cdata-section-elements");
+    if (cdataSectionElements != null)
+      {
+        StringTokenizer st = new StringTokenizer(cdataSectionElements, " ");
+        while (st.hasMoreTokens())
+          {
+            outputCdataSectionElements.add(st.nextToken());
+          }
+      }
+  }
+
+  /**
+   * keys
+   */
+  final void parseKeys(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException, XPathExpressionException
+  {
+    // TODO
+    throw new UnsupportedOperationException("not yet implemented");
+  }
+
+  /**
+   * decimal-format
+   */
+  final void parseDecimalFormat(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException
+  {
+    String dfName = getRequiredAttribute(attrs, "name", node);
+    DecimalFormat df = new DecimalFormat();
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+    symbols.setDecimalSeparator(parseDFChar(attrs, "decimal-separator", '.'));
+    symbols.setGroupingSeparator(parseDFChar(attrs, "grouping-spearator", ','));
+    symbols.setInfinity(parseDFString(attrs, "infinity", "Infinity"));
+    symbols.setMinusSign(parseDFChar(attrs, "minus-sign", '-'));
+    symbols.setNaN(parseDFString(attrs, "NaN", "NaN"));
+    symbols.setPercent(parseDFChar(attrs, "percent", '%'));
+    symbols.setPerMill(parseDFChar(attrs, "per-mille", '\u2030'));
+    symbols.setZeroDigit(parseDFChar(attrs, "zero-digit", '0'));
+    symbols.setDigit(parseDFChar(attrs, "digit", '#'));
+    symbols.setPatternSeparator(parseDFChar(attrs, "pattern-separator", ';'));
+    df.setDecimalFormatSymbols(symbols);
+    decimalFormats.put(dfName, df);
+  }
+
+  private final char parseDFChar(NamedNodeMap attrs, String name, char def)
+    throws TransformerConfigurationException
+  {
+    Node attr = attrs.getNamedItem(name);
+    try
+      {
+        return (attr == null) ? def : attr.getNodeValue().charAt(0);
+      }
+    catch (StringIndexOutOfBoundsException e)
+      {
+        throw new TransformerConfigurationException("empty attribute '" +
+                                                    name +
+                                                    "' in decimal-format", e);
+      }
+  }
+
+  private final String parseDFString(NamedNodeMap attrs, String name,
+                                     String def)
+  {
+    Node attr = attrs.getNamedItem(name);
+    return (attr == null) ? def : attr.getNodeValue();
+  }
+  
+  /**
+   * namespace-alias
+   */
+  final void parseNamespaceAlias(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException
+  {
+    String sp = getRequiredAttribute(attrs, "stylesheet-prefix", node);
+    String rp = getRequiredAttribute(attrs, "result-prefix", node);
+    namespaceAliases.put(sp, rp);
+  }
+
+  /**
+   * attribute-set
+   */
+  final void parseAttributeSet(Node node, NamedNodeMap attrs)
+    throws TransformerConfigurationException, XPathExpressionException
+  {
+    String name = getRequiredAttribute(attrs, "name", node);
+    String uas = getAttribute(attrs, "use-attribute-sets");
+    if (uas != null)
+      {
+        usedAttributeSets.put(name, uas);
+      }
+    TemplateNode last = null;
+    for (Node ctx = node.getLastChild(); ctx != null;
+         ctx = ctx.getPreviousSibling())
+      {
+        String ctxNamespaceUri = ctx.getNamespaceURI();
+        if (XSL_NS.equals(ctxNamespaceUri) &&
+            ctx.getNodeType() == Node.ELEMENT_NODE &&
+            "attribute".equals(ctx.getLocalName()))
+          {
+            NamedNodeMap aattrs = ctx.getAttributes();
+            String aname = getRequiredAttribute(aattrs, "name", ctx);
+            String ns = getAttribute(aattrs, "namespace");
+            TemplateNode n = parseAttributeValueTemplate(aname, node);
+            last = new AttributeNode(null, last, n, ns);
+          }
+      }
+    attributeSets.put(name, last);
+  }
+  
   void parse(Node node, boolean root)
     throws TransformerConfigurationException
   {
@@ -234,56 +415,32 @@ class Stylesheet
         if (XSL_NS.equals(namespaceUri) &&
             node.getNodeType() == Node.ELEMENT_NODE)
           {
-            Element element = (Element) node;
-            String name = element.getLocalName();
+            String name = node.getLocalName();
+            NamedNodeMap attrs = node.getAttributes();
             if ("stylesheet".equals(name))
               {
-                version = element.getAttribute("version");
-                parse(element.getFirstChild(), false);
+                version = getAttribute(attrs, "version");
+                parse(node.getFirstChild(), false);
+                return;
               }
             else if ("template".equals(name))
               {
-                String tname = element.getAttribute("name");
-                if (tname.length() == 0)
-                  {
-                    tname = null;
-                  }
-                String m = element.getAttribute("match");
-                Expr match = (m != null && m.length() > 0) ?
-                  (Expr) xpath.compile(m) : null;
-                String priority = element.getAttribute("priority");
-                String mode = element.getAttribute("mode");
-                double p = (priority == null ||
-                            priority.length() == 0) ?
-                  Template.DEFAULT_PRIORITY :
-                  Double.parseDouble(priority);
-                templates.add(new Template(this,
-                                           tname,
-                                           match,
-                                           element.getFirstChild(),
-                                           precedence,
-                                           p,
-                                           mode));
-                parse(element.getNextSibling(), false);
+                templates.add(parseTemplate(node, attrs));
               }
             else if ("param".equals(name) ||
                      "variable".equals(name))
               {
                 boolean global = "variable".equals(name);
-                Object content = element.getFirstChild();
-                String paramName = element.getAttribute("name");
-                if (paramName.length() == 0)
-                  {
-                    paramName = null;
-                  }
-                String select = element.getAttribute("select");
+                Object content = node.getFirstChild();
+                String paramName = getAttribute(attrs, "name");
+                String select = getAttribute(attrs, "select");
                 if (select != null && select.length() > 0)
                   {
                     if (content != null)
                       {
                         String msg = "parameter '" + paramName +
                           "' has both select and content";
-                        DOMSourceLocator l = new DOMSourceLocator(element);
+                        DOMSourceLocator l = new DOMSourceLocator(node);
                         throw new TransformerConfigurationException(msg, l);
                       }
                     content = xpath.compile(select);
@@ -293,149 +450,68 @@ class Stylesheet
                     content = "";
                   }
                 bindings.set(paramName, content, global);
-                parse(element.getNextSibling(), false);
               }
             else if ("include".equals(name) || "import".equals(name))
               {
-                int p = "import".equals(name) ? -1 : 0;
-                String href = element.getAttribute("href");
-								Source source;
-								synchronized (factory.resolver)
-								  {
-										if (transformer != null)
-										  {
-												factory.resolver.setUserResolver(transformer.getURIResolver());
-												factory.resolver.setUserListener(transformer.getErrorListener());
-											}
-										source = factory.resolver.resolve(systemId, href);
-									}
-                Stylesheet stylesheet =
-                  factory.newStylesheet(source, precedence + p, this);
-                parse(element.getNextSibling(), false);
+                int delta = "import".equals(name) ? -1 : 0;
+                String href = getRequiredAttribute(attrs, "href", node);
+                Source source;
+                synchronized (factory.resolver)
+                  {
+                    if (transformer != null)
+                      {
+                        factory.resolver
+                          .setUserResolver(transformer.getURIResolver());
+                        factory.resolver
+                          .setUserListener(transformer.getErrorListener());
+                      }
+                    source = factory.resolver.resolve(systemId, href);
+                  }
+                factory.newStylesheet(source, precedence + delta, this);
               }
             else if ("output".equals(name))
               {
-                String method = element.getAttribute("method");
-                if ("xml".equals(method) || method.length() == 0)
-                  {
-                    outputMethod = OUTPUT_XML;
-                  }
-                else if ("html".equals(method))
-                  {
-                    outputMethod = OUTPUT_HTML;
-                  }
-                else if ("text".equals(method))
-                  {
-                    outputMethod = OUTPUT_TEXT;
-                  }
-                else
-                  {
-                    throw new TransformerConfigurationException("unsupported output method: " + method, new DOMSourceLocator(element));
-                  }
-                outputPublicId = element.getAttribute("public-id");
-                if (outputPublicId != null && outputPublicId.length() == 0)
-                  {
-                    outputPublicId = null;
-                  }
-                outputSystemId = element.getAttribute("system-id");
-                if (outputSystemId != null && outputSystemId.length() == 0)
-                  {
-                    outputSystemId = null;
-                  }
-                outputEncoding = element.getAttribute("encoding");
-                if (outputEncoding!= null && outputEncoding.length() == 0)
-                  {
-                    outputEncoding = null;
-                  }
-                String indent = element.getAttribute("indent");
-                outputIndent = "yes".equals(indent);
-                outputVersion = element.getAttribute("version");
-                if (outputVersion != null && outputVersion.length() == 0)
-                  {
-                    outputVersion = null;
-                  }
-                String omitXmlDecl =
-                  element.getAttribute("omit-xml-declaration");
-                outputOmitXmlDeclaration = "yes".equals(omitXmlDecl);
-                String standalone = element.getAttribute("standalone");
-                outputStandalone = "yes".equals(standalone);
-                outputMediaType = element.getAttribute("media-type");
-                if (outputMediaType != null && outputMediaType.length() == 0)
-                  {
-                    outputMediaType = null;
-                  }
-                String cdataSectionElements =
-                  element.getAttribute("cdata-section-elements");
-                StringTokenizer st = new StringTokenizer(cdataSectionElements,
-                                                         " ");
-                while (st.hasMoreTokens())
-                  {
-                    outputCdataSectionElements.add(st.nextToken());
-                  }
-                parse(element.getNextSibling(), false);
+                parseOutput(node, attrs);
               }
             else if ("preserve-space".equals(name))
               {
-                String elements = element.getAttribute("elements");
+                String elements =
+                  getRequiredAttribute(attrs, "elements", node);
                 StringTokenizer st = new StringTokenizer(elements,
                                                          " \t\n\r");
                 while (st.hasMoreTokens())
                   {
                     preserveSpace.add(parseNameTest(st.nextToken()));
                   }
-                parse(element.getNextSibling(), false);
               }
             else if ("strip-space".equals(name))
               {
-                String elements = element.getAttribute("elements");
+                String elements =
+                  getRequiredAttribute(attrs, "elements", node);
                 StringTokenizer st = new StringTokenizer(elements,
                                                          " \t\n\r");
                 while (st.hasMoreTokens())
                   {
                     stripSpace.add(parseNameTest(st.nextToken()));
                   }
-                parse(element.getNextSibling(), false);
               }
-            // TODO keys
-            // TODO decimal-format
+            else if ("keys".equals(name))
+              {
+                parseKeys(node, attrs);
+              }
+            else if ("decimal-format".equals(name))
+              {
+                parseDecimalFormat(node, attrs);
+              }
             else if ("namespace-alias".equals(name))
               {
-                String sp = element.getAttribute("stylesheet-prefix");
-                String rp = element.getAttribute("result-prefix");
-                namespaceAliases.put(sp, rp);
+                parseNamespaceAlias(node, attrs);
               }
             else if ("attribute-set".equals(name))
               {
-                String asName = element.getAttribute("name");
-                String uas = element.getAttribute("use-attribute-sets");
-                if (uas != null && uas.length() > 0)
-                  {
-                    usedAttributeSets.put(asName, uas);
-                  }
-                TemplateNode last = null;
-                for (Node ctx = element.getLastChild(); ctx != null;
-                     ctx = ctx.getPreviousSibling())
-                  {
-                    String ctxNamespaceUri = ctx.getNamespaceURI();
-                    String ctxName = ctx.getLocalName();
-                    if (XSL_NS.equals(ctxNamespaceUri) &&
-                        ctx.getNodeType() == Node.ELEMENT_NODE &&
-                        "attribute".equals(ctxName))
-                      {
-                        String aname = element.getAttribute("name");
-                        String ns = element.getAttribute("namespace");
-                        last = new AttributeNode(null, last,
-                                                 aname, ns);
-                      }
-                  }
-                attributeSets.put(asName, last);
+                parseAttributeSet(node, attrs);
               }
-            else
-              {
-                // Forwards-compatible processing: ignore unknown XSL
-                // elements
-                parse(element.getNextSibling(), false);
-              }
+            parse(node.getNextSibling(), false);
           }
         else if (root)
           {
@@ -500,6 +576,66 @@ class Stylesheet
       }
   }
 
+  final TemplateNode parseAttributeValueTemplate(String value, Node source)
+    throws TransformerConfigurationException, XPathExpressionException
+  {
+    // Check for attribute value template    
+    int start = value.lastIndexOf('{');
+    int end = value.lastIndexOf('}');
+    TemplateNode ret = null;
+    Document doc = source.getOwnerDocument();
+    if (start != -1 && end > start)
+      {
+        while (value.length() > 0 && start != -1 && end > start)
+          {
+            // Verbatim text at end
+            String sub = value.substring(end + 1);
+            if (sub.length() > 0)
+              {
+                ret = new LiteralNode(null, ret, doc.createTextNode(sub));
+              }
+            // Expression text
+            String expr = value.substring(start + 1, end);
+            if (expr.length() == 0)
+              {
+                String msg =
+                  "attribute value template must contain expression";
+                DOMSourceLocator l = new DOMSourceLocator(source);
+                throw new TransformerConfigurationException(msg, l);
+              }
+            Expr select = (Expr) xpath.compile(expr);
+            ret = new ValueOfNode(null, ret, select, false);
+            // work backwards through the text
+            value = value.substring(0, start);
+            start = value.lastIndexOf('{');
+            end = value.lastIndexOf('}');
+          }
+        if (value.length() > 0)
+          {
+            // Verbatim text at beginning
+            ret = new LiteralNode(null, ret, doc.createTextNode(value));
+          }
+      }
+    else
+      {
+        // Verbatim
+        ret = new LiteralNode(null, ret, doc.createTextNode(value));
+      }
+    return ret;
+  }
+
+  static final String getAttribute(NamedNodeMap attrs, String name)
+  {
+    return Template.getAttribute(attrs, name);
+  }
+
+  static final String getRequiredAttribute(NamedNodeMap attrs, String name,
+                                           Node node)
+    throws TransformerConfigurationException
+  {
+    return Template.getRequiredAttribute(attrs, name, node);
+  }
+  
   boolean isPreserved(Text text)
   {
     // Check characters in text
@@ -579,27 +715,27 @@ class Stylesheet
         int p = 1;
         for (Iterator i = ns.iterator(); i.hasNext(); )
           {
-            Node subject = (Node) i.next();
+            Node node = (Node) i.next();
             applyTemplates(mode,
-                           context, subject, p++, l,
+                           node, p++, l,
                            parent, nextSibling);
           }
       }
   }
 
   void applyTemplates(String mode,
-                      Node context, Node subject, int pos, int len,
+                      Node context, int pos, int len,
                       Node parent, Node nextSibling)
     throws TransformerException
   {
     //System.out.println("applyTemplates:");
-    //System.out.println("\tsubject="+subject);
+    //System.out.println("\tcontext="+context);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
-        boolean isMatch = t.matches(mode, context, subject, pos, len);
-        //System.out.println("applyTemplates: "+subject+" "+t+"="+isMatch);
+        boolean isMatch = t.matches(mode, context);
+        //System.out.println("applyTemplates: "+context+" "+t+"="+isMatch);
         if (isMatch)
           {
             candidates.add(t);
@@ -609,20 +745,20 @@ class Stylesheet
     if (candidates.isEmpty())
       {
         // Apply built-in template
-        //System.out.println("\tbuiltInTemplate subject="+subject);
-        switch (subject.getNodeType())
+        //System.out.println("\tbuiltInTemplate context="+context);
+        switch (context.getNodeType())
           {
           case Node.ELEMENT_NODE:
           case Node.DOCUMENT_NODE:
           case Node.DOCUMENT_FRAGMENT_NODE:
             builtInNodeTemplate.apply(this, mode,
-                                      subject, pos, len,
+                                      context, pos, len,
                                       parent, nextSibling);
             break;
           case Node.TEXT_NODE:
           case Node.ATTRIBUTE_NODE:
             builtInTextTemplate.apply(this, mode,
-                                      subject, pos, len,
+                                      context, pos, len,
                                       parent, nextSibling);
             break;
           }
@@ -631,9 +767,9 @@ class Stylesheet
       {
         Template t =
           (Template) candidates.iterator().next();
-        //System.out.println("\ttemplate="+t+" subject="+subject);
+        //System.out.println("\ttemplate="+t+" context="+context);
         t.apply(this, mode,
-                subject, pos, len,
+                context, pos, len,
                 parent, nextSibling);
       }
   }

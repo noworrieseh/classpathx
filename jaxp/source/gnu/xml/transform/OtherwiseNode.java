@@ -55,7 +55,7 @@ final class OtherwiseNode
     super(children, next);
   }
 
-  void apply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, String mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
@@ -72,6 +72,14 @@ final class OtherwiseNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+  
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append(']');
+    return buf.toString();
   }
   
 }

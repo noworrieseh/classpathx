@@ -50,7 +50,7 @@ import org.w3c.dom.Node;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public final class UnionExpr
-  extends Expr
+  extends Pattern
 {
 
   final Expr lhs;
@@ -60,6 +60,16 @@ public final class UnionExpr
   {
     this.lhs = lhs;
     this.rhs = rhs;
+  }
+
+  public boolean matches(Node context)
+  {
+    if (lhs instanceof Pattern && rhs instanceof Pattern)
+      {
+        return ((Pattern) lhs).matches(context) ||
+          ((Pattern) rhs).matches(context);
+      }
+    return false;
   }
 
   public Object evaluate(Node context, int pos, int len)

@@ -66,9 +66,9 @@ final class CopyOfNode
     this.select = select;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
     throws TransformerException
   {
     Object ret = select.evaluate(context, pos, len);
@@ -115,6 +115,16 @@ final class CopyOfNode
                    context, pos, len,
                    parent, nextSibling);
       }
+  }
+  
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("select=");
+    buf.append(select);
+    buf.append(']');
+    return buf.toString();
   }
   
 }

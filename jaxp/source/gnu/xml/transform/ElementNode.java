@@ -41,8 +41,10 @@ package gnu.xml.transform;
 import java.util.StringTokenizer;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
  * A template node representing an XSL <code>element</code> instruction.
@@ -53,11 +55,11 @@ final class ElementNode
   extends TemplateNode
 {
 
-  final String name;
+  final TemplateNode name;
   final String namespace;
   final String uas;
   
-  ElementNode(TemplateNode children, TemplateNode next, String name,
+  ElementNode(TemplateNode children, TemplateNode next, TemplateNode name,
               String namespace, String uas)
   {
     super(children, next);
@@ -66,16 +68,25 @@ final class ElementNode
     this.uas = uas;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
+  void doApply(Stylesheet stylesheet, String mode,
              Node context, int pos, int len,
              Node parent, Node nextSibling)
     throws TransformerException
   {
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
+    // Create a document fragment to hold the text
+    DocumentFragment fragment = doc.createDocumentFragment();
+    // Apply children to the fragment
+    name.apply(stylesheet, mode,
+               context, pos, len,
+               fragment, null);
+    // Use XPath string-value of fragment
+    String value = Expr.stringValue(fragment);
+    // Create element
     Element element = (namespace != null) ?
-      doc.createElementNS(namespace, name) :
-      doc.createElement(name);
+      doc.createElementNS(namespace, value) :
+      doc.createElement(value);
     if (nextSibling != null)
       {
         parent.insertBefore(element, nextSibling);

@@ -73,9 +73,9 @@ final class ApplyTemplatesNode
     this.withParams = withParams;
   }
 
-  void apply(Stylesheet stylesheet, String mode,
-             Node context, int pos, int len,
-             Node parent, Node nextSibling)
+  void doApply(Stylesheet stylesheet, String mode,
+               Node context, int pos, int len,
+               Node parent, Node nextSibling)
     throws TransformerException
   {
     Object ret = select.evaluate(context, pos, len);
@@ -107,9 +107,9 @@ final class ApplyTemplatesNode
         int p = 1;
         for (Iterator i = list.iterator(); i.hasNext(); )
           {
-            Node subject = (Node) i.next();
+            Node node = (Node) i.next();
             stylesheet.applyTemplates((this.mode != null) ? this.mode : mode,
-                                      subject, subject, p++, l,
+                                      node, p++, l,
                                       parent, nextSibling);
           }
         if (withParams != null)
