@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: IBlockCipherSpi.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: IBlockCipherSpi.java,v 1.3 2002-06-28 13:01:36 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,10 +34,10 @@ import java.security.InvalidKeyException;
 import java.util.Iterator;
 
 /**
- * Package-private interface exposing mandatory methods to be implemented by
- * concrete {@link gnu.crypto.cipher.BaseCipher} sub-classes.
+ * <p>Package-private interface exposing mandatory methods to be implemented by
+ * concrete {@link gnu.crypto.cipher.BaseCipher} sub-classes.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 interface IBlockCipherSpi extends Cloneable {
 
@@ -48,24 +48,24 @@ interface IBlockCipherSpi extends Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported block sizes.
-    * Each element returned by this object is a {@link java.lang.Integer}.<p>
+    * <p>Returns an {@link java.util.Iterator} over the supported block sizes.
+    * Each element returned by this object is a {@link java.lang.Integer}.</p>
     *
-    * @return an <tt>Iterator</tt> over the supported block sizes.
+    * @return an <code>Iterator</code> over the supported block sizes.
     */
    Iterator blockSizes();
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported key sizes. Each
-    * element returned by this object is a {@link java.lang.Integer}.<p>
+    * <p>Returns an {@link java.util.Iterator} over the supported key sizes.
+    * Each element returned by this object is a {@link java.lang.Integer}.</p>
     *
-    * @return an <tt>Iterator</tt> over the supported key sizes.
+    * @return an <code>Iterator</code> over the supported key sizes.
     */
    Iterator keySizes();
 
    /**
-    * Expands a user-supplied key material into a session key for a designated
-    * <i>block size</i>.<p>
+    * <p>Expands a user-supplied key material into a session key for a
+    * designated <i>block size</i>.</p>
     *
     * @param k the user-supplied key material.
     * @param bs the desired block size in bytes.
@@ -76,12 +76,13 @@ interface IBlockCipherSpi extends Cloneable {
    Object makeKey(byte[]k, int bs) throws InvalidKeyException;
 
    /**
-    * Encrypts exactly one block of plaintext.<p>
+    * <p>Encrypts exactly one block of plaintext.</p>
     *
     * @param in the plaintext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
+    * @param inOffset index of <code>in</code> from which to start considering
+    * data.
     * @param out the ciphertext.
-    * @param outOffset index of <i>out</i> from which to store the result.
+    * @param outOffset index of <code>out</code> from which to store the result.
     * @param k the session key to use.
     * @param bs the block size to use.
     * @exception IllegalArgumentException if the block size is invalid.
@@ -92,12 +93,13 @@ interface IBlockCipherSpi extends Cloneable {
    encrypt(byte[] in, int inOffset, byte[] out, int outOffset, Object k, int bs);
 
    /**
-    * Decrypts exactly one block of ciphertext.<p>
+    * <p>Decrypts exactly one block of ciphertext.</p>
     *
     * @param in the ciphertext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
+    * @param inOffset index of <code>in</code> from which to start considering
+    * data.
     * @param out the plaintext.
-    * @param outOffset index of <i>out</i> from which to store the result.
+    * @param outOffset index of <code>out</code> from which to store the result.
     * @param k the session key to use.
     * @param bs the block size to use.
     * @exception IllegalArgumentException if the block size is invalid.
@@ -106,4 +108,14 @@ interface IBlockCipherSpi extends Cloneable {
     */
    void
    decrypt(byte[] in, int inOffset, byte[] out, int outOffset, Object k, int bs);
+
+   /**
+    * <p>A <i>correctness</i> test that consists of basic symmetric encryption /
+    * decryption test(s) for all supported block and key sizes, as well as one
+    * (1) variable key Known Answer Test (KAT).</p>
+    *
+    * @return <code>true</code> if the implementation passes simple
+    * <i>correctness</i> tests. Returns <code>false</code> otherwise.
+    */
+   boolean selfTest();
 }
