@@ -725,7 +725,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: acinclude.m4,v 1.8 2004-08-13 07:44:03 dog Exp $
+# $Id: acinclude.m4,v 1.9 2004-10-08 08:17:08 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,
@@ -741,7 +741,7 @@ rm -fr Test*])
 
 # This macro is used internally to discover the suffix for the current
 # settings of $module.  The result is stored in $_SOSUFFIX.
-AC_DEFUN(_SOSUFFIX_INTERNAL, [
+AC_DEFUN([_SOSUFFIX_INTERNAL], [
 	versuffix=""
 	release=""
 	libname=libfoo
@@ -760,7 +760,7 @@ AC_DEFUN(_SOSUFFIX_INTERNAL, [
 
 # SOSUFFIX_CONFIG will set the variable SOSUFFIX to be the
 # shared library extension used for general linking, not dlopen.
-AC_DEFUN(SOSUFFIX_CONFIG, [
+AC_DEFUN([SOSUFFIX_CONFIG], [
 	AC_MSG_CHECKING([SOSUFFIX from libtool])
 	module=no
         _SOSUFFIX_INTERNAL
@@ -772,7 +772,7 @@ AC_DEFUN(SOSUFFIX_CONFIG, [
 # MODSUFFIX_CONFIG will set the variable MODSUFFIX to be the
 # shared library extension used for dlopen'ed modules.
 # To discover this, we set $module, simulating libtool's -module option.
-AC_DEFUN(MODSUFFIX_CONFIG, [
+AC_DEFUN([MODSUFFIX_CONFIG], [
 	AC_MSG_CHECKING([MODSUFFIX from libtool])
 	module=yes
         _SOSUFFIX_INTERNAL
@@ -788,7 +788,7 @@ AC_DEFUN(MODSUFFIX_CONFIG, [
 # Robert Boehne:  Not much point in this macro any more because apparently
 # Darwin is the only OS that wants or needs the .jnilib extension.
 ##########################################################################
-AC_DEFUN(JMODSUFFIX_CONFIG, [
+AC_DEFUN([JMODSUFFIX_CONFIG], [
 	AC_MSG_CHECKING([JMODSUFFIX from libtool])
 	module=yes
         _SOSUFFIX_INTERNAL

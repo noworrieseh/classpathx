@@ -1,6 +1,8 @@
 2004-10-08  Chris Burdess <dog@gnu.org>
 
 	* xmlj_util.c: String caching only by setting macro.
+	* acinclude.m4,configure.ac,Makefile.am: automake 1.8 patch by
+	    Michael Koch; fixes to compile in subdirectory.
 
 2004-10-06  Chris Burdess <dog@gnu.org>
 

@@ -393,7 +393,7 @@ libj_jarfile=   gnujaxp.jar
 
 #XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -export-dynamic -D_JNI_IMPLEMENTATION_
 XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
-XMLJ_CFLAGS=    $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -fbounds-check
+XMLJ_CFLAGS=    $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -I. -pedantic -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wall -Wno-long-long -fbounds-check
 LT_COMPILE=     $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
 LT_LINK=        $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
 LT_INSTALL=     $(LIBTOOL) --mode=install $(INSTALL)
@@ -472,7 +472,7 @@ $(libj_jarfile): $(classes)
 		-C $(dst) org
 
 # JNI objects
-$(jni_lobjects): %.lo: %.c $(headers)
+$(jni_lobjects): %.lo: @srcdir@/%.c $(headers)
 	$(LT_COMPILE) $< 
 
 # Shared JNI library
@@ -502,8 +502,8 @@ dist-hook:
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
 
 install-data-local:
-	@srcdir@/mkinstalldirs $(libdir)
-	$(LT_INSTALL) ${libjso_target} $(libdir)
-	@srcdir@/mkinstalldirs $(datadir)/java/
-	$(INSTALL_DATA) ${libj_jarfile} $(datadir)/java/
+	@srcdir@/mkinstalldirs $(DESTDIR)$(libdir)
+	$(LT_INSTALL) ${libjso_target} $(DESTDIR)$(libdir)
+	@srcdir@/mkinstalldirs $(DESTDIR)$(datadir)/java/
+	$(INSTALL_DATA) ${libj_jarfile} $(DESTDIR)$(datadir)/java/
 

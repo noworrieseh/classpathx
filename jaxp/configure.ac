@@ -22,11 +22,13 @@
 # 02111-1307 USA. 
 #
 
-AC_INIT(source/javax/xml/parsers/SAXParserFactory.java)
-AC_CONFIG_SRCDIR(xmlj_util.c)
-AC_CONFIG_AUX_DIR(config)
+#AC_INIT(source/javax/xml/parsers/SAXParserFactory.java)
+AC_INIT([jaxp], [1.1], [jaxp])
+AC_CONFIG_SRCDIR([xmlj_util.c])
+AC_CONFIG_AUX_DIR([config])
 
-AM_INIT_AUTOMAKE(jaxp, 1.1)
+#AM_INIT_AUTOMAKE(jaxp, 1.1)
+AM_INIT_AUTOMAKE([1.8.0])
 
 AC_JAVA_OPTIONS
 
@@ -71,6 +73,6 @@ SOSUFFIX_CONFIG
 MODSUFFIX_CONFIG
 JMODSUFFIX_CONFIG
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
