@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha160.java,v 1.2 2001-12-15 02:07:11 raif Exp $
+// $Id: Sha160.java,v 1.3 2001-12-30 15:53:10 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -55,7 +55,7 @@ import java.io.PrintWriter;
  * STANDARD</a><br>
  * Federal Information, Processing Standards Publication 180-1, 1995 April 17.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Sha160 extends BaseHash {
 
@@ -112,55 +112,22 @@ public class Sha160 extends BaseHash {
    // Class methods
    // -------------------------------------------------------------------------
 
-   public static final int[] G(int h0, int h1, int h2, int h3, int h4, int[] W) {
-      int A = h0;
-      int B = h1;
-      int C = h2;
-      int D = h3;
-      int E = h4;
-      int r, T;
-
-      // rounds 0-19
-      for (r = 0; r < 20; r++) {
-         T = (A << 5 | A >>> 27) + ((B & C) | (~B & D)) + E + W[r] + 0x5A827999;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
+   public static final int[]
+   G(int h0, int h1, int h2, int h3, int h4, byte[] in, int offset) {
+      int[] w = new int[80];
+      int i, T;
+      for (i = 0; i < 16; i++) {
+         w[i] = in[offset++]         << 24 |
+               (in[offset++] & 0xFF) << 16 |
+               (in[offset++] & 0xFF) <<  8 |
+               (in[offset++] & 0xFF);
+      }
+      for (i = 16; i < 80; i++) {
+         T = w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16];
+         w[i] = T << 1 | T >>> 31;
       }
 
-      // rounds 20-39
-      for (r = 20; r < 40; r++) {
-         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[r] + 0x6ED9EBA1;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      // rounds 40-59
-      for (r = 40; r < 60; r++) {
-         T = (A << 5 | A >>> 27) + (B & C | B & D | C & D) + E + W[r] + 0x8F1BBCDC;                // K_t
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      // rounds 60-79
-      for (r = 60; r < 80; r++) {
-         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + W[r] + 0xCA62C1D6;
-         E = D;
-         D = C;
-         C = B << 30 | B >>> 2;
-         B = A;
-         A = T;
-      }
-
-      return new int[] {h0+A, h1+B, h2+C, h3+D, h4+E};
+      return sha(h0, h1, h2, h3, h4, w);
    }
 
    // Cloneable interface implementation
@@ -175,21 +142,19 @@ public class Sha160 extends BaseHash {
    // -------------------------------------------------------------------------
 
    protected void transform(byte[] in, int offset) {
-      int t;
-      for (t = 0; t < 16; t++) {
-         W[t] = in[offset++]         << 24 |
+      int i, T;
+      for (i = 0; i < 16; i++) {
+         W[i] = in[offset++]         << 24 |
                (in[offset++] & 0xFF) << 16 |
                (in[offset++] & 0xFF) <<  8 |
                (in[offset++] & 0xFF);
       }
-
-      int T;
-      for (t = 16; t < 80; t++) {
-         T = W[t-3] ^ W[t-8] ^ W[t-14] ^ W[t-16];
-         W[t] = T << 1 | T >>> 31;
+      for (i = 16; i < 80; i++) {
+         T = W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16];
+         W[i] = T << 1 | T >>> 31;
       }
 
-      int[] result = G(h0, h1, h2, h3, h4, W);
+      int[] result = sha(h0, h1, h2, h3, h4, W);
 
       h0 = result[0];
       h1 = result[1];
@@ -247,6 +212,62 @@ public class Sha160 extends BaseHash {
       md.update((byte) 0x62); // b
       md.update((byte) 0x63); // c
       String result = Util.toString(md.digest());
+
       return DIGEST0.equals(result);
+   }
+
+   // SHA specific methods
+   // -------------------------------------------------------------------------
+
+   private static final int[]
+   sha(int h0, int h1, int h2, int h3, int h4, int[] w) {
+      int A = h0;
+      int B = h1;
+      int C = h2;
+      int D = h3;
+      int E = h4;
+      int r, T;
+
+      // rounds 0-19
+      for (r = 0; r < 20; r++) {
+         T = (A << 5 | A >>> 27) + ((B & C) | (~B & D)) + E + w[r] + 0x5A827999;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 20-39
+      for (r = 20; r < 40; r++) {
+         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + w[r] + 0x6ED9EBA1;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 40-59
+      for (r = 40; r < 60; r++) {
+         T = (A << 5 | A >>> 27) + (B & C | B & D | C & D) + E + w[r] + 0x8F1BBCDC;                // K_t
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      // rounds 60-79
+      for (r = 60; r < 80; r++) {
+         T = (A << 5 | A >>> 27) + (B ^ C ^ D) + E + w[r] + 0xCA62C1D6;
+         E = D;
+         D = C;
+         C = B << 30 | B >>> 2;
+         B = A;
+         A = T;
+      }
+
+      return new int[] {h0+A, h1+B, h2+C, h3+D, h4+E};
    }
 }
