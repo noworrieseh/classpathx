@@ -1,5 +1,5 @@
 /*
- * $Id: DomDocument.java,v 1.6 2001-11-16 23:17:43 db Exp $
+ * $Id: DomDocument.java,v 1.7 2001-11-19 04:48:35 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,10 +32,10 @@ import java.util.Enumeration;
 import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
-import DomDoctype.ElementInfo;
+import gnu.xml.dom.DomDoctype.ElementInfo;
 
 
-// $Id: DomDocument.java,v 1.6 2001-11-16 23:17:43 db Exp $
+// $Id: DomDocument.java,v 1.7 2001-11-19 04:48:35 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -47,7 +47,7 @@ import DomDoctype.ElementInfo;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 23:17:43 $
+ * @version $Date: 2001-11-19 04:48:35 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -87,10 +87,6 @@ public class DomDocument extends DomNode
      * a specialized implementation; it will normally be called by
      * that implementation.
      *
-     * <p> Note that this constructor enables character checking;
-     * this constructor is not normally used when connecting a DOM
-     * to an XML parser.
-     *
      * @see DomImpl
      * @see #setCheckingCharacters
      */
@@ -98,7 +94,6 @@ public class DomDocument extends DomNode
     {
 	super (null, DOCUMENT_NODE);
 	implementation = impl;
-	checkingCharacters = true;
     }
 
 
@@ -380,8 +375,6 @@ public class DomDocument extends DomNode
     public Element createElement (String name)
     {
 	Element		element;
-	DomDoctype	doctype;
-	ElementInfo	info;
 
 	if (checkingCharacters)
 	    verifyXmlName (name);
@@ -389,20 +382,7 @@ public class DomDocument extends DomNode
 	    element = createElementNS (null, name);
 	else
 	    element = new DomElement (this, null, name);
-	doctype = (DomDoctype) getDoctype ();
-	if (doctype == null)
-	    return element;
-
-	// default any attributes that need it
-	info = doctype.getElementInfo (name);
-	for (Enumeration e = info.keys (); e.hasMoreElements (); /* NOP */) {
-	    String	attr = (String) e.nextElement ();
-	    DomAttr	node = (DomAttr) createAttribute (attr);
-
-	    node.setValue ((String) info.get (attr));
-	    node.setSpecified (false);
-	    element.setAttributeNode (node);
-	}
+	defaultAttributes (element, name);
 	return element;
     }
 
@@ -420,11 +400,11 @@ public class DomDocument extends DomNode
 	if ("".equals (namespaceURI))
 	    namespaceURI = null;
 	if (name.startsWith ("xml:")) {
-	    if (namespaceURI == null)
-		namespaceURI = xmlNamespace;
-	    else if (!xmlNamespace.equals (namespaceURI))
+	    if (namespaceURI != null
+		    && !xmlNamespace.equals (namespaceURI))
 		throw new DomEx (DomEx.NAMESPACE_ERR,
 		    "xml namespace is always " + xmlNamespace, this, 0);
+	    namespaceURI = xmlNamespace;
 	} else if (name.startsWith ("xmlns:"))
 	    throw new DomEx (DomEx.NAMESPACE_ERR,
 		"xmlns is reserved", this, 0);
@@ -432,7 +412,29 @@ public class DomDocument extends DomNode
 	    throw new DomEx (DomEx.NAMESPACE_ERR,
 		"prefixed name needs a URI", this, 0);
 
-	return new DomElement (this, namespaceURI, name);
+	Element	element = new DomElement (this, namespaceURI, name);
+	defaultAttributes (element, name);
+	return element;
+    }
+
+    private void defaultAttributes (Element element, String name)
+    {
+	DomDoctype	doctype = (DomDoctype) getDoctype ();
+	ElementInfo	info;
+
+	if (doctype == null)
+	    return;
+
+	// default any attributes that need it
+	info = doctype.getElementInfo (name);
+	for (Enumeration e = info.keys (); e.hasMoreElements (); /* NOP */) {
+	    String	attr = (String) e.nextElement ();
+	    DomAttr	node = (DomAttr) createAttribute (attr);
+
+	    node.setValue ((String) info.get (attr));
+	    node.setSpecified (false);
+	    element.setAttributeNode (node);
+	}
     }
 
 
@@ -621,7 +623,7 @@ public class DomDocument extends DomNode
 		    // these, or add them to a doctype.  Useless.
 		    Entity node = (Entity) copiedNode;
 
-			// XXX if "deep", can/should copy children!
+			// FIXME if "deep", can/should copy children!
 
 		    return new DomEntity (this, node.getNodeName (),
 			    node.getPublicId (), node.getSystemId (),
@@ -653,7 +655,6 @@ public class DomDocument extends DomNode
 			retval = (DomAttr) createAttributeNS (ns, name);
 		    else
 			retval = (DomAttr) createAttribute (name);
-		    retval.setSpecified (true);
 
 		    // this is _always_ done regardless of "deep" setting
 		    for (int i = 0; i < len; i++)
@@ -674,14 +675,20 @@ public class DomDocument extends DomNode
 			retval = (DomElement) createElement (name);
 		    for (int i = 0; i < len; i++) {
 			Attr	attr = (Attr) attrs.item (i);
-			DomAttr	newAttr = (DomAttr) importNode (attr, false);
+			Attr	dflt;
 
-			// This is the only way we have to record attributes
-			// whose values are "defaulted".
-			if (!attr.getSpecified ())
-			    newAttr.setSpecified (false);
+			// maybe update defaulted attributes
+			dflt = retval.getAttributeNode (attr.getNodeName ());
+			if (dflt != null) {
+			    String	newval = attr.getNodeValue ();
+			    if (!dflt.getNodeValue ().equals (newval)
+				    || attr.getSpecified () == true)
+				dflt.setNodeValue (newval);
+			    continue;
+			}
 
-			retval.setAttributeNode (newAttr);
+			retval.setAttributeNode ((Attr)
+				    importNode (attr, false));
 		    }
 
 		    if (!deep)
@@ -706,7 +713,7 @@ public class DomDocument extends DomNode
 		throw new DomEx (DomEx.NOT_SUPPORTED_ERR, null, copiedNode, 0);
 	}
 
-	// XXX cleanup a bit -- for deep copies, copy those
+	// FIXME cleanup a bit -- for deep copies, copy those
 	// children in one place, here (code sharing is healthy)
     }
 
@@ -737,7 +744,7 @@ public class DomDocument extends DomNode
 	boolean		entityReferenceExpansion
     )
     {
-nyi (); // XXX createTreeWalker
+nyi (); // FIXME createTreeWalker
 	return null;
     }
 }
