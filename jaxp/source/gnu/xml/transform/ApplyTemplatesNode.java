@@ -118,4 +118,28 @@ final class ApplyTemplatesNode
       }
   }
   
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    boolean o = false;
+    if (select != null)
+      {
+        buf.append("select=");
+        buf.append(select);
+        o = true;
+      }
+    if (mode != null)
+      {
+        if (o)
+          {
+            buf.append(',');
+          }
+        buf.append("mode=");
+        buf.append(mode);
+      }
+    buf.append(']');
+    return buf.toString();
+  }
+  
 }

@@ -585,6 +585,7 @@ class Stylesheet
             return;
           }
       }
+    System.err.println("WARNING: call-template: '"+name+"' not found");
   }
 
   public XPathFunction resolveFunction(QName name, int arity)

@@ -68,8 +68,8 @@ final class AttributeNode
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    Document doc = (context instanceof Document) ? (Document) context :
-      context.getOwnerDocument();
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
     Attr attr = (namespace != null) ?
       doc.createAttributeNS(namespace, name) :
       doc.createAttribute(name);
@@ -93,6 +93,16 @@ final class AttributeNode
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
+  }
+  
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("name=");
+    buf.append(name);
+    buf.append(']');
+    return buf.toString();
   }
   
 }

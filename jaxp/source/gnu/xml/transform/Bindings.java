@@ -131,6 +131,10 @@ public class Bindings
         Expr expr = (Expr) ret;
         ret = expr.evaluate(context);
       }
+    if (ret == null)
+      {
+        ret = "";
+      }
     return ret;
   }
 

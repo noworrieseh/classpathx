@@ -66,7 +66,7 @@ abstract class TemplateNode
   /**
    * Debugging
    */
-  void list(int depth, PrintStream out)
+  void list(int depth, PrintStream out, boolean listNext)
   {
     for (int i = 0; i < depth; i++)
       {
@@ -75,11 +75,11 @@ abstract class TemplateNode
     out.println(toString());
     if (children != null)
       {
-        children.list(depth + 1, out);
+        children.list(depth + 1, out, true);
       }
-    if (next != null)
+    if (listNext && next != null)
       {
-        next.list(depth, out);
+        next.list(depth, out, listNext);
       }
   }
 

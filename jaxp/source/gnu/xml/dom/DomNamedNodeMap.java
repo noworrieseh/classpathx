@@ -174,13 +174,13 @@ public class DomNamedNodeMap
       }
     if (node.nodeType == Node.ATTRIBUTE_NODE)
       {
-        DomAttr attr = (DomAttr) arg;
-        DomElement element = attr.element;
+        DomNode element = node.parent;
         if (element != null && element != owner)
           {
             throw new DomEx (DomEx.INUSE_ATTRIBUTE_ERR);
           }
-        attr.element = (DomElement) owner;
+        node.parent = owner;
+        node.depth = owner.depth + 1;
       }
     
     String nodeName = ns ? null : node.getNodeName();

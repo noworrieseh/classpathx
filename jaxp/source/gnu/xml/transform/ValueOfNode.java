@@ -93,5 +93,19 @@ final class ValueOfNode
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
   }
+
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("select=");
+    buf.append(select);
+    if (disableOutputEscaping)
+      {
+        buf.append(",disableOutputEscaping");
+      }
+    buf.append(']');
+    return buf.toString();
+  }
   
 }

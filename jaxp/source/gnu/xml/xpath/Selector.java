@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -186,7 +187,8 @@ extends Expr
 
   void addParentNode (Node context, Collection acc, boolean recurse)
   {
-    Node parent = context.getParentNode ();
+    Node parent = (context.getNodeType() == Node.ATTRIBUTE_NODE) ?
+      ((Attr) context).getOwnerElement() : context.getParentNode ();
     if (parent != null)
       {
         acc.add (parent);

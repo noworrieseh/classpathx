@@ -93,4 +93,14 @@ final class CallTemplateNode
       }
   }
   
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("name=");
+    buf.append(name);
+    buf.append(']');
+    return buf.toString();
+  }
+  
 }

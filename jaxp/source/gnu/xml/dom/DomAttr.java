@@ -74,211 +74,220 @@ public class DomAttr
   implements Attr
 {
   
-    private boolean	specified;
-
-    // NOTE:  it could be possible to rework this code a bit so that
-    // this extra field isn't needed; "parent" might do double duty,
-    // with appropriate safeguards.  Using less space is healthy!
-    DomElement	element;
-
-
-    /**
-     * Constructs an Attr node associated with the specified document.
-     * The "specified" flag is initialized to true, since this DOM has
-     * no current "back door" mechanisms to manage default values so
-     * that every value must effectively be "specified".
-     *
-     * <p>This constructor should only be invoked by a Document as part of
-     * its createAttribute functionality, or through a subclass which is
-     * similarly used in a "Sub-DOM" style layer.
-     *
-     * @param owner The document with which this node is associated
-     * @param namespaceURI Combined with the local part of the name,
-     *	this is used to uniquely identify a type of attribute
-     * @param name Name of this attribute, which may include a prefix
-     */
-    protected DomAttr(Document owner, String namespaceURI, String name)
-    {
-      super(ATTRIBUTE_NODE, owner, namespaceURI, name);
-      specified = true;
-      
-      // XXX register self to get insertion/removal events
-      // and character data change events and when they happen,
-      // report self-mutation
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the attribute name (same as getNodeName)
-     */
-    public final String getName()
-    {
-      return getNodeName();
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns true if a parser reported this was in the source text.
-     */
-    public final boolean getSpecified()
-    {
-      return specified;
-    }
-
-
-    /**
-     * Records whether this attribute was in the source text.
-     */
-    public final void setSpecified(boolean value)
-    {
-      specified = value;
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the attribute value, with character and entity
-     * references substituted.
-     * <em>NOTE:  entity refs as children aren't currently handled.</em>
-     */
-    public String getNodeValue()
-    {
-      StringBuffer buf = new StringBuffer();
-      for (DomNode ctx = first; ctx != null; ctx = ctx.next)
-        {
-          switch (ctx.nodeType)
-            {
-            case Node.TEXT_NODE:
-              buf.append(ctx.getNodeValue());
-              break;
-            case Node.ENTITY_REFERENCE_NODE:
-              // TODO
-              break;
-            }
-        }
-      return buf.toString();
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Assigns the value of the attribute; it will have one child,
-     * which is a text node with the specified value (same as
-     * setNodeValue).
-     */
-    public final void setValue(String value)
-    {
-      setNodeValue(value);
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the value of the attribute as a non-null string; same
-     * as getNodeValue.
-     * <em>NOTE:  entity refs as children aren't currently handled.</em>
-     */
-    public final String getValue()
-    {
-      return getNodeValue();
-    }
-
-
-    /**
-     * <b>DOM L1</b>
-     * Assigns the attribute value; using this API, no entity or
-     * character references will exist.
-     * Causes a DOMAttrModified mutation event to be sent.
-     */
-    public void setNodeValue(String value)
-    {
-      if (isReadonly())
-        {
-          throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
-        }
-      
-      String oldValue = getValue ();
-      while (last != null)
-        {
-          removeChild(last);
-        }
-      Node text = owner.createTextNode(value);
-      appendChild(text);
-      specified = true;
-      
-      mutating(oldValue, value, MutationEvent.MODIFICATION);
-    }
-
-
-    /**
-     * <b>DOM L2</b>
-     * Returns the element with which this attribute is associated.
-     */
-    public final Element getOwnerElement()
-    {
-      return element;
-    }
-
-
-    /**
-     * Records the element with which this attribute is associated.
-     */
-    public final void setOwnerElement(Element e)
-    {
-      if (element != null)
-        {
-          throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
-        }
-      if (!(e instanceof DomElement))
-        {
-          throw new DomEx(DomEx.WRONG_DOCUMENT_ERR);
-        }
-      element = (DomElement) e;
-    }
-
-    /**
-     * Shallow clone of the attribute, breaking all ties with any
-     * elements.
-     */
-    public Object clone()
-    {
-      DomAttr retval = (DomAttr) super.clone();
-      
-      retval.element = null;
-      retval.specified = false;
-      return retval;
-    }
+  private boolean	specified;
+  
+  /**
+   * Constructs an Attr node associated with the specified document.
+   * The "specified" flag is initialized to true, since this DOM has
+   * no current "back door" mechanisms to manage default values so
+   * that every value must effectively be "specified".
+   *
+   * <p>This constructor should only be invoked by a Document as part of
+   * its createAttribute functionality, or through a subclass which is
+   * similarly used in a "Sub-DOM" style layer.
+   *
+   * @param owner The document with which this node is associated
+   * @param namespaceURI Combined with the local part of the name,
+   *	this is used to uniquely identify a type of attribute
+   * @param name Name of this attribute, which may include a prefix
+   */
+  protected DomAttr(Document owner, String namespaceURI, String name)
+  {
+    super(ATTRIBUTE_NODE, owner, namespaceURI, name);
+    specified = true;
     
-    private void mutating(String oldValue, String newValue, short why)
-    {
-	if (!reportMutations || element == null)
-	    return;
+    // XXX register self to get insertion/removal events
+    // and character data change events and when they happen,
+    // report self-mutation
+  }
+  
 
-	// EVENT:  DOMAttrModified, target = element,
-	//	prev/new values provided, also attr name
-	MutationEvent	event;
+  /**
+   * <b>DOM L1</b>
+   * Returns the attribute name (same as getNodeName)
+   */
+  public final String getName()
+  {
+    return getNodeName();
+  }
+  
 
-	event = (MutationEvent) createEvent ("MutationEvents");
-	event.initMutationEvent ("DOMAttrModified",
-		true /* bubbles */, false /* nocancel */,
-		null, oldValue, newValue, getNodeName (), why);
-	element.dispatchEvent (event);
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns true if a parser reported this was in the source text.
+   */
+  public final boolean getSpecified()
+  {
+    return specified;
+  }
+  
 
-    // DOM Level 3 methods
+  /**
+   * Records whether this attribute was in the source text.
+   */
+  public final void setSpecified(boolean value)
+  {
+    specified = value;
+  }
 
-    public TypeInfo getSchemaTypeInfo()
-    {
-      // TODO
-      return null;
-    }
 
-    public boolean isId()
-    {
-      // TODO
-      return false;
-    }
+  /**
+   * <b>DOM L1</b>
+   * Returns the attribute value, with character and entity
+   * references substituted.
+   * <em>NOTE:  entity refs as children aren't currently handled.</em>
+   */
+  public String getNodeValue()
+  {
+    StringBuffer buf = new StringBuffer();
+    for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+      {
+        switch (ctx.nodeType)
+          {
+          case Node.TEXT_NODE:
+            buf.append(ctx.getNodeValue());
+            break;
+          case Node.ENTITY_REFERENCE_NODE:
+            // TODO
+            break;
+          }
+      }
+    return buf.toString();
+  }
+  
+
+  /**
+   * <b>DOM L1</b>
+   * Assigns the value of the attribute; it will have one child,
+   * which is a text node with the specified value (same as
+   * setNodeValue).
+   */
+  public final void setValue(String value)
+  {
+    setNodeValue(value);
+  }
+  
+
+  /**
+   * <b>DOM L1</b>
+   * Returns the value of the attribute as a non-null string; same
+   * as getNodeValue.
+   * <em>NOTE:  entity refs as children aren't currently handled.</em>
+   */
+  public final String getValue()
+  {
+    return getNodeValue();
+  }
+  
+
+  /**
+   * <b>DOM L1</b>
+   * Assigns the attribute value; using this API, no entity or
+   * character references will exist.
+   * Causes a DOMAttrModified mutation event to be sent.
+   */
+  public void setNodeValue(String value)
+  {
+    if (isReadonly())
+      {
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      }
+    
+    String oldValue = getValue ();
+    while (last != null)
+      {
+        removeChild(last);
+      }
+    Node text = owner.createTextNode(value);
+    appendChild(text);
+    specified = true;
+    
+    mutating(oldValue, value, MutationEvent.MODIFICATION);
+  }
+
+
+  /**
+   * <b>DOM L2</b>
+   * Returns the element with which this attribute is associated.
+   */
+  public final Element getOwnerElement()
+  {
+    return (Element) parent;
+  }
+
+
+  /**
+   * Records the element with which this attribute is associated.
+   */
+  public final void setOwnerElement(Element e)
+  {
+    if (parent != null)
+      {
+        throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
+      }
+    if (!(e instanceof DomElement))
+      {
+        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR);
+      }
+    parent = (DomElement) e;
+    depth = parent.depth + 1;
+  }
+
+  /**
+   * Shallow clone of the attribute, breaking all ties with any
+   * elements.
+   */
+  public Object clone()
+  {
+    DomAttr retval = (DomAttr) super.clone();
+    
+    retval.specified = false;
+    return retval;
+  }
+    
+  private void mutating(String oldValue, String newValue, short why)
+  {
+    if (!reportMutations || parent == null)
+      {
+        return;
+      }
+    
+    // EVENT:  DOMAttrModified, target = parent,
+    //	prev/new values provided, also attr name
+    MutationEvent	event;
+    
+    event = (MutationEvent) createEvent ("MutationEvents");
+    event.initMutationEvent ("DOMAttrModified",
+                             true /* bubbles */, false /* nocancel */,
+                             null, oldValue, newValue, getNodeName (), why);
+    parent.dispatchEvent (event);
+  }
+
+  // DOM Level 3 methods
+  
+  public TypeInfo getSchemaTypeInfo()
+  {
+    // TODO
+    return null;
+  }
+
+  public boolean isId()
+  {
+    if (parent != null)
+      {
+        DomDoctype doctype = (DomDoctype) parent.owner.getDoctype();
+        if (doctype != null)
+          {
+            DomDoctype.ElementInfo info =
+              doctype.getElementInfo(parent.getNodeName());
+            if (info != null)
+              {
+                String idAttr = info.getIdAttr();
+                return (idAttr != null && idAttr.equals(getNodeName()));
+              }
+          }
+      }
+    return false;
+  }
 
 }

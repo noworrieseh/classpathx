@@ -1168,6 +1168,10 @@ public abstract class DomNode
    */
   final public Node getNextSibling()
   {
+    if (nodeType == ATTRIBUTE_NODE)
+      {
+        return null;
+      }
     return next;
     /*
       if (parent == null || getNodeType() == ATTRIBUTE_NODE)
@@ -1183,6 +1187,10 @@ public abstract class DomNode
    */
   final public Node getPreviousSibling()
   {
+    if (nodeType == ATTRIBUTE_NODE)
+      {
+        return null;
+      }
     return previous;
     /*
       if (parent == null || getNodeType () == ATTRIBUTE_NODE)
@@ -1198,6 +1206,10 @@ public abstract class DomNode
    */
   final public Node getParentNode()
   {
+    if (nodeType == ATTRIBUTE_NODE)
+      {
+        return null;
+      }
     return parent;
   }
 

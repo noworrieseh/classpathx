@@ -249,7 +249,7 @@ class Template
               {
                 String tname = element.getAttribute("name");
                 List withParams = parseWithParams(children);
-                return new CallTemplateNode(null, parse(next), name,
+                return new CallTemplateNode(null, parse(next), tname,
                                             withParams);
               }
             else if ("value-of".equals(name))
@@ -484,9 +484,9 @@ class Template
                     int start = value.lastIndexOf('{');
                     int end = value.lastIndexOf('}');
                     TemplateNode grandchild = null;
+                    Document doc = source.getOwnerDocument();
                     if (start != -1 && end > start)
                       {
-                        Document doc = source.getOwnerDocument();
                         while (value.length() > 0 &&
                                start != -1 && end > start)
                           {
@@ -528,8 +528,9 @@ class Template
                     else
                       {
                         // Verbatim
-                        grandchild = parse(attr.getFirstChild());
-                  }
+                        grandchild = new LiteralNode(null, grandchild,
+                                                     doc.createTextNode(value));
+                      }
                     child = new AttributeNode(grandchild, child,
                                               attr.getNodeName(),
                                               attr.getNamespaceURI());
@@ -653,7 +654,7 @@ class Template
     out.println(toString());
     if (node != null)
       {
-        node.list(1, out);
+        node.list(1, out, true);
       }
   }
 

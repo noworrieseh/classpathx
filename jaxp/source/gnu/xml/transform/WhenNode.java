@@ -80,4 +80,14 @@ final class WhenNode
       }
   }
   
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("test=");
+    buf.append(test);
+    buf.append(']');
+    return buf.toString();
+  }
+  
 }

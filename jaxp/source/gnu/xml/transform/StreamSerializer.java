@@ -122,10 +122,14 @@ public class StreamSerializer
             defined = true;
           }
         NamedNodeMap attrs = node.getAttributes();
-        if (attrs != null && attrs.getLength() > 0)
+        if (attrs != null)
           {
-            Node attr = attrs.item(0);
-            serialize(attr, out, mode);
+            int len = attrs.getLength();
+            for (int i = 0; i < len; i++)
+              {
+                Node attr = attrs.item(i);
+                serialize(attr, out, mode);
+              }
           }
         children = node.getFirstChild();
         if (children == null)
