@@ -44,6 +44,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -64,17 +66,33 @@ public class StreamSerializer
   static final int KET = 0x3e; // >
   static final int EQ = 0x3d; // =
 
-  final String encoding;
+  protected String encoding;
+  final int mode;
   final Map namespaces;
+  protected String eol;
+
+  protected boolean discardDefaultContent;
+  protected boolean xmlDeclaration = true;
+
+  public StreamSerializer()
+  {
+    this(Stylesheet.OUTPUT_XML, null, null);
+  }
 
   public StreamSerializer(String encoding)
   {
+    this(Stylesheet.OUTPUT_XML, encoding, null);
+  }
+
+  public StreamSerializer(int mode, String encoding, String eol)
+  {
+    this.mode = mode;
     this.encoding = (encoding != null) ? encoding : "UTF-8";
+    this.eol = (eol != null) ? eol : System.getProperty("line.separator");
     namespaces = new HashMap();
   }
 
-  public void serialize(final Node node, final OutputStream out,
-                        final int mode)
+  public void serialize(final Node node, final OutputStream out)
     throws IOException
   {
     if (out == null)
@@ -127,8 +145,15 @@ public class StreamSerializer
             int len = attrs.getLength();
             for (int i = 0; i < len; i++)
               {
-                Node attr = attrs.item(i);
-                serialize(attr, out, mode);
+                Attr attr = (Attr) attrs.item(i);
+                if (discardDefaultContent && !attr.getSpecified())
+                  {
+                    // NOOP
+                  }
+                else
+                  {
+                    serialize(attr, out);
+                  }
               }
           }
         children = node.getFirstChild();
@@ -140,7 +165,7 @@ public class StreamSerializer
         else
           {
             out.write(KET);
-            serialize(children, out, mode);
+            serialize(children, out);
             out.write(BRA);
             out.write(SLASH);
             out.write(value.getBytes(encoding));
@@ -162,14 +187,26 @@ public class StreamSerializer
       case Node.COMMENT_NODE:
         value = "<!--" + encode(node.getNodeValue()) + "-->";
         out.write(value.getBytes(encoding));
+        Node cp = node.getParentNode();
+        if (cp != null && cp.getNodeType() == Node.DOCUMENT_NODE)
+          {
+            out.write(eol.getBytes(encoding));
+          }
         break;
       case Node.DOCUMENT_NODE:
       case Node.DOCUMENT_FRAGMENT_NODE:
         if (mode == Stylesheet.OUTPUT_XML)
           {
-            if (!"yes".equals(node.getUserData("omit-xml-declaration")))
+            if (!"yes".equals(node.getUserData("omit-xml-declaration")) &&
+                xmlDeclaration)
               {
-                String version = (String) node.getUserData("version");
+                Document doc = (node instanceof Document) ?
+                  (Document) node : null;
+                String version = (doc != null) ? doc.getXmlVersion() : null;
+                if (version == null)
+                  {
+                    version = (String) node.getUserData("version");
+                  }
                 if (version == null)
                   {
                     version = "1.0";
@@ -185,19 +222,22 @@ public class StreamSerializer
                     out.write(encoding.getBytes("US-ASCII"));
                     out.write(APOS);
                   }
-                if ("yes".equals(node.getUserData("standalone")))
+                if ((doc != null && doc.getXmlStandalone()) ||
+                    "yes".equals(node.getUserData("standalone")))
                   {
                     out.write(" standalone='yes'".getBytes("US-ASCII"));
                   }
                 out.write(0x3f);
                 out.write(KET);
-                out.write(0x0a);
+                out.write(eol.getBytes(encoding));
               }
+            // TODO warn if not outputting the declaration would be a
+            // problem
           }
         children = node.getFirstChild();
         if (children != null)
           {
-            serialize(children, out, mode);
+            serialize(children, out);
           }
         break;
       case Node.DOCUMENT_TYPE_NODE:
@@ -228,11 +268,20 @@ public class StreamSerializer
             out.write(internalSubset.getBytes(encoding));
           }
         out.write(KET);
-        out.write(0x0a);
+        out.write(eol.getBytes(encoding));
         break;
       case Node.ENTITY_REFERENCE_NODE:
         value = "&" + node.getNodeValue() + ";";
         out.write(value.getBytes(encoding));
+        break;
+      case Node.PROCESSING_INSTRUCTION_NODE:
+        value = "<?" + node.getNodeName() + " " + node.getNodeValue() + "?>";
+        out.write(value.getBytes(encoding));
+        Node pp = node.getParentNode();
+        if (pp != null && pp.getNodeType() == Node.DOCUMENT_NODE)
+          {
+            out.write(eol.getBytes(encoding));
+          }
         break;
       }
     if (defined)
@@ -241,7 +290,7 @@ public class StreamSerializer
       }
     if (next != null)
       {
-        serialize(next, out, mode);
+        serialize(next, out);
       }
   }
 
@@ -326,7 +375,7 @@ public class StreamSerializer
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     try
       {
-        serialize(node, out, Stylesheet.OUTPUT_XML);
+        serialize(node, out);
         return new String(out.toByteArray(), encoding);
       }
     catch (IOException e)

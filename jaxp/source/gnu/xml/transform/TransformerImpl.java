@@ -251,8 +251,9 @@ class TransformerImpl
                     out = new FileOutputStream(systemId);
                   }
               }
-            StreamSerializer serializer = new StreamSerializer(encoding);
-            serializer.serialize(parent, out, outputMethod);
+            StreamSerializer serializer =
+              new StreamSerializer(outputMethod, encoding, null);
+            serializer.serialize(parent, out);
             out.close();
           }
         catch (IOException e)

@@ -498,7 +498,7 @@ class Template
                         throw new TransformerConfigurationException(msg, l);
                       }
                     Expr expr = (Expr) stylesheet.xpath.compile(select);
-                    return new ParameterNode(content, parse(next),
+                    return new ParameterNode(null, parse(next),
                                              paramName, expr, global);
                   }
                 else

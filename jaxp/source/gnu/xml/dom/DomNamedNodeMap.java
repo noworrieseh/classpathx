@@ -334,13 +334,13 @@ public class DomNamedNodeMap
       {
         return null;
       }
-    DomDoctype.ElementInfo info =
-      doctype.getElementInfo(owner.getNodeName());
+    DTDAttributeTypeInfo info =
+      doctype.getAttributeTypeInfo(owner.getNodeName(), name);
     if (info == null)
       {
         return null;
       }
-    return info.getAttrDefault(name);
+    return info.value;
   }
 
   /**

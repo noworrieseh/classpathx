@@ -271,7 +271,17 @@ public class DomAttr
   
   public TypeInfo getSchemaTypeInfo()
   {
-    // TODO
+    if (parent != null)
+      {
+        // DTD implementation
+        DomDoctype doctype = (DomDoctype) parent.owner.getDoctype();
+        if (doctype != null)
+          {
+            return doctype.getAttributeTypeInfo(parent.getNodeName(),
+                                                getNodeName());
+          }
+        // TODO XML Schema implementation
+      }
     return null;
   }
 
@@ -282,14 +292,12 @@ public class DomAttr
         DomDoctype doctype = (DomDoctype) parent.owner.getDoctype();
         if (doctype != null)
           {
-            DomDoctype.ElementInfo info =
-              doctype.getElementInfo(parent.getNodeName());
-            if (info != null)
-              {
-                String idAttr = info.getIdAttr();
-                return (idAttr != null && idAttr.equals(getNodeName()));
-              }
+            DTDAttributeTypeInfo info =
+              doctype.getAttributeTypeInfo(parent.getNodeName(),
+                                           getNodeName());
+            return ("ID".equals(info.type));
           }
+        // TODO XML Schema implementation
       }
     return false;
   }

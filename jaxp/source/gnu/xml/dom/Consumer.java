@@ -265,6 +265,11 @@ public class Consumer extends DomConsumer
 		return doc.createTextNode (buf, off, len);
 	}
 
+        public void elementDecl(String name, String model)
+          throws SAXException
+        {
+          getDoctype().elementDecl(name, model);
+        }
 
 	public void attributeDecl (
 	    String	ename,
@@ -274,6 +279,8 @@ public class Consumer extends DomConsumer
 	    String	value
 	) throws SAXException
 	{
+          getDoctype().attributeDecl(ename, aname, type, mode, value);
+            /*
 	    if (value == null && !"ID".equals (type))
 		return;
 	    
@@ -284,6 +291,8 @@ public class Consumer extends DomConsumer
 		info.setAttrDefault (aname, value);
 	    if ("ID".equals (type))
 		info.setIdAttr (aname);
+                */
+            
 	}
 
 	// force duplicate name checking off while we're

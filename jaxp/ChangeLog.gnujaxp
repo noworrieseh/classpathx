@@ -1,3 +1,8 @@
+2004-11-14  Chris Burdess  <dog@gnu.org>
+
+   	* dom: TypeInfo implementations for DTD-specified type declarations.
+   	* ls: New DOM Level 3 Load and Save implementation.
+   	
 2004-11-11  Chris Burdess  <dog@gnu.org>
 
    	* transform: Implemented decimal-formats and number formatting.

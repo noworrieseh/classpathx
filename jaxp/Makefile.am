@@ -297,6 +297,8 @@ $(src)/gnu/xml/aelfred2/SAXDriver.java \
 $(src)/gnu/xml/aelfred2/XmlParser.java \
 $(src)/gnu/xml/aelfred2/XmlReader.java \
 $(src)/gnu/xml/dom/Consumer.java \
+$(src)/gnu/xml/dom/DTDAttributeTypeInfo.java \
+$(src)/gnu/xml/dom/DTDElementTypeInfo.java \
 $(src)/gnu/xml/dom/DomAttr.java \
 $(src)/gnu/xml/dom/DomCDATA.java \
 $(src)/gnu/xml/dom/DomCharacterData.java \
@@ -325,6 +327,15 @@ $(src)/gnu/xml/dom/DomXPathResult.java \
 $(src)/gnu/xml/dom/ImplementationSource.java \
 $(src)/gnu/xml/dom/ImplementationList.java \
 $(src)/gnu/xml/dom/JAXPFactory.java \
+$(src)/gnu/xml/dom/ls/DomLSEx.java \
+$(src)/gnu/xml/dom/ls/DomLSInput.java \
+$(src)/gnu/xml/dom/ls/DomLSOutput.java \
+$(src)/gnu/xml/dom/ls/DomLSParser.java \
+$(src)/gnu/xml/dom/ls/DomLSSerializer.java \
+$(src)/gnu/xml/dom/ls/FilteredSAXEventSink.java \
+$(src)/gnu/xml/dom/ls/ReaderInputStream.java \
+$(src)/gnu/xml/dom/ls/SAXEventSink.java \
+$(src)/gnu/xml/dom/ls/WriterOutputStream.java \
 $(src)/gnu/xml/pipeline/CallFilter.java \
 $(src)/gnu/xml/pipeline/DomConsumer.java \
 $(src)/gnu/xml/pipeline/EventConsumer.java \
@@ -562,6 +573,7 @@ org.xml.sax.ext \
 org.xml.sax.helpers \
 gnu.xml.aelfred2 \
 gnu.xml.dom \
+gnu.xml.dom.ls \
 gnu.xml.libxmlj.dom \
 gnu.xml.libxmlj.sax \
 gnu.xml.libxmlj.transform \

@@ -40,8 +40,18 @@ package gnu.xml.dom;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSParser;
+import org.w3c.dom.ls.LSSerializer;
+import gnu.xml.dom.ls.DomLSInput;
+import gnu.xml.dom.ls.DomLSOutput;
+import gnu.xml.dom.ls.DomLSParser;
+import gnu.xml.dom.ls.DomLSSerializer;
 
 /**
  * <p> "DOMImplementation" implementation. </p>
@@ -55,7 +65,7 @@ import org.w3c.dom.Element;
  * @author David Brownell 
  */
 public class DomImpl
-  implements DOMImplementation
+  implements DOMImplementation, DOMImplementationLS
 {
   
   /**
@@ -82,6 +92,11 @@ public class DomImpl
                 "1.0".equals(version) ||
                 "2.0".equals(version));
       
+      }
+    else if ("ls".equals(name) || "ls-async".equals(name))
+      {
+        return (version == null ||
+                "3.0".equals(version));
       }
     else if ("events".equals(name)
              || "mutationevents".equals(name)
@@ -196,8 +211,40 @@ public class DomImpl
   
   public Object getFeature(String feature, String version)
   {
-    // TODO
+    feature = feature.toLowerCase();
+    
+    // DOM Level 3 Load and Save
+    if ("ls".equals(feature) || "ls-async".equals(feature))
+      {
+        if (version == null || "3.0".equals(version))
+          {
+            return this;
+          }
+      }
     return null;
+  }
+
+  // -- DOMImplementationLS --
+
+  public LSParser createLSParser(short mode, String schemaType)
+    throws DOMException
+  {
+    return new DomLSParser(mode, schemaType);
+  }
+
+  public LSSerializer createLSSerializer()
+  {
+    return new DomLSSerializer();
+  }
+
+  public LSInput createLSInput()
+  {
+    return new DomLSInput();
+  }
+
+  public LSOutput createLSOutput()
+  {
+    return new DomLSOutput();
   }
   
 }

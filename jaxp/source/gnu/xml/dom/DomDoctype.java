@@ -120,12 +120,17 @@ public class DomDoctype
     subset = internalSubset;
   }
 
-  // package private
-  // for JAXP-style builder backdoors
-  DomDoctype(DomDocument doc,
-             String name,
-             String publicId,
-             String systemId)
+  /**
+   * JAXP builder constructor.
+   * @param doc the document
+   * @param name the name of the document element
+   * @param publicId the public ID of the document type declaration
+   * @param systemId the system ID of the document type declaration
+   */
+  public DomDoctype(DomDocument doc,
+                    String name,
+                    String publicId,
+                    String systemId)
   {
     super(DOCUMENT_TYPE_NODE, doc, name, publicId, systemId);
     implementation = doc.getImplementation();
@@ -329,82 +334,57 @@ public class DomDoctype
   {
     return implementation;
   }
-  
-  // Yeech.  Package-private hooks, I don't like this.
-  // For all that it's better than making this stuff a
-  // public API...
-  
 
-  // package private
-  ElementInfo getElementInfo(String element)
+  public void elementDecl(String name, String model)
   {
-    ElementInfo	info = (ElementInfo) elements.get(element);
-    
-    if (info != null)
+    DTDElementTypeInfo info = getElementTypeInfo(name);
+    if (info == null)
       {
-        return info;
+        info = new DTDElementTypeInfo(name, model);
+        elements.put(name, info);
       }
-    info = new ElementInfo(this);
-    elements.put(element, info);
-    return info;
+    else
+      {
+        info.model = model;
+      }
   }
-  
-  void setHasIds()
+
+  DTDElementTypeInfo getElementTypeInfo(String name)
   {
-    ids = true;
+    return (DTDElementTypeInfo) elements.get(name);
   }
-  
+
+  public void attributeDecl(String eName, String aName, String type,
+                            String mode, String value)
+  {
+    DTDAttributeTypeInfo info = new DTDAttributeTypeInfo(eName, aName, type,
+                                                         mode, value);
+    DTDElementTypeInfo elementInfo = getElementTypeInfo(eName);
+    if (elementInfo == null)
+      {
+        elementInfo = new DTDElementTypeInfo(eName, null);
+        elements.put(eName, elementInfo);
+      }
+    elementInfo.setAttributeTypeInfo(aName, info);
+    if ("ID".equals(type))
+      {
+        ids = true;
+      }
+  }
+
+  DTDAttributeTypeInfo getAttributeTypeInfo(String elementName, String name)
+  {
+    DTDElementTypeInfo elementInfo =
+      (DTDElementTypeInfo) elements.get(elementName);
+    return (elementInfo == null) ? null :
+      elementInfo.getAttributeTypeInfo(name);
+  }
+
   boolean hasIds()
   {
     return ids;
   }
-
-  // package private
-  static class ElementInfo
-    extends HashMap
-  {
-
-    private String idAttrName;
-    private DomDoctype doctype;
-    
-    // is-a vs has-a ... just to minimize number of objects.
-    // keys in table are attribute names, values are defaults.
-    
-    ElementInfo(DomDoctype dt)
-    {
-      super(5, 5);
-      doctype = dt;
-    }
-
-    void setAttrDefault(String attName, String value)
-    {
-      if (!containsKey(attName))
-        {
-          put(attName, value);
-        }
-    }
-    
-    String getAttrDefault(String attName)
-    {
-      return (String) get(attName);
-    }
-
-    void setIdAttr(String attName)
-    {
-      if (idAttrName == null)
-        {
-          idAttrName = attName;
-        }
-      doctype.setHasIds();
-    }
-    
-    String getIdAttr()
-    {
-      return idAttrName;
-    }
-    
-  }
-
+  
   public boolean isSameNode(Node arg)
   {
     if (equals(arg))

@@ -151,7 +151,6 @@ public class DomElement
     return getNodeName();
   }
 
-
   /**
    * <b>DOM L1</b>
    * Returns the value of the specified attribute, or an
@@ -353,24 +352,33 @@ public class DomElement
 
   public TypeInfo getSchemaTypeInfo()
   {
-    // TODO
+    // DTD implementation
+    DomDoctype doctype = (DomDoctype) owner.getDoctype();
+    if (doctype != null)
+      {
+        return doctype.getElementTypeInfo(getNodeName());
+      }
+    // TODO XML Schema implementation
     return null;
   }
 
   public void setIdAttribute(String name, boolean isId)
   {
-    // TODO
+    // TODO XML Schema implementation
+    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
   }
   
   public void setIdAttributeNode(Attr isAddr, boolean isId)
   {
-    // TODO
+    // TODO XML Schema implementation
+    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
   }
 
   public void setIdAttributeNS(String namespaceURI, String localName,
                                boolean isId)
   {
-    // TODO
+    // TODO XML Schema implementation
+    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
   }
   
 }

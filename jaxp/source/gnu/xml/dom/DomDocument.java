@@ -213,10 +213,9 @@ public class DomDocument
       if (current.getNodeType() == ELEMENT_NODE)
           {
             Element element = (Element) current;
-            DomDoctype.ElementInfo  info;
-
-            info = doctype.getElementInfo(current.getNodeName());
-            if (id.equals(element.getAttribute(info.getIdAttr())))
+            DTDElementTypeInfo info =
+              doctype.getElementTypeInfo(current.getNodeName());
+            if (id.equals(element.getAttribute(info.idAttrName)))
               {
                 return element;
               }
@@ -497,24 +496,22 @@ public class DomDocument
 
   private void defaultAttributes(Element element, String name)
   {
-  DomDoctype doctype = (DomDoctype) getDoctype();
-  DomDoctype.ElementInfo info;
-
-  if (doctype == null)
+    DomDoctype doctype = (DomDoctype) getDoctype();
+    if (doctype == null)
       {
-      return;
+        return;
       }
 
-  // default any attributes that need it
-  info = doctype.getElementInfo(name);
-  for (Iterator i = info.keySet().iterator(); i.hasNext(); )
+    // default any attributes that need it
+    DTDElementTypeInfo info = doctype.getElementTypeInfo(name);
+    for (Iterator i = info.attributes(); i != null && i.hasNext(); )
       {
-      String  attr = (String) i.next();
-      DomAttr  node = (DomAttr) createAttribute(attr);
+        DTDAttributeTypeInfo attr = (DTDAttributeTypeInfo) i.next();
+        DomAttr node = (DomAttr) createAttribute(attr.name);
 
-      node.setValue((String) info.get(attr));
-      node.setSpecified(false);
-      element.setAttributeNode(node);
+        node.setValue(attr.value);
+        node.setSpecified(false);
+        element.setAttributeNode(node);
       }
   }
 
