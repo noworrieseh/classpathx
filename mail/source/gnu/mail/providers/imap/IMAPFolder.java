@@ -1201,9 +1201,8 @@ implements UIDFolder
           Folder.HOLDS_FOLDERS;
         if (!entry.isNoselect ())
           {
-            Folder f = getFolder (entry.getMailbox (),
-                                  type,
-                                  entry.getDelimiter ());
+            Folder f = new IMAPFolder (store, entry.getMailbox (),
+                                       type, entry.getDelimiter ());
             if (!unique.contains (f))
               {
                 unique.add (f);
@@ -1238,26 +1237,14 @@ implements UIDFolder
   public Folder getFolder (String name) 
     throws MessagingException 
   {
-    return getFolder (name, -1, getSeparator ());
-  }
-
-  /**
-   * Returns a configured subfolder.
-   */
-  protected IMAPFolder getFolder (String name, int type, char delimiter)
-    throws MessagingException
-  {
-    StringBuffer pathBuffer = new StringBuffer ();
-    if (path != null)
+    StringBuffer buf = new StringBuffer ();
+    if (path != null && path.length () > 0)
       {
-        pathBuffer.append (path);
+        buf.append (path);
+        buf.append (delimiter);
       }
-    if (pathBuffer.length () > 0)
-      {
-        pathBuffer.append (delimiter);
-      }
-    pathBuffer.append (name);
-    return new IMAPFolder (store, pathBuffer.toString (), type, delimiter);
+    buf.append (name);
+    return new IMAPFolder (store, buf.toString (), -1, getSeparator ());
   }
 
   /**
