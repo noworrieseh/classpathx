@@ -1,6 +1,6 @@
 /*
  * XPathFactory.java
- * Copyright (C) 2004 Chris Burdess
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -40,6 +40,8 @@ package javax.xml.xpath;
 
 /**
  * Factory for creating XPath environments.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @since 1.3
  */
 public abstract class XPathFactory
@@ -48,7 +50,8 @@ public abstract class XPathFactory
   /**
    * The default property name according to the JAXP specification.
    */
-  public static final String DEFAULT_PROPERTY_NAME = "XPath";
+  public static final String DEFAULT_PROPERTY_NAME =
+	 	"javax.xml.xpath.XPathFactory";
 
   /**
    * The default object model URI.

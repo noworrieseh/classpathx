@@ -1,3 +1,9 @@
+2004-10-25  Chris Burdess <dog@gnu.org>
+
+	* xmlj_transform.c: Experimental code to load external entities
+	(xsl:import, xsl:include, and document()) from Java URL.
+	* configure.ac: Minimum version of libxslt is 1.1.11.
+
 2004-10-08  Chris Burdess <dog@gnu.org>
 
 	* xmlj_util.c: String caching only by setting macro.

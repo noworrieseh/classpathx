@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001 Andrew Selkirk
+ * ParserConfigurationException.java
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -38,28 +39,29 @@
 package javax.xml.parsers;
 
 /**
- * ParserConfigurationException
- * @author	Andrew Selkirk
- * @version	1.0
+ * An exception occurred during configuration of the XML parser.
+ * 
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class ParserConfigurationException
   extends Exception
 {
 
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
+  /**
+   * Constructor with no detail message.
+   */
   public ParserConfigurationException()
   {
     super();
-  } // ParserConfigurationException()
+  }
 
-  public ParserConfigurationException(String message)
+  /**
+   * Constructor with the specified detail message.
+   * @param msg the detail message
+   */
+  public ParserConfigurationException(String msg)
   {
-    super(message);
-  } // ParserConfigurationException()
+    super(msg);
+  }
 
-
-} // ParserConfigurationException
-
+}

@@ -1,24 +1,40 @@
+# Process this file with automake to generate Makefile.in
+
+# Makefile.am
+# Copyright (C) 2004 The Free Software Foundation
 # 
-# Copyright (C) 2003 Julian Scheid
+# This file is part of GNU JAXP, a library.
+#
+# GNU JAXP is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 # 
-# This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
-# the XML and XSLT C libraries for Gnome (libxml2/libxslt).
-# 
-# GNU LibxmlJ is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2, or (at your option) any
-# later version.
-#  
-# GNU LibxmlJ is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
+# GNU JAXP is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with GNU LibxmlJ; see the file COPYING.  If not, write to the
-# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# 02111-1307 USA. 
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
+# Linking this library statically or dynamically with other modules is
+# making a combined work based on this library.  Thus, the terms and
+# conditions of the GNU General Public License cover the whole
+# combination.
+#
+# As a special exception, the copyright holders of this library give you
+# permission to link this library with independent modules to produce an
+# executable, regardless of the license terms of these independent
+# modules, and to copy and distribute the resulting executable under
+# terms of your choice, provided that you also meet, for each linked
+# independent module, the terms and conditions of the license of that
+# module.  An independent module is a module which is not derived from
+# or based on this library.  If you modify this library, you may extend
+# this exception to your version of the library, but you are not
+# obliged to do so.  If you do not wish to do so, delete this
+# exception statement from your version. 
 
 JAVADOC = javadoc
 
@@ -232,14 +248,12 @@ $(src)/javax/xml/datatype/Duration.java \
 $(src)/javax/xml/datatype/XMLGregorianCalendar.java \
 $(src)/javax/xml/namespace/NamespaceContext.java \
 $(src)/javax/xml/namespace/QName.java \
-$(src)/javax/xml/parsers/ClassStuff.java \
 $(src)/javax/xml/parsers/DocumentBuilder.java \
 $(src)/javax/xml/parsers/DocumentBuilderFactory.java \
 $(src)/javax/xml/parsers/FactoryConfigurationError.java \
 $(src)/javax/xml/parsers/ParserConfigurationException.java \
 $(src)/javax/xml/parsers/SAXParser.java \
 $(src)/javax/xml/parsers/SAXParserFactory.java \
-$(src)/javax/xml/transform/ClassStuff.java \
 $(src)/javax/xml/transform/ErrorListener.java \
 $(src)/javax/xml/transform/OutputKeys.java \
 $(src)/javax/xml/transform/Result.java \

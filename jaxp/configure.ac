@@ -48,7 +48,7 @@ XMLJ_VERSION_MINOR="99"
 
 # Checks for header files.
 
-AM_PATH_XML([2.6.10],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
+AM_PATH_XML([2.6.8],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxml.]))
 AM_PATH_XSLT([1.1.11],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxslt.]))

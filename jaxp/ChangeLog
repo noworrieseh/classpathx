@@ -1,3 +1,8 @@
+2004-10-27  Chris Burdess	<dog@gnu.org>
+
+	* parsers, transform, dom, sax, stream: API rewritten from
+	scratch to satisfy copyright assignment.
+
 2004-10-13  Arnaud Vandyck  <avdyk@gnu.org>
 	
 	Reported by John Kristian <jk2004@engineer.com>:

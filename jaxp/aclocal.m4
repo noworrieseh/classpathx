@@ -738,7 +738,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: aclocal.m4,v 1.19 2004-10-17 20:14:14 dog Exp $
+# $Id: aclocal.m4,v 1.20 2004-10-27 18:20:33 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,
@@ -855,11 +855,11 @@ AC_ARG_ENABLE(xmltest,
     XML_CFLAGS=`$XML2_CONFIG $xml_config_args --cflags`
     XML_LIBS=`$XML2_CONFIG $xml_config_args --libs`
     xml_config_major_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
     xml_config_minor_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
     xml_config_micro_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
     if test "x$enable_xmltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
@@ -927,11 +927,11 @@ main()
    */
     LIBXML_TEST_VERSION;
 
-    /* Test that the library is greater than our minimum version */
+    /* Test that the library is greater than or equal to our minimum version */
     if (($xml_config_major_version > major) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
-        ($xml_config_micro_version > micro)))
+        ($xml_config_micro_version >= micro)))
       {
         return 0;
        }
@@ -1050,11 +1050,11 @@ AC_ARG_ENABLE(xmltest,
     XML_CFLAGS=`$XML2_CONFIG $xml_config_args --cflags`
     XML_LIBS=`$XML2_CONFIG $xml_config_args --libs`
     xml_config_major_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
     xml_config_minor_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
     xml_config_micro_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
     if test "x$enable_xmltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
@@ -1240,11 +1240,11 @@ AC_ARG_ENABLE(xslttest,
     XSLT_CFLAGS=`$XSLT_CONFIG $xslt_config_args --cflags`
     XSLT_LIBS=`$XSLT_CONFIG $xslt_config_args --libs`
     xslt_config_major_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
     xslt_config_minor_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
     xslt_config_micro_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+           sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
     if test "x$enable_xslttest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
