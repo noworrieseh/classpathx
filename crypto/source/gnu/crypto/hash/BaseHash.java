@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseHash.java,v 1.4 2001-12-08 21:42:27 raif Exp $
+// $Id: BaseHash.java,v 1.5 2001-12-30 15:51:51 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto.hash;
 /**
  * A base abstract class to facilitate hash implementations.
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public abstract class BaseHash implements IMessageDigest {
 
@@ -120,15 +120,18 @@ public abstract class BaseHash implements IMessageDigest {
       update(tail, 0, tail.length); // last transform of a message
       byte[] result = getResult(); // make a result out of context
 
-      // reset this instance for future re-use
+      reset(); // reset this instance for future re-use
+
+      return result;
+   }
+
+   public void reset() { // reset this instance for future re-use
       count = 0L;
       for (int i = 0; i < blockSize; ) {
          buffer[i++] = 0;
       }
 
       resetContext();
-
-      return result;
    }
 
    // methods to be implemented by concrete subclasses
