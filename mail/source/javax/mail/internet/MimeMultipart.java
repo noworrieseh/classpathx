@@ -316,6 +316,7 @@ public class MimeMultipart
         try
           {
             is = ds.getInputStream ();
+            System.out.println("ds="+ds+"; is="+is);
             if (is instanceof SharedInputStream)
               {
                 sis = (SharedInputStream) is;
@@ -338,9 +339,11 @@ public class MimeMultipart
             
             LineInputStream lis = new LineInputStream (is);
             String line;
+            System.out.println("looking for "+boundary);
             while ((line = lis.readLine ()) != null)
               {
-                if (line.trim () .equals (boundary))
+                System.out.println(line);
+                if (trim(line) .equals (boundary))
                   {
                     break;
                   }
@@ -497,6 +500,20 @@ public class MimeMultipart
           }
         parsed = true;
       }
+  }
+
+  /*
+   * Ensures that CR is stripped from the end of the given line.
+   */
+  private static String trim (String line)
+  {
+    line = line.trim ();
+    int len = line.length ();
+    if (len > 0 && line.charAt (len - 1) == '\r')
+      {
+        line = line.substring (0, len - 1);
+      }
+    return line;
   }
   
   /**

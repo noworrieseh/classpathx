@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -152,41 +151,48 @@ public class SMTPTransport
               }
             else
               {
+                if (extensions.contains ("STARTTLS"))
+                  {
+                    if (!propertyIsFalse ("tls"))
+                      {
+                        // Locate custom trust manager
+                        String tmt = getProperty ("trustmanager");
+                        if (tmt == null)
+                          {
+                            connection.starttls ();
+                            extensions = connection.ehlo (localHostName);
+                          }
+                        else
+                          {
+                            try
+                              {
+                                Class t = Class.forName (tmt);
+                                TrustManager tm = (TrustManager) t.newInstance ();
+                                connection.starttls (tm);
+                              }
+                            catch (Exception e)
+                              {
+                                throw new MessagingException (e.getMessage (), e);
+                              }
+                          }
+                      }
+                  }
+                else if ("required".equals (getProperty ("tls")))
+                  {
+                    throw new MessagingException ("TLS not available");
+                  }
+                // Populate authenticationMechanisms
                 for (Iterator i = extensions.iterator (); i.hasNext (); )
                   {
                     String extension = (String) i.next ();
                     if (extension.startsWith ("AUTH "))
                       {
-                        // Populate authenticationMechanisms
                         authenticationMechanisms = new ArrayList ();
                         StringTokenizer st =
                           new StringTokenizer (extension.substring (5));
                         while (st.hasMoreTokens ())
                           {
                             authenticationMechanisms.add (st.nextToken ());
-                          }
-                      }
-                  }
-                if (!propertyIsFalse ("tls") &&
-                    extensions.contains ("STARTTLS"))
-                  {
-                    // Locate custom trust manager
-                    String tmt = getProperty ("trustmanager");
-                    if (tmt == null)
-                      {
-                        connection.starttls ();
-                      }
-                    else
-                      {
-                        try
-                          {
-                            Class t = Class.forName (tmt);
-                            TrustManager tm = (TrustManager) t.newInstance ();
-                            connection.starttls (tm);
-                          }
-                        catch (Exception e)
-                          {
-                            throw new MessagingException (e.getMessage (), e);
                           }
                       }
                   }
@@ -222,14 +228,6 @@ public class SMTPTransport
       }
   }
 
-  /**
-   * Returns a list of the ESMTP extensions supported by the server.
-   */
-  public List getExtensions ()
-  {
-    return Collections.unmodifiableList (extensions);
-  }
-  
   /**
    * Send the specified message to the server.
    */

@@ -1,3 +1,11 @@
+2004-09-08  Chris Burdess  <dog@bluezoo.org>
+
+	* SMTPTransport.java: New property value tls=required added and
+	    ESMTP extension list no longer exposed. EHLO issued following
+            STARTTLS.
+	* MimeMultipart.java,InternetHeaders.java: Trim method to remove
+	    final CR.
+
 2004-09-07  Chris Burdess  <dog@bluezoo.org>
 
 	* SMTPTransport.java: Expose ESMTP extension list.

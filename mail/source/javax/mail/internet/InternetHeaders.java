@@ -322,6 +322,7 @@ public class InternetHeaders
       {
         for (String line = in.readLine (); line != null; line = in.readLine ()) 
           {
+            line = trim (line);
             if (line.length () == 0)
               {
                 break;
@@ -565,6 +566,16 @@ public class InternetHeaders
   public Enumeration getNonMatchingHeaderLines (String[] names)
   {
     return new HeaderEnumeration (headers.iterator (), names, true, false);
+  }
+
+  private static String trim (String line)
+  {
+    int len = line.length ();
+    if (len > 0 && line.charAt (len - 1) == '\r')
+      {
+        line = line.substring (0, len - 1);
+      }
+    return line;
   }
   
 }
