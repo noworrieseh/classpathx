@@ -1,73 +1,76 @@
 WHAT IS THIS
-    The AElfred2 implementation of a SAX2 parser, the DOM2 implementation
-    of DOM Level 2, SAX2 XML pipeline utilities (including a streaming
-    DTD validator), and JAXP glue for those standard APIs.
+    GNUJAXP includes interfaces and implementations for basic XML
+    processing in Java, and some general purpose SAX2 utilities.
+
+    The standard distribution includes "gnujaxp.jar", javadoc, and full
+    source code.  The current software is available at:
+
+    	http://www.gnu.org/software/classpathx/jaxp
 
     This is intended only to require JDK 1.1 support to compile or run;
     that may change at some point, but for now portability to PJava and
     other widely used Java configurations/profiles is important.
     
-    GCJ 3.0 has a bug (PR 3285?) preventing the "DomNode" implementation
-    class from compiling, it can't find constructors for some DomEvent
-    classes.  Newer snapshots may fix this.
+    GCJ 3.0 has some bugs compiling this code, either to class files or
+    to native code.  Newer snapshots (GCJ 3.1) are currently needed to
+    compile this code.
 
 JAVA PACKAGES
     
     javax.xml.*		... JAXP 1.1 interfaces
-    org.xml.sax.*	... SAX2 interfaces
+    org.xml.sax.*	... SAX2 (r2pre2) interfaces
     org.w3c.dom.*	... DOM Level 2 interfaces
 
-    gnu.xml.aelfred2.*	... SAX2 parsers (and JAXP glue)
-    gnu.xml.dom.*	... DOM level 2 (XML) implementation
-    gnu.xml.pipeline.*	... SAX2 event stream utilities
+    gnu.xml.aelfred2.*	... SAX2 parsers (+ optional validator, and JAXP glue)
+    gnu.xml.dom.*	... DOM level 2 (XML) implementation (and JAXP glue)
+    gnu.xml.pipeline.*	... SAX2 event pipeline support
     gnu.xml.util.*	... various XML utility classes
 
 LICENSING
-    The software in this package is distributed under the GNU
-    General Public License, with the exception of DOM interface
-    sources which are subject instead to the W3C license.
+    Briefly, most software in this package is distributed under the
+    GNU General Public License with the "library exception" that 
+    permits its usage even in statically linked environments.  That
+    licensing is more permissive than the "LGPL".
 
-    In addition, the files distributed under GPL include the
-    following special exception.
-
-	As a special exception, if you link this library with
-	other files to produce an executable, this library does
-	not by itself cause the resulting executable to be covered
-	by the GNU General Public License. This exception does
-	not however invalidate any other reasons why the executable
-	file might be covered by the GNU General Public License. 
-
-    As such, it can be used to run free as well as proprietary
-    applications and applets:  static linking is permitted, so
-    this can even be used in embedded configurations.
-
-	COPYING		... contains the GPL text.
-	COPYRIGHT.html	... contains the W3C license.
-    
-    The SAX/SAX2 files, originally in the public domain, have
-    been updated; those updates are under the GPL.  SAX2 APIs
-    remain unchanged.
+    See the LICENSE file for more information.
 
 BUILDING
-    This software uses autoconf; eventually it should learn how to figure
-    out the right Java compiler (JDK, GCJ, Kaffe, etc) to use when building
-    this software.
+    The default build tools use autoconf and GNU make.  At this writing
+    you have two configuration options.  Most developers will use a JDK
+    environment to build:
 
-    1 - "autoconf" ... generates "configure"
+    	$ ./configure
+	...
+	$ make all
+	...
+	$
     
-    2 - "configure" ... generates Makefile matching the build environment
+    Some versions of GCJ (after 3.0) can compile this to class files:
 
-    3 - "make" ... builds gnujaxp.jar
+    	$ ./configure --with-gcj
+	...
+	$ make all
+	...
+	$
 
-    Also see the Makefile.  Targets include:
+    In the future, using GCJ (some versions after 3.0) to native code
+    will be supported.
 
-	- "clean" (expecting rebuild from scratch)
+    Also see the autoconf files (you may need CVS access).
 
-	- "distclean" (expecting "configure" to be run)
+INSTALLATION AND CONFIGURATION
+    The simplest way to use this software is to put the "gnujaxp.jar"
+    file into $JAVA_HOME/jre/lib/ext so that it's automatically part
+    of the classpath for every application.  That works for JDK 1.2
+    and later.
 
-	- "mrproper" (expecting autoconf to be run)
-    
-    So far there's no way to package a source distribution; stick to CVS.
+    Otherwise, you'll need some other way to put it into $CLASSPATH,
+    such as an environment variable.
+
+    If you have multiple XML tools implementations in your environment,
+    you may need to configure software to use the implementations in 
+    the GNUJAXP distribution rather than some other one.  See the project
+    website (http://www.gnu.org/software/classpathx/jaxp) for information.
 
 CONFORMANCE TESTING
     The primary test resources are at http://xmlconf.sourceforge.net
@@ -77,6 +80,9 @@ CONFORMANCE TESTING
 	The AElfred2 parser is highly conformant, though it still takes
 	a few implementation shortcuts.  See the package documentation
 	for information about known XML conformance issues in AElfred2.
+	The primary issue is using Unicode character tables, rather than
+	those in the XML specification, for determining what names are
+	valid.  (Most applications won't notice the difference.)
 
 	Note that the "xml.testing.Driver" only addresses the core
 	XML 1.0 specification requirements, which roughly correspond
@@ -93,21 +99,17 @@ CONFORMANCE TESTING
 	      declarations;
 	    
 	    - The pipeline package's layered validator demands that
-	      element and attribute declarations work correctly.
+	      element and attribute declarations are reported correctly.
 	
 	By those metrics, SAX2 conformance for AElfred2 is also strong. 
     
     DOM Unit Tests
-	The "domunit 0.0.4" tests use the JAXP API to hook up a DOM
+	The "domunit 0.0.6" tests use the JAXP API to hook up a DOM
 	implementation to a parser (out of scope for DOM L2).
 
 	At this writing, this passes the bulk of those tests except
 	for a few which require magic handling of attributes:
 
-	    - DOM wants to expose which attributes were specified
-	      in the literal text of an XML document.  SAX doesn't
-	      expose that information.
-	    
 	    - DOM expects that attributes that are defaulted in
 	      the DTD will magically reappear when they're deleted.
 	      This DOM could implement that behavior, but doesn't.
