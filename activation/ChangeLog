@@ -1,3 +1,8 @@
+2004-06-09  Chris Burdess  <dog@bluezoo.org>
+
+	* MailcapCommandMap: Fixed bug whereby x-java prefix was not
+	    attempted.
+
 2004-06-01  Chris Burdess  <dog@bluezoo.org>
 
 	* Makefile.am: Applied patch #3104.
@@ -9,7 +14,7 @@
 
 2004-01-26  Chris Burdess  <dog@bluezoo.org>
 
-    * build.xml: Updated ant build script to add licence to jar.
+	* build.xml: Updated ant build script to add licence to jar.
 
 2004-01-12  Chris Burdess  <dog@bluezoo.org>
 

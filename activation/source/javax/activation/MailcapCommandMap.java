@@ -189,11 +189,16 @@ public class MailcapCommandMap
                 URL url = (URL)systemResources.get(i);
                 try
                 {
+                    if (debug)
+                        System.out.println("\t" + url.toString());
                     urlIn = new InputStreamReader(url.openStream());
                     parse(mailcaps[JAR], urlIn);
                 }
                 catch (IOException e)
                 {
+                    if (debug)
+                        System.out.println(e.getClass().getName() + ": " +
+                                           e.getMessage());
                 }
                 finally
                 {
@@ -341,6 +346,8 @@ public class MailcapCommandMap
             if (map != null)
             {
                 List classNames = (List)map.get("content-handler");
+                if (classNames == null)
+                    classNames = (List)map.get("x-java-content-handler");
                 if (classNames != null)
                 {
                     String className = (String)classNames.get(0);
@@ -397,11 +404,16 @@ public class MailcapCommandMap
         Reader in = null;
         try
         {
+            if (debug)
+                System.out.println("\t" + filename);
             in = new FileReader(filename);
             parse(mailcap, in);
         }
         catch (IOException e)
         {
+            if (debug)
+                System.out.println(e.getClass().getName() + ": " +
+                                   e.getMessage());
         }
         finally
         {
@@ -426,12 +438,17 @@ public class MailcapCommandMap
             InputStream is = getClass().getResourceAsStream(name);
             if (is != null)
             {
+                if (debug)
+                    System.out.println("\t" + name);
                 in = new InputStreamReader(is);
                 parse(mailcap, in);
             }
         }
         catch (IOException e)
         {
+            if (debug)
+                System.out.println(e.getClass().getName() + ": " +
+                                   e.getMessage());
         }
         finally
         {
