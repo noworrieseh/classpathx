@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSKeyPairGenerator.java,v 1.3 2002-01-11 21:26:46 raif Exp $
+// $Id: DSSKeyPairGenerator.java,v 1.4 2002-01-17 11:53:06 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.DSAParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,7 @@ import java.util.Map;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class DSSKeyPairGenerator implements IKeyPairGenerator {
 
@@ -81,8 +82,24 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
    /** Property name of the Boolean indicating wether or not to use defaults. */
    public static final String USE_DEFAULTS = "gnu.crypto.dss.use.defaults";
 
+   /**
+    * Property name of an optional {@link java.security.SecureRandom} instance
+    * to use. The default is to use a classloader singleton from
+    * {@link gnu.crypto.util.PRNG}.
+    */
+   public static final String SOURCE_OF_RANDOMNESS = "gnu.crypto.dss.prng";
+
+   /**
+    * Property name of an optional {@link java.security.spec.DSAParameterSpec}
+    * instance to use for this generator's <code>p</code>, <code>q</code>, and
+    * <code>g</code> values. The default is to generate these values or use
+    * pre-computed ones, depending on the value of the <code>USE_DEFAULTS</code>
+    * attribute.
+    */
+   public static final String DSS_PARAMETERS = "gnu.crypto.dss.params";
+
    /** Default value for the modulus length. */
-   private static final int DEFAULT_MODULUS_LENGTH = 512;
+   private static final int DEFAULT_MODULUS_LENGTH = 1024;
 
    /** Initial SHS context. */
    private static final int[] T_SHS = new int[]
@@ -136,6 +153,9 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
    /** The SHA instance to use. */
    private Sha160 sha = new Sha160();
 
+   /** The optional {@link java.security.SecureRandom} instance to use. */
+   private SecureRandom rnd = null;
+
    private BigInteger p;
    private BigInteger q;
    private BigInteger g;
@@ -171,12 +191,19 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
       if ((L % 64) != 0 || L < 512 || L > 1024)
          throw new IllegalArgumentException(MODULUS_LENGTH);
 
+      // should we use the default pre-computed params?
       Boolean useDefaults = (Boolean) attributes.get(USE_DEFAULTS);
       if (useDefaults == null) {
          useDefaults = Boolean.TRUE;
       }
 
-      if (useDefaults.equals(Boolean.TRUE)) {
+      // are we given a set of DSA params or we shall use/generate our own?
+      DSAParameterSpec params = (DSAParameterSpec) attributes.get(DSS_PARAMETERS);
+      if (params != null) {
+         p = params.getP();
+         q = params.getQ();
+         g = params.getG();
+      } else if (useDefaults.equals(Boolean.TRUE)) {
          switch (L) {
          case 512:
             p = KEY_PARAMS_512.getP();
@@ -195,14 +222,21 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
             break;
          default:
             p = null;
+            q = null;
+            g = null;
          }
       } else {
          p = null;
+         q = null;
+         g = null;
       }
+
+      // do we have a SecureRandom, or should we use our own?
+      rnd = (SecureRandom) attributes.get(SOURCE_OF_RANDOMNESS);
 
       // set the seed-key
       byte[] kb = new byte[20]; // we need 160 bits of randomness
-      PRNG.nextBytes(kb);
+      nextRandomBytes(kb);
       XKEY = new BigInteger(1, kb).setBit(159).setBit(0);
    }
 
@@ -268,7 +302,7 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
          step1: while (true) {
             // 1. Choose an arbitrary sequence of at least 160 bits and
             // call it SEED.
-            PRNG.nextBytes(kb);
+            nextRandomBytes(kb);
             SEED = new BigInteger(1, kb).setBit(159).setBit(0);
             // Let g be the length of SEED in bits. here always 160
             // 2. Compute: U = SHA[SEED] XOR SHA[(SEED+1) mod 2**g]
@@ -412,5 +446,18 @@ public class DSSKeyPairGenerator implements IKeyPairGenerator {
       XKEY = XKEY.add(result).add(BigInteger.ONE).mod(TWO_POW_160);
 
       return result;
+   }
+
+   /**
+    * Fills the designated byte array with random data.
+    *
+    * @param buffer the byte array to fill with random data.
+    */
+   private void nextRandomBytes(byte[] buffer) {
+      if (rnd != null) {
+         rnd.nextBytes(buffer);
+      } else {
+         PRNG.nextBytes(buffer);
+      }
    }
 }
