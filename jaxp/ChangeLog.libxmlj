@@ -1,3 +1,7 @@
+2004-07-21  Chris Burdess <dog@gnu.org>
+
+	* GnomeTransformerFactory.java: getFeature supports stream features.
+
 2004-07-12  Chris Burdess <dog@gnu.org>
 
 	* dom: Entities and notations NamedNodeMaps.
