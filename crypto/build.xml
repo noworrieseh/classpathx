@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.12 2002-06-28 13:20:48 raif Exp $
+   $Id: build.xml,v 1.13 2002-07-27 02:12:00 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -340,9 +340,10 @@
             <pathelement location="${main.jar}"/>
          </classpath>
          <group title="GNU Crypto Algorithms"
-                packages="gnu.crypto.cipher*,gnu.crypto.hash*,gnu.crypto.mode*,gnu.crypto.pad*,gnu.crypto.prng*"/>
+                packages="gnu.crypto.cipher*,gnu.crypto.hash*,gnu.crypto.mac*,gnu.crypto.mode*,gnu.crypto.pad*,gnu.crypto.prng*"/>
          <group title="GNU Crypto Signature Schemes" packages="gnu.crypto.sig*"/>
          <group title="GNU Crypto JCE Adapters" packages="gnu.crypto.jce*"/>
+         <group title="GNU Crypto Experimental Algorithms" packages="gnu.crypto.exp.ust*"/>
          <group title="GNU Crypto Tools" packages="gnu.crypto.tool*"/>
          <group title="GNU Crypto Utilities" packages="gnu.crypto.util*"/>
       </javadoc>
