@@ -834,10 +834,14 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttribute (JNIEnv * env,
 {
   xmlNodePtr node;
   const xmlChar *s_name;
+  const xmlChar *s_value;
   
   node = xmljGetNodeID (env, self);
   s_name = xmljGetStringChars (env, name);
-  return xmljNewString (env, xmlGetProp (node, s_name));
+  s_value = xmlGetProp (node, s_name);
+  return (s_value == NULL) ?
+    xmljNewString (env, BAD_CAST "") :
+    xmljNewString (env, s_value);
 }
 
 JNIEXPORT void JNICALL
@@ -944,7 +948,9 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_getAttributeNS (JNIEnv * env,
       s_uri = xmljGetStringChars (env, uri);
       s_value = xmlGetNsProp (node, s_localName, s_uri);
     }
-  return xmljNewString (env, s_value);
+  return (s_value == NULL) ?
+    xmljNewString (env, BAD_CAST "") :
+    xmljNewString (env, s_value);
 }
 
 JNIEXPORT void JNICALL
@@ -1049,35 +1055,43 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNodeNS (JNIEnv * env,
 }
 
 JNIEXPORT jboolean JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttribute (JNIEnv * env,
+                                                    jobject self,
+                                                    jstring name)
+{
+  xmlNodePtr node;
+  const xmlChar *s_name;
+  const xmlChar *s_value;
+  
+  node = xmljGetNodeID (env, self);
+  s_name = xmljGetStringChars (env, name);
+  s_value = xmlGetProp (node, s_name);
+  return (s_value != NULL);
+}
+
+JNIEXPORT jboolean JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeElement_hasAttributeNS (JNIEnv * env,
                                                       jobject self,
                                                       jstring uri,
                                                       jstring localName)
 {
   xmlNodePtr node;
-  xmlAttrPtr attr;
   const xmlChar *s_uri;
   const xmlChar *s_localName;
+  const xmlChar *s_value;
 
   node = xmljGetNodeID (env, self);
-  attr = node->properties;
-  s_uri = xmljGetStringChars (env, uri);
   s_localName = xmljGetStringChars (env, localName);
-  while (attr != NULL)
+  if (uri == NULL)
     {
-      if (uri == NULL)
-        {
-          if (xmljMatch (s_localName, (xmlNodePtr) attr))
-            break;
-        }
-      else
-        {
-          if (xmljMatchNS (s_uri, s_localName, (xmlNodePtr) attr))
-            break;
-        }
-      attr = attr->next;
+      s_value = xmlGetNoNsProp (node, s_localName);
     }
-  return (attr != NULL);
+  else
+    {
+      s_uri = xmljGetStringChars (env, uri);
+      s_value = xmlGetNsProp (node, s_localName, s_uri);
+    }
+  return (s_value != NULL);
 }
 
 /* -- GnomeEntity -- */

@@ -1,3 +1,8 @@
+2004-07-27  Chris Burdess <dog@gnu.org>
+
+	* GnomeElement: getAttribute(NS) returns empty strings instead of
+	    null.
+
 2004-07-21  Chris Burdess <dog@gnu.org>
 
 	* GnomeTransformerFactory.java: getFeature supports stream features.
