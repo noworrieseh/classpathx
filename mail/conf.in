@@ -3,4 +3,4 @@
 ##the configure has to build a makefile and the providers file
 ##for whatever providers you choose to build
 AC_INIT(source/javax/mail/Session.java)
-AC_OUTPUT(Makefile )
+AC_OUTPUT(Makefile javamail.providers)
