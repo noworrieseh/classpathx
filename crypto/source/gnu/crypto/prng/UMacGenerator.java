@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: UMacGenerator.java,v 1.2 2002-07-06 23:58:44 raif Exp $
+// $Id: UMacGenerator.java,v 1.3 2002-07-14 01:44:21 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -42,15 +42,33 @@ import java.security.InvalidKeyException;
 /**
  * <p><i>KDF</i>s (Key Derivation Functions) are used to stretch user-supplied
  * key material to specific size(s) required by high level cryptographic
- * primitives.</p>
+ * primitives. Described in the <A
+ * HREF="http://www.ietf.org/internet-drafts/draft-krovetz-umac-01.txt">UMAC</A>
+ * paper, this function basically operates an underlying <em>symmetric key block
+ * cipher</em> instance in output feedback mode (OFB), as a <b>strong</b>
+ * pseudo-random number generator.</p>
  *
- * <p>This <i>KDF</i> implementation is described in the
- * <A HREF="http://www.ietf.org/internet-drafts/draft-krovetz-umac-01.txt">UMAC</A>
- * paper. Basically, it operates an underlying <i>AES</i> instance in output
- * feedback mode (OFB), as a <b>strong</b> pseudo-random number generator.</p>
+ * <p><code>UMacGenerator</code> requires an <em>index</em> parameter
+ * (initialisation parameter <code>gnu.crypto.prng.umac.kdf.index</code> taken
+ * to be an instance of {@link java.lang.Integer} with a value between
+ * <code>0</code> and <code>255</code>). Using the same key, but different
+ * indices, generates different pseudorandom outputs.</p>
  *
- * <p><code>UMacGenerator</code> requires an <code>index</code> parameter to
- * outputs.</p>
+ * <p>This implementation generalises the definition of the
+ * <code>UmacGenerator</code> algorithm to allow for other than the AES symetric
+ * key block cipher algorithm (initialisation parameter
+ * <code>gnu.crypto.prng.umac.cipher.name</code> taken to be an instance of
+ * {@link java.lang.String}). If such a parameter is not defined/included in the
+ * initialisation <code>Map</code>, then the "Rijndael" algorithm is used.
+ * Furthermore, if the initialisation parameter
+ * <code>gnu.crypto.cipher.block.size</code> (taken to be a instance of {@link
+ * java.lang.Integer}) is missing or undefined in the initialisation <code>Map
+ * </code>, then the cipher's <em>default</em> block size is used.</p>
+ *
+ * <p><b>NOTE</b>: Rijndael is used as the default symmetric key block cipher
+ * algorithm because, with its default block and key sizes, it is the AES. Yet
+ * being Rijndael, the algorithm offers more versatile block and key sizes which
+ * may prove to be useful for generating "longer" key streams.</p>
  *
  * <p>References:</p>
  *
@@ -60,7 +78,7 @@ import java.security.InvalidKeyException;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class UMacGenerator extends BasePRNG {
 
@@ -72,9 +90,13 @@ public class UMacGenerator extends BasePRNG {
     * instance. The value is taken to be an {@link Integer} less than
     * <code>256</code>.</p>
     */
-   public static final String INDEX = "gnu.crypto.prng.umac.kdf.index";
+   public static final String INDEX = "gnu.crypto.prng.umac.index";
 
-   private IBlockCipher aes;
+   /** The name of the underlying symmetric key block cipher algorithm. */
+   public static final String CIPHER = "gnu.crypto.prng.umac.cipher.name";
+
+   /** The generator's underlying block cipher. */
+   private IBlockCipher cipher;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -92,7 +114,7 @@ public class UMacGenerator extends BasePRNG {
    private UMacGenerator(UMacGenerator that) {
       this();
 
-      this.aes = (that.aes == null ? null : (IBlockCipher) that.aes.clone());
+      this.cipher = (that.cipher == null ? null : (IBlockCipher) that.cipher.clone());
    }
 
    // Class methods
@@ -110,7 +132,28 @@ public class UMacGenerator extends BasePRNG {
    // Implementation of abstract methods in BasePRNG --------------------------
 
    public void setup(Map attributes) {
-      aes = CipherFactory.getInstance(Registry.AES_CIPHER);
+      boolean newCipher = true;
+      String cipherName = (String) attributes.get(CIPHER);
+      if (cipherName == null) {
+         if (cipher == null) { // happy birthday
+            cipher = CipherFactory.getInstance(Registry.RIJNDAEL_CIPHER);
+         } else { // we already have one. use it as is
+            newCipher = false;
+         }
+      } else {
+         cipher = CipherFactory.getInstance(cipherName);
+      }
+
+      // find out what block size we should use it in
+      int cipherBlockSize = 0;
+      Integer bs = (Integer) attributes.get(IBlockCipher.CIPHER_BLOCK_SIZE);
+      if (bs != null) {
+         cipherBlockSize = bs.intValue();
+      } else {
+         if (newCipher) { // assume we'll use its default block size
+            cipherBlockSize = cipher.defaultBlockSize();
+         } // else use as is
+      }
 
       // get the key material
       byte[] key = (byte[]) attributes.get(IBlockCipher.KEY_MATERIAL);
@@ -121,7 +164,7 @@ public class UMacGenerator extends BasePRNG {
       int keyLength = key.length;
       // ensure that keyLength is valid for the chosen underlying cipher
       boolean ok = false;
-      for (Iterator it = aes.keySizes(); it.hasNext(); ) {
+      for (Iterator it = cipher.keySizes(); it.hasNext(); ) {
          ok = (keyLength == ((Integer) it.next()).intValue());
          if (ok) {
             break;
@@ -141,23 +184,27 @@ public class UMacGenerator extends BasePRNG {
          }
       }
 
+      // now initialise the underlying cipher
       Map map = new HashMap();
+      if (cipherBlockSize != 0) { // only needed if new or changed
+         map.put(IBlockCipher.CIPHER_BLOCK_SIZE, new Integer(cipherBlockSize));
+      }
       map.put(IBlockCipher.KEY_MATERIAL, key);
       try {
-         aes.init(map);
+         cipher.init(map);
       } catch (InvalidKeyException x) {
          throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
       }
 
-      buffer = new byte[16];
-      buffer[15] = (byte) index;
+      buffer = new byte[cipher.currentBlockSize()];
+      buffer[cipher.currentBlockSize() - 1] = (byte) index;
       try {
          fillBlock();
-      } catch (LimitReachedException ignored) {
+      } catch (LimitReachedException impossible) {
       }
    }
 
    public void fillBlock() throws LimitReachedException {
-      aes.encryptBlock(buffer, 0, buffer, 0);
+      cipher.encryptBlock(buffer, 0, buffer, 0);
    }
 }
