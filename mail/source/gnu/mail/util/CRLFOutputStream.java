@@ -1,129 +1,142 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+  GNU-Classpath Extensions: javamail
+  Copyright (C) 1999  Chris Burdess
 
-package oje.mail.util;
+  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
 
-// Imports
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
 
-/** ensures that all end-of-lines consist of the CR-LF character sequence.
- * This is an SMTP requirement and also is required by protocols like POP.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+package gnu.mail.util;
+
+
+import java.io.*;
+
+
+/** an output stream that filters LFs into CR/LF pairs.
  *
- * @author	Andrew Selkirk
- * @version	1.0
+ * @author dog: dog@dog.net.uk
+ * @version 1.1
  */
 public class CRLFOutputStream
-extends FilterOutputStream 
+extends FilterOutputStream
 {
 
-  /** last byte to be written.
-   * -1 represents no bytes have been written yet.
+  /**
+   * The CR octet.
    */
-  protected int lastb = -1;
+  public static final int CR = 13;
 
-  /** end-of-line character sequence.
+  /**
+   * The LF octet.
    */
-  protected static byte[] newline = {13, 10};
+  public static final int LF = 10;
 
+  /**
+   * The CR/LF pair.
+   */
+  public static final byte[] CRLF = { CR, LF };
 
-  public CRLFOutputStream(OutputStream stream) 
+  /**
+   * The last byte read.
+   */
+  protected int last;
+
+  /**
+   * Constructs a CR/LF output stream connected to the specified output stream.
+   */
+  public CRLFOutputStream(OutputStream out)
   {
-    super(stream);
+    super(out);
+    last = -1;
   }
 
-  /** write end-of-line character sequence.
-   * @throws IOException IO Exception occurred
+  /**
+   * Writes a character to the underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  public void write(int ch)
+  throws IOException
+  {
+    if (ch==CR)
+    out.write(CRLF);
+    else if (ch==LF)
+    {
+      if (last!=CR)
+      out.write(CRLF);
+    }
+    else
+    {
+      out.write(ch);
+    }
+    last = ch;
+  }
+
+  /**
+   * Writes a byte array to the underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  public void write(byte b[])
+  throws IOException
+  {
+    write(b, 0, b.length);
+  }
+
+  /**
+   * Writes a portion of a byte array to the underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  public void write(byte b[], int off, int len)
+  throws IOException
+  {
+    int d = off;
+    len += off;
+    for (int i=off; i<len; i++)
+    switch (b[i])
+    {
+      default:
+	break;
+      case CR:
+	if (i+1<len && b[i+1]==LF)
+	{
+	  i++;
+	}
+	else
+	{
+	  out.write(b, d, (i-d)+1);
+	  out.write(LF);
+	  d = i+1;
+	}
+	break;
+      case LF:
+	out.write(b, d, i-d);
+	out.write(CRLF, 0, 2);
+	d = i+1;
+	break;
+    }
+    if (len-d>0)
+    out.write(b, d, len-d);
+  }
+
+  /**
+   * Writes a newline to the underlying stream.
+   * @exception IOException if an I/O error occurred
    */
   public void writeln()
-  throws IOException 
+  throws IOException
   {
-    out.write(newline);
+    out.write(CRLF);
   }
-
-  /** write byte to filtered output stream.
-   * Checks if CR/LF being written and ensures that all
-   * end-of-lines on this output stream are CR-LF.
-   * @param b Byte to write
-   * @throws IOException IO Exception occurred
-   */
-  public void write(int b)
-  throws IOException 
-  {
-    // Check for CR
-    if (b == '\r') 
-    out.write(newline);
-    else if (b == '\n') 
-    {
-      // Only output if NOT preceeded by CR
-      if (lastb != '\r') 
-      out.write(newline);
-    }
-    else 
-    {
-      // Otherwise, it's safe to write the byte
-      out.write(b);
-    } 
-    // Track the last byte
-    lastb = b;
-  }
-
-  /**
-   * Write byte array to filtered output stream.
-   * @param bytes Byte array to write
-   * @exception IOException IO Exception occurred
-   */
-  public void write(byte[] bytes)
-  throws IOException 
-  {
-    write(bytes, 0, bytes.length);
-  }
-
-  /**
-   * Write byte array to filtered output stream.
-   * @param bytes Byte array to write
-   * @param offset Offset of byte array to start
-   * @param length Number of bytes to output
-   * @exception IOException IO Exception occurred
-   */
-  public void write(byte[] bytes, int offset, int length)
-  throws IOException 
-  {
-    // Variables
-    int index;
-    int writeStart;
-    // Process each byte
-    writeStart = offset;
-    for (index = offset; index < length; index++) 
-    {
-      // Check for CR
-      if (bytes[index] == '\r') 
-      {
-	out.write(bytes, writeStart, index - writeStart);
-	out.write(newline);
-	writeStart = index + 1;
-	// Check for LF
-      }
-      else if (bytes[index] == '\n') 
-      {
-	if (lastb != '\r') 
-	{
-	  out.write(bytes, writeStart, index - writeStart);
-	  out.write(newline);
-	}
-	writeStart = index + 1;
-      }
-      // Track Last Byte
-      lastb = bytes[index];
-    }
-    // Check for unwritten bytes
-    if (writeStart < length) 
-    {
-      out.write(bytes, writeStart, length - writeStart);
-    }
-  }
-
 
 }
