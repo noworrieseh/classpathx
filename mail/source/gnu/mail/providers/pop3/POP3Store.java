@@ -29,6 +29,7 @@ package gnu.mail.providers.pop3;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import java.util.StringTokenizer;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
@@ -185,6 +187,25 @@ extends Store
                 if (authenticationMechanisms != null &&
                     !authenticationMechanisms.isEmpty ())
                   {
+                    if (username != null && password != null)
+                      {
+                        PasswordAuthentication pa =
+                          session.getPasswordAuthentication (url);
+                        if (pa == null)
+                          {
+                            InetAddress addr = InetAddress.getByName (host);
+                            pa = session.requestPasswordAuthentication (addr,
+                                                                        port,
+                                                                        "pop3",
+                                                                        null,
+                                                                        null);
+                          }
+                        if (pa != null)
+                          {
+                            username = pa.getUserName ();
+                            password = pa.getPassword ();
+                          }
+                      }
                     if (username != null && password != null)
                       {
                         // Discover user ordering preferences for auth

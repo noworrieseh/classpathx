@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -207,6 +208,25 @@ public class SMTPTransport
             !authenticationMechanisms.isEmpty () &&
             (authRequired || propertyIsTrue ("auth")))
           {
+            if (username != null && password != null)
+              {
+                PasswordAuthentication pa =
+                  session.getPasswordAuthentication (url);
+                if (pa == null)
+                  {
+                    InetAddress addr = InetAddress.getByName (host);
+                    pa = session.requestPasswordAuthentication (addr,
+                                                                port,
+                                                                "smtp",
+                                                                null,
+                                                                null);
+                  }
+                if (pa != null)
+                  {
+                    username = pa.getUserName ();
+                    password = pa.getPassword ();
+                  }
+              }
             if (username != null && password != null)
               {
                 // Discover user ordering preferences for auth mechanisms

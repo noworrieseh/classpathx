@@ -13,7 +13,7 @@ prefix = /usr/local/share/java
 extra = /usr/share/java
 
 OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true -Djavax.net.debug=true \
--Dmail.smtp.host=bluezoo.org -Dmail.smtp.auth=required
+-Dmail.smtp.host=bluezoo.org -Dmail.smtp.tls=false -Dmail.smtp.auth=required
 
 all: test
 

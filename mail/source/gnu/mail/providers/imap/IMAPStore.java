@@ -28,6 +28,7 @@
 package gnu.mail.providers.imap;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.StoreClosedException;
@@ -167,6 +169,25 @@ public class IMAPStore
             if (authenticationMechanisms != null &&
                 !authenticationMechanisms.isEmpty ())
               {
+                if (username != null && password != null)
+                  {
+                    PasswordAuthentication pa =
+                      session.getPasswordAuthentication (url);
+                    if (pa == null)
+                      {
+                        InetAddress addr = InetAddress.getByName (host);
+                        pa = session.requestPasswordAuthentication (addr,
+                                                                    port,
+                                                                    "imap",
+                                                                    null,
+                                                                    null);
+                      }
+                    if (pa != null)
+                      {
+                        username = pa.getUserName ();
+                        password = pa.getPassword ();
+                      }
+                  }
                 if (username != null && password != null)
                   {
                     // Discover user ordering preferences for auth
