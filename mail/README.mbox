@@ -1,0 +1,51 @@
+The mbox provider allows for both reading and saving of MIME messages to and
+from a local filesystem, using the UNIX mbox format used by Netscape
+Messenger and many other MUAs.
+
+Reading messages
+
+Nothing special should be required for the configuration of a connection to
+a local mailbox using the provider. The protocol to use is mbox.
+
+  URLName url = new URLName("mbox://localhost/home/user/mail");
+  Store store = session.getStore(url);
+  Folder root = store.getDefaultFolder();
+  Folder savedMessages = root.lookup("saved.messages");
+
+Any host details specified in the connection (username, password, host, or
+port) are ignored. The file part of the URL is used to specify the default 
+root directory for mailboxes, however any valid filename can be used to
+refer to a mailbox anywhere in the filesystem. For instance,
+
+  Folder localSpool = root.lookup("/var/spool/mail/user");
+
+would return a spool mailbox whatever the default root directory. If no
+directory is specified in the URL, the user's home directory becomes the de
+facto default directory context for lookups.
+
+WARNING
+
+It is NOT recommended that you access spool mailboxes using the mbox
+provider, as it does not use filesystem-level file locking and you may lose
+valuable data. Use movemail if necessary for this purpose. The mbox provider
+is supplied specifically for personal user mailboxes only.
+
+Saving messages
+
+You may use the standard appendMessages() method to save MIME messages to a
+local mailbox using this provider.
+
+Filtering
+
+No inherent filtering mechanism is currently supplied, although you are free
+to use procmail or any other filtering MTA as you see fit.
+
+Session properties
+
+There is a session property you can set that may speed up disk reads:
+
+  property --------------------+ type ---+ default + description ----------
+  mail.mbox.fetchsize          | int     | 1024    | read buffer size
+
+
+Chris Burdess, August 2001

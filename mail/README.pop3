@@ -1,0 +1,41 @@
+The POP3 provider allows for reading of messages from a POP3 mailbox.
+
+Reading messages
+
+Nothing special should be required for the configuration of a connection to
+a POP server using the provider. The protocol to use is pop3.
+
+  URLName url = new URLName("pop3://user:pass@host:port");
+  Store store = session.getStore(url);
+  Folder root = store.getDefaultFolder();
+  Folder inbox = root.lookup("INBOX");
+
+A username and password must be supplied. The port can be omitted, it
+defaults to 110.
+
+Note that the POP3 protocol only allows for ONE mailbox. This is always
+called INBOX. Much of the advanced searching functionality provided by
+JavaMail, fecth profiles for instance, will not work over POP3.
+
+Local cache
+
+No local cache is provided. It is recommended that if you want to maintain a
+local cache you use the mbox provider supplied, and transfer messages from
+the POP3 mailbox to the local mbox.
+
+Filtering
+
+No filtering mechanism is currently supplied. It was originally hoped that
+JavaMail would provide a standard architecture for this, but this
+possibility now seems remote. Suggestions are welcome.
+
+Session properties
+
+There is a session property you can set that may help speed up network
+reads, depending on your configuration (try setting between 1-4K):
+
+  property --------------------+ type ---+ default + description ----------
+  mail.pop3.fetchsize          | int     | 1024    | read buffer size
+
+
+Chris Burdess, August 2001
