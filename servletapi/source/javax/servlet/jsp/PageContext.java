@@ -32,6 +32,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.BodyContent;
 
 /**
  * The definition of a page.
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
  */
 public abstract class PageContext 
+extends JspContext
 {
 
   //  static final strings used in attribute name table
@@ -131,46 +133,6 @@ public abstract class PageContext
    */
   protected transient Hashtable attributes;
 
-  /**
-   * XXX
-   */
-  protected ServletContext context;
-
-  /**
-   * XXX
-   */
-  protected JspFactory factory;
-
-  /**
-   * XXX
-   */
-  protected boolean needsSession;
-
-  /**
-   * XXX [mjw] Why transient?
-   */
-  protected transient JspWriter out;
-
-  /**
-   * XXX [mjw] Why transient?
-   */
-  protected transient ServletRequest request;
-
-  /**
-   * XXX [mjw] Why transient?
-   */
-  protected transient ServletResponse response;
-
-  /**
-   * XXX
-   */
-  protected Servlet servlet;
-
-  /**
-   * XXX [mjw] Why transient?
-   */
-  protected transient HttpSession session;
-
   //  Private Instance Variables
 
   //  XXX [mjw] Do we really need this?
@@ -200,162 +162,13 @@ public abstract class PageContext
     //  XXX [mjw] What should the default behaviour be?
   }
 
-  /**
-   * XXX
-   *
-   * @param name
-   * @return XXX
-   */
-  public Object getAttribute(String name) 
-  {
-    return attributes.get(name);
-  }
+  public abstract Exception getException();
 
-  /**
-   * XXX
-   *
-   * @param name XXX
-   * @return XXX
-   */
-  public int getAttributesScope(String name) 
-  {
-    return 0; //  XXX [mjw] I have no idea
-  }
+  public abstract ServletConfig getServletConfig();
 
-  /**
-   * XXX
-   *
-   * @param scope XXX
-   * @return XXX
-   */
-  public Enumeration getAttributesInScope(int scope) 
-  {
-    return null; //  XXX [mjw] I have no idea
-  }
+  public abstract ServletContext getServletContext();
 
-  /**
-   * XXX
-   *
-   * @param name XXX
-   */
-  public void removeAttribute(String name) 
-  {
-    attributes.remove(name);
-  }
-
-  /**
-   * XXX
-   *
-   * @param name XXX
-   * @param scope XXX
-   */
-  public void removeAttributeInScope(String name, int scope) 
-  {
-    attributes.remove(name); //  XXX [mjw] scope ???
-  }
-
-  /**
-   * XXX
-   *
-   * @param name XXX
-   * @param attribute XXX
-   * @exception NullPointerException XXX
-   */
-  public void setAttribute(String name, Object attribute)
-    throws NullPointerException
-  {
-    setAttributeWithScope(name, attribute, PAGE_SCOPE);
-  }
-
-  /**
-   * XXX
-   *
-   * @param name XXX
-   * @param attribute XXX
-   * @param scope XXX
-   * @exception IllegalArgumentException XXX
-   * @exception NullPointerException XXX
-   */
-  public void setAttributeWithScope(String name,
-				    Object attribute,
-				    int scope)
-    throws IllegalArgumentException, NullPointerException 
-  {
-    attributes.put(name, attribute); //  XXX [mjw] scope???
-  }
-
-  public Exception getException() 
-  {
-    return (Exception) attributes.get(EXCEPTION);
-    //  XXX [mjw] is this right?
-  }
-
-  public JspFactory getFactory() 
-  {
-    return this.factory;
-  }
-
-  public JspWriter getInitialOut() 
-  {
-    return this.initialOut;
-  }
-
-  public boolean getNeedsSession() 
-  {
-    return this.needsSession;
-  }
-
-  public JspWriter getOut() 
-  {
-    return this.out;
-  }
-
-  public int getOutBufferSize() 
-  {
-    return this.out.getBufferSize();
-  }
-
-  public Servlet getServlet() 
-  {
-    return this.servlet;
-  }
-
-  public ServletConfig getServletConfig() 
-  {
-    return this.servlet.getServletConfig();
-  }
-
-  public ServletContext getServletContext() 
-  {
-    return this.context;
-  }
-
-  public ServletRequest getServletRequest() 
-  {
-    return this.request;
-  }
-
-  public ServletResponse getServletResponse() 
-  {
-    return this.response;
-  }
-
-  public HttpSession getSession() 
-  {
-    return this.session;
-  }
-
-  public boolean isAutoFlush() 
-  {
-    return this.out.isAutoFlush();
-  }
-
-  public boolean isOutBuffered() 
-  {
-    return (this.out.getBufferSize() != 0);
-  }
-
-  //  Abstract methods
+  public abstract HttpSession getSession();
 
   /**
    * XXX
@@ -393,8 +206,7 @@ public abstract class PageContext
    * @exception SecurityException
    */
   public abstract void forward(String urlPath)
-    throws IOException, ServletException, IllegalArgumentException,
-    IllegalStateException, SecurityException;
+    throws IOException, ServletException;
 
   /**
    * XXX
@@ -407,16 +219,42 @@ public abstract class PageContext
    * @exception SecurityException
    */
   public abstract void include(String urlPath)
-    throws IOException, ServletException, IllegalArgumentException, SecurityException;
+    throws IOException, ServletException;
+
+  /**
+   * XXX
+   *
+   * @param urlPath
+   * @param flush 
+   *
+   * @since JSP 2.0
+   * 
+   * @exception IOException
+   * @exception ServletException
+   * @exception IllegalArgumentException
+   * @exception SecurityException
+   */
+  public abstract void include(String urlPath, boolean flush)
+    throws IOException, ServletException;
 
   /**
    * Handle an exception created by the page.
+   * @param e
+   * @exception ServletException
+   * @exception IOException
+   * @exception NullPointerException
+   * @exception SecurityException
    */
   public abstract void handlePageException (Exception e)
     throws ServletException, IOException;
 
   /**
    * Handle an exception created by the page.
+   * @param t
+   * @exception ServletException
+   * @exception IOException
+   * @exception NullPointerException
+   * @exception SecurityException
    */
   public abstract void handlePageException (Throwable t)
     throws ServletException, IOException;
@@ -425,4 +263,54 @@ public abstract class PageContext
    * Release this page context.
    */
   public abstract void release ();
+
+  /**
+   * get the current page (a servlet)
+   * 
+   * @return XXX
+   */
+  public abstract Object getPage();
+
+  /**
+   * get the current servlet request object
+   * 
+   * @return the request
+   */
+  public abstract ServletRequest getRequest();
+
+  /**
+   * get the current servlet response object
+   * 
+   * @return the response
+   */
+  public abstract ServletResponse getResponse();
+
+  /**
+   * XXX
+   * @return a BodyContent
+   */
+  public BodyContent pushBody()
+  {
+    return null; // BAD! XXX
+  }
+
+  /**
+   * 
+   * @return a JspWriter
+   */
+  public JspWriter popBody()
+  {
+    return (JspWriter) this.attributes.get( PageContext.OUT );
+  }
+
+  /**
+   * 
+   * @return an ErrorData
+   * @since JSP 2.0
+   */
+  public ErrorData getErrorData()
+  {
+    return null;
+  }
+
 }
