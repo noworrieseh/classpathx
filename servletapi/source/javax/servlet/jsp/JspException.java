@@ -29,6 +29,8 @@ package javax.servlet.jsp;
 public class JspException extends Exception
 {
 
+  protected Throwable rootCause;
+
   /** Make an exception with a default error message.
    */
   public JspException ()
@@ -43,6 +45,24 @@ public class JspException extends Exception
   public JspException (String message)
   {
     super(message);
+  }
+
+  public JspException (String message,
+                       Throwable rootCause)
+  {
+    super(message);
+    this.rootCause = rootCause;
+  }
+
+  public JspException (Throwable rootCause)
+  {
+    super(rootCause.getMessage());
+    this.rootCause = rootCause;
+  }
+
+  public Throwable getRootCause()
+  {
+    return this.rootCause;
   }
   
 }
