@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.2 2001-07-11 17:15:59 db Exp $
+ * $Id: XMLWriter.java,v 1.3 2001-09-26 19:31:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-07-11 17:15:59 $
+ * @version $Date: 2001-09-26 19:31:17 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -1024,7 +1024,12 @@ public class XMLWriter
 	}
     }
 
-    /** <b>SAX1</b>:  reports a PI */
+    /**
+     * <b>SAX1</b>:  reports a PI.
+     * This doesn't check for illegal target names, such as "xml" or "XML",
+     * or namespace-incompatible ones like "big:dog"; the caller is
+     * responsible for ensuring those names are legal.
+     */
     final public void processingInstruction (String name, String value)
     throws SAXException
     {
