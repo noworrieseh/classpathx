@@ -1,5 +1,5 @@
 /*
- * $Id: XmlReader.java,v 1.1 2001-07-05 01:52:53 db Exp $
+ * $Id: XmlReader.java,v 1.2 2001-07-10 23:00:00 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.pipeline.*;
 
 
-// $Id: XmlReader.java,v 1.1 2001-07-05 01:52:53 db Exp $
+// $Id: XmlReader.java,v 1.2 2001-07-10 23:00:00 db Exp $
 
 /**
  * This SAX2 parser optionally layers a validator over the &AElig;lfred2
@@ -53,7 +53,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.ValidationConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-07-05 01:52:53 $
+ * @version $Date: 2001-07-10 23:00:00 $
  */
 public final class XmlReader implements XMLReader
 {
@@ -262,19 +262,9 @@ public final class XmlReader implements XMLReader
 	    next = new ValidationConsumer (filter);
 	} else
 	    next = filter;
-	next.setErrorHandler (aelfred2.getErrorHandler ());
 
-	// connect pipeline (manually)
-	aelfred2.setContentHandler (next.getContentHandler ());
-	aelfred2.setDTDHandler (next.getDTDHandler ());
-	try {
-	    aelfred2.setProperty (SAXDriver.PROPERTY + "declaration-handler",
-	    	next.getProperty (SAXDriver.PROPERTY + "declaration-handler"));
-	} catch (Exception e) { /* ignore */ }
-	try {
-	    aelfred2.setProperty (SAXDriver.PROPERTY + "lexical-handler",
-	    	next.getProperty (SAXDriver.PROPERTY + "lexical-handler"));
-	} catch (Exception e) { /* ignore */ }
+	// connect pipeline and error handler
+	EventFilter.bind (aelfred2, next);
 
 	// parse, clean up
 	try {
