@@ -795,8 +795,10 @@ final public class SAXDriver
                  && qname.startsWith ("xmlns")) {
           String		prefix = qname.substring (6);
           
+          if (prefix.equals(""))
+          	fatal ("missing prefix in namespace declaration attribute");	
           if (value.length () == 0) {
-            verror ("missing URI in namespace decl attribute: "
+            verror ("missing URI in namespace declaration attribute: "
                     + qname);
           } else
             declarePrefix (prefix, value);
