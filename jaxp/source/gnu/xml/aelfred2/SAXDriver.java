@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.26 2002-03-07 19:10:00 db Exp $
+ * $Id: SAXDriver.java,v 1.27 2003-01-20 23:46:33 nferrier Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -48,9 +48,8 @@
 
 package gnu.xml.aelfred2;
 
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
@@ -67,7 +66,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.26 2002-03-07 19:10:00 db Exp $
+// $Id: SAXDriver.java,v 1.27 2003-01-20 23:46:33 nferrier Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -124,7 +123,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2002-03-07 19:10:00 $
+ * @version $Date: 2003-01-20 23:46:33 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -150,6 +149,7 @@ final public class SAXDriver
     private Vector			attributeLocalNames = new Vector ();
     private Vector			attributeValues = new Vector ();
     private boolean			attributeSpecified [] = new boolean[10];
+    private boolean			attributeDeclared [] = new boolean[10];
 
     private boolean			namespaces = true;
     private boolean			xmlNames = false;
@@ -321,10 +321,15 @@ final public class SAXDriver
 	    parser.setHandler (this);
 
 	    try {
+
+	      Reader r = source.getCharacterStream();
+	      InputStream in = source.getByteStream();
+
+	      
 		parser.doParse (source.getSystemId (),
 			      source.getPublicId (),
-			      source.getCharacterStream (),
-			      source.getByteStream (),
+			      r,
+			      in,
 			      source.getEncoding ());
 	    } catch (SAXException e) {
 		throw e;
@@ -1099,6 +1104,43 @@ final public class SAXDriver
     // Implementation of org.xml.sax.ext.Attributes2
     //
 
+
+    /** @return false unless the attribute was declared in the DTD.
+     * @throws java.lang.ArrayIndexOutOfBoundsException
+     *   When the supplied index does not identify an attribute.
+     */    
+    public boolean isDeclared (int index)
+    {
+	if (index < 0 || index >= attributeCount) 
+	    throw new ArrayIndexOutOfBoundsException ();
+	return attributeDeclared [index];
+    }
+
+    /** @return false unless the attribute was declared in the DTD.
+     * @throws java.lang.IllegalArgumentException
+     *   When the supplied names do not identify an attribute.
+     */
+    public boolean isDeclared (java.lang.String qName)
+    {
+	int index = getIndex (qName);
+	if (index < 0)
+	    throw new IllegalArgumentException ();
+	return attributeDeclared [index];
+    }
+
+    /** @return false unless the attribute was declared in the DTD.
+     * @throws java.lang.IllegalArgumentException
+     *   When the supplied names do not identify an attribute.
+     */
+    public boolean isDeclared (java.lang.String uri, java.lang.String localName)
+    {
+	int index = getIndex (uri, localName);
+	if (index < 0)
+	    throw new IllegalArgumentException ();
+	return attributeDeclared [index];
+    }
+
+
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
      */
@@ -1108,7 +1150,6 @@ final public class SAXDriver
 	    throw new ArrayIndexOutOfBoundsException ();
 	return attributeSpecified [index];
     }
-
 
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
@@ -1121,7 +1162,6 @@ final public class SAXDriver
 	    throw new IllegalArgumentException ();
 	return attributeSpecified [index];
     }
-
 
     /**
      * <b>SAX-ext Attributes2</b> method (don't invoke on parser);
