@@ -203,7 +203,7 @@ CC-DESTDIR =	bin
 GCJ_OPTS = --encoding=8859_1 -fsyntax-only -femit-class-files 
 GCJ_COMPILE = $(GCJ) $(GCJ_OPTS) -Isource -foutput-class-dir=$(CC-DESTDIR)
 
-JAVAC_COMPILE = javac -classpath  $(CPATH) -d $(CC-DESTDIR)
+JAVAC_COMPILE = javac -sourcepath source -classpath  $(CPATH) -d $(CC-DESTDIR)
 
 ##variables which define some useful constants
 
@@ -212,14 +212,14 @@ empty:=
 space:=$(empty) $(empty)
 
 
+#
+# REAL TARGETS
+#
 
-##user defined targets
+default: $(LIBNAME).jar
 
-#the standard distrib target
-#Users should extend this to do the "all" build in whaetver way they
-#want, eg: building jar files and javadoc
-#The default is to associate "all" with "compile"
-all: $(LIBNAME).jar
+all: $(LIBNAME).jar javadoc
+
 
 # for normal development
 # must rerun "make" after this
@@ -242,10 +242,9 @@ javadoc:
 	    -nodeprecatedlist \
 	    -version -author -use \
 	    -bottom "<p>Source code is under GPL \
-		(with 'library exception') \
-	        in the JAXP subproject at \
-		<a href='http://savannah.gnu.org/projects/classpathx'> \
-		http://savannah.gnu.org/projects/classpathx</a> \
+		(with library exception) in the JAXP project at \
+		<a href='http://www.gnu.org/software/classpathx/jaxp'> \
+		http://www.gnu.org/software/classpathx/jaxp</a> \
 		<br>This documentation was derived from that\
 		source code on `date -I`.\
 		</p>" \
