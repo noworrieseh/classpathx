@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: IMessageDigest.java,v 1.1.1.1 2001-11-20 13:40:34 raif Exp $
+// $Id: IMessageDigest.java,v 1.2 2001-11-21 19:55:29 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -28,9 +28,9 @@ import java.math.BigInteger;
 import java.io.PrintWriter;
 
 /**
- * The basic visible method of any hash algorithm.
+ * The basic visible methods of any hash algorithm.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface IMessageDigest extends Cloneable {
 
