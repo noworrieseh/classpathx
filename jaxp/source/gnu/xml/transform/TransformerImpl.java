@@ -360,6 +360,24 @@ class TransformerImpl
     throws TransformerConfigurationException
   {
     short nt = node.getNodeType();
+    if (nt == Node.ENTITY_REFERENCE_NODE)
+      {
+        // Replace entity reference with its content
+        Node parent = node.getParentNode();
+        Node child = node.getFirstChild();
+        if (child != null)
+          {
+            strip(child);
+          }
+        while (child != null)
+          {
+            Node next = child.getNextSibling();
+            node.removeChild(child);
+            parent.insertBefore(child, node);
+            child = next;
+          }
+        parent.removeChild(node);
+      }
     if (nt == Node.TEXT_NODE) // CDATA sections ?
       {
         if (!stylesheet.isPreserved((Text) node))

@@ -226,6 +226,7 @@ class XSLURIResolver
             DocumentBuilderFactory factory =
               DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
+            factory.setExpandEntityReferences(true);
             builder = factory.newDocumentBuilder();
           }
         if (userResolver != null)

@@ -1,3 +1,7 @@
+2004-12-04  Chris Burdess	<dog@gnu.org>
+
+	* README,INSTALL,AUTHORS: Updated documentation.
+
 2004-12-03  Andrew Overholt  <overholt@redhat.com>
 
 	* autogen.sh: New file.

@@ -62,6 +62,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import gnu.xml.dom.DomDocument;
@@ -84,6 +85,7 @@ public class DomLSParser
                     "expand-entity-references",
                     "coalescing",
                     "validating",
+                    "xinclude-aware",
                     "entity-resolver",
                     "error-handler" });
 
@@ -100,6 +102,7 @@ public class DomLSParser
   private boolean ignoreComments;
   private boolean coalescing;
   private boolean validating;
+  private boolean xIncludeAware;
   private EntityResolver entityResolver;
   private ErrorHandler errorHandler;
 
@@ -272,8 +275,24 @@ public class DomLSParser
                           true);
         reader.setFeature("http://xml.org/sax/features/validation",
                           validating);
-        reader.setFeature("http://xml.org/sax/features/use-attributes2",
-                          true);
+        try
+          {
+            reader.setFeature("http://xml.org/sax/features/use-attributes2",
+                              true);
+          }
+        catch (SAXNotRecognizedException e)
+          {
+            // ignore
+          }
+        try
+          {
+            reader.setFeature("http://xml.org/sax/features/external-general-entities",
+                              true);
+          }
+        catch (SAXNotRecognizedException e)
+          {
+            // ignore
+          }
         reader.setEntityResolver(entityResolver);
         reader.setErrorHandler(errorHandler);
         // parse
@@ -315,7 +334,7 @@ public class DomLSParser
       {
         factory.setNamespaceAware(namespaceAware);
         factory.setValidating(validating);
-        // TODO xincludeAware
+        factory.setXIncludeAware(xIncludeAware);
         try
           {
             SAXParser parser = factory.newSAXParser();
@@ -396,6 +415,7 @@ public class DomLSParser
   public void setParameter(String name, Object value)
     throws DOMException
   {
+    name = name.toLowerCase();
     if ("cdata-sections".equals(name))
       {
         coalescing = !((Boolean) value).booleanValue();
@@ -424,6 +444,10 @@ public class DomLSParser
       {
         validating = ((Boolean) value).booleanValue();
       }
+    else if ("xinclude-aware".equals(name))
+      {
+        xIncludeAware = ((Boolean) value).booleanValue();
+      }
     else if ("entity-resolver".equals(name))
       {
         entityResolver = (EntityResolver) value;
@@ -443,6 +467,7 @@ public class DomLSParser
   public Object getParameter(String name)
     throws DOMException
   {
+    name = name.toLowerCase();
     if ("cdata-sections".equals(name))
       {
         return coalescing ? Boolean.FALSE : Boolean.TRUE;
@@ -470,6 +495,10 @@ public class DomLSParser
     else if ("validating".equals(name))
       {
         return validating ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("xinclude-aware".equals(name))
+      {
+        return xIncludeAware ? Boolean.TRUE : Boolean.FALSE;
       }
     else if ("entity-resolver".equals(name))
       {

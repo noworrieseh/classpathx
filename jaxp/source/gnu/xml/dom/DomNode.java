@@ -307,7 +307,7 @@ public abstract class DomNode
   // times (docfrag) before anything is allowed to change
   private void checkMisc(DomNode child)
   {
-    if (readonly)
+    if (readonly && !owner.building)
       {
         throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
                         null, this, 0);
@@ -854,7 +854,7 @@ public abstract class DomNode
           {
             throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
           }
-        if (readonly)
+        if (readonly && !owner.building)
           {
             throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
                             null, this, 0);

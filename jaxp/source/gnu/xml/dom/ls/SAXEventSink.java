@@ -43,7 +43,9 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.xml.XMLConstants;
 import org.w3c.dom.Attr;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
+import org.w3c.dom.Entity;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -352,21 +354,46 @@ class SAXEventSink
   public void startEntity(String name)
     throws SAXException
   {
-    // TODO
-    /*
-    Node entity = new DomEntity(doc, name);
-    ctx.appendChild(entity);
-    ctx = entityRef;
-    */
+    // Get entity
+    DocumentType doctype = doc.getDoctype();
+    if (doctype == null)
+      {
+        throw new SAXException("SAX parser error: " +
+                               "reference to entity in undeclared doctype");
+      }
+    NamedNodeMap entities = doctype.getEntities();
+    Entity entity = (Entity) entities.getNamedItem(name);
+    if (entity == null)
+      {
+        throw new SAXException("SAX parser error: " +
+                               "reference to undeclared entity: " + name);
+      }
+    // TODO resolve external entities to ensure that entity has content
+    if (expandEntityReferences)
+      {
+        // Get entity content
+        for (Node child = entity.getFirstChild(); child != null;
+             child = child.getNextSibling())
+          {
+            ctx.appendChild(child);
+          }
+      }
+    else
+      {
+        Node entityReference = doc.createEntityReference(name);
+        ctx.appendChild(entityReference);
+        // Copy entity content
+        for (Node child = entity.getFirstChild(); child != null;
+             child = child.getNextSibling())
+          {
+            entityReference.appendChild(child.cloneNode(true));
+          }
+      }
   }
 
   public void endEntity(String name)
     throws SAXException
   {
-    // TODO
-    /*
-    ctx = ctx.getParentNode();
-    */
   }
 
   public void startCDATA()
@@ -422,7 +449,8 @@ class SAXEventSink
         return;
       }
     DomDoctype doctype = (DomDoctype) ctx;
-    doctype.declareEntity(name, publicId, systemId, notationName);
+    Entity entity = doctype.declareEntity(name, publicId, systemId,
+                                          notationName);
   }
 
   // -- DeclHandler --
@@ -458,7 +486,9 @@ class SAXEventSink
         return;
       }
     DomDoctype doctype = (DomDoctype) ctx;
-    doctype.declareEntity(name, null, null, null); // TODO value
+    Entity entity = doctype.declareEntity(name, null, null, null);
+    Node text = doc.createTextNode(value);
+    entity.appendChild(text);
   }
 
   public void externalEntityDecl(String name, String publicId, String systemId)
@@ -469,7 +499,7 @@ class SAXEventSink
         return;
       }
     DomDoctype doctype = (DomDoctype) ctx;
-    doctype.declareEntity(name, publicId, systemId, null);
+    Entity entity = doctype.declareEntity(name, publicId, systemId, null);
   }
   
 }

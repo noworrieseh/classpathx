@@ -1,6 +1,6 @@
 WHAT IS THIS
 
-GNUJAXP includes interfaces and implementations for basic XML processing
+GNU JAXP includes interfaces and implementations for basic XML processing
 in Java, some general purpose SAX2 utilities, and transformation.
 
 The standard distribution includes the full source code.  The current
@@ -11,15 +11,21 @@ See INSTALL for installation instructions.
 
 JAVA PACKAGES
     
-. javax.xml.* ... JAXP 1.2 interfaces
+. javax.xml.* ... JAXP 1.3 interfaces
 . org.xml.sax.* ... SAX2 (r2pre3, extensions 1.1beta) interfaces
-. org.w3c.dom.* ... DOM Level 2 interfaces
+. org.w3c.dom.* ... DOM Level 3 interfaces
 
-. gnu.xml.aelfred2.* ... SAX2 parsers (+ optional validator, and JAXP glue)
-. gnu.xml.dom.* ... DOM level 2 (XML) implementation (and JAXP glue)
+. gnu.xml.aelfred2.* ... SAX2 parser + validator
+. gnu.xml.dom.* ... DOM Level 3 Core, Traversal, XPath implementation
+. gnu.xml.dom.ls.* ... DOM Level 3 Load & Save implementation
+. gnu.xml.xpath.* ... JAXP XPath implementation
+. gnu.xml.transform.* ... JAXP XSL transformer implementation
 . gnu.xml.pipeline.* ... SAX2 event pipeline support
 . gnu.xml.util.* ... various XML utility classes
-. gnu.xml.libxmlj.transform.* ... JNI bindings to libxslt
+. gnu.xml.libxmlj.dom.* ... libxmlj DOM Level 3 Core and XPath
+. gnu.xml.libxmlj.sax.* ... libxmlj SAX parser
+. gnu.xml.libxmlj.transform.* ... libxmlj XSL transformer
+. gnu.xml.libxmlj.util.* ... libxmlj utility classes
 
 LICENSING
 
@@ -30,7 +36,7 @@ permissive than the "LGPL".
 
 See the LICENSE file for more information.
 
-CONFORMANCE TESTING
+CONFORMANCE
     The primary test resources are at http://xmlconf.sourceforge.net
     and include:
 
@@ -55,6 +61,11 @@ CONFORMANCE TESTING
 	layered.  For example, validity constraints related to standalone
 	declarations and PE nesting are not checked.
 
+        The current implementation has also been tested against Elliotte
+        Rusty Harold's SAXTest test suite (http://www.cafeconleche.org/SAXTest)
+        and achieves approximately 93% conformance to the SAX specification
+        according to these tests, higher than any other current Java parser.
+
     SAX2
 	SAX2 API conformance currently has a minimal JUNIT (0.2) test suite,
 	which can be accessed at the xmlconf site listed above.  It does
@@ -72,42 +83,38 @@ CONFORMANCE TESTING
 	
 	By those metrics, SAX2 conformance for AElfred2 is also strong. 
     
-    DOM Level 1 (and Level 2 Events) Tests
-	The "domunit 0.0.6" tests use the JAXP API to hook up a DOM
-	implementation to a parser (out of scope for DOM Level 2).
-	Those DOM unit tests are mostly related to Level 1, except
-	for a few relating to the Level 2 events module.
+    DOM Level 3 Core Tests
+        The DOM implementation has been tested against the W3C DOM Level 3
+        Core conformance test suite (http://www.w3.org/DOM/Test/). Current
+        conformance according to these tests is 72.3%. Many of the test
+        failures are due to the fact that GNU JAXP does not currently
+        provide any W3C XML Schema support.
 
-	All of these tests pass.
+    XSL transformation
+        The transformer and XPath implementation have been tested against
+        the OASIS XSLT and XPath TC test suite. Conformance against the
+        Xalan tests is currently 77%.
 
-	However, you may want to be aware that Entity nodes, and all
-	EntityReference nodes not created by parsing a document, will
-	have no children.  Since you should as a rule avoid both these
-	node types, you probably won't run into related problems.
 
-----------------------------------------------
-
-GNU LibxmlJ
+GNU libxmlj
 ========================================================================
 
-LibxmlJ is an effort to create a 100% JAXP-compatible Java wrapper for
-Libxml2 and Libxslt. JAXP is the Java API for XML processing, Libxml2
-is the XML C library for Gnome, and Libxslt is the XSLT C library for
+libxmlj is an effort to create a 100% JAXP-compatible Java wrapper for
+libxml2 and libxslt. JAXP is the Java API for XML processing, libxml2
+is the XML C library for Gnome, and libxslt is the XSLT C library for
 Gnome.
 
-Currently there is only an implementation for the `JAXP API for XML
-Transformations' subset - package javax.xml.transform - and only a
-partial implementation. It should be complete enough to work for a
-number of use cases, though. See below for a list of limitations and
-unsupported features.
+libxmlj currently supports most of the DOM Level 3 Core, Traversal, and
+XPath APIs, SAX2, and XSLT transformations. There is no W3C XML Schema
+support yet.
 
-The main focus of LibxmlJ so far was support for GNU Gjdoc, which is
-now rather complete. Aside from its use in Gjdoc, It hasn't been
-tested at all, and has a number of known bugs.
+libxmlj can parse and transform XML documents extremely quickly in
+comparison to Java-based JAXP implementations. DOM manipulations, however,
+involve JNI overhead, so the speed of DOM tree construction and traversal
+can be slower than the Java implementation.
 
-CAVEAT: LibxmlJ's current incarnation is incomplete and partly
-incorrect and may leak memory. Highly experimental. Not for production
-use.
+libxmlj is highly experimental, doesn't always conform to the DOM
+specification correctly, and may leak memory. Production use is not advised.
 
 
 Usage
@@ -115,18 +122,35 @@ Usage
 
 See INSTALL for installation instructions.
 
-To enable use of LibxmlJ for JAXP transformations:
+To enable the various GNU JAXP factories, set the following system properties
+(command-line version shown, but they can equally be set programmatically):
 
- System.setProperty("javax.xml.transform.TransformerFactory",
-                    "gnu.xml.libxmlj.transform.TransformerFactoryImpl");
+  AElfred2:
+   -Djavax.xml.parsers.SAXParserFactory=gnu.xml.aelfred2.JAXPFactory
 
-You can also specifiy the factory by using the VM command line or one
-of the other methods described in the documentation for
-javax.xml.transform.TransformerFactory.newInstance().
+  GNU DOM (using DOM Level 3 Load & Save):
+   -Djavax.xml.parsers.DocumentBuilderFactory=gnu.xml.dom.DomDocumentBuilderFactory
 
-Make sure that `gnujaxp.jar' and `libxmlj.jar' are on your CLASSPATH
-and the shared library can be found (i.e. is configured via ldconfig
-or located on the LD_LIBRARY_PATH).
+  GNU DOM (using AElfred-only pipeline classes):
+   -Djavax.xml.parsers.DocumentBuilderFactory=gnu.xml.dom.JAXPFactory
+
+  GNU XSL transformer:
+   -Djavax.xml.transform.TransformerFactory=gnu.xml.transform.TransformerFactoryImpl
+
+  libxmlj SAX:
+   -Djavax.xml.parsers.SAXParserFactory=gnu.xml.libxmlj.sax.GnomeSAXParserFactory
+
+  libxmlj DOM:
+   -Djavax.xml.parsers.DocumentBuilderFactory=gnu.xml.libxmlj.dom.GnomeDocumentBuilderFactory
+
+  libxmlj XSL transformer:
+   -Djavax.xml.transform.TransformerFactory=gnu.xml.libxmlj.transform.GnomeTransformerFactory
+
+When using libxmlj, the libxmlj shared library must be available. In Linux,
+this means it must be configured via ldconfig or specified in the
+LD_LIBRARY_PATH environment variable. Additionally, you may need to specify
+the location of your shared libraries to the JRE using the java.library.path
+system property.
 
 
 Usage with Gcj
@@ -163,11 +187,11 @@ See BUGS for known bugs.
 This implementation should be thread-safe, but currently all
 transformation requests are queued via Java synchronization, which
 means that it effectively performs single-threaded. Long story short,
-both Libxml2 and Libxslt are not fully reentrant.  
+both libxml2 and libxslt are not fully reentrant.  
 
-Update: it may be possible to make LibxmlJ thread-safe nonetheless
+Update: it may be possible to make libxmlj thread-safe nonetheless
 using thread context variables.
 
 Update: thread context variables have been introduced. This is very
-untested though, LibxmlJ therefore still has the single thread
+untested though, libxmll therefore still has the single thread
 bottleneck.

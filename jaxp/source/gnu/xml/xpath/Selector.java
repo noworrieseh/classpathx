@@ -231,12 +231,18 @@ public final class Selector
                         continue;
                       }
                   }
-                int p = getContextPosition(node);
-                int l = getContextSize(node);
-                if (test.matches(node, p, l))
+                if (test.matches(node, i + 1, len))
                   {
                     successful.add(node);
                   }
+                /*
+                   System.err.println("Testing "+node);
+                   int p = getContextPosition(node);
+                   int l = getContextSize(node);
+                   if (test.matches(node, p, l))
+                   {
+                   successful.add(node);
+                   }*/
               }
             candidates = successful;
             len = candidates.size();

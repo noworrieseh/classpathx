@@ -583,9 +583,9 @@ filter_expr:
   primary_expr
   | filter_expr predicate
     {
-      Test test = (Test) $2;
+      Predicate filter = (Predicate) $2;
       Selector s = new Selector(Selector.SELF,
-                                Collections.singletonList(test));
+                                Collections.singletonList(filter));
       Steps steps;
       if ($1 instanceof Steps)
         {

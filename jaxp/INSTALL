@@ -1,27 +1,29 @@
-GNU Jaxp Installation Instructions
+GNU JAXP Installation Instructions
 ========================================================================
 
 Dependencies
 ------------------------------------------------------------------------
 
-GNU Jaxp depends on the following packages which you must download and
+GNU JAXP depends on the following packages which you must download and
 install first:
 
-- The XML C library for Gnome (Libxml2)
+- The XML C library for Gnome (libxml2)
   http://www.xmlsoft.org/
-  Tested with: 2.5.1 and 2.5.3
+  Minimum version of libxml2 required: 2.6.8
 
-- The XSLT C library for Gnome (Libxslt)
+- The XSLT C library for Gnome (libxslt)
   http://www.xmlsoft.org/XSLT/
-  Tested with: 10.0.24 and 10.0.26
+  Minimum version of libxslt required: 1.1.11
 
 - An up-to-date version of gcc/gcj is recommended, 3.3 is known to
   work.
 
-Note that gcj is no requirement, you can also use GNU Jaxp with your
-favorite Java SDK (you will still need a C compiler, though.)  You may
-have to pass --with-java-home or other configuration parameters to
-configure. See below.
+Note that gcj is no requirement, you can also use GNU JAXP with your
+favorite Java SDK (you will still need a C compiler, though). When
+running configure, pass your Java compiler in the JAVAC environment
+variable, e.g.:
+
+  JAVAC=jikes /path/to/configure
 
 
 Installation
@@ -42,7 +44,7 @@ shared library at `/usr/local/lib/libxmlj.so' and a Java archive at
 `/usr/local/share/gnujaxp.jar'.
 
 Make sure that gnujaxp.jar and libxmlj.so are on your CLASSPATH and
-LD_LIBRARY_PATH, resp. If the shared library has been properly
+LD_LIBRARY_PATH, respectively. If the shared library has been properly
 ldconfig'ed, you needn't care about LD_LIBRARY_PATH.
 
 

@@ -87,6 +87,12 @@ class DomDocumentBuilder
     return ((Boolean) config.getParameter("validating")).booleanValue();
   }
 
+  public boolean isXIncludeAware()
+  {
+    DOMConfiguration config = parser.getDomConfig();
+    return ((Boolean) config.getParameter("xinclude-aware")).booleanValue();
+  }
+
   public void setEntityResolver(EntityResolver resolver)
   {
     DOMConfiguration config = parser.getDomConfig();
@@ -98,8 +104,6 @@ class DomDocumentBuilder
     DOMConfiguration config = parser.getDomConfig();
     config.setParameter("error-handler", handler);
   }
-
-  // TODO isXIncludeAware
 
   public DOMImplementation getDOMImplementation()
   {

@@ -801,9 +801,9 @@ case 48:
 case 50:
 					// line 585 "XPathParser.y"
   {
-      Test test = (Test) yyVals[0+yyTop];
+      Predicate filter = (Predicate) yyVals[0+yyTop];
       Selector s = new Selector(Selector.SELF,
-                                Collections.singletonList(test));
+                                Collections.singletonList(filter));
       Steps steps;
       if (yyVals[-1+yyTop] instanceof Steps)
         {

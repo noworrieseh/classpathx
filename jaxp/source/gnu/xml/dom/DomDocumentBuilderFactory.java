@@ -99,7 +99,8 @@ public class DomDocumentBuilderFactory
                  isCoalescing() ? Boolean.TRUE : Boolean.FALSE);
     setParameter(config, "validating",
                  isValidating() ? Boolean.TRUE : Boolean.FALSE);
-    // TODO isXIncludeAware()
+    setParameter(config, "xinclude-aware",
+                 isXIncludeAware() ? Boolean.TRUE : Boolean.FALSE);
     return new DomDocumentBuilder(impl, ls, parser);
   }
 

@@ -1,14 +1,21 @@
 David Brownell:		dbrownell@users.sourceforge.net
-	(AElfred v2, DOM implementation, SAX and XML utilities)
+  (AElfred v2, DOM Level 2 Core and Events implementation,
+   SAX pipeline classes and XML utilities)
 
 David Megginson:	david@megginson.com
-	(original author:  SAX1, SAX2 interface files; AElfred v1)
+  (original author:  SAX1, SAX2 interface files; AElfred v1)
 
 Andrew Selkirk:		aselkirk@mailandnews.com
-	(original author:  JAXP interface files)
+  (original author:  JAXP 1.2 interface files)
 
 Julian Scheid: 
   (gnu.xml.libxmlj.transform java classes and C code)
 
 Chris Burdess:		dog@gnu.org
-	(libxmlj SAX and DOM java and C implementation)
+  (libxmlj SAX and DOM java and C implementation, JAXP 1.3 interface,
+   DOM Level 3 Core, Load & Save, Traversal, XPath implementation, 
+   JAXP XPath implementation, JAXP XSL transformer implementation)
+
+Musachy Barroso:
+  (AElfred2 conformance testing and performance tweaking)
+
