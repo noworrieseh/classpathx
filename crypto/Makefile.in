@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.in,v 1.6 2002-07-27 02:14:03 raif Exp $
+## $Id: Makefile.in,v 1.7 2002-08-14 16:01:58 raif Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -78,6 +78,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
 	$(SOURCEDIR)/gnu/crypto/jce/DSSRawSignatureSpi.java \
 	$(SOURCEDIR)/gnu/crypto/jce/GnuCrypto.java \
+	$(SOURCEDIR)/gnu/crypto/jce/ICMRandomSpi.java \
 	$(SOURCEDIR)/gnu/crypto/jce/KeyPairGeneratorAdapter.java \
 	$(SOURCEDIR)/gnu/crypto/jce/MD4RandomSpi.java \
 	$(SOURCEDIR)/gnu/crypto/jce/MD4Spi.java \
@@ -143,6 +144,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/tool/NessieHashTVEmitter.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NistKat.java \
 	$(SOURCEDIR)/gnu/crypto/tool/NistMCT.java \
+	$(SOURCEDIR)/gnu/crypto/tool/Ent.java \
 	\
 	$(SOURCEDIR)/gnu/crypto/util/Prime.java \
 	$(SOURCEDIR)/gnu/crypto/util/PRNG.java \
@@ -207,8 +209,9 @@ TESTFILES = \
 	$(SOURCEDIR)/test/sig/rsa/AllTests.java \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSACodec.java \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSAKeyGeneration.java \
-	$(SOURCEDIR)/test/sig/rsa/TestOfRSAPSSSignature.java \
-	\
+	$(SOURCEDIR)/test/sig/rsa/TestOfRSAPSSSignature.java
+
+TVFILES = \
 	tv/nist/anubis/cbc_d_m.txt \
 	tv/nist/anubis/cbc_e_m.txt \
 	tv/nist/anubis/ecb_d_m.txt \
@@ -241,7 +244,19 @@ TESTFILES = \
 	tv/nist/twofish/ecb_d_m.txt \
 	tv/nist/twofish/ecb_e_m.txt \
 	tv/nist/twofish/ecb_vk.txt \
-	tv/nist/twofish/ecb_vt.txt
+	tv/nist/twofish/ecb_vt.txt \
+	\
+	tv/nessie/anubis-128-tv.txt \
+	tv/nessie/anubis-160-tv.txt \
+	tv/nessie/anubis-192-tv.txt \
+	tv/nessie/anubis-224-tv.txt \
+	tv/nessie/anubis-256-tv.txt \
+	tv/nessie/anubis-288-tv.txt \
+	tv/nessie/anubis-320-tv.txt \
+	\
+	tv/nessie/khazad-tv.txt \
+	\
+	tv/nessie/whirlpool-tv.txt
 
 PKGFILES =
 
@@ -302,6 +317,7 @@ test:	jar
 clean:
 	-rm -rf lib/$(LIBNAME)* $(CC-DESTDIR) docs/api
 	-rm -rf $(LIBNAME)-*.zip
+	-rm -rf $(LIBNAME)-*.tar.*
 
 # must rerun configure after this
 distclean:	clean
@@ -459,17 +475,69 @@ $(CC-DESTDIR)/%.class: $(SOURCEDIR)/%.java
 #
 VERSION =	dev
 
-release: $(LIBNAME)-$(VERSION).zip
+release: $(LIBNAME)-$(VERSION).zip $(LIBNAME)-$(VERSION)-tv.zip $(LIBNAME)-$(VERSION).md5
 
 
 DIST_DIR =	$(LIBNAME)-$(VERSION)
 
 # XXX ChangeLog
-FILES		:= \
+TOPLEVELFILES := \
 	AUTHORS ChangeLog COPYING LICENSE NEWS README THANKS \
-	build.xml configure configure.in Makefile.in \
+	build.xml configure configure.in Makefile.in
+
+FILES := \
+	$(TOPLEVELFILES) \
 	etc/$(LIBNAME).mf \
 	lib/$(LIBNAME).jar lib/$(LIBNAME)-test.jar  \
+
+
+test-vectors:
+	@ test -e tv || mkdir tv
+	@ test -e tv/nessie || mkdir tv/nessie
+	@ test -e tv/nist || mkdir tv/nist
+	@ test -e tv/nist/anubis || mkdir tv/nist/anubis
+	@ test -e tv/nist/rijndael || mkdir tv/nist/rijndael
+	@ test -e tv/nist/serpent || mkdir tv/nist/serpent
+	@ test -e tv/nist/twofish || mkdir tv/nist/twofish
+	@ test -e tv/nist/khazad || mkdir tv/nist/khazad
+	@ test -e tv/nist/square || mkdir tv/nist/square
+	java -cp "lib/$(LIBNAME).jar" gnu.crypto.tool.NessieCipherTVEmitter anubis 128 > tv/nessie/anubis-128-tv.txt
+	java -cp "lib/$(LIBNAME).jar" gnu.crypto.tool.NessieCipherTVEmitter anubis 160 > tv/nessie/anubis-160-tv.txt
+	java -cp "lib/$(LIBNAME).jar" gnu.crypto.tool.NessieCipherTVEmitter anubis 192 > tv/nessie/anubis-192-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieCipherTVEmitter anubis 224 > tv/nessie/anubis-224-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieCipherTVEmitter anubis 256 > tv/nessie/anubis-256-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieCipherTVEmitter anubis 288 > tv/nessie/anubis-288-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieCipherTVEmitter anubis 320 > tv/nessie/anubis-320-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieCipherTVEmitter khazad     > tv/nessie/khazad-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NessieHashTVEmitter whirlpool    > tv/nessie/whirlpool-tv.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k anubis > tv/nist/anubis/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t anubis > tv/nist/anubis/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k rijndael > tv/nist/rijndael/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t rijndael > tv/nist/rijndael/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k serpent > tv/nist/serpent/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t serpent > tv/nist/serpent/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k twofish > tv/nist/twofish/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t twofish > tv/nist/twofish/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k khazad 128 > tv/nist/khazad/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t khazad 128 > tv/nist/khazad/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -k square 128 > tv/nist/square/ecb_vk.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistKat -t square 128 > tv/nist/square/ecb_vt.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -e anubis > tv/nist/anubis/ecb_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -d anubis > tv/nist/anubis/ecb_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -e anubis > tv/nist/anubis/cbc_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -d anubis > tv/nist/anubis/cbc_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -e rijndael > tv/nist/rijndael/ecb_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -d rijndael > tv/nist/rijndael/ecb_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -e rijndael > tv/nist/rijndael/cbc_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -d rijndael > tv/nist/rijndael/cbc_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -e serpent > tv/nist/serpent/ecb_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -d serpent > tv/nist/serpent/ecb_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -e serpent > tv/nist/serpent/cbc_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -d serpent > tv/nist/serpent/cbc_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -e twofish > tv/nist/twofish/ecb_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -E -d twofish > tv/nist/twofish/ecb_d_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -e twofish > tv/nist/twofish/cbc_e_m.txt
+	java -cp "lib/$(LIBNAME).jar"  gnu.crypto.tool.NistMCT -C -d twofish > tv/nist/twofish/cbc_d_m.txt
 
 $(LIBNAME)-$(VERSION).zip: test javadoc $(FILES) $(SOURCEFILES) $(TESTFILES) $(PKGFILES)
 	for F in $(FILES) $(SOURCEFILES) $(PKGFILES) ;\
@@ -484,7 +552,29 @@ $(LIBNAME)-$(VERSION).zip: test javadoc $(FILES) $(SOURCEFILES) $(TESTFILES) $(P
 	zip -qr9 $(LIBNAME)-$(VERSION).zip $(DIST_DIR)
 	tar -cf $(LIBNAME)-$(VERSION).tar $(DIST_DIR)
 	gzip $(LIBNAME)-$(VERSION).tar
+	tar -cf $(LIBNAME)-$(VERSION).tar $(DIST_DIR)
+	bzip2 $(LIBNAME)-$(VERSION).tar
 	rm -rf $(DIST_DIR)
+
+$(LIBNAME)-$(VERSION)-tv.zip: test-vectors $(TOPLEVELFILES)
+	for F in $(TOPLEVELFILES) $(TVFILES) ;\
+	do \
+		 mkdir -p `dirname $(DIST_DIR)/$$F` ;\
+		 cp $$F $(DIST_DIR)/$$F ;\
+	done
+	chmod +x $(DIST_DIR)/configure
+	zip -qr9 $(LIBNAME)-$(VERSION)-tv.zip $(DIST_DIR)
+	tar -cf $(LIBNAME)-$(VERSION)-tv.tar $(DIST_DIR)
+	gzip $(LIBNAME)-$(VERSION)-tv.tar
+	tar -cf $(LIBNAME)-$(VERSION)-tv.tar $(DIST_DIR)
+	bzip2 $(LIBNAME)-$(VERSION)-tv.tar
+	rm -rf $(DIST_DIR)
+
+$(LIBNAME)-$(VERSION).md5:
+	md5sum -b \
+		$(LIBNAME)-$(VERSION).zip $(LIBNAME)-$(VERSION).tar.gz $(LIBNAME)-$(VERSION).tar.bz2 \
+		$(LIBNAME)-$(VERSION)-tv.zip $(LIBNAME)-$(VERSION)-tv.tar.gz $(LIBNAME)-$(VERSION)-tv.tar.bz2 \
+		>$@
 
 # setup required jars
 JUNITVERSION:=3.7
