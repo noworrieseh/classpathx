@@ -37,67 +37,67 @@ import java.util.EventObject;
 public class ParallelPortEvent extends EventObject
 {
 
-    /**
-     * @deprecated Replaced by <code>getEventType</code> method.
-     * For compatibility only.
-     */
-    public int eventType;
+  /**
+   * @deprecated Replaced by <code>getEventType</code> method.
+   * For compatibility only.
+   */
+  public int eventType;
 
-    /**
-     * An error occurred.
-     */
-    public static final int PAR_EV_ERROR = 1;
+  /**
+   * An error occurred.
+   */
+  public static final int PAR_EV_ERROR = 1;
 
-    /**
-     * The output buffer is empty.
-     */
-    public static final int PAR_EV_BUFFER = 2;
+  /**
+   * The output buffer is empty.
+   */
+  public static final int PAR_EV_BUFFER = 2;
 
-    int eventtype;
-    boolean oldvalue;
-    boolean newvalue;
+  int eventtype;
+  boolean oldvalue;
+  boolean newvalue;
 
-    /**
-     * Constructor.
-     * This should only be called by the port driver.
-     * @param srcport the source port
-     * @param eventtype the event type: PAR_EV_ERROR or PAR_EV_BUFFER
-     * @param oldvalue the old value
-     * @param newvalue the new value
-     */
-    public ParallelPortEvent(ParallelPort srcport, int eventtype,
-            boolean oldvalue, boolean newvalue)
-    {
-        super(srcport);
-        this.eventtype = eventtype;
-        this.oldvalue = oldvalue;
-        this.newvalue = newvalue;
-        // Compatibility
-        eventType = eventtype;
-    }
+  /**
+   * Constructor.
+   * This should only be called by the port driver.
+   * @param srcport the source port
+   * @param eventtype the event type: PAR_EV_ERROR or PAR_EV_BUFFER
+   * @param oldvalue the old value
+   * @param newvalue the new value
+   */
+  public ParallelPortEvent(ParallelPort srcport, int eventtype,
+      boolean oldvalue, boolean newvalue)
+  {
+    super(srcport);
+    this.eventtype = eventtype;
+    this.oldvalue = oldvalue;
+    this.newvalue = newvalue;
+    // Compatibility
+    eventType = eventtype;
+  }
 
-    /**
-     * Returns the type of event: PAR_EV_ERROR or PAR_EV_BUFFER
-     */
-    public int getEventType()
-    {
-        return eventtype;
-    }
+  /**
+   * Returns the type of event: PAR_EV_ERROR or PAR_EV_BUFFER
+   */
+  public int getEventType()
+  {
+    return eventtype;
+  }
 
-    /**
-     * Returns the new value of the state change that caused this event.
-     */
-    public boolean getNewValue()
-    {
-        return newvalue;
-    }
+  /**
+   * Returns the new value of the state change that caused this event.
+   */
+  public boolean getNewValue()
+  {
+    return newvalue;
+  }
 
-    /**
-     * Returns the old value of the state change that caused this event.
-     */
-    public boolean getOldValue()
-    {
-        return oldvalue;
-    }
-    
+  /**
+   * Returns the old value of the state change that caused this event.
+   */
+  public boolean getOldValue()
+  {
+    return oldvalue;
+  }
+
 }

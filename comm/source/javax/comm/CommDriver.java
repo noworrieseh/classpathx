@@ -36,18 +36,18 @@ package javax.comm;
 public interface CommDriver
 {
 
-    /**
-     * This method ensures that the hardware is present, loads any native
-     * libraries, and register the port names with the CommPortIdentifier.
-     */
-    public void initialize();
+  /**
+   * This method ensures that the hardware is present, loads any native
+   * libraries, and register the port names with the CommPortIdentifier.
+   */
+  public void initialize();
 
-    /**
-     * This method will be called on <code>CommPortIdentifier.open</code>.
-     * @param portName a string registered earlier using
-     * <code>CommPortIdentifier.addPortName</code>
-     * @param portType the port type
-     */
-    public CommPort getCommPort(String portName, int portType);
-    
+  /**
+   * This method will be called on <code>CommPortIdentifier.open</code>.
+   * @param portName a string registered earlier using
+   * <code>CommPortIdentifier.addPortName</code>
+   * @param portType the port type
+   */
+  public CommPort getCommPort(String portName, int portType);
+
 }

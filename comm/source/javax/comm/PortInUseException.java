@@ -35,10 +35,10 @@ package javax.comm;
 public class PortInUseException extends Exception
 {
 
-    /**
-     * Description of the current owner of the port.
-     * @since CommAPI 1.1
-     */
-    public String currentOwner;
-    
+  /**
+   * Description of the current owner of the port.
+   * @since CommAPI 1.1
+   */
+  public String currentOwner;
+
 }

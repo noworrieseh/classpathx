@@ -37,125 +37,125 @@ import java.util.TooManyListenersException;
 public abstract class ParallelPort extends CommPort
 {
 
-    /**
-     * Uses the best available mode.
-     */
-    public static final int LPT_MODE_ANY = 0;
+  /**
+   * Uses the best available mode.
+   */
+  public static final int LPT_MODE_ANY = 0;
 
-    /**
-     * Unidrectional compatibility mode.
-     */
-    public static final int LPT_MODE_SPP = 1;
+  /**
+   * Unidrectional compatibility mode.
+   */
+  public static final int LPT_MODE_SPP = 1;
 
-    /**
-     * Bidirectional byte-at-a-time mode.
-     */
-    public static final int LPT_MODE_PS2 = 2;
+  /**
+   * Bidirectional byte-at-a-time mode.
+   */
+  public static final int LPT_MODE_PS2 = 2;
 
-    /**
-     * Extended Parallel Port mode.
-     */
-    public static final int LPT_MODE_EPP = 3;
+  /**
+   * Extended Parallel Port mode.
+   */
+  public static final int LPT_MODE_EPP = 3;
 
-    /**
-     * Extended Capabilities Port mode.
-     */
-    public static final int LPT_MODE_ECP = 4;
+  /**
+   * Extended Capabilities Port mode.
+   */
+  public static final int LPT_MODE_ECP = 4;
 
-    /**
-     * Bidirectional 4-bits-at-a-time mode.
-     */
-    public static final int LPT_MODE_NIBBLE = 5;
+  /**
+   * Bidirectional 4-bits-at-a-time mode.
+   */
+  public static final int LPT_MODE_NIBBLE = 5;
 
-    /**
-     * Constructor.
-     */
-    public ParallelPort()
-    {
-        // TODO ?
-    }
+  /**
+   * Constructor.
+   */
+  public ParallelPort()
+  {
+    // TODO ?
+  }
 
-    /**
-     * Adds a listener for parallel port events.
-     * Only one listener per ParallelPort is allowed at a time.
-     * @param listener the listener to add
-     */
-    public abstract void addEventListener(ParallelPortEventListener listener)
-        throws TooManyListenersException;
+  /**
+   * Adds a listener for parallel port events.
+   * Only one listener per ParallelPort is allowed at a time.
+   * @param listener the listener to add
+   */
+  public abstract void addEventListener(ParallelPortEventListener listener)
+    throws TooManyListenersException;
 
-    /**
-     * Removes the parallel port event listener.
-     * This method is automatically called when the port is closed.
-     */
-    public abstract void removeEventListener();
+  /**
+   * Removes the parallel port event listener.
+   * This method is automatically called when the port is closed.
+   */
+  public abstract void removeEventListener();
 
-    /**
-     * Instructs the port to notify its listener in the case of port errors.
-     * @param notify true to notify in case of error, false otherwise
-     */
-    public abstract void notifyOnError(boolean notify);
+  /**
+   * Instructs the port to notify its listener in the case of port errors.
+   * @param notify true to notify in case of error, false otherwise
+   */
+  public abstract void notifyOnError(boolean notify);
 
-    /**
-     * Instructs the port to notify its listener in the case of the output
-     * buffer being empty.
-     * @param notify true to notify in case of empty buffer, false otherwise
-     */
-    public abstract void notifyOnBuffer(boolean notify);
+  /**
+   * Instructs the port to notify its listener in the case of the output
+   * buffer being empty.
+   * @param notify true to notify in case of empty buffer, false otherwise
+   */
+  public abstract void notifyOnBuffer(boolean notify);
 
-    /**
-     * Returns the number of available bytes in the output buffer.
-     */
-    public abstract int getOutputBufferFree();
+  /**
+   * Returns the number of available bytes in the output buffer.
+   */
+  public abstract int getOutputBufferFree();
 
-    /**
-     * Indicates if the port is in the Out Of Paper state.
-     */
-    public abstract boolean isPaperOut();
+  /**
+   * Indicates if the port is in the Out Of Paper state.
+   */
+  public abstract boolean isPaperOut();
 
-    /**
-     * Indicates if the port is in the Printer Busy state.
-     */
-    public abstract boolean isPrinterBusy();
-    
-    /**
-     * Indicates if the printer is in the selected state.
-     */
-    public abstract boolean isPrinterSelected();
+  /**
+   * Indicates if the port is in the Printer Busy state.
+   */
+  public abstract boolean isPrinterBusy();
 
-    /**
-     * Indicates if the printer has timed out.
-     */
-    public abstract boolean isPrinterTimedOut();
+  /**
+   * Indicates if the printer is in the selected state.
+   */
+  public abstract boolean isPrinterSelected();
 
-    /**
-     * Indicates if the printer has encountered an error.
-     */
-    public abstract boolean isPrinterError();
+  /**
+   * Indicates if the printer has timed out.
+   */
+  public abstract boolean isPrinterTimedOut();
 
-    /**
-     * Restart the printer after an error has occurred.
-     */
-    public abstract void restart();
+  /**
+   * Indicates if the printer has encountered an error.
+   */
+  public abstract boolean isPrinterError();
 
-    /**
-     * Suspend output.
-     */
-    public abstract void suspend();
+  /**
+   * Restart the printer after an error has occurred.
+   */
+  public abstract void restart();
 
-    /**
-     * Returns the currently configured mode: one of LPT_MODE_ANY,
-     * LPT_MODE_SPP, LPT_MODE_PS2, LPT_MODE_EPP, or LPT_MODE_ECP.
-     */
-    public abstract int getMode();
+  /**
+   * Suspend output.
+   */
+  public abstract void suspend();
 
-    /**
-     * Sets the printer port mode.
-     * @param mode one of LPT_MODE_ANY, LPT_MODE_SPP, LPT_MODE_PS2,
-     * LPT_MODE_EPP, or LPT_MODE_ECP
-     * @exception UnsupportedCommOperationException if the mode is not
-     * supported by the driver
-     */
-    public abstract int setMode(int mode)
-        throws UnsupportedCommOperationException;
-    
+  /**
+   * Returns the currently configured mode: one of LPT_MODE_ANY,
+   * LPT_MODE_SPP, LPT_MODE_PS2, LPT_MODE_EPP, or LPT_MODE_ECP.
+   */
+  public abstract int getMode();
+
+  /**
+   * Sets the printer port mode.
+   * @param mode one of LPT_MODE_ANY, LPT_MODE_SPP, LPT_MODE_PS2,
+   * LPT_MODE_EPP, or LPT_MODE_ECP
+   * @exception UnsupportedCommOperationException if the mode is not
+   * supported by the driver
+   */
+  public abstract int setMode(int mode)
+    throws UnsupportedCommOperationException;
+
 }

@@ -38,10 +38,10 @@ import java.util.EventListener;
 public interface SerialPortEventListener extends EventListener
 {
 
-    /**
-     * Notifies this listener of a serial port event.
-     * @param ev the event
-     */
-    void serialEvent(SerialPortEvent ev);
-    
+  /**
+   * Notifies this listener of a serial port event.
+   * @param ev the event
+   */
+  void serialEvent(SerialPortEvent ev);
+
 }

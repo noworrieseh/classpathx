@@ -36,21 +36,21 @@ package javax.comm;
 public class UnsupportedCommOperationException extends Exception
 {
 
-    /**
-     * Constructor with no detail message.
-     */
-    public UnsupportedCommOperationException()
-    {
-        super();
-    }
+  /**
+   * Constructor with no detail message.
+   */
+  public UnsupportedCommOperationException()
+  {
+    super();
+  }
 
-    /**
-     * Constructor with the specified detail message.
-     * @param messge the detail message
-     */
-    public UnsupportedCommOperationException(String message)
-    {
-        super(message);
-    }
-    
+  /**
+   * Constructor with the specified detail message.
+   * @param messge the detail message
+   */
+  public UnsupportedCommOperationException(String message)
+  {
+    super(message);
+  }
+
 }

@@ -37,110 +37,110 @@ import java.util.EventObject;
 public class SerialPortEvent extends EventObject
 {
 
-    /**
-     * @deprecated Replaced by <code>getEventType</code> method.
-     * For compatibility only.
-     */
-    public int eventType;
+  /**
+   * @deprecated Replaced by <code>getEventType</code> method.
+   * For compatibility only.
+   */
+  public int eventType;
 
-    /**
-     * Data is available at the serial port.
-     */
-    public static final int DATA_AVAILABLE = 1;
+  /**
+   * Data is available at the serial port.
+   */
+  public static final int DATA_AVAILABLE = 1;
 
-    /**
-     * The output buffer is empty.
-     */
-    public static final int OUTPUT_BUFFER_EMPTY = 2;
+  /**
+   * The output buffer is empty.
+   */
+  public static final int OUTPUT_BUFFER_EMPTY = 2;
 
-    /**
-     * Clear to send.
-     */
-    public static final int CTS = 3;
+  /**
+   * Clear to send.
+   */
+  public static final int CTS = 3;
 
-    /**
-     * Data set ready.
-     */
-    public static final int DSR = 4;
+  /**
+   * Data set ready.
+   */
+  public static final int DSR = 4;
 
-    /**
-     * Ring indicator.
-     */
-    public static final int RI = 5;
+  /**
+   * Ring indicator.
+   */
+  public static final int RI = 5;
 
-    /**
-     * Carrier detect.
-     */
-    public static final int CD = 6;
+  /**
+   * Carrier detect.
+   */
+  public static final int CD = 6;
 
-    /**
-     * Overrun error.
-     */
-    public static final int OE = 7;
+  /**
+   * Overrun error.
+   */
+  public static final int OE = 7;
 
-    /**
-     * Parity error.
-     */
-    public static final int PE = 8;
+  /**
+   * Parity error.
+   */
+  public static final int PE = 8;
 
-    /**
-     * Framing error.
-     */
-    public static final int FE = 9;
+  /**
+   * Framing error.
+   */
+  public static final int FE = 9;
 
-    /**
-     * Break interrupt.
-     */
-    public static final int BI = 10;
+  /**
+   * Break interrupt.
+   */
+  public static final int BI = 10;
 
-    int eventtype;
-    boolean oldvalue;
-    boolean newvalue;
+  int eventtype;
+  boolean oldvalue;
+  boolean newvalue;
 
-    /**
-     * Constructor.
-     * This should only be called by the port driver.
-     * @param srcport the source port
-     * @param eventtype the event type, one of: BI, CD, CTS, DATA_AVAILABLE,
-     * DSR, FE, OE, OUTPUT_BUFFER_EMPTY, PE or RI.
-     * @param oldvalue the old value
-     * @param newvalue the new value
-     */
-    public SerialPortEvent(SerialPort srcport, int eventtype,
-            boolean oldvalue, boolean newvalue)
-    {
-        super(srcport);
-        this.eventtype = eventtype;
-        this.oldvalue = oldvalue;
-        this.newvalue = newvalue;
-        // Compatibility
-        eventType = eventtype;
-    }
+  /**
+   * Constructor.
+   * This should only be called by the port driver.
+   * @param srcport the source port
+   * @param eventtype the event type, one of: BI, CD, CTS, DATA_AVAILABLE,
+   * DSR, FE, OE, OUTPUT_BUFFER_EMPTY, PE or RI.
+   * @param oldvalue the old value
+   * @param newvalue the new value
+   */
+  public SerialPortEvent(SerialPort srcport, int eventtype,
+      boolean oldvalue, boolean newvalue)
+  {
+    super(srcport);
+    this.eventtype = eventtype;
+    this.oldvalue = oldvalue;
+    this.newvalue = newvalue;
+    // Compatibility
+    eventType = eventtype;
+  }
 
-    /**
-     * Returns the type of event, one of: BI, CD, CTS, DATA_AVAILABLE, DSR,
-     * FE, OE, OUTPUT_BUFFER_EMPTY, PE or RI.
-     * @since CommAPI 1.1
-     */
-    public int getEventType()
-    {
-        return eventtype;
-    }
+  /**
+   * Returns the type of event, one of: BI, CD, CTS, DATA_AVAILABLE, DSR,
+   * FE, OE, OUTPUT_BUFFER_EMPTY, PE or RI.
+   * @since CommAPI 1.1
+   */
+  public int getEventType()
+  {
+    return eventtype;
+  }
 
-    /**
-     * Returns the new value of the state change that caused this event.
-     */
-    public boolean getNewValue()
-    {
-        return newvalue;
-    }
+  /**
+   * Returns the new value of the state change that caused this event.
+   */
+  public boolean getNewValue()
+  {
+    return newvalue;
+  }
 
-    /**
-     * Returns the old value of the state change that caused this event.
-     */
-    public boolean getOldValue()
-    {
-        return oldvalue;
-    }
-    
+  /**
+   * Returns the old value of the state change that caused this event.
+   */
+  public boolean getOldValue()
+  {
+    return oldvalue;
+  }
+
 }

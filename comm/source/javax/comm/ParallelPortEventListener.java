@@ -38,10 +38,10 @@ import java.util.EventListener;
 public interface ParallelPortEventListener extends EventListener
 {
 
-    /**
-     * Notifies this listener of a parallel port event.
-     * @param ev the event
-     */
-    void parallelEvent(ParallelPortEvent ev);
-    
+  /**
+   * Notifies this listener of a parallel port event.
+   * @param ev the event
+   */
+  void parallelEvent(ParallelPortEvent ev);
+
 }

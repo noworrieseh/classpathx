@@ -1,0 +1,4 @@
+2004-04-20  Chris Burdess  <dog@bluezoo.org>
+
+	* CommPortIdentifier.java: Make property key comparisons case insensitive.
+
