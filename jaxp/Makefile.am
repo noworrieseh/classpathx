@@ -282,6 +282,7 @@ $(src)/gnu/xml/dom/DomPI.java \
 $(src)/gnu/xml/dom/DomText.java \
 $(src)/gnu/xml/dom/DomXPathExpression.java \
 $(src)/gnu/xml/dom/DomXPathNSResolver.java \
+$(src)/gnu/xml/dom/DomXPathResult.java \
 $(src)/gnu/xml/dom/ImplementationSource.java \
 $(src)/gnu/xml/dom/ImplementationList.java \
 $(src)/gnu/xml/dom/JAXPFactory.java \
@@ -298,6 +299,26 @@ $(src)/gnu/xml/pipeline/ValidationConsumer.java \
 $(src)/gnu/xml/pipeline/WellFormednessFilter.java \
 $(src)/gnu/xml/pipeline/XIncludeFilter.java \
 $(src)/gnu/xml/pipeline/XsltFilter.java \
+$(src)/gnu/xml/xpath/AndExpr.java \
+$(src)/gnu/xml/xpath/ArithmeticExpr.java \
+$(src)/gnu/xml/xpath/Constant.java \
+$(src)/gnu/xml/xpath/EqualityExpr.java \
+$(src)/gnu/xml/xpath/Expr.java \
+$(src)/gnu/xml/xpath/ExpressionTest.java \
+$(src)/gnu/xml/xpath/FunctionCall.java \
+$(src)/gnu/xml/xpath/NameTest.java \
+$(src)/gnu/xml/xpath/NegativeExpr.java \
+$(src)/gnu/xml/xpath/NodeTypeTest.java \
+$(src)/gnu/xml/xpath/OrExpr.java \
+$(src)/gnu/xml/xpath/ParenthesizedExpr.java \
+$(src)/gnu/xml/xpath/RelationalExpr.java \
+$(src)/gnu/xml/xpath/Root.java \
+$(src)/gnu/xml/xpath/Selector.java \
+$(src)/gnu/xml/xpath/Step.java \
+$(src)/gnu/xml/xpath/Test.java \
+$(src)/gnu/xml/xpath/UnionExpr.java \
+$(src)/gnu/xml/xpath/XPathTokenizer.java \
+$(src)/gnu/xml/xpath/XPathParser.java \
 $(src)/gnu/xml/util/DoParse.java \
 $(src)/gnu/xml/util/DomParser.java \
 $(src)/gnu/xml/util/Resolver.java \
@@ -351,6 +372,8 @@ $(src)/gnu/xml/libxmlj/util/NamedInputStream.java \
 $(src)/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
 $(src)/gnu/xml/libxmlj/util/StandaloneLocator.java \
 $(src)/gnu/xml/libxmlj/util/XMLJ.java
+
+# $(src)/gnu/xml/xpath/Index.java
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 

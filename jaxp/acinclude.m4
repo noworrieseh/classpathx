@@ -725,7 +725,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: acinclude.m4,v 1.9 2004-10-08 08:17:08 dog Exp $
+# $Id: acinclude.m4,v 1.10 2004-10-17 20:14:14 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,
@@ -920,7 +920,7 @@ main()
     if (($xml_config_major_version > major) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
-        ($xml_config_micro_version >= micro)))
+        ($xml_config_micro_version > micro)))
       {
         return 0;
        }

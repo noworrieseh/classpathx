@@ -1,3 +1,7 @@
+2004-10-17  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: Added experimental XPath 1.0 engine.
+   	
 2004-10-06  Chris Burdess  <dog@gnu.org>
 
    	* dom: Added framework for XPath expression evaluation.

@@ -117,7 +117,7 @@ main()
     if (($xml_config_major_version > major) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
         (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
-        ($xml_config_micro_version >= micro)))
+        ($xml_config_micro_version > micro)))
       {
         return 0;
        }

@@ -28,7 +28,7 @@ AC_CONFIG_SRCDIR([xmlj_util.c])
 AC_CONFIG_AUX_DIR([config])
 
 #AM_INIT_AUTOMAKE(jaxp, 1.1)
-AM_INIT_AUTOMAKE([1.8.0])
+AM_INIT_AUTOMAKE([1.6.0])
 
 AC_JAVA_OPTIONS
 
@@ -48,9 +48,9 @@ XMLJ_VERSION_MINOR="99"
 
 # Checks for header files.
 
-AM_PATH_XML([2.6.9],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
+AM_PATH_XML([2.6.0],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxml.]))
-AM_PATH_XSLT([1.1.9],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
+AM_PATH_XSLT([1.1.1],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxslt.]))
 
 # Libtool configuration
