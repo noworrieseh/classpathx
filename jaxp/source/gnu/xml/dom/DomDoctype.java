@@ -1,5 +1,5 @@
 /*
- * $Id: DomDoctype.java,v 1.2 2001-06-23 21:13:31 db Exp $
+ * $Id: DomDoctype.java,v 1.3 2001-10-18 22:08:07 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomDoctype.java,v 1.2 2001-06-23 21:13:31 db Exp $
+// $Id: DomDoctype.java,v 1.3 2001-10-18 22:08:07 db Exp $
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -51,7 +51,7 @@ import org.w3c.dom.*;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-06-23 21:13:31 $
+ * @version $Date: 2001-10-18 22:08:07 $
  */
 public class DomDoctype extends DomExtern implements DocumentType
 {
@@ -263,8 +263,10 @@ public class DomDoctype extends DomExtern implements DocumentType
     public void makeReadonly ()
     {
 	super.makeReadonly ();
-	entities.makeReadonly ();
-	notations.makeReadonly ();
+	if (entities != null)
+	    entities.makeReadonly ();
+	if (notations != null)
+	    notations.makeReadonly ();
     }
 
 
