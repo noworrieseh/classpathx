@@ -58,6 +58,11 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
   static final String FETCH_CONTENT = "BODY.PEEK[]";
 
+  /**
+   * If set, this contains the RFC822-formatted value of the received date.
+   */
+  protected String internalDate;
+
   IMAPMessage(IMAPFolder folder, InputStream in, int msgnum) 
     throws MessagingException 
   {
@@ -172,6 +177,10 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       {
         InputStream in = new ByteArrayInputStream(status.getContent());
         parse(in);
+      }
+      else if (key==INTERNALDATE)
+      {
+        internalDate = (String)status.get(key);
       }
       else
         throw new MessagingException("Unknown message status key: "+key);

@@ -87,10 +87,10 @@ public interface IMAPConstants
   public static final String UIDNEXT = "UIDNEXT".intern();
 
   // List responses
-  public static final String LIST_NOINFERIORS = "\\NoInferiors".intern();
-  public static final String LIST_NOSELECT = "\\NoSelect".intern();
+  public static final String LIST_NOINFERIORS = "\\Noinferiors".intern();
+  public static final String LIST_NOSELECT = "\\Noselect".intern();
   public static final String LIST_MARKED = "\\Marked".intern();
-  public static final String LIST_UNMARKED = "\\UnMarked".intern();
+  public static final String LIST_UNMARKED = "\\Unmarked".intern();
 
   // Flags
   public static final String FLAG_SEEN = "\\Seen".intern();

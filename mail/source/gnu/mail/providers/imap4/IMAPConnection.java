@@ -441,15 +441,35 @@ public class IMAPConnection implements IMAPConstants
         {
           List code = response.getResponseCode();
           String text = response.getText();
-          ListEntry entry = new ListEntry();
-          entry.attributes = code;
+          
+          // Populate entry attributes with the interned versions
+          // of the response code.
+          // NB IMAP servers do not necessarily pay attention to case.
+          int alen = code.size();
+          boolean noinferiors = false;
+          boolean noselect = false;
+          boolean marked = false;
+          boolean unmarked = false;
+          for (int i=0; i<alen; i++)
+          {
+            String attribute = (String)code.get(i);
+            if (attribute.equalsIgnoreCase(LIST_NOINFERIORS))
+              noinferiors = true;
+            else if (attribute.equalsIgnoreCase(LIST_NOSELECT))
+              noselect = true;
+            else if (attribute.equalsIgnoreCase(LIST_MARKED))
+              marked = true;
+            else if (attribute.equalsIgnoreCase(LIST_UNMARKED))
+              unmarked = true;
+          }
           int si = text.indexOf(' ');
-          String delimiter = text.substring(0, si).intern();
-          if (delimiter==NIL)
-            entry.delimiter='\u0000';
-          else
-            entry.delimiter = stripQuotes(delimiter).charAt(0);
-          entry.mailbox = stripQuotes(text.substring(si+1));
+          char delimiter='\u0000';
+          String d = text.substring(0, si);
+          if (d.equalsIgnoreCase(NIL))
+            delimiter = stripQuotes(d).charAt(0);
+          String mbox = stripQuotes(text.substring(si+1));
+          ListEntry entry = new ListEntry(mbox, delimiter, noinferiors,
+              noselect, marked, unmarked);
           acc.add(entry);
         }
       }

@@ -112,10 +112,7 @@ public class IMAPFolder
     throws MessagingException
   {
     if (status==null)
-    {
-      System.err.println("update: status is null");
       throw new FolderNotFoundException(this);
-    }
     mode = status.readWrite ? Folder.READ_WRITE : Folder.READ_ONLY;
     if (status.permanentFlags!=null)
       permanentFlags = readFlags(status.permanentFlags);
@@ -206,20 +203,12 @@ public class IMAPFolder
         }
         if (entries.length>0)
         {
-          List attributes = entries[0].attributes;
-          if (attributes!=null)
-          {
-            if (attributes.contains(LIST_NOINFERIORS))
-              type = Folder.HOLDS_MESSAGES;
-            else
-              type = Folder.HOLDS_FOLDERS;
-          }
+          type = entries[0].isNoinferiors() ?
+            Folder.HOLDS_MESSAGES :
+            Folder.HOLDS_FOLDERS;
         }
         else
-        {
-          System.err.println("getType: no entries on list: "+parent+" "+name);
           throw new FolderNotFoundException(this);
-        }
       }
       catch (IOException e)
       {
@@ -236,7 +225,15 @@ public class IMAPFolder
   public boolean exists() 
     throws MessagingException 
   {
-    return (getType()!=-1);
+    try
+    {
+      getType();
+    }
+    catch (FolderNotFoundException e)
+    {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -263,7 +260,6 @@ public class IMAPFolder
       MailboxStatus status = null;
       synchronized (connection)
       {
-        System.out.println("Opening "+path+" with mode "+mode);
         switch (mode)
         {
           case Folder.READ_WRITE:
@@ -294,10 +290,7 @@ public class IMAPFolder
   {
     getSeparator();
     if (delimiter=='\u0000') // this folder cannot be created
-    {
-      System.err.println("create: delimiter is NIL");
       throw new FolderNotFoundException(this);
-    }
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
@@ -582,15 +575,33 @@ public class IMAPFolder
     if (!isOpen())
       throw new FolderClosedException(this);
     // decide which commands to send
+    String[] headers = fp.getHeaderNames();
     List l = new ArrayList();
     if (fp.contains(FetchProfile.Item.CONTENT_INFO))
       l.add(IMAPMessage.FETCH_CONTENT);
     else if (fp.contains(FetchProfile.Item.ENVELOPE))
       l.add(IMAPMessage.FETCH_HEADERS);
+    else if (headers.length>0)
+    {
+      // specified headers only
+      StringBuffer hbuf = new StringBuffer("BODY.PEEK[HEADER.FIELDS (");
+      for (int i=0; i<headers.length; i++)
+      {
+        if (i>0)
+          hbuf.append(' ');
+        hbuf.append(headers[i]);
+      }
+      hbuf.append(')');
+      hbuf.append(']');
+      l.add(hbuf.toString());
+    }
     if (fp.contains(FetchProfile.Item.FLAGS))
       l.add(FLAGS);
-    // TODO generic headers
-    String[] commands = new String[l.size()];
+    l.add(INTERNALDATE); // for received date
+    int llen = l.size();
+    if (llen==0)
+      return; // no commands to send: don't bother the server
+    String[] commands = new String[llen];
     l.toArray(commands);
     l = null;
     // get casted imapmessages and message numbers
@@ -679,26 +690,22 @@ public class IMAPFolder
     }
   }
 
+  /*
+   * Returns a set of folders for a corresponding set of list entries.
+   */
   Folder[] getFolders(ListEntry[] entries)
     throws MessagingException
   {
     List unique = new ArrayList(entries.length);
     for (int i=0; i<entries.length; i++)
     {
-      boolean suppress = false;
-      int type = -1;
-      List attributes = entries[i].attributes;
-      if (attributes!=null)
+      ListEntry entry = entries[i];
+      int type = entry.isNoinferiors() ?
+        Folder.HOLDS_MESSAGES :
+        Folder.HOLDS_FOLDERS;
+      if (!entry.isNoselect())
       {
-        suppress = (attributes.contains(LIST_NOSELECT));
-        if (attributes.contains(LIST_NOINFERIORS))
-          type = Folder.HOLDS_MESSAGES;
-        else
-          type = Folder.HOLDS_FOLDERS;
-      }
-      if (!suppress)
-      {
-        Folder f = getFolder(entries[i].mailbox, type, entries[i].delimiter);
+        Folder f = getFolder(entry.getMailbox(), type, entry.getDelimiter());
         if (!unique.contains(f))
           unique.add(f);
       }
@@ -762,9 +769,9 @@ public class IMAPFolder
           entries = connection.list(path, null);
         }
         if (entries.length>0)
-          delimiter = entries[0].delimiter;
+          delimiter = entries[0].getDelimiter();
         else
-          throw new MessagingException("Error retrieving separator"); 
+          throw new FolderNotFoundException(this); 
       }
       catch (IOException e)
       {

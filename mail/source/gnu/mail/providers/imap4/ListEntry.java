@@ -35,29 +35,121 @@ import java.util.List;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 0.1
  */
-public class ListEntry
+public class ListEntry implements IMAPConstants
 {
 
-  List attributes;
+  private String mailbox;
 
-  char delimiter;
+  private char delimiter;
 
-  String mailbox;
+  private boolean noinferiors;
+  private boolean noselect;
+  private boolean marked;
+  private boolean unmarked;
 
+  /*
+   * Constructor.
+   * The list entry is otherwise immutable.
+   */
+  ListEntry(String mailbox, char delimiter, boolean noinferiors,
+      boolean noselect, boolean marked, boolean unmarked)
+  {
+    this.mailbox = mailbox;
+    this.delimiter = delimiter;
+    this.noinferiors = noinferiors;
+    this.noselect = noselect;
+    this.marked = marked;
+    this.unmarked = unmarked;
+  }
+
+  /**
+   * Returns the mailbox this list entry refers to.
+   */
+  public String getMailbox()
+  {
+    return mailbox;
+  }
+
+  /**
+   * Returns the mailbox hierarchy delimiter.
+   */
+  public char getDelimiter()
+  {
+    return delimiter;
+  }
+
+  /**
+   * If true: it is not possible for any child levels of hierarchy to
+   * exist under this name; no child levels exist now and none can be
+   * created in the future.
+   */
+  public boolean isNoinferiors()
+  {
+    return noinferiors;
+  }
+
+  /**
+   * If true: it is not possible to use this name as a selectable
+   * mailbox.
+   */
+  public boolean isNoselect()
+  {
+    return noselect;
+  }
+
+  /**
+   * If true: the mailbox has been marked "interesting" by the server;
+   * the mailbox probably contains messages that have been added since
+   * the last time the mailbox was selected.
+   */
+  public boolean isMarked()
+  {
+    return marked;
+  }
+
+  /**
+   * If true: the mailbox does not contain any additional messages since
+   * the last time the mailbox was selected.
+   */
+  public boolean isUnmarked()
+  {
+    return unmarked;
+  }
+
+  /**
+   * Debugging
+   */
   public String toString()
   {
     StringBuffer buffer = new StringBuffer();
-    if (attributes!=null)
+    if (noinferiors || noselect || marked || unmarked)
     {
-      buffer.append("\u001b[00;35m");
-      buffer.append(attributes);
-      buffer.append("\u001b[00m ");
+      buffer.append("(\u001b[00;35m");
+      boolean seq = false;
+      seq = conditionalAppend(buffer, seq, noinferiors, LIST_NOINFERIORS);
+      seq = conditionalAppend(buffer, seq, noselect, LIST_NOSELECT);
+      seq = conditionalAppend(buffer, seq, marked, LIST_MARKED);
+      seq = conditionalAppend(buffer, seq, unmarked, LIST_UNMARKED);
+      buffer.append("\u001b[00m) ");
     }
     buffer.append("\"\u001b[00;31m");
     buffer.append(delimiter);
     buffer.append("\u001b[00m\" ");
     buffer.append(mailbox);
     return buffer.toString();
+  }
+
+  private static boolean conditionalAppend(StringBuffer buffer,
+      boolean seq, boolean test, String value)
+  {
+    if (test)
+    {
+      if (seq)
+        buffer.append(' ');
+      buffer.append(value);
+      seq = true;
+    }
+    return seq;
   }
   
 }
