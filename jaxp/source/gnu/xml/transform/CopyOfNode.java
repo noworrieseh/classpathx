@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * CopyOfNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,55 +38,71 @@
 
 package gnu.xml.transform;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node representing an XSLT <code>copy-of</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
+final class CopyOfNode
   extends TemplateNode
 {
 
-  final String name;
-  final List withParams;
+  final Expr select;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  CopyOfNode(TemplateNode children, TemplateNode next, Expr select)
   {
     super(children, next);
-    this.name = name;
-    this.withParams = withParams;
+    this.select = select;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (withParams != null)
+    Object ret = select.evaluate(context);
+    if (ret instanceof Collection)
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
+        Collection ns = (Collection) ret;
+        for (Iterator i = ns.iterator(); i.hasNext(); )
           {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
+            Node node = (Node) i.next();
+            if (nextSibling != null)
+              {
+                parent.insertBefore(node, nextSibling);
+              }
+            else
+              {
+                parent.appendChild(node);
+              }
           }
       }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
+    else
       {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
+        String value = Expr._string(context, ret);
+        if (value != null && value.length() > 0)
+          {
+            Document doc = (parent instanceof Document) ?
+              (Document) parent : parent.getOwnerDocument();
+            Text textNode = doc.createTextNode(value);
+            if (nextSibling != null)
+              {
+                parent.insertBefore(textNode, nextSibling);
+              }
+            else
+              {
+                parent.appendChild(textNode);
+              }
+          }
       }
-    // call-template doesn't have processable children
+    // copy-of doesn't process children
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);

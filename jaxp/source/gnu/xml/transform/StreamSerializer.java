@@ -42,6 +42,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -51,7 +53,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class StreamSerializer
+public class StreamSerializer
 {
   
   static final int SPACE = 0x20;
@@ -63,22 +65,36 @@ class StreamSerializer
   static final int EQ = 0x3d; // =
 
   final String encoding;
+  final Map namespaces;
 
-  StreamSerializer(String encoding)
+  public StreamSerializer(String encoding)
   {
     this.encoding = (encoding != null) ? encoding : "UTF-8";
+    namespaces = new HashMap();
   }
 
-  void serialize(Node node, OutputStream out, int mode)
+  public void serialize(Node node, OutputStream out, int mode)
     throws IOException
   {
     String value;
     Node children;
     Node next = node.getNextSibling();
+    String uri = node.getNamespaceURI();
+    boolean defined = false;
     switch (node.getNodeType())
       {
       case Node.ATTRIBUTE_NODE:
-        // TODO namespaces
+        if (uri != null && !isDefined(uri))
+          {
+            String prefix = define(uri, node.getPrefix());
+            String nsname = (prefix == null) ? "xmlns" : "xmlns:" + prefix;
+            out.write(SPACE);
+            out.write(nsname.getBytes(encoding));
+            out.write(EQ);
+            String nsvalue = "'" + encode(uri) + "'";
+            out.write(nsvalue.getBytes(encoding));
+            defined = true;
+          }
         out.write(SPACE);
         out.write(node.getNodeName().getBytes(encoding));
         out.write(EQ);
@@ -86,10 +102,20 @@ class StreamSerializer
         out.write(value.getBytes(encoding));
         break;
       case Node.ELEMENT_NODE:
-        // TODO namespaces
         value = node.getNodeName();
         out.write(BRA);
         out.write(value.getBytes(encoding));
+        if (uri != null && !isDefined(uri))
+          {
+            String prefix = define(uri, node.getPrefix());
+            String nsname = (prefix == null) ? "xmlns" : "xmlns:" + prefix;
+            out.write(SPACE);
+            out.write(nsname.getBytes(encoding));
+            out.write(EQ);
+            String nsvalue = "'" + encode(uri) + "'";
+            out.write(nsvalue.getBytes(encoding));
+            defined = true;
+          }
         NamedNodeMap attrs = node.getAttributes();
         if (attrs != null && attrs.getLength() > 0)
           {
@@ -113,7 +139,7 @@ class StreamSerializer
           }
         break;
       case Node.TEXT_NODE:
-        out.write(node.getNodeValue().getBytes(encoding));
+        out.write(encode(node.getNodeValue()).getBytes(encoding));
         break;
       case Node.CDATA_SECTION_NODE:
         value = "<![CDATA[" + node.getNodeValue() + "]]>";
@@ -181,10 +207,35 @@ class StreamSerializer
         out.write(value.getBytes(encoding));
         break;
       }
+    if (defined)
+      {
+        undefine(uri);
+      }
     if (next != null)
       {
         serialize(next, out, mode);
       }
+  }
+
+  boolean isDefined(String uri)
+  {
+    return namespaces.containsKey(uri);
+  }
+
+  String define(String uri, String prefix)
+  {
+    while (namespaces.containsValue(prefix))
+      {
+        // Fabricate new prefix
+        prefix = prefix + "_";
+      }
+    namespaces.put(uri, prefix);
+    return prefix;
+  }
+
+  void undefine(String uri)
+  {
+    namespaces.remove(uri);
   }
 
   static String encode(String text)

@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import javax.xml.namespace.QName;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -56,7 +55,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.DOMImplementation;
@@ -70,10 +68,8 @@ import gnu.xml.xpath.Root;
 
 class TransformerImpl
   extends Transformer
-  implements XPathVariableResolver
 {
 
-  final Map parameters;
   Properties outputProperties;
   final Stylesheet stylesheet;
   URIResolver uriResolver;
@@ -83,18 +79,23 @@ class TransformerImpl
                   Stylesheet stylesheet)
     throws TransformerConfigurationException
   {
-    parameters = new LinkedHashMap();
     uriResolver = resolver;
     errorListener = listener;
     this.stylesheet = stylesheet;
+    if (stylesheet != null)
+      {
+        // Set up parameter context for this transformer
+        stylesheet.bindings.push(false);
+      }
   }
 
   public void transform(Source xmlSource, Result outputTarget)
     throws TransformerException
   {
-    DOMSource source =
-      new DOMSourceWrapper(xmlSource, uriResolver, errorListener);
-    Node context = source.getNode();
+    DOMSourceWrapper wrapper = new DOMSourceWrapper(xmlSource,
+                                                    uriResolver,
+                                                    errorListener);
+    Node context = wrapper.getNode();
     Node parent = null, nextSibling = null;
     if (outputTarget instanceof DOMResult)
       {
@@ -260,17 +261,28 @@ class TransformerImpl
 
   public void setParameter(String name, Object value)
   {
-    parameters.put(name, value);
+    if (stylesheet != null)
+      {
+        stylesheet.bindings.set(name, value, false);
+      }
   }
 
   public Object getParameter(String name)
   {
-    return parameters.get(name);
+    if (stylesheet != null)
+      {
+        return stylesheet.bindings.get(name);
+      }
+    return null;
   }
 
   public void clearParameters()
   {
-    parameters.clear();
+    if (stylesheet != null)
+      {
+        stylesheet.bindings.pop(false);
+        stylesheet.bindings.push(false);
+      }
   }
 
   public void setURIResolver(URIResolver resolver)
@@ -316,9 +328,4 @@ class TransformerImpl
     return errorListener;
   }
 
-  public Object resolveVariable(QName variableName)
-  {
-    return parameters.get(variableName.toString());
-  }
-  
 }

@@ -76,13 +76,21 @@ class XSLComparator
               new Locale(sortKey.lang);
             Collator collator = Collator.getInstance(locale);
             int d = collator.compare(k1, k2);
-            if (sortKey.descending)
-              {
-                d = -d;
-              }
-            // TODO sortKey.caseOrder
             if (d != 0)
               {
+                switch (sortKey.caseOrder)
+                  {
+                  case SortKey.UPPER_FIRST:
+                    // TODO
+                    break;
+                  case SortKey.LOWER_FIRST:
+                    // TODO
+                    break;
+                  }
+                if (sortKey.descending)
+                  {
+                    d = -d;
+                  }
                 return d;
               }
           }

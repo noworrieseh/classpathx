@@ -86,7 +86,7 @@ public class DomDocument extends DomNode
      */
     public DomDocument ()
     {
-	super (null);
+	super (DOCUMENT_NODE, null);
 	implementation = new DomImpl ();
     }
 
@@ -102,7 +102,7 @@ public class DomDocument extends DomNode
      */
     protected DomDocument (DOMImplementation impl)
     {
-	super (null);
+	super (DOCUMENT_NODE, null);
 	implementation = impl;
     }
 
@@ -115,13 +115,6 @@ public class DomDocument extends DomNode
     {
 	return "#document";
     }
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant DOCUMENT_NODE.
-     */
-    final public short getNodeType ()
-	{ return DOCUMENT_NODE; }
 
 
     /**

@@ -88,8 +88,10 @@ class DOMSourceWrapper
       {
         try
           {
+            // We must currently use the GNU DOM
+            // as this supports native ordering of nodes
             DocumentBuilderFactory factory =
-              DocumentBuilderFactory.newInstance();
+              new gnu.xml.dom.JAXPFactory();
             factory.setNamespaceAware(true); // must have namespace support
             //factory.setValidating(false);
             DocumentBuilder builder = factory.newDocumentBuilder();

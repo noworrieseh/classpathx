@@ -49,14 +49,14 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class UnionExpr
+public class UnionExpr
 extends Expr
 {
 
   final Expr lhs;
   final Expr rhs;
 
-  UnionExpr (Expr lhs, Expr rhs)
+  public UnionExpr (Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;

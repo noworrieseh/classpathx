@@ -55,9 +55,9 @@ public abstract class DomCharacterData extends DomNode
     private char		raw [];
 
     // package private
-    DomCharacterData (Document doc, String value)
+    DomCharacterData (short nodeType, Document doc, String value)
     {
-	super (doc);
+	super (nodeType, doc);
 	if (value != null)
 	    raw = value.toCharArray ();
 	else
@@ -65,9 +65,10 @@ public abstract class DomCharacterData extends DomNode
     }
 
     // package private
-    DomCharacterData (Document doc, char buf [], int offset, int length)
+    DomCharacterData (short nodeType, Document doc,
+                      char buf [], int offset, int length)
     {
-	super (doc);
+	super (nodeType, doc);
 	if (buf == null)
 	    raw = new char [0];
 	else {

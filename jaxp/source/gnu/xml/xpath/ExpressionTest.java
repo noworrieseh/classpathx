@@ -56,7 +56,7 @@ extends Test
     this.expr = expr;
   }
 
-  boolean matches (Node node)
+  public boolean matches (Node node)
   {
     return expr._boolean (node, expr.evaluate (node));
   }

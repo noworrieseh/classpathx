@@ -38,6 +38,7 @@
 
 package gnu.xml.xpath;
 
+import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 
 /**
@@ -49,12 +50,24 @@ public class NameTest
   extends Test
 {
 
+  final String uri;
   final String name;
   final boolean anyLocalName;
   final boolean any;
 
-  NameTest (String name, boolean anyLocalName, boolean any)
+  public NameTest (String name, boolean anyLocalName, boolean any)
   {
+    int start = name.indexOf('{');
+    int end = name.indexOf('}');
+    if (start != -1 && end > start)
+      {
+        uri = name.substring(start + 1, end);
+        name = name.substring(end + 1);
+      }
+    else
+      {
+        uri = null;
+      }
     this.name = name;
     this.anyLocalName = anyLocalName;
     this.any = any;
@@ -70,7 +83,7 @@ public class NameTest
     return anyLocalName;
   }
 
-  boolean matches (Node node)
+  public boolean matches (Node node)
   {
     switch (node.getNodeType ())
       {
@@ -85,16 +98,34 @@ public class NameTest
       {
         return true;
       }
-    if (anyLocalName)
+    String nodeUri = node.getNamespaceURI();
+    String nodeName = anyLocalName ? node.getPrefix() : node.getNodeName();
+    if (uri != null && uri.length() > 0)
       {
-        return name.equals (node.getPrefix ());
+        if (!uri.equals(nodeUri))
+          {
+            return false;
+          }
       }
-    return name.equals (node.getNodeName ());
+    else if (nodeUri != null && nodeUri.length() > 0)
+      {
+        return false;
+      }
+    //System.err.println("TEST: "+localName+" == "+nodeLocalName);
+    return (name.equals(nodeName));
   }
 
   public String toString ()
   {
-    return any ? "*" : anyLocalName ? name + ":*" : name;
+    if (any)
+      {
+        return "*";
+      }
+    if (uri != null)
+      {
+        return "{" + uri + "}" + (anyLocalName ? name + ":*" : name);
+      }
+    return anyLocalName ? name + ":*" : name;
   }
   
 }

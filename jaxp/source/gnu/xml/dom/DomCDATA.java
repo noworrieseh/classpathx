@@ -55,8 +55,11 @@ import org.w3c.dom.*;
  *
  * @author David Brownell
  */
-public class DomCDATA extends DomText implements CDATASection
+public class DomCDATA
+  extends DomText
+  implements CDATASection
 {
+  
     /**
      * Constructs a CDATA section node associated with the specified
      * document and holding the specified data.
@@ -68,12 +71,12 @@ public class DomCDATA extends DomText implements CDATASection
      */
     protected DomCDATA (Document owner, String value)
     {
-	super (owner, value);
+	super (CDATA_SECTION_NODE, owner, value);
     }
 
     protected DomCDATA (Document owner, char buf [], int off, int len)
     {
-	super (owner, buf, off, len);
+	super (CDATA_SECTION_NODE, owner, buf, off, len);
     }
 
 
@@ -86,12 +89,4 @@ public class DomCDATA extends DomText implements CDATASection
 	return "#cdata-section";
     }
 
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant CDATA_SECTION_NODE.
-     */
-    final public short getNodeType ()
-	{ return CDATA_SECTION_NODE; }
-    
 }

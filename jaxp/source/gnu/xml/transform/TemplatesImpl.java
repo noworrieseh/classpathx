@@ -70,7 +70,11 @@ class TemplatesImpl
   public Transformer newTransformer()
     throws TransformerConfigurationException
   {
-    return new TransformerImpl(uriResolver, errorListener, stylesheet);
+    Stylesheet stylesheet = (Stylesheet) this.stylesheet.clone();
+    TransformerImpl transformer =
+      new TransformerImpl(uriResolver, errorListener, stylesheet);
+    stylesheet.transformer = transformer;
+    return transformer;
   }
 
   public Properties getOutputProperties()

@@ -35,14 +35,18 @@ public class XPathTest
         Document doc = b.parse(new InputSource(in));
         
         XPathImpl xpath = new XPathImpl(null, null);
-        Object ret = xpath.evaluate(expression, doc, null);
+        Expr expr = (Expr) xpath.compile(expression);
+        Object ret = expr.evaluate(doc);
+        System.out.println(">>> "+expr);
         if (ret instanceof Collection)
           {
+            System.out.println("[");
             Collection ns = (Collection) ret;
             for (Iterator i = ns.iterator(); i.hasNext(); )
               {
-                System.out.println(Expr._string((Node) i.next(), null));
+                System.out.println(i.next().toString());
               }
+            System.out.println("]");
           }
         else
           {

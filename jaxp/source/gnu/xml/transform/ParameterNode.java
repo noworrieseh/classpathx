@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * ParameterNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,59 +38,52 @@
 
 package gnu.xml.transform;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node that sets a variable or parameter during template
+ * processing.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
+final class ParameterNode
   extends TemplateNode
 {
 
   final String name;
-  final List withParams;
+  final Object value;
+  final boolean global;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  ParameterNode(TemplateNode children, TemplateNode next,
+                String name, Object value, boolean global)
   {
     super(children, next);
     this.name = name;
-    this.withParams = withParams;
+    this.value = value;
+    this.global = global;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (withParams != null)
-      {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
-      }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
-      {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
-      }
-    // call-template doesn't have processable children
+    // push the variable context
+    stylesheet.bindings.push(global);
+    // set the variable
+    stylesheet.bindings.set(name, value, global);
+    // variable and param don't process children
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
+    // pop the variable context
+    stylesheet.bindings.pop(global);
   }
   
 }

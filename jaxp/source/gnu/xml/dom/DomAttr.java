@@ -96,7 +96,7 @@ public class DomAttr extends DomNsNode implements Attr
      */
     protected DomAttr (Document owner, String namespaceURI, String name)
     {
-	super (owner, namespaceURI, name);
+	super (ATTRIBUTE_NODE, owner, namespaceURI, name);
 	specified = true;
 
 	// XXX register self to get insertion/removal events
@@ -113,13 +113,6 @@ public class DomAttr extends DomNsNode implements Attr
     {
 	return getNodeName ();
     }
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant ATTRIBUTE_NODE.
-     */
-    final public short getNodeType ()
-	{ return ATTRIBUTE_NODE; }
 
 
     /**

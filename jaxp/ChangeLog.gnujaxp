@@ -1,3 +1,13 @@
+2004-11-03  Chris Burdess  <dog@gnu.org>
+
+ 	* dom: Refactoring of DomNode for efficiency, using pointers to
+ 	next/previous/first/last nodes instead of arrays of children, and
+ 	explicit node type without the need for a method call. Fixed
+ 	problems inserting DocumentFragments.
+ 	* transform: whitespace stripping; parameters and variables;
+ 	document() function.
+ 	* xpath: Name test fix.
+   	
 2004-11-02  Chris Burdess  <dog@gnu.org>
 
    	* transform: Fully compiled templates; many more XSL language

@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * AbstractNumberNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,59 +38,73 @@
 
 package gnu.xml.transform;
 
-import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node representing the XSL <code>number</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
+abstract class AbstractNumberNode
   extends TemplateNode
 {
 
-  final String name;
-  final List withParams;
+  static final int ALPHABETIC = 0;
+  static final int TRADITIONAL = 1;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  final String format;
+  final String lang;
+  final int letterValue;
+  final String groupingSeparator;
+  final int groupingSize;
+
+  AbstractNumberNode(TemplateNode children, TemplateNode next,
+                     String format, String lang,
+                     int letterValue, String groupingSeparator,
+                     int groupingSize)
   {
     super(children, next);
-    this.name = name;
-    this.withParams = withParams;
+    this.format = format;
+    this.lang = lang;
+    this.letterValue = letterValue;
+    this.groupingSeparator = groupingSeparator;
+    this.groupingSize = groupingSize;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (withParams != null)
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
+    String value = format(compute(stylesheet, context));
+    Text text = doc.createTextNode(value);
+    if (nextSibling != null)
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
+        parent.insertBefore(text, nextSibling);
       }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
+    else
       {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
+        parent.appendChild(text);
       }
-    // call-template doesn't have processable children
+    // xsl:number doesn't process children
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
   }
+
+  String format(int[] number)
+  {
+    // TODO
+    return null;
+  }
+
+  abstract int[] compute(Stylesheet stylesheet, Node context)
+    throws TransformerException;
   
 }

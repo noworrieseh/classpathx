@@ -73,7 +73,9 @@ import org.w3c.dom.*;
  *
  * @author David Brownell 
  */
-public class DomEntityReference extends DomNode implements EntityReference
+public class DomEntityReference
+  extends DomNode
+  implements EntityReference
 {
     private String	name;
 
@@ -91,7 +93,7 @@ public class DomEntityReference extends DomNode implements EntityReference
      */
     protected DomEntityReference (Document owner, String name)
     {
-	super (owner);
+	super (ENTITY_REFERENCE_NODE, owner);
 	this.name = name;
     }
 
@@ -105,10 +107,4 @@ public class DomEntityReference extends DomNode implements EntityReference
 	return name;
     }
 
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant ENTITY_REFERENCE_NODE.
-     */
-    final public short getNodeType ()
-	{ return ENTITY_REFERENCE_NODE; }
 }

@@ -54,7 +54,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import gnu.xml.xpath.XPathImpl;
 
 /**
  * GNU transformer factory implementation.
@@ -67,12 +66,11 @@ public class TransformerFactoryImpl
 
   ErrorListener errorListener;
   URIResolver uriResolver;
-  final XPathImpl xpath;
+  final XPathFactory xpathFactory;
 
   public TransformerFactoryImpl()
   {
-    XPathFactory xpathFactory = new gnu.xml.xpath.XPathFactoryImpl();
-    xpath = (XPathImpl) xpathFactory.newXPath();
+    xpathFactory = new gnu.xml.xpath.XPathFactoryImpl();
   }
 
   public Transformer newTransformer(Source source)

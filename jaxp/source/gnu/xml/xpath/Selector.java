@@ -143,6 +143,8 @@ extends Expr
         candidates.add (context);
         break;
       }
+    if (axis==ATTRIBUTE)
+      System.out.println("selected: "+candidates);
     // Now filter them
     int tlen = tests.length;
     if (tlen > 0)
@@ -159,24 +161,22 @@ extends Expr
               }
           }
       }
+    if (axis==ATTRIBUTE)
+      System.out.println("filtered: "+candidates);
     return candidates;
   }
 
   void addChildNodes (Node context, Collection acc, boolean recurse)
   {
-    NodeList children = context.getChildNodes ();
-    if (children != null)
+    Node child = context.getFirstChild();
+    while (child != null)
       {
-        int len = children.getLength ();
-        for (int i = 0; i < len; i++)
+        acc.add(child);
+        if (recurse)
           {
-            Node child = children.item (i);
-            acc.add (child);
-            if (recurse)
-              {
-                addChildNodes (child, acc, recurse);
-              }
+            addChildNodes(child, acc, recurse);
           }
+        child = child.getNextSibling();
       }
   }
 
@@ -233,10 +233,13 @@ extends Expr
   void addAttributes (Node context, Collection acc)
   {
     NamedNodeMap attrs = context.getAttributes ();
-    int attrLen = attrs.getLength ();
-    for (int j = 0; j < attrLen; j++)
+    if (attrs != null)
       {
-        acc.add (attrs.item (j));
+        int attrLen = attrs.getLength ();
+        for (int i = 0; i < attrLen; i++)
+          {
+            acc.add (attrs.item (i));
+          }
       }
   }
 

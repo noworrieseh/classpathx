@@ -49,11 +49,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -62,8 +65,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.NameTest;
+import gnu.xml.xpath.Selector;
 import gnu.xml.xpath.Root;
+import gnu.xml.xpath.XPathImpl;
 
 /**
  * An XSL stylesheet.
@@ -71,6 +78,7 @@ import gnu.xml.xpath.Root;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 class Stylesheet
+  implements XPathFunctionResolver, Cloneable
 {
 
   static final String XSL_NS = "http://www.w3.org/1999/XSL/Transform";
@@ -80,6 +88,8 @@ class Stylesheet
   static final int OUTPUT_TEXT = 2;
 
   final TransformerFactoryImpl factory;
+  TransformerImpl transformer;
+  final XPathImpl xpath;
   final int precedence;
 
   /**
@@ -117,19 +127,17 @@ class Stylesheet
   Map usedAttributeSets;
 
   /**
-   * Variables (cannot be overridden by parameters)
+   * Variable and parameter bindings.
    */
-  Map variables;
-
-  /**
-   * Parameters (can be overridden)
-   */
-  Map parameters;
+  Bindings bindings;
 
   /**
    * Templates.
    */
   List templates;
+
+  TemplateNode builtInNodeTemplate;
+  TemplateNode builtInTextTemplate;
 
   Stylesheet(TransformerFactoryImpl factory, Document doc, int precedence)
     throws TransformerConfigurationException
@@ -140,10 +148,46 @@ class Stylesheet
     preserveSpace = new LinkedHashSet();
     attributeSets = new LinkedHashMap();
     usedAttributeSets = new LinkedHashMap();
-    variables = new LinkedHashMap();
-    parameters = new LinkedHashMap();
+    bindings = new Bindings();
     templates = new LinkedList();
+
+    factory.xpathFactory.setXPathVariableResolver(bindings);
+    factory.xpathFactory.setXPathFunctionResolver(this);
+    xpath = (XPathImpl) factory.xpathFactory.newXPath();
+
+    builtInNodeTemplate =
+      new ApplyTemplatesNode(null, null,
+                             new Selector(Selector.CHILD,
+                                          Collections.EMPTY_LIST),
+                             null, null, null);
+    builtInTextTemplate =
+      new ValueOfNode(null, null,
+                      new Selector(Selector.SELF, Collections.EMPTY_LIST),
+                      false);
+    
     parse(doc.getDocumentElement(), true);
+    
+    /*for (Iterator i = templates.iterator(); i.hasNext(); )
+      {
+        Template t = (Template) i.next();
+        t.list(System.out);
+        System.out.println("--------------------");
+      }
+      */
+  }
+
+  public Object clone()
+  {
+    try
+      {
+        Stylesheet clone = (Stylesheet) super.clone();
+        clone.bindings = (Bindings) bindings.clone();
+        return clone;
+      }
+    catch (CloneNotSupportedException e)
+      {
+        throw new Error(e.getMessage());
+      }
   }
 
   void parse(Node node, boolean root)
@@ -175,7 +219,7 @@ class Stylesheet
                   }
                 String m = element.getAttribute("match");
                 Expr match = (m != null) ?
-                  (Expr) factory.xpath.compile(m) : null;
+                  (Expr) xpath.compile(m) : null;
                 String priority = element.getAttribute("priority");
                 String mode = element.getAttribute("mode");
                 double p = (priority == null ||
@@ -194,8 +238,8 @@ class Stylesheet
             else if ("param".equals(name) ||
                      "variable".equals(name))
               {
-                Map target = "variable".equals(name) ? variables : parameters;
-                Node content = element.getFirstChild();
+                boolean global = "variable".equals(name);
+                Object content = element.getFirstChild();
                 String paramName = element.getAttribute("name");
                 if (paramName.length() == 0)
                   {
@@ -206,19 +250,17 @@ class Stylesheet
                   {
                     if (content != null)
                       {
-                        throw new TransformerConfigurationException("parameter has both select and content", new DOMSourceLocator(element));
+                        String msg = "parameter has both select and content";
+                        DOMSourceLocator l = new DOMSourceLocator(element);
+                        throw new TransformerConfigurationException(msg, l);
                       }
-                    target.put(paramName,
-                               factory.xpath.compile(select));
+                    content = xpath.compile(select);
                   }
-                else if (content != null)
+                if (content == null)
                   {
-                    target.put(paramName, content);
+                    content = "";
                   }
-                else
-                  {
-                    target.put(paramName, "");
-                  }
+                bindings.set(paramName, content, global);
                 parse(element.getNextSibling(), false);
               }
             else if ("include".equals(name) || "import".equals(name))
@@ -265,10 +307,10 @@ class Stylesheet
               {
                 String elements = element.getAttribute("elements");
                 StringTokenizer st = new StringTokenizer(elements,
-                                                         " ");
+                                                         " \t\n\r");
                 while (st.hasMoreTokens())
                   {
-                    preserveSpace.add(st.nextToken());
+                    preserveSpace.add(parseNameTest(st.nextToken()));
                   }
                 parse(element.getNextSibling(), false);
               }
@@ -276,10 +318,10 @@ class Stylesheet
               {
                 String elements = element.getAttribute("elements");
                 StringTokenizer st = new StringTokenizer(elements,
-                                                         " ");
+                                                         " \t\n\r");
                 while (st.hasMoreTokens())
                   {
-                    stripSpace.add(st.nextToken());
+                    stripSpace.add(parseNameTest(st.nextToken()));
                   }
                 parse(element.getNextSibling(), false);
               }
@@ -342,6 +384,83 @@ class Stylesheet
       }
   }
 
+  NameTest parseNameTest(String token)
+  {
+    if ("*".equals(token))
+      {
+        return new NameTest("", true, true);
+      }
+    else if (token.endsWith(":*"))
+      {
+        return new NameTest(token.substring(0, token.length() - 2),
+                            true, false);
+      }
+    else
+      {
+        return new NameTest(token, false, false);
+      }
+  }
+
+  boolean isPreserved(Text text)
+  {
+    // Check characters in text
+    String value = text.getData();
+    if (value != null)
+      {
+        int len = value.length();
+        for (int i = 0; i < len; i++)
+          {
+            char c = value.charAt(i);
+            if (c != 0x20 && c != 0x09 && c != 0x0a && c != 0x0d)
+              {
+                return true;
+              }
+          }
+      }
+    // Check parent node
+    Node ctx = text.getParentNode();
+    for (Iterator i = preserveSpace.iterator(); i.hasNext(); )
+      {
+        NameTest preserveTest = (NameTest) i.next();
+        if (preserveTest.matches(ctx))
+          {
+            boolean override = false;
+            for (Iterator j = stripSpace.iterator(); j.hasNext(); )
+              {
+                NameTest stripTest = (NameTest) j.next();
+                if (stripTest.matches(ctx))
+                  {
+                    override = true;
+                    break;
+                  }
+              }
+            if (!override)
+              {
+                return true;
+              }
+          }
+      }
+    // Check whether any ancestor specified xml:space
+    while (ctx != null)
+      {
+        if (ctx.getNodeType() == Node.ELEMENT_NODE)
+          {
+            Element element = (Element) ctx;
+            String xmlSpace = element.getAttribute("xml:space");
+            if ("default".equals(xmlSpace))
+              {
+                break;
+              }
+            else if ("preserve".equals(xmlSpace))
+              {
+                return true;
+              }
+          }
+        ctx = ctx.getParentNode();
+      }
+    return false;
+  }
+
   void applyTemplates(Node context, Expr select, String mode,
                       Node parent, Node nextSibling)
     throws TransformerException
@@ -362,7 +481,8 @@ class Stylesheet
                       Node parent, Node nextSibling)
     throws TransformerException
   {
-    //System.out.println("applyTemplates: subject="+subject);
+    //System.out.println("applyTemplates:");
+    //System.out.println("\tsubject="+subject);
     Set candidates = new TreeSet();
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
@@ -374,12 +494,29 @@ class Stylesheet
             candidates.add(t);
           }
       }
-    //System.out.println("applyTemplates: candidates="+candidates);
-    if (!candidates.isEmpty())
+    //System.out.println("\tcandidates="+candidates);
+    if (candidates.isEmpty())
+      {
+        // Apply built-in template
+        //System.out.println("\tbuiltInTemplate subject="+subject);
+        switch (subject.getNodeType())
+          {
+          case Node.ELEMENT_NODE:
+          case Node.DOCUMENT_NODE:
+          case Node.DOCUMENT_FRAGMENT_NODE:
+            builtInNodeTemplate.apply(this, subject, mode, parent, nextSibling);
+            break;
+          case Node.TEXT_NODE:
+          case Node.ATTRIBUTE_NODE:
+            builtInTextTemplate.apply(this, subject, mode, parent, nextSibling);
+            break;
+          }
+      }
+    else
       {
         Template t =
           (Template) candidates.iterator().next();
-        //System.out.println("applyTemplates: template="+t.expr+" subject="+subject);
+        //System.out.println("\ttemplate="+t+" subject="+subject);
         t.apply(this, subject, mode, parent, nextSibling);
       }
   }
@@ -397,6 +534,20 @@ class Stylesheet
             return;
           }
       }
+  }
+
+  public XPathFunction resolveFunction(QName name, int arity)
+  {
+    String uri = name.getNamespaceURI();
+    if (XSL_NS.equals(uri) || uri == null || uri.length() == 0)
+      {
+        String localName = name.getLocalName();
+        if ("document".equals(localName) && (arity == 1 || arity == 2))
+          {
+            return new DocumentFunction(transformer);
+          }
+      }
+    return null;
   }
     
 }

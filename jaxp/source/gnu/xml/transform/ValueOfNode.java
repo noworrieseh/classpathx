@@ -72,6 +72,7 @@ final class ValueOfNode
   {
     Object ret = select.evaluate(context);
     String value = Expr._string(context, ret);
+    System.out.println("value-of: "+context+" "+ select + " -> "+ value);
     if (value != null && value.length() > 0)
       {
         Document doc = (parent instanceof Document) ?

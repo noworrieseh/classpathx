@@ -96,7 +96,7 @@ public class DomEntity extends DomExtern implements Entity
 	String notation
     )
     {
-	super (owner, name, publicId, systemId);
+	super (ENTITY_NODE, owner, name, publicId, systemId);
 	this.notation = notation;
 
 	// NOTE:  if notation == null, this is a parsed entity
@@ -113,13 +113,6 @@ public class DomEntity extends DomExtern implements Entity
     {
 	return notation;
     }
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant ENTITY_NODE.
-     */
-    final public short getNodeType ()
-	{ return ENTITY_NODE; }
 
     // DOM Level 3 methods
     

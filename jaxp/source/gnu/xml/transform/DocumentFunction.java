@@ -1,5 +1,5 @@
 /*
- * ApplyTemplatesNode.java
+ * DocumentFunction.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,84 +38,92 @@
 
 package gnu.xml.transform;
 
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathFunction;
+import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>apply-templates</code>
- * instruction.
+ * The XSLT <code>document()</code>function.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class ApplyTemplatesNode
-  extends TemplateNode
+final class DocumentFunction
+  implements XPathFunction
 {
 
-  final Expr select;
-  final String mode;
-  final List sortKeys;
-  final List withParams;
+  final TransformerImpl transformer;
 
-  ApplyTemplatesNode(TemplateNode children, TemplateNode next,
-                     Expr select, String mode,
-                     List sortKeys, List withParams)
+  DocumentFunction(TransformerImpl transformer)
   {
-    super(children, next);
-    this.select = select;
-    this.mode = mode;
-    this.sortKeys = sortKeys;
-    this.withParams = withParams;
+    this.transformer = transformer;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
-             Node parent, Node nextSibling)
-    throws TransformerException
+  public Object evaluate(List args)
+    throws XPathFunctionException
   {
-    Object ret = select.evaluate(context);
-    if (ret != null && ret instanceof Collection)
+    String base = null;
+    switch (args.size())
       {
-        if (withParams != null)
+      case 2:
+        Object arg2 = args.get(1);
+        base = Expr._string(null, arg2);
+        // Fall through
+      case 1:
+        Object arg = args.get(0);
+        if (arg instanceof Collection)
           {
-            // push the parameter context
-            stylesheet.bindings.push(false);
-            // set the parameters
-            for (Iterator i = withParams.iterator(); i.hasNext(); )
+            Collection ns = (Collection) arg;
+            Collection acc = new TreeSet();
+            for (Iterator i = ns.iterator(); i.hasNext(); )
               {
-                WithParam p = (WithParam) i.next();
-                stylesheet.bindings.set(p.name, p.value, false);
+                Node node = (Node) i.next();
+                String uri = Expr.stringValue(node);
+                acc.add(_document(uri, base));
               }
+            return acc;
           }
-        Collection ns = (Collection) ret;
-        if (sortKeys != null)
+        else
           {
-            List list = new ArrayList(ns);
-            Collections.sort(list, new XSLComparator(sortKeys));
-            ns = list;
+            String uri = Expr._string(null, arg);
+            return Collections.singleton(_document(uri, base));
           }
-        for (Iterator i = ns.iterator(); i.hasNext(); )
-          {
-            Node subject = (Node) i.next();
-            stylesheet.applyTemplates(subject, subject,
-                                      (this.mode != null) ? this.mode : mode,
-                                      parent, nextSibling);
-          }
-        if (withParams != null)
-          {
-            // pop the variable context
-            stylesheet.bindings.pop(false);
-          }
+      default:
+        throw new XPathFunctionException("invalid arity");
       }
-    // apply-templates doesn't have processable children
-    if (next != null)
+  }
+
+  Node _document(String uri, String base)
+    throws XPathFunctionException
+  {
+    if (base != null)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        try
+          {
+            uri = new URL(new URL(base), uri).toString();
+          }
+        catch (MalformedURLException e)
+          {
+          }
       }
+    URIResolver uriResolver = transformer.uriResolver;
+    ErrorListener errorListener = transformer.errorListener;
+    StreamSource source = new StreamSource(uri);
+    DOMSourceWrapper wrapper = new DOMSourceWrapper(source,
+                                                    uriResolver,
+                                                    errorListener);
+    return wrapper.getNode();
   }
   
 }

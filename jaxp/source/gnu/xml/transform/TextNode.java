@@ -39,7 +39,11 @@
 package gnu.xml.transform;
 
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import gnu.xml.xpath.Expr;
 
 /**
  * A template node representing the XSL <code>text</code> instruction.
@@ -64,9 +68,27 @@ final class TextNode
     throws TransformerException
   {
     // TODO output escaping
+    String value = "";
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
     if (children != null)
       {
-        children.apply(stylesheet, context, mode, parent, nextSibling);
+        // Create a document fragment to hold the text
+        DocumentFragment fragment = doc.createDocumentFragment();
+        // Apply children to the fragment
+        children.apply(stylesheet, context, mode, fragment, null);
+        // Use XPath string-value of fragment
+        value = Expr.stringValue(fragment);
+      }
+    Text text = doc.createTextNode(value);
+    // Insert into result tree
+    if (nextSibling != null)
+      {
+        parent.insertBefore(text, nextSibling);
+      }
+    else
+      {
+        parent.appendChild(text);
       }
     if (next != null)
       {

@@ -67,7 +67,7 @@ public class DomElement extends DomNsNode implements Element
      */
     protected DomElement (Document owner, String namespaceURI, String name)
     {
-	super (owner, namespaceURI, name);
+	super (ELEMENT_NODE, owner, namespaceURI, name);
     }
 
 
@@ -134,13 +134,6 @@ public class DomElement extends DomNsNode implements Element
     {
 	return getNodeName ();
     }
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant ELEMENT_NODE.
-     */
-    final public short getNodeType ()
-	{ return ELEMENT_NODE; }
 
 
     /**

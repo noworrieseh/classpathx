@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * Bindings.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,59 +38,119 @@
 
 package gnu.xml.transform;
 
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import javax.xml.transform.TransformerException;
+import java.util.LinkedList;
+import java.util.Map;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * The set of variable bindings in effect for a stylesheet.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
-  extends TemplateNode
+class Bindings
+  implements XPathVariableResolver, Cloneable
 {
 
-  final String name;
-  final List withParams;
+  /**
+   * Global variables.
+   */
+  LinkedList variables;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  /**
+   * Parameter value stack.
+   */
+  LinkedList parameters;
+
+  Bindings()
   {
-    super(children, next);
-    this.name = name;
-    this.withParams = withParams;
+    variables = new LinkedList();
+    parameters = new LinkedList();
+    push(true);
+    push(false);
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
-             Node parent, Node nextSibling)
-    throws TransformerException
+  public Object clone()
   {
-    if (withParams != null)
+    try
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
+        return (Bindings) super.clone();
+      }
+    catch (CloneNotSupportedException e)
+      {
+        throw new Error(e.getMessage());
+      }
+  }
+
+  void push(boolean global)
+  {
+    if (global)
+      {
+        variables.addFirst(new HashMap());
+      }
+    else
+      {
+        parameters.addFirst(new HashMap());
+      }
+  }
+
+  void pop(boolean global)
+  {
+    if (global)
+      {
+        variables.removeFirst();
+      }
+    else
+      {
+        parameters.removeFirst();
+      }
+  }
+
+  Object get(String name)
+  {
+    Object ret = null;
+    for (Iterator i = variables.iterator(); i.hasNext() && ret == null; )
+      {
+        Map context = (Map) i.next();
+        ret = context.get(name);
+      }
+    if (ret == null)
+      {
+        for (Iterator i = parameters.iterator(); i.hasNext() && ret == null; )
           {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
+            Map context = (Map) i.next();
+            ret = context.get(name);
           }
       }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
+    if (ret instanceof Expr)
       {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
+        Expr expr = (Expr) ret;
+        ret = expr.evaluate((Node) null);
       }
-    // call-template doesn't have processable children
-    if (next != null)
+    return ret;
+  }
+
+  void set(String name, Object value, boolean global)
+  {
+    if (global)
       {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
+        Map context = (Map) variables.getFirst();
+        context.put(name, value);
       }
+    else
+      {
+        Map context = (Map) parameters.getFirst();
+        context.put(name, value);
+      }
+  }
+
+  public Object resolveVariable(QName qName)
+  {
+    return get(qName.toString());
   }
   
 }

@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * CommentNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,55 +38,53 @@
 
 package gnu.xml.transform;
 
-import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node representing the XSL <code>comment</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
+final class CommentNode
   extends TemplateNode
 {
 
-  final String name;
-  final List withParams;
-
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  CommentNode(TemplateNode children, TemplateNode next)
   {
     super(children, next);
-    this.name = name;
-    this.withParams = withParams;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (withParams != null)
+    String value = "";
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
+    if (children != null)
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
+        // Create a document fragment to hold the text
+        DocumentFragment fragment = doc.createDocumentFragment();
+        // Apply children to the fragment
+        children.apply(stylesheet, context, mode, fragment, null);
+        // Use XPath string-value of fragment
+        value = Expr.stringValue(fragment);
       }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
+    Comment comment = doc.createComment(value);
+    // Insert into result tree
+    if (nextSibling != null)
       {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
+        parent.insertBefore(comment, nextSibling);
       }
-    // call-template doesn't have processable children
+    else
+      {
+        parent.appendChild(comment);
+      }
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);

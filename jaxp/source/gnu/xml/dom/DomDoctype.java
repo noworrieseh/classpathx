@@ -71,7 +71,9 @@ import java.util.Hashtable;
  *
  * @author David Brownell 
  */
-public class DomDoctype extends DomExtern implements DocumentType
+public class DomDoctype
+  extends DomExtern
+  implements DocumentType
 {
     private DomNamedNodeMap	notations;
     private DomNamedNodeMap	entities;
@@ -111,7 +113,7 @@ public class DomDoctype extends DomExtern implements DocumentType
 	String internalSubset
     )
     {
-	super (null, name, publicId, systemId);
+	super (DOCUMENT_TYPE_NODE, null, name, publicId, systemId);
 	implementation = impl;
 	subset = internalSubset;
     }
@@ -125,7 +127,7 @@ public class DomDoctype extends DomExtern implements DocumentType
 	String		systemId
     )
     {
-	super (doc, name, publicId, systemId);
+	super (DOCUMENT_TYPE_NODE, doc, name, publicId, systemId);
 	implementation = doc.getImplementation ();
     }
 
@@ -135,13 +137,6 @@ public class DomDoctype extends DomExtern implements DocumentType
      * Returns the root element's name (just like getNodeName).
      */
     final public String getName () { return getNodeName (); }
-
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant DOCUMENT_TYPE_NODE.
-     */
-    final public short getNodeType ()
-	{ return DOCUMENT_TYPE_NODE; }
 
 
     /**

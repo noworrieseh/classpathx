@@ -42,14 +42,14 @@ import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Node;
 
-class VariableReference
+public class VariableReference
   extends Expr
 {
 
   final XPathVariableResolver resolver;
   final String name;
 
-  VariableReference(XPathVariableResolver resolver, String name)
+  public VariableReference(XPathVariableResolver resolver, String name)
   {
     this.resolver = resolver;
     this.name = name;

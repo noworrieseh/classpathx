@@ -73,7 +73,7 @@ public class NodeTypeTest
     return data;
   }
 
-  boolean matches (Node node)
+  public boolean matches (Node node)
   {
     if (type > 0)
       {

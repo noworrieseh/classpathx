@@ -720,7 +720,7 @@ public abstract class Expr
   /**
    * Computes the XPath string-value of the specified node-set.
    */
-  static String stringValue (Collection nodeSet)
+  public static String stringValue (Collection nodeSet)
   {
     StringBuffer buf = new StringBuffer ();
     for (Iterator i = nodeSet.iterator (); i.hasNext (); )
@@ -733,7 +733,7 @@ public abstract class Expr
   /**
    * Computes the XPath string-value of the specified node.
    */
-  static String stringValue (Node node)
+  public static String stringValue (Node node)
   {
     return stringValue (node, false);
   }
@@ -743,6 +743,7 @@ public abstract class Expr
     switch (node.getNodeType ())
       {
       case Node.DOCUMENT_NODE: // 5.1 Root Node
+      case Node.DOCUMENT_FRAGMENT_NODE:
       case Node.ELEMENT_NODE: // 5.2 Element Nodes
         StringBuffer buf = new StringBuffer ();
         NodeList children = node.getChildNodes ();

@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * NumberNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,59 +38,39 @@
 
 package gnu.xml.transform;
 
-import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node representing the XSL <code>number</code> instruction
+ * with a <code>value</code> expression.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
-  extends TemplateNode
+final class NumberNode
+  extends AbstractNumberNode
 {
 
-  final String name;
-  final List withParams;
+  final Expr value;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  NumberNode(TemplateNode children, TemplateNode next,
+             Expr value, String format, String lang,
+             int letterValue, String groupingSeparator, int groupingSize)
   {
-    super(children, next);
-    this.name = name;
-    this.withParams = withParams;
+    super(children, next, format, lang, letterValue, groupingSeparator,
+          groupingSize);
+    this.value = value;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
-             Node parent, Node nextSibling)
+  int[] compute(Stylesheet stylesheet, Node context)
     throws TransformerException
   {
-    if (withParams != null)
-      {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
-      }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
-      {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
-      }
-    // call-template doesn't have processable children
-    if (next != null)
-      {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
-      }
+    Object ret = value.evaluate(context);
+    Double d = (ret instanceof Double) ? ((Double) ret) :
+      new Double(Expr._number(context, ret));
+    return new int[] { d.intValue() };
   }
   
 }

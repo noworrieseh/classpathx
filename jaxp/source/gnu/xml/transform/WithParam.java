@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * WithParam.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,59 +38,23 @@
 
 package gnu.xml.transform;
 
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.transform.TransformerException;
-import org.w3c.dom.Node;
-
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A specification for setting a variable or parameter during template
+ * processing with <code>apply-templates</code> or
+ * <code>call-template</code>.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
-  extends TemplateNode
+final class WithParam
 {
 
   final String name;
-  final List withParams;
+  final Object value;
 
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  WithParam(String name, Object value)
   {
-    super(children, next);
     this.name = name;
-    this.withParams = withParams;
+    this.value = value;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
-             Node parent, Node nextSibling)
-    throws TransformerException
-  {
-    if (withParams != null)
-      {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
-      }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
-      {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
-      }
-    // call-template doesn't have processable children
-    if (next != null)
-      {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
-      }
-  }
-  
 }

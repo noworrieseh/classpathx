@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.io.PrintStream;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 
@@ -61,5 +62,25 @@ abstract class TemplateNode
   abstract void apply(Stylesheet stylesheet, Node context, String mode,
                       Node parent, Node nextSibling)
     throws TransformerException;
+
+  /**
+   * Debugging
+   */
+  void list(int depth, PrintStream out)
+  {
+    for (int i = 0; i < depth; i++)
+      {
+        out.print("  ");
+      }
+    out.println(toString());
+    if (children != null)
+      {
+        children.list(depth + 1, out);
+      }
+    if (next != null)
+      {
+        next.list(depth, out);
+      }
+  }
 
 }

@@ -73,6 +73,12 @@ final class LiteralNode
     Document doc = (parent instanceof Document) ? (Document) parent :
       parent.getOwnerDocument();
     result = doc.adoptNode(result);
+    if (result == null)
+      {
+        String msg = "Error adopting node to result tree";
+        DOMSourceLocator l = new DOMSourceLocator(context);
+        throw new TransformerException(msg, l);
+      }
     if (nextSibling != null)
       {
         parent.insertBefore(result, nextSibling);
@@ -103,6 +109,16 @@ final class LiteralNode
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
+  }
+
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("source=");
+    buf.append(source);
+    buf.append(']');
+    return buf.toString();
   }
   
 }

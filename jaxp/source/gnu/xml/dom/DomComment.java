@@ -63,7 +63,7 @@ public class DomComment extends DomCharacterData implements Comment
      */
     protected DomComment (Document owner, String value)
     {
-	super (owner, value);
+	super (COMMENT_NODE, owner, value);
     }
 
 
@@ -76,10 +76,4 @@ public class DomComment extends DomCharacterData implements Comment
 	return "#comment";
     }
 
-    /**
-     * <b>DOM L1</b>
-     * Returns the constant COMMENT_NODE.
-     */
-    final public short getNodeType ()
-	{ return COMMENT_NODE; }
 }

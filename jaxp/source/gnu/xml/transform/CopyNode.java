@@ -1,5 +1,5 @@
 /*
- * CallTemplateNode.java
+ * CopyNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,55 +38,44 @@
 
 package gnu.xml.transform;
 
-import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * A template node representing the XSL <code>call-template</code>
- * instruction.
+ * A template node representing the XSL <code>copy</code> instruction.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CallTemplateNode
+final class CopyNode
   extends TemplateNode
 {
 
-  final String name;
-  final List withParams;
-
-  CallTemplateNode(TemplateNode children, TemplateNode next,
-                   String name, List withParams)
+  CopyNode(TemplateNode children, TemplateNode next)
   {
     super(children, next);
-    this.name = name;
-    this.withParams = withParams;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (withParams != null)
+    Document doc = (parent instanceof Document) ? (Document) parent :
+      parent.getOwnerDocument();
+    Node copy = context.cloneNode(false);
+    copy = doc.adoptNode(copy);
+    if (nextSibling != null)
       {
-        // push the parameter context
-        stylesheet.bindings.push(false);
-        // set the parameters
-        for (Iterator i = withParams.iterator(); i.hasNext(); )
-          {
-            WithParam p = (WithParam) i.next();
-            stylesheet.bindings.set(p.name, p.value, false);
-          }
+        parent.insertBefore(copy, nextSibling);
       }
-    stylesheet.callTemplate(context, name, mode,
-                            parent, nextSibling);
-    if (withParams != null)
+    else
       {
-        // pop the variable context
-        stylesheet.bindings.pop(false);
+        parent.appendChild(copy);
       }
-    // call-template doesn't have processable children
+    if (children != null)
+      {
+        children.apply(stylesheet, context, mode, copy, null);
+      }
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);

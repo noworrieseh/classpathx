@@ -45,14 +45,14 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class AndExpr
+public class AndExpr
 extends Expr
 {
 
   final Expr lhs;
   final Expr rhs;
 
-  AndExpr (Expr lhs, Expr rhs)
+  public AndExpr (Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;

@@ -45,14 +45,14 @@ import org.w3c.dom.Node;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class OrExpr
+public class OrExpr
 extends Expr
 {
 
   final Expr lhs;
   final Expr rhs;
 
-  OrExpr (Expr lhs, Expr rhs)
+  public OrExpr (Expr lhs, Expr rhs)
   {
     this.lhs = lhs;
     this.rhs = rhs;

@@ -361,10 +361,16 @@ $(src)/gnu/xml/xpath/XPathFactoryImpl.java \
 $(src)/gnu/xml/xpath/XPathTokenizer.java \
 $(src)/gnu/xml/xpath/XPathParser.java \
 $(src)/gnu/xml/xpath/XPathTest.java \
+$(src)/gnu/xml/transform/AbstractNumberNode.java \
 $(src)/gnu/xml/transform/ApplyTemplatesNode.java \
 $(src)/gnu/xml/transform/AttributeNode.java \
+$(src)/gnu/xml/transform/Bindings.java \
 $(src)/gnu/xml/transform/CallTemplateNode.java \
 $(src)/gnu/xml/transform/ChooseNode.java \
+$(src)/gnu/xml/transform/CommentNode.java \
+$(src)/gnu/xml/transform/CopyNode.java \
+$(src)/gnu/xml/transform/CopyOfNode.java \
+$(src)/gnu/xml/transform/DocumentFunction.java \
 $(src)/gnu/xml/transform/DOMSourceLocator.java \
 $(src)/gnu/xml/transform/DOMSourceWrapper.java \
 $(src)/gnu/xml/transform/DummyNode.java \
@@ -373,7 +379,11 @@ $(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
 $(src)/gnu/xml/transform/ForEachNode.java \
 $(src)/gnu/xml/transform/IfNode.java \
 $(src)/gnu/xml/transform/LiteralNode.java \
+$(src)/gnu/xml/transform/NodeNumberNode.java \
+$(src)/gnu/xml/transform/NumberNode.java \
 $(src)/gnu/xml/transform/OtherwiseNode.java \
+$(src)/gnu/xml/transform/ParameterNode.java \
+$(src)/gnu/xml/transform/ProcessingInstructionNode.java \
 $(src)/gnu/xml/transform/SAXSerializer.java \
 $(src)/gnu/xml/transform/SortKey.java \
 $(src)/gnu/xml/transform/StreamSerializer.java \
@@ -386,6 +396,7 @@ $(src)/gnu/xml/transform/TransformerImpl.java \
 $(src)/gnu/xml/transform/URIResolverEntityResolver.java \
 $(src)/gnu/xml/transform/ValueOfNode.java \
 $(src)/gnu/xml/transform/WhenNode.java \
+$(src)/gnu/xml/transform/WithParam.java \
 $(src)/gnu/xml/transform/XSLComparator.java \
 $(src)/gnu/xml/util/DoParse.java \
 $(src)/gnu/xml/util/DomParser.java \
