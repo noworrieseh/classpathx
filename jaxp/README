@@ -1,7 +1,11 @@
 WHAT IS THIS
-    ... a work in progress!
+    A Free Software implementation of the standard Java processing
+    APIs for XML, which include SAX2, DOM Level 2, and JAXP 1.1
+    (which, among other things, "blesses" SAX and DOM).
     
-    At this writing, components are being incrementally integrated.
+    This should compile with JDK 1.2 and later.  Versions of GCJ
+    slightly more recent than the 3.0 release are needed; 3.0.1
+    may integrate the necessary fixes..
 
 JAVA PACKAGES
     
