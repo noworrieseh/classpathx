@@ -1,26 +1,6 @@
-/*
-  GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 David Brownell
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 // SAX entity resolver.
-// $Id: EntityResolver.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// No warranty; no copyright -- use this as you will.
+// $Id: EntityResolver.java,v 1.3 2001-08-03 18:47:00 db Exp $
 
 package org.xml.sax;
 
@@ -29,6 +9,11 @@ import java.io.IOException;
 
 /**
  * Basic interface for resolving entities.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p>If a SAX application needs to implement customized handling
  * for external entities, it must implement this interface and
@@ -75,8 +60,8 @@ import java.io.IOException;
  * @since SAX 1.0
  * @author David Megginson, 
  *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0
- * @see org.xml.sax.Parser#setEntityResolver
+ * @version 2.0r2pre
+ * @see org.xml.sax.XMLReader#setEntityResolver
  * @see org.xml.sax.InputSource
  */
 public interface EntityResolver {
@@ -85,13 +70,16 @@ public interface EntityResolver {
     /**
      * Allow the application to resolve external entities.
      *
-     * <p>The Parser will call this method before opening any external
-     * entity except the top-level document entity (including the
-     * external DTD subset, external entities referenced within the
-     * DTD, and external entities referenced within the document
-     * element): the application may request that the parser resolve
+     * <p>The parser will call this method before opening any external
+     * entity except the top-level document entity.  Such entities include
+     * the external DTD subset and external parameter entities referenced
+     * within the DTD (in either case, only if the parser reads external
+     * parameter entities), and external general entities referenced
+     * within the document element (if the parser reads external general
+     * entities).  The application may request that the parser locate
      * the entity itself, that it use an alternative URI, or that it
-     * use an entirely different input source.</p>
+     * use data provided by the application (as a character or byte
+     * input stream).</p>
      *
      * <p>Application writers can use this method to redirect external
      * system identifiers to secure and/or local URIs, to look up
