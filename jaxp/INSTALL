@@ -1,0 +1,11 @@
+How to install GNUJAXP?
+-----------------------
+
+./configure
+make
+make install
+
+should work... or bug me!
+
+--
+Arnaud Vandyck <arnaud.vandyck@ulg.ac.be>

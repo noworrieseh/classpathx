@@ -1,3 +1,13 @@
+2004-04-08  Arnaud Vandyck  <avdyk@ressource-toi.org>
+
+	* NEWS: initial commit
+
+	* INSTALL: initial commit
+
+	* src: sources directory has been moved to src directory
+
+	* configure.ac, Makefile.am: now build jaxp and libxmlj together
+
 2004-02-05  Arnaud Vandyck  <avdyk@users.sourceforge.net>
 
 	* ChangeLog.libxmlj, source/*.c, source/*h,
