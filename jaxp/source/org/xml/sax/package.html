@@ -1,13 +1,13 @@
 <html><head>
 
-<!-- This file is distributed under the GPL. -->
+<!-- $Id: package.html,v 1.5 2001-08-03 18:49:47 db Exp $ -->
 
 </head><body>
 
-<p> This package provides the core SAX1 and SAX2 APIs.
-SAX1 APIs are deprecated to encourage integration of
+<p> This package provides the core SAX APIs.
+Some SAX1 APIs are deprecated to encourage integration of
 namespace-awareness into designs of new applications
-and maintainance of existing infrastructure.
+and into maintainance of existing infrastructure.
 For more information on SAX, see
 <a href="http://sax.sourceforge.net">the SAX page</a>.
 
@@ -71,10 +71,10 @@ Currently defined standard feature URIs have the prefix
 	<td>string-interning</td>
 	<td><em>unspecified</em></td>
 	<td> true if all XML names (for elements, prefixes, attributes,
-	    and local names), as well as Namespace URIs, will have been
-	    interned
-	    using <em>java.lang.String.intern</em>, supporting fast
-	    testing of equality/inequality with string constants </td>
+	    entities, notations, and local names),
+	    as well as Namespace URIs, will have been interned
+	    using <em>java.lang.String.intern</em>. This supports fast
+	    testing of equality/inequality against string constants.</td>
 	</tr>
 
     <tr>
@@ -92,10 +92,10 @@ properties is required.
 </p>
 
 <p> For default values not specified by SAX2,
-each XMLReader implementation specifies its default
-(or may choose not to expose the feature flag).
-Implementations may support changing current standard
-feature values, but not while parsing.
+each XMLReader implementation specifies its default,
+or may choose not to expose the feature flag.
+Implementations may support changing current values
+of these standard feature flags, but not while parsing.
 </p>
 
 <h2> SAX2 Standard Handler and Property IDs </h2>
@@ -118,7 +118,7 @@ the standard property URIs have the prefix
     <tr>
 	<td>declaration-handler</td>
 	<td> Used to see most DTD declarations except those treated
-	    as lexical ("root element name is ...") or which are
+	    as lexical ("document element name is ...") or which are
 	    mandatory for all SAX parsers (<em>DTDHandler</em>).
 	    The Object must implement <em>DeclHandler</em>.  </td>
 	</tr>
@@ -135,7 +135,8 @@ the standard property URIs have the prefix
 	<td>lexical-handler</td>
 	<td> Used to see some syntax events that are essential in some
 	    applications:  comments, CDATA delimeters, selected general
-	    entity inclusions, and the start and end of the DTD.
+	    entity inclusions, and the start and end of the DTD
+	    (and declaration of document element name).
 	    The Object must implement <em>LexicalHandler</em>.  </td>
 	</tr>
 
@@ -150,34 +151,5 @@ the standard property URIs have the prefix
 <p> All of these standard properties are optional;
 XMLReader implementations need not support them.
 </p>
-
-
-<h2> SAX2 Namespace Support </h2>
-
-<p> Namespace support is the root of the incompatibilities between 
-SAX1 and SAX2. 
-Namespaces are not part of XML itself, but are felt to be
-sufficiently strategic that this layer has been integrated
-into the SAX2 API.
-Existing applications needs to change two method signatures, and add
-two new handler methods, to handle SAX2 namespace features.
-
-<p>
-Names in the <a href="ContentHandler.html">ContentHandler</a> startElement
-and endElement callback must now, by default, conform to the XML + Namespaces
-specification.  You will get two callbacks describing the beginning and end
-of a scope for a given name prefix, and may also see the attributes
-which tell you that same thing.  (As a rule, ignore those callbacks.)
-
-<p> If you explicitly enable the <em>namespace-prefixes</em>
-feature on a parser, you can see the <em>xmlns*</em> attributes, and
-the element and attribute names as found in the document (with prefixes).
-If your SAX1 application is currently namespace aware, or needs to work
-with data that may use prefixed (or perhaps hierarchical) names, you must
-enable that feature in order to continue working correctly with a SAX2
-parser, in addition to making the various call syntax changes.
-(You can phase in use of the SAX2 namespace features incrementally,
-as you verify that it's safe for use with each existing application's
-data set or messaging partner.)
 
 </body></html>

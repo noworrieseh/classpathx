@@ -1,28 +1,8 @@
-/*
-  GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 David Brownell
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 // DefaultHandler.java - default implementation of the core handlers.
 // Written by David Megginson, sax@megginson.com
+// NO WARRANTY!  This class is in the public domain.
 
-// $Id: DefaultHandler.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// $Id: DefaultHandler.java,v 1.3 2001-08-03 18:54:48 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -41,6 +21,11 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Default base class for SAX2 event handlers.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p>This class is available as a convenience base class for SAX2
  * applications: it provides default implementations for all of the
@@ -267,8 +252,17 @@ public class DefaultHandler
      * each element (such as allocating a new tree node or writing
      * output to a file).</p>
      *
-     * @param name The element type name.
-     * @param attributes The specified or defaulted attributes.
+     * @param uri The Namespace URI, or the empty string if the
+     *        element has no Namespace URI or if Namespace
+     *        processing is not being performed.
+     * @param localName The local name (without prefix), or the
+     *        empty string if Namespace processing is not being
+     *        performed.
+     * @param qName The qualified name (with prefix), or the
+     *        empty string if qualified names are not available.
+     * @param atts The attributes attached to the element.  If
+     *        there are no attributes, it shall be an empty
+     *        Attributes object.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
      * @see org.xml.sax.ContentHandler#startElement
@@ -289,8 +283,14 @@ public class DefaultHandler
      * each element (such as finalising a tree node or writing
      * output to a file).</p>
      *
-     * @param name The element type name.
-     * @param attributes The specified or defaulted attributes.
+     * @param uri The Namespace URI, or the empty string if the
+     *        element has no Namespace URI or if Namespace
+     *        processing is not being performed.
+     * @param localName The local name (without prefix), or the
+     *        empty string if Namespace processing is not being
+     *        performed.
+     * @param qName The qualified name (with prefix), or the
+     *        empty string if qualified names are not available.
      * @exception org.xml.sax.SAXException Any SAX exception, possibly
      *            wrapping another exception.
      * @see org.xml.sax.ContentHandler#endElement

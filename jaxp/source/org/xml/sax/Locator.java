@@ -1,32 +1,17 @@
-/*
-  GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 David Brownell
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 // SAX locator interface for document events.
-// $Id: Locator.java,v 1.2 2001-06-08 20:42:17 db Exp $
+// No warranty; no copyright -- use this as you will.
+// $Id: Locator.java,v 1.3 2001-08-03 18:48:21 db Exp $
 
 package org.xml.sax;
 
 
 /**
  * Interface for associating a SAX event with a document location.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
  *
  * <p>If a SAX parser provides location information to the SAX
  * application, it does so by implementing this interface and then
@@ -52,7 +37,7 @@ package org.xml.sax;
  * @since SAX 1.0
  * @author David Megginson, 
  *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0
+ * @version 2.0r2pre
  * @see org.xml.sax.ContentHandler#setDocumentLocator 
  */
 public interface Locator {
@@ -122,10 +107,6 @@ public interface Locator {
      * <p>The return value is an approximation of the column number
      * in the document entity or external parsed entity where the
      * markup triggering the event appears.</p>
-     *
-     * <p>If possible, the SAX driver should provide the line position 
-     * of the first character after the text associated with the document 
-     * event.</p>
      *
      * <p>If possible, the SAX driver should provide the line position 
      * of the first character after the text associated with the document 
