@@ -1,5 +1,5 @@
 /*
- * $Id: DomCharacterData.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomCharacterData.java,v 1.2 2001-06-23 05:23:00 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import org.w3c.dom.*;
 import org.w3c.dom.events.MutationEvent;
 
 
-// $Id: DomCharacterData.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomCharacterData.java,v 1.2 2001-06-23 05:23:00 db Exp $
 
 /**
  * <p> Abstract "CharacterData" implementation.  This
@@ -38,7 +38,7 @@ import org.w3c.dom.events.MutationEvent;
  * (For example, it could be defined through a new "feature" module.)
  *
  * @author David Brownell
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-06-23 05:23:00 $
  */
 public abstract class DomCharacterData extends DomNode
     implements CharacterData
@@ -84,9 +84,13 @@ public abstract class DomCharacterData extends DomNode
 
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
+	else if (count < 0)
+	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	buf = new StringBuffer ();
 	try {
 	    chars = data.toCharArray ();
+	    if (offset > chars.length)
+		throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	    buf.append (chars, 0, offset);
 	    buf.append (chars, offset + count,
 		    chars.length - (offset + count));
@@ -94,6 +98,15 @@ public abstract class DomCharacterData extends DomNode
 	    mutating (newValue);
 	    data = newValue;
 	} catch (IndexOutOfBoundsException x) {
+	    if (offset >= 0 && count >= 0) {
+		int len = data.length ();
+		if ((offset + count) > len) {
+		    newValue = data.substring (0, offset);
+		    mutating (newValue);
+		    data = newValue;
+		    return;
+		}
+	    }
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	}
     }
@@ -189,7 +202,10 @@ public abstract class DomCharacterData extends DomNode
 	    chars = data.toCharArray ();
 	    src = arg.toCharArray ();
 	    buf.append (chars, 0, offset);
-	    buf.append (src, 0, count);
+	    if (src.length < count)
+		buf.append (src, 0, src.length);
+	    else
+		buf.append (src, 0, count);
 	    if ((offset + count) < chars.length)
 		buf.append (chars, offset + count,
 			chars.length - (offset + count));
@@ -237,6 +253,11 @@ public abstract class DomCharacterData extends DomNode
 	try {
 	    return data.substring (offset, offset + count);
 	} catch (IndexOutOfBoundsException e) {
+	    if (offset >= 0 && count >= 0) {
+		int len = data.length ();
+		if (offset < len && (offset + count) > len)
+		    return data.substring (offset);
+	    }
 	    throw new DomEx (DomEx.INDEX_SIZE_ERR);
 	}
     }
