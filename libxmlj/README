@@ -1,0 +1,105 @@
+GNU LibxmlJ
+========================================================================
+
+Copyright (C) 2003 Julian Scheid
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
+About
+------------------------------------------------------------------------ 
+
+This is GNU LibxmlJ Version 0.1.1.
+
+LibxmlJ is part of GNU ClasspathX. See
+http://www.gnu.org/software/classpathx/
+
+LibxmlJ is an effort to create a 100% JAXP-compatible Java wrapper for
+Libxml2 and Libxslt. JAXP is the Java API for XML processing, Libxml2
+is the XML C library for Gnome, and Libxslt is the XSLT C library for
+Gnome.
+
+Currently there is only an implementation for the `JAXP API for XML
+Transformations' subset - package javax.xml.transform - and only a
+partial implementation. It should be complete enough to work for a
+number of use cases, though. See below for a list of limitations and
+unsupported features.
+
+The main focus of LibxmlJ so far was support for GNU Gjdoc, which is
+now rather complete. Aside from its use in Gjdoc, It hasn't been
+tested at all, and has a number of known bugs.
+
+CAVEAT: LibxmlJ's current incarnation is incomplete and partly
+incorrect and may leak memory. Highly experimental. Not for production
+use.
+
+
+Usage
+------------------------------------------------------------------------
+
+See INSTALL for installation instructions.
+
+To enable use of LibxmlJ for JAXP transformations:
+
+ System.setProperty("javax.xml.transform.TransformerFactory",
+                    "gnu.xml.libxmlj.transform.TransformerFactoryImpl");
+
+You can also specifiy the factory by using the VM command line or one
+of the other methods described in the documentation for
+javax.xml.transform.TransformerFactory.newInstance().
+
+Make sure that `gnujaxp.jar' and `libxmlj.jar' are on your CLASSPATH
+and the shared library can be found (i.e. is configured via ldconfig
+or located on the LD_LIBRARY_PATH).
+
+
+Usage with Gcj
+------------------------------------------------------------------------
+
+You can create native executables from Java JAXP/XSLT applications
+using gcj, GNU JAXP and LibxmlJ like this:
+
+	gcj --output=./yourapplication \
+	    --main=your.MainClass \
+            --fjni \
+	    /path/to/your/application.jar \
+	    /path/to/gnujaxp.jar \
+	    /path/to/libxmlj.jar \
+	    -Djavax.xml.transform.TransformerFactory= \
+	        gnu.xml.libxmlj.transform.TransformerFactoryImpl \
+            -lxml2 -lxslt -lxmlj
+
+Note that this requires gcj 3.3.
+
+Note that you may have to specify the source codes (the .java files)
+for the classes contained in the jar files listed above in order for 
+gcj 3.3 to link stuff properly.
+
+The resulting executable will depend on libxmlj.so, which in turn
+depends on libxml2.so and libxslt.so.
+
+
+Missing Features
+------------------------------------------------------------------------ 
+
+See BUGS for known bugs.
+
+This implementation should be thread-safe, but currently all
+transformation requests are queued via Java synchronization, which
+means that it effectively performs single-threaded. Long story short,
+both Libxml2 and Libxslt are not fully reentrant.  
+
+Update: it may be possible to make LibxmlJ thread-safe nonetheless
+using thread context variables.
