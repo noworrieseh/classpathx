@@ -1,6 +1,6 @@
 /*
- * $Id: DomDocument.java,v 1.4 2001-11-16 13:34:14 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomDocument.java,v 1.5 2001-11-16 20:24:37 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -27,11 +27,15 @@
 
 package gnu.xml.dom;
 
+import java.util.Enumeration;
+
 import org.w3c.dom.*;
 import org.w3c.dom.traversal.*;
 
+import DomDoctype.ElementInfo;
 
-// $Id: DomDocument.java,v 1.4 2001-11-16 13:34:14 db Exp $
+
+// $Id: DomDocument.java,v 1.5 2001-11-16 20:24:37 db Exp $
 
 /**
  * <p> "Document" and "DocumentTraversal" implementation.
@@ -43,7 +47,7 @@ import org.w3c.dom.traversal.*;
  * hairy to implement.)
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 13:34:14 $
+ * @version $Date: 2001-11-16 20:24:37 $
  */
 public class DomDocument extends DomNode
     implements Document, DocumentTraversal
@@ -150,14 +154,60 @@ public class DomDocument extends DomNode
      * <b>DOM L1 (relocated in DOM L2)</b>
      * Returns the element with the specified "ID" attribute, or null.
      *
-     * <p>Since there is no nonproprietary way to associate the "ID" type
-     * with attributes (L3 should finally offer this functionality) this
-     * returns null unless it is overridden by some subclass accessing
-     * proprietary functionality, or (as with the XHTML DOM) hard-wiring
-     * such DTD knowledge in software.
+     * <p>Returns null unless {@link Consumer} was used to populate internal
+     * DTD declaration information, using package-private APIs.  If that
+     * internal DTD information is available, the document may be searched for
+     * the element with that ID.
      */
     public Element getElementById (String id)
     {
+	DomDoctype	doctype = (DomDoctype) getDoctype ();
+
+	if (doctype == null || !doctype.hasIds ()
+		|| id == null || id.length () == 0)
+	    return null;
+	
+	// yes, this is linear in size of document.
+	// it'd be easy enough to maintain a hashtable.
+	Node	current = getDocumentElement ();
+	Node	temp;
+
+	if (current == null)
+	    return null;
+	while (current != this) {
+	    // done?
+	    if (current.getNodeType () == ELEMENT_NODE) {
+		Element		element = (Element) current;
+		ElementInfo	info;
+
+		info = doctype.getElementInfo (current.getNodeName ());
+		if (id.equals (element.getAttribute (info.getIdAttr ())))
+		    return element;
+	    }
+
+	    // descend?
+	    if (current.hasChildNodes ()) {
+		current = current.getFirstChild ();
+		continue;
+	    }
+	    
+	    // lateral?
+	    temp = current.getNextSibling ();
+	    if (temp != null) {
+		current = temp;
+		continue;
+	    }
+	    
+	    // back up ... 
+	    do {
+		temp = current.getParentNode ();
+		if (temp == null)
+		    return null;
+		current = temp;
+		temp = current.getNextSibling ();
+	    } while (temp == null);
+	    current = temp;
+	}
 	return null;
     }
 
@@ -236,8 +286,11 @@ public class DomDocument extends DomNode
 	char c;
 	int len = name.length ();
 
+	if (len == 0)
+	    throw new DomEx (DomEx.NAMESPACE_ERR, name, null, 0);
+
 	// NOTE:  these aren't really the XML rules, but they're
-	// a good approximation that's simple to implement.
+	// a close approximation that's simple to implement.
 	c = name.charAt (0);
 	if (!Character.isUnicodeIdentifierStart (c)
 		&& c != ':' && c != '_')
@@ -324,13 +377,31 @@ public class DomDocument extends DomNode
      */
     public Element createElement (String name)
     {
+	Element		element;
+	DomDoctype	doctype;
+	ElementInfo	info;
+
 	if (checkingCharacters)
 	    verifyXmlName (name);
-
 	if (name.startsWith ("xml:"))
-	    return createElementNS (null, name);
+	    element = createElementNS (null, name);
 	else
-	    return new DomElement (this, null, name);
+	    element = new DomElement (this, null, name);
+	doctype = (DomDoctype) getDoctype ();
+	if (doctype == null)
+	    return element;
+
+	// default any attributes that need it
+	info = doctype.getElementInfo (name);
+	for (Enumeration e = info.keys (); e.hasMoreElements (); /* NOP */) {
+	    String	attr = (String) e.nextElement ();
+	    DomAttr	node = (DomAttr) createAttribute (attr);
+
+	    node.setValue ((String) info.get (attr));
+	    node.setSpecified (false);
+	    element.setAttributeNode (node);
+	}
+	return element;
     }
 
 
