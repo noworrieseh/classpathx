@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSPrivateKey.java,v 1.1 2001-12-30 15:57:53 raif Exp $
+// $Id: DSSPrivateKey.java,v 1.2 2002-01-11 21:33:24 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -31,7 +31,6 @@ package gnu.crypto.sig.dss;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.sig.IKeyPairCodec;
-import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.interfaces.DSAPrivateKey;
@@ -41,7 +40,7 @@ import java.security.spec.DSAParameterSpec;
 /**
  * An object that embodies a DSS (Digital Signature Standard) private key.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
 
@@ -78,7 +77,7 @@ public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
    /**
     * A class method that takes the output of the <code>encodePrivateKey()</code>
     * method of a DSS keypair codec object (an instance implementing
-    * {@link gnu.crypto.sig.IKeyPairCodec} for DSS keys, and re-constructs an 
+    * {@link gnu.crypto.sig.IKeyPairCodec} for DSS keys, and re-constructs an
     * instance of this object.<p>
     *
     * @param k the contents of a previously encoded instance of this object.
@@ -119,7 +118,7 @@ public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
     * format.<p>
     *
     * @param format the desired format identifier of the resulting encoding.
-    * @return the byte sequence encoding this key according to the designated 
+    * @return the byte sequence encoding this key according to the designated
     * format.
     * @exception IllegalArgumentException if the format is not supported.
     * @see gnu.crypto.sig.dss.DSSKeyPairRawCodec
@@ -128,7 +127,7 @@ public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
       byte[] result;
       switch (format) {
       case IKeyPairCodec.RAW_FORMAT:
-      	result = new DSSKeyPairRawCodec().encodePrivateKey(this);
+         result = new DSSKeyPairRawCodec().encodePrivateKey(this);
          break;
       default:
          throw new IllegalArgumentException("format");
@@ -137,9 +136,9 @@ public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
    }
 
    /**
-    * Returns <code>true</code> if the designated object is an instance of this
-    * class and has the same DSS (Digital Signature Standard) parameter values
-    * as this one.<p>
+    * Returns <code>true</code> if the designated object is an instance of
+    * {@link java.security.interfaces.DSAPrivateKey} and has the same DSS
+    * (Digital Signature Standard) parameter values as this one.<p>
     *
     * @param obj the other non-null DSS key to compare to.
     * @return <code>true</code> if the designated object is of the same type and
@@ -149,10 +148,10 @@ public class DSSPrivateKey extends DSSKey implements PrivateKey, DSAPrivateKey {
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof DSSPrivateKey)) {
+      if (!(obj instanceof DSAPrivateKey)) {
          return false;
       }
-      DSSPrivateKey that = (DSSPrivateKey) obj;
-      return (super.equals(that) && that.x.equals(this.x));
+      DSAPrivateKey that = (DSAPrivateKey) obj;
+      return super.equals(that) && x.equals(that.getX());
    }
 }
