@@ -61,7 +61,8 @@ xmljNewString (JNIEnv * env, const xmlChar * text)
       ret = (*env)->NewStringUTF (env, (char *) text);
       if (ret == NULL) /* Why? */
         {
-          printf("xmljNewString: ERROR: NewStringUTF returned null for \"%s\"\n", text);
+          fprintf(stderr, "xmljNewString: ERROR: NewStringUTF returned null for \"%s\"\n", text);
+          fflush (stderr);
         }
       else
         {

@@ -46,9 +46,9 @@ XMLJ_VERSION_MINOR="99"
 
 # Checks for header files.
 
-AM_PATH_XML([2.5.1],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
+AM_PATH_XML([2.6.9],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxml.]))
-AM_PATH_XSLT([1.0.24],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
+AM_PATH_XSLT([1.1.9],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
 	    AC_MSG_ERROR([unable to locate libxslt.]))
 
 # Libtool configuration

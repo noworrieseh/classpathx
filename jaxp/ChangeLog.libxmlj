@@ -1,3 +1,7 @@
+2004-10-06  Chris Burdess <dog@gnu.org>
+
+	* xmlj_util.c,xmlj_error.c: Call fflush after fprintf.
+
 2004-08-10  Chris Burdess <dog@gnu.org>
 
 	* transform: Fixed imports.

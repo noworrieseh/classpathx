@@ -400,6 +400,8 @@ $(src)/gnu/xml/dom/DomNotation.java \
 $(src)/gnu/xml/dom/DomNsNode.java \
 $(src)/gnu/xml/dom/DomPI.java \
 $(src)/gnu/xml/dom/DomText.java \
+$(src)/gnu/xml/dom/DomXPathExpression.java \
+$(src)/gnu/xml/dom/DomXPathNSResolver.java \
 $(src)/gnu/xml/dom/ImplementationSource.java \
 $(src)/gnu/xml/dom/ImplementationList.java \
 $(src)/gnu/xml/dom/JAXPFactory.java \
@@ -818,8 +820,9 @@ $(libjso_target): $(jni_lobjects)
 # API documentation
 javadoc:
 	mkdir -p $(doc)
-	$(JAVADOC) -d $(doc) -windowtitle "GNU JAXP Library" \
-		-sourcepath @srcdir@/source $(package_names)
+	$(JAVADOC) -d $(doc) -sourcepath @srcdir@/source \
+		$(package_names)
+#		-windowtitle "GNU JAXP Library" $(package_names)
 
 # Remove classes and jar file
 clean-local:

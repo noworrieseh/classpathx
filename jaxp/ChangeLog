@@ -1,3 +1,7 @@
+2004-10-06  Chris Burdess	<dog@gnu.org>
+
+	* Makefile.am: Make invocation of javadoc gjdoc-compatible.
+
 2004-09-03  Chris Burdess	<dog@gnu.org>
 
 	* all: Replaced GPL exception with new exception text.
