@@ -24,7 +24,7 @@ package gnu.mail.handler;
  * type.
  */
 public final class MultipartMixed
-  extends Application
+  extends Multipart
 {
 
   /**

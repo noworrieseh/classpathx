@@ -24,7 +24,7 @@ package gnu.mail.handler;
  * type.
  */
 public final class MultipartAlternative
-  extends Application
+  extends Multipart
 {
 
   /**

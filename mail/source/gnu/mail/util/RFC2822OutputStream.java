@@ -107,10 +107,10 @@ public class RFC2822OutputStream
     len += off;
     for (int i=off; i<len; i++)
     {
+      count++;
       if (b[i]==CR || b[i]==LF)
       {
         out.write(b, d, i-d);
-        out.write(LF);
         d = i;
         count = 0;
       }
@@ -124,7 +124,6 @@ public class RFC2822OutputStream
           count = 0;
         }
       }
-      count++;
     }
     if (count>0)
       out.write(b, d, count);
