@@ -464,8 +464,8 @@ libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
 JARFILE = gnujaxp.jar
-data_DATA = ${JARFILE}
 
+#data_DATA = ${JARFILE}
 package_names = \
 javax.xml.parsers \
 javax.xml.transform \
@@ -526,13 +526,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libxmlj_la_SOURCES)
-DATA = $(data_DATA)
-
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 	Makefile.in NEWS acinclude.m4 aclocal.m4 config/compile \
 	config/config.guess config/config.sub config/depcomp \
 	config/install-sh config/ltmain.sh config/missing \
-	config/mkinstalldirs configure configure.ac
+	config/mkinstalldirs configure configure.ac mkinstalldirs
 SOURCES = $(libxmlj_la_SOURCES)
 
 all: $(BUILT_SOURCES)
@@ -765,24 +763,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-dataDATA_INSTALL = $(INSTALL_DATA)
-install-dataDATA: $(data_DATA)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(datadir)
-	@list='$(data_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f"; \
-	  $(dataDATA_INSTALL) $$d$$p $(DESTDIR)$(datadir)/$$f; \
-	done
-
-uninstall-dataDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(data_DATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(datadir)/$$f"; \
-	  rm -f $(DESTDIR)$(datadir)/$$f; \
-	done
 
 ETAGS = etags
 ETAGSFLAGS =
@@ -914,10 +894,10 @@ distcleancheck: distclean
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(LTLIBRARIES)
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(datadir)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
 
 install: install-am
 install-exec: install-exec-am
@@ -962,7 +942,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-dataDATA
+install-data-am: install-data-local
 
 install-exec-am: install-libLTLIBRARIES
 
@@ -982,8 +962,7 @@ mostlyclean: mostlyclean-am
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-uninstall-am: uninstall-dataDATA uninstall-info-am \
-	uninstall-libLTLIBRARIES
+uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 
 .PHONY: GTAGS all all-am check check-am check-local clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool clean-local dist dist-all \
@@ -991,13 +970,13 @@ uninstall-am: uninstall-dataDATA uninstall-info-am \
 	distclean-depend distclean-generic distclean-libtool \
 	distclean-tags distcleancheck distdir dvi dvi-am info info-am \
 	install install-am install-data install-data-am \
-	install-dataDATA install-exec install-exec-am install-info \
+	install-data-local install-exec install-exec-am install-info \
 	install-info-am install-libLTLIBRARIES install-man \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	tags uninstall uninstall-am uninstall-dataDATA \
-	uninstall-info-am uninstall-libLTLIBRARIES
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 
 # Generate header files for classes containing native code.
@@ -1054,6 +1033,10 @@ dist-hook:
 	cp -r $(srcdir)/source/gnu/* $(distdir)/source/gnu
 	mkdir $(distdir)/testdocs
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
+
+install-data-local:
+	@srcdir@/mkinstalldirs $(prefix)/share/java
+	$(INSTALL_DATA) ${JARFILE} $(prefix)/share/java
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -343,7 +343,7 @@ libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
 JARFILE = gnujaxp.jar
-data_DATA = ${JARFILE}
+#data_DATA = ${JARFILE}
 
 package_names = \
 javax.xml.parsers \
@@ -458,4 +458,8 @@ dist-hook:
 	cp -r $(srcdir)/source/gnu/* $(distdir)/source/gnu
 	mkdir $(distdir)/testdocs
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
+
+install-data-local:
+	@srcdir@/mkinstalldirs $(prefix)/share/java
+	$(INSTALL_DATA) ${JARFILE} $(prefix)/share/java
 
