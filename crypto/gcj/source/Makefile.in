@@ -205,6 +205,7 @@ junitTest_LDFLAGS = --main=test.AllTests
 #
 crypto_sources = \
  gnu/crypto/Registry.java \
+ \
  gnu/crypto/cipher/Anubis.java \
  gnu/crypto/cipher/BaseCipher.java \
  gnu/crypto/cipher/CipherFactory.java \
@@ -216,6 +217,9 @@ crypto_sources = \
  gnu/crypto/cipher/Serpent.java \
  gnu/crypto/cipher/Square.java \
  gnu/crypto/cipher/Twofish.java \
+ \
+ gnu/crypto/exp/ust/UST.java \
+ \
  gnu/crypto/hash/BaseHash.java \
  gnu/crypto/hash/HashFactory.java \
  gnu/crypto/hash/IMessageDigest.java \
@@ -225,31 +229,39 @@ crypto_sources = \
  gnu/crypto/hash/RipeMD160.java \
  gnu/crypto/hash/Sha160.java \
  gnu/crypto/hash/Whirlpool.java \
+ \
  gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
  gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+ gnu/crypto/jce/MD4RandomSpi.java \
  gnu/crypto/jce/MD4Spi.java \
+ gnu/crypto/jce/MD5RandomSpi.java \
  gnu/crypto/jce/MD5Spi.java \
  gnu/crypto/jce/MessageDigestAdapter.java \
- gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
- gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
+ gnu/crypto/jce/RipeMD128RandomSpi.java \
  gnu/crypto/jce/RipeMD128Spi.java \
  gnu/crypto/jce/RipeMD160RandomSpi.java \
  gnu/crypto/jce/RipeMD160Spi.java \
+ gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
+ gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
  gnu/crypto/jce/SecureRandomAdapter.java \
  gnu/crypto/jce/Sha160RandomSpi.java \
  gnu/crypto/jce/Sha160Spi.java \
  gnu/crypto/jce/SignatureAdapter.java \
+ gnu/crypto/jce/UMacRandomSpi.java \
  gnu/crypto/jce/WhirlpoolRandomSpi.java \
  gnu/crypto/jce/WhirlpoolSpi.java \
+ \
  gnu/crypto/mac/BaseMac.java \
  gnu/crypto/mac/HMac.java \
  gnu/crypto/mac/HMacFactory.java \
  gnu/crypto/mac/IMac.java \
  gnu/crypto/mac/MacFactory.java \
+ gnu/crypto/mac/TMMH16.java \
  gnu/crypto/mac/UHash32.java \
  gnu/crypto/mac/UMac32.java \
+ \
  gnu/crypto/mode/BaseMode.java \
  gnu/crypto/mode/CTR.java \
  gnu/crypto/mode/ECB.java \
@@ -257,12 +269,14 @@ crypto_sources = \
  gnu/crypto/mode/IMode.java \
  gnu/crypto/mode/ModeFactory.java \
  gnu/crypto/mode/OFB.java \
+ \
  gnu/crypto/pad/BasePad.java \
  gnu/crypto/pad/IPad.java \
- gnu/crypto/pad/PKCS7.java \
  gnu/crypto/pad/PadFactory.java \
+ gnu/crypto/pad/PKCS7.java \
  gnu/crypto/pad/TBC.java \
  gnu/crypto/pad/WrongPaddingException.java \
+ \
  gnu/crypto/prng/BasePRNG.java \
  gnu/crypto/prng/ICMGenerator.java \
  gnu/crypto/prng/IRandom.java \
@@ -270,6 +284,7 @@ crypto_sources = \
  gnu/crypto/prng/MDGenerator.java \
  gnu/crypto/prng/PRNGFactory.java \
  gnu/crypto/prng/UMacGenerator.java \
+ \
  gnu/crypto/sig/BaseSignature.java \
  gnu/crypto/sig/IKeyPairCodec.java \
  gnu/crypto/sig/IKeyPairGenerator.java \
@@ -277,6 +292,7 @@ crypto_sources = \
  gnu/crypto/sig/ISignatureCodec.java \
  gnu/crypto/sig/KeyPairGeneratorFactory.java \
  gnu/crypto/sig/SignatureFactory.java \
+ \
  gnu/crypto/sig/dss/DSSKey.java \
  gnu/crypto/sig/dss/DSSKeyPairGenerator.java \
  gnu/crypto/sig/dss/DSSKeyPairRawCodec.java \
@@ -284,6 +300,7 @@ crypto_sources = \
  gnu/crypto/sig/dss/DSSPublicKey.java \
  gnu/crypto/sig/dss/DSSSignature.java \
  gnu/crypto/sig/dss/DSSSignatureRawCodec.java \
+ \
  gnu/crypto/sig/rsa/EMSA_PSS.java \
  gnu/crypto/sig/rsa/GnuRSAKey.java \
  gnu/crypto/sig/rsa/GnuRSAPrivateKey.java \
@@ -293,13 +310,15 @@ crypto_sources = \
  gnu/crypto/sig/rsa/RSAKeyPairRawCodec.java \
  gnu/crypto/sig/rsa/RSAPSSSignature.java \
  gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java \
- gnu/crypto/util/PRNG.java \
+ \
  gnu/crypto/util/Prime.java \
+ gnu/crypto/util/PRNG.java \
  gnu/crypto/util/Util.java
 
 
 junit_test_sources = \
  test/AllTests.java \
+ \
  test/cipher/AllTests.java \
  test/cipher/BaseCipherTestCase.java \
  test/cipher/TestOfAnubis.java \
@@ -311,6 +330,10 @@ junit_test_sources = \
  test/cipher/TestOfSerpent.java \
  test/cipher/TestOfSquare.java \
  test/cipher/TestOfTwofish.java \
+ \
+ test/exp/AllTests.java \
+ test/exp/TestOfUST.java \
+ \
  test/hash/AllTests.java \
  test/hash/TestOfHashFactory.java \
  test/hash/TestOfMD4.java \
@@ -319,32 +342,41 @@ junit_test_sources = \
  test/hash/TestOfRipeMD160.java \
  test/hash/TestOfSha160.java \
  test/hash/TestOfWhirlpool.java \
+ \
  test/jce/AllTests.java \
  test/jce/TestOfKeyPairGenerator.java \
  test/jce/TestOfMessageDigest.java \
  test/jce/TestOfProvider.java \
  test/jce/TestOfSignature.java \
+ \
  test/mac/AllTests.java \
  test/mac/TestOfHMacFactory.java \
  test/mac/TestOfMacFactory.java \
+ test/mac/TestOfTMMH16.java \
+ \
  test/mode/AllTests.java \
  test/mode/TestOfECB.java \
  test/mode/TestOfModeFactory.java \
  test/mode/TestOfOFB.java \
+ \
  test/pad/AllTests.java \
- test/pad/TestOfPKCS7.java \
  test/pad/TestOfPadFactory.java \
+ test/pad/TestOfPKCS7.java \
  test/pad/TestOfTBC.java \
+ \
  test/prng/AllTests.java \
  test/prng/TestOfICMGenerator.java \
  test/prng/TestOfPRNGFactory.java \
+ \
  test/sig/AllTests.java \
  test/sig/TestOfKeyPairGeneratorFactory.java \
  test/sig/TestOfSignatureFactory.java \
+ \
  test/sig/dss/AllTests.java \
  test/sig/dss/TestOfDSSCodec.java \
  test/sig/dss/TestOfDSSKeyGeneration.java \
  test/sig/dss/TestOfDSSSignature.java \
+ \
  test/sig/rsa/AllTests.java \
  test/sig/rsa/TestOfRSACodec.java \
  test/sig/rsa/TestOfRSAKeyGeneration.java \
@@ -374,7 +406,8 @@ am__objects_1 = gnu/crypto/Registry.lo gnu/crypto/cipher/Anubis.lo \
 	gnu/crypto/cipher/Khazad.lo gnu/crypto/cipher/NullCipher.lo \
 	gnu/crypto/cipher/Rijndael.lo gnu/crypto/cipher/Serpent.lo \
 	gnu/crypto/cipher/Square.lo gnu/crypto/cipher/Twofish.lo \
-	gnu/crypto/hash/BaseHash.lo gnu/crypto/hash/HashFactory.lo \
+	gnu/crypto/exp/ust/UST.lo gnu/crypto/hash/BaseHash.lo \
+	gnu/crypto/hash/HashFactory.lo \
 	gnu/crypto/hash/IMessageDigest.lo gnu/crypto/hash/MD4.lo \
 	gnu/crypto/hash/MD5.lo gnu/crypto/hash/RipeMD128.lo \
 	gnu/crypto/hash/RipeMD160.lo gnu/crypto/hash/Sha160.lo \
@@ -383,28 +416,31 @@ am__objects_1 = gnu/crypto/Registry.lo gnu/crypto/cipher/Anubis.lo \
 	gnu/crypto/jce/DSSRawSignatureSpi.lo \
 	gnu/crypto/jce/GnuCrypto.lo \
 	gnu/crypto/jce/KeyPairGeneratorAdapter.lo \
-	gnu/crypto/jce/MD4Spi.lo gnu/crypto/jce/MD5Spi.lo \
+	gnu/crypto/jce/MD4RandomSpi.lo gnu/crypto/jce/MD4Spi.lo \
+	gnu/crypto/jce/MD5RandomSpi.lo gnu/crypto/jce/MD5Spi.lo \
 	gnu/crypto/jce/MessageDigestAdapter.lo \
-	gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo \
-	gnu/crypto/jce/RSAPSSRawSignatureSpi.lo \
+	gnu/crypto/jce/RipeMD128RandomSpi.lo \
 	gnu/crypto/jce/RipeMD128Spi.lo \
 	gnu/crypto/jce/RipeMD160RandomSpi.lo \
 	gnu/crypto/jce/RipeMD160Spi.lo \
+	gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo \
+	gnu/crypto/jce/RSAPSSRawSignatureSpi.lo \
 	gnu/crypto/jce/SecureRandomAdapter.lo \
 	gnu/crypto/jce/Sha160RandomSpi.lo gnu/crypto/jce/Sha160Spi.lo \
 	gnu/crypto/jce/SignatureAdapter.lo \
+	gnu/crypto/jce/UMacRandomSpi.lo \
 	gnu/crypto/jce/WhirlpoolRandomSpi.lo \
 	gnu/crypto/jce/WhirlpoolSpi.lo gnu/crypto/mac/BaseMac.lo \
 	gnu/crypto/mac/HMac.lo gnu/crypto/mac/HMacFactory.lo \
 	gnu/crypto/mac/IMac.lo gnu/crypto/mac/MacFactory.lo \
-	gnu/crypto/mac/UHash32.lo gnu/crypto/mac/UMac32.lo \
-	gnu/crypto/mode/BaseMode.lo gnu/crypto/mode/CTR.lo \
-	gnu/crypto/mode/ECB.lo gnu/crypto/mode/ICM.lo \
-	gnu/crypto/mode/IMode.lo gnu/crypto/mode/ModeFactory.lo \
-	gnu/crypto/mode/OFB.lo gnu/crypto/pad/BasePad.lo \
-	gnu/crypto/pad/IPad.lo gnu/crypto/pad/PKCS7.lo \
-	gnu/crypto/pad/PadFactory.lo gnu/crypto/pad/TBC.lo \
-	gnu/crypto/pad/WrongPaddingException.lo \
+	gnu/crypto/mac/TMMH16.lo gnu/crypto/mac/UHash32.lo \
+	gnu/crypto/mac/UMac32.lo gnu/crypto/mode/BaseMode.lo \
+	gnu/crypto/mode/CTR.lo gnu/crypto/mode/ECB.lo \
+	gnu/crypto/mode/ICM.lo gnu/crypto/mode/IMode.lo \
+	gnu/crypto/mode/ModeFactory.lo gnu/crypto/mode/OFB.lo \
+	gnu/crypto/pad/BasePad.lo gnu/crypto/pad/IPad.lo \
+	gnu/crypto/pad/PadFactory.lo gnu/crypto/pad/PKCS7.lo \
+	gnu/crypto/pad/TBC.lo gnu/crypto/pad/WrongPaddingException.lo \
 	gnu/crypto/prng/BasePRNG.lo gnu/crypto/prng/ICMGenerator.lo \
 	gnu/crypto/prng/IRandom.lo \
 	gnu/crypto/prng/LimitReachedException.lo \
@@ -428,7 +464,7 @@ am__objects_1 = gnu/crypto/Registry.lo gnu/crypto/cipher/Anubis.lo \
 	gnu/crypto/sig/rsa/RSAKeyPairRawCodec.lo \
 	gnu/crypto/sig/rsa/RSAPSSSignature.lo \
 	gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.lo \
-	gnu/crypto/util/PRNG.lo gnu/crypto/util/Prime.lo \
+	gnu/crypto/util/Prime.lo gnu/crypto/util/PRNG.lo \
 	gnu/crypto/util/Util.lo
 am_lib_gnu_crypto_la_OBJECTS = $(am__objects_1)
 lib_gnu_crypto_la_OBJECTS = $(am_lib_gnu_crypto_la_OBJECTS)
@@ -457,8 +493,8 @@ am__objects_2 = test/AllTests.$(OBJEXT) test/cipher/AllTests.$(OBJEXT) \
 	test/cipher/TestOfRijndael.$(OBJEXT) \
 	test/cipher/TestOfSerpent.$(OBJEXT) \
 	test/cipher/TestOfSquare.$(OBJEXT) \
-	test/cipher/TestOfTwofish.$(OBJEXT) \
-	test/hash/AllTests.$(OBJEXT) \
+	test/cipher/TestOfTwofish.$(OBJEXT) test/exp/AllTests.$(OBJEXT) \
+	test/exp/TestOfUST.$(OBJEXT) test/hash/AllTests.$(OBJEXT) \
 	test/hash/TestOfHashFactory.$(OBJEXT) \
 	test/hash/TestOfMD4.$(OBJEXT) test/hash/TestOfMD5.$(OBJEXT) \
 	test/hash/TestOfRipeMD128.$(OBJEXT) \
@@ -471,12 +507,13 @@ am__objects_2 = test/AllTests.$(OBJEXT) test/cipher/AllTests.$(OBJEXT) \
 	test/jce/TestOfSignature.$(OBJEXT) test/mac/AllTests.$(OBJEXT) \
 	test/mac/TestOfHMacFactory.$(OBJEXT) \
 	test/mac/TestOfMacFactory.$(OBJEXT) \
-	test/mode/AllTests.$(OBJEXT) test/mode/TestOfECB.$(OBJEXT) \
+	test/mac/TestOfTMMH16.$(OBJEXT) test/mode/AllTests.$(OBJEXT) \
+	test/mode/TestOfECB.$(OBJEXT) \
 	test/mode/TestOfModeFactory.$(OBJEXT) \
 	test/mode/TestOfOFB.$(OBJEXT) test/pad/AllTests.$(OBJEXT) \
-	test/pad/TestOfPKCS7.$(OBJEXT) \
 	test/pad/TestOfPadFactory.$(OBJEXT) \
-	test/pad/TestOfTBC.$(OBJEXT) test/prng/AllTests.$(OBJEXT) \
+	test/pad/TestOfPKCS7.$(OBJEXT) test/pad/TestOfTBC.$(OBJEXT) \
+	test/prng/AllTests.$(OBJEXT) \
 	test/prng/TestOfICMGenerator.$(OBJEXT) \
 	test/prng/TestOfPRNGFactory.$(OBJEXT) \
 	test/sig/AllTests.$(OBJEXT) \
@@ -523,6 +560,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/cipher/$(DEPDIR)/Serpent.Plo \
 @AMDEP_TRUE@	gnu/crypto/cipher/$(DEPDIR)/Square.Plo \
 @AMDEP_TRUE@	gnu/crypto/cipher/$(DEPDIR)/Twofish.Plo \
+@AMDEP_TRUE@	gnu/crypto/exp/ust/$(DEPDIR)/UST.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/BaseHash.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/HashFactory.Plo \
 @AMDEP_TRUE@	gnu/crypto/hash/$(DEPDIR)/IMessageDigest.Plo \
@@ -536,11 +574,14 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/DSSRawSignatureSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/GnuCrypto.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.Plo \
+@AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo \
+@AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MD5Spi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/MessageDigestAdapter.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Plo \
+@AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RipeMD128Spi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RipeMD160RandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/RipeMD160Spi.Plo \
@@ -548,6 +589,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/Sha160RandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/Sha160Spi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/SignatureAdapter.Plo \
+@AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/WhirlpoolRandomSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/jce/$(DEPDIR)/WhirlpoolSpi.Plo \
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/BaseMac.Plo \
@@ -555,6 +597,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/HMacFactory.Plo \
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/IMac.Plo \
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/MacFactory.Plo \
+@AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/TMMH16.Plo \
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/UHash32.Plo \
 @AMDEP_TRUE@	gnu/crypto/mac/$(DEPDIR)/UMac32.Plo \
 @AMDEP_TRUE@	gnu/crypto/mode/$(DEPDIR)/BaseMode.Plo \
@@ -621,6 +664,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	test/cipher/$(DEPDIR)/TestOfSerpent.Po \
 @AMDEP_TRUE@	test/cipher/$(DEPDIR)/TestOfSquare.Po \
 @AMDEP_TRUE@	test/cipher/$(DEPDIR)/TestOfTwofish.Po \
+@AMDEP_TRUE@	test/exp/$(DEPDIR)/AllTests.Po \
+@AMDEP_TRUE@	test/exp/$(DEPDIR)/TestOfUST.Po \
 @AMDEP_TRUE@	test/hash/$(DEPDIR)/AllTests.Po \
 @AMDEP_TRUE@	test/hash/$(DEPDIR)/TestOfHashFactory.Po \
 @AMDEP_TRUE@	test/hash/$(DEPDIR)/TestOfMD4.Po \
@@ -637,6 +682,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	test/mac/$(DEPDIR)/AllTests.Po \
 @AMDEP_TRUE@	test/mac/$(DEPDIR)/TestOfHMacFactory.Po \
 @AMDEP_TRUE@	test/mac/$(DEPDIR)/TestOfMacFactory.Po \
+@AMDEP_TRUE@	test/mac/$(DEPDIR)/TestOfTMMH16.Po \
 @AMDEP_TRUE@	test/mode/$(DEPDIR)/AllTests.Po \
 @AMDEP_TRUE@	test/mode/$(DEPDIR)/TestOfECB.Po \
 @AMDEP_TRUE@	test/mode/$(DEPDIR)/TestOfModeFactory.Po \
@@ -755,6 +801,15 @@ gnu/crypto/cipher/Square.lo: gnu/crypto/cipher/Square.java \
 gnu/crypto/cipher/Twofish.lo: gnu/crypto/cipher/Twofish.java \
 	gnu/crypto/cipher/.dirstamp \
 	gnu/crypto/cipher/$(DEPDIR)/.dirstamp
+gnu/crypto/exp/ust/.dirstamp:
+	@$(mkinstalldirs) gnu/crypto/exp/ust
+	@: > gnu/crypto/exp/ust/.dirstamp
+gnu/crypto/exp/ust/$(DEPDIR)/.dirstamp:
+	@$(mkinstalldirs) gnu/crypto/exp/ust/$(DEPDIR)
+	@: > gnu/crypto/exp/ust/$(DEPDIR)/.dirstamp
+gnu/crypto/exp/ust/UST.lo: gnu/crypto/exp/ust/UST.java \
+	gnu/crypto/exp/ust/.dirstamp \
+	gnu/crypto/exp/ust/$(DEPDIR)/.dirstamp
 gnu/crypto/hash/.dirstamp:
 	@$(mkinstalldirs) gnu/crypto/hash
 	@: > gnu/crypto/hash/.dirstamp
@@ -796,25 +851,32 @@ gnu/crypto/jce/GnuCrypto.lo: gnu/crypto/jce/GnuCrypto.java \
 gnu/crypto/jce/KeyPairGeneratorAdapter.lo: \
 	gnu/crypto/jce/KeyPairGeneratorAdapter.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/MD4RandomSpi.lo: gnu/crypto/jce/MD4RandomSpi.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/MD4Spi.lo: gnu/crypto/jce/MD4Spi.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/MD5RandomSpi.lo: gnu/crypto/jce/MD5RandomSpi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/MD5Spi.lo: gnu/crypto/jce/MD5Spi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/MessageDigestAdapter.lo: \
 	gnu/crypto/jce/MessageDigestAdapter.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
-gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo: \
-	gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
-	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
-gnu/crypto/jce/RSAPSSRawSignatureSpi.lo: \
-	gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
-	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/RipeMD128RandomSpi.lo: \
+	gnu/crypto/jce/RipeMD128RandomSpi.java gnu/crypto/jce/.dirstamp \
+	gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/RipeMD128Spi.lo: gnu/crypto/jce/RipeMD128Spi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/RipeMD160RandomSpi.lo: \
 	gnu/crypto/jce/RipeMD160RandomSpi.java gnu/crypto/jce/.dirstamp \
 	gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/RipeMD160Spi.lo: gnu/crypto/jce/RipeMD160Spi.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo: \
+	gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/RSAPSSRawSignatureSpi.lo: \
+	gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/SecureRandomAdapter.lo: \
 	gnu/crypto/jce/SecureRandomAdapter.java \
@@ -824,6 +886,8 @@ gnu/crypto/jce/Sha160RandomSpi.lo: gnu/crypto/jce/Sha160RandomSpi.java \
 gnu/crypto/jce/Sha160Spi.lo: gnu/crypto/jce/Sha160Spi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/SignatureAdapter.lo: gnu/crypto/jce/SignatureAdapter.java \
+	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
+gnu/crypto/jce/UMacRandomSpi.lo: gnu/crypto/jce/UMacRandomSpi.java \
 	gnu/crypto/jce/.dirstamp gnu/crypto/jce/$(DEPDIR)/.dirstamp
 gnu/crypto/jce/WhirlpoolRandomSpi.lo: \
 	gnu/crypto/jce/WhirlpoolRandomSpi.java gnu/crypto/jce/.dirstamp \
@@ -845,6 +909,8 @@ gnu/crypto/mac/HMacFactory.lo: gnu/crypto/mac/HMacFactory.java \
 gnu/crypto/mac/IMac.lo: gnu/crypto/mac/IMac.java \
 	gnu/crypto/mac/.dirstamp gnu/crypto/mac/$(DEPDIR)/.dirstamp
 gnu/crypto/mac/MacFactory.lo: gnu/crypto/mac/MacFactory.java \
+	gnu/crypto/mac/.dirstamp gnu/crypto/mac/$(DEPDIR)/.dirstamp
+gnu/crypto/mac/TMMH16.lo: gnu/crypto/mac/TMMH16.java \
 	gnu/crypto/mac/.dirstamp gnu/crypto/mac/$(DEPDIR)/.dirstamp
 gnu/crypto/mac/UHash32.lo: gnu/crypto/mac/UHash32.java \
 	gnu/crypto/mac/.dirstamp gnu/crypto/mac/$(DEPDIR)/.dirstamp
@@ -880,9 +946,9 @@ gnu/crypto/pad/BasePad.lo: gnu/crypto/pad/BasePad.java \
 	gnu/crypto/pad/.dirstamp gnu/crypto/pad/$(DEPDIR)/.dirstamp
 gnu/crypto/pad/IPad.lo: gnu/crypto/pad/IPad.java \
 	gnu/crypto/pad/.dirstamp gnu/crypto/pad/$(DEPDIR)/.dirstamp
-gnu/crypto/pad/PKCS7.lo: gnu/crypto/pad/PKCS7.java \
-	gnu/crypto/pad/.dirstamp gnu/crypto/pad/$(DEPDIR)/.dirstamp
 gnu/crypto/pad/PadFactory.lo: gnu/crypto/pad/PadFactory.java \
+	gnu/crypto/pad/.dirstamp gnu/crypto/pad/$(DEPDIR)/.dirstamp
+gnu/crypto/pad/PKCS7.lo: gnu/crypto/pad/PKCS7.java \
 	gnu/crypto/pad/.dirstamp gnu/crypto/pad/$(DEPDIR)/.dirstamp
 gnu/crypto/pad/TBC.lo: gnu/crypto/pad/TBC.java gnu/crypto/pad/.dirstamp \
 	gnu/crypto/pad/$(DEPDIR)/.dirstamp
@@ -1008,9 +1074,9 @@ gnu/crypto/util/.dirstamp:
 gnu/crypto/util/$(DEPDIR)/.dirstamp:
 	@$(mkinstalldirs) gnu/crypto/util/$(DEPDIR)
 	@: > gnu/crypto/util/$(DEPDIR)/.dirstamp
-gnu/crypto/util/PRNG.lo: gnu/crypto/util/PRNG.java \
-	gnu/crypto/util/.dirstamp gnu/crypto/util/$(DEPDIR)/.dirstamp
 gnu/crypto/util/Prime.lo: gnu/crypto/util/Prime.java \
+	gnu/crypto/util/.dirstamp gnu/crypto/util/$(DEPDIR)/.dirstamp
+gnu/crypto/util/PRNG.lo: gnu/crypto/util/PRNG.java \
 	gnu/crypto/util/.dirstamp gnu/crypto/util/$(DEPDIR)/.dirstamp
 gnu/crypto/util/Util.lo: gnu/crypto/util/Util.java \
 	gnu/crypto/util/.dirstamp gnu/crypto/util/$(DEPDIR)/.dirstamp
@@ -1079,6 +1145,16 @@ test/cipher/TestOfSquare.$(OBJEXT): test/cipher/TestOfSquare.java \
 	test/cipher/.dirstamp test/cipher/$(DEPDIR)/.dirstamp
 test/cipher/TestOfTwofish.$(OBJEXT): test/cipher/TestOfTwofish.java \
 	test/cipher/.dirstamp test/cipher/$(DEPDIR)/.dirstamp
+test/exp/.dirstamp:
+	@$(mkinstalldirs) test/exp
+	@: > test/exp/.dirstamp
+test/exp/$(DEPDIR)/.dirstamp:
+	@$(mkinstalldirs) test/exp/$(DEPDIR)
+	@: > test/exp/$(DEPDIR)/.dirstamp
+test/exp/AllTests.$(OBJEXT): test/exp/AllTests.java test/exp/.dirstamp \
+	test/exp/$(DEPDIR)/.dirstamp
+test/exp/TestOfUST.$(OBJEXT): test/exp/TestOfUST.java test/exp/.dirstamp \
+	test/exp/$(DEPDIR)/.dirstamp
 test/hash/.dirstamp:
 	@$(mkinstalldirs) test/hash
 	@: > test/hash/.dirstamp
@@ -1131,6 +1207,8 @@ test/mac/TestOfHMacFactory.$(OBJEXT): test/mac/TestOfHMacFactory.java \
 	test/mac/.dirstamp test/mac/$(DEPDIR)/.dirstamp
 test/mac/TestOfMacFactory.$(OBJEXT): test/mac/TestOfMacFactory.java \
 	test/mac/.dirstamp test/mac/$(DEPDIR)/.dirstamp
+test/mac/TestOfTMMH16.$(OBJEXT): test/mac/TestOfTMMH16.java \
+	test/mac/.dirstamp test/mac/$(DEPDIR)/.dirstamp
 test/mode/.dirstamp:
 	@$(mkinstalldirs) test/mode
 	@: > test/mode/.dirstamp
@@ -1153,9 +1231,9 @@ test/pad/$(DEPDIR)/.dirstamp:
 	@: > test/pad/$(DEPDIR)/.dirstamp
 test/pad/AllTests.$(OBJEXT): test/pad/AllTests.java test/pad/.dirstamp \
 	test/pad/$(DEPDIR)/.dirstamp
-test/pad/TestOfPKCS7.$(OBJEXT): test/pad/TestOfPKCS7.java \
-	test/pad/.dirstamp test/pad/$(DEPDIR)/.dirstamp
 test/pad/TestOfPadFactory.$(OBJEXT): test/pad/TestOfPadFactory.java \
+	test/pad/.dirstamp test/pad/$(DEPDIR)/.dirstamp
+test/pad/TestOfPKCS7.$(OBJEXT): test/pad/TestOfPKCS7.java \
 	test/pad/.dirstamp test/pad/$(DEPDIR)/.dirstamp
 test/pad/TestOfTBC.$(OBJEXT): test/pad/TestOfTBC.java test/pad/.dirstamp \
 	test/pad/$(DEPDIR)/.dirstamp
@@ -1270,6 +1348,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/cipher/Square.lo
 	-rm -f gnu/crypto/cipher/Twofish.$(OBJEXT)
 	-rm -f gnu/crypto/cipher/Twofish.lo
+	-rm -f gnu/crypto/exp/ust/UST.$(OBJEXT)
+	-rm -f gnu/crypto/exp/ust/UST.lo
 	-rm -f gnu/crypto/hash/BaseHash.$(OBJEXT)
 	-rm -f gnu/crypto/hash/BaseHash.lo
 	-rm -f gnu/crypto/hash/HashFactory.$(OBJEXT)
@@ -1296,8 +1376,12 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/jce/GnuCrypto.lo
 	-rm -f gnu/crypto/jce/KeyPairGeneratorAdapter.$(OBJEXT)
 	-rm -f gnu/crypto/jce/KeyPairGeneratorAdapter.lo
+	-rm -f gnu/crypto/jce/MD4RandomSpi.$(OBJEXT)
+	-rm -f gnu/crypto/jce/MD4RandomSpi.lo
 	-rm -f gnu/crypto/jce/MD4Spi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/MD4Spi.lo
+	-rm -f gnu/crypto/jce/MD5RandomSpi.$(OBJEXT)
+	-rm -f gnu/crypto/jce/MD5RandomSpi.lo
 	-rm -f gnu/crypto/jce/MD5Spi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/MD5Spi.lo
 	-rm -f gnu/crypto/jce/MessageDigestAdapter.$(OBJEXT)
@@ -1306,6 +1390,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo
 	-rm -f gnu/crypto/jce/RSAPSSRawSignatureSpi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/RSAPSSRawSignatureSpi.lo
+	-rm -f gnu/crypto/jce/RipeMD128RandomSpi.$(OBJEXT)
+	-rm -f gnu/crypto/jce/RipeMD128RandomSpi.lo
 	-rm -f gnu/crypto/jce/RipeMD128Spi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/RipeMD128Spi.lo
 	-rm -f gnu/crypto/jce/RipeMD160RandomSpi.$(OBJEXT)
@@ -1320,6 +1406,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/jce/Sha160Spi.lo
 	-rm -f gnu/crypto/jce/SignatureAdapter.$(OBJEXT)
 	-rm -f gnu/crypto/jce/SignatureAdapter.lo
+	-rm -f gnu/crypto/jce/UMacRandomSpi.$(OBJEXT)
+	-rm -f gnu/crypto/jce/UMacRandomSpi.lo
 	-rm -f gnu/crypto/jce/WhirlpoolRandomSpi.$(OBJEXT)
 	-rm -f gnu/crypto/jce/WhirlpoolRandomSpi.lo
 	-rm -f gnu/crypto/jce/WhirlpoolSpi.$(OBJEXT)
@@ -1334,6 +1422,8 @@ mostlyclean-compile:
 	-rm -f gnu/crypto/mac/IMac.lo
 	-rm -f gnu/crypto/mac/MacFactory.$(OBJEXT)
 	-rm -f gnu/crypto/mac/MacFactory.lo
+	-rm -f gnu/crypto/mac/TMMH16.$(OBJEXT)
+	-rm -f gnu/crypto/mac/TMMH16.lo
 	-rm -f gnu/crypto/mac/UHash32.$(OBJEXT)
 	-rm -f gnu/crypto/mac/UHash32.lo
 	-rm -f gnu/crypto/mac/UMac32.$(OBJEXT)
@@ -1448,6 +1538,8 @@ mostlyclean-compile:
 	-rm -f test/cipher/TestOfSerpent.$(OBJEXT)
 	-rm -f test/cipher/TestOfSquare.$(OBJEXT)
 	-rm -f test/cipher/TestOfTwofish.$(OBJEXT)
+	-rm -f test/exp/AllTests.$(OBJEXT)
+	-rm -f test/exp/TestOfUST.$(OBJEXT)
 	-rm -f test/hash/AllTests.$(OBJEXT)
 	-rm -f test/hash/TestOfHashFactory.$(OBJEXT)
 	-rm -f test/hash/TestOfMD4.$(OBJEXT)
@@ -1464,6 +1556,7 @@ mostlyclean-compile:
 	-rm -f test/mac/AllTests.$(OBJEXT)
 	-rm -f test/mac/TestOfHMacFactory.$(OBJEXT)
 	-rm -f test/mac/TestOfMacFactory.$(OBJEXT)
+	-rm -f test/mac/TestOfTMMH16.$(OBJEXT)
 	-rm -f test/mode/AllTests.$(OBJEXT)
 	-rm -f test/mode/TestOfECB.$(OBJEXT)
 	-rm -f test/mode/TestOfModeFactory.$(OBJEXT)
@@ -1493,6 +1586,8 @@ distclean-compile:
 	-rm -f gnu/crypto/.dirstamp
 	-rm -f gnu/crypto/cipher/$(DEPDIR)/.dirstamp
 	-rm -f gnu/crypto/cipher/.dirstamp
+	-rm -f gnu/crypto/exp/ust/$(DEPDIR)/.dirstamp
+	-rm -f gnu/crypto/exp/ust/.dirstamp
 	-rm -f gnu/crypto/hash/$(DEPDIR)/.dirstamp
 	-rm -f gnu/crypto/hash/.dirstamp
 	-rm -f gnu/crypto/jce/$(DEPDIR)/.dirstamp
@@ -1519,6 +1614,8 @@ distclean-compile:
 	-rm -f test/.dirstamp
 	-rm -f test/cipher/$(DEPDIR)/.dirstamp
 	-rm -f test/cipher/.dirstamp
+	-rm -f test/exp/$(DEPDIR)/.dirstamp
+	-rm -f test/exp/.dirstamp
 	-rm -f test/hash/$(DEPDIR)/.dirstamp
 	-rm -f test/hash/.dirstamp
 	-rm -f test/jce/$(DEPDIR)/.dirstamp
@@ -1550,6 +1647,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/cipher/$(DEPDIR)/Serpent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/cipher/$(DEPDIR)/Square.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/cipher/$(DEPDIR)/Twofish.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/exp/ust/$(DEPDIR)/UST.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/BaseHash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/HashFactory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/hash/$(DEPDIR)/IMessageDigest.Plo@am__quote@
@@ -1563,11 +1661,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/DSSRawSignatureSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/GnuCrypto.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/KeyPairGeneratorAdapter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MD5Spi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/MessageDigestAdapter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RipeMD128Spi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RipeMD160RandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/RipeMD160Spi.Plo@am__quote@
@@ -1575,6 +1676,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/Sha160RandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/Sha160Spi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/SignatureAdapter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/WhirlpoolRandomSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/jce/$(DEPDIR)/WhirlpoolSpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/BaseMac.Plo@am__quote@
@@ -1582,6 +1684,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/HMacFactory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/IMac.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/MacFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/TMMH16.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/UHash32.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mac/$(DEPDIR)/UMac32.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gnu/crypto/mode/$(DEPDIR)/BaseMode.Plo@am__quote@
@@ -1648,6 +1751,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@test/cipher/$(DEPDIR)/TestOfSerpent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/cipher/$(DEPDIR)/TestOfSquare.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/cipher/$(DEPDIR)/TestOfTwofish.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@test/exp/$(DEPDIR)/AllTests.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@test/exp/$(DEPDIR)/TestOfUST.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/hash/$(DEPDIR)/AllTests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/hash/$(DEPDIR)/TestOfHashFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/hash/$(DEPDIR)/TestOfMD4.Po@am__quote@
@@ -1664,6 +1769,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@test/mac/$(DEPDIR)/AllTests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/mac/$(DEPDIR)/TestOfHMacFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/mac/$(DEPDIR)/TestOfMacFactory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@test/mac/$(DEPDIR)/TestOfTMMH16.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/mode/$(DEPDIR)/AllTests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/mode/$(DEPDIR)/TestOfECB.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/mode/$(DEPDIR)/TestOfModeFactory.Po@am__quote@
@@ -1688,7 +1794,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@test/sig/rsa/$(DEPDIR)/TestOfRSAPSSSignature.Po@am__quote@
 
 distclean-depend:
-	-rm -rf gnu/crypto/$(DEPDIR) gnu/crypto/cipher/$(DEPDIR) gnu/crypto/hash/$(DEPDIR) gnu/crypto/jce/$(DEPDIR) gnu/crypto/mac/$(DEPDIR) gnu/crypto/mode/$(DEPDIR) gnu/crypto/pad/$(DEPDIR) gnu/crypto/prng/$(DEPDIR) gnu/crypto/sig/$(DEPDIR) gnu/crypto/sig/dss/$(DEPDIR) gnu/crypto/sig/rsa/$(DEPDIR) gnu/crypto/tool/$(DEPDIR) gnu/crypto/util/$(DEPDIR) test/$(DEPDIR) test/cipher/$(DEPDIR) test/hash/$(DEPDIR) test/jce/$(DEPDIR) test/mac/$(DEPDIR) test/mode/$(DEPDIR) test/pad/$(DEPDIR) test/prng/$(DEPDIR) test/sig/$(DEPDIR) test/sig/dss/$(DEPDIR) test/sig/rsa/$(DEPDIR)
+	-rm -rf gnu/crypto/$(DEPDIR) gnu/crypto/cipher/$(DEPDIR) gnu/crypto/exp/ust/$(DEPDIR) gnu/crypto/hash/$(DEPDIR) gnu/crypto/jce/$(DEPDIR) gnu/crypto/mac/$(DEPDIR) gnu/crypto/mode/$(DEPDIR) gnu/crypto/pad/$(DEPDIR) gnu/crypto/prng/$(DEPDIR) gnu/crypto/sig/$(DEPDIR) gnu/crypto/sig/dss/$(DEPDIR) gnu/crypto/sig/rsa/$(DEPDIR) gnu/crypto/tool/$(DEPDIR) gnu/crypto/util/$(DEPDIR) test/$(DEPDIR) test/cipher/$(DEPDIR) test/exp/$(DEPDIR) test/hash/$(DEPDIR) test/jce/$(DEPDIR) test/mac/$(DEPDIR) test/mode/$(DEPDIR) test/pad/$(DEPDIR) test/prng/$(DEPDIR) test/sig/$(DEPDIR) test/sig/dss/$(DEPDIR) test/sig/rsa/$(DEPDIR)
 
 .java.o:
 @AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
@@ -1924,6 +2030,24 @@ gnu/crypto/cipher/Twofish.lo: gnu/crypto/cipher/Twofish.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/cipher/Twofish.lo `test -f 'gnu/crypto/cipher/Twofish.java' || echo '$(srcdir)/'`gnu/crypto/cipher/Twofish.java
 
+gnu/crypto/exp/ust/UST.o: gnu/crypto/exp/ust/UST.java
+@AMDEP_TRUE@	source='gnu/crypto/exp/ust/UST.java' object='gnu/crypto/exp/ust/UST.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.Po' tmpdepfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/exp/ust/UST.o `test -f 'gnu/crypto/exp/ust/UST.java' || echo '$(srcdir)/'`gnu/crypto/exp/ust/UST.java
+
+gnu/crypto/exp/ust/UST.obj: gnu/crypto/exp/ust/UST.java
+@AMDEP_TRUE@	source='gnu/crypto/exp/ust/UST.java' object='gnu/crypto/exp/ust/UST.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.Po' tmpdepfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/exp/ust/UST.obj `cygpath -w gnu/crypto/exp/ust/UST.java`
+
+gnu/crypto/exp/ust/UST.lo: gnu/crypto/exp/ust/UST.java
+@AMDEP_TRUE@	source='gnu/crypto/exp/ust/UST.java' object='gnu/crypto/exp/ust/UST.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.Plo' tmpdepfile='gnu/crypto/exp/ust/$(DEPDIR)/UST.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/exp/ust/UST.lo `test -f 'gnu/crypto/exp/ust/UST.java' || echo '$(srcdir)/'`gnu/crypto/exp/ust/UST.java
+
 gnu/crypto/hash/BaseHash.o: gnu/crypto/hash/BaseHash.java
 @AMDEP_TRUE@	source='gnu/crypto/hash/BaseHash.java' object='gnu/crypto/hash/BaseHash.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='gnu/crypto/hash/$(DEPDIR)/BaseHash.Po' tmpdepfile='gnu/crypto/hash/$(DEPDIR)/BaseHash.TPo' @AMDEPBACKSLASH@
@@ -2158,6 +2282,24 @@ gnu/crypto/jce/KeyPairGeneratorAdapter.lo: gnu/crypto/jce/KeyPairGeneratorAdapte
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/KeyPairGeneratorAdapter.lo `test -f 'gnu/crypto/jce/KeyPairGeneratorAdapter.java' || echo '$(srcdir)/'`gnu/crypto/jce/KeyPairGeneratorAdapter.java
 
+gnu/crypto/jce/MD4RandomSpi.o: gnu/crypto/jce/MD4RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4RandomSpi.java' object='gnu/crypto/jce/MD4RandomSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4RandomSpi.o `test -f 'gnu/crypto/jce/MD4RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD4RandomSpi.java
+
+gnu/crypto/jce/MD4RandomSpi.obj: gnu/crypto/jce/MD4RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4RandomSpi.java' object='gnu/crypto/jce/MD4RandomSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4RandomSpi.obj `cygpath -w gnu/crypto/jce/MD4RandomSpi.java`
+
+gnu/crypto/jce/MD4RandomSpi.lo: gnu/crypto/jce/MD4RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD4RandomSpi.java' object='gnu/crypto/jce/MD4RandomSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4RandomSpi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4RandomSpi.lo `test -f 'gnu/crypto/jce/MD4RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD4RandomSpi.java
+
 gnu/crypto/jce/MD4Spi.o: gnu/crypto/jce/MD4Spi.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/MD4Spi.java' object='gnu/crypto/jce/MD4Spi.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.TPo' @AMDEPBACKSLASH@
@@ -2175,6 +2317,24 @@ gnu/crypto/jce/MD4Spi.lo: gnu/crypto/jce/MD4Spi.java
 @AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD4Spi.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD4Spi.lo `test -f 'gnu/crypto/jce/MD4Spi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD4Spi.java
+
+gnu/crypto/jce/MD5RandomSpi.o: gnu/crypto/jce/MD5RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD5RandomSpi.java' object='gnu/crypto/jce/MD5RandomSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD5RandomSpi.o `test -f 'gnu/crypto/jce/MD5RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD5RandomSpi.java
+
+gnu/crypto/jce/MD5RandomSpi.obj: gnu/crypto/jce/MD5RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD5RandomSpi.java' object='gnu/crypto/jce/MD5RandomSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD5RandomSpi.obj `cygpath -w gnu/crypto/jce/MD5RandomSpi.java`
+
+gnu/crypto/jce/MD5RandomSpi.lo: gnu/crypto/jce/MD5RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/MD5RandomSpi.java' object='gnu/crypto/jce/MD5RandomSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/MD5RandomSpi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MD5RandomSpi.lo `test -f 'gnu/crypto/jce/MD5RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/MD5RandomSpi.java
 
 gnu/crypto/jce/MD5Spi.o: gnu/crypto/jce/MD5Spi.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/MD5Spi.java' object='gnu/crypto/jce/MD5Spi.o' libtool=no @AMDEPBACKSLASH@
@@ -2212,41 +2372,23 @@ gnu/crypto/jce/MessageDigestAdapter.lo: gnu/crypto/jce/MessageDigestAdapter.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/MessageDigestAdapter.lo `test -f 'gnu/crypto/jce/MessageDigestAdapter.java' || echo '$(srcdir)/'`gnu/crypto/jce/MessageDigestAdapter.java
 
-gnu/crypto/jce/RSAKeyPairGeneratorSpi.o: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPo' @AMDEPBACKSLASH@
+gnu/crypto/jce/RipeMD128RandomSpi.o: gnu/crypto/jce/RipeMD128RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RipeMD128RandomSpi.java' object='gnu/crypto/jce/RipeMD128RandomSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.o `test -f 'gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RipeMD128RandomSpi.o `test -f 'gnu/crypto/jce/RipeMD128RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RipeMD128RandomSpi.java
 
-gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPo' @AMDEPBACKSLASH@
+gnu/crypto/jce/RipeMD128RandomSpi.obj: gnu/crypto/jce/RipeMD128RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RipeMD128RandomSpi.java' object='gnu/crypto/jce/RipeMD128RandomSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj `cygpath -w gnu/crypto/jce/RSAKeyPairGeneratorSpi.java`
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RipeMD128RandomSpi.obj `cygpath -w gnu/crypto/jce/RipeMD128RandomSpi.java`
 
-gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPlo' @AMDEPBACKSLASH@
+gnu/crypto/jce/RipeMD128RandomSpi.lo: gnu/crypto/jce/RipeMD128RandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RipeMD128RandomSpi.java' object='gnu/crypto/jce/RipeMD128RandomSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RipeMD128RandomSpi.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo `test -f 'gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
-
-gnu/crypto/jce/RSAPSSRawSignatureSpi.o: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.o `test -f 'gnu/crypto/jce/RSAPSSRawSignatureSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAPSSRawSignatureSpi.java
-
-gnu/crypto/jce/RSAPSSRawSignatureSpi.obj: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.obj `cygpath -w gnu/crypto/jce/RSAPSSRawSignatureSpi.java`
-
-gnu/crypto/jce/RSAPSSRawSignatureSpi.lo: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
-@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.lo `test -f 'gnu/crypto/jce/RSAPSSRawSignatureSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAPSSRawSignatureSpi.java
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RipeMD128RandomSpi.lo `test -f 'gnu/crypto/jce/RipeMD128RandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RipeMD128RandomSpi.java
 
 gnu/crypto/jce/RipeMD128Spi.o: gnu/crypto/jce/RipeMD128Spi.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/RipeMD128Spi.java' object='gnu/crypto/jce/RipeMD128Spi.o' libtool=no @AMDEPBACKSLASH@
@@ -2301,6 +2443,42 @@ gnu/crypto/jce/RipeMD160Spi.lo: gnu/crypto/jce/RipeMD160Spi.java
 @AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RipeMD160Spi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RipeMD160Spi.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RipeMD160Spi.lo `test -f 'gnu/crypto/jce/RipeMD160Spi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RipeMD160Spi.java
+
+gnu/crypto/jce/RSAKeyPairGeneratorSpi.o: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.o `test -f 'gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+
+gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.obj `cygpath -w gnu/crypto/jce/RSAKeyPairGeneratorSpi.java`
+
+gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo: gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' object='gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAKeyPairGeneratorSpi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAKeyPairGeneratorSpi.lo `test -f 'gnu/crypto/jce/RSAKeyPairGeneratorSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAKeyPairGeneratorSpi.java
+
+gnu/crypto/jce/RSAPSSRawSignatureSpi.o: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.o `test -f 'gnu/crypto/jce/RSAPSSRawSignatureSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAPSSRawSignatureSpi.java
+
+gnu/crypto/jce/RSAPSSRawSignatureSpi.obj: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.obj `cygpath -w gnu/crypto/jce/RSAPSSRawSignatureSpi.java`
+
+gnu/crypto/jce/RSAPSSRawSignatureSpi.lo: gnu/crypto/jce/RSAPSSRawSignatureSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/RSAPSSRawSignatureSpi.java' object='gnu/crypto/jce/RSAPSSRawSignatureSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/RSAPSSRawSignatureSpi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/RSAPSSRawSignatureSpi.lo `test -f 'gnu/crypto/jce/RSAPSSRawSignatureSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/RSAPSSRawSignatureSpi.java
 
 gnu/crypto/jce/SecureRandomAdapter.o: gnu/crypto/jce/SecureRandomAdapter.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/SecureRandomAdapter.java' object='gnu/crypto/jce/SecureRandomAdapter.o' libtool=no @AMDEPBACKSLASH@
@@ -2373,6 +2551,24 @@ gnu/crypto/jce/SignatureAdapter.lo: gnu/crypto/jce/SignatureAdapter.java
 @AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/SignatureAdapter.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/SignatureAdapter.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/SignatureAdapter.lo `test -f 'gnu/crypto/jce/SignatureAdapter.java' || echo '$(srcdir)/'`gnu/crypto/jce/SignatureAdapter.java
+
+gnu/crypto/jce/UMacRandomSpi.o: gnu/crypto/jce/UMacRandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/UMacRandomSpi.java' object='gnu/crypto/jce/UMacRandomSpi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/UMacRandomSpi.o `test -f 'gnu/crypto/jce/UMacRandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/UMacRandomSpi.java
+
+gnu/crypto/jce/UMacRandomSpi.obj: gnu/crypto/jce/UMacRandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/UMacRandomSpi.java' object='gnu/crypto/jce/UMacRandomSpi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.Po' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/UMacRandomSpi.obj `cygpath -w gnu/crypto/jce/UMacRandomSpi.java`
+
+gnu/crypto/jce/UMacRandomSpi.lo: gnu/crypto/jce/UMacRandomSpi.java
+@AMDEP_TRUE@	source='gnu/crypto/jce/UMacRandomSpi.java' object='gnu/crypto/jce/UMacRandomSpi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.Plo' tmpdepfile='gnu/crypto/jce/$(DEPDIR)/UMacRandomSpi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/jce/UMacRandomSpi.lo `test -f 'gnu/crypto/jce/UMacRandomSpi.java' || echo '$(srcdir)/'`gnu/crypto/jce/UMacRandomSpi.java
 
 gnu/crypto/jce/WhirlpoolRandomSpi.o: gnu/crypto/jce/WhirlpoolRandomSpi.java
 @AMDEP_TRUE@	source='gnu/crypto/jce/WhirlpoolRandomSpi.java' object='gnu/crypto/jce/WhirlpoolRandomSpi.o' libtool=no @AMDEPBACKSLASH@
@@ -2499,6 +2695,24 @@ gnu/crypto/mac/MacFactory.lo: gnu/crypto/mac/MacFactory.java
 @AMDEP_TRUE@	depfile='gnu/crypto/mac/$(DEPDIR)/MacFactory.Plo' tmpdepfile='gnu/crypto/mac/$(DEPDIR)/MacFactory.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/mac/MacFactory.lo `test -f 'gnu/crypto/mac/MacFactory.java' || echo '$(srcdir)/'`gnu/crypto/mac/MacFactory.java
+
+gnu/crypto/mac/TMMH16.o: gnu/crypto/mac/TMMH16.java
+@AMDEP_TRUE@	source='gnu/crypto/mac/TMMH16.java' object='gnu/crypto/mac/TMMH16.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.Po' tmpdepfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/mac/TMMH16.o `test -f 'gnu/crypto/mac/TMMH16.java' || echo '$(srcdir)/'`gnu/crypto/mac/TMMH16.java
+
+gnu/crypto/mac/TMMH16.obj: gnu/crypto/mac/TMMH16.java
+@AMDEP_TRUE@	source='gnu/crypto/mac/TMMH16.java' object='gnu/crypto/mac/TMMH16.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.Po' tmpdepfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/mac/TMMH16.obj `cygpath -w gnu/crypto/mac/TMMH16.java`
+
+gnu/crypto/mac/TMMH16.lo: gnu/crypto/mac/TMMH16.java
+@AMDEP_TRUE@	source='gnu/crypto/mac/TMMH16.java' object='gnu/crypto/mac/TMMH16.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.Plo' tmpdepfile='gnu/crypto/mac/$(DEPDIR)/TMMH16.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/mac/TMMH16.lo `test -f 'gnu/crypto/mac/TMMH16.java' || echo '$(srcdir)/'`gnu/crypto/mac/TMMH16.java
 
 gnu/crypto/mac/UHash32.o: gnu/crypto/mac/UHash32.java
 @AMDEP_TRUE@	source='gnu/crypto/mac/UHash32.java' object='gnu/crypto/mac/UHash32.o' libtool=no @AMDEPBACKSLASH@
@@ -2698,24 +2912,6 @@ gnu/crypto/pad/IPad.lo: gnu/crypto/pad/IPad.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/IPad.lo `test -f 'gnu/crypto/pad/IPad.java' || echo '$(srcdir)/'`gnu/crypto/pad/IPad.java
 
-gnu/crypto/pad/PKCS7.o: gnu/crypto/pad/PKCS7.java
-@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Po' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.o `test -f 'gnu/crypto/pad/PKCS7.java' || echo '$(srcdir)/'`gnu/crypto/pad/PKCS7.java
-
-gnu/crypto/pad/PKCS7.obj: gnu/crypto/pad/PKCS7.java
-@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Po' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.obj `cygpath -w gnu/crypto/pad/PKCS7.java`
-
-gnu/crypto/pad/PKCS7.lo: gnu/crypto/pad/PKCS7.java
-@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Plo' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.lo `test -f 'gnu/crypto/pad/PKCS7.java' || echo '$(srcdir)/'`gnu/crypto/pad/PKCS7.java
-
 gnu/crypto/pad/PadFactory.o: gnu/crypto/pad/PadFactory.java
 @AMDEP_TRUE@	source='gnu/crypto/pad/PadFactory.java' object='gnu/crypto/pad/PadFactory.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PadFactory.Po' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PadFactory.TPo' @AMDEPBACKSLASH@
@@ -2733,6 +2929,24 @@ gnu/crypto/pad/PadFactory.lo: gnu/crypto/pad/PadFactory.java
 @AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PadFactory.Plo' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PadFactory.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PadFactory.lo `test -f 'gnu/crypto/pad/PadFactory.java' || echo '$(srcdir)/'`gnu/crypto/pad/PadFactory.java
+
+gnu/crypto/pad/PKCS7.o: gnu/crypto/pad/PKCS7.java
+@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Po' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.o `test -f 'gnu/crypto/pad/PKCS7.java' || echo '$(srcdir)/'`gnu/crypto/pad/PKCS7.java
+
+gnu/crypto/pad/PKCS7.obj: gnu/crypto/pad/PKCS7.java
+@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Po' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.obj `cygpath -w gnu/crypto/pad/PKCS7.java`
+
+gnu/crypto/pad/PKCS7.lo: gnu/crypto/pad/PKCS7.java
+@AMDEP_TRUE@	source='gnu/crypto/pad/PKCS7.java' object='gnu/crypto/pad/PKCS7.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.Plo' tmpdepfile='gnu/crypto/pad/$(DEPDIR)/PKCS7.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/pad/PKCS7.lo `test -f 'gnu/crypto/pad/PKCS7.java' || echo '$(srcdir)/'`gnu/crypto/pad/PKCS7.java
 
 gnu/crypto/pad/TBC.o: gnu/crypto/pad/TBC.java
 @AMDEP_TRUE@	source='gnu/crypto/pad/TBC.java' object='gnu/crypto/pad/TBC.o' libtool=no @AMDEPBACKSLASH@
@@ -3310,24 +3524,6 @@ gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.lo: gnu/crypto/sig/rsa/RSAPSSSignatur
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.lo `test -f 'gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java' || echo '$(srcdir)/'`gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java
 
-gnu/crypto/util/PRNG.o: gnu/crypto/util/PRNG.java
-@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Po' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.o `test -f 'gnu/crypto/util/PRNG.java' || echo '$(srcdir)/'`gnu/crypto/util/PRNG.java
-
-gnu/crypto/util/PRNG.obj: gnu/crypto/util/PRNG.java
-@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Po' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.obj `cygpath -w gnu/crypto/util/PRNG.java`
-
-gnu/crypto/util/PRNG.lo: gnu/crypto/util/PRNG.java
-@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Plo' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.lo `test -f 'gnu/crypto/util/PRNG.java' || echo '$(srcdir)/'`gnu/crypto/util/PRNG.java
-
 gnu/crypto/util/Prime.o: gnu/crypto/util/Prime.java
 @AMDEP_TRUE@	source='gnu/crypto/util/Prime.java' object='gnu/crypto/util/Prime.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/Prime.Po' tmpdepfile='gnu/crypto/util/$(DEPDIR)/Prime.TPo' @AMDEPBACKSLASH@
@@ -3345,6 +3541,24 @@ gnu/crypto/util/Prime.lo: gnu/crypto/util/Prime.java
 @AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/Prime.Plo' tmpdepfile='gnu/crypto/util/$(DEPDIR)/Prime.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/Prime.lo `test -f 'gnu/crypto/util/Prime.java' || echo '$(srcdir)/'`gnu/crypto/util/Prime.java
+
+gnu/crypto/util/PRNG.o: gnu/crypto/util/PRNG.java
+@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Po' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.o `test -f 'gnu/crypto/util/PRNG.java' || echo '$(srcdir)/'`gnu/crypto/util/PRNG.java
+
+gnu/crypto/util/PRNG.obj: gnu/crypto/util/PRNG.java
+@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Po' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.obj `cygpath -w gnu/crypto/util/PRNG.java`
+
+gnu/crypto/util/PRNG.lo: gnu/crypto/util/PRNG.java
+@AMDEP_TRUE@	source='gnu/crypto/util/PRNG.java' object='gnu/crypto/util/PRNG.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='gnu/crypto/util/$(DEPDIR)/PRNG.Plo' tmpdepfile='gnu/crypto/util/$(DEPDIR)/PRNG.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o gnu/crypto/util/PRNG.lo `test -f 'gnu/crypto/util/PRNG.java' || echo '$(srcdir)/'`gnu/crypto/util/PRNG.java
 
 gnu/crypto/util/Util.o: gnu/crypto/util/Util.java
 @AMDEP_TRUE@	source='gnu/crypto/util/Util.java' object='gnu/crypto/util/Util.o' libtool=no @AMDEPBACKSLASH@
@@ -3615,6 +3829,42 @@ test/cipher/TestOfTwofish.lo: test/cipher/TestOfTwofish.java
 @AMDEP_TRUE@	depfile='test/cipher/$(DEPDIR)/TestOfTwofish.Plo' tmpdepfile='test/cipher/$(DEPDIR)/TestOfTwofish.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/cipher/TestOfTwofish.lo `test -f 'test/cipher/TestOfTwofish.java' || echo '$(srcdir)/'`test/cipher/TestOfTwofish.java
+
+test/exp/AllTests.o: test/exp/AllTests.java
+@AMDEP_TRUE@	source='test/exp/AllTests.java' object='test/exp/AllTests.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/AllTests.Po' tmpdepfile='test/exp/$(DEPDIR)/AllTests.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/AllTests.o `test -f 'test/exp/AllTests.java' || echo '$(srcdir)/'`test/exp/AllTests.java
+
+test/exp/AllTests.obj: test/exp/AllTests.java
+@AMDEP_TRUE@	source='test/exp/AllTests.java' object='test/exp/AllTests.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/AllTests.Po' tmpdepfile='test/exp/$(DEPDIR)/AllTests.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/AllTests.obj `cygpath -w test/exp/AllTests.java`
+
+test/exp/AllTests.lo: test/exp/AllTests.java
+@AMDEP_TRUE@	source='test/exp/AllTests.java' object='test/exp/AllTests.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/AllTests.Plo' tmpdepfile='test/exp/$(DEPDIR)/AllTests.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/AllTests.lo `test -f 'test/exp/AllTests.java' || echo '$(srcdir)/'`test/exp/AllTests.java
+
+test/exp/TestOfUST.o: test/exp/TestOfUST.java
+@AMDEP_TRUE@	source='test/exp/TestOfUST.java' object='test/exp/TestOfUST.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/TestOfUST.Po' tmpdepfile='test/exp/$(DEPDIR)/TestOfUST.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/TestOfUST.o `test -f 'test/exp/TestOfUST.java' || echo '$(srcdir)/'`test/exp/TestOfUST.java
+
+test/exp/TestOfUST.obj: test/exp/TestOfUST.java
+@AMDEP_TRUE@	source='test/exp/TestOfUST.java' object='test/exp/TestOfUST.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/TestOfUST.Po' tmpdepfile='test/exp/$(DEPDIR)/TestOfUST.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/TestOfUST.obj `cygpath -w test/exp/TestOfUST.java`
+
+test/exp/TestOfUST.lo: test/exp/TestOfUST.java
+@AMDEP_TRUE@	source='test/exp/TestOfUST.java' object='test/exp/TestOfUST.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/exp/$(DEPDIR)/TestOfUST.Plo' tmpdepfile='test/exp/$(DEPDIR)/TestOfUST.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/exp/TestOfUST.lo `test -f 'test/exp/TestOfUST.java' || echo '$(srcdir)/'`test/exp/TestOfUST.java
 
 test/hash/AllTests.o: test/hash/AllTests.java
 @AMDEP_TRUE@	source='test/hash/AllTests.java' object='test/hash/AllTests.o' libtool=no @AMDEPBACKSLASH@
@@ -3904,6 +4154,24 @@ test/mac/TestOfMacFactory.lo: test/mac/TestOfMacFactory.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/mac/TestOfMacFactory.lo `test -f 'test/mac/TestOfMacFactory.java' || echo '$(srcdir)/'`test/mac/TestOfMacFactory.java
 
+test/mac/TestOfTMMH16.o: test/mac/TestOfTMMH16.java
+@AMDEP_TRUE@	source='test/mac/TestOfTMMH16.java' object='test/mac/TestOfTMMH16.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/mac/$(DEPDIR)/TestOfTMMH16.Po' tmpdepfile='test/mac/$(DEPDIR)/TestOfTMMH16.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/mac/TestOfTMMH16.o `test -f 'test/mac/TestOfTMMH16.java' || echo '$(srcdir)/'`test/mac/TestOfTMMH16.java
+
+test/mac/TestOfTMMH16.obj: test/mac/TestOfTMMH16.java
+@AMDEP_TRUE@	source='test/mac/TestOfTMMH16.java' object='test/mac/TestOfTMMH16.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/mac/$(DEPDIR)/TestOfTMMH16.Po' tmpdepfile='test/mac/$(DEPDIR)/TestOfTMMH16.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/mac/TestOfTMMH16.obj `cygpath -w test/mac/TestOfTMMH16.java`
+
+test/mac/TestOfTMMH16.lo: test/mac/TestOfTMMH16.java
+@AMDEP_TRUE@	source='test/mac/TestOfTMMH16.java' object='test/mac/TestOfTMMH16.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/mac/$(DEPDIR)/TestOfTMMH16.Plo' tmpdepfile='test/mac/$(DEPDIR)/TestOfTMMH16.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/mac/TestOfTMMH16.lo `test -f 'test/mac/TestOfTMMH16.java' || echo '$(srcdir)/'`test/mac/TestOfTMMH16.java
+
 test/mode/AllTests.o: test/mode/AllTests.java
 @AMDEP_TRUE@	source='test/mode/AllTests.java' object='test/mode/AllTests.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='test/mode/$(DEPDIR)/AllTests.Po' tmpdepfile='test/mode/$(DEPDIR)/AllTests.TPo' @AMDEPBACKSLASH@
@@ -3994,24 +4262,6 @@ test/pad/AllTests.lo: test/pad/AllTests.java
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/AllTests.lo `test -f 'test/pad/AllTests.java' || echo '$(srcdir)/'`test/pad/AllTests.java
 
-test/pad/TestOfPKCS7.o: test/pad/TestOfPKCS7.java
-@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Po' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.o `test -f 'test/pad/TestOfPKCS7.java' || echo '$(srcdir)/'`test/pad/TestOfPKCS7.java
-
-test/pad/TestOfPKCS7.obj: test/pad/TestOfPKCS7.java
-@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Po' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.obj `cygpath -w test/pad/TestOfPKCS7.java`
-
-test/pad/TestOfPKCS7.lo: test/pad/TestOfPKCS7.java
-@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Plo' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.lo `test -f 'test/pad/TestOfPKCS7.java' || echo '$(srcdir)/'`test/pad/TestOfPKCS7.java
-
 test/pad/TestOfPadFactory.o: test/pad/TestOfPadFactory.java
 @AMDEP_TRUE@	source='test/pad/TestOfPadFactory.java' object='test/pad/TestOfPadFactory.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPadFactory.Po' tmpdepfile='test/pad/$(DEPDIR)/TestOfPadFactory.TPo' @AMDEPBACKSLASH@
@@ -4029,6 +4279,24 @@ test/pad/TestOfPadFactory.lo: test/pad/TestOfPadFactory.java
 @AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPadFactory.Plo' tmpdepfile='test/pad/$(DEPDIR)/TestOfPadFactory.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPadFactory.lo `test -f 'test/pad/TestOfPadFactory.java' || echo '$(srcdir)/'`test/pad/TestOfPadFactory.java
+
+test/pad/TestOfPKCS7.o: test/pad/TestOfPKCS7.java
+@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Po' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.o `test -f 'test/pad/TestOfPKCS7.java' || echo '$(srcdir)/'`test/pad/TestOfPKCS7.java
+
+test/pad/TestOfPKCS7.obj: test/pad/TestOfPKCS7.java
+@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Po' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.obj `cygpath -w test/pad/TestOfPKCS7.java`
+
+test/pad/TestOfPKCS7.lo: test/pad/TestOfPKCS7.java
+@AMDEP_TRUE@	source='test/pad/TestOfPKCS7.java' object='test/pad/TestOfPKCS7.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='test/pad/$(DEPDIR)/TestOfPKCS7.Plo' tmpdepfile='test/pad/$(DEPDIR)/TestOfPKCS7.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o test/pad/TestOfPKCS7.lo `test -f 'test/pad/TestOfPKCS7.java' || echo '$(srcdir)/'`test/pad/TestOfPKCS7.java
 
 test/pad/TestOfTBC.o: test/pad/TestOfTBC.java
 @AMDEP_TRUE@	source='test/pad/TestOfTBC.java' object='test/pad/TestOfTBC.o' libtool=no @AMDEPBACKSLASH@
@@ -4379,6 +4647,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf gnu/crypto/.libs gnu/crypto/_libs
 	-rm -rf gnu/crypto/cipher/.libs gnu/crypto/cipher/_libs
+	-rm -rf gnu/crypto/exp/ust/.libs gnu/crypto/exp/ust/_libs
 	-rm -rf gnu/crypto/hash/.libs gnu/crypto/hash/_libs
 	-rm -rf gnu/crypto/jce/.libs gnu/crypto/jce/_libs
 	-rm -rf gnu/crypto/mac/.libs gnu/crypto/mac/_libs
@@ -4566,10 +4835,6 @@ uninstall-am: uninstall-dataDATA uninstall-info-am \
 
 $(crypto_jar): $(crypto_classes)
 	jar cf $@ $(crypto_classes)
-
-#clean-local:
-#	find . -name '*.class' -print | xargs rm -f
-#	find . -name '*.txt' -print | xargs rm -f
 
 # Remove internal automake dependencies.
 #

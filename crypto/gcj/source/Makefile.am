@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.6 2002-07-27 02:10:51 raif Exp $
+## $Id: Makefile.am,v 1.7 2002-07-28 06:00:49 olf Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -318,10 +318,6 @@ $(crypto_jar): $(crypto_classes)
 	jar cf $@ $(crypto_classes)
 
 MOSTLYCLEANFILES = $(crypto_jar) $(crypto_classes) $(junit_test_classes)
-
-#clean-local:
-#	find . -name '*.class' -print | xargs rm -f
-#	find . -name '*.txt' -print | xargs rm -f
 
 ## ############################################################################
 # Remove internal automake dependencies.
