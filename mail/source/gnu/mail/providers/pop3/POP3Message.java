@@ -1,13 +1,13 @@
 /*
  * POP3Message.java
- * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999, 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -65,10 +65,10 @@ extends ReadOnlyMessage
    * @param msgnum the message number
    * @param size the size of the entire message
    */
-  POP3Message (POP3Folder folder, int msgnum, int size) 
+  POP3Message(POP3Folder folder, int msgnum, int size) 
     throws MessagingException 
   {
-    super (folder, msgnum);
+    super(folder, msgnum);
     this.size = size;
   }
 
@@ -78,30 +78,30 @@ extends ReadOnlyMessage
    * Retrieves the content of the message.
    * This uses the POP3Store to do the retrieval.
    */
-  void fetchContent () 
+  void fetchContent() 
     throws MessagingException 
   {
     if (content != null)
       {
         return;
       }
-    POP3Connection connection = ((POP3Store) folder.getStore ()).connection;
+    POP3Connection connection = ((POP3Store) folder.getStore()).connection;
     synchronized (connection)
       {
         try
           {
-            InputStream retr = connection.retr (msgnum);
-            parse (retr);
+            InputStream retr = connection.retr(msgnum);
+            parse(retr);
             // Read to end of stream
-            int c = retr.read ();
+            int c = retr.read();
             while (c != -1)
               {
-                c = retr.read ();
+                c = retr.read();
               }
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -109,34 +109,34 @@ extends ReadOnlyMessage
   /** 
    * Causes the content to be read in.
    */
-  public DataHandler getDataHandler () 
+  public DataHandler getDataHandler() 
     throws MessagingException
   {
     if (content == null)
       {
-        fetchContent ();
+        fetchContent();
       }
-    return super.getDataHandler ();
+    return super.getDataHandler();
   }
 
   /** 
    * Causes the content to be read in.
    */
-  protected InputStream getContentStream () 
+  protected InputStream getContentStream() 
     throws MessagingException 
   {
     if (content == null)
       {
-        fetchContent ();
+        fetchContent();
       }
-    return super.getContentStream ();
+    return super.getContentStream();
   }
 
   /** 
    * Gets the size of the message.
    * Uses the cached size if it's available to us.
    */
-  public int getSize () 
+  public int getSize() 
     throws MessagingException 
   {
     if (size > -1)
@@ -145,9 +145,9 @@ extends ReadOnlyMessage
       }
     if (content == null)
       {
-        fetchContent ();
+        fetchContent();
       }
-    return super.getSize ();
+    return super.getSize();
   }
 
   // -- Headers --
@@ -155,30 +155,30 @@ extends ReadOnlyMessage
   /** 
    * Causes the headers to be read.
    */
-  void fetchHeaders () 
+  void fetchHeaders() 
     throws MessagingException 
   {
     if (headers != null)
       {
         return;
       }
-    POP3Connection connection = ((POP3Store) folder.getStore ()).connection;
+    POP3Connection connection = ((POP3Store) folder.getStore()).connection;
     synchronized (connection)
       {
         try
           {
-            InputStream top = connection.top (msgnum);
-            headers = createInternetHeaders (top);
+            InputStream top = connection.top(msgnum);
+            headers = createInternetHeaders(top);
             // Read to end of stream
-            int c = top.read ();
+            int c = top.read();
             while (c != -1)
               {
-                c = top.read ();
+                c = top.read();
               }
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -186,135 +186,135 @@ extends ReadOnlyMessage
   /**
    * Causes the headers to be read.
    */
-  public String[] getHeader (String name) 
+  public String[] getHeader(String name) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getHeader (name);
+    return super.getHeader(name);
   }
   
   /**
    * Causes the headers to be read.
    */
-  public String getHeader (String name, String delimiter) 
+  public String getHeader(String name, String delimiter) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getHeader (name, delimiter);
+    return super.getHeader(name, delimiter);
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getAllHeaders () 
+  public Enumeration getAllHeaders() 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getAllHeaders ();
+    return super.getAllHeaders();
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getAllHeaderLines () 
+  public Enumeration getAllHeaderLines() 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getAllHeaderLines ();
+    return super.getAllHeaderLines();
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getMatchingHeaders (String[] names) 
+  public Enumeration getMatchingHeaders(String[] names) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getMatchingHeaders (names);
+    return super.getMatchingHeaders(names);
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getMatchingHeaderLines (String[] names) 
+  public Enumeration getMatchingHeaderLines(String[] names) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getMatchingHeaderLines (names);
+    return super.getMatchingHeaderLines(names);
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getNonMatchingHeaders (String[] names) 
+  public Enumeration getNonMatchingHeaders(String[] names) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getNonMatchingHeaders (names);
+    return super.getNonMatchingHeaders(names);
   }
 
   /** 
    * Causes the headers to be read.
    */
-  public Enumeration getNonMatchingHeaderLines (String[] names) 
+  public Enumeration getNonMatchingHeaderLines(String[] names) 
     throws MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
-    return super.getNonMatchingHeaderLines (names);
+    return super.getNonMatchingHeaderLines(names);
   }
 
   // -- Utility --
 
-  public void writeTo (OutputStream msgStream) 
+  public void writeTo(OutputStream msgStream) 
     throws IOException, MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
     if (content == null)
       {
         fetchContent();
       }
-    super.writeTo (msgStream);
+    super.writeTo(msgStream);
   }
 
-  public void writeTo (OutputStream msgStream, String[] ignoreList) 
+  public void writeTo(OutputStream msgStream, String[] ignoreList) 
     throws IOException, MessagingException 
   {
     if (headers == null)
       {
-        fetchHeaders ();
+        fetchHeaders();
       }
     if (content == null)
       {
-        fetchContent ();
+        fetchContent();
       }
-    super.writeTo (msgStream, ignoreList);
+    super.writeTo(msgStream, ignoreList);
   }
 
   // -- UIDL --
@@ -322,23 +322,23 @@ extends ReadOnlyMessage
   /** 
    * Causes the UID to be fetched.
    */
-  void fetchUid () 
+  void fetchUid() 
     throws MessagingException 
   {
     if (headers != null)
       {
         return;
       }
-    POP3Connection connection = ((POP3Store) folder.getStore ()).connection;
+    POP3Connection connection = ((POP3Store) folder.getStore()).connection;
     synchronized (connection)
       {
         try
           {
-            uid = connection.uidl (msgnum);
+            uid = connection.uidl(msgnum);
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -346,12 +346,12 @@ extends ReadOnlyMessage
   /**
    * Returns the unique ID for this message.
    */
-  public String getUID ()
+  public String getUID()
     throws MessagingException
   {
     if (uid == null)
       {
-        fetchUid ();
+        fetchUid();
       }
     return uid;
   }

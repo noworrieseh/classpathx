@@ -1,13 +1,13 @@
 /*
   GNU-Classpath Extensions: GNU Javamail - SMTP Service Provider
-  Copyright (C) 2001 Benjamin A. Speakmon
+  Copyright(C) 2001 Benjamin A. Speakmon
 
   For more information on the classpathx please mail: classpathx-discuss@gnu.org
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
   as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
+  of the License, or(at your option) any later version.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -76,17 +76,17 @@ public class SMTPTransport
    * @param session a <code>Session</code> value
    * @param urlName an <code>URLName</code> value
    */
-  public SMTPTransport (Session session, URLName urlName) 
+  public SMTPTransport(Session session, URLName urlName) 
   {
-    super (session, urlName);
+    super(session, urlName);
    
     // Check for mail.smtp.localhost property
-    localHostName = getProperty ("localhost");
+    localHostName = getProperty("localhost");
     if (localHostName == null)
       {
         try
           {
-            localHostName = InetAddress.getLocalHost ().getHostName ();
+            localHostName = InetAddress.getLocalHost().getHostName();
           }
         catch (UnknownHostException e)
           {
@@ -98,7 +98,7 @@ public class SMTPTransport
   /**
    * Connects to the SMTP server.
    */
-  protected boolean protocolConnect (String host, int port, String username,
+  protected boolean protocolConnect(String host, int port, String username,
                                      String password)
     throws MessagingException 
   {
@@ -108,117 +108,117 @@ public class SMTPTransport
       }
     if (host == null)
       {
-        host = getProperty ("host");
+        host = getProperty("host");
       }
     if (port < 0)
       {
-        port = getIntProperty ("port");
+        port = getIntProperty("port");
       }
     if (username == null)
       {
-        username = getProperty ("user");
+        username = getProperty("user");
       }
     
     // Check host
     if (host == null)
       {
-        throw new MessagingException ("No SMTP host set (mail.smtp.host)");
+        throw new MessagingException("No SMTP host set(mail.smtp.host)");
       }
     
     try
       {	
-        int connectionTimeout = getIntProperty ("connectiontimeout");
-        int timeout = getIntProperty ("timeout");
-        connection = new SMTPConnection (host, port,
+        int connectionTimeout = getIntProperty("connectiontimeout");
+        int timeout = getIntProperty("timeout");
+        connection = new SMTPConnection(host, port,
                                          connectionTimeout, timeout,
-                                         session.getDebug ());
+                                         session.getDebug());
     
         // EHLO/HELO
-        if (propertyIsFalse ("ehlo"))
+        if (propertyIsFalse("ehlo"))
           {
-            if (!connection.helo (localHostName))
-              throw new MessagingException ("HELO failed: "+
-                                            connection.getLastResponse ());
+            if (!connection.helo(localHostName))
+              throw new MessagingException("HELO failed: "+
+                                            connection.getLastResponse());
           }
         else
           {
-            extensions = connection.ehlo (localHostName);
+            extensions = connection.ehlo(localHostName);
             if (extensions == null)
               {
-                if (!connection.helo (localHostName))
+                if (!connection.helo(localHostName))
                   {
                     throw new MessagingException("HELO failed: "+
-                                                 connection.getLastResponse ());
+                                                 connection.getLastResponse());
                   }
               }
             else
               {
                 boolean tls = false;
-                if (extensions.contains ("STARTTLS"))
+                if (extensions.contains("STARTTLS"))
                   {
-                    if (!propertyIsFalse ("tls"))
+                    if (!propertyIsFalse("tls"))
                       {
                         // Locate custom trust manager
-                        String tmt = getProperty ("trustmanager");
+                        String tmt = getProperty("trustmanager");
                         if (tmt == null)
                           {
-                            tls = connection.starttls ();
+                            tls = connection.starttls();
                           }
                         else
                           {
                             try
                               {
-                                Class t = Class.forName (tmt);
-                                TrustManager tm = (TrustManager) t.newInstance ();
-                                tls = connection.starttls (tm);
+                                Class t = Class.forName(tmt);
+                                TrustManager tm = (TrustManager) t.newInstance();
+                                tls = connection.starttls(tm);
                               }
                             catch (Exception e)
                               {
-                                throw new MessagingException (e.getMessage (), e);
+                                throw new MessagingException(e.getMessage(), e);
                               }
                           }
                         if (tls)
                           {
-                            extensions = connection.ehlo (localHostName);
+                            extensions = connection.ehlo(localHostName);
                           }
                       }
                   }
-                if (!tls && "required".equals (getProperty ("tls")))
+                if (!tls && "required".equals(getProperty("tls")))
                   {
-                    throw new MessagingException ("TLS not available");
+                    throw new MessagingException("TLS not available");
                   }
                 // Populate authenticationMechanisms
-                for (Iterator i = extensions.iterator (); i.hasNext (); )
+                for (Iterator i = extensions.iterator(); i.hasNext(); )
                   {
-                    String extension = (String) i.next ();
-                    if (extension.startsWith ("AUTH "))
+                    String extension = (String) i.next();
+                    if (extension.startsWith("AUTH "))
                       {
-                        String m = extension.substring (5);
+                        String m = extension.substring(5);
                         authenticationMechanisms =
-                          Collections.list (new StringTokenizer (m));
+                          Collections.list(new StringTokenizer(m));
                       }
                   }
               }
           }
         
         // User authentication
-        String auth = getProperty ("auth");
-        boolean authRequired = "required".equals (auth);
+        String auth = getProperty("auth");
+        boolean authRequired = "required".equals(auth);
         if (authenticationMechanisms == null ||
-            authenticationMechanisms.isEmpty ())
+            authenticationMechanisms.isEmpty())
           {
             return !authRequired;
           }
-        if (authRequired || propertyIsTrue ("auth"))
+        if (authRequired || propertyIsTrue("auth"))
           {
             if (username == null || password == null)
               {
                 PasswordAuthentication pa =
-                  session.getPasswordAuthentication (url);
+                  session.getPasswordAuthentication(url);
                 if (pa == null)
                   {
-                    InetAddress addr = InetAddress.getByName (host);
-                    pa = session.requestPasswordAuthentication (addr,
+                    InetAddress addr = InetAddress.getByName(host);
+                    pa = session.requestPasswordAuthentication(addr,
                                                                 port,
                                                                 "smtp",
                                                                 null,
@@ -226,31 +226,31 @@ public class SMTPTransport
                   }
                 if (pa != null)
                   {
-                    username = pa.getUserName ();
-                    password = pa.getPassword ();
+                    username = pa.getUserName();
+                    password = pa.getPassword();
                   }
               }
             if (username != null && password != null)
               {
                 // Discover user ordering preferences for auth mechanisms
-                String authPrefs = getProperty ("auth.mechanisms");
+                String authPrefs = getProperty("auth.mechanisms");
                 Iterator i = null;
                 if (authPrefs == null)
                   {
-                    i = authenticationMechanisms.iterator ();
+                    i = authenticationMechanisms.iterator();
                   }
                 else
                   {
                     List authPrefList =
-                      Collections.list (new StringTokenizer (authPrefs, ","));
-                    i = authPrefList.iterator ();
+                      Collections.list(new StringTokenizer(authPrefs, ","));
+                    i = authPrefList.iterator();
                   }
                 // Try each mechanism in the list in turn
-                while (i.hasNext ())
+                while (i.hasNext())
                   {
-                    String mechanism = (String) i.next ();
-                    if (authenticationMechanisms.contains (mechanism) &&
-                        connection.authenticate (mechanism, username,
+                    String mechanism = (String) i.next();
+                    if (authenticationMechanisms.contains(mechanism) &&
+                        connection.authenticate(mechanism, username,
                                                  password))
                       {
                         return true;
@@ -259,9 +259,9 @@ public class SMTPTransport
               }
             else
               {
-                if (session.getDebug ())
+                if (session.getDebug())
                   {
-                    System.err.println ("smtp: WARNING: server requested " +
+                    System.err.println("smtp: WARNING: server requested " +
                                         "AUTH, but authentication principal " +
                                         "and credentials are not available");
                   }
@@ -270,9 +270,9 @@ public class SMTPTransport
           }
         else
           {
-            if (session.getDebug ())
+            if (session.getDebug())
               {
-                System.err.println ("smtp: WARNING: server requested " +
+                System.err.println("smtp: WARNING: server requested " +
                                     "AUTH, but authentication is not " +
                                     "enabled");
               }
@@ -281,61 +281,61 @@ public class SMTPTransport
       }
     catch (IOException e)
       {
-        throw new MessagingException (e.getMessage (), e);
+        throw new MessagingException(e.getMessage(), e);
       }
   }
 
   /**
    * Returns the greeting banner.
    */
-  public String getGreeting ()
+  public String getGreeting()
     throws MessagingException
   {
-    if (!isConnected ())
+    if (!isConnected())
       {
-        throw new MessagingException ("not connected");
+        throw new MessagingException("not connected");
       }
     synchronized (connection)
       {
-        return connection.getGreeting ();
+        return connection.getGreeting();
       }
   }
 
   /**
    * Send the specified message to the server.
    */
-  public void sendMessage (Message message, Address[] addresses)
+  public void sendMessage(Message message, Address[] addresses)
     throws MessagingException, SendFailedException 
   {
     if (!(message instanceof MimeMessage))
       {
-        throw new SendFailedException ("only MimeMessages are supported");
+        throw new SendFailedException("only MimeMessages are supported");
       }
     // Cast message
     MimeMessage mimeMessage = (MimeMessage) message;
       
     int len = addresses.length;
-    List sent = new ArrayList (len);
-    List unsent = new ArrayList (len);
-    List invalid = new ArrayList (len);
+    List sent = new ArrayList(len);
+    List unsent = new ArrayList(len);
+    List invalid = new ArrayList(len);
     int deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
     ParameterList params = null; // ESMTP parameters
     
     synchronized (connection)
       {
-        if (!isConnected ())
+        if (!isConnected())
           {
-            throw new MessagingException ("not connected");
+            throw new MessagingException("not connected");
           }
         
         try
           {
             // reverse-path
-            String from0 = getProperty ("from");
+            String from0 = getProperty("from");
             InternetAddress from = null;
             if (from0 != null)
               {
-                InternetAddress[] from1 = InternetAddress.parse (from0);
+                InternetAddress[] from1 = InternetAddress.parse(from0);
                 if (from1 != null && from1.length > 0)
                   {
                     from = from1[0];
@@ -343,7 +343,7 @@ public class SMTPTransport
               }
             if (from == null)
               {
-                Address[] from2 = mimeMessage.getFrom ();
+                Address[] from2 = mimeMessage.getFrom();
                 if (from2 != null && from2.length > 0 &&
                     from2[0] instanceof InternetAddress)
                   {
@@ -352,90 +352,90 @@ public class SMTPTransport
               }
             if (from == null)
               {
-                from = InternetAddress.getLocalAddress (session);
+                from = InternetAddress.getLocalAddress(session);
               }
-            String reversePath = from.getAddress ();
+            String reversePath = from.getAddress();
             // DSN RET
-            String dsnRet = getProperty ("dsn.ret");
+            String dsnRet = getProperty("dsn.ret");
             if (dsnRet != null && extensions != null &&
-                extensions.contains ("DSN"))
+                extensions.contains("DSN"))
               {
                 String FULL = "FULL", HDRS = "HDRS";
                 String value = null;
-                if (FULL.equalsIgnoreCase (dsnRet))
+                if (FULL.equalsIgnoreCase(dsnRet))
                   {
                     value = FULL;
                   }
-                else if (HDRS.equalsIgnoreCase (dsnRet))
+                else if (HDRS.equalsIgnoreCase(dsnRet))
                   {
                     value = HDRS;
                   }
                 if (value != null)
                   {
-                    params = new ParameterList ();
-                    params.add (new Parameter ("RET", value));
+                    params = new ParameterList();
+                    params.add(new Parameter("RET", value));
                   }
               }
             // MAIL FROM
-            if (!connection.mailFrom (reversePath, params))
+            if (!connection.mailFrom(reversePath, params))
               {
-                throw new SendFailedException (connection.getLastResponse ());
+                throw new SendFailedException(connection.getLastResponse());
               }
             params = null;
             
             // DSN NOTIFY
-            String dsnNotify = getProperty ("dsn.notify");
+            String dsnNotify = getProperty("dsn.notify");
             if (dsnNotify != null && extensions != null &&
-                extensions.contains ("DSN"))
+                extensions.contains("DSN"))
               {
                 String NEVER = "NEVER", SUCCESS = "SUCCESS";
                 String FAILURE = "FAILURE", DELAY = "DELAY";
                 String value = null;
-                if (NEVER.equalsIgnoreCase (dsnNotify))
+                if (NEVER.equalsIgnoreCase(dsnNotify))
                   {
                     value = NEVER;
                   }
                 else
                   {
-                    StringBuffer buf = new StringBuffer ();
-                    StringTokenizer st = new StringTokenizer (dsnNotify, " ,");
-                    while (st.hasMoreTokens ())
+                    StringBuffer buf = new StringBuffer();
+                    StringTokenizer st = new StringTokenizer(dsnNotify, " ,");
+                    while (st.hasMoreTokens())
                       {
-                        String token = st.nextToken ();
-                        if (SUCCESS.equalsIgnoreCase (token))
+                        String token = st.nextToken();
+                        if (SUCCESS.equalsIgnoreCase(token))
                           {
-                            if (buf.length () > 0)
+                            if (buf.length() > 0)
                               {
-                                buf.append (',');
+                                buf.append(',');
                               }
-                            buf.append (SUCCESS);
+                            buf.append(SUCCESS);
                           }
-                        else if (FAILURE.equalsIgnoreCase (token))
+                        else if (FAILURE.equalsIgnoreCase(token))
                           {
-                            if (buf.length () > 0)
+                            if (buf.length() > 0)
                               {
-                                buf.append (',');
+                                buf.append(',');
                               }
-                            buf.append (FAILURE);
+                            buf.append(FAILURE);
                           }
-                        else if (DELAY.equalsIgnoreCase (token))
+                        else if (DELAY.equalsIgnoreCase(token))
                           {
-                            if (buf.length () > 0)
+                            if (buf.length() > 0)
                               {
-                                buf.append (',');
+                                buf.append(',');
                               }
-                            buf.append (DELAY);
+                            buf.append(DELAY);
                           }
                       }
-                    if (buf.length () > 0)
+                    if (buf.length() > 0)
                       {
-                        value = buf.toString ();
+                        value = buf.toString();
                       }
                   }
                 if (value != null)
                   {
-                    params = new ParameterList ();
-                    params.add (new Parameter ("NOTIFY", value));
+                    params = new ParameterList();
+                    params.add(new Parameter("NOTIFY", value));
                   }
               }
             // RCPT TO
@@ -445,19 +445,19 @@ public class SMTPTransport
                 if (address instanceof InternetAddress)
                   {
                     String forwardPath =
-                      ((InternetAddress) address).getAddress ();
-                    if (connection.rcptTo (forwardPath, params))
+                     ((InternetAddress) address).getAddress();
+                    if (connection.rcptTo(forwardPath, params))
                       {
-                        sent.add (address);
+                        sent.add(address);
                       }
                     else
                       {
-                        invalid.add (address);
+                        invalid.add(address);
                       }
                   }
                 else
                   {
-                    invalid.add (address);
+                    invalid.add(address);
                   }
               }
           }
@@ -466,37 +466,37 @@ public class SMTPTransport
             try
               {
                 // Reset connection
-                connection.rset ();
+                connection.rset();
               }
             catch (IOException e2)
               {
                 // Possible transport-level problem
               }
-            throw new SendFailedException (e.getMessage ());
+            throw new SendFailedException(e.getMessage());
           }
         
-        if (sent.size () > 0)
+        if (sent.size() > 0)
           {
             try
               {  
                 // DATA
-                OutputStream dataStream = connection.data ();
+                OutputStream dataStream = connection.data();
                 if (dataStream == null)
                   {
-                    String msg = connection.getLastResponse ();
-                    throw new MessagingException (msg);
+                    String msg = connection.getLastResponse();
+                    throw new MessagingException(msg);
                   }
-                mimeMessage.writeTo (dataStream);
-                dataStream.flush ();
-                if (!connection.finishData ())
+                mimeMessage.writeTo(dataStream);
+                dataStream.flush();
+                if (!connection.finishData())
                   {
-                    unsent.addAll (sent);
-                    sent.clear ();
+                    unsent.addAll(sent);
+                    sent.clear();
                     deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
                   }
                 else 
                   {
-                    deliveryStatus = invalid.isEmpty () ?
+                    deliveryStatus = invalid.isEmpty() ?
                       TransportEvent.MESSAGE_DELIVERED :
                       TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
                   }
@@ -506,49 +506,49 @@ public class SMTPTransport
                 try
                   {
                     // Attempt to ensure that connection is in control mode
-                    if (connection.finishData ())
+                    if (connection.finishData())
                       {
-                        connection.rset ();
+                        connection.rset();
                       }
                   }
                 catch (IOException e2)
                   {
                     // Possible transport-level problem
                   }
-                throw new SendFailedException (e.getMessage ());
+                throw new SendFailedException(e.getMessage());
               }
           }
       }
   
     // Notify transport listeners
-    Address[] a_sent = new Address[sent.size ()];
-    sent.toArray (a_sent);
-    Address[] a_unsent = new Address[unsent.size ()];
-    unsent.toArray (a_unsent);
-    Address[] a_invalid = new Address[invalid.size ()];
-    invalid.toArray (a_invalid);
+    Address[] a_sent = new Address[sent.size()];
+    sent.toArray(a_sent);
+    Address[] a_unsent = new Address[unsent.size()];
+    unsent.toArray(a_unsent);
+    Address[] a_invalid = new Address[invalid.size()];
+    invalid.toArray(a_invalid);
     
-    notifyTransportListeners (deliveryStatus, a_sent, a_unsent, a_invalid,
+    notifyTransportListeners(deliveryStatus, a_sent, a_unsent, a_invalid,
                               mimeMessage);
   }
 
   /**
    * Close this transport.
    */
-  public void close ()
+  public void close()
     throws MessagingException 
   {
-    if (isConnected ()) 
+    if (isConnected()) 
       {
         synchronized (connection)
           {
             try 
               {
-                connection.quit ();
+                connection.quit();
               }
             catch (IOException e) 
               {
-                throw new MessagingException (e.getMessage (), e);
+                throw new MessagingException(e.getMessage(), e);
               }
             finally
               {
@@ -556,19 +556,19 @@ public class SMTPTransport
               }
           }
       }
-    super.close ();
+    super.close();
   }
   
   // -- Utility methods --
 
-  private int getIntProperty (String key)
+  private int getIntProperty(String key)
   {
-    String value = getProperty (key);
+    String value = getProperty(key);
     if (value != null)
       {
         try
           {
-            return Integer.parseInt (value);
+            return Integer.parseInt(value);
           }
         catch (Exception e)
           {
@@ -577,26 +577,26 @@ public class SMTPTransport
     return -1;
   }
   
-  private boolean propertyIsFalse (String key)
+  private boolean propertyIsFalse(String key)
   {
-    return "false".equals (getProperty (key));
+    return "false".equals(getProperty(key));
   }
   
-  private boolean propertyIsTrue (String key)
+  private boolean propertyIsTrue(String key)
   {
-    return "true".equals (getProperty (key));
+    return "true".equals(getProperty(key));
   }
   
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty (String key)
+  private String getProperty(String key)
   {
-    String value = session.getProperty ("mail.smtp." + key);
+    String value = session.getProperty("mail.smtp." + key);
     if (value == null)
       {
-        value = session.getProperty ("mail." + key);
+        value = session.getProperty("mail." + key);
       }
     return value;
   }

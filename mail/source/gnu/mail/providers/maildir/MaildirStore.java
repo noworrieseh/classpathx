@@ -1,13 +1,13 @@
 /*
  * MaildirStore.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -121,7 +121,7 @@ public final class MaildirStore
       String maildir = session.getProperty("mail.maildir.maildir");
       if (!isMaildir(maildir))
       {
-        // Try some common (UNIX) locations.
+        // Try some common(UNIX) locations.
         try 
         {
           String userhome = System.getProperty("user.home");
@@ -214,7 +214,7 @@ public final class MaildirStore
   /**
    * Adds a status listener to this store.
    * The listener will be informed of state changes during potentially
-   * lengthy procedures (opening and closing mboxes).
+   * lengthy procedures(opening and closing mboxes).
    * @param l the status listener
    * @see #removeStatusListener
    */

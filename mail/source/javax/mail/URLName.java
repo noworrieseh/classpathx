@@ -1,13 +1,13 @@
 /*
  * URLName.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -69,7 +69,7 @@ public class URLName
    * Specifying a port number of -1 indicates that the URL should 
    * use the default port for the protocol.
    */
-  public URLName (String protocol, String host, int port,
+  public URLName(String protocol, String host, int port,
                   String file, String username, String password)
   {
     this.protocol = protocol;
@@ -78,11 +78,11 @@ public class URLName
     this.file = file;
     if (file != null)
       {
-        int hashIndex = file.indexOf ('#');
+        int hashIndex = file.indexOf('#');
         if (hashIndex != -1)
           {
-            this.file = file.substring (0, hashIndex);
-            ref = file.substring (hashIndex + 1);
+            this.file = file.substring(0, hashIndex);
+            ref = file.substring(hashIndex + 1);
           }
       }
     this.username = username;
@@ -92,25 +92,25 @@ public class URLName
   /**
    * Construct a URLName from a java.net.URL object.
    */
-  public URLName (URL url)
+  public URLName(URL url)
   {
-    this (url.toString ());
+    this(url.toString());
   }
 
   /**
    * Construct a URLName from the string. Parses out all the possible
-   * information (protocol, host, port, file, username, password).
+   * information(protocol, host, port, file, username, password).
    */
-  public URLName (String url)
+  public URLName(String url)
   {
-    parseString (url);
+    parseString(url);
   }
 
   /**
    * Returns the port number of this URLName.
    * Returns -1 if the port is not set.
    */
-  public int getPort ()
+  public int getPort()
   {
     return port;
   }
@@ -119,7 +119,7 @@ public class URLName
    * Returns the protocol of this URLName. 
    * Returns null if this URLName has no protocol.
    */
-  public String getProtocol ()
+  public String getProtocol()
   {
     return protocol;
   }
@@ -128,7 +128,7 @@ public class URLName
    * Returns the file name of this URLName.
    * Returns null if this URLName has no file name.
    */
-  public String getFile ()
+  public String getFile()
   {
     return file;
   }
@@ -137,7 +137,7 @@ public class URLName
    * Returns the reference of this URLName.
    * Returns null if this URLName has no reference.
    */
-  public String getRef ()
+  public String getRef()
   {
     return ref;
   }
@@ -146,7 +146,7 @@ public class URLName
    * Returns the host of this URLName.
    * Returns null if this URLName has no host.
    */
-  public String getHost ()
+  public String getHost()
   {
     return host;
   }
@@ -155,7 +155,7 @@ public class URLName
    * Returns the user name of this URLName.
    * Returns null if this URLName has no user name.
    */
-  public String getUsername ()
+  public String getUsername()
   {
     return username;
   }
@@ -164,7 +164,7 @@ public class URLName
    * Returns the password of this URLName.
    * Returns null if this URLName has no password.
    */
-  public String getPassword ()
+  public String getPassword()
   {
     return password;
   }
@@ -172,10 +172,10 @@ public class URLName
   /**
    * Constructs a URL from the URLName.
    */
-  public URL getURL ()
+  public URL getURL()
     throws MalformedURLException
   {
-    return new URL (getProtocol (), getHost (), getPort (), getFile ());
+    return new URL(getProtocol(), getHost(), getPort(), getFile());
   }
 
   // -- Utility methods --
@@ -183,53 +183,53 @@ public class URLName
   /**
    * Constructs a string representation of this URLName.
    */
-  public String toString ()
+  public String toString()
   {
     if (fullURL == null)
       {
-        StringBuffer buffer = new StringBuffer ();
+        StringBuffer buffer = new StringBuffer();
         if (protocol != null)
           {
-            buffer.append (protocol);
-            buffer.append (":");
+            buffer.append(protocol);
+            buffer.append(":");
           }
         if (username != null || host != null)
           {
-            buffer.append ("//");
+            buffer.append("//");
             if (username != null)
               {
-                buffer.append (username);
+                buffer.append(username);
                 if (password != null)
                   {
-                    buffer.append (":");
-                    buffer.append (password);
+                    buffer.append(":");
+                    buffer.append(password);
                   }
-                buffer.append ("@");
+                buffer.append("@");
               }
             if (host != null)
               {
-                buffer.append (host);
+                buffer.append(host);
               }
             if (port != -1)
               {
-                buffer.append (":");
-                buffer.append (Integer.toString (port));
+                buffer.append(":");
+                buffer.append(Integer.toString(port));
               }
             if (file != null)
               {
-                buffer.append ("/");
+                buffer.append("/");
               }
           }
         if (file != null)
           {
-            buffer.append (file);
+            buffer.append(file);
           }
         if (ref != null)
           {
-            buffer.append ("#");
-            buffer.append (ref);
+            buffer.append("#");
+            buffer.append(ref);
           }
-        fullURL = buffer.toString ();
+        fullURL = buffer.toString();
       }
     return fullURL;
   }
@@ -239,11 +239,11 @@ public class URLName
    * not null and is a URLName object that represents the same URLName as this
    * object. Two URLName objects are equal if they have the same protocol and
    * reference the same host, the same port number on the host, the same
-   * username and password, and the same file on the host. The fields (host,
+   * username and password, and the same file on the host. The fields(host,
    * username, password, file) are also considered the same if they are both
    * null.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other == this)
       {
@@ -254,34 +254,34 @@ public class URLName
         return false;
       }
     URLName url = (URLName) other;
-    if (url.protocol == null || !url.protocol.equals (protocol))
+    if (url.protocol == null || !url.protocol.equals(protocol))
       {
         return false;
       }
-    InetAddress address = getHostAddress ();
-    InetAddress otherAddress = url.getHostAddress ();
+    InetAddress address = getHostAddress();
+    InetAddress otherAddress = url.getHostAddress();
     if (address != null && otherAddress != null)
       {
-        if (!address.equals (otherAddress))
+        if (!address.equals(otherAddress))
           {
             return false;
           }
       }
     else if (host != null)
       {
-        if (!host.equalsIgnoreCase (url.host))
+        if (!host.equalsIgnoreCase(url.host))
           {
             return false;
           }
       }
     if (username != url.username && 
-        (username==null || !username.equals (url.username)))
+       (username==null || !username.equals(url.username)))
       {
         return false;
       }
     String file = (this.file != null) ? this.file : "";
     String otherFile = (url.file != null) ? url.file : "";
-    if (!file.equals (otherFile))
+    if (!file.equals(otherFile))
       {
         return false;
       }
@@ -291,7 +291,7 @@ public class URLName
   /**
    * Compute the hash code for this URLName.
    */
-  public int hashCode ()
+  public int hashCode()
   {
     if (hashCode != 0)
       {
@@ -299,30 +299,30 @@ public class URLName
       }
     if (protocol != null)
       {
-        hashCode += protocol.hashCode ();
+        hashCode += protocol.hashCode();
       }
-    InetAddress address = getHostAddress ();
+    InetAddress address = getHostAddress();
     if (address != null)
       {
-        hashCode += address.hashCode ();
+        hashCode += address.hashCode();
       }
     else if (host != null)
       {
-        hashCode += host.toLowerCase ().hashCode ();
+        hashCode += host.toLowerCase().hashCode();
       }
     if (username != null)
       {
-        hashCode += username.hashCode ();
+        hashCode += username.hashCode();
       }
     if (file != null)
       {
-        hashCode += file.hashCode ();
+        hashCode += file.hashCode();
       }
     hashCode += port;
     return hashCode;
   }
 
-  private synchronized InetAddress getHostAddress ()
+  private synchronized InetAddress getHostAddress()
   {
     if (gotHostAddress)
       {
@@ -334,7 +334,7 @@ public class URLName
       }
     try
       {
-        hostAddress = InetAddress.getByName (host);
+        hostAddress = InetAddress.getByName(host);
       }
     catch (UnknownHostException e)
       {
@@ -347,26 +347,26 @@ public class URLName
   /**
    * Method which does all of the work of parsing the string.
    */
-  protected void parseString (String url)
+  protected void parseString(String url)
   {
     protocol = file = ref = host = username = password = null;
     port = -1;
-    int len = url.length ();
-    int colonIndex = url.indexOf (':');
+    int len = url.length();
+    int colonIndex = url.indexOf(':');
     if (colonIndex != -1)
       {
-        protocol = url.substring (0, colonIndex);
+        protocol = url.substring(0, colonIndex);
       }
-    if (url.regionMatches (colonIndex + 1, "//", 0, 2))
+    if (url.regionMatches(colonIndex + 1, "//", 0, 2))
       {
         String hostPart;
-        int slashIndex = url.indexOf ('/', colonIndex + 3);
+        int slashIndex = url.indexOf('/', colonIndex + 3);
         if (slashIndex != -1)
           {
-            hostPart = url.substring (colonIndex + 3, slashIndex);
+            hostPart = url.substring(colonIndex + 3, slashIndex);
             if ((slashIndex + 1) < len)
               {
-                file = url.substring (slashIndex + 1);
+                file = url.substring(slashIndex + 1);
               }
             else
               {
@@ -375,20 +375,20 @@ public class URLName
           }
         else
           {
-            hostPart = url.substring (colonIndex + 3);
+            hostPart = url.substring(colonIndex + 3);
           }
         
         // user:password@host?
-        int atIndex = hostPart.lastIndexOf ('@');
+        int atIndex = hostPart.lastIndexOf('@');
         if (atIndex != -1)
           {
-            String userPart = hostPart.substring (0, atIndex);
-            hostPart = hostPart.substring (atIndex + 1);
-            colonIndex = userPart.indexOf (':');
+            String userPart = hostPart.substring(0, atIndex);
+            hostPart = hostPart.substring(atIndex + 1);
+            colonIndex = userPart.indexOf(':');
             if (colonIndex != -1)
               {
-                username = userPart.substring (0, colonIndex);
-                password = userPart.substring (colonIndex + 1);
+                username = userPart.substring(0, colonIndex);
+                password = userPart.substring(colonIndex + 1);
               }
             else
               {
@@ -397,29 +397,29 @@ public class URLName
           }
         
         // host:port?
-        if (hostPart.length () > 0 && hostPart.charAt (0) == '[')
+        if (hostPart.length() > 0 && hostPart.charAt(0) == '[')
           {
-            colonIndex = hostPart.indexOf (':', hostPart.indexOf (']'));
+            colonIndex = hostPart.indexOf(':', hostPart.indexOf(']'));
           }
         else
           {
-            colonIndex = hostPart.indexOf (':');
+            colonIndex = hostPart.indexOf(':');
           }
         if (colonIndex != -1)
           {
-            String portPart = hostPart.substring (colonIndex + 1);
-            if (portPart.length () > 0)
+            String portPart = hostPart.substring(colonIndex + 1);
+            if (portPart.length() > 0)
               {
                 try
                   {
-                    port = Integer.parseInt (portPart);
+                    port = Integer.parseInt(portPart);
                   }
                 catch (NumberFormatException e)
                   {
                     port = -1;
                   }
               }
-            host = hostPart.substring (0, colonIndex);
+            host = hostPart.substring(0, colonIndex);
           }
         else
           {
@@ -428,14 +428,14 @@ public class URLName
       }
     else if ((colonIndex + 1) < len)
       {
-        file = url.substring (colonIndex + 1);
+        file = url.substring(colonIndex + 1);
       }
     
-    int hashIndex = (file != null) ? file.indexOf ('#') : -1;
+    int hashIndex = (file != null) ? file.indexOf('#') : -1;
     if (hashIndex != -1)
       {
-        ref = file.substring (hashIndex + 1);
-        file = file.substring (0, hashIndex);
+        ref = file.substring(hashIndex + 1);
+        file = file.substring(0, hashIndex);
       }
   }
   

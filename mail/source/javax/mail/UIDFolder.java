@@ -1,13 +1,13 @@
 /*
  * UIDFolder.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * the folder. This interface is based on the IMAP model for supporting 
  * disconnected operation.
  * <p>
- * A Unique identifier (UID) is a positive long value, assigned to each 
+ * A Unique identifier(UID) is a positive long value, assigned to each 
  * message in a specific folder. Unique identifiers are assigned in a strictly 
  * ascending fashion in the mailbox. That is, as each message is added to the 
  * mailbox it is assigned a higher UID than the message(s) which were added 
@@ -78,11 +78,11 @@ public interface UIDFolder
      folder.fetch(msgs, fp);
      </pre>
      */
-    public static final FetchProfileItem UID = new FetchProfileItem ("UID");
+    public static final FetchProfileItem UID = new FetchProfileItem("UID");
 
-    protected FetchProfileItem (String name)
+    protected FetchProfileItem(String name)
     {
-      super (name);
+      super(name);
     }
     
   }
@@ -100,7 +100,7 @@ public interface UIDFolder
    * Clients typically compare this value against a UIDValidity value 
    * saved from a previous session to insure that any cached UIDs not stale.
    */
-  long getUIDValidity ()
+  long getUIDValidity()
     throws MessagingException;
 
   /**
@@ -108,7 +108,7 @@ public interface UIDFolder
    * If no such message exists, null is returned.
    * @param uid UID for the desired message
    */
-  Message getMessageByUID (long uid)
+  Message getMessageByUID(long uid)
     throws MessagingException;
 
   /**
@@ -118,7 +118,7 @@ public interface UIDFolder
    * @param start start UID
    * @param end end UID
    */
-  Message[] getMessagesByUID (long start, long end)
+  Message[] getMessagesByUID(long start, long end)
     throws MessagingException;
 
   /**
@@ -130,7 +130,7 @@ public interface UIDFolder
    * invalid UIDs.
    * @param uids array of UIDs
    */
-  Message[] getMessagesByUID (long[] uids)
+  Message[] getMessagesByUID(long[] uids)
     throws MessagingException;
 
   /**
@@ -142,7 +142,7 @@ public interface UIDFolder
    * @exception NoSuchElementException if the given Message is not in this
    * Folder.
    */
-  long getUID (Message message)
+  long getUID(Message message)
     throws MessagingException;
   
 }

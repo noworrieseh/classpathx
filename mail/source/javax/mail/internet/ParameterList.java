@@ -1,13 +1,13 @@
 /*
  * ParameterList.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * This class holds MIME parameters (attribute-value pairs).
+ * This class holds MIME parameters(attribute-value pairs).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -45,12 +45,12 @@ public class ParameterList
   /*
    * The underlying storage.
    */
-  private HashMap list = new HashMap ();
+  private HashMap list = new HashMap();
 
   /**
    * No-arg Constructor.
    */
-  public ParameterList ()
+  public ParameterList()
   {
   }
 
@@ -63,162 +63,162 @@ public class ParameterList
    * @param s the parameter-list string.
    * @exception ParseException if the parse fails.
    */
-  public ParameterList (String s)
+  public ParameterList(String s)
     throws ParseException
   {
-    HashMap charsets = new HashMap ();
-    HeaderTokenizer ht = new HeaderTokenizer (s, HeaderTokenizer.MIME);
+    HashMap charsets = new HashMap();
+    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
     for (int type = 0; type != HeaderTokenizer.Token.EOF; )
       {
-        HeaderTokenizer.Token token = ht.next ();
-        type = token.getType ();
+        HeaderTokenizer.Token token = ht.next();
+        type = token.getType();
         
         if (type != HeaderTokenizer.Token.EOF)
           {
             if (type != 0x3b) // ';'
               {
-                throw new ParseException (s);
+                throw new ParseException(s);
               }
             
-            token = ht.next ();
-            type = token.getType ();
+            token = ht.next();
+            type = token.getType();
             if (type != HeaderTokenizer.Token.ATOM)
               {
-                throw new ParseException (s);
+                throw new ParseException(s);
               }
-            String key = token.getValue ().toLowerCase ();
+            String key = token.getValue().toLowerCase();
             
-            token = ht.next ();
-            type = token.getType ();
+            token = ht.next();
+            type = token.getType();
             if (type != 0x3d) // '='
               {
-                throw new ParseException (s);
+                throw new ParseException(s);
               }
             
-            token = ht.next ();
-            type = token.getType ();
+            token = ht.next();
+            type = token.getType();
             if (type != HeaderTokenizer.Token.ATOM && 
                 type != HeaderTokenizer.Token.QUOTEDSTRING)
               {
-                throw new ParseException (s);
+                throw new ParseException(s);
               }
-            String value = token.getValue ();
+            String value = token.getValue();
 
             // Handle RFC 2231 encoding and continuations
             // This will handle out-of-order extended-other-values
             // but the extended-initial-value must precede them
-            int si = key.indexOf ('*');
+            int si = key.indexOf('*');
             if (si > 0)
               {
-                int len = key.length ();
+                int len = key.length();
                 if (si == len - 1 ||
-                    (si == len - 3 &&
-                     key.charAt (si + 1) == '0' &&
-                     key.charAt (si + 2) == '*'))
+                   (si == len - 3 &&
+                     key.charAt(si + 1) == '0' &&
+                     key.charAt(si + 2) == '*'))
                   {
                     // extended-initial-name
-                    key = key.substring (0, si);
+                    key = key.substring(0, si);
                     // extended-initial-value
-                    int ai = value.indexOf ('\'');
+                    int ai = value.indexOf('\'');
                     if (ai == -1)
                       {
-                        throw new ParseException ("no charset specified: " +
+                        throw new ParseException("no charset specified: " +
                                                   value);
                       }
-                    String charset = value.substring (0, ai);
-                    charset = MimeUtility.javaCharset (charset);
-                    charsets.put (key, charset);
+                    String charset = value.substring(0, ai);
+                    charset = MimeUtility.javaCharset(charset);
+                    charsets.put(key, charset);
                     // advance to last apostrophe
-                    for (int i = value.indexOf ('\'', ai + 1); i != -1; )
+                    for (int i = value.indexOf('\'', ai + 1); i != -1; )
                       {
                         ai = i;
-                        i = value.indexOf ('\'', ai + 1);
+                        i = value.indexOf('\'', ai + 1);
                       }
-                    value = decode (value.substring (ai + 1), charset);
-                    ArrayList values = new ArrayList ();
-                    set (values, 0, value);
-                    list.put (key, values);
+                    value = decode(value.substring(ai + 1), charset);
+                    ArrayList values = new ArrayList();
+                    set(values, 0, value);
+                    list.put(key, values);
                   }
                 else
                   {
                     // extended-other-name
-                    int end = (key.charAt (len - 1) == '*') ? len - 1 : len;
+                    int end = (key.charAt(len - 1) == '*') ? len - 1 : len;
                     int section = -1;
                     try
                       {
                         section =
-                          Integer.parseInt (key.substring (si + 1, end));
+                          Integer.parseInt(key.substring(si + 1, end));
                         if (section < 1)
                           {
-                            throw new NumberFormatException ();
+                            throw new NumberFormatException();
                           }
                       }
                     catch (NumberFormatException e)
                       {
-                        throw new ParseException ("invalid section: " + key);
+                        throw new ParseException("invalid section: " + key);
                       }
-                    key = key.substring (0, si);
+                    key = key.substring(0, si);
                     // extended-other-value
-                    String charset = (String) charsets.get (key);
-                    ArrayList values = (ArrayList) list.get (key);
+                    String charset = (String) charsets.get(key);
+                    ArrayList values = (ArrayList) list.get(key);
                     if (charset == null || values == null)
                       {
-                        throw new ParseException ("no initial extended " +
+                        throw new ParseException("no initial extended " +
                                                   "parameter for '" + key +
                                                   "'");
                       }
                     if (type == HeaderTokenizer.Token.ATOM)
                       {
-                        value = decode (value, charset);
+                        value = decode(value, charset);
                       }
-                    set (values, section, value);
+                    set(values, section, value);
                   }
               }
             else
               {
-                list.put (key, value);
+                list.put(key, value);
               }
           }
       }
     // Replace list values by string concatenations of their components
-    int len = list.size ();
+    int len = list.size();
     String[] keys = new String[len];
-    list.keySet ().toArray (keys);
+    list.keySet().toArray(keys);
     for (int i = 0; i < len; i++)
       {
-        Object value = list.get (keys[i]);
+        Object value = list.get(keys[i]);
         if (value instanceof ArrayList)
           {
             ArrayList values = (ArrayList) value;
-            StringBuffer buf = new StringBuffer ();
-            for (Iterator j = values.iterator (); j.hasNext (); )
+            StringBuffer buf = new StringBuffer();
+            for (Iterator j = values.iterator(); j.hasNext(); )
               {
-                String comp = (String) j.next ();
+                String comp = (String) j.next();
                 if (comp != null)
                   {
-                    buf.append (comp);
+                    buf.append(comp);
                   }
               }
-            list.put (keys[i], buf.toString ());
+            list.put(keys[i], buf.toString());
           }
       }
   }
 
-  private void set (ArrayList list, int index, Object value)
+  private void set(ArrayList list, int index, Object value)
   {
-    int len = list.size ();
+    int len = list.size();
     while (index > len - 1)
       {
-        list.add (null);
+        list.add(null);
         len++;
       }
-    list.set (index, value);
+    list.set(index, value);
   }
 
-  private String decode (String text, String charset)
+  private String decode(String text, String charset)
     throws ParseException
   {
-    char[] schars = text.toCharArray ();
+    char[] schars = text.toCharArray();
     int slen = schars.length;
     byte[] dchars = new byte[slen];
     int dlen = 0;
@@ -229,10 +229,10 @@ public class ParameterList
           {
             if (i + 3 > slen)
               {
-                throw new ParseException ("malformed: " + text);
+                throw new ParseException("malformed: " + text);
               }
-            int val = Character.digit (schars[i + 2], 16) +
-              Character.digit (schars[i + 1], 16) * 16;
+            int val = Character.digit(schars[i + 2], 16) +
+              Character.digit(schars[i + 1], 16) * 16;
             dchars[dlen++] = ((byte) val);
             i += 2;
           }
@@ -243,20 +243,20 @@ public class ParameterList
       }
     try
       {
-        return new String (dchars, 0, dlen, charset);
+        return new String(dchars, 0, dlen, charset);
       }
     catch (UnsupportedEncodingException e)
       {
-        throw new ParseException ("Unsupported encoding: " + charset);
+        throw new ParseException("Unsupported encoding: " + charset);
       }
   }
 
   /**
    * Return the number of parameters in this list.
    */
-  public int size ()
+  public int size()
   {
-    return list.size ();
+    return list.size();
   }
 
   /**
@@ -266,9 +266,9 @@ public class ParameterList
    * @return Value of the parameter. 
    * Returns null if the parameter is not present.
    */
-  public String get (String name)
+  public String get(String name)
   {
-    return (String) list.get (name.toLowerCase ().trim ());
+    return (String) list.get(name.toLowerCase().trim());
   }
 
   /**
@@ -277,9 +277,9 @@ public class ParameterList
    * @param name name of the parameter.
    * @param value value of the parameter.
    */
-  public void set (String name, String value)
+  public void set(String name, String value)
   {
-    list.put (name.toLowerCase ().trim (), value);
+    list.put(name.toLowerCase().trim(), value);
   }
 
   /**
@@ -287,27 +287,27 @@ public class ParameterList
    * This method does nothing if the parameter is not present.
    * @param name name of the parameter.
    */
-  public void remove (String name)
+  public void remove(String name)
   {
-    list.remove (name.toLowerCase ().trim ());
+    list.remove(name.toLowerCase().trim());
   }
 
   /**
    * Return an enumeration of the names of all parameters in this list.
    */
-  public Enumeration getNames ()
+  public Enumeration getNames()
   {
-    return new ParameterEnumeration (list.keySet ().iterator ());
+    return new ParameterEnumeration(list.keySet().iterator());
   }
 
   /**
    * Convert this ParameterList into a MIME String.
    * If this is an empty list, an empty string is returned.
    */
-  public String toString ()
+  public String toString()
   {
     // Simply calls toString(int) with a used value of 0.
-    return toString (0);
+    return toString(0);
   }
 
   /**
@@ -320,33 +320,33 @@ public class ParameterList
    * @param used number of character positions already used, in the field into
    * which the parameter list is to be inserted.
    */
-  public String toString (int used)
+  public String toString(int used)
   {
-    StringBuffer buffer = new StringBuffer ();
-    for (Iterator i = list.keySet ().iterator (); i.hasNext (); )
+    StringBuffer buffer = new StringBuffer();
+    for (Iterator i = list.keySet().iterator(); i.hasNext(); )
       {
-        String key = (String) i.next ();
-        String value = MimeUtility.quote ((String) list.get (key), 
+        String key = (String) i.next();
+        String value = MimeUtility.quote((String) list.get(key), 
                                           HeaderTokenizer.MIME);
         
         // delimiter
-        buffer.append ("; ");
+        buffer.append("; ");
         used += 2;
         
         // wrap to next line if necessary
-        int len = key.length () + value.length () + 1;
+        int len = key.length() + value.length() + 1;
         if ((used + len) > 76)
           {
-            buffer.append ("\r\n\t");
+            buffer.append("\r\n\t");
             used = 8;
           }
         
         // append key=value
-        buffer.append (key);
-        buffer.append ('=');
-        buffer.append (value);
+        buffer.append(key);
+        buffer.append('=');
+        buffer.append(value);
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
   
   /*
@@ -358,19 +358,19 @@ public class ParameterList
 
     Iterator source;
 
-    ParameterEnumeration (Iterator source)
+    ParameterEnumeration(Iterator source)
     {
       this.source = source;
     }
 
-    public boolean hasMoreElements ()
+    public boolean hasMoreElements()
     {
-      return source.hasNext ();
+      return source.hasNext();
     }
 
-    public Object nextElement ()
+    public Object nextElement()
     {
-      return source.next ();
+      return source.next();
     }
     
   }

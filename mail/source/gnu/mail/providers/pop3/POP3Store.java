@@ -1,13 +1,13 @@
 /*
  * POP3Store.java
- * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999, 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -76,16 +76,16 @@ extends Store
   /**
    * Constructor.
    */
-  public POP3Store (Session session, URLName urlname)
+  public POP3Store(Session session, URLName urlname)
   {
-    super (session, urlname);
+    super(session, urlname);
   }
 
   /**
    * Connects to the POP3 server and authenticates with the specified
    * parameters.
    */
-  protected boolean protocolConnect (String host, int port, String username,
+  protected boolean protocolConnect(String host, int port, String username,
                                      String password)
     throws MessagingException
   {
@@ -95,15 +95,15 @@ extends Store
       }
     if (host == null)
       {
-        host = getProperty ("host");
+        host = getProperty("host");
       }
     if (username == null)
       {
-        username = getProperty ("user");
+        username = getProperty("user");
       }
     if (port < 0)
       {
-        port = getIntProperty ("port");
+        port = getIntProperty("port");
         if (port < 0)
           {
             port = POP3Connection.DEFAULT_PORT;
@@ -118,83 +118,83 @@ extends Store
       {
         try
           {
-            int connectionTimeout = getIntProperty ("connectiontimeout");
-            int timeout = getIntProperty ("timeout");
-            connection = new POP3Connection (host, port,
+            int connectionTimeout = getIntProperty("connectiontimeout");
+            int timeout = getIntProperty("timeout");
+            connection = new POP3Connection(host, port,
                                              connectionTimeout, timeout,
-                                             session.getDebug ());
+                                             session.getDebug());
             // Disable APOP if necessary
-            if (propertyIsFalse ("apop"))
+            if (propertyIsFalse("apop"))
               {
                 disableApop = true;
               }
             // Get capabilities
-            List capa = connection.capa ();
+            List capa = connection.capa();
             boolean tls = false;
             if (capa != null)
               {
-                if (capa.contains ("STLS"))
+                if (capa.contains("STLS"))
                   {
-                    if (!propertyIsFalse ("tls"))
+                    if (!propertyIsFalse("tls"))
                       {
                         // Locate custom trust manager
-                        String tmt = getProperty ("trustmanager");
+                        String tmt = getProperty("trustmanager");
                         if (tmt == null)
                           {
-                            tls = connection.stls ();
+                            tls = connection.stls();
                           }
                         else
                           {
                             try
                               {
-                                Class t = Class.forName (tmt);
+                                Class t = Class.forName(tmt);
                                 TrustManager tm =
-                                  (TrustManager) t.newInstance ();
-                                tls = connection.stls (tm);
+                                 (TrustManager) t.newInstance();
+                                tls = connection.stls(tm);
                               }
                             catch (Exception e)
                               {
-                                String m = e.getMessage ();
-                                throw new MessagingException (m, e);
+                                String m = e.getMessage();
+                                throw new MessagingException(m, e);
                               }
                           }
                         // Capabilities may have changed since STLS
                         if (tls)
                           {
-                            capa = connection.capa ();
+                            capa = connection.capa();
                           }
                       }
                   }
-                if (!tls && "required".equals (getProperty ("tls")))
+                if (!tls && "required".equals(getProperty("tls")))
                   {
-                    throw new MessagingException ("TLS not available");
+                    throw new MessagingException("TLS not available");
                   }
                 // Build list of SASL mechanisms
                 List authenticationMechanisms = null;
-                for (Iterator i = capa.iterator (); i.hasNext (); )
+                for (Iterator i = capa.iterator(); i.hasNext(); )
                   {
-                    String cap = (String) i.next ();
-                    if (cap.startsWith ("SASL "))
+                    String cap = (String) i.next();
+                    if (cap.startsWith("SASL "))
                       {
                         if (authenticationMechanisms == null)
                           {
-                            authenticationMechanisms = new ArrayList ();
+                            authenticationMechanisms = new ArrayList();
                           }
-                        authenticationMechanisms.add (cap.substring (5));
+                        authenticationMechanisms.add(cap.substring(5));
                       }
                   }
                 // User authentication
                 if (authenticationMechanisms != null &&
-                    !authenticationMechanisms.isEmpty ())
+                    !authenticationMechanisms.isEmpty())
                   {
                     if (username == null || password == null)
                       {
                         PasswordAuthentication pa =
-                          session.getPasswordAuthentication (url);
+                          session.getPasswordAuthentication(url);
                         if (pa == null)
                           {
-                            InetAddress addr = InetAddress.getByName (host);
-                            pa = session.requestPasswordAuthentication (addr,
+                            InetAddress addr = InetAddress.getByName(host);
+                            pa = session.requestPasswordAuthentication(addr,
                                                                         port,
                                                                         "pop3",
                                                                         null,
@@ -202,33 +202,33 @@ extends Store
                           }
                         if (pa != null)
                           {
-                            username = pa.getUserName ();
-                            password = pa.getPassword ();
+                            username = pa.getUserName();
+                            password = pa.getPassword();
                           }
                       }
                     if (username != null && password != null)
                       {
                         // Discover user ordering preferences for auth
                         // mechanisms
-                        String authPrefs = getProperty ("auth.mechanisms");
+                        String authPrefs = getProperty("auth.mechanisms");
                         Iterator i = null;
                         if (authPrefs == null)
                           {
-                            i = authenticationMechanisms.iterator ();
+                            i = authenticationMechanisms.iterator();
                           }
                         else
                           {
                             StringTokenizer st =
-                              new StringTokenizer (authPrefs, ",");
-                            List authPrefList = Collections.list (st);
-                            i = authPrefList.iterator ();
+                              new StringTokenizer(authPrefs, ",");
+                            List authPrefList = Collections.list(st);
+                            i = authPrefList.iterator();
                           }
                         // Try each mechanism in the list in turn
-                        while (i.hasNext ())
+                        while (i.hasNext())
                           {
-                            String mechanism = (String) i.next ();
-                            if (authenticationMechanisms.contains (mechanism) &&
-                                connection.auth (mechanism, username,
+                            String mechanism = (String) i.next();
+                            if (authenticationMechanisms.contains(mechanism) &&
+                                connection.auth(mechanism, username,
                                                  password))
                               {
                                 return true;
@@ -240,20 +240,20 @@ extends Store
             // Fall back to APOP or login
             if (!disableApop)
               {
-                return connection.apop (username, password);
+                return connection.apop(username, password);
               }
             else
               {
-                return connection.login (username, password);
+                return connection.login(username, password);
               }
           }
         catch (UnknownHostException e)
           {
-            throw new MessagingException ("Connect failed", e);
+            throw new MessagingException("Connect failed", e);
           }
         catch (IOException e)
           {
-            throw new MessagingException ("Connect failed", e);
+            throw new MessagingException("Connect failed", e);
           }
       }
   }
@@ -261,7 +261,7 @@ extends Store
   /**
    * Closes the connection.
    */
-  public void close ()
+  public void close()
     throws MessagingException
   {
     if (connection != null)
@@ -270,33 +270,33 @@ extends Store
           {
             try
               {
-                if (propertyIsTrue ("rsetbeforequit"))
+                if (propertyIsTrue("rsetbeforequit"))
                   {
-                    connection.rset ();
+                    connection.rset();
                   }
-                connection.quit ();
+                connection.quit();
               }
             catch (IOException e)
               {
-                throw new MessagingException ("Close failed", e);
+                throw new MessagingException("Close failed", e);
               }
           }
         connection = null;
       }
-    super.close ();
+    super.close();
   }
 
   /**
    * Returns the root folder.
    */
-  public Folder getDefaultFolder ()
+  public Folder getDefaultFolder()
     throws MessagingException
   {
     synchronized (this)
       {
         if (root == null)
           {
-            root = new POP3Folder (this, Folder.HOLDS_FOLDERS);
+            root = new POP3Folder(this, Folder.HOLDS_FOLDERS);
           }
       }
     return root;
@@ -305,31 +305,31 @@ extends Store
   /**
    * Returns the folder with the specified name.
    */
-  public Folder getFolder (String s)
+  public Folder getFolder(String s)
     throws MessagingException
   {
-    return getDefaultFolder ().getFolder (s);
+    return getDefaultFolder().getFolder(s);
   }
 
   /**
    * Returns the folder whose name is the file part of the specified URLName.
    */
-  public Folder getFolder (URLName urlname)
+  public Folder getFolder(URLName urlname)
     throws MessagingException
   {
-    return getDefaultFolder ().getFolder (urlname.getFile ());
+    return getDefaultFolder().getFolder(urlname.getFile());
   }
 
   // -- Utility methods --
 
-  private int getIntProperty (String key)
+  private int getIntProperty(String key)
   {
-    String value = getProperty (key);
+    String value = getProperty(key);
     if (value != null)
       {
         try
           {
-            return Integer.parseInt (value);
+            return Integer.parseInt(value);
           }
         catch (Exception e)
           {
@@ -338,26 +338,26 @@ extends Store
     return -1;
   }
 
-  private boolean propertyIsFalse (String key)
+  private boolean propertyIsFalse(String key)
   {
-    return "false".equals (getProperty (key));
+    return "false".equals(getProperty(key));
   }
 
-  private boolean propertyIsTrue (String key)
+  private boolean propertyIsTrue(String key)
   {
-    return "true".equals (getProperty (key));
+    return "true".equals(getProperty(key));
   }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty (String key)
+  private String getProperty(String key)
   {
-    String value = session.getProperty ("mail.pop3." + key);
+    String value = session.getProperty("mail.pop3." + key);
     if (value == null)
       {
-        value = session.getProperty ("mail." + key);
+        value = session.getProperty("mail." + key);
       }
     return value;
   }

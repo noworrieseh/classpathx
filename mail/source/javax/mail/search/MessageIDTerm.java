@@ -1,13 +1,13 @@
 /*
  * MessageIDTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,9 +48,9 @@ public final class MessageIDTerm
    * Constructor.
    * @param msgid the msgid to search for
    */
-  public MessageIDTerm (String msgid)
+  public MessageIDTerm(String msgid)
   {
-    super (msgid);
+    super(msgid);
   }
 
   /**
@@ -62,12 +62,12 @@ public final class MessageIDTerm
   {
     try
       {
-        String[] messageIDs = msg.getHeader ("Message-ID");
+        String[] messageIDs = msg.getHeader("Message-ID");
         if (messageIDs != null)
           {
             for (int i = 0; i < messageIDs.length; i++)
               {
-                if (super.match (messageIDs[i]))
+                if (super.match(messageIDs[i]))
                   {
                     return true;
                   }
@@ -83,9 +83,9 @@ public final class MessageIDTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
-    return (other instanceof MessageIDTerm && super.equals (other));
+    return (other instanceof MessageIDTerm && super.equals(other));
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * ConnectionAdapter.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +43,7 @@ public abstract class ConnectionAdapter
   /**
    * Invoked when a Store/Folder/Transport is opened.
    */
-  public void opened (ConnectionEvent e)
+  public void opened(ConnectionEvent e)
   {
   }
 
@@ -52,14 +52,14 @@ public abstract class ConnectionAdapter
    * Note that a folder cannot be disconnected, so a folder will not fire 
    * this event.
    */
-  public void disconnected (ConnectionEvent e)
+  public void disconnected(ConnectionEvent e)
   {
   }
 
   /**
    * Invoked when a Store/Folder/Transport is closed.
    */
-  public void closed (ConnectionEvent e)
+  public void closed(ConnectionEvent e)
   {
   }
 

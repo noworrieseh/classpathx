@@ -1,13 +1,13 @@
 /*
  * ConnectionEvent.java
- * Copyright (C) 2002 The Free Software Fooundation
+ * Copyright(C) 2002 The Free Software Fooundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +43,7 @@ public class ConnectionEvent
   public static final int OPENED = 1;
 
   /**
-   * A connection was disconnected (not currently used).
+   * A connection was disconnected(not currently used).
    */
   public static final int DISCONNECTED = 2;
 
@@ -61,16 +61,16 @@ public class ConnectionEvent
    * Constructor
    * @param source The source object
    */
-  public ConnectionEvent (Object source, int type)
+  public ConnectionEvent(Object source, int type)
   {
-    super (source);
+    super(source);
     this.type = type;
   }
 
   /**
    * Return the type of this event
    */
-  public int getType ()
+  public int getType()
   {
     return type;
   }
@@ -78,19 +78,19 @@ public class ConnectionEvent
   /**
    * Invokes the appropriate ConnectionListener method
    */
-  public void dispatch (Object listener)
+  public void dispatch(Object listener)
   {
     ConnectionListener l = (ConnectionListener) listener;
     switch (type)
     {
       case OPENED:
-        l.opened (this);
+        l.opened(this);
         break;
       case DISCONNECTED:
-        l.disconnected (this);
+        l.disconnected(this);
         break;
       case CLOSED:
-        l.closed (this);
+        l.closed(this);
         break;
     }
   }

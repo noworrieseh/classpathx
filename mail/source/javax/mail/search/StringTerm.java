@@ -1,13 +1,13 @@
 /*
  * StringTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 /**
  * This class implements the match method for Strings.
  * The current implementation provides only for substring matching.
- * We could add comparisons (like strcmp ...).
+ * We could add comparisons(like strcmp ...).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -49,12 +49,12 @@ public abstract class StringTerm
    */
   protected boolean ignoreCase;
 
-  protected StringTerm (String pattern)
+  protected StringTerm(String pattern)
   {
-    this (pattern, true);
+    this(pattern, true);
   }
 
-  protected StringTerm (String pattern, boolean ignoreCase)
+  protected StringTerm(String pattern, boolean ignoreCase)
   {
     this.pattern = pattern;
     this.ignoreCase = ignoreCase;
@@ -63,7 +63,7 @@ public abstract class StringTerm
   /**
    * Return the string to match with.
    */
-  public String getPattern ()
+  public String getPattern()
   {
     return pattern;
   }
@@ -71,19 +71,19 @@ public abstract class StringTerm
   /**
    * Return true if we should ignore case when matching.
    */
-  public boolean getIgnoreCase ()
+  public boolean getIgnoreCase()
   {
     return ignoreCase;
   }
 
   // locate pattern in s
-  protected boolean match (String s)
+  protected boolean match(String s)
   {
-    int patlen = pattern.length ();
-    int len = s.length () - patlen;
+    int patlen = pattern.length();
+    int len = s.length() - patlen;
     for (int i = 0; i <= len; i++)
       {
-        if (s.regionMatches (ignoreCase, i, pattern, 0, patlen))
+        if (s.regionMatches(ignoreCase, i, pattern, 0, patlen))
           {
             return true;
           }
@@ -94,19 +94,19 @@ public abstract class StringTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof StringTerm)
       {
         StringTerm st = (StringTerm)other;
         if (ignoreCase)
           {
-            return st.pattern.equalsIgnoreCase (pattern) && 
+            return st.pattern.equalsIgnoreCase(pattern) && 
               st.ignoreCase == ignoreCase;
           }
         else
           {
-            return st.pattern.equals (pattern) && 
+            return st.pattern.equals(pattern) && 
               st.ignoreCase == ignoreCase;
           }
       }
@@ -116,9 +116,9 @@ public abstract class StringTerm
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return (ignoreCase) ? pattern.hashCode () : ~pattern.hashCode ();
+    return (ignoreCase) ? pattern.hashCode() : ~pattern.hashCode();
   }
   
 }

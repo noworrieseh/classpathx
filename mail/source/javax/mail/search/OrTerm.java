@@ -1,13 +1,13 @@
 /*
  * OrTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,7 +49,7 @@ public final class OrTerm
    * @param t1 first term
    * @param t2 second term
    */
-  public OrTerm (SearchTerm t1, SearchTerm t2)
+  public OrTerm(SearchTerm t1, SearchTerm t2)
   {
     terms = new SearchTerm[2];
     terms[0] = t1;
@@ -59,18 +59,18 @@ public final class OrTerm
   /**
    * Constructor that takes an array of SearchTerms.
    */
-  public OrTerm (SearchTerm[] t)
+  public OrTerm(SearchTerm[] t)
   {
     terms = new SearchTerm[t.length];
-    System.arraycopy (t, 0, terms, 0, t.length);
+    System.arraycopy(t, 0, terms, 0, t.length);
   }
 
   /**
    * Return the search terms.
    */
-  public SearchTerm[] getTerms ()
+  public SearchTerm[] getTerms()
   {
-    return (SearchTerm[]) terms.clone ();
+    return (SearchTerm[]) terms.clone();
   }
 
   /**
@@ -82,11 +82,11 @@ public final class OrTerm
    * and the OR operator is applied to their results.
    * @return true if the OR succeeds, otherwise false
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     for (int i = 0; i < terms.length; i++)
       {
-        if (terms[i].match (msg))
+        if (terms[i].match(msg))
           {
             return true;
           }
@@ -97,7 +97,7 @@ public final class OrTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof OrTerm)
       {
@@ -108,7 +108,7 @@ public final class OrTerm
           }
         for (int i = 0; i < terms.length; i++)
           {
-            if (!terms[i].equals (orterm.terms[i]))
+            if (!terms[i].equals(orterm.terms[i]))
               {
                 return false;
               }
@@ -121,12 +121,12 @@ public final class OrTerm
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
     int acc = 0;
     for (int i = 0; i < terms.length; i++)
       {
-        acc += terms[i].hashCode ();
+        acc += terms[i].hashCode();
       }
     return acc;
   }

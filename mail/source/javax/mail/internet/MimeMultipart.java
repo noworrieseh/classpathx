@@ -1,13 +1,13 @@
 /*
  * MimeMultipart.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,7 +49,7 @@ import gnu.inet.util.LineInputStream;
  * class that uses MIME conventions for the multipart data.
  * <p>
  * A MimeMultipart is obtained from a MimePart whose primary type is
- * "multipart" (by invoking the part's <code>getContent()</code> method)
+ * "multipart"(by invoking the part's <code>getContent()</code> method)
  * or it can be created by a client as part of creating a new MimeMessage.
  * <p>
  * The default multipart subtype is "mixed".
@@ -99,9 +99,9 @@ public class MimeMultipart
    * <p>
    * MimeBodyParts may be added later.
    */
-  public MimeMultipart ()
+  public MimeMultipart()
   {
-    this ("mixed");
+    this("mixed");
   }
 
   /**
@@ -111,12 +111,12 @@ public class MimeMultipart
    * <p>
    * MimeBodyParts may be added later.
    */
-  public MimeMultipart (String subtype)
+  public MimeMultipart(String subtype)
   {
-    String boundary = MimeUtility.getUniqueBoundaryValue ();
-    ContentType ct = new ContentType ("multipart", subtype, null);
-    ct.setParameter ("boundary", boundary);
-    contentType = ct.toString ();
+    String boundary = MimeUtility.getUniqueBoundaryValue();
+    ContentType ct = new ContentType("multipart", subtype, null);
+    ct.setParameter("boundary", boundary);
+    contentType = ct.toString();
     parsed = true;
   }
 
@@ -126,7 +126,7 @@ public class MimeMultipart
    * <p>
    * This constructor handles as a special case the situation where the given
    * DataSource is a MultipartDataSource object. In this case, this method 
-   * just invokes the superclass (i.e., Multipart) constructor that takes a
+   * just invokes the superclass(i.e., Multipart) constructor that takes a
    * MultipartDataSource object.
    * <p>
    * Otherwise, the DataSource is assumed to provide a MIME multipart byte
@@ -137,23 +137,23 @@ public class MimeMultipart
    * stream.
    * @param ds DataSource, can be a MultipartDataSource
    */
-  public MimeMultipart (DataSource ds)
+  public MimeMultipart(DataSource ds)
     throws MessagingException
   {
     if (ds instanceof MessageAware)
       {
-        MessageContext mc = ((MessageAware) ds).getMessageContext ();
-        setParent (mc.getPart ());
+        MessageContext mc = ((MessageAware) ds).getMessageContext();
+        setParent(mc.getPart());
       }
     if (ds instanceof MultipartDataSource)
       {
-        setMultipartDataSource ((MultipartDataSource) ds);
+        setMultipartDataSource((MultipartDataSource) ds);
         parsed = true;
       }
     else
       {
         this.ds = ds;
-        contentType = ds.getContentType ();
+        contentType = ds.getContentType();
         parsed = false;
       }
   }
@@ -165,24 +165,24 @@ public class MimeMultipart
    * is "mixed".
    * @param subtype Subtype
    */
-  public void setSubType (String subtype)
+  public void setSubType(String subtype)
     throws MessagingException
   {
-    ContentType ct = new ContentType (contentType);
-    ct.setSubType (subtype);
-    contentType = ct.toString ();
+    ContentType ct = new ContentType(contentType);
+    ct.setSubType(subtype);
+    contentType = ct.toString();
   }
 
   /**
    * * Return the number of enclosed BodyPart objects.
    */
-  public int getCount ()
+  public int getCount()
     throws MessagingException
   {
     synchronized (this)
       {
-        parse ();
-        return super.getCount ();
+        parse();
+        return super.getCount();
       }
   }
 
@@ -192,33 +192,33 @@ public class MimeMultipart
    * @param index the index of the desired BodyPart
    * @exception MessagingException if no such BodyPart exists
    */
-  public BodyPart getBodyPart (int index)
+  public BodyPart getBodyPart(int index)
     throws MessagingException
   {
     synchronized (this)
       {
-        parse ();
-        return super.getBodyPart (index);
+        parse();
+        return super.getBodyPart(index);
       }
   }
 
   /**
-   * Get the MimeBodyPart referred to by the given ContentID (CID).
+   * Get the MimeBodyPart referred to by the given ContentID(CID).
    * Returns null if the part is not found.
    * @param CID the ContentID of the desired part
    */
-  public BodyPart getBodyPart (String CID)
+  public BodyPart getBodyPart(String CID)
     throws MessagingException
   {
     synchronized (this)
       {
-        parse ();
-        int count = getCount ();
+        parse();
+        int count = getCount();
         for (int i = 0; i < count; i++)
           {
-            MimeBodyPart bp = (MimeBodyPart) getBodyPart (i);
-            String contentID = bp.getContentID ();
-            if (contentID != null && contentID.equals (CID))
+            MimeBodyPart bp = (MimeBodyPart) getBodyPart(i);
+            String contentID = bp.getContentID();
+            if (contentID != null && contentID.equals(CID))
               {
                 return bp;
               }
@@ -244,15 +244,15 @@ public class MimeMultipart
    * its internal state actually did change,
    * and do the header updating only if necessary.
    */
-  protected void updateHeaders ()
+  protected void updateHeaders()
     throws MessagingException
   {
     synchronized (parts)
     {
-      int len = parts.size ();
+      int len = parts.size();
       for (int i = 0; i < len; i++)
         {
-          ((MimeBodyPart) parts.get (i)).updateHeaders ();
+         ((MimeBodyPart) parts.get(i)).updateHeaders();
         }
     }
   }
@@ -262,37 +262,37 @@ public class MimeMultipart
    * separated by a boundary.
    * @exception IOException if an IO related exception occurs
    */
-  public void writeTo (OutputStream os)
+  public void writeTo(OutputStream os)
     throws IOException, MessagingException
   {
     final String charset = "US-ASCII";
     final byte[] sep = { 0x0d, 0x0a };
     
-    parse ();
-    ContentType ct = new ContentType (contentType);
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append ("--");
-    buffer.append (ct.getParameter ("boundary"));
-    byte[] boundary = buffer.toString ().getBytes (charset);
+    parse();
+    ContentType ct = new ContentType(contentType);
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("--");
+    buffer.append(ct.getParameter("boundary"));
+    byte[] boundary = buffer.toString().getBytes(charset);
     
     synchronized (parts)
     {
-      int len = parts.size ();
+      int len = parts.size();
       for (int i = 0; i < len; i++)
       {
-        os.write (boundary);
-        os.write (sep);
-        os.flush ();
-        ((MimeBodyPart) parts.get (i)).writeTo (os);
-        os.write (sep);
+        os.write(boundary);
+        os.write(sep);
+        os.flush();
+       ((MimeBodyPart) parts.get(i)).writeTo(os);
+        os.write(sep);
       }
     }
 
-    buffer.append ("--");
-    boundary = buffer.toString ().getBytes (charset);
-    os.write (boundary);
-    os.write (sep);
-    os.flush ();
+    buffer.append("--");
+    boundary = buffer.toString().getBytes(charset);
+    os.write(boundary);
+    os.write(sep);
+    os.flush();
   }
 
   /**
@@ -302,7 +302,7 @@ public class MimeMultipart
    * This method is called by all other methods that need data for the body 
    * parts, to make sure the data has been parsed.
    */
-  protected void parse ()
+  protected void parse()
     throws MessagingException
   {
     if (parsed)
@@ -315,7 +315,7 @@ public class MimeMultipart
         SharedInputStream sis = null;
         try
           {
-            is = ds.getInputStream ();
+            is = ds.getInputStream();
             if (is instanceof SharedInputStream)
               {
                 sis = (SharedInputStream) is;
@@ -324,31 +324,31 @@ public class MimeMultipart
             if (!(is instanceof ByteArrayInputStream) && 
                 !(is instanceof BufferedInputStream))
               {
-                is = new BufferedInputStream (is);
+                is = new BufferedInputStream(is);
               }
             
-            ContentType ct = new ContentType (contentType);
-            StringBuffer buffer = new StringBuffer ();
-            buffer.append ("--");
-            buffer.append (ct.getParameter ("boundary"));
-            String boundary = buffer.toString ();
+            ContentType ct = new ContentType(contentType);
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("--");
+            buffer.append(ct.getParameter("boundary"));
+            String boundary = buffer.toString();
             
-            byte[] bbytes = boundary.getBytes ();
+            byte[] bbytes = boundary.getBytes();
             int blen = bbytes.length;
             
-            LineInputStream lis = new LineInputStream (is);
+            LineInputStream lis = new LineInputStream(is);
             String line;
-            while ((line = lis.readLine ()) != null)
+            while ((line = lis.readLine()) != null)
               {
                 System.out.println(line);
-                if (trim(line) .equals (boundary))
+                if (trim(line) .equals(boundary))
                   {
                     break;
                   }
               }
             if (line == null)
               {
-                throw new MessagingException ("No start boundary");
+                throw new MessagingException("No start boundary");
               }
             
             long start = 0L, end = 0L;
@@ -357,34 +357,34 @@ public class MimeMultipart
                 InternetHeaders headers = null;
                 if (sis != null)
                   {
-                    start = sis.getPosition ();
+                    start = sis.getPosition();
                     do
                       {
-                        line = trim (lis.readLine ());
+                        line = trim(lis.readLine());
                       }
-                    while (line != null && line.length () > 0);
+                    while (line != null && line.length() > 0);
                     if (line == null)
                       {
-                        throw new IOException ("EOF before content body");
+                        throw new IOException("EOF before content body");
                       }
                   }
                 else
                   {
-                    headers = createInternetHeaders (is);
+                    headers = createInternetHeaders(is);
                   }
                 ByteArrayOutputStream bos = null;
                 if (sis == null)
                   {
-                    bos = new ByteArrayOutputStream ();
+                    bos = new ByteArrayOutputStream();
                   }
                 
                 // NB this routine uses the InputStream.mark() method
                 // if it is not supported by the underlying stream
                 // we will run into problems
-                if (!is.markSupported ())
+                if (!is.markSupported())
                   {
-                    String cn = is.getClass ().getName ();
-                    throw new MessagingException ("FIXME: mark not supported" +
+                    String cn = is.getClass().getName();
+                    throw new MessagingException("FIXME: mark not supported" +
                                                   " on underlying input stre" +
                                                   "am: " + cn);
                   }
@@ -396,11 +396,11 @@ public class MimeMultipart
                     int c;
                     if (eol)
                       {
-                        is.mark (blen + 1024);
+                        is.mark(blen + 1024);
                         int pos = 0;
                         while (pos < blen)
                           {
-                            if (is.read () != bbytes[pos])
+                            if (is.read() != bbytes[pos])
                               {
                                 break;
                               }
@@ -409,22 +409,22 @@ public class MimeMultipart
                         
                         if (pos == blen)
                           {
-                            c = is.read ();
-                            if (c == '-' && is.read () == '-')
+                            c = is.read();
+                            if (c == '-' && is.read() == '-')
                               {
                                 done = true;
                                 break;
                               }
                             while (c == ' ' || c == '\t')
                               {
-                                c = is.read ();
+                                c = is.read();
                               }
                             if (c == '\r')
                               {
-                                is.mark (1);
-                                if (is.read () != '\n')
+                                is.mark(1);
+                                if (is.read() != '\n')
                                   {
-                                    is.reset ();
+                                    is.reset();
                                   }
                                 break;
                               }
@@ -435,16 +435,16 @@ public class MimeMultipart
                           }
                         if (bos != null && last != -1)
                           {
-                            bos.write (last);
+                            bos.write(last);
                             if (afterLast != -1)
                               {
-                                bos.write (afterLast);
+                                bos.write(afterLast);
                               }
                             last = afterLast = -1;
                           }
-                        is.reset ();
+                        is.reset();
                       }
-                    c = is.read ();
+                    c = is.read();
                     if (c < 0)
                       {
                         done = true;
@@ -455,19 +455,19 @@ public class MimeMultipart
                         eol = true;
                         if (sis != null)
                           {
-                            end = sis.getPosition () - 1L;
+                            end = sis.getPosition() - 1L;
                           }
                         last = c;
                         if (c == '\r')
                           {
-                            is.mark (1);
-                            if ((c = is.read ()) == '\n')
+                            is.mark(1);
+                            if ((c = is.read()) == '\n')
                               {
                                 afterLast = c;
                               }
                             else
                               {
-                                is.reset ();
+                                is.reset();
                               }
                           }
                       }
@@ -476,7 +476,7 @@ public class MimeMultipart
                         eol = false;
                         if (bos != null)
                           {
-                            bos.write (c);
+                            bos.write(c);
                           }
                       }
                   }
@@ -485,19 +485,19 @@ public class MimeMultipart
                 MimeBodyPart bp;
                 if (sis != null)
                   {
-                    bp = createMimeBodyPart (sis.newStream (start, end));
+                    bp = createMimeBodyPart(sis.newStream(start, end));
                   }
                 else
                   {
-                    bp = createMimeBodyPart (headers, bos.toByteArray ());
+                    bp = createMimeBodyPart(headers, bos.toByteArray());
                   }
-                addBodyPart (bp);
+                addBodyPart(bp);
               }
             
           }
         catch (IOException e)
           {
-            throw new MessagingException ("I/O error", e);
+            throw new MessagingException("I/O error", e);
           }
         parsed = true;
       }
@@ -506,17 +506,17 @@ public class MimeMultipart
   /*
    * Ensures that CR is stripped from the end of the given line.
    */
-  private static String trim (String line)
+  private static String trim(String line)
   {
     if (line == null)
       {
         return null;
       }
-    line = line.trim ();
-    int len = line.length ();
-    if (len > 0 && line.charAt (len - 1) == '\r')
+    line = line.trim();
+    int len = line.length();
+    if (len > 0 && line.charAt(len - 1) == '\r')
       {
-        line = line.substring (0, len - 1);
+        line = line.substring(0, len - 1);
       }
     return line;
   }
@@ -530,10 +530,10 @@ public class MimeMultipart
    * object.
    * @param is the InputStream to read the headers from
    */
-  protected InternetHeaders createInternetHeaders (InputStream is)
+  protected InternetHeaders createInternetHeaders(InputStream is)
     throws MessagingException
   {
-    return new InternetHeaders (is);
+    return new InternetHeaders(is);
   }
   
   /**
@@ -545,11 +545,11 @@ public class MimeMultipart
    * @param headers the headers for the body part
    * @param content the content of the body part
    */
-  protected MimeBodyPart createMimeBodyPart (InternetHeaders headers,
+  protected MimeBodyPart createMimeBodyPart(InternetHeaders headers,
                                              byte[] content)
     throws MessagingException
   {
-    return new MimeBodyPart (headers, content);
+    return new MimeBodyPart(headers, content);
   }
   
   /**
@@ -560,10 +560,10 @@ public class MimeMultipart
    * returns a MimeBodyPart object.
    * @param is InputStream containing the body part
    */
-  protected MimeBodyPart createMimeBodyPart (InputStream is)
+  protected MimeBodyPart createMimeBodyPart(InputStream is)
     throws MessagingException
   {
-    return new MimeBodyPart (is);
+    return new MimeBodyPart(is);
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * TransportListener.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,16 +42,16 @@ public interface TransportListener
   /**
    * Invoked when a Message is succesfully delivered.
    */
-  void messageDelivered (TransportEvent e);
+  void messageDelivered(TransportEvent e);
 
   /**
    * Invoked when a Message is not delivered.
    */
-  void messageNotDelivered (TransportEvent e);
+  void messageNotDelivered(TransportEvent e);
 
   /**
    * Invoked when a Message is partially delivered.
    */
-  void messagePartiallyDelivered (TransportEvent e);
+  void messagePartiallyDelivered(TransportEvent e);
   
 }

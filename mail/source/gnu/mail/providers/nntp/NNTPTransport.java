@@ -1,13 +1,13 @@
 /*
  * NNTPTransport.java
- * Copyright (C) 2002 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2002 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -61,16 +61,16 @@ public class NNTPTransport extends Transport
    * @param session the session
    * @param url the connection URL
    */
-  public NNTPTransport (Session session, URLName url)
+  public NNTPTransport(Session session, URLName url)
     {
-      super (session, url);
+      super(session, url);
     }
 
   /**
    * Performs the protocol connection.
    * @see NNTPStore#protocolConnect
    */
-  protected boolean protocolConnect (String host, int port, String username,
+  protected boolean protocolConnect(String host, int port, String username,
                                      String password)
     throws MessagingException
     {
@@ -80,15 +80,15 @@ public class NNTPTransport extends Transport
         }
       if (host == null)
         {
-          host = getProperty ("host");
+          host = getProperty("host");
         }
       if (username == null)
         {
-          username = getProperty ("user");
+          username = getProperty("user");
         }
       if (port < 0)
         {
-          port = getIntProperty ("port");
+          port = getIntProperty("port");
         }
       if (host == null)
         {
@@ -96,20 +96,20 @@ public class NNTPTransport extends Transport
         }
       try
         {
-          int connectionTimeout = getIntProperty ("connectiontimeout");
-          int timeout = getIntProperty ("timeout");
+          int connectionTimeout = getIntProperty("connectiontimeout");
+          int timeout = getIntProperty("timeout");
           if (port < 0)
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
-          connection = new NNTPConnection (host, port,
+          connection = new NNTPConnection(host, port,
                                            connectionTimeout, timeout,
                                            debug);
           if (username != null && password != null)
             {
               // TODO decide on authentication method
               // Original authinfo
-              return connection.authinfo (username, password);
+              return connection.authinfo(username, password);
             }
           else
             {
@@ -118,13 +118,13 @@ public class NNTPTransport extends Transport
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
       catch (SecurityException e)
         {
           if (username != null && password != null)
             {
-              throw new AuthenticationFailedException (e.getMessage ());
+              throw new AuthenticationFailedException(e.getMessage());
             }
           else
             {
@@ -137,41 +137,41 @@ public class NNTPTransport extends Transport
    * Close the connection.
    * @see NNTPStore#close
    */
-  public void close ()
+  public void close()
     throws MessagingException
     {
       try
         {
           synchronized (connection)
             {
-              connection.quit ();
+              connection.quit();
             }
         }
       catch (IOException e)
         {
           if (!(e instanceof SocketException))
             {
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
-      super.close ();
+      super.close();
     }
 
   /**
    * Post an article.
    * @param message a MimeMessage
-   * @param addresses an array of Address (ignored!)
+   * @param addresses an array of Address(ignored!)
    */
-  public void sendMessage (Message message, Address[] addresses)
+  public void sendMessage(Message message, Address[] addresses)
     throws MessagingException
     {
       // Ensure corrent recipient type, and that all newsgroup recipients are
       // of type NewsAddress.
-      addresses = message.getRecipients (MimeMessage.RecipientType.NEWSGROUPS);
+      addresses = message.getRecipients(MimeMessage.RecipientType.NEWSGROUPS);
       boolean ok = (addresses.length > 0);
       if (!ok)
         {
-          throw new MessagingException ("No recipients specified");
+          throw new MessagingException("No recipients specified");
         }
       for (int i = 0; i < addresses.length; i++)
         {
@@ -183,7 +183,7 @@ public class NNTPTransport extends Transport
         }
       if (!ok)
         {
-          throw new MessagingException ("Newsgroup recipients must be "+
+          throw new MessagingException("Newsgroup recipients must be "+
                                         "specified as type NewsAddress");
         }
       
@@ -191,11 +191,11 @@ public class NNTPTransport extends Transport
         {
           synchronized (connection)
             {
-              OutputStream out = connection.post ();
-              message.writeTo (out);
-              out.close ();
+              OutputStream out = connection.post();
+              message.writeTo(out);
+              out.close();
             }
-          notifyTransportListeners (TransportEvent.MESSAGE_DELIVERED,
+          notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED,
                                     addresses,
                                     new NewsAddress[0],
                                     new NewsAddress[0],
@@ -203,18 +203,18 @@ public class NNTPTransport extends Transport
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
   
-  private int getIntProperty (String key)
+  private int getIntProperty(String key)
     {
-      String value = getProperty (key);
+      String value = getProperty(key);
       if (value != null)
         {
           try
             {
-              return Integer.parseInt (value);
+              return Integer.parseInt(value);
             }
           catch (RuntimeException e)
             {
@@ -223,26 +223,26 @@ public class NNTPTransport extends Transport
       return -1;
     }
 
-  private boolean propertyIsFalse (String key)
+  private boolean propertyIsFalse(String key)
     {
-      return "false".equals (getProperty (key));
+      return "false".equals(getProperty(key));
     }
 
-  private boolean propertyIsTrue (String key)
+  private boolean propertyIsTrue(String key)
     {
-      return "true".equals (getProperty (key));
+      return "true".equals(getProperty(key));
     }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty (String key)
+  private String getProperty(String key)
     {
-      String value = session.getProperty ("mail.nntp." + key);
+      String value = session.getProperty("mail.nntp." + key);
       if (value == null)
         {
-          value = session.getProperty ("mail." + key);
+          value = session.getProperty("mail." + key);
         }
       return value;
     }

@@ -1,13 +1,13 @@
 /*
  * Base64InputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -133,7 +133,7 @@ public class Base64InputStream
   }
 
   /**
-   * Returns the number of bytes that can be read (or skipped over) from this
+   * Returns the number of bytes that can be read(or skipped over) from this
    * input stream without blocking by the next caller of a method for this 
    * input stream.
    */
@@ -157,7 +157,7 @@ public class Base64InputStream
     while (c==LF || c==CR);
     decodeBuf[0] = (byte)c;
     int j = 3, l;
-    for (int k=1; (l=in.read(decodeBuf, k, j))!=j; k += l)
+    for (int k=1;(l=in.read(decodeBuf, k, j))!=j; k += l)
     {
       if (l==-1)
         throw new IOException("Base64 encoding error");

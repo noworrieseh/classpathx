@@ -1,13 +1,13 @@
 /*
  * NNTPFolder.java
- * Copyright (C) 2002 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2002 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,16 +71,16 @@ public final class NNTPFolder
 
   Map articleCache; // cache of article-number to NNTPMessage
   
-  NNTPFolder (NNTPStore store, String name)
+  NNTPFolder(NNTPStore store, String name)
     {
-      super (store);
+      super(store);
       this.name = name;
     }
 
   /**
    * Returns the name of the newsgroup, e.g. <code>alt.test</code>.
    */
-  public String getName ()
+  public String getName()
     {
       return name;
     }
@@ -88,7 +88,7 @@ public final class NNTPFolder
   /**
    * @see #getName
    */
-  public String getFullName ()
+  public String getFullName()
     {
       return name;
     }
@@ -97,7 +97,7 @@ public final class NNTPFolder
    * This implementation uses a flat namespace, so the parent of any
    * NNTPFolder is the NNTP root folder.
    */
-  public Folder getParent ()
+  public Folder getParent()
     throws MessagingException
     {
       NNTPStore ns = (NNTPStore) store;
@@ -108,13 +108,13 @@ public final class NNTPFolder
    * Returns the type of this folder.
    * This folder type only holds messages.
    */
-  public int getType ()
+  public int getType()
     throws MessagingException
     {
       return HOLDS_MESSAGES;
     }
 
-  public boolean isOpen ()
+  public boolean isOpen()
     {
       return open;
     }
@@ -122,7 +122,7 @@ public final class NNTPFolder
   /**
    * This folder type is always read-only.
    */
-  public int getMode ()
+  public int getMode()
     {
       return READ_ONLY;
     }
@@ -130,10 +130,10 @@ public final class NNTPFolder
   /**
    * Returns the flags supported by this folder.
    */
-  public Flags getPermanentFlags ()
+  public Flags getPermanentFlags()
     {
       NNTPStore ns = (NNTPStore) store;
-      return new Flags (ns.permanentFlags);
+      return new Flags(ns.permanentFlags);
     }
 
   /**
@@ -141,67 +141,67 @@ public final class NNTPFolder
    * However, we will use it to send a GROUP command and refresh our article
    * stats.
    */
-  public void open (int mode)
+  public void open(int mode)
     throws MessagingException
     {
       // NB this should probably throw an exception if READ_WRITE is
       // specified, but this tends to cause problems with existing clients.
       if (open)
         {
-          throw new IllegalStateException ();
+          throw new IllegalStateException();
         }
       try
         {
           NNTPStore ns = (NNTPStore) store;
           synchronized (ns.connection)
             {
-              GroupResponse response = ns.connection.group (name);
+              GroupResponse response = ns.connection.group(name);
               count = response.count;
               first = response.first;
               last = response.last;
             }
 
-          articleCache = new HashMap (1024); // TODO make configurable
+          articleCache = new HashMap(1024); // TODO make configurable
           open = true;
-          notifyConnectionListeners (ConnectionEvent.OPENED);
+          notifyConnectionListeners(ConnectionEvent.OPENED);
         }
       catch (NNTPException e)
         {
-          if (e.getResponse ().getStatus () == NNTPConstants.NO_SUCH_GROUP)
+          if (e.getResponse().getStatus() == NNTPConstants.NO_SUCH_GROUP)
             {
-              throw new FolderNotFoundException (e.getMessage (), this);
+              throw new FolderNotFoundException(e.getMessage(), this);
             }
           else
             {
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
 
   /**
    * This method has no particular meaning in NNTP.
    */
-  public void close (boolean expunge)
+  public void close(boolean expunge)
     throws MessagingException
     {
       if (!open)
         {
-          throw new IllegalStateException ();
+          throw new IllegalStateException();
         }
       
       articleCache = null;
       open = false;
-      notifyConnectionListeners (ConnectionEvent.CLOSED);
+      notifyConnectionListeners(ConnectionEvent.CLOSED);
     }
   
   /**
    * Indicates whether the newsgroup is present on the server.
    */
-  public boolean exists ()
+  public boolean exists()
     throws MessagingException
     {
       try
@@ -209,7 +209,7 @@ public final class NNTPFolder
           NNTPStore ns = (NNTPStore) store;
           synchronized (ns.connection)
             {
-              GroupResponse response = ns.connection.group (name);
+              GroupResponse response = ns.connection.group(name);
               count = response.count;
               first = response.first;
               last = response.last;
@@ -218,25 +218,25 @@ public final class NNTPFolder
         }
       catch (NNTPException e)
         {
-          if (e.getResponse ().getStatus () == NNTPConstants.NO_SUCH_GROUP)
+          if (e.getResponse().getStatus() == NNTPConstants.NO_SUCH_GROUP)
             {
               return false;
             }
           else
             {
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
 
   /**
    * Indicates whether there are new articles in this newsgroup.
    */
-  public boolean hasNewMessages ()
+  public boolean hasNewMessages()
     throws MessagingException
     {
       try
@@ -245,7 +245,7 @@ public final class NNTPFolder
           boolean hasNew = false;
           synchronized (ns.connection)
             {
-              GroupResponse response = ns.connection.group (name);
+              GroupResponse response = ns.connection.group(name);
               if (response.last > last)
                 {
                   hasNew = true;
@@ -258,25 +258,25 @@ public final class NNTPFolder
         }
       catch (NNTPException e)
         {
-          if (e.getResponse ().getStatus () == NNTPConstants.NO_SUCH_GROUP)
+          if (e.getResponse().getStatus() == NNTPConstants.NO_SUCH_GROUP)
             {
-              throw new FolderNotFoundException (e.getMessage (), this);
+              throw new FolderNotFoundException(e.getMessage(), this);
             }
           else
             {
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
   
   /**
    * Returns the number of articles in this newsgroup.
    */
-  public int getMessageCount ()
+  public int getMessageCount()
     throws MessagingException
     {
       return count;
@@ -287,17 +287,17 @@ public final class NNTPFolder
    * number.
    * @throws MessageRemovedException often ;-)
    */
-  public Message getMessage (int msgnum)
+  public Message getMessage(int msgnum)
     throws MessagingException
     {
       if (!open)
         {
-          throw new IllegalStateException ();
+          throw new IllegalStateException();
         }
       
       // Cache lookup
-      Integer key = new Integer (msgnum);
-      NNTPMessage m = (NNTPMessage) articleCache.get (key);
+      Integer key = new Integer(msgnum);
+      NNTPMessage m = (NNTPMessage) articleCache.get(key);
       if (m!=null)
         {
           return m;
@@ -309,32 +309,32 @@ public final class NNTPFolder
           synchronized (ns.connection)
             {
               // Ensure group selected
-              GroupResponse gr = ns.connection.group (name);
+              GroupResponse gr = ns.connection.group(name);
               first = gr.first;
               last = gr.last;
               count = gr.count;
               // Get article
-              m = getMessageImpl (msgnum - 1 + first);
+              m = getMessageImpl(msgnum - 1 + first);
               // Cache store
-              articleCache.put (key, m);
+              articleCache.put(key, m);
               return m;
             }
         }
       catch (NNTPException e)
           {
-            switch (e.getResponse ().getStatus ())
+            switch (e.getResponse().getStatus())
               {
               case NNTPConstants.NO_ARTICLE_SELECTED:
               case NNTPConstants.NO_SUCH_ARTICLE_NUMBER:
               case NNTPConstants.NO_SUCH_ARTICLE:
-                throw new MessageRemovedException (e.getMessage ());
+                throw new MessageRemovedException(e.getMessage());
               default:
-                throw new MessagingException (e.getMessage (), e);
+                throw new MessagingException(e.getMessage(), e);
               }
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
 
@@ -342,14 +342,14 @@ public final class NNTPFolder
    * Perform article STAT.
    * NB not synchronized against the connection!
    */
-  NNTPMessage getMessageImpl (int msgnum)
+  NNTPMessage getMessageImpl(int msgnum)
     throws IOException
     {
       NNTPStore ns = (NNTPStore) store;
       // Issue STAT
-      ArticleResponse response = ns.connection.stat (msgnum);
+      ArticleResponse response = ns.connection.stat(msgnum);
       String messageId = response.messageId;
-      return new NNTPMessage (this, msgnum, messageId);
+      return new NNTPMessage(this, msgnum, messageId);
     }
 
   /**
@@ -357,42 +357,42 @@ public final class NNTPFolder
    * This tries XHDR first to retrieve Message-IDs for the articles.
    * If this fails we fall back to statting each article.
    */
-  public Message[] getMessages ()
+  public Message[] getMessages()
     throws MessagingException
     {
       NNTPStore ns = (NNTPStore) store;
-      List acc = new LinkedList ();
+      List acc = new LinkedList();
       synchronized (ns.connection)
         {
           try
             {
               // Ensure group selected
-              GroupResponse gr = ns.connection.group (name);
+              GroupResponse gr = ns.connection.group(name);
               first = gr.first;
               last = gr.last;
               count = gr.count;
               // Get Message-IDs for all article numbers
-              StringBuffer rb = new StringBuffer ();
-              rb.append (Integer.toString (first));
-              rb.append ('-');
-              rb.append (Integer.toString (last));
-              HeaderIterator i = ns.connection.xhdr ("Message-ID",
-                                                     rb.toString ());
-              while (i.hasNext ())
+              StringBuffer rb = new StringBuffer();
+              rb.append(Integer.toString(first));
+              rb.append('-');
+              rb.append(Integer.toString(last));
+              HeaderIterator i = ns.connection.xhdr("Message-ID",
+                                                     rb.toString());
+              while (i.hasNext())
                 {
-                  HeaderEntry entry = i.nextHeaderEntry ();
-                  Integer key = new Integer (entry.getArticleId ());
+                  HeaderEntry entry = i.nextHeaderEntry();
+                  Integer key = new Integer(entry.getArticleId());
                   // Cache lookup
-                  NNTPMessage m = (NNTPMessage) articleCache.get (key);
+                  NNTPMessage m = (NNTPMessage) articleCache.get(key);
                   if (m == null)
                     {
-                      int msgnum = key.intValue ();
-                      String messageId = entry.getHeader ();
-                      m = new NNTPMessage (this, msgnum, messageId);
+                      int msgnum = key.intValue();
+                      String messageId = entry.getHeader();
+                      m = new NNTPMessage(this, msgnum, messageId);
                       // Cache store
-                      articleCache.put (key, m);
+                      articleCache.put(key, m);
                     }
-                  acc.add (m);
+                  acc.add(m);
                 }
             }
           catch (NNTPException e)
@@ -401,58 +401,58 @@ public final class NNTPFolder
               // We'll do it the slow way.
               for (int i = first; i <= last; i++)
                 {
-                  Integer key = new Integer (i);
+                  Integer key = new Integer(i);
                   // Cache lookup
-                  Message m = (NNTPMessage) articleCache.get (key);
+                  Message m = (NNTPMessage) articleCache.get(key);
                   if (m == null)
                     {
                       try 
                         {
-                          m = getMessageImpl (i);
+                          m = getMessageImpl(i);
                           // Cache store
-                          articleCache.put (key, m);
-                          acc.add (m);
+                          articleCache.put(key, m);
+                          acc.add(m);
                         }
                       catch (NNTPException e2)
                         {
-                          switch (e2.getResponse ().getStatus ())
+                          switch (e2.getResponse().getStatus())
                             {
                             case NNTPConstants.NO_ARTICLE_SELECTED:
                             case NNTPConstants.NO_SUCH_ARTICLE_NUMBER:
                             case NNTPConstants.NO_SUCH_ARTICLE:
                               break; // article does not exist, ignore
                             default:
-                              throw new MessagingException (e2.getMessage (),
+                              throw new MessagingException(e2.getMessage(),
                                                             e2);
                             }
                         }
                       catch (IOException ie)
                         {
-                          throw new MessagingException (ie.getMessage (), ie);
+                          throw new MessagingException(ie.getMessage(), ie);
                         }
                     }
                 }
             }
           catch (IOException e)
             {
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
-      int len = acc.size ();
+      int len = acc.size();
       Message[] messages = new Message[len];
-      acc.toArray (messages);
+      acc.toArray(messages);
       return messages;
     }
 
   /**
    * Prefetch.
    */
-  public void fetch (Message[] msgs, FetchProfile fp)
+  public void fetch(Message[] msgs, FetchProfile fp)
     throws MessagingException
     {
-      boolean head = fp.contains (FetchProfile.Item.ENVELOPE);
-      head = head || (fp.getHeaderNames ().length > 0);
-      boolean body = fp.contains (FetchProfile.Item.CONTENT_INFO);
+      boolean head = fp.contains(FetchProfile.Item.ENVELOPE);
+      head = head ||(fp.getHeaderNames().length > 0);
+      boolean body = fp.contains(FetchProfile.Item.CONTENT_INFO);
       int op = (head && body) ? 3 : head ? 2 : body ? 1 : 0;
       try
         {
@@ -465,7 +465,7 @@ public final class NNTPFolder
                   continue;
                 }
               NNTPMessage message = (NNTPMessage) msg;
-              String messageId = message.getMessageId ();
+              String messageId = message.getMessageId();
 
               ArticleResponse response = null;
               synchronized (ns.connection)
@@ -473,41 +473,41 @@ public final class NNTPFolder
                   switch (op)
                     {
                     case 3: // head & body
-                      response = ns.connection.article (messageId);
+                      response = ns.connection.article(messageId);
                       break;
                     case 2: // head
-                      response = ns.connection.head (messageId);
+                      response = ns.connection.head(messageId);
                       break;
                     case 1: // body
-                      response = ns.connection.body (messageId);
+                      response = ns.connection.body(messageId);
                       break;
                     }
-                  ByteArrayOutputStream out = new ByteArrayOutputStream ();
+                  ByteArrayOutputStream out = new ByteArrayOutputStream();
                   byte[] buf = new byte[4096];
-                  for (int len = response.in.read (buf);
+                  for (int len = response.in.read(buf);
                        len >- 1;
-                       len = response.in.read (buf))
+                       len = response.in.read(buf))
                     {
-                      out.write (buf, 0, len);
+                      out.write(buf, 0, len);
                     }
                   switch (op)
                     {
                     case 3: // head & body
                       ByteArrayInputStream hbin =
-                        new ByteArrayInputStream (out.toByteArray ());
-                      message.updateHeaders (hbin);
-                      int len = hbin.available ();
+                        new ByteArrayInputStream(out.toByteArray());
+                      message.updateHeaders(hbin);
+                      int len = hbin.available();
                       byte[] content = new byte[len];
-                      hbin.read (content);
-                      message.updateContent (content);
+                      hbin.read(content);
+                      message.updateContent(content);
                       break;
                     case 2: // head
                       ByteArrayInputStream hin =
-                        new ByteArrayInputStream (out.toByteArray ());
-                      message.updateHeaders (hin);
+                        new ByteArrayInputStream(out.toByteArray());
+                      message.updateHeaders(hin);
                       break;
                     case 1: // body
-                      message.updateContent (out.toByteArray ());
+                      message.updateContent(out.toByteArray());
                       break;
                     }
                 }
@@ -515,21 +515,21 @@ public final class NNTPFolder
         }
       catch (NNTPException e)
         {
-          switch (e.getResponse ().getStatus ())
+          switch (e.getResponse().getStatus())
             {
             case NNTPConstants.NO_GROUP_SELECTED:
-              throw new IllegalStateException (e.getMessage ());
+              throw new IllegalStateException(e.getMessage());
             case NNTPConstants.NO_ARTICLE_SELECTED:
             case NNTPConstants.NO_SUCH_ARTICLE_NUMBER:
             case NNTPConstants.NO_SUCH_ARTICLE:
-              throw new MessageRemovedException (e.getMessage ());
+              throw new MessageRemovedException(e.getMessage());
             default:
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
 
@@ -539,33 +539,33 @@ public final class NNTPFolder
    * Indicates if the newsgroup is subscribed.
    * This uses the newsrc mechanism associated with this folder's store.
    */
-  public boolean isSubscribed ()
+  public boolean isSubscribed()
     {
       NNTPStore ns = (NNTPStore) store;
-      return ns.newsrc.isSubscribed (name);
+      return ns.newsrc.isSubscribed(name);
     }
 
   /**
    * Subscribes or unsubscribes to this newsgroup.
    * This uses the newsrc mechanism associated with this folder's store.
    */
-  public void setSubscribed (boolean flag)
+  public void setSubscribed(boolean flag)
     throws MessagingException
     {
       NNTPStore ns = (NNTPStore) store;
-      ns.newsrc.setSubscribed (name, flag);
+      ns.newsrc.setSubscribed(name, flag);
     }
 
-  boolean isSeen (int articleNumber)
+  boolean isSeen(int articleNumber)
     {
       NNTPStore ns = (NNTPStore) store;
-      return ns.newsrc.isSeen (name, articleNumber);
+      return ns.newsrc.isSeen(name, articleNumber);
     }
 
-  void setSeen (int articleNumber, boolean flag)
+  void setSeen(int articleNumber, boolean flag)
     {
       NNTPStore ns = (NNTPStore) store;
-      ns.newsrc.setSeen (name, articleNumber, flag);
+      ns.newsrc.setSeen(name, articleNumber, flag);
     }
 
   // -- Stuff we can't do --
@@ -573,34 +573,34 @@ public final class NNTPFolder
   /**
    * This folder type does not contain other folders.
    */
-  public Folder getFolder (String name)
+  public Folder getFolder(String name)
     throws MessagingException
     {
-      throw new MethodNotSupportedException ();
+      throw new MethodNotSupportedException();
     }
 
   /**
    * This folder type does not contain other folders.
    */
-  public Folder[] list (String pattern)
+  public Folder[] list(String pattern)
     throws MessagingException
     {
-      throw new MethodNotSupportedException ();
+      throw new MethodNotSupportedException();
     }
 
   /**
    * This folder type does not contain other folders.
    */
-  public Folder[] listSubscribed (String pattern)
+  public Folder[] listSubscribed(String pattern)
     throws MessagingException
     {
-      return list (pattern);
+      return list(pattern);
     }
 
   /**
    * If we move away from a flat namespace, this might be useful.
    */
-  public char getSeparator ()
+  public char getSeparator()
     throws MessagingException
     {
       return '.';
@@ -609,34 +609,34 @@ public final class NNTPFolder
   /**
    * NNTP servers are read-only.
    */
-  public boolean create (int type)
+  public boolean create(int type)
     throws MessagingException
     {
-      throw new MethodNotSupportedException ();
+      throw new MethodNotSupportedException();
     }
 
   /**
    * NNTP servers are read-only.
    */
-  public boolean delete (boolean recurse)
+  public boolean delete(boolean recurse)
     throws MessagingException
     {
-      throw new MethodNotSupportedException ();
+      throw new MethodNotSupportedException();
     }
 
   /**
    * NNTP servers are read-only.
    */
-  public boolean renameTo (Folder folder)
+  public boolean renameTo(Folder folder)
     throws MessagingException
     {
-      throw new MethodNotSupportedException ();
+      throw new MethodNotSupportedException();
     }
 
   /**
    * NNTP servers are read-only.
    */
-  public void appendMessages (Message[] messages)
+  public void appendMessages(Message[] messages)
     throws MessagingException
     {
       throw new IllegalWriteException();
@@ -645,10 +645,10 @@ public final class NNTPFolder
   /**
    * NNTP servers are read-only.
    */
-  public Message[] expunge ()
+  public Message[] expunge()
     throws MessagingException
     {
-      throw new IllegalWriteException ();
+      throw new IllegalWriteException();
     }
 
 }

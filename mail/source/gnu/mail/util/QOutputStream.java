@@ -1,13 +1,13 @@
 /*
  * QOutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,14 +26,14 @@
  */
 /*
  * QOutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -68,18 +68,18 @@ import java.io.OutputStream;
  * <li>Any 8-bit value may be represented by a "=" followed by two
  * hexadecimal digits.  For example, if the character set in use
  * were ISO-8859-1, the "=" character would thus be encoded as
- * "=3D", and a SPACE by "=20".  (Upper case should be used for
+ * "=3D", and a SPACE by "=20". (Upper case should be used for
  * hexadecimal digits "A" through "F".)
- * <li>The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be
- * represented as "_" (underscore, ASCII 95.).  (This character may
+ * <li>The 8-bit hexadecimal value 20(e.g., ISO-8859-1 SPACE) may be
+ * represented as "_"(underscore, ASCII 95.). (This character may
  * not pass through some internetwork mail gateways, but its use
  * will greatly enhance readability of "Q" encoded data with mail
  * readers that do not support this encoding.)  Note that the "_"
  * always represents hexadecimal 20, even if the SPACE character
  * occupies a different code position in the character set in use.
  * <li>8-bit values which correspond to printable ASCII characters other
- * than "=", "?", and "_" (underscore), MAY be represented as those
- * characters.  (But see section 5 for restrictions.)  In
+ * than "=", "?", and "_"(underscore), MAY be represented as those
+ * characters. (But see section 5 for restrictions.)  In
  * particular, SPACE and TAB MUST NOT be represented as themselves
  * within encoded words.
  *

@@ -1,13 +1,13 @@
 /*
  * NNTPStore.java
- * Copyright (C) 2002 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2002 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -68,53 +68,53 @@ public class NNTPStore extends Store
    * @param session the session
    * @param url the connection URL
    */
-  public NNTPStore (Session session, URLName url)
+  public NNTPStore(Session session, URLName url)
     {
-      super (session, url);
+      super(session, url);
 
       // The permanent flags for NNTPFolders.
-      permanentFlags = new Flags ();
-      permanentFlags.add (Flags.Flag.RECENT);
-      permanentFlags.add (Flags.Flag.SEEN);
+      permanentFlags = new Flags();
+      permanentFlags.add(Flags.Flag.RECENT);
+      permanentFlags.add(Flags.Flag.SEEN);
 
       // Init newsrc
-      String tn = getProperty ("newsrc");
+      String tn = getProperty("newsrc");
       if (tn != null)
         {
           // TODO implement independent way to instantiate newsrcs
-          Logger logger = Logger.getInstance ();
-          logger.log ("nntp", "ERROR: unable to instantiate newsrc");
+          Logger logger = Logger.getInstance();
+          logger.log("nntp", "ERROR: unable to instantiate newsrc");
         }
       else
         {
           // ${HOME}/.newsrc[-${hostname}]
           String baseFilename = ".newsrc";
-          StringBuffer buffer = new StringBuffer (baseFilename);
+          StringBuffer buffer = new StringBuffer(baseFilename);
           if (url != null)
             {
-              buffer.append ('-');
-              buffer.append (url.getHost());
+              buffer.append('-');
+              buffer.append(url.getHost());
             }
-          String filename = buffer.toString ();
-          String home = System.getProperty ("user.home");
-          File file = new File (home, filename);
-          if (!file.exists ())
+          String filename = buffer.toString();
+          String home = System.getProperty("user.home");
+          File file = new File(home, filename);
+          if (!file.exists())
             {
               // Fall back to base filename iff the file exists
-              File baseFile = new File (home, baseFilename);
-              if (baseFile.exists ())
+              File baseFile = new File(home, baseFilename);
+              if (baseFile.exists())
                 {
                   file = baseFile;
                 }
             }
-          newsrc = new FileNewsrc (file, session.getDebug ());
+          newsrc = new FileNewsrc(file, session.getDebug());
         }
     }
 
   /**
    * Performs the protocol connection.
    */
-  protected boolean protocolConnect (String host, int port, String username,
+  protected boolean protocolConnect(String host, int port, String username,
                                      String password)
     throws MessagingException
     {
@@ -124,15 +124,15 @@ public class NNTPStore extends Store
         }
       if (host == null)
         {
-          host = getProperty ("host");
+          host = getProperty("host");
         }
       if (username == null)
         {
-          username = getProperty ("user");
+          username = getProperty("user");
         }
       if (port < 0)
         {
-          port = getIntProperty ("port");
+          port = getIntProperty("port");
         }
       if (host == null)
         {
@@ -140,20 +140,20 @@ public class NNTPStore extends Store
         }
       try
         {
-          int connectionTimeout = getIntProperty ("connectiontimeout");
-          int timeout = getIntProperty ("timeout");
+          int connectionTimeout = getIntProperty("connectiontimeout");
+          int timeout = getIntProperty("timeout");
           if (port < 0)
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
-          connection = new NNTPConnection (host, port,
+          connection = new NNTPConnection(host, port,
                                            connectionTimeout, timeout,
-                                           session.getDebug ());
+                                           session.getDebug());
           if (username != null && password != null)
             {
               // TODO decide on authentication method
               // Original authinfo
-              return connection.authinfo (username, password);
+              return connection.authinfo(username, password);
             }
           else
             {
@@ -162,41 +162,41 @@ public class NNTPStore extends Store
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
     }
 
   /**
    * Close the connection.
    */
-  public void close ()
+  public void close()
     throws MessagingException
     {
       try
         {
-          newsrc.close ();
+          newsrc.close();
           synchronized (connection)
             {
-              connection.quit ();
+              connection.quit();
             }
           }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
-      super.close ();
+      super.close();
     }
 
   /**
    * Returns the folder representing the &quot;root&quot; namespace.
    * This folder can be used to browse the folder hierarchy.
    */
-  public Folder getDefaultFolder ()
+  public Folder getDefaultFolder()
     throws MessagingException
     {
       if (root == null)
         {
-          root = new NNTPRootFolder (this);
+          root = new NNTPRootFolder(this);
         }
       return root;
     }
@@ -204,20 +204,20 @@ public class NNTPStore extends Store
   /**
    * Returns a folder by name.
    */
-  public Folder getFolder (String name)
+  public Folder getFolder(String name)
     throws MessagingException
     {
-      return getDefaultFolder ().getFolder (name);
+      return getDefaultFolder().getFolder(name);
     }
 
   /**
    * Returns the folder whose name corresponds to the <code>file</code> part
    * of the specified URL.
    */
-  public Folder getFolder (URLName url)
+  public Folder getFolder(URLName url)
     throws MessagingException
     {
-      return getDefaultFolder ().getFolder (url.getFile ());
+      return getDefaultFolder().getFolder(url.getFile());
     }
 
   /*
@@ -225,21 +225,21 @@ public class NNTPStore extends Store
    * There are >30,000 newsgroups on Usenet. A naive client is unlikely to
    * expect upwards of 30,000 folders to be returned from list().
    */
-  boolean isListAll ()
+  boolean isListAll()
     {
-      return propertyIsTrue ("listall");
+      return propertyIsTrue("listall");
     }
 
   // -- Utility methods --
 
-  private int getIntProperty (String key)
+  private int getIntProperty(String key)
     {
-      String value = getProperty (key);
+      String value = getProperty(key);
       if (value != null)
         {
           try
             {
-              return Integer.parseInt (value);
+              return Integer.parseInt(value);
             }
           catch (RuntimeException e)
             {
@@ -248,26 +248,26 @@ public class NNTPStore extends Store
       return -1;
     }
 
-  private boolean propertyIsFalse (String key)
+  private boolean propertyIsFalse(String key)
     {
-      return "false".equals (getProperty (key));
+      return "false".equals(getProperty(key));
     }
 
-  private boolean propertyIsTrue (String key)
+  private boolean propertyIsTrue(String key)
     {
-      return "true".equals (getProperty (key));
+      return "true".equals(getProperty(key));
     }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty (String key)
+  private String getProperty(String key)
     {
-      String value = session.getProperty ("mail.nntp." + key);
+      String value = session.getProperty("mail.nntp." + key);
       if (value == null)
         {
-          value = session.getProperty ("mail." + key);
+          value = session.getProperty("mail." + key);
         }
       return value;
     }

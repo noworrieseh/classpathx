@@ -1,13 +1,13 @@
 /*
  * NewsAddress.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,7 +59,7 @@ public class NewsAddress
   /**
    * Default constructor.
    */
-  public NewsAddress ()
+  public NewsAddress()
   {
   }
 
@@ -67,9 +67,9 @@ public class NewsAddress
    * Construct a NewsAddress with the given newsgroup.
    * @param newsgroup the newsgroup
    */
-  public NewsAddress (String newsgroup)
+  public NewsAddress(String newsgroup)
   {
-    this (newsgroup, null);
+    this(newsgroup, null);
   }
 
   /**
@@ -77,7 +77,7 @@ public class NewsAddress
    * @param newsgroup the newsgroup
    * @param host the host
    */
-  public NewsAddress (String newsgroup, String host)
+  public NewsAddress(String newsgroup, String host)
   {
     this.newsgroup = newsgroup;
     this.host = host;
@@ -87,7 +87,7 @@ public class NewsAddress
    * Return the type of this address.
    * The type of a NewsAddress is "news".
    */
-  public String getType ()
+  public String getType()
   {
     return TYPE;
   }
@@ -96,7 +96,7 @@ public class NewsAddress
    * Set the newsgroup.
    * @param newsgroup the newsgroup
    */
-  public void setNewsgroup (String newsgroup)
+  public void setNewsgroup(String newsgroup)
   {
     this.newsgroup = newsgroup;
   }
@@ -104,7 +104,7 @@ public class NewsAddress
   /**
    * Get the newsgroup.
    */
-  public String getNewsgroup ()
+  public String getNewsgroup()
   {
     return newsgroup;
   }
@@ -113,7 +113,7 @@ public class NewsAddress
    * Set the host.
    * @param host the host
    */
-  public void setHost (String host)
+  public void setHost(String host)
   {
     this.host = host;
   }
@@ -121,7 +121,7 @@ public class NewsAddress
   /**
    * Get the host.
    */
-  public String getHost ()
+  public String getHost()
   {
     return host;
   }
@@ -129,7 +129,7 @@ public class NewsAddress
   /**
    * Convert this address into a RFC 1036 address.
    */
-  public String toString ()
+  public String toString()
   {
     return newsgroup;
   }
@@ -137,15 +137,15 @@ public class NewsAddress
   /**
    * The equality operator.
    */
-  public boolean equals (Object a)
+  public boolean equals(Object a)
   {
     if (a instanceof NewsAddress)
       {
         NewsAddress na = (NewsAddress) a;
-        return (newsgroup.equals (na.newsgroup) &&
-                ((host == null && na.host == null) || 
-                 (host != null && na.host != null &&
-                  host.equalsIgnoreCase (na.host))));
+        return (newsgroup.equals(na.newsgroup) &&
+               ((host == null && na.host == null) || 
+                (host != null && na.host != null &&
+                  host.equalsIgnoreCase(na.host))));
       }
     return false;
   }
@@ -153,16 +153,16 @@ public class NewsAddress
   /**
    * Compute a hash code for the address.
    */
-  public int hashCode ()
+  public int hashCode()
   {
     int hashCode = 0;
     if (newsgroup != null)
       {
-        hashCode += newsgroup.hashCode ();
+        hashCode += newsgroup.hashCode();
       }
     if (host != null)
       {
-        hashCode += host.hashCode ();
+        hashCode += host.hashCode();
       }
     return hashCode;
   }
@@ -177,24 +177,24 @@ public class NewsAddress
    * @exception ClassCastException if any address object in the given array 
    * is not a NewsAddress object. Note that this is a RuntimeException.
    */
-  public static String toString (Address[] addresses)
+  public static String toString(Address[] addresses)
   {
     if (addresses == null || addresses.length == 0)
       {
         return null;
       }
-    StringBuffer buffer = new StringBuffer ();
+    StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < addresses.length; i++)
       {
         if (i > 0)
           {
-            buffer.append (',');
+            buffer.append(',');
           }
         // possible ClassCastException...
         NewsAddress na = (NewsAddress) addresses[i];
-        buffer.append (na.toString ());
+        buffer.append(na.toString());
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
@@ -204,17 +204,17 @@ public class NewsAddress
    * @return array of NewsAddress objects
    * @exception AddressException if the parse failed
    */
-  public static NewsAddress[] parse (String newsgroups)
+  public static NewsAddress[] parse(String newsgroups)
     throws AddressException
   {
-    StringTokenizer st = new StringTokenizer (newsgroups, ",");
-    ArrayList acc = new ArrayList ();
-    while (st.hasMoreTokens ())
+    StringTokenizer st = new StringTokenizer(newsgroups, ",");
+    ArrayList acc = new ArrayList();
+    while (st.hasMoreTokens())
       {
-        acc.add (new NewsAddress (st.nextToken ()));
+        acc.add(new NewsAddress(st.nextToken()));
       }
-    NewsAddress[] addresses = new NewsAddress[acc.size ()];
-    acc.toArray (addresses);
+    NewsAddress[] addresses = new NewsAddress[acc.size()];
+    acc.toArray(addresses);
     return addresses;
   }
   

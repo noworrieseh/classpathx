@@ -9,11 +9,11 @@ JAVADOC = javadoc
 JAVADOCFLAGS =
 
 src = @srcdir@/source
-dst = @srcdir@/classes
+dst = classes
 doc = @srcdir@/docs
 
-gnumail_jar = @srcdir@/gnumail.jar
-providers_jar = @srcdir@/gnumail-providers.jar
+gnumail_jar = gnumail.jar
+providers_jar = gnumail-providers.jar
 
 # The java source files that make up the GNU version of the javax.mail API.
 gnumail_sources = \
@@ -270,14 +270,14 @@ jsse_jar = @JSSE_JAR@
 
 # The META stuff
 gnumail_meta = \
-@srcdir@/META-INF/COPYING \
-@srcdir@/META-INF/mime.types \
-@srcdir@/META-INF/mailcap \
-@srcdir@/META-INF/javamail.charset.map
+META-INF/COPYING \
+META-INF/mime.types \
+META-INF/mailcap \
+META-INF/javamail.charset.map
 
 providers_meta = \
-@srcdir@/META-INF/javamail.default.providers \
-@srcdir@/META-INF/javamail.default.address.map
+META-INF/javamail.default.providers \
+META-INF/javamail.default.address.map
 
 manifest_mf = @srcdir@/MANIFEST.MF
 
@@ -317,22 +317,22 @@ META-INF/javamail.charset.map: META-INF @srcdir@/javamail.charset.map
 META-INF/javamail.default.providers: META-INF
 	echo "# javamail.providers for GNU JavaMail" > javamail.providers
 if ENABLE_SMTP
-	grep "protocol=smtp" javamail.providers.in >> javamail.providers
+	grep "protocol=smtp" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 if ENABLE_IMAP
-	grep "protocol=imap" javamail.providers.in >> javamail.providers
+	grep "protocol=imap" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 if ENABLE_POP3
-	grep "protocol=pop3" javamail.providers.in >> javamail.providers
+	grep "protocol=pop3" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 if ENABLE_NNTP
-	grep "protocol=nntp" javamail.providers.in >> javamail.providers
+	grep "protocol=nntp" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 if ENABLE_MBOX
-	grep "protocol=mbox" javamail.providers.in >> javamail.providers
+	grep "protocol=mbox" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 if ENABLE_MAILDIR
-	grep "protocol=maildir" javamail.providers.in >> javamail.providers
+	grep "protocol=maildir" @srcdir@/javamail.providers.in >> javamail.providers
 endif
 	cp javamail.providers META-INF/javamail.default.providers
 

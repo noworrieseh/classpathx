@@ -1,13 +1,13 @@
 /*
  * RecipientStringTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,16 +54,16 @@ public final class RecipientStringTerm
    * @param type the recipient type
    * @param address the address pattern to be compared.
    */
-  public RecipientStringTerm (Message.RecipientType type, String pattern)
+  public RecipientStringTerm(Message.RecipientType type, String pattern)
   {
-    super (pattern);
+    super(pattern);
     this.type = type;
   }
 
   /**
    * Return the type of recipient to match with.
    */
-  public Message.RecipientType getRecipientType ()
+  public Message.RecipientType getRecipientType()
   {
     return type;
   }
@@ -74,16 +74,16 @@ public final class RecipientStringTerm
    * @param msg The comparison is applied to this Message's recepient address.
    * @return true if the match succeeds, otherwise false.
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        Address[] addresses = msg.getRecipients (type);
+        Address[] addresses = msg.getRecipients(type);
         if (addresses != null)
           {
             for (int i = 0; i < addresses.length; i++)
               {
-                if (super.match (addresses[i]))
+                if (super.match(addresses[i]))
                   {
                     return true;
                   }
@@ -99,19 +99,19 @@ public final class RecipientStringTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     return (other instanceof RecipientStringTerm &&
-            ((RecipientStringTerm) other).type.equals (type) &&
-            super.equals (other));
+           ((RecipientStringTerm) other).type.equals(type) &&
+            super.equals(other));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return type.hashCode () + super.hashCode ();
+    return type.hashCode() + super.hashCode();
   }
   
 }

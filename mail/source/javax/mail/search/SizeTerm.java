@@ -1,13 +1,13 @@
 /*
  * SizeTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,9 +44,9 @@ public final class SizeTerm
    * @param comparison the Comparison type
    * @param size the size
    */
-  public SizeTerm (int comparison, int size)
+  public SizeTerm(int comparison, int size)
   {
-    super (comparison, size);
+    super(comparison, size);
   }
 
   /**
@@ -54,14 +54,14 @@ public final class SizeTerm
    * @param msg the size comparator is applied to this Message's size
    * @return true if the size is equal, otherwise false
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        int size = msg.getSize ();
+        int size = msg.getSize();
         if (size != -1)
           {
-            return super.match (size);
+            return super.match(size);
           }
       }
     catch (Exception e)
@@ -73,9 +73,9 @@ public final class SizeTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
-    return (other instanceof SizeTerm && super.equals (other));
+    return (other instanceof SizeTerm && super.equals(other));
   }
   
 }

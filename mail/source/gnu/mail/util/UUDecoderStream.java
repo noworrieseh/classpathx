@@ -1,13 +1,13 @@
 /*
  * UUDecoderStream.java
- * Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
+ * Copyright(C) 2000 2001  Andrew Selkirk, Nic Ferrier
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -129,13 +129,13 @@ public class UUDecoderStream
       c3 = (decode_buffer[decode_index+2] - ' ') & 0x3f;
       c4 = (decode_buffer[decode_index+3] - ' ') & 0x3f;
       // Decode Bytes
-      a = ((c1 << 2) & 0xfc) | ((c2 >>> 4) & 3);
-      b = ((c2 << 4) & 0xf0) | ((c3 >>> 2) & 0xf);
-      c = ((c3 << 6) & 0xc0) | (c4 & 0x3f);
+      a = ((c1 << 2) & 0xfc) |((c2 >>> 4) & 3);
+      b = ((c2 << 4) & 0xf0) |((c3 >>> 2) & 0xf);
+      c = ((c3 << 6) & 0xc0) |(c4 & 0x3f);
       // Store Decoded Bytes in read buffer
-      buffer[bufsize]   = (byte) (a & 0xff);
-      buffer[bufsize+1] = (byte) (b & 0xff);
-      buffer[bufsize+2] = (byte) (c & 0xff);
+      buffer[bufsize]   = (byte)(a & 0xff);
+      buffer[bufsize+1] = (byte)(b & 0xff);
+      buffer[bufsize+2] = (byte)(c & 0xff);
       // Increment Index
       decode_index += 4;
       bufsize += 3;
@@ -173,7 +173,7 @@ public class UUDecoderStream
       length = (lengthByte - ' ') & 0x3f;
       // Check for Decoded length
       if (length > 45) 
-        throw new IOException("UUDecode error: line length to large ("
+        throw new IOException("UUDecode error: line length to large("
             + length + ")");
       // Check for End
       if (length == 0) 
@@ -185,7 +185,7 @@ public class UUDecoderStream
       decodeLength = line.length() - 1;
       // Check for encoded line length multiple of 4
       if ((decodeLength % 4) != 0) 
-        throw new IOException("UUDecode error: line length not multiple of 4 ("
+        throw new IOException("UUDecode error: line length not multiple of 4("
             + decodeLength + ")");
       // Get Encoded Line
       decode_buffer = line.substring(1).getBytes();

@@ -1,13 +1,13 @@
 /*
  * SharedInputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,12 +48,12 @@ public interface SharedInputStream
    * beginning of the InputStream.
    * @return the current position
    */
-  long getPosition ();
+  long getPosition();
 
   /**
    * Return a new InputStream representing a subset of the data from this
-   * InputStream, starting at <code>start</code> (inclusive) up to 
-   * <code>end</code> (exclusive). <code>start</code> must be non-negative.
+   * InputStream, starting at <code>start</code>(inclusive) up to 
+   * <code>end</code>(exclusive). <code>start</code> must be non-negative.
    * If <code>end</code> is -1, the new stream ends at the same place
    * as this stream. The returned InputStream will also implement the
    * SharedInputStream interface.
@@ -61,6 +61,6 @@ public interface SharedInputStream
    * @param end the ending position + 1
    * @return the new stream
    */
-  InputStream newStream (long start, long end);
+  InputStream newStream(long start, long end);
   
 }

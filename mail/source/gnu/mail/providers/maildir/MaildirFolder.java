@@ -1,13 +1,13 @@
 /*
  * MaildirFolder.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -533,7 +533,7 @@ public final class MaildirFolder
         offset += in.read(bytes, offset, bytes.length-offset);
       in.close();
       for (int i=0; i<bytes.length; i++)
-        pid |= (((long)bytes[i]) * ((long)Math.pow(i, 2)));
+        pid |= (((long)bytes[i]) *((long)Math.pow(i, 2)));
     }
     else
       pid += ++deliveryCount;

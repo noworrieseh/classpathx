@@ -1,13 +1,13 @@
 /*
  * Folder.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright(C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,14 +45,14 @@ import javax.mail.search.SearchTerm;
  * <p>
  * Folders can contain Messages, other Folders or both, thus providing a
  * tree-like hierarchy rooted at the Store's default folder.
- * (Note that some Folder implementations may not allow both Messages and
+ *(Note that some Folder implementations may not allow both Messages and
  * other Folders in the same Folder).
  * <p>
  * The interpretation of folder names is implementation dependent.
  * The different levels of hierarchy in a folder's full name are separated 
  * from each other by the hierarchy delimiter character.
  * <p>
- * The case-insensitive full folder name (that is, the full name relative
+ * The case-insensitive full folder name(that is, the full name relative
  * to the default folder for a Store) INBOX is reserved to mean the
  * "primary folder for this user on this server". Not all Stores will 
  * provide an INBOX folder, and not all users will have an INBOX folder 
@@ -86,7 +86,7 @@ import javax.mail.search.SearchTerm;
  * Note that a Message's message number can change within a session if the
  * containing Folder is expunged using the expunge method. Clients that use
  * message numbers as references to messages should be aware of this and 
- * should be prepared to deal with situation (probably by flushing out 
+ * should be prepared to deal with situation(probably by flushing out 
  * existing message number references and reloading them). 
  * Because of this complexity, it is better for clients to use Message
  * objects as references to messages, rather than message numbers.
@@ -142,7 +142,7 @@ public abstract class Folder
    * Constructor that takes a Store object.
    * @param store the Store that holds this folder
    */
-  protected Folder (Store store)
+  protected Folder(Store store)
   {
     this.store = store;
   }
@@ -152,7 +152,7 @@ public abstract class Folder
    * <p>
    * This method can be invoked on a closed Folder.
    */
-  public abstract String getName ();
+  public abstract String getName();
 
   /**
    * Returns the full name of this Folder.
@@ -163,28 +163,28 @@ public abstract class Folder
    * <p>
    * This method can be invoked on a closed Folder.
    */
-  public abstract String getFullName ();
+  public abstract String getFullName();
 
   /**
    * Return a URLName representing this folder.
    * The returned URLName does not include the password 
    * used to access the store.
    */
-  public URLName getURLName ()
+  public URLName getURLName()
     throws MessagingException
   {
-    URLName url = getStore ().getURLName ();
-    String name = getFullName ();
-    return new URLName (url.getProtocol (), 
-                        url.getHost (), url.getPort (), name,
-                        url.getUsername (), null);
+    URLName url = getStore().getURLName();
+    String name = getFullName();
+    return new URLName(url.getProtocol(), 
+                       url.getHost(), url.getPort(), name,
+                       url.getUsername(), null);
   }
 
   /**
    * Returns the Store that owns this Folder object.
    * This method can be invoked on a closed Folder.
    */
-  public Store getStore ()
+  public Store getStore()
   {
     return store;
   }
@@ -198,14 +198,14 @@ public abstract class Folder
    * Note that since Folder objects are not cached, invoking this method 
    * returns a new distinct Folder object.
    */
-  public abstract Folder getParent ()
+  public abstract Folder getParent()
     throws MessagingException;
 
   /**
    * Indicates if this folder physically exists on the Store.
    * This method can be invoked on a closed Folder.
    */
-  public abstract boolean exists ()
+  public abstract boolean exists()
     throws MessagingException;
 
   /**
@@ -236,7 +236,7 @@ public abstract class Folder
    * This method can be invoked on a closed Folder.
    * @param pattern the match pattern
    */
-  public abstract Folder[] list (String pattern)
+  public abstract Folder[] list(String pattern)
     throws MessagingException;
 
   /**
@@ -244,7 +244,7 @@ public abstract class Folder
    * this Folder's namespace that match the specified pattern. 
    * If the folder does not support subscription, this method should 
    * resolve to <code>list</code>.
-   * (The default implementation provided here, does just this).
+   *(The default implementation provided here, does just this).
    * The pattern can contain wildcards as for list.
    * <p>
    * Folder objects are not cached by the Store, so invoking this method 
@@ -254,10 +254,10 @@ public abstract class Folder
    * This method can be invoked on a closed Folder.
    * @param pattern the match pattern
    */
-  public Folder[] listSubscribed (String pattern)
+  public Folder[] listSubscribed(String pattern)
     throws MessagingException
   {
-    return list (pattern);
+    return list(pattern);
   }
 
   /**
@@ -266,10 +266,10 @@ public abstract class Folder
    * with "%" as the match pattern.
    * This method can be invoked on a closed Folder.
    */
-  public Folder[] list ()
+  public Folder[] list()
     throws MessagingException
   {
-    return list ("%");
+    return list("%");
   }
 
   /**
@@ -279,10 +279,10 @@ public abstract class Folder
    * method with "%" as the match pattern.
    * This method can be invoked on a closed Folder.
    */
-  public Folder[] listSubscribed ()
+  public Folder[] listSubscribed()
     throws MessagingException
   {
-    return listSubscribed ("%");
+    return listSubscribed("%");
   }
 
   /**
@@ -290,7 +290,7 @@ public abstract class Folder
    * from the names of immediate subfolders.
    * This method can be invoked on a closed Folder.
    */
-  public abstract char getSeparator ()
+  public abstract char getSeparator()
     throws MessagingException;
 
   /**
@@ -299,7 +299,7 @@ public abstract class Folder
    * The returned value is an integer bitfield with the appropriate bits set.
    * This method can be invoked on a closed folder.
    */
-  public abstract int getType ()
+  public abstract int getType()
     throws MessagingException;
 
   /**
@@ -311,7 +311,7 @@ public abstract class Folder
    * to any FolderListeners registered on this Folder and this Store.
    * @param type The type of this folder.
    */
-  public abstract boolean create (int type)
+  public abstract boolean create(int type)
     throws MessagingException;
 
   /**
@@ -321,7 +321,7 @@ public abstract class Folder
    * <p>
    * The default implementation provided here just returns true.
    */
-  public boolean isSubscribed ()
+  public boolean isSubscribed()
   {
     return true;
   }
@@ -335,19 +335,19 @@ public abstract class Folder
    * The implementation provided here just throws the
    * MethodNotSupportedException.
    */
-  public void setSubscribed (boolean flag)
+  public void setSubscribed(boolean flag)
     throws MessagingException
   {
-    throw new MethodNotSupportedException ();
+    throw new MethodNotSupportedException();
   }
 
   /**
    * Returns true if this Folder has new messages since the last time 
    * this indication was reset.
    * When this indication is set or reset depends on the Folder 
-   * implementation (and in the case of IMAP, depends on the server).
+   * implementation(and in the case of IMAP, depends on the server).
    * This method can be used to implement a lightweight "check for new mail"
-   * operation on a Folder without opening it. (For example, a thread that
+   * operation on a Folder without opening it.(For example, a thread that
    * monitors a mailbox and flags when it has new mail.) This method should
    * indicate whether any messages in the Folder have the RECENT flag set.
    * <p>
@@ -358,7 +358,7 @@ public abstract class Folder
    * <p>
    * This method can be invoked on a closed Folder that can contain Messages.
    */
-  public abstract boolean hasNewMessages ()
+  public abstract boolean hasNewMessages()
     throws MessagingException;
 
   /**
@@ -378,7 +378,7 @@ public abstract class Folder
    * This method can be invoked on a closed Folder.
    * @param name name of the Folder
    */
-  public abstract Folder getFolder (String name)
+  public abstract Folder getFolder(String name)
     throws MessagingException;
 
   /**
@@ -391,19 +391,19 @@ public abstract class Folder
    * the folder type and is elaborated below:
    * <ul>
    * <li> The folder can contain only messages:
-   * (<code>type==HOLDS_MESSAGES</code>).
+   *(<code>type==HOLDS_MESSAGES</code>).
    * All messages within the folder are removed. The folder itself is then
    * removed. An appropriate FolderEvent is generated by the Store and this
    * folder.
    * <li> The folder can contain only subfolders:
-   * (<code>type==HOLDS_FOLDERS</code>).
-   * If this folder is empty (does not contain any subfolders at all), it is
+   *(<code>type==HOLDS_FOLDERS</code>).
+   * If this folder is empty(does not contain any subfolders at all), it is
    * removed. An appropriate FolderEvent is generated by the Store and this
    * folder.
    * If this folder contains any subfolders, the delete fails and returns
    * false.
    * <li> The folder can contain subfolders as well as messages:
-   * If the folder is empty (no messages or subfolders), it is removed. If
+   * If the folder is empty(no messages or subfolders), it is removed. If
    * the folder contains no subfolders, but only messages, then all messages
    * are removed. The folder itself is then removed. In both the above
    * cases, an appropriate FolderEvent is generated by the Store and this
@@ -434,7 +434,7 @@ public abstract class Folder
    * @exception IllegalStateException if this folder is not in the closed 
    * state.
    */
-  public abstract boolean delete (boolean recurse)
+  public abstract boolean delete(boolean recurse)
     throws MessagingException;
 
   /**
@@ -449,7 +449,7 @@ public abstract class Folder
    * @exception IllegalStateException if this folder is not in the closed 
    * state.
    */
-  public abstract boolean renameTo (Folder folder)
+  public abstract boolean renameTo(Folder folder)
     throws MessagingException;
 
   /**
@@ -469,7 +469,7 @@ public abstract class Folder
    * @exception IllegalStateException if this folder is not in the closed 
    * state.
    */
-  public abstract void open (int mode)
+  public abstract void open(int mode)
     throws MessagingException;
 
   /**
@@ -480,27 +480,27 @@ public abstract class Folder
    * this method terminates abnormally by throwing a MessagingException.
    * @param expunge expunges all deleted messages if this flag is true
    */
-  public abstract void close (boolean expunge)
+  public abstract void close(boolean expunge)
     throws MessagingException;
 
   /**
    * Indicates whether this Folder is in the 'open' state.
    */
-  public abstract boolean isOpen ();
+  public abstract boolean isOpen();
 
   /**
    * Return the open mode of this folder.
    * Returns <code>Folder.READ_ONLY</code>, <code>Folder.READ_WRITE</code>,
-   * or <code>-1</code> if the open mode is not known (usually only
+   * or <code>-1</code> if the open mode is not known(usually only
    * because an older Folder provider has not been updated to use this new
    * method).
    * @exception IllegalStateException if this folder is not open
    */
-  public int getMode ()
+  public int getMode()
   {
-    if (!isOpen ())
+    if (!isOpen())
       {
-        throw new IllegalStateException ("Folder not open");
+        throw new IllegalStateException("Folder not open");
       }
     return mode;
   }
@@ -515,7 +515,7 @@ public abstract class Folder
    * The supported permanent flags for a folder may not be available 
    * until the folder is opened.
    */
-  public abstract Flags getPermanentFlags ();
+  public abstract Flags getPermanentFlags();
 
   /**
    * Get total number of messages in this Folder.
@@ -532,7 +532,7 @@ public abstract class Folder
    * Clients must also be prepared to handle a return value of -1 in 
    * this case.
    */
-  public abstract int getMessageCount ()
+  public abstract int getMessageCount()
     throws MessagingException;
 
   /**
@@ -555,20 +555,20 @@ public abstract class Folder
    * <code>getMessage(int)</code> and checks whether its RECENT flag is 
    * set. The total number of messages that have this flag set is returned.
    */
-  public synchronized int getNewMessageCount ()
+  public synchronized int getNewMessageCount()
     throws MessagingException
   {
-    if (!isOpen ())
+    if (!isOpen())
       {
         return -1;
       }
     int count = 0;
-    int total = getMessageCount ();
+    int total = getMessageCount();
     for (int i = 1; i <= total; i++)
       {
         try
           {
-            if (getMessage (i).isSet (Flags.Flag.RECENT))
+            if (getMessage(i).isSet(Flags.Flag.RECENT))
               {
                 count++;
               }
@@ -600,20 +600,20 @@ public abstract class Folder
    * <code>getMessage(int)</code> and checks whether its SEEN flag is 
    * set. The total number of messages that have this flag set is returned.
    */
-  public synchronized int getUnreadMessageCount ()
+  public synchronized int getUnreadMessageCount()
     throws MessagingException
   {
-    if (!isOpen ())
+    if (!isOpen())
       {
         return -1;
       }
     int count = 0;
-    int total = getMessageCount ();
+    int total = getMessageCount();
     for (int i = 1; i <= total; i++)
       {
         try
           {
-            if (!getMessage (i).isSet (Flags.Flag.SEEN))
+            if (!getMessage(i).isSet(Flags.Flag.SEEN))
               {
                 count++;
               }
@@ -646,20 +646,20 @@ public abstract class Folder
    * @exception FolderNotFoundException if this folder does not exist
    * @since JavaMail 1.3
    */
-  public synchronized int getDeletedMessageCount ()
+  public synchronized int getDeletedMessageCount()
     throws MessagingException
   {
-    if (!isOpen ())
+    if (!isOpen())
       {
         return -1;
       }
     int count = 0;
-    int total = getMessageCount ();
+    int total = getMessageCount();
     for (int i = 1; i <= total; i++)
       {
         try
           {
-            if (!getMessage (i).isSet (Flags.Flag.DELETED))
+            if (!getMessage(i).isSet(Flags.Flag.DELETED))
               {
                 count++;
               }
@@ -697,7 +697,7 @@ public abstract class Folder
    * @exception IndexOutOfBoundsException if the message number is out of 
    * range.
    */
-  public abstract Message getMessage (int msgnum)
+  public abstract Message getMessage(int msgnum)
     throws MessagingException;
 
   /**
@@ -719,13 +719,13 @@ public abstract class Folder
    * @exception IndexOutOfBoundsException if the start or end message 
    * numbers are out of range.
    */
-  public synchronized Message[] getMessages (int start, int end)
+  public synchronized Message[] getMessages(int start, int end)
     throws MessagingException
   {
     Message[] messages = new Message[(end - start) + 1];
     for (int i = start; i <= end; i++)
       {
-        messages[i - start] = getMessage (i);
+        messages[i - start] = getMessage(i);
       }
     return messages;
   }
@@ -746,14 +746,14 @@ public abstract class Folder
    * @exception IndexOutOfBoundsException if any message number in the 
    * given array is out of range.
    */
-  public synchronized Message[] getMessages (int msgnums[])
+  public synchronized Message[] getMessages(int msgnums[])
     throws MessagingException
   {
     int total = msgnums.length;
     Message[] messages = new Message[total];
     for(int i = 0; i < total; i++)
       {
-        messages[i] = getMessage (msgnums[i]);
+        messages[i] = getMessage(msgnums[i]);
       }
     return messages;
   }
@@ -761,7 +761,7 @@ public abstract class Folder
   /**
    * Get all Message objects from this Folder.
    * Returns an empty array if the folder is empty.
-   * Clients can use Message objects (instead of sequence numbers)
+   * Clients can use Message objects(instead of sequence numbers)
    * as references to the messages within a folder; this method supplies 
    * the Message objects to the client.
    * Folder implementations are expected to provide light-weight Message 
@@ -773,18 +773,18 @@ public abstract class Folder
    * @exception FolderNotFoundException if this folder does not exist.
    * @exception IllegalStateException if this folder is not opened.
    */
-  public synchronized Message[] getMessages ()
+  public synchronized Message[] getMessages()
     throws MessagingException
   {
-    if (!isOpen ())
+    if (!isOpen())
       {
-        throw new IllegalStateException ("Folder not open");
+        throw new IllegalStateException("Folder not open");
       }
-    int total = getMessageCount ();
+    int total = getMessageCount();
     Message[] messages = new Message[total];
     for (int i = 1; i <= total; i++)
       {
-        messages[i - 1] = getMessage (i);
+        messages[i - 1] = getMessage(i);
       }
     return messages;
   }
@@ -802,7 +802,7 @@ public abstract class Folder
    * @exception FolderNotFoundException if this folder does not exist.
    * @exception MessagingException if the append failed.
    */
-  public abstract void appendMessages (Message[] msgs)
+  public abstract void appendMessages(Message[] msgs)
     throws MessagingException;
 
   /**
@@ -836,7 +836,7 @@ public abstract class Folder
    * @param msgs fetch items for these messages
    * @param fp the FetchProfile
    */
-  public void fetch (Message[] msgs, FetchProfile fp)
+  public void fetch(Message[] msgs, FetchProfile fp)
     throws MessagingException
   {
   }
@@ -864,14 +864,14 @@ public abstract class Folder
    * @exception IllegalStateException if this folder is not opened or 
    * if it has been opened READ_ONLY.
    */
-  public synchronized void setFlags (Message[] msgs, Flags flag, boolean value)
+  public synchronized void setFlags(Message[] msgs, Flags flag, boolean value)
     throws MessagingException
   {
     for (int i = 0; i < msgs.length; i++)
       {
         try
           {
-            msgs[i].setFlags (flag, value);
+            msgs[i].setFlags(flag, value);
           }
         catch (MessageRemovedException e)
           {
@@ -905,7 +905,7 @@ public abstract class Folder
    * @exception IndexOutOfBoundsException if the start or end message 
    * numbers are out of range.
    */
-  public synchronized void setFlags (int start, int end, Flags flag, 
+  public synchronized void setFlags(int start, int end, Flags flag, 
                                      boolean value)
     throws MessagingException
   {
@@ -913,7 +913,7 @@ public abstract class Folder
       {
         try
           {
-            getMessage (i).setFlags (flag, value);
+            getMessage(i).setFlags(flag, value);
           }
         catch (MessageRemovedException e)
           {
@@ -945,14 +945,14 @@ public abstract class Folder
    * @exception IndexOutOfBoundsException if any message number in the 
    * given array is out of range.
    */
-  public synchronized void setFlags (int msgnums[], Flags flag, boolean value)
+  public synchronized void setFlags(int msgnums[], Flags flag, boolean value)
     throws MessagingException
   {
     for (int i = 0; i < msgnums.length; i++)
       {
         try
           {
-            getMessage (msgnums[i]).setFlags (flag, value);
+            getMessage(msgnums[i]).setFlags(flag, value);
           }
         catch (MessageRemovedException e)
           {
@@ -981,37 +981,37 @@ public abstract class Folder
    * @param msgnums the array of message objects
    * @param folder the folder to copy the messages to
    */
-  public void copyMessages (Message[] msgs, Folder folder)
+  public void copyMessages(Message[] msgs, Folder folder)
     throws MessagingException
   {
-    if (!folder.exists ())
+    if (!folder.exists())
       {
-        throw new FolderNotFoundException ("Folder does not exist", folder);
+        throw new FolderNotFoundException("Folder does not exist", folder);
       }
-    boolean isOpen = folder.isOpen ();
+    boolean isOpen = folder.isOpen();
     if (!isOpen)
       {
-        folder.open (Folder.READ_WRITE);
+        folder.open(Folder.READ_WRITE);
       }
-    folder.appendMessages (msgs);
+    folder.appendMessages(msgs);
     if (!isOpen)
       {
-        folder.close (false);
+        folder.close(false);
       }
   }
 
   /**
-   * Expunge (permanently remove) messages marked DELETED.
+   * Expunge(permanently remove) messages marked DELETED.
    * Returns an array containing the expunged message objects.
    * The getMessageNumber method on each of these message objects returns 
-   * that Message's original (that is, prior to the expunge) sequence number.
+   * that Message's original(that is, prior to the expunge) sequence number.
    * A MessageCountEvent containing the expunged messages is delivered 
    * to any MessageCountListeners registered on the folder.
    * <p>
    * Expunge causes the renumbering of Message objects subsequent to the
    * expunged messages. Clients that use message numbers as references to
    * messages should be aware of this and should be prepared to deal with the
-   * situation (probably by flushing out existing message number caches and
+   * situation(probably by flushing out existing message number caches and
    * reloading them). Because of this complexity, it is better for clients to
    * use Message objects as references to messages, rather than message 
    * numbers. Any expunged Messages objects still have to be pruned, but other 
@@ -1024,7 +1024,7 @@ public abstract class Folder
    * @exception FolderNotFoundException if this folder does not exist
    * @exception IllegalStateException if this folder is not opened.
    */
-  public abstract Message[] expunge ()
+  public abstract Message[] expunge()
     throws MessagingException;
 
   /**
@@ -1042,10 +1042,10 @@ public abstract class Folder
    * @exception FolderNotFoundException if this folder does not exist.
    * @exception IllegalStateException if this folder is not opened.
    */
-  public Message[] search (SearchTerm term)
+  public Message[] search(SearchTerm term)
     throws MessagingException
   {
-    return search (term, getMessages ());
+    return search(term, getMessages());
   }
 
   /**
@@ -1072,25 +1072,25 @@ public abstract class Folder
    * implementation to handle.
    * @exception IllegalStateException if this folder is not opened
    */
-  public Message[] search (SearchTerm term, Message[] msgs)
+  public Message[] search(SearchTerm term, Message[] msgs)
     throws MessagingException
   {
-    ArrayList acc = new ArrayList ();
+    ArrayList acc = new ArrayList();
     for (int i = 0; i < msgs.length; i++)
       {
         try
           {
-            if (msgs[i].match (term))
+            if (msgs[i].match(term))
               {
-                acc.add (msgs[i]);
+                acc.add(msgs[i]);
               }
           }
         catch (MessageRemovedException e)
           {
           }
       }
-    Message[] m = new Message[acc.size ()];
-    acc.toArray (m);
+    Message[] m = new Message[acc.size()];
+    acc.toArray(m);
     return m;
   }
 
@@ -1116,28 +1116,28 @@ public abstract class Folder
   /**
    * Add a listener for Connection events on this Folder.
    */
-  public void addConnectionListener (ConnectionListener l)
+  public void addConnectionListener(ConnectionListener l)
   {
     if (connectionListeners == null)
       {
-        connectionListeners = new ArrayList ();
+        connectionListeners = new ArrayList();
       }
     synchronized (connectionListeners)
       {
-        connectionListeners.add (l);
+        connectionListeners.add(l);
       }
   }
 
   /**
    * Remove a Connection event listener.
    */
-  public void removeConnectionListener (ConnectionListener l)
+  public void removeConnectionListener(ConnectionListener l)
   {
     if (connectionListeners != null)
       {
         synchronized (connectionListeners)
           {
-            connectionListeners.remove (l);
+            connectionListeners.remove(l);
           }
       }
   }
@@ -1147,19 +1147,19 @@ public abstract class Folder
    * Folder implementations are expected to use this method 
    * to broadcast connection events.
    */
-  protected void notifyConnectionListeners (int type)
+  protected void notifyConnectionListeners(int type)
   {
-    ConnectionEvent event = new ConnectionEvent (this, type);
+    ConnectionEvent event = new ConnectionEvent(this, type);
     switch (type)
       {
       case ConnectionEvent.OPENED:
-        fireOpened (event);
+        fireOpened(event);
         break;
       case ConnectionEvent.DISCONNECTED:
-        fireDisconnected (event);
+        fireDisconnected(event);
         break;
       case ConnectionEvent.CLOSED:
-        fireClosed (event);
+        fireClosed(event);
         break;
       }
   }
@@ -1167,19 +1167,19 @@ public abstract class Folder
   /*
    * Propagates an OPENED ConnectionEvent to all registered listeners.
    */
-  void fireOpened (ConnectionEvent event)
+  void fireOpened(ConnectionEvent event)
   {
     if (connectionListeners != null)
       {
         ConnectionListener[] l = null;
         synchronized (connectionListeners)
           {
-            l = new ConnectionListener[connectionListeners.size ()];
-            connectionListeners.toArray (l);
+            l = new ConnectionListener[connectionListeners.size()];
+            connectionListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].opened (event);
+            l[i].opened(event);
           }
       }
   }
@@ -1187,19 +1187,19 @@ public abstract class Folder
   /*
    * Propagates a DISCONNECTED ConnectionEvent to all registered listeners.
    */
-  void fireDisconnected (ConnectionEvent event)
+  void fireDisconnected(ConnectionEvent event)
   {
     if (connectionListeners != null)
       {
         ConnectionListener[] l = null;
         synchronized (connectionListeners)
           {
-            l = new ConnectionListener[connectionListeners.size ()];
-            connectionListeners.toArray (l);
+            l = new ConnectionListener[connectionListeners.size()];
+            connectionListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].disconnected (event);
+            l[i].disconnected(event);
           }
       }
   }
@@ -1207,19 +1207,19 @@ public abstract class Folder
   /*
    * Propagates a CLOSED ConnectionEvent to all registered listeners.
    */
-  void fireClosed (ConnectionEvent event)
+  void fireClosed(ConnectionEvent event)
   {
     if (connectionListeners != null)
       {
         ConnectionListener[] l = null;
         synchronized (connectionListeners)
           {
-            l = new ConnectionListener[connectionListeners.size ()];
-            connectionListeners.toArray (l);
+            l = new ConnectionListener[connectionListeners.size()];
+            connectionListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].closed (event);
+            l[i].closed(event);
           }
       }
   }
@@ -1229,28 +1229,28 @@ public abstract class Folder
   /**
    * Add a listener for Folder events on this Folder.
    */
-  public void addFolderListener (FolderListener l)
+  public void addFolderListener(FolderListener l)
   {
     if (folderListeners == null)
       {
-        folderListeners = new ArrayList ();
+        folderListeners = new ArrayList();
       }
     synchronized (folderListeners)
       {
-        folderListeners.add (l);
+        folderListeners.add(l);
       }
   }
 
   /**
    * Remove a Folder event listener.
    */
-  public void removeFolderListener (FolderListener l)
+  public void removeFolderListener(FolderListener l)
   {
     if (folderListeners != null)
       {
         synchronized (folderListeners)
           {
-            folderListeners.remove (l);
+            folderListeners.remove(l);
           }
       }
   }
@@ -1260,19 +1260,19 @@ public abstract class Folder
    * Store. Folder implementations are expected to use this method to 
    * broadcast Folder events.
    */
-  protected void notifyFolderListeners (int type)
+  protected void notifyFolderListeners(int type)
   {
-    FolderEvent event = new FolderEvent (this, this, type);
+    FolderEvent event = new FolderEvent(this, this, type);
     switch (type)
       {
       case FolderEvent.CREATED:
-        fireFolderCreated (event);
+        fireFolderCreated(event);
         break;
       case FolderEvent.DELETED:
-        fireFolderDeleted (event);
+        fireFolderDeleted(event);
         break;
       }
-    store.notifyFolderListeners (type, this);
+    store.notifyFolderListeners(type, this);
   }
 
   /**
@@ -1281,30 +1281,30 @@ public abstract class Folder
    * expected to use this method to broadcast Folder events indicating the
    * renaming of folders.
    */
-  protected void notifyFolderRenamedListeners (Folder folder)
+  protected void notifyFolderRenamedListeners(Folder folder)
   {
-    FolderEvent event = new FolderEvent (this, this, folder, 
-                                         FolderEvent.RENAMED);
-    fireFolderRenamed (event);
-    store.notifyFolderRenamedListeners (this, folder);
+    FolderEvent event = new FolderEvent(this, this, folder, 
+                                        FolderEvent.RENAMED);
+    fireFolderRenamed(event);
+    store.notifyFolderRenamedListeners(this, folder);
   }
 
   /*
    * Propagates a CREATED FolderEvent to all registered listeners.
    */
-  void fireFolderCreated (FolderEvent event)
+  void fireFolderCreated(FolderEvent event)
   {
     if (folderListeners != null)
       {
         FolderListener[] l = null;
         synchronized (folderListeners)
           {
-            l = new FolderListener[folderListeners.size ()];
-            folderListeners.toArray (l);
+            l = new FolderListener[folderListeners.size()];
+            folderListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].folderCreated (event);
+            l[i].folderCreated(event);
           }
       }
   }
@@ -1312,19 +1312,19 @@ public abstract class Folder
   /*
    * Propagates a DELETED FolderEvent to all registered listeners.
    */
-  void fireFolderDeleted (FolderEvent event)
+  void fireFolderDeleted(FolderEvent event)
   {
     if (folderListeners != null)
       {
         FolderListener[] l = null;
         synchronized (folderListeners)
           {
-            l = new FolderListener[folderListeners.size ()];
-            folderListeners.toArray (l);
+            l = new FolderListener[folderListeners.size()];
+            folderListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].folderDeleted (event);
+            l[i].folderDeleted(event);
           }
       }
   }
@@ -1332,19 +1332,19 @@ public abstract class Folder
   /*
    * Propagates a RENAMED FolderEvent to all registered listeners.
    */
-  void fireFolderRenamed (FolderEvent event)
+  void fireFolderRenamed(FolderEvent event)
   {
     if (folderListeners != null)
       {
         FolderListener[] l = null;
         synchronized (folderListeners)
           {
-            l = new FolderListener[folderListeners.size ()];
-            folderListeners.toArray (l);
+            l = new FolderListener[folderListeners.size()];
+            folderListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].folderRenamed (event);
+            l[i].folderRenamed(event);
           }
       }
   }
@@ -1354,28 +1354,28 @@ public abstract class Folder
   /**
    * Add a listener for MessageCount events on this Folder.
    */
-  public void addMessageCountListener (MessageCountListener l)
+  public void addMessageCountListener(MessageCountListener l)
   {
     if (messageCountListeners == null)
       {
-        messageCountListeners = new ArrayList ();
+        messageCountListeners = new ArrayList();
       }
     synchronized (messageCountListeners)
       {
-        messageCountListeners.add (l);
+        messageCountListeners.add(l);
       }
   }
 
   /**
    * Remove a MessageCount listener.
    */
-  public void removeMessageCountListener (MessageCountListener l)
+  public void removeMessageCountListener(MessageCountListener l)
   {
     if (messageCountListeners != null)
       {
         synchronized (messageCountListeners)
           {
-            messageCountListeners.remove (l);
+            messageCountListeners.remove(l);
           }
       }
   }
@@ -1386,11 +1386,11 @@ public abstract class Folder
    * method to broadcast MessageCount events for indicating arrival of 
    * new messages.
    */
-  protected void notifyMessageAddedListeners (Message[] msgs)
+  protected void notifyMessageAddedListeners(Message[] msgs)
   {
     MessageCountEvent event =
-      new MessageCountEvent (this, MessageCountEvent.ADDED, false, msgs);
-    fireMessagesAdded (event);
+      new MessageCountEvent(this, MessageCountEvent.ADDED, false, msgs);
+    fireMessagesAdded(event);
   }
 
   /**
@@ -1398,29 +1398,29 @@ public abstract class Folder
    * Folder. Folder implementations are expected to use this method to 
    * broadcast MessageCount events indicating removal of messages.
    */
-  protected void notifyMessageRemovedListeners (boolean removed, Message[] msgs)
+  protected void notifyMessageRemovedListeners(boolean removed, Message[] msgs)
   {
     MessageCountEvent event =
-      new MessageCountEvent (this, MessageCountEvent.REMOVED, removed, msgs);
-    fireMessagesRemoved (event);
+      new MessageCountEvent(this, MessageCountEvent.REMOVED, removed, msgs);
+    fireMessagesRemoved(event);
   }
 
   /*
    * Propagates an ADDED MessageCountEvent to all registered listeners.
    */
-  void fireMessagesAdded (MessageCountEvent event)
+  void fireMessagesAdded(MessageCountEvent event)
   {
     if (messageCountListeners != null)
       {
         MessageCountListener[] l = null;
         synchronized (messageCountListeners)
           {
-            l = new MessageCountListener[messageCountListeners.size ()];
-            messageCountListeners.toArray (l);
+            l = new MessageCountListener[messageCountListeners.size()];
+            messageCountListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].messagesAdded (event);
+            l[i].messagesAdded(event);
           }
       }
   }
@@ -1428,19 +1428,19 @@ public abstract class Folder
   /*
    * Propagates a REMOVED MessageCountEvent to all registered listeners.
    */
-  void fireMessagesRemoved (MessageCountEvent event)
+  void fireMessagesRemoved(MessageCountEvent event)
   {
     if (messageCountListeners != null)
       {
         MessageCountListener[] l = null;
         synchronized (messageCountListeners)
           {
-            l = new MessageCountListener[messageCountListeners.size ()];
-            messageCountListeners.toArray (l);
+            l = new MessageCountListener[messageCountListeners.size()];
+            messageCountListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].messagesRemoved (event);
+            l[i].messagesRemoved(event);
           }
       }
   }
@@ -1450,28 +1450,28 @@ public abstract class Folder
   /**
    * Add a listener for MessageChanged events on this Folder.
    */
-  public void addMessageChangedListener (MessageChangedListener l)
+  public void addMessageChangedListener(MessageChangedListener l)
   {
     if (messageChangedListeners == null)
       {
-        messageChangedListeners = new ArrayList ();
+        messageChangedListeners = new ArrayList();
       }
     synchronized (messageChangedListeners)
       {
-        messageChangedListeners.add (l);
+        messageChangedListeners.add(l);
       }
   }
 
   /**
    * Remove a MessageChanged listener.
    */
-  public void removeMessageChangedListener (MessageChangedListener l)
+  public void removeMessageChangedListener(MessageChangedListener l)
   {
     if (messageChangedListeners != null)
       {
         synchronized (messageChangedListeners)
           {
-            messageChangedListeners.remove (l);
+            messageChangedListeners.remove(l);
           }
       }
   }
@@ -1480,28 +1480,28 @@ public abstract class Folder
    * Notify all MessageChangedListeners. Folder implementations are expected 
    * to use this method to broadcast MessageChanged events.
    */
-  protected void notifyMessageChangedListeners (int type, Message msg)
+  protected void notifyMessageChangedListeners(int type, Message msg)
   {
-    MessageChangedEvent event = new MessageChangedEvent (this, type, msg);
-    fireMessageChanged (event);
+    MessageChangedEvent event = new MessageChangedEvent(this, type, msg);
+    fireMessageChanged(event);
   }
 
   /*
    * Propagates a MessageChangedEvent to all registered listeners.
    */
-  void fireMessageChanged (MessageChangedEvent event)
+  void fireMessageChanged(MessageChangedEvent event)
   {
     if (messageChangedListeners != null)
       {
         MessageChangedListener[] l = null;
         synchronized (messageChangedListeners)
           {
-            l = new MessageChangedListener[messageChangedListeners.size ()];
-            messageChangedListeners.toArray (l);
+            l = new MessageChangedListener[messageChangedListeners.size()];
+            messageChangedListeners.toArray(l);
           }
         for (int i = 0; i < l.length; i++)
           {
-            l[i].messageChanged (event);
+            l[i].messageChanged(event);
           }
       }
   }
@@ -1513,10 +1513,10 @@ public abstract class Folder
    * it will return the String from Folder.getFullName() or if that is null,
    * it will use the default toString() behavior.
    */
-  public String toString ()
+  public String toString()
   {
-    String name = getFullName ();
-    return (name != null) ? name : super.toString ();
+    String name = getFullName();
+    return (name != null) ? name : super.toString();
   }
   
 }

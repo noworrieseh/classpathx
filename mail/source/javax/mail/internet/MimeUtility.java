@@ -1,13 +1,13 @@
 /*
  * MimeUtility.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright(C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -65,15 +65,15 @@ import gnu.mail.util.UUEncoderStream;
  * US-ASCII characters. Basically, this process involves using either BASE64 
  * or QP to encode certain characters. RFC 2047 describes this in detail.
  * <p>
- * In Java, Strings contain (16 bit) Unicode characters. ASCII is a subset of
- * Unicode (and occupies the range 0 - 127). A String that contains only ASCII
+ * In Java, Strings contain(16 bit) Unicode characters. ASCII is a subset of
+ * Unicode(and occupies the range 0 - 127). A String that contains only ASCII
  * characters is already mail-safe. If the String contains non US-ASCII
  * characters, it must be encoded. An additional complexity in this step is that
  * since Unicode is not yet a widely used charset, one might want to first
  * charset-encode the String into another charset and then do the
  * transfer-encoding.
  * <p>
- * Note that to get the actual bytes of a mail-safe String (say, for sending 
+ * Note that to get the actual bytes of a mail-safe String(say, for sending 
  * over SMTP), one must do
  * <pre>
 
@@ -100,7 +100,7 @@ public class MimeUtility
   /*
    * Uninstantiable.
    */
-  private MimeUtility ()
+  private MimeUtility()
   {
   }
   
@@ -122,16 +122,16 @@ public class MimeUtility
    * @return the encoding.
    * This is either "7bit", "quoted-printable" or "base64"
    */
-  public static String getEncoding (DataSource ds)
+  public static String getEncoding(DataSource ds)
   {
     String encoding = "base64";
     InputStream is = null;
     try
       {
-        is = ds.getInputStream ();
-        ContentType ct = new ContentType (ds.getContentType ());
-        boolean text = ct.match ("text/*");
-        switch (asciiStatus (is, ALL, text))
+        is = ds.getInputStream();
+        ContentType ct = new ContentType(ds.getContentType());
+        boolean text = ct.match("text/*");
+        switch (asciiStatus(is, ALL, text))
           {
           case ALL_ASCII:
             encoding = "7bit";
@@ -149,7 +149,7 @@ public class MimeUtility
       }
     try
       {
-        is.close ();
+        is.close();
       }
     catch (IOException e)
       {
@@ -161,33 +161,33 @@ public class MimeUtility
    * Same as getEncoding(DataSource) except that instead of reading the data
    * from an InputStream it uses the writeTo method to examine the data.
    * This is more efficient in the common case of a DataHandler created 
-   * with an object and a MIME type (for example, a "text/plain" String)
+   * with an object and a MIME type(for example, a "text/plain" String)
    * because all the I/O is done in this thread.
    * In the case requiring an InputStream the DataHandler uses a thread,
    * a pair of pipe streams, and the writeTo method to produce the data.
    */
-  public static String getEncoding (DataHandler dh)
+  public static String getEncoding(DataHandler dh)
   {
     String encoding = "base64";
-    if (dh.getName () != null)
+    if (dh.getName() != null)
       {
-        return getEncoding (dh.getDataSource ());
+        return getEncoding(dh.getDataSource());
       }
     try
       {
-        ContentType ct = new ContentType (dh.getContentType ());
-        boolean text = ct.match ("text/*");
+        ContentType ct = new ContentType(dh.getContentType());
+        boolean text = ct.match("text/*");
         
         AsciiOutputStream aos =
-          new AsciiOutputStream (!text, encodeeolStrict () && !text);
+          new AsciiOutputStream(!text, encodeeolStrict() && !text);
         try
           {
-            dh.writeTo (aos);
+            dh.writeTo(aos);
           }
         catch (IOException e)
           {
           }
-        switch (aos.status ())
+        switch (aos.status())
           {
           case ALL_ASCII:
             encoding = "7bit";
@@ -216,29 +216,29 @@ public class MimeUtility
    * @param encoding the encoding of the stream.
    * @return decoded input stream.
    */
-  public static InputStream decode (InputStream is, String encoding)
+  public static InputStream decode(InputStream is, String encoding)
     throws MessagingException
   {
-    if (encoding.equalsIgnoreCase ("base64"))
+    if (encoding.equalsIgnoreCase("base64"))
       {
-        return new Base64InputStream (is);
+        return new Base64InputStream(is);
       }
-    if (encoding.equalsIgnoreCase ("quoted-printable"))
+    if (encoding.equalsIgnoreCase("quoted-printable"))
       {
-        return new QPInputStream (is);
+        return new QPInputStream(is);
       }
-    if (encoding.equalsIgnoreCase ("uuencode") || 
-        encoding.equalsIgnoreCase ("x-uuencode"))
+    if (encoding.equalsIgnoreCase("uuencode") || 
+        encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUDecoderStream (is);
+        return new UUDecoderStream(is);
       }
-    if (encoding.equalsIgnoreCase ("binary") ||
-        encoding.equalsIgnoreCase ("7bit") ||
-        encoding.equalsIgnoreCase ("8bit"))
+    if (encoding.equalsIgnoreCase("binary") ||
+        encoding.equalsIgnoreCase("7bit") ||
+        encoding.equalsIgnoreCase("8bit"))
       {
         return is;
       }
-    throw new MessagingException ("Unknown encoding: " + encoding);
+    throw new MessagingException("Unknown encoding: " + encoding);
   }
 
   /**
@@ -250,33 +250,33 @@ public class MimeUtility
    * @param encoding the encoding of the stream.
    * @return output stream that applies the specified encoding.
    */
-  public static OutputStream encode (OutputStream os, String encoding)
+  public static OutputStream encode(OutputStream os, String encoding)
     throws MessagingException
   {
     if (encoding == null)
       {
         return os;
       }
-    if (encoding.equalsIgnoreCase ("base64"))
+    if (encoding.equalsIgnoreCase("base64"))
       {
-        return new Base64OutputStream (os);
+        return new Base64OutputStream(os);
       }
-    if (encoding.equalsIgnoreCase ("quoted-printable"))
+    if (encoding.equalsIgnoreCase("quoted-printable"))
       {
-        return new QPOutputStream (os);
+        return new QPOutputStream(os);
       }
-    if (encoding.equalsIgnoreCase ("uuencode") ||
-        encoding.equalsIgnoreCase ("x-uuencode"))
+    if (encoding.equalsIgnoreCase("uuencode") ||
+        encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUEncoderStream (os);
+        return new UUEncoderStream(os);
       }
-    if (encoding.equalsIgnoreCase ("binary") || 
-        encoding.equalsIgnoreCase ("7bit") || 
-        encoding.equalsIgnoreCase ("8bit"))
+    if (encoding.equalsIgnoreCase("binary") || 
+        encoding.equalsIgnoreCase("7bit") || 
+        encoding.equalsIgnoreCase("8bit"))
       {
         return os;
       }
-    throw new MessagingException ("Unknown encoding: " + encoding);
+    throw new MessagingException("Unknown encoding: " + encoding);
   }
 
   /**
@@ -288,10 +288,10 @@ public class MimeUtility
    * encoded output.
    * @param os output stream
    * @param encoding the encoding of the stream.
-   * @param filename name for the file being encoded (only used with uuencode)
+   * @param filename name for the file being encoded(only used with uuencode)
    * @return output stream that applies the specified encoding.
    */
-  public static OutputStream encode (OutputStream os, String encoding,
+  public static OutputStream encode(OutputStream os, String encoding,
                                      String filename)
     throws MessagingException
   {
@@ -299,26 +299,26 @@ public class MimeUtility
       {
         return os;
       }
-    if (encoding.equalsIgnoreCase ("base64"))
+    if (encoding.equalsIgnoreCase("base64"))
       {
-        return new Base64OutputStream (os);
+        return new Base64OutputStream(os);
       }
-    if (encoding.equalsIgnoreCase ("quoted-printable"))
+    if (encoding.equalsIgnoreCase("quoted-printable"))
       {
-        return new QPOutputStream (os);
+        return new QPOutputStream(os);
       }
-    if (encoding.equalsIgnoreCase ("uuencode") ||
-        encoding.equalsIgnoreCase ("x-uuencode"))
+    if (encoding.equalsIgnoreCase("uuencode") ||
+        encoding.equalsIgnoreCase("x-uuencode"))
       {
-        return new UUEncoderStream (os, filename);
+        return new UUEncoderStream(os, filename);
       }
-    if (encoding.equalsIgnoreCase ("binary") || 
-        encoding.equalsIgnoreCase ("7bit") || 
-        encoding.equalsIgnoreCase ("8bit"))
+    if (encoding.equalsIgnoreCase("binary") || 
+        encoding.equalsIgnoreCase("7bit") || 
+        encoding.equalsIgnoreCase("8bit"))
       {
         return os;
       }
-    throw new MessagingException ("Unknown encoding: " + encoding);
+    throw new MessagingException("Unknown encoding: " + encoding);
   }
 
   /**
@@ -352,10 +352,10 @@ public class MimeUtility
    * @return Unicode string containing only US-ASCII characters
    * @param UnsupportedEncodingException if the encoding fails
    */
-  public static String encodeText (String text)
+  public static String encodeText(String text)
     throws UnsupportedEncodingException
   {
-    return encodeText (text, null, null);
+    return encodeText(text, null, null);
   }
 
   /**
@@ -381,10 +381,10 @@ public class MimeUtility
    * encoding is used.
    * @return Unicode string containing only US-ASCII characters
    */
-  public static String encodeText (String text, String charset, String encoding)
+  public static String encodeText(String text, String charset, String encoding)
     throws UnsupportedEncodingException
   {
-    return encodeWord (text, charset, encoding, false);
+    return encodeWord(text, charset, encoding, false);
   }
 
   /**
@@ -413,54 +413,54 @@ public class MimeUtility
    * @param etext the possibly encoded value
    * @exception UnsupportedEncodingException if the charset conversion failed.
    */
-  public static String decodeText (String etext)
+  public static String decodeText(String etext)
     throws UnsupportedEncodingException
   {
     String delimiters = "\t\n\r ";
-    if (etext.indexOf ("=?") == -1)
+    if (etext.indexOf("=?") == -1)
       {
         return etext;
       }
-    StringTokenizer st = new StringTokenizer (etext, delimiters, true);
-    StringBuffer buffer = new StringBuffer ();
-    StringBuffer extra = new StringBuffer ();
+    StringTokenizer st = new StringTokenizer(etext, delimiters, true);
+    StringBuffer buffer = new StringBuffer();
+    StringBuffer extra = new StringBuffer();
     boolean decoded = false;
-    while (st.hasMoreTokens ()) 
+    while (st.hasMoreTokens()) 
       {
-        String token = st.nextToken ();
-        char c = token.charAt (0);
-        if (delimiters.indexOf (c) > -1)
+        String token = st.nextToken();
+        char c = token.charAt(0);
+        if (delimiters.indexOf(c) > -1)
           {
-            extra.append (c);
+            extra.append(c);
           }
         else
           {
             try
               {
-                token = decodeWord (token);
-                if (!decoded && extra.length () > 0)
+                token = decodeWord(token);
+                if (!decoded && extra.length() > 0)
                   {
-                    buffer.append (extra);
+                    buffer.append(extra);
                   }
                 decoded = true;
               }
             catch (ParseException e)
               {
-                if (!decodetextStrict ())
+                if (!decodetextStrict())
                   {
-                    token = decodeInnerText (token);
+                    token = decodeInnerText(token);
                   }
-                if (extra.length () > 0)
+                if (extra.length() > 0)
                   {
-                    buffer.append (extra);
+                    buffer.append(extra);
                   }
                 decoded = false;
               }
-            buffer.append (token);
-            extra.setLength (0);
+            buffer.append(token);
+            extra.setLength(0);
           }
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
@@ -481,10 +481,10 @@ public class MimeUtility
    * @return Unicode string containing only US-ASCII characters.
    * @exception UnsupportedEncodingException if the encoding fails
    */
-  public static String encodeWord (String text)
+  public static String encodeWord(String text)
     throws UnsupportedEncodingException
   {
-    return encodeWord (text, null, null);
+    return encodeWord(text, null, null);
   }
 
   /**
@@ -508,35 +508,35 @@ public class MimeUtility
    * @return Unicode string containing only US-ASCII characters
    * @exception UnsupportedEncodingException if the encoding fails
    */
-  public static String encodeWord (String text, String charset,
+  public static String encodeWord(String text, String charset,
                                    String encoding)
     throws UnsupportedEncodingException
   {
-    return encodeWord (text, charset, encoding, true);
+    return encodeWord(text, charset, encoding, true);
   }
 
-  private static String encodeWord (String text, String charset, 
+  private static String encodeWord(String text, String charset, 
                                     String encoding, boolean word)
     throws UnsupportedEncodingException
   {
-    if (asciiStatus (text.getBytes ()) == ALL_ASCII)
+    if (asciiStatus(text.getBytes()) == ALL_ASCII)
       {
         return text;
       }
     String javaCharset;
     if (charset == null)
       {
-        javaCharset = getDefaultJavaCharset ();
-        charset = mimeCharset (javaCharset);
+        javaCharset = getDefaultJavaCharset();
+        charset = mimeCharset(javaCharset);
       }
     else
       {
-        javaCharset = javaCharset (charset);
+        javaCharset = javaCharset(charset);
       }
     if (encoding == null)
       {
-        byte[] bytes = text.getBytes (javaCharset);
-        if (asciiStatus (bytes) != MINORITY_ASCII)
+        byte[] bytes = text.getBytes(javaCharset);
+        if (asciiStatus(bytes) != MINORITY_ASCII)
           {
             encoding = "Q";
           }
@@ -546,37 +546,37 @@ public class MimeUtility
           }
       }
     boolean bEncoding;
-    if (encoding.equalsIgnoreCase ("B"))
+    if (encoding.equalsIgnoreCase("B"))
       {
         bEncoding = true;
       }
-    else if (encoding.equalsIgnoreCase ("Q"))
+    else if (encoding.equalsIgnoreCase("Q"))
       {
         bEncoding = false;
       }
     else
       {
-        throw new UnsupportedEncodingException ("Unknown transfer encoding: " +
+        throw new UnsupportedEncodingException("Unknown transfer encoding: " +
                                                 encoding);
       }
     
-    StringBuffer encodingBuffer = new StringBuffer ();
-    encodingBuffer.append ("=?");
-    encodingBuffer.append (charset);
-    encodingBuffer.append ("?");
-    encodingBuffer.append (encoding);
-    encodingBuffer.append ("?");
+    StringBuffer encodingBuffer = new StringBuffer();
+    encodingBuffer.append("=?");
+    encodingBuffer.append(charset);
+    encodingBuffer.append("?");
+    encodingBuffer.append(encoding);
+    encodingBuffer.append("?");
     
-    StringBuffer buffer = new StringBuffer ();
-    encodeBuffer (buffer,
+    StringBuffer buffer = new StringBuffer();
+    encodeBuffer(buffer,
                   text, 
                   javaCharset, 
                   bEncoding, 
-                  68 - charset.length (), 
-                  encodingBuffer.toString (), 
+                  68 - charset.length(), 
+                  encodingBuffer.toString(), 
                   true,
                   word);
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   private static void encodeBuffer(StringBuffer buffer,
@@ -589,21 +589,21 @@ public class MimeUtility
                                    boolean word)
     throws UnsupportedEncodingException
   {
-    byte[] bytes = text.getBytes (charset);
+    byte[] bytes = text.getBytes(charset);
     int elen;
     if (bEncoding)
       {
-        elen = BOutputStream.encodedLength (bytes);
+        elen = BOutputStream.encodedLength(bytes);
       }
     else
       {
-        elen = QOutputStream.encodedLength (bytes, word);
+        elen = QOutputStream.encodedLength(bytes, word);
       }
-    int len = text.length ();
+    int len = text.length();
     if (elen > max && len > 1)
       {
         encodeBuffer(buffer,
-                     text.substring (0, len / 2), 
+                     text.substring(0, len / 2), 
                      charset, 
                      bEncoding, 
                      max, 
@@ -621,20 +621,20 @@ public class MimeUtility
       }
     else
       {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         OutputStream os = null;
         if (bEncoding)
           {
-            os = new BOutputStream (bos);
+            os = new BOutputStream(bos);
           }
         else
           {
-            os = new QOutputStream (bos, word);
+            os = new QOutputStream(bos, word);
           }
         try
           {
-            os.write (bytes);
-            os.close ();
+            os.write(bytes);
+            os.close();
           }
         catch (IOException e)
           {
@@ -642,15 +642,15 @@ public class MimeUtility
         bytes = bos.toByteArray();
         if (!keepTogether)
           {
-            buffer.append ("\r\n ");
+            buffer.append("\r\n ");
           }
-        buffer.append (encoding);
+        buffer.append(encoding);
         for (int i = 0; i < bytes.length; i++)
           {
             buffer.append((char) bytes[i]);
           }
         
-        buffer.append ("?=");
+        buffer.append("?=");
       }
   }
   
@@ -666,46 +666,46 @@ public class MimeUtility
    * @exception UnsupportedEncodingException if the charset conversion
    * failed.
    */
-  public static String decodeWord (String text)
+  public static String decodeWord(String text)
     throws ParseException, UnsupportedEncodingException
   {
-    if (!text.startsWith ("=?"))
+    if (!text.startsWith("=?"))
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
     int start = 2;
-    int end = text.indexOf ('?', start);
+    int end = text.indexOf('?', start);
     if (end < 0)
       {
         throw new ParseException();
       }
-    String charset = text.substring (start, end);
+    String charset = text.substring(start, end);
     // Allow for RFC2231 language
-    int si = charset.indexOf ('*');
+    int si = charset.indexOf('*');
     if (si != -1)
       {
-        charset = charset.substring (0, si);
+        charset = charset.substring(0, si);
       }
-    charset = javaCharset (charset);
+    charset = javaCharset(charset);
     start = end + 1;
-    end = text.indexOf ('?', start);
+    end = text.indexOf('?', start);
     if (end < 0)
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
-    String encoding = text.substring (start, end);
+    String encoding = text.substring(start, end);
     start = end + 1;
-    end = text.indexOf ("?=", start);
+    end = text.indexOf("?=", start);
     if (end < 0)
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
-    text = text.substring (start, end);
+    text = text.substring(start, end);
     try
       {
         // The characters in the remaining string must all be 7-bit clean.
         // Therefore it is safe just to copy them verbatim into a byte array.
-        char[] chars = text.toCharArray ();
+        char[] chars = text.toCharArray();
         int len = chars.length;
         byte[] bytes = new byte[len];
         for (int i = 0; i < len; i++)
@@ -713,31 +713,31 @@ public class MimeUtility
             bytes[i] = (byte) chars[i];
           }
         
-        ByteArrayInputStream bis = new ByteArrayInputStream (bytes);
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         InputStream is;
-        if (encoding.equalsIgnoreCase ("B"))
+        if (encoding.equalsIgnoreCase("B"))
           {
-            is = new Base64InputStream (bis);
+            is = new Base64InputStream(bis);
           }
-        else if (encoding.equalsIgnoreCase ("Q"))
+        else if (encoding.equalsIgnoreCase("Q"))
           {
-            is = new QInputStream (bis);
+            is = new QInputStream(bis);
           }
         else
           {
-            throw new UnsupportedEncodingException ("Unknown encoding: " +
+            throw new UnsupportedEncodingException("Unknown encoding: " +
                                                     encoding);
           }
-        len = bis.available ();
+        len = bis.available();
         bytes = new byte[len];
-        len = is.read (bytes, 0, len);
-        String ret = new String (bytes, 0, len, charset);
-        if (text.length () > end + 2)
+        len = is.read(bytes, 0, len);
+        String ret = new String(bytes, 0, len, charset);
+        if (text.length() > end + 2)
           {
-            String extra = text.substring (end + 2);
-            if (!decodetextStrict ())
+            String extra = text.substring(end + 2);
+            if (!decodetextStrict())
               {
-                extra = decodeInnerText (extra);
+                extra = decodeInnerText(extra);
               }
             ret = ret + extra;
           }
@@ -745,11 +745,11 @@ public class MimeUtility
       }
     catch (IOException e)
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
     catch (IllegalArgumentException e)
       {
-        throw new UnsupportedEncodingException ();
+        throw new UnsupportedEncodingException();
       }
   }
 
@@ -759,13 +759,13 @@ public class MimeUtility
    * needs to be encoded.
    * @since JavaMail 1.3
    */
-  private static boolean encodeeolStrict ()
+  private static boolean encodeeolStrict()
   {
     try
       {
         String encodeeolStrict =
-          System.getProperty ("mail.mime.encodeeol.strict", "false");
-        return Boolean.valueOf (encodeeolStrict).booleanValue ();
+          System.getProperty("mail.mime.encodeeol.strict", "false");
+        return Boolean.valueOf(encodeeolStrict).booleanValue();
       }
     catch (SecurityException e)
       {
@@ -777,13 +777,13 @@ public class MimeUtility
    * Indicates if text in the middle of words should be decoded.
    * @since JavaMail 1.3
    */
-  private static boolean decodetextStrict ()
+  private static boolean decodetextStrict()
   {
     try
       {
         String decodetextStrict =
-          System.getProperty ("mail.mime.decodetext.strict", "true");
-        return Boolean.valueOf (decodetextStrict).booleanValue ();
+          System.getProperty("mail.mime.decodetext.strict", "true");
+        return Boolean.valueOf(decodetextStrict).booleanValue();
       }
     catch (SecurityException e)
       {
@@ -795,39 +795,39 @@ public class MimeUtility
    * Decodes text in the middle of the specified text.
    * @since JavaMail 1.3
    */
-  private static String decodeInnerText (String text)
+  private static String decodeInnerText(String text)
     throws UnsupportedEncodingException
   {
     final String LD = "=?", RD = "?=";
     int pos = 0;
-    StringBuffer buffer = new StringBuffer ();
-    for (int start = text.indexOf (LD, pos); start != -1;
-        start = text.indexOf (LD, pos))
+    StringBuffer buffer = new StringBuffer();
+    for (int start = text.indexOf(LD, pos); start != -1;
+        start = text.indexOf(LD, pos))
       {
-        int end = text.indexOf (RD, start + 2);
+        int end = text.indexOf(RD, start + 2);
         if (end == -1)
           {
             break;
           }
-        buffer.append (text.substring (pos, start));
+        buffer.append(text.substring(pos, start));
         pos = end + 2;
-        String encoded = text.substring (start, pos);
+        String encoded = text.substring(start, pos);
         try
           {
-            buffer.append (decodeWord (encoded));
+            buffer.append(decodeWord(encoded));
           }
         catch (ParseException e)
           {
-            buffer.append (encoded);
+            buffer.append(encoded);
           }
       }
-    if (buffer.length () > 0)
+    if (buffer.length() > 0)
       {
-        if (pos < text.length ())
+        if (pos < text.length())
           {
-            buffer.append (text.substring (pos));
+            buffer.append(text.substring(pos));
           }
-        return buffer.toString ();
+        return buffer.toString();
       }
     return text;
   }
@@ -845,31 +845,31 @@ public class MimeUtility
    * @param specials the set of special characters
    * @return the possibly quoted word
    */
-  public static String quote (String text, String specials)
+  public static String quote(String text, String specials)
   {
-    int len = text.length ();
+    int len = text.length();
     boolean needsQuotes = false;
     for (int i = 0; i < len; i++)
       {
-        char c = text.charAt (i);
+        char c = text.charAt(i);
         if (c == '\n' || c == '\r' || c == '"' || c == '\\')
           {
-            StringBuffer buffer = new StringBuffer (len + 3);
-            buffer.append ('"');
+            StringBuffer buffer = new StringBuffer(len + 3);
+            buffer.append('"');
             for (int j = 0; j < len; j++)
               {
-                char c2 = text.charAt (j);
+                char c2 = text.charAt(j);
                 if (c2 == '"' || c2 == '\\' || c2 == '\r' || c2 == '\n')
                   {
                     buffer.append('\\');
                   }
-                buffer.append (c2);
+                buffer.append(c2);
               }
             
-            buffer.append ('"');
-            return buffer.toString ();
+            buffer.append('"');
+            return buffer.toString();
           }
-        if (c < ' ' || c > '\177' || specials.indexOf (c) >= 0)
+        if (c < ' ' || c > '\177' || specials.indexOf(c) >= 0)
           {
             needsQuotes = true;
           }
@@ -877,11 +877,11 @@ public class MimeUtility
     
     if (needsQuotes)
       {
-        StringBuffer buffer = new StringBuffer (len + 2);
-        buffer.append ('"');
-        buffer.append (text);
-        buffer.append ('"');
-        return buffer.toString ();
+        StringBuffer buffer = new StringBuffer(len + 2);
+        buffer.append('"');
+        buffer.append(text);
+        buffer.append('"');
+        return buffer.toString();
       }
     return text;
   }
@@ -910,20 +910,20 @@ public class MimeUtility
   static 
   {
     String mappings = "/META-INF/javamail.charset.map";
-    InputStream in = (MimeUtility.class).getResourceAsStream (mappings);
+    InputStream in = (MimeUtility.class).getResourceAsStream(mappings);
     if (in != null)
       {
-        mimeCharsets = new HashMap (10);
-        javaCharsets = new HashMap (20);
-        LineInputStream lin = new LineInputStream (in);
-        parse (mimeCharsets, lin);
-        parse (javaCharsets, lin);
+        mimeCharsets = new HashMap(10);
+        javaCharsets = new HashMap(20);
+        LineInputStream lin = new LineInputStream(in);
+        parse(mimeCharsets, lin);
+        parse(javaCharsets, lin);
       }
     try
       {
-        String version = System.getProperty ("java.version");
-        java12 = (version.startsWith ("1.2") ||
-                  version.startsWith ("1.1"));
+        String version = System.getProperty("java.version");
+        java12 = (version.startsWith("1.2") ||
+                  version.startsWith("1.1"));
       }
     catch (SecurityException e)
       {
@@ -934,27 +934,27 @@ public class MimeUtility
   /*
    * Parse a charset map stream.
    */
-  private static void parse (HashMap mappings, LineInputStream lin)
+  private static void parse(HashMap mappings, LineInputStream lin)
   {
     try
       {
         while (true)
           {
-            String line = lin.readLine ();
+            String line = lin.readLine();
             if (line == null ||
-                (line.startsWith ("--") && line.endsWith ("--")))
+               (line.startsWith("--") && line.endsWith("--")))
               {
                 return;
               }
             
-            if (line.trim ().length () != 0 && !line.startsWith ("#"))
+            if (line.trim().length() != 0 && !line.startsWith("#"))
               {
-                StringTokenizer st = new StringTokenizer (line, "\t ");
+                StringTokenizer st = new StringTokenizer(line, "\t ");
                 try
                   {
-                    String key = st.nextToken ();
-                    String value = st.nextToken ();
-                    mappings.put (key.toLowerCase (), value);
+                    String key = st.nextToken();
+                    String value = st.nextToken();
+                    mappings.put(key.toLowerCase(), value);
                   }
                 catch (NoSuchElementException e2)
                   {
@@ -964,7 +964,7 @@ public class MimeUtility
       }
     catch (IOException e)
       {
-        e.printStackTrace ();
+        e.printStackTrace();
       }
   }
 
@@ -975,13 +975,13 @@ public class MimeUtility
    * If a suitable mapping is not available, the passed in charset is 
    * itself returned.
    */
-  public static String javaCharset (String charset)
+  public static String javaCharset(String charset)
   {
     if (mimeCharsets == null || charset == null)
       {
         return charset;
       }
-    String jc = (String) mimeCharsets.get (charset.toLowerCase ());
+    String jc = (String) mimeCharsets.get(charset.toLowerCase());
     if (jc != null)
       {
         if (java12)
@@ -990,7 +990,7 @@ public class MimeUtility
           }
         else
           {
-            String mc = (String) javaCharsets.get (jc.toLowerCase ());
+            String mc = (String) javaCharsets.get(jc.toLowerCase());
             return (mc != null) ? mc : charset;
           }
       }
@@ -1000,19 +1000,19 @@ public class MimeUtility
   /**
    * Convert a java charset into its MIME charset name.
    * <p>
-   * Note that a future version of JDK (post 1.2) might provide this
+   * Note that a future version of JDK(post 1.2) might provide this
    * functionality, in which case, we may deprecate this method then.
    * @param charset the JDK charset
    * @return the MIME/IANA equivalent.
    * If a mapping is not possible, the passed in charset itself is returned.
    */
-  public static String mimeCharset (String charset)
+  public static String mimeCharset(String charset)
   {
     if (javaCharsets == null || charset == null)
       {
         return charset;
       }
-    String mc = (String) javaCharsets.get (charset.toLowerCase ());
+    String mc = (String) javaCharsets.get(charset.toLowerCase());
     return (mc != null) ? mc : charset;
   }
 
@@ -1030,17 +1030,17 @@ public class MimeUtility
    * @return the default charset of the system's default locale,
    * as a Java charset.
    */
-  public static String getDefaultJavaCharset ()
+  public static String getDefaultJavaCharset()
   {
     if (defaultJavaCharset == null)
       {
         try
           {
             // Use mail.mime.charset as of JavaMail 1.3
-            defaultJavaCharset = System.getProperty ("mail.mime.charset");
+            defaultJavaCharset = System.getProperty("mail.mime.charset");
             if (defaultJavaCharset == null)
               {
-                defaultJavaCharset = System.getProperty ("file.encoding",
+                defaultJavaCharset = System.getProperty("file.encoding",
                                                          "UTF-8");
               }
           }
@@ -1051,7 +1051,7 @@ public class MimeUtility
             // this encoding value.
             InputStreamReader isr = 
               new InputStreamReader(new InputStream() { public int read() { return 0; } });
-            defaultJavaCharset = isr.getEncoding ();
+            defaultJavaCharset = isr.getEncoding();
             
             // If all else fails use UTF-8
             if (defaultJavaCharset == null)
@@ -1060,7 +1060,7 @@ public class MimeUtility
               }
           }
       }
-    return javaCharset (defaultJavaCharset);
+    return javaCharset(defaultJavaCharset);
   }
   
   // -- Calculating multipart boundaries --
@@ -1070,35 +1070,35 @@ public class MimeUtility
   /*
    * Returns a suitably unique boundary value.
    */
-  static String getUniqueBoundaryValue ()
+  static String getUniqueBoundaryValue()
   {
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append ("----=_Part_");
-    buffer.append (part++);
-    buffer.append ("_");
-    buffer.append (buffer.hashCode ());
-    buffer.append ('.');
-    buffer.append (System.currentTimeMillis ());
-    return buffer.toString ();
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("----=_Part_");
+    buffer.append(part++);
+    buffer.append("_");
+    buffer.append(buffer.hashCode());
+    buffer.append('.');
+    buffer.append(System.currentTimeMillis());
+    return buffer.toString();
   }
 
   /*
    * Returns a suitably unique Message-ID value.
    */
-  static String getUniqueMessageIDValue (Session session)
+  static String getUniqueMessageIDValue(Session session)
   {
-    InternetAddress localAddress = InternetAddress.getLocalAddress (session);
-    String address = (localAddress != null) ? localAddress.getAddress () :
+    InternetAddress localAddress = InternetAddress.getLocalAddress(session);
+    String address = (localAddress != null) ? localAddress.getAddress() :
       "javamailuser@localhost";
 
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append (buffer.hashCode ());
-    buffer.append ('.');
-    buffer.append (System.currentTimeMillis ());
-    buffer.append ('.');
-    buffer.append ("JavaMail.");
-    buffer.append (address);
-    return buffer.toString ();
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(buffer.hashCode());
+    buffer.append('.');
+    buffer.append(System.currentTimeMillis());
+    buffer.append('.');
+    buffer.append("JavaMail.");
+    buffer.append(address);
+    return buffer.toString();
   }
 
   // These methods provide checks on whether collections of bytes contain
@@ -1110,13 +1110,13 @@ public class MimeUtility
   static final int MAJORITY_ASCII = 2;
   static final int MINORITY_ASCII = 3;
 
-  static int asciiStatus (byte[] bytes)
+  static int asciiStatus(byte[] bytes)
   {
     int asciiCount = 0;
     int nonAsciiCount = 0;
     for (int i = 0; i < bytes.length; i++)
       {
-        if (isAscii ((int) bytes[i]))
+        if (isAscii((int) bytes[i]))
           {
             asciiCount++;
           }
@@ -1133,7 +1133,7 @@ public class MimeUtility
     return (asciiCount <= nonAsciiCount) ? MINORITY_ASCII : MAJORITY_ASCII;
   }
 
-  static int asciiStatus (InputStream is, int len, boolean text)
+  static int asciiStatus(InputStream is, int len, boolean text)
   {
     int asciiCount = 0;
     int nonAsciiCount = 0;
@@ -1143,7 +1143,7 @@ public class MimeUtility
     byte[] bytes = null;
     if (len != 0)
       {
-        blockLen = (len != ALL) ? Math.min (len, 4096) : 4096;
+        blockLen = (len != ALL) ? Math.min(len, 4096) : 4096;
         bytes = new byte[blockLen];
       }
     while (len != 0) 
@@ -1151,7 +1151,7 @@ public class MimeUtility
         int readLen;
         try
           {
-            readLen = is.read (bytes, 0, blockLen);
+            readLen = is.read(bytes, 0, blockLen);
             if (readLen < 0)
               {
                 break;
@@ -1171,7 +1171,7 @@ public class MimeUtility
                         islong = true;
                       }
                   }
-                if (isAscii (c))
+                if (isAscii(c))
                   {
                     asciiCount++;
                   }
@@ -1206,7 +1206,7 @@ public class MimeUtility
     return (asciiCount <= nonAsciiCount) ? MINORITY_ASCII : MAJORITY_ASCII;
   }
 
-  private static final boolean isAscii (int c)
+  private static final boolean isAscii(int c)
   {
     if (c < 0)
       {
@@ -1236,36 +1236,36 @@ public class MimeUtility
     private boolean islong = false;
     private boolean eolCheckFailed = false;
     
-    public AsciiOutputStream (boolean strict, boolean eolStrict)
+    public AsciiOutputStream(boolean strict, boolean eolStrict)
     {
       this.strict = strict;
       this.eolStrict = eolStrict;
     }
     
-    public void write (int c)
+    public void write(int c)
       throws IOException
     {
-      check (c);
+      check(c);
     }
     
-    public void write (byte[] bytes)
+    public void write(byte[] bytes)
       throws IOException
     {
-      write (bytes, 0, bytes.length);
+      write(bytes, 0, bytes.length);
     }
     
-    public void write (byte[] bytes, int offset, int length)
+    public void write(byte[] bytes, int offset, int length)
       throws IOException
     {
       length += offset;
       for (int i = offset; i < length; i++)
         {
-          check (bytes[i]);
+          check(bytes[i]);
         }
       
     }
     
-    private final void check (int c)
+    private final void check(int c)
       throws IOException
     {
       c &= 0xff;
@@ -1294,7 +1294,7 @@ public class MimeUtility
           if (strict)
             {
               ret = MINORITY_ASCII;
-              throw new EOFException ();
+              throw new EOFException();
             }
         }
       else
@@ -1304,7 +1304,7 @@ public class MimeUtility
       last = c;
     }
     
-    int status ()
+    int status()
     {
       if (ret != 0)
         {

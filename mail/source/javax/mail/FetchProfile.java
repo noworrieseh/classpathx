@@ -1,13 +1,13 @@
 /*
  * FetchProfile.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,9 +37,9 @@ import java.util.ArrayList;
  * start off as empty references to the actual messages. Such a Message
  * object is filled in "on-demand" when the appropriate get*() methods are
  * invoked on that particular Message. Certain server-based message access
- * protocols (Ex: IMAP) allow batch fetching of message attributes for a
+ * protocols(Ex: IMAP) allow batch fetching of message attributes for a
  * range of messages in a single request. Clients that want to use message
- * attributes for a range of Messages (Example: to display the top-level
+ * attributes for a range of Messages(Example: to display the top-level
  * headers in a headerlist) might want to use the optimization provided by
  * such servers. The FetchProfile allows the client to indicate this desire
  * to the server.
@@ -85,11 +85,11 @@ public class FetchProfile
      * From, To, Cc, Bcc, ReplyTo, Subject and Date.
      * More items may be included as well.
      * <p>
-     * For implementations of the IMAP4 protocol (RFC 2060),
+     * For implementations of the IMAP4 protocol(RFC 2060),
      * the Envelope should include the ENVELOPE data item.
      * More items may be included too.
      */
-    public static final Item ENVELOPE = new Item ("ENVELOPE");
+    public static final Item ENVELOPE = new Item("ENVELOPE");
 
     /**
      * This item is for fetching information about the content of the message.
@@ -100,21 +100,21 @@ public class FetchProfile
      * ContentType, ContentDisposition, ContentDescription, Size and LineCount. 
      * Other items may be included as well.
      */
-    public static final Item CONTENT_INFO = new Item ("CONTENT_INFO");
+    public static final Item CONTENT_INFO = new Item("CONTENT_INFO");
 
     /**
      * This is the Flags item.
      */
-    public static final Item FLAGS = new Item ("FLAGS");
+    public static final Item FLAGS = new Item("FLAGS");
     
     private String name;
 
-    protected Item (String name)
+    protected Item(String name)
     {
       this.name = name;
     }
 
-    public String toString ()
+    public String toString()
     {
       return name;
     }
@@ -128,7 +128,7 @@ public class FetchProfile
   /**
    * Create an empty FetchProfile.
    */
-  public FetchProfile ()
+  public FetchProfile()
   {
   }
 
@@ -136,15 +136,15 @@ public class FetchProfile
    * Add the given special item as one of the attributes to be prefetched.
    * @param item the special item to be fetched
    */
-  public void add (Item item)
+  public void add(Item item)
   {
     if (items == null)
       {
-        items = new ArrayList ();
+        items = new ArrayList();
       }
     synchronized (items)
       {
-        items.add (item);
+        items.add(item);
       }
   }
 
@@ -152,24 +152,24 @@ public class FetchProfile
    * Add the specified header-field to the list of attributes to be prefetched.
    * @param header the header to be prefetched
    */
-  public void add (String header)
+  public void add(String header)
   {
     if (headers == null)
       {
-        headers = new ArrayList ();
+        headers = new ArrayList();
       }
     synchronized (headers)
       {
-        headers.add (header);
+        headers.add(header);
       }
   }
 
   /**
    * Returns true if the fetch profile contains given special item.
    */
-  public boolean contains (Item item)
+  public boolean contains(Item item)
   {
-    return (items != null && items.contains (item));
+    return (items != null && items.contains(item));
   }
 
   /**
@@ -183,7 +183,7 @@ public class FetchProfile
   /**
    * Get the items set in this profile.
    */
-  public Item[] getItems ()
+  public Item[] getItems()
   {
     if (items == null)
       {
@@ -191,8 +191,8 @@ public class FetchProfile
       }
     synchronized (items)
       {
-        Item[] i = new Item[items.size ()];
-        items.toArray (i);
+        Item[] i = new Item[items.size()];
+        items.toArray(i);
         return i;
       }
   }
@@ -200,7 +200,7 @@ public class FetchProfile
   /**
    * Get the names of the header-fields set in this profile.
    */
-  public String[] getHeaderNames ()
+  public String[] getHeaderNames()
   {
     if (headers == null)
       {
@@ -208,8 +208,8 @@ public class FetchProfile
       }
     synchronized (headers)
       {
-        String[] h = new String[headers.size ()];
-        headers.toArray (h);
+        String[] h = new String[headers.size()];
+        headers.toArray(h);
         return h;
       }
   }

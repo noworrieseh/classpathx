@@ -1,13 +1,13 @@
 /*
  * MboxFolder.java
- * Copyright (C) 1999 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -301,7 +301,7 @@ public class MboxFolder
       {
         char c = line.charAt(i);
         if (i>0 &&
-            (c=='F' &&
+           (c=='F' &&
              line.charAt(i+1)=='r' &&
              line.charAt(i+2)=='o' &&
              line.charAt(i+3)=='m' &&
@@ -395,7 +395,7 @@ public class MboxFolder
 
   /**
    * Returns the From_ line for the specified mbox message.
-   * If this does not already exist (the message was appended to the folder
+   * If this does not already exist(the message was appended to the folder
    * since it was last opened), we will attempt to generate a suitable From_
    * line for it.
    */
@@ -460,7 +460,7 @@ public class MboxFolder
           {
             elist.add(messages[i]);
             if (messages[i] instanceof MboxMessage)
-              ((MboxMessage)messages[i]).setExpunged(true);
+             ((MboxMessage)messages[i]).setExpunged(true);
           }
           else
             mlist.add(messages[i]);
@@ -861,7 +861,7 @@ public class MboxFolder
   /**
    * This method creates a new file.
    * Because Java cannot properly dotlock a file by creating a temporary
-   * file and hardlinking it (some platforms do not support hard links) we
+   * file and hardlinking it(some platforms do not support hard links) we
    * must use this method to create a zero-length inode.
    * This is a replacement for File.createNewFile(), which only exists in
    * the JDK since 1.2.

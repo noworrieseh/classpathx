@@ -1,13 +1,13 @@
 /*
  * Provider.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,12 +45,12 @@ public class Provider
   public static class Type
   {
 
-    public static final Type STORE = new Type ("Store");
-    public static final Type TRANSPORT = new Type ("Transport");
+    public static final Type STORE = new Type("Store");
+    public static final Type TRANSPORT = new Type("Transport");
 
     private String type;
 
-    private Type (String type)
+    private Type(String type)
     {
       this.type = type;
     }
@@ -63,7 +63,7 @@ public class Provider
   private String vendor;
   private String version;
 
-  Provider (Type type, String protocol, String className, String vendor,
+  Provider(Type type, String protocol, String className, String vendor,
             String version)
   {
     this.type = type;
@@ -76,7 +76,7 @@ public class Provider
   /**
    * Returns the type of this Provider.
    */
-  public Type getType ()
+  public Type getType()
   {
     return type;
   }
@@ -84,7 +84,7 @@ public class Provider
   /**
    * Returns the protocol supported by this Provider.
    */
-  public String getProtocol ()
+  public String getProtocol()
   {
     return protocol;
   }
@@ -92,7 +92,7 @@ public class Provider
   /**
    * Returns the name of the class that implements the protocol.
    */
-  public String getClassName ()
+  public String getClassName()
   {
     return className;
   }
@@ -101,7 +101,7 @@ public class Provider
    * Returns name of vendor associated with this implementation.
    * May be null.
    */
-  public String getVendor ()
+  public String getVendor()
   {
     return vendor;
   }
@@ -109,7 +109,7 @@ public class Provider
   /**
    * Returns version of this implementation or null if no version.
    */
-  public String getVersion ()
+  public String getVersion()
   {
     return version;
   }
@@ -117,33 +117,33 @@ public class Provider
   /**
    * Overrides Object.toString()
    */
-  public String toString ()
+  public String toString()
   {
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append ("javax.mail.Provider[");
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("javax.mail.Provider[");
     if (type == Type.STORE)
       {
-        buffer.append ("STORE,");
+        buffer.append("STORE,");
       }
     else if (type == Type.TRANSPORT)
       {
-        buffer.append ("TRANSPORT,");
+        buffer.append("TRANSPORT,");
       }
-    buffer.append (protocol);
-    buffer.append (',');
-    buffer.append (className);
+    buffer.append(protocol);
+    buffer.append(',');
+    buffer.append(className);
     if (vendor != null)
       {
-        buffer.append (',');
-        buffer.append (vendor);
+        buffer.append(',');
+        buffer.append(vendor);
       }
     if (version != null)
       {
-        buffer.append (',');
-        buffer.append (version);
+        buffer.append(',');
+        buffer.append(version);
       }
-    buffer.append ("]");
-    return buffer.toString ();
+    buffer.append("]");
+    return buffer.toString();
   }
   
 }

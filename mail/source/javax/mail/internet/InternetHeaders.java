@@ -1,13 +1,13 @@
 /*
  * InternetHeaders.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,9 +57,9 @@ import gnu.inet.util.LineInputStream;
  * be used to to achieve this. Callers of the <code>setHeader</code>,
  * <code>addHeader</code>, and <code>addHeaderLine</code> methods are 
  * responsible for enforcing the MIME requirements for the specified headers.
- * In addition, these header fields must be folded (wrapped) before being 
+ * In addition, these header fields must be folded(wrapped) before being 
  * sent if they exceed the line length limitation for the transport 
- * (1000 bytes for SMTP). Received headers may have been folded.
+ *(1000 bytes for SMTP). Received headers may have been folded.
  * The application is responsible for folding and unfolding headers 
  * as appropriate.
  *
@@ -78,62 +78,62 @@ public class InternetHeaders
     
     String line;
     
-    InternetHeader (String line)
+    InternetHeader(String line)
     {
-      super (null, null);
-      int i = line.indexOf (':');
-      name = (i < 0) ? line.trim () : line.substring (0, i).trim ();
+      super(null, null);
+      int i = line.indexOf(':');
+      name = (i < 0) ? line.trim() : line.substring(0, i).trim();
       this.line = line;
     }
     
-    InternetHeader (String name, String value)
+    InternetHeader(String name, String value)
     {
-      super (name, null);
+      super(name, null);
       if (value != null)
         {
-          StringBuffer buffer = new StringBuffer ();
-          buffer.append (name);
-          buffer.append (':');
-          buffer.append (' ');
-          buffer.append (value);
-          line = buffer.toString ();
+          StringBuffer buffer = new StringBuffer();
+          buffer.append(name);
+          buffer.append(':');
+          buffer.append(' ');
+          buffer.append(value);
+          line = buffer.toString();
         }
     }
 
-    public String getValue ()
+    public String getValue()
     {
-      int i = line.indexOf (':');
+      int i = line.indexOf(':');
       if (i < 0)
         {
           return line;
         }
       
-      int pos, len = line.length ();
+      int pos, len = line.length();
       for (pos = i + 1; pos < len; pos++)
         {
-          char c = line.charAt (pos);
+          char c = line.charAt(pos);
           if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
             {
               break;
             }
         }
       
-      return line.substring (pos);
+      return line.substring(pos);
     }
 
-    void setValue (String value)
+    void setValue(String value)
     {
-      StringBuffer buffer = new StringBuffer ();
-      buffer.append (name);
-      buffer.append (':');
-      buffer.append (' ');
-      buffer.append (value);
-      line = buffer.toString ();
+      StringBuffer buffer = new StringBuffer();
+      buffer.append(name);
+      buffer.append(':');
+      buffer.append(' ');
+      buffer.append(value);
+      line = buffer.toString();
     }
 
-    boolean nameEquals (String other)
+    boolean nameEquals(String other)
     {
-      return name.equalsIgnoreCase (other);
+      return name.equalsIgnoreCase(other);
     }
     
   }
@@ -151,7 +151,7 @@ public class InternetHeaders
     private boolean matching;
     private InternetHeader nextHeader;
     
-    HeaderEnumeration (Iterator source, String[] names,
+    HeaderEnumeration(Iterator source, String[] names,
                        boolean stringForm, boolean matching)
     {
       this.source = source;
@@ -163,19 +163,19 @@ public class InternetHeaders
     /**
      * Enumeration syntax
      */
-    public boolean hasMoreElements ()
+    public boolean hasMoreElements()
     {
-      return hasNext ();
+      return hasNext();
     }
 
     /**
      * Iterator syntax
      */
-    public boolean hasNext ()
+    public boolean hasNext()
     {
       if (nextHeader == null)
         {
-          nextHeader = getNext ();
+          nextHeader = getNext();
         }
       return (nextHeader != null);
     }
@@ -183,23 +183,23 @@ public class InternetHeaders
     /**
      * Enumeration syntax
      */
-    public Object nextElement ()
+    public Object nextElement()
     {
-      return next ();
+      return next();
     }
 
     /**
      * Iterator syntax
      */
-    public Object next ()
+    public Object next()
     {
       if (nextHeader == null)
         {
-          nextHeader = getNext ();
+          nextHeader = getNext();
         }
       if (nextHeader == null)
         {
-          throw new NoSuchElementException ();
+          throw new NoSuchElementException();
         }
       
       InternetHeader header = nextHeader;
@@ -212,16 +212,16 @@ public class InternetHeaders
       return header;
     }
 
-    public void remove ()
+    public void remove()
     {
-      throw new UnsupportedOperationException ();
+      throw new UnsupportedOperationException();
     }
     
-    private InternetHeader getNext ()
+    private InternetHeader getNext()
     {
-      while (source.hasNext ()) 
+      while (source.hasNext()) 
         {
-          InternetHeader header = (InternetHeader) source.next ();
+          InternetHeader header = (InternetHeader) source.next();
           if (header.line == null)
             {
               continue;
@@ -234,7 +234,7 @@ public class InternetHeaders
           
           for (int i = 0; i < names.length; i++)
             {
-              if (!header.nameEquals (names[i]))
+              if (!header.nameEquals(names[i]))
                 {
                   continue;
                 }
@@ -244,7 +244,7 @@ public class InternetHeaders
                   return header;
                 }
               
-              return getNext ();
+              return getNext();
             }
           
           if (!matching)
@@ -260,33 +260,33 @@ public class InternetHeaders
   /*
    * The list of headers.
    */
-  private ArrayList headers = new ArrayList (20);
+  private ArrayList headers = new ArrayList(20);
 
   /**
    * Create an empty InternetHeaders object.
    */
-  public InternetHeaders ()
+  public InternetHeaders()
   {
-    headers.add (new InternetHeader ("Return-Path", null));
-    headers.add (new InternetHeader ("Received", null));
-    headers.add (new InternetHeader ("Message-Id", null));
-    headers.add (new InternetHeader ("Resent-Date", null));
-    headers.add (new InternetHeader ("Date", null));
-    headers.add (new InternetHeader ("Resent-From", null));
-    headers.add (new InternetHeader ("From", null));
-    headers.add (new InternetHeader ("Reply-To", null));
-    headers.add (new InternetHeader ("To", null));
-    headers.add (new InternetHeader ("Subject", null));
-    headers.add (new InternetHeader ("Cc", null));
-    headers.add (new InternetHeader ("In-Reply-To", null));
-    headers.add (new InternetHeader ("Resent-Message-Id", null));
-    headers.add (new InternetHeader ("Errors-To", null));
-    headers.add (new InternetHeader ("Mime-Version", null));
-    headers.add (new InternetHeader ("Content-Type", null));
-    headers.add (new InternetHeader ("Content-Transfer-Encoding", null));
-    headers.add (new InternetHeader ("Content-MD5", null));
-    headers.add (new InternetHeader ("Content-Length", null));
-    headers.add (new InternetHeader ("Status", null));
+    headers.add(new InternetHeader("Return-Path", null));
+    headers.add(new InternetHeader("Received", null));
+    headers.add(new InternetHeader("Message-Id", null));
+    headers.add(new InternetHeader("Resent-Date", null));
+    headers.add(new InternetHeader("Date", null));
+    headers.add(new InternetHeader("Resent-From", null));
+    headers.add(new InternetHeader("From", null));
+    headers.add(new InternetHeader("Reply-To", null));
+    headers.add(new InternetHeader("To", null));
+    headers.add(new InternetHeader("Subject", null));
+    headers.add(new InternetHeader("Cc", null));
+    headers.add(new InternetHeader("In-Reply-To", null));
+    headers.add(new InternetHeader("Resent-Message-Id", null));
+    headers.add(new InternetHeader("Errors-To", null));
+    headers.add(new InternetHeader("Mime-Version", null));
+    headers.add(new InternetHeader("Content-Type", null));
+    headers.add(new InternetHeader("Content-Transfer-Encoding", null));
+    headers.add(new InternetHeader("Content-MD5", null));
+    headers.add(new InternetHeader("Content-Length", null));
+    headers.add(new InternetHeader("Status", null));
   }
 
   /**
@@ -299,10 +299,10 @@ public class InternetHeaders
    * stream and pass it as the parameter.
    * @param is an rfc822 input stream
    */
-  public InternetHeaders (InputStream is)
+  public InternetHeaders(InputStream is)
     throws MessagingException
   {
-    load (is);
+    load(is);
   }
 
   /**
@@ -314,20 +314,20 @@ public class InternetHeaders
    * so any existing headers in this object will not be affected.
    * @param is an rfc822 input stream
    */
-  public void load (InputStream is)
+  public void load(InputStream is)
     throws MessagingException
   {
-    LineInputStream in = new LineInputStream (is);
+    LineInputStream in = new LineInputStream(is);
     try
       {
-        for (String line = in.readLine (); line != null; line = in.readLine ()) 
+        for (String line = in.readLine(); line != null; line = in.readLine()) 
           {
-            line = trim (line);
-            if (line.length () == 0)
+            line = trim(line);
+            if (line.length() == 0)
               {
                 break;
               }
-            addHeaderLine (line);
+            addHeaderLine(line);
           }
       }
     catch (IOException e)
@@ -341,24 +341,24 @@ public class InternetHeaders
    * The values are String objects.
    * @param name the header name
    */
-  public String[] getHeader (String name)
+  public String[] getHeader(String name)
   {
-    ArrayList acc = new ArrayList (headers.size ());
-    for (Iterator i = headers.iterator (); i.hasNext (); ) 
+    ArrayList acc = new ArrayList(headers.size());
+    for (Iterator i = headers.iterator(); i.hasNext(); ) 
       {
-        InternetHeader header = (InternetHeader) i.next ();
-        if (header.nameEquals (name) && header.line != null)
+        InternetHeader header = (InternetHeader) i.next();
+        if (header.nameEquals(name) && header.line != null)
           {
-            acc.add (header.getValue ());
+            acc.add(header.getValue());
           }
       }
-    int size = acc.size ();
+    int size = acc.size();
     if (size == 0)
       {
         return null;
       }
     String[] h = new String[size];
-    acc.toArray (h);
+    acc.toArray(h);
     return h;
   }
 
@@ -370,9 +370,9 @@ public class InternetHeaders
    * @param delimiter the delimiter
    * @return the value fields for all headers with this name
    */
-  public String getHeader (String name, String delimiter)
+  public String getHeader(String name, String delimiter)
   {
-    String[] h = getHeader (name);
+    String[] h = getHeader(name);
     if (h == null)
       {
         return null;
@@ -383,16 +383,16 @@ public class InternetHeaders
         return h[0];
       }
 
-    StringBuffer buffer = new StringBuffer ();
+    StringBuffer buffer = new StringBuffer();
     for(int i = 0; i < h.length; i++)
       {
         if (i > 0)
           {
-            buffer.append (delimiter);
+            buffer.append(delimiter);
           }
-        buffer.append (h[i]);
+        buffer.append(h[i]);
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
@@ -404,29 +404,29 @@ public class InternetHeaders
    * @param name the header name
    * @param value the header value
    */
-  public void setHeader (String name, String value)
+  public void setHeader(String name, String value)
   {
     boolean first = true;
-    for (int i = 0; i < headers.size (); i++)
+    for (int i = 0; i < headers.size(); i++)
     {
-      InternetHeader header = (InternetHeader) headers.get (i);
-      if (header.nameEquals (name))
+      InternetHeader header = (InternetHeader) headers.get(i);
+      if (header.nameEquals(name))
         {
           if (first)
             {
-              header.setValue (value);
+              header.setValue(value);
               first = false;
             }
           else
             {
-              headers.remove (i);
+              headers.remove(i);
               i--;
             }
         }
     }
     if (first)
       {
-        addHeader (name, value);
+        addHeader(name, value);
       }
   }
 
@@ -437,25 +437,25 @@ public class InternetHeaders
    * @param name the header name
    * @param value the header value
    */
-  public void addHeader (String name, String value)
+  public void addHeader(String name, String value)
   {
     synchronized (headers)
       {
-        int len = headers.size ();
+        int len = headers.size();
         for (int i = len - 1; i >= 0; i--)
           {
-            InternetHeader header = (InternetHeader) headers.get (i);
-            if (header.nameEquals (name))
+            InternetHeader header = (InternetHeader) headers.get(i);
+            if (header.nameEquals(name))
               {
-                headers.add (i + 1, new InternetHeader (name, value));
+                headers.add(i + 1, new InternetHeader(name, value));
                 return;
               }
-            if (header.nameEquals (":"))
+            if (header.nameEquals(":"))
               {
                 len = i;
               }
           }
-        headers.add (len, new InternetHeader (name, value));
+        headers.add(len, new InternetHeader(name, value));
       }
   }
 
@@ -463,15 +463,15 @@ public class InternetHeaders
    * Remove all header entries that match the given name
    * @param name header name
    */
-  public void removeHeader (String name)
+  public void removeHeader(String name)
   {
     synchronized (headers)
       {
-        int len = headers.size ();
+        int len = headers.size();
         for (int i = 0; i < len; i++)
           {
-            InternetHeader header = (InternetHeader) headers.get (i);
-            if (header.nameEquals (name))
+            InternetHeader header = (InternetHeader) headers.get(i);
+            if (header.nameEquals(name))
               {
                 header.line = null;
               }
@@ -482,57 +482,57 @@ public class InternetHeaders
   /**
    * Return all the headers as an Enumeration of Header objects
    */
-  public Enumeration getAllHeaders ()
+  public Enumeration getAllHeaders()
   {
-    return new HeaderEnumeration (headers.iterator (), null, false, false);
+    return new HeaderEnumeration(headers.iterator(), null, false, false);
   }
 
   /**
    * Return all matching Header objects
    * @param names the names to match
    */
-  public Enumeration getMatchingHeaders (String[] names)
+  public Enumeration getMatchingHeaders(String[] names)
   {
-    return new HeaderEnumeration (headers.iterator (), names, false, true);
+    return new HeaderEnumeration(headers.iterator(), names, false, true);
   }
 
   /**
    * Return all non-matching Header objects
    * @param names the names not to match
    */
-  public Enumeration getNonMatchingHeaders (String[] names)
+  public Enumeration getNonMatchingHeaders(String[] names)
   {
-    return new HeaderEnumeration (headers.iterator (), names, false, false);
+    return new HeaderEnumeration(headers.iterator(), names, false, false);
   }
 
   /**
    * Add an RFC822 header line to the header store.
-   * If the line starts with a space or tab (a continuation line),
+   * If the line starts with a space or tab(a continuation line),
    * add it to the last header line in the list.
    * <p>
    * Note that RFC822 headers can only contain US-ASCII characters
    * @param line raw rfc822 header line
    */
-  public void addHeaderLine (String line)
+  public void addHeaderLine(String line)
   {
     try
       {
-        char c = line.charAt (0);
+        char c = line.charAt(0);
         if (c == ' ' || c == '\t') // continuation character
           {
-            int len = headers.size ();
-            InternetHeader header = (InternetHeader) headers.get (len - 1);
-            StringBuffer buffer = new StringBuffer ();
-            buffer.append (header.line);
-            buffer.append ("\r\n");
-            buffer.append (line);
-            header.line = buffer.toString ();
+            int len = headers.size();
+            InternetHeader header = (InternetHeader) headers.get(len - 1);
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(header.line);
+            buffer.append("\r\n");
+            buffer.append(line);
+            header.line = buffer.toString();
           }
         else
           {
             synchronized (headers)
               {
-                headers.add (new InternetHeader (line));
+                headers.add(new InternetHeader(line));
               }
           }
       }
@@ -547,33 +547,33 @@ public class InternetHeaders
   /**
    * Return all the header lines as an Enumeration of Strings.
    */
-  public Enumeration getAllHeaderLines ()
+  public Enumeration getAllHeaderLines()
   {
-    return new HeaderEnumeration (headers.iterator (), null, true, false);
+    return new HeaderEnumeration(headers.iterator(), null, true, false);
   }
 
   /**
    * Return all matching header lines as an Enumeration of Strings.
    */
-  public Enumeration getMatchingHeaderLines (String[] names)
+  public Enumeration getMatchingHeaderLines(String[] names)
   {
-    return new HeaderEnumeration (headers.iterator (), names, true, true);
+    return new HeaderEnumeration(headers.iterator(), names, true, true);
   }
 
   /**
    * Return all non-matching header lines
    */
-  public Enumeration getNonMatchingHeaderLines (String[] names)
+  public Enumeration getNonMatchingHeaderLines(String[] names)
   {
-    return new HeaderEnumeration (headers.iterator (), names, true, false);
+    return new HeaderEnumeration(headers.iterator(), names, true, false);
   }
 
-  private static String trim (String line)
+  private static String trim(String line)
   {
-    int len = line.length ();
-    if (len > 0 && line.charAt (len - 1) == '\r')
+    int len = line.length();
+    if (len > 0 && line.charAt(len - 1) == '\r')
       {
-        line = line.substring (0, len - 1);
+        line = line.substring(0, len - 1);
       }
     return line;
   }

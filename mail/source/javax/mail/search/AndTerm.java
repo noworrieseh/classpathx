@@ -1,13 +1,13 @@
 /*
  * AndTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,7 +49,7 @@ public final class AndTerm
    * @param t1 first term
    * @param t2 second term
    */
-  public AndTerm (SearchTerm t1, SearchTerm t2)
+  public AndTerm(SearchTerm t1, SearchTerm t2)
   {
     terms = new SearchTerm[2];
     terms[0] = t1;
@@ -63,15 +63,15 @@ public final class AndTerm
   public AndTerm(SearchTerm[] t)
   {
     terms = new SearchTerm[t.length];
-    System.arraycopy (t, 0, terms, 0, t.length);
+    System.arraycopy(t, 0, terms, 0, t.length);
   }
 
   /**
    * Return the search terms.
    */
-  public SearchTerm[] getTerms ()
+  public SearchTerm[] getTerms()
   {
-    return (SearchTerm[]) terms.clone ();
+    return (SearchTerm[]) terms.clone();
   }
 
   /**
@@ -83,11 +83,11 @@ public final class AndTerm
    * and the AND operator is applied to their results.
    * @return true if the AND succeds, otherwise false
    */
-  public boolean match (Message message)
+  public boolean match(Message message)
   {
     for (int i = 0; i < terms.length; i++)
       {
-        if (!terms[i].match (message))
+        if (!terms[i].match(message))
           {
             return false;
           }
@@ -98,7 +98,7 @@ public final class AndTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof AndTerm)
       {
@@ -109,7 +109,7 @@ public final class AndTerm
           }
         for (int i = 0; i < terms.length; i++)
           {
-            if (!terms[i].equals (andterm.terms[i]))
+            if (!terms[i].equals(andterm.terms[i]))
               {
                 return false;
               }
@@ -122,12 +122,12 @@ public final class AndTerm
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
     int acc = 0;
     for (int i = 0; i < terms.length; i++)
       {
-        acc += terms[i].hashCode ();
+        acc += terms[i].hashCode();
       }
     return acc;
   }

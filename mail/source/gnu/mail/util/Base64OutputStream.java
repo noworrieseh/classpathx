@@ -1,13 +1,13 @@
 /*
  * Base64OutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -159,7 +159,7 @@ public class Base64OutputStream
       int i = 0;
       boolean flag = false;
       out.write(src[b>>>2 & 0x3f]);
-      out.write(src[(b<<4 & 0x30) + (i>>>4 & 0xf)]);
+      out.write(src[(b<<4 & 0x30) +(i>>>4 & 0xf)]);
       out.write(EQ);
       out.write(EQ);
     }
@@ -168,16 +168,16 @@ public class Base64OutputStream
       byte b1 = buffer[0], b2 = buffer[1];
       int i = 0;
       out.write(src[b1>>>2 & 0x3f]);
-      out.write(src[(b1<<4 & 0x30) + (b2>>>4 & 0xf)]);
-      out.write(src[(b2<<2 & 0x3c) + (i>>>6 & 0x3)]);
+      out.write(src[(b1<<4 & 0x30) +(b2>>>4 & 0xf)]);
+      out.write(src[(b2<<2 & 0x3c) +(i>>>6 & 0x3)]);
       out.write(EQ);
     }
     else
     {
       byte b1 = buffer[0], b2 = buffer[1], b3 = buffer[2];
       out.write(src[b1>>>2 & 0x3f]);
-      out.write(src[(b1<<4 & 0x30) + (b2>>>4 & 0xf)]);
-      out.write(src[(b2<<2 & 0x3c) + (b3>>>6 & 0x3)]);
+      out.write(src[(b1<<4 & 0x30) +(b2>>>4 & 0xf)]);
+      out.write(src[(b2<<2 & 0x3c) +(b3>>>6 & 0x3)]);
       out.write(src[b3 & 0x3f]);
     }
     count += 4;

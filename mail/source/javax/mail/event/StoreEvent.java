@@ -1,13 +1,13 @@
 /*
  * StoreEvent.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -66,9 +66,9 @@ public class StoreEvent
    * Constructor.
    * @param source The source Store
    */
-  public StoreEvent (Store source, int type, String message)
+  public StoreEvent(Store source, int type, String message)
   {
-    super (source);
+    super(source);
     this.type = type;
     this.message = message;
   }
@@ -78,7 +78,7 @@ public class StoreEvent
    * @see #ALERT
    * @see #NOTICE
    */
-  public int getMessageType ()
+  public int getMessageType()
   {
     return type;
   }
@@ -86,7 +86,7 @@ public class StoreEvent
   /**
    * Get the message from the Store.
    */
-  public String getMessage ()
+  public String getMessage()
   {
     return message;
   }
@@ -94,9 +94,9 @@ public class StoreEvent
   /**
    * Invokes the appropriate StoreListener method.
    */
-  public void dispatch (Object listener)
+  public void dispatch(Object listener)
   {
-    ((StoreListener) listener).notification (this);
+   ((StoreListener) listener).notification(this);
   }
   
 }

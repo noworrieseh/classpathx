@@ -1,13 +1,13 @@
 /*
  * RFC2822OutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,7 @@ import java.io.OutputStream;
 
 /** 
  * An output stream that ensures that lines of characters in the body are
- * limited to 998 octets (excluding CRLF).
+ * limited to 998 octets(excluding CRLF).
  *
  * This is required by RFC 2822, section 2.3.
  *

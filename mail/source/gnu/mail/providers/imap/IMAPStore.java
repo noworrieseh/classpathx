@@ -1,13 +1,13 @@
 /*
  * IMAPStore.java
- * Copyright (C) 2003,2004 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2003,2004 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -79,16 +79,16 @@ public class IMAPStore
   /**
    * Constructor.
    */
-  public IMAPStore (Session session, URLName url)
+  public IMAPStore(Session session, URLName url)
   {
-    super (session, url);
+    super(session, url);
   }
 
   /**
    * Connects to the IMAP server and authenticates with the specified
    * parameters.
    */
-  protected boolean protocolConnect (String host, int port, String username,
+  protected boolean protocolConnect(String host, int port, String username,
                                      String password)
     throws MessagingException
   {
@@ -98,15 +98,15 @@ public class IMAPStore
       }
     if (host == null)
       {
-        host = getProperty ("host");
+        host = getProperty("host");
       }
     if (username == null)
       {
-        username = getProperty ("user");
+        username = getProperty("user");
       }
     if (port < 0)
       {
-        port = getIntProperty ("port");
+        port = getIntProperty("port");
       }
     if (host == null || username == null || password == null)
       {
@@ -116,70 +116,70 @@ public class IMAPStore
       {
         try
           {
-            int connectionTimeout = getIntProperty ("connectiontimeout");
-            int timeout = getIntProperty ("timeout");
-            connection = new IMAPConnection (host, port,
+            int connectionTimeout = getIntProperty("connectiontimeout");
+            int timeout = getIntProperty("timeout");
+            connection = new IMAPConnection(host, port,
                                              connectionTimeout, timeout,
                                              session.getDebug());
         
-            if (propertyIsTrue ("debug.ansi"))
+            if (propertyIsTrue("debug.ansi"))
               {
-                connection.setAnsiDebug (true);
+                connection.setAnsiDebug(true);
               }
         
-            List capabilities = connection.capability ();
+            List capabilities = connection.capability();
             boolean tls = false;
-            if (capabilities.contains (IMAPConstants.STARTTLS))
+            if (capabilities.contains(IMAPConstants.STARTTLS))
               {
-                if (!propertyIsFalse ("tls"))
+                if (!propertyIsFalse("tls"))
                   {
                     // Locate custom trust manager
-                    TrustManager tm = getTrustManager ();
+                    TrustManager tm = getTrustManager();
                     if (tm == null)
                       {
-                        tls = connection.starttls ();
+                        tls = connection.starttls();
                       }
                     else
                       {
-                        tls = connection.starttls (tm);
+                        tls = connection.starttls(tm);
                       }
                     // Capabilities may have changed since STARTTLS
                     if (tls)
                       {
-                        capabilities = connection.capability ();
+                        capabilities = connection.capability();
                       }
                   }
               }
-            if (!tls && "required".equals (getProperty ("tls")))
+            if (!tls && "required".equals(getProperty("tls")))
               {
-                throw new MessagingException ("TLS not available");
+                throw new MessagingException("TLS not available");
               }
             // Build list of available SASL mechanisms
             List authenticationMechanisms = null;
-            for (Iterator i = capabilities.iterator (); i.hasNext (); )
+            for (Iterator i = capabilities.iterator(); i.hasNext(); )
               {
-                String cap = (String) i.next ();
-                if (cap.startsWith ("AUTH="))
+                String cap = (String) i.next();
+                if (cap.startsWith("AUTH="))
                   {
                     if (authenticationMechanisms == null)
                       {
-                        authenticationMechanisms = new ArrayList ();
+                        authenticationMechanisms = new ArrayList();
                       }
-                    authenticationMechanisms.add (cap.substring (5));
+                    authenticationMechanisms.add(cap.substring(5));
                   }
               }
             // User authentication
             if (authenticationMechanisms != null &&
-                !authenticationMechanisms.isEmpty ())
+                !authenticationMechanisms.isEmpty())
               {
                 if (username == null || password == null)
                   {
                     PasswordAuthentication pa =
-                      session.getPasswordAuthentication (url);
+                      session.getPasswordAuthentication(url);
                     if (pa == null)
                       {
-                        InetAddress addr = InetAddress.getByName (host);
-                        pa = session.requestPasswordAuthentication (addr,
+                        InetAddress addr = InetAddress.getByName(host);
+                        pa = session.requestPasswordAuthentication(addr,
                                                                     port,
                                                                     "imap",
                                                                     null,
@@ -187,33 +187,33 @@ public class IMAPStore
                       }
                     if (pa != null)
                       {
-                        username = pa.getUserName ();
-                        password = pa.getPassword ();
+                        username = pa.getUserName();
+                        password = pa.getPassword();
                       }
                   }
                 if (username != null && password != null)
                   {
                     // Discover user ordering preferences for auth
                     // mechanisms
-                    String authPrefs = getProperty ("auth.mechanisms");
+                    String authPrefs = getProperty("auth.mechanisms");
                     Iterator i = null;
                     if (authPrefs == null)
                       {
-                        i = authenticationMechanisms.iterator ();
+                        i = authenticationMechanisms.iterator();
                       }
                     else
                       {
                         StringTokenizer st =
-                          new StringTokenizer (authPrefs, ",");
-                        List authPrefList = Collections.list (st);
-                        i = authPrefList.iterator ();
+                          new StringTokenizer(authPrefs, ",");
+                        List authPrefList = Collections.list(st);
+                        i = authPrefList.iterator();
                       }
                     // Try each mechanism in the list in turn
-                    while (i.hasNext ())
+                    while (i.hasNext())
                       {
-                        String mechanism = (String) i.next ();
-                        if (authenticationMechanisms.contains (mechanism) &&
-                            connection.authenticate (mechanism, username,
+                        String mechanism = (String) i.next();
+                        if (authenticationMechanisms.contains(mechanism) &&
+                            connection.authenticate(mechanism, username,
                                                      password))
                           {
                             return true;
@@ -221,25 +221,25 @@ public class IMAPStore
                       }
                   }
               }
-            if (capabilities.contains (IMAPConstants.LOGINDISABLED))
+            if (capabilities.contains(IMAPConstants.LOGINDISABLED))
               {
                 return false; // sorry
               }
-            return connection.login (username, password);
+            return connection.login(username, password);
           }
         catch (UnknownHostException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
         finally
           {
-            if (connection != null && connection.alertsPending ())
+            if (connection != null && connection.alertsPending())
               {
-                processAlerts ();
+                processAlerts();
               }
           }
       }
@@ -248,10 +248,10 @@ public class IMAPStore
   /**
    * Returns a trust manager used for TLS negotiation.
    */
-  protected TrustManager getTrustManager ()
+  protected TrustManager getTrustManager()
     throws MessagingException
   {
-    String tmt = getProperty ("trustmanager");
+    String tmt = getProperty("trustmanager");
     if (tmt == null)
       {
         return null;
@@ -261,15 +261,15 @@ public class IMAPStore
         try
           {
             // Instantiate the trust manager
-            Class t = Class.forName (tmt);
-            TrustManager tm = (TrustManager) t.newInstance ();
+            Class t = Class.forName(tmt);
+            TrustManager tm = (TrustManager) t.newInstance();
             // If there is a setSession method, call it
             try
               {
                 Class[] pt = new Class[] { Session.class };
-                Method m = t.getMethod ("setSession", pt);
+                Method m = t.getMethod("setSession", pt);
                 Object[] args = new Object[] { session };
-                m.invoke (tm, args);
+                m.invoke(tm, args);
               }
             catch (NoSuchMethodException e)
               {
@@ -278,7 +278,7 @@ public class IMAPStore
           }
         catch (Exception e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -286,7 +286,7 @@ public class IMAPStore
   /**
    * Closes the connection.
    */
-  public synchronized void close ()
+  public synchronized void close()
     throws MessagingException
   {
     if (connection != null)
@@ -295,7 +295,7 @@ public class IMAPStore
           {
             try
               {
-                connection.logout ();
+                connection.logout();
               }
             catch (IOException e)
               {
@@ -303,18 +303,18 @@ public class IMAPStore
             connection = null;
           }
       }
-    super.close ();
+    super.close();
   }
 
   /**
    * Returns the root folder.
    */
-  public Folder getDefaultFolder ()
+  public Folder getDefaultFolder()
     throws MessagingException
   {
     if (root == null)
       {
-        root = new IMAPFolder (this, "");
+        root = new IMAPFolder(this, "");
       }
     return root;
   }
@@ -322,31 +322,31 @@ public class IMAPStore
   /**
    * Returns the folder with the specified name.
    */
-  public Folder getFolder (String name)
+  public Folder getFolder(String name)
     throws MessagingException
   {
-    return new IMAPFolder (this, name);
+    return new IMAPFolder(this, name);
   }
 
   /**
    * Returns the folder whose name is the file part of the specified URLName.
    */
-  public Folder getFolder (URLName urlname)
+  public Folder getFolder(URLName urlname)
     throws MessagingException
   {
-    return getFolder (urlname.getFile ());
+    return getFolder(urlname.getFile());
   }
 
   /**
    * Returns the IMAP connection used by this store.
    * @exception StoreClosedException if the store is not currently connected
    */
-  protected IMAPConnection getConnection ()
+  protected IMAPConnection getConnection()
     throws StoreClosedException
   {
-    if (!isConnected ())
+    if (!isConnected())
       {
-        throw new StoreClosedException (this);
+        throw new StoreClosedException(this);
       }
     return connection;
   }
@@ -354,15 +354,15 @@ public class IMAPStore
   /**
    * Indicates whether the specified folder is selected.
    */
-  protected boolean isSelected (IMAPFolder folder)
+  protected boolean isSelected(IMAPFolder folder)
   {
-    return folder.equals (selected);
+    return folder.equals(selected);
   }
 
   /**
    * Sets the selected folder.
    */
-  protected void setSelected (IMAPFolder folder)
+  protected void setSelected(IMAPFolder folder)
   {
     selected = folder;
   }
@@ -370,12 +370,12 @@ public class IMAPStore
   /**
    * Process any alerts supplied by the server.
    */
-  protected void processAlerts ()
+  protected void processAlerts()
   {
-    String[] alerts = connection.getAlerts ();
+    String[] alerts = connection.getAlerts();
     for (int i = 0; i < alerts.length; i++)
       {
-        notifyStoreListeners (StoreEvent.ALERT, alerts[i]);
+        notifyStoreListeners(StoreEvent.ALERT, alerts[i]);
       }
   }
 
@@ -383,36 +383,36 @@ public class IMAPStore
    * Returns a list of folders representing personal namespaces.
    * See RFC 2342 for details.
    */
-  public Folder[] getPersonalNamespaces ()
+  public Folder[] getPersonalNamespaces()
     throws MessagingException
   {
-    if (!isConnected ())
+    if (!isConnected())
       {
-        throw new StoreClosedException (this);
+        throw new StoreClosedException(this);
       }
     synchronized (this)
       {
         try
           {
-            Namespaces ns = connection.namespace ();
+            Namespaces ns = connection.namespace();
             if (ns == null)
               {
-                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                throw new MethodNotSupportedException("IMAP NAMESPACE " +
                                                        "command not supported");
               }
-            Namespaces.Namespace[] n = ns.getPersonal ();
+            Namespaces.Namespace[] n = ns.getPersonal();
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {
-                String prefix = n[i].getPrefix ();
-                char delimiter = n[i].getDelimiter ();
-                f[i] = new IMAPFolder (this, prefix, delimiter);
+                String prefix = n[i].getPrefix();
+                char delimiter = n[i].getDelimiter();
+                f[i] = new IMAPFolder(this, prefix, delimiter);
               }
             return f;
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -421,36 +421,36 @@ public class IMAPStore
    * Returns a list of folders representing other users' namespaces.
    * See RFC 2342 for details.
    */
-  public Folder[] getUserNamespaces ()
+  public Folder[] getUserNamespaces()
     throws MessagingException
   {
-    if (!isConnected ())
+    if (!isConnected())
       {
-        throw new StoreClosedException (this);
+        throw new StoreClosedException(this);
       }
     synchronized (this)
       {
         try
           {
-            Namespaces ns = connection.namespace ();
+            Namespaces ns = connection.namespace();
             if (ns == null)
               {
-                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                throw new MethodNotSupportedException("IMAP NAMESPACE " +
                                                        "command not supported");
               }
-            Namespaces.Namespace[] n = ns.getOther ();
+            Namespaces.Namespace[] n = ns.getOther();
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {
-                String prefix = n[i].getPrefix ();
-                char delimiter = n[i].getDelimiter ();
-                f[i] = new IMAPFolder (this, prefix, delimiter);
+                String prefix = n[i].getPrefix();
+                char delimiter = n[i].getDelimiter();
+                f[i] = new IMAPFolder(this, prefix, delimiter);
               }
             return f;
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -459,36 +459,36 @@ public class IMAPStore
    * Returns a list of folders representing shared namespaces.
    * See RFC 2342 for details.
    */
-  public Folder[] getSharedNamespaces ()
+  public Folder[] getSharedNamespaces()
     throws MessagingException
   {
-    if (!isConnected ())
+    if (!isConnected())
       {
-        throw new StoreClosedException (this);
+        throw new StoreClosedException(this);
       }
     synchronized (this)
       {
         try
           {
-            Namespaces ns = connection.namespace ();
+            Namespaces ns = connection.namespace();
             if (ns == null)
               {
-                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                throw new MethodNotSupportedException("IMAP NAMESPACE " +
                                                        "command not supported");
               }
-            Namespaces.Namespace[] n = ns.getShared ();
+            Namespaces.Namespace[] n = ns.getShared();
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {
-                String prefix = n[i].getPrefix ();
-                char delimiter = n[i].getDelimiter ();
-                f[i] = new IMAPFolder (this, prefix, delimiter);
+                String prefix = n[i].getPrefix();
+                char delimiter = n[i].getDelimiter();
+                f[i] = new IMAPFolder(this, prefix, delimiter);
               }
             return f;
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -544,14 +544,14 @@ public class IMAPStore
 
   // -- Utility methods --
   
-  private int getIntProperty (String key)
+  private int getIntProperty(String key)
   {
-    String value = getProperty (key);
+    String value = getProperty(key);
     if (value != null)
       {
         try
           {
-            return Integer.parseInt (value);
+            return Integer.parseInt(value);
           }
         catch (Exception e)
           {
@@ -560,26 +560,26 @@ public class IMAPStore
     return -1;
   }
 
-  private boolean propertyIsFalse (String key)
+  private boolean propertyIsFalse(String key)
   {
-    return "false".equals (getProperty (key));
+    return "false".equals(getProperty(key));
   }
 
-  private boolean propertyIsTrue (String key)
+  private boolean propertyIsTrue(String key)
   {
-    return "true".equals (getProperty (key));
+    return "true".equals(getProperty(key));
   }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
-  private String getProperty (String key)
+  private String getProperty(String key)
   {
-    String value = session.getProperty ("mail.imap." + key);
+    String value = session.getProperty("mail.imap." + key);
     if (value == null)
       {
-        value = session.getProperty ("mail." + key);
+        value = session.getProperty("mail." + key);
       }
     return value;
   }

@@ -1,13 +1,13 @@
 /*
  * StoreClosedException.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,21 +51,21 @@ public class StoreClosedException
    */
   private Store store;
 
-  public StoreClosedException (Store store)
+  public StoreClosedException(Store store)
   {
-    this (store, null);
+    this(store, null);
   }
 
-  public StoreClosedException (Store store, String message)
+  public StoreClosedException(Store store, String message)
   {
-    super (message);
+    super(message);
     this.store = store;
   }
 
   /**
    * Returns the dead Store object.
    */
-  public Store getStore ()
+  public Store getStore()
   {
     return store;
   }

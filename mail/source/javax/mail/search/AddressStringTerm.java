@@ -1,13 +1,13 @@
 /*
  * AddressStringTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,9 +47,9 @@ public abstract class AddressStringTerm
    * Constructor.
    * @param pattern the address pattern to be compared.
    */
-  protected AddressStringTerm (String pattern)
+  protected AddressStringTerm(String pattern)
   {
-    super (pattern, true);
+    super(pattern, true);
   }
 
   /**
@@ -62,24 +62,24 @@ public abstract class AddressStringTerm
    * @param a The comparison is applied to this Address object.
    * @return true if the match succeeds, otherwise false.
    */
-  protected boolean match (Address a)
+  protected boolean match(Address a)
   {
     if (a instanceof InternetAddress)
       {
-        return super.match (((InternetAddress) a).toUnicodeString ());
+        return super.match(((InternetAddress) a).toUnicodeString());
       }
     else
       {
-        return super.match (a.toString ());
+        return super.match(a.toString());
       }
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
-    return ((other instanceof AddressStringTerm) && super.equals (other));
+    return ((other instanceof AddressStringTerm) && super.equals(other));
   }
 
 }

@@ -1,13 +1,13 @@
 /*
  * NotTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +44,7 @@ public final class NotTerm
    */
   protected SearchTerm term;
 
-  public NotTerm (SearchTerm t)
+  public NotTerm(SearchTerm t)
   {
     term = t;
   }
@@ -52,31 +52,31 @@ public final class NotTerm
   /**
    * Return the term to negate.
    */
-  public SearchTerm getTerm ()
+  public SearchTerm getTerm()
   {
     return term;
   }
 
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
-    return !term.match (msg);
+    return !term.match(msg);
   }
 
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     return (other instanceof NotTerm &&
-            ((NotTerm) other).term.equals (term));
+           ((NotTerm) other).term.equals(term));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return term.hashCode () << 1;
+    return term.hashCode() << 1;
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * UUEncoderStream.java
- * Copyright (C) 2000 Andrew Selkirk
+ * Copyright(C) 2000 Andrew Selkirk
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ extends FilterOutputStream
 
   /**
    * Encoding buffer.  Up to 45 bytes are read in before encoding
-   * is started (unless a flush is initiated).
+   * is started(unless a flush is initiated).
    */
   private byte[] buffer;
 
@@ -246,8 +246,8 @@ extends FilterOutputStream
 
       // Calculate UU Encoding
       c1 = (a >>> 2) & 0xff;
-      c2 = ((a << 4) & 0x30) | ((b >>> 4) & 0xf);
-      c3 = ((b << 2) & 0x3c) | ((c >>> 6) & 0x3);
+      c2 = ((a << 4) & 0x30) |((b >>> 4) & 0xf);
+      c3 = ((b << 2) & 0x3c) |((c >>> 6) & 0x3);
       c4 = c & 0x3f;
 
       // Write Encoded Characters

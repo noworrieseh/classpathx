@@ -1,13 +1,13 @@
 /*
  * Session.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright(C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,7 +56,7 @@ public final class Session
   // Constant definitions of property locations.
   
   private static final String SYSTEM_PROVIDERS =
-      (System.getProperty ("java.home")
+     (System.getProperty("java.home")
 			+ File.separator
 			+ "lib"
 			+ File.separator
@@ -69,7 +69,7 @@ public final class Session
       "META-INF/javamail.default.providers";
   
   private static final String SYSTEM_ADDRESS_MAP =
-      (System.getProperty ("java.home")
+     (System.getProperty("java.home")
 			+ File.separator
 			+ "lib"
 			+ File.separator
@@ -87,17 +87,17 @@ public final class Session
   
   private Authenticator authenticator;
 
-  private HashMap authTable = new HashMap ();
+  private HashMap authTable = new HashMap();
   
   private boolean debug;
   
-  private ArrayList providers = new ArrayList ();
+  private ArrayList providers = new ArrayList();
 
-  private HashMap providersByProtocol = new HashMap ();
+  private HashMap providersByProtocol = new HashMap();
 
-  private HashMap providersByClassName = new HashMap ();
+  private HashMap providersByClassName = new HashMap();
 
-  private Properties addressMap = new Properties ();
+  private Properties addressMap = new Properties();
 
   private PrintStreamLogger logger;
   
@@ -107,64 +107,64 @@ public final class Session
    */
   private Session(Properties props, Authenticator authenticator)
   {
-    logger = new PrintStreamLogger (System.out);
-    Logger.setInstance (logger);
+    logger = new PrintStreamLogger(System.out);
+    Logger.setInstance(logger);
     
     this.props = props;
     this.authenticator = authenticator;
-    debug = new Boolean (props.getProperty ("mail.debug")).booleanValue ();
+    debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
     if (debug)
       {
-        logger.config ("using GNU JavaMail 1.3");
+        logger.config("using GNU JavaMail 1.3");
       }
     ClassLoader loader = null;
     if (authenticator == null)
       {
-        loader = getClass ().getClassLoader ();
+        loader = getClass().getClassLoader();
       }
     else
       {
-        loader = authenticator.getClass ().getClassLoader ();
+        loader = authenticator.getClass().getClassLoader();
       }
     // Load the providers
-    loadProviders (getResourceAsStream (loader, DEFAULT_PROVIDERS), "default");
-    loadProviders (getResourceAsStream (loader, CUSTOM_PROVIDERS), "custom");
+    loadProviders(getResourceAsStream(loader, DEFAULT_PROVIDERS), "default");
+    loadProviders(getResourceAsStream(loader, CUSTOM_PROVIDERS), "custom");
     try
       {
-        File file = new File (SYSTEM_PROVIDERS);
-        InputStream pin = new BufferedInputStream (new FileInputStream (file));
-        loadProviders (pin, "system");
+        File file = new File(SYSTEM_PROVIDERS);
+        InputStream pin = new BufferedInputStream(new FileInputStream(file));
+        loadProviders(pin, "system");
       }
     catch (FileNotFoundException e)
       {
         if (debug)
           {
-            logger.config ("no system providers");
+            logger.config("no system providers");
           }
       }
     if (debug)
       {
-        logger.config ("Providers by class name: "
-                       + providersByClassName.toString ());
-        logger.config ("Providers by protocol: "
-                       + providersByProtocol.toString ());
+        logger.config("Providers by class name: "
+                       + providersByClassName.toString());
+        logger.config("Providers by protocol: "
+                       + providersByProtocol.toString());
       }
     // Load the address map
-    loadAddressMap (getResourceAsStream (loader, DEFAULT_ADDRESS_MAP),
+    loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP),
                     "default");
-    loadAddressMap (getResourceAsStream (loader, CUSTOM_ADDRESS_MAP),
+    loadAddressMap(getResourceAsStream(loader, CUSTOM_ADDRESS_MAP),
                     "custom");
     try
       {
-        File file = new File (SYSTEM_ADDRESS_MAP);
-        InputStream min = new BufferedInputStream (new FileInputStream (file));
-        loadAddressMap (min, "system");
+        File file = new File(SYSTEM_ADDRESS_MAP);
+        InputStream min = new BufferedInputStream(new FileInputStream(file));
+        loadAddressMap(min, "system");
       }
     catch (FileNotFoundException e)
       {
         if (debug)
           {
-            logger.config ("no system address map");
+            logger.config("no system address map");
           }
       }
   }
@@ -172,24 +172,24 @@ public final class Session
   /**
    * Get an input stream for a resource.
    * <code>ClassLoader.getResourceAsStream</code> should work,
-   * but Class.getClassLoader() returns null in kaffe (2003-01-22).
+   * but Class.getClassLoader() returns null in kaffe(2003-01-22).
    */
-  private InputStream getResourceAsStream (ClassLoader loader, String resource)
+  private InputStream getResourceAsStream(ClassLoader loader, String resource)
   {
     InputStream in = null;
     try
       {
         if (loader == null)
           {
-            in = loader.getResourceAsStream (resource);
+            in = loader.getResourceAsStream(resource);
           }
         else
           {
-            in = getClass ().getResourceAsStream (resource);
+            in = getClass().getResourceAsStream(resource);
           }
-        if (in == null && resource.charAt (0) != '/')
+        if (in == null && resource.charAt(0) != '/')
           {
-            in = getResourceAsStream (loader, "/" + resource);
+            in = getResourceAsStream(loader, "/" + resource);
           }
       }
     catch (Exception e)
@@ -200,64 +200,64 @@ public final class Session
   
   /** Load the provider database description.
    */
-  private void loadProviders (InputStream in, String description)
+  private void loadProviders(InputStream in, String description)
   {
     if (in == null)
       {
         if (debug)
           {
-            logger.config ("no " + description + " providers");
+            logger.config("no " + description + " providers");
           }
         return;
       }
     try
       {
-        BufferedReader reader = new BufferedReader (new InputStreamReader (in));
-        for (String line = reader.readLine ();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        for (String line = reader.readLine();
             line != null;
-            line = reader.readLine ()) 
+            line = reader.readLine()) 
           {
-            line = line.trim ();
-            if (!line.startsWith ("#") && line.length () > 0)
+            line = line.trim();
+            if (!line.startsWith("#") && line.length() > 0)
               {
                 Provider.Type type = null;
                 String protocol = null;
                 String className = null;
                 String vendor = null;
                 String version = null;
-                for (StringTokenizer st = new StringTokenizer (line, ";"); 
-                     st.hasMoreTokens (); )
+                for (StringTokenizer st = new StringTokenizer(line, ";"); 
+                     st.hasMoreTokens(); )
                   {
-                    String token = st.nextToken ().trim ();
-                    int equalsIndex = token.indexOf ("=");
-                    if (token.startsWith ("protocol="))
+                    String token = st.nextToken().trim();
+                    int equalsIndex = token.indexOf("=");
+                    if (token.startsWith("protocol="))
                       {
-                        protocol = token.substring (equalsIndex + 1);
+                        protocol = token.substring(equalsIndex + 1);
                       }
-                    else if (token.startsWith ("type="))
+                    else if (token.startsWith("type="))
                       {
                         String transportValue =
-                          token.substring (equalsIndex + 1);
-                        if (transportValue.equalsIgnoreCase ("store"))
+                          token.substring(equalsIndex + 1);
+                        if (transportValue.equalsIgnoreCase("store"))
                           {
                             type = Provider.Type.STORE;
                           }
-                        else if (transportValue.equalsIgnoreCase ("transport"))
+                        else if (transportValue.equalsIgnoreCase("transport"))
                           {
                             type = Provider.Type.TRANSPORT;
                           }
                       }
-                    else if (token.startsWith ("class="))
+                    else if (token.startsWith("class="))
                       {
-                        className = token.substring (equalsIndex + 1);
+                        className = token.substring(equalsIndex + 1);
                       }
-                    else if (token.startsWith ("vendor="))
+                    else if (token.startsWith("vendor="))
                       {
-                        vendor = token.substring (equalsIndex + 1);
+                        vendor = token.substring(equalsIndex + 1);
                       }
-                    else if (token.startsWith ("version="))
+                    else if (token.startsWith("version="))
                       {
-                        version = token.substring (equalsIndex + 1);
+                        version = token.substring(equalsIndex + 1);
                       }
                   }
                 
@@ -265,75 +265,75 @@ public final class Session
                   {
                     if (debug)
                       {
-                        logger.config ("Invalid provider: " + line);
+                        logger.config("Invalid provider: " + line);
                       }
                   }
                 else
                   {
-                    Provider provider = new Provider (type, protocol, className,
+                    Provider provider = new Provider(type, protocol, className,
                                                       vendor, version);
-                    providers.add (provider);
-                    providersByClassName.put (className, provider);
-                    if (!providersByProtocol.containsKey (protocol))
+                    providers.add(provider);
+                    providersByClassName.put(className, provider);
+                    if (!providersByProtocol.containsKey(protocol))
                       {
-                        providersByProtocol.put (protocol, provider);
+                        providersByProtocol.put(protocol, provider);
                       }
                   }
               }
           }
-        in.close ();
+        in.close();
         if (debug)
           {
-            logger.config ("loaded " + description + " providers");
+            logger.config("loaded " + description + " providers");
           }
       }
     catch (IOException e)
       {
         if (debug)
           {
-            logger.config (e.getMessage ());
+            logger.config(e.getMessage());
           }
       }
     catch (SecurityException e)
       {
         if (debug)
           {
-            logger.config ("can't load " + description + " providers");
+            logger.config("can't load " + description + " providers");
           }
       }
   }
   
-  private void loadAddressMap (InputStream in, String description)
+  private void loadAddressMap(InputStream in, String description)
   {
     if (in == null)
       {
         if (debug)
           {
-            logger.config ("no " + description + " address map");
+            logger.config("no " + description + " address map");
           }
         return;
       }
     try
       {
-        addressMap.load (in);
-        in.close ();
+        addressMap.load(in);
+        in.close();
         if (debug)
           {
-            logger.config ("loaded " + description + " address map");
+            logger.config("loaded " + description + " address map");
           }
       }
     catch (IOException e)
       {
         if (debug)
           {
-            logger.config (e.getMessage ());
+            logger.config(e.getMessage());
           }
       }
     catch (SecurityException e)
       {
         if (debug)
           {
-            logger.config ("can't load " + description + " address map");
+            logger.config("can't load " + description + " address map");
           }
       }
   }
@@ -342,7 +342,7 @@ public final class Session
    * Get a new Session object.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec (particularly
+   * listed in Appendix A of the JavaMail spec(particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -355,14 +355,14 @@ public final class Session
   public static Session getInstance(Properties props, 
       Authenticator authenticator)
   {
-    return new Session (props, authenticator);
+    return new Session(props, authenticator);
   }
 
   /**
    * Get a new Session object.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec (particularly
+   * listed in Appendix A of the JavaMail spec(particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -370,9 +370,9 @@ public final class Session
    * and <code>mail.from</code>)
    * as the defaults are unlikely to work in all cases.
    */
-  public static Session getInstance (Properties props)
+  public static Session getInstance(Properties props)
   {
-    return getInstance (props, null);
+    return getInstance(props, null);
   }
 
   /**
@@ -398,7 +398,7 @@ public final class Session
    * access to the default session.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec (particularly
+   * listed in Appendix A of the JavaMail spec(particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -408,20 +408,20 @@ public final class Session
    * @param authenticator Authenticator object used to call back to the
    * application when a user name and password is needed.
    */
-  public static Session getDefaultInstance (Properties props,
+  public static Session getDefaultInstance(Properties props,
                                             Authenticator authenticator)
   {
     if (defaultSession == null)
       {
-        defaultSession = new Session (props, authenticator);
+        defaultSession = new Session(props, authenticator);
       }
     else if (defaultSession.authenticator != authenticator
-             && (defaultSession.authenticator == null ||
+             &&(defaultSession.authenticator == null ||
                  authenticator == null ||
-                 (defaultSession.authenticator.getClass ().getClassLoader ()
-                  != authenticator.getClass ().getClassLoader ())))
+                (defaultSession.authenticator.getClass().getClassLoader()
+                  != authenticator.getClass().getClassLoader())))
       {
-        throw new SecurityException ("Access denied");
+        throw new SecurityException("Access denied");
       }
     return defaultSession;
   }
@@ -437,7 +437,7 @@ public final class Session
    * passwords.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec (particularly
+   * listed in Appendix A of the JavaMail spec(particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -445,9 +445,9 @@ public final class Session
    * and <code>mail.from</code>)
    * as the defaults are unlikely to work in all cases.
    */
-  public static Session getDefaultInstance (Properties props)
+  public static Session getDefaultInstance(Properties props)
   {
-    return getDefaultInstance (props, null);
+    return getDefaultInstance(props, null);
   }
 
   /**
@@ -461,7 +461,7 @@ public final class Session
    * to the <code>setDebug</code> method manipulate the per-Session debugging 
    * flag and have no affect on the <code>mail.debug</code> property.
    */
-  public void setDebug (boolean debug)
+  public void setDebug(boolean debug)
   {
     this.debug = debug;
   }
@@ -469,7 +469,7 @@ public final class Session
   /**
    * Get the debug setting for this Session.
    */
-  public boolean getDebug ()
+  public boolean getDebug()
   {
     return debug;
   }
@@ -479,10 +479,10 @@ public final class Session
    * via the javamail.[default.]providers files that can be loaded 
    * using the ClassLoader available to this application.
    */
-  public Provider[] getProviders ()
+  public Provider[] getProviders()
   {
-    Provider[] p = new Provider[providers.size ()];
-    providers.toArray (p);
+    Provider[] p = new Provider[providers.size()];
+    providers.toArray(p);
     return p;
   }
 
@@ -494,42 +494,42 @@ public final class Session
    * appeared first in the configuration files. 
    * If an implementation for the protocol isn't found, 
    * throws NoSuchProviderException
-   * @param protocol Configured protocol (i.e. smtp, imap, etc)
+   * @param protocol Configured protocol(i.e. smtp, imap, etc)
    * @param NoSuchProviderException If a provider for the given protocol 
    * is not found.
    */
-  public Provider getProvider (String protocol)
+  public Provider getProvider(String protocol)
     throws NoSuchProviderException
   {
-    if (protocol == null || protocol.length () <= 0)
+    if (protocol == null || protocol.length() <= 0)
       {
-        throw new NoSuchProviderException ("Invalid protocol: " + protocol);
+        throw new NoSuchProviderException("Invalid protocol: " + protocol);
       }
     Provider provider = null;
     String providerClassKey = "mail." + protocol + ".class";
-    String providerClassName = props.getProperty (providerClassKey);
+    String providerClassName = props.getProperty(providerClassKey);
     synchronized (providers)
       {
         if (providerClassName != null)
           {
             if (debug)
               {
-                logger.config (providerClassKey + "=" + providerClassName);
+                logger.config(providerClassKey + "=" + providerClassName);
               }
-            provider = (Provider) providersByClassName.get (providerClassName);
+            provider = (Provider) providersByClassName.get(providerClassName);
           }
         if (provider == null)
           {
-            provider = (Provider) providersByProtocol.get (protocol);
+            provider = (Provider) providersByProtocol.get(protocol);
           }
       }
     if (provider == null)
       {
-        throw new NoSuchProviderException ("No provider for " + protocol);
+        throw new NoSuchProviderException("No provider for " + protocol);
       }
     if (debug)
       {
-        logger.config ("getProvider(): " + provider.toString ());
+        logger.config("getProvider(): " + provider.toString());
       }
     return provider;
   }
@@ -538,19 +538,19 @@ public final class Session
    * Set the passed Provider to be the default implementation for the protocol
    * in Provider.protocol overriding any previous values.
    */
-  public void setProvider (Provider provider)
+  public void setProvider(Provider provider)
     throws NoSuchProviderException
   {
     if (provider == null)
       {
-        throw new NoSuchProviderException ("Can't set null provider");
+        throw new NoSuchProviderException("Can't set null provider");
       }
     synchronized (providers)
       {
-        String protocol = provider.getProtocol ();
-        providersByProtocol.put (protocol, provider);
+        String protocol = provider.getProtocol();
+        providersByProtocol.put(protocol, provider);
         String providerClassKey = "mail." + protocol + ".class";
-        props.put (providerClassKey, provider.getClassName ());
+        props.put(providerClassKey, provider.getClassName());
       }
   }
 
@@ -560,10 +560,10 @@ public final class Session
    * protocol. If an appropriate Store object is not obtained,
    * NoSuchProviderException is thrown
    */
-  public Store getStore ()
+  public Store getStore()
     throws NoSuchProviderException
   {
-    return getStore (getProperty ("mail.store.protocol"));
+    return getStore(getProperty("mail.store.protocol"));
   }
 
   /**
@@ -571,26 +571,26 @@ public final class Session
    * If an appropriate Store object cannot be obtained,
    * NoSuchProviderException is thrown.
    */
-  public Store getStore (String protocol)
+  public Store getStore(String protocol)
     throws NoSuchProviderException
   {
-    return getStore (new URLName (protocol, null, -1, null, null, null));
+    return getStore(new URLName(protocol, null, -1, null, null, null));
   }
 
   /**
    * Get a Store object for the given URLName.
    * If the requested Store object cannot be obtained,
    * NoSuchProviderException is thrown. 
-   * The "scheme" part of the URL string (Refer RFC 1738) is used to 
+   * The "scheme" part of the URL string(Refer RFC 1738) is used to 
    * locate the Store protocol.
    * @param url URLName that represents the desired Store
    */
-  public Store getStore (URLName url)
+  public Store getStore(URLName url)
     throws NoSuchProviderException
   {
-    String protocol = url.getProtocol ();
-    Provider provider = getProvider (protocol);
-    return getStore (provider, url);
+    String protocol = url.getProtocol();
+    Provider provider = getProvider(protocol);
+    return getStore(provider, url);
   }
 
   /**
@@ -598,26 +598,26 @@ public final class Session
    * Instantiates the store and returns it.
    * @param provider Store Provider that will be instantiated
    */
-  public Store getStore (Provider provider)
+  public Store getStore(Provider provider)
     throws NoSuchProviderException
   {
-    return getStore (provider, null);
+    return getStore(provider, null);
   }
 
-  private Store getStore (Provider provider, URLName url)
+  private Store getStore(Provider provider, URLName url)
     throws NoSuchProviderException
   {
-    if (provider == null || provider.getType () != Provider.Type.STORE)
+    if (provider == null || provider.getType() != Provider.Type.STORE)
       {
         throw new NoSuchProviderException("invalid provider");
       }
     try
       {
-        return (Store) getService (provider, url);
+        return (Store) getService(provider, url);
       }
     catch (ClassCastException e)
       {
-        throw new NoSuchProviderException ("not a store");
+        throw new NoSuchProviderException("not a store");
       }
   }
   
@@ -629,10 +629,10 @@ public final class Session
    * MessagingException is thrown.
    * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport ()
+  public Transport getTransport()
     throws NoSuchProviderException
   {
-    return getTransport (getProperty ("mail.transport.protocol"));
+    return getTransport(getProperty("mail.transport.protocol"));
   }
 
   /**
@@ -640,26 +640,26 @@ public final class Session
    * If an appropriate Transport object cannot be obtained, null is returned.
    * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport (String protocol)
+  public Transport getTransport(String protocol)
     throws NoSuchProviderException
   {
-    return getTransport (new URLName (protocol, null, -1, null, null, null));
+    return getTransport(new URLName(protocol, null, -1, null, null, null));
   }
 
   /**
    * Get a Transport object for the given URLName.
    * If the requested Transport object cannot be obtained,
    * NoSuchProviderException is thrown. The "scheme" part of the URL 
-   * string (Refer RFC 1738) is used to locate the Transport protocol.
+   * string(Refer RFC 1738) is used to locate the Transport protocol.
    * @param url URLName that represents the desired Transport
    * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport (URLName url)
+  public Transport getTransport(URLName url)
     throws NoSuchProviderException
   {
-    String protocol = url.getProtocol ();
-    Provider provider = getProvider (protocol);
-    return getTransport (provider, url);
+    String protocol = url.getProtocol();
+    Provider provider = getProvider(protocol);
+    return getTransport(provider, url);
   }
 
   /**
@@ -667,10 +667,10 @@ public final class Session
    * Instantiates the transport and returns it.
    * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport (Provider provider)
+  public Transport getTransport(Provider provider)
     throws NoSuchProviderException
   {
-    return getTransport (provider, null);
+    return getTransport(provider, null);
   }
 
   /**
@@ -678,32 +678,32 @@ public final class Session
    * address type.
    * @exception NoSuchProviderException If the provider is not found.
    */
-  public Transport getTransport (Address address)
+  public Transport getTransport(Address address)
     throws NoSuchProviderException
   {
-    String provider = (String) addressMap.get (address.getType ());
+    String provider = (String) addressMap.get(address.getType());
     if (provider == null)
       {
-        throw new NoSuchProviderException ("No provider for address: "+
-                                           address.getType ());
+        throw new NoSuchProviderException("No provider for address: "+
+                                           address.getType());
       }
-    return getTransport (provider);
+    return getTransport(provider);
   }
 
-  private Transport getTransport (Provider provider, URLName urlname)
+  private Transport getTransport(Provider provider, URLName urlname)
     throws NoSuchProviderException
   {
-    if (provider == null || provider.getType () != Provider.Type.TRANSPORT)
+    if (provider == null || provider.getType() != Provider.Type.TRANSPORT)
       {
-        throw new NoSuchProviderException ("invalid provider");
+        throw new NoSuchProviderException("invalid provider");
       }
     try
       {
-        return (Transport) getService (provider, urlname);
+        return (Transport) getService(provider, urlname);
       }
     catch (ClassCastException _ex)
       {
-        throw new NoSuchProviderException ("incorrect class");
+        throw new NoSuchProviderException("incorrect class");
       }
   }
 
@@ -711,37 +711,37 @@ public final class Session
    * Get a closed Folder object for the given URLName.
    * If the requested Folder object cannot be obtained, null is returned.
    * <p>
-   * The "scheme" part of the URL string (Refer RFC 1738) is used to locate 
-   * the Store protocol. The rest of the URL string (that is, the
+   * The "scheme" part of the URL string(Refer RFC 1738) is used to locate 
+   * the Store protocol. The rest of the URL string(that is, the
    * "schemepart", as per RFC 1738) is used by that Store in a protocol 
    * dependent manner to locate and instantiate the appropriate Folder object.
    * <p>
    * Note that RFC 1738 also specifies the syntax for the "schemepart" for
-   * IP-based protocols (IMAP4, POP3, etc.). Providers of IP-based mail Stores
+   * IP-based protocols(IMAP4, POP3, etc.). Providers of IP-based mail Stores
    * should implement that syntax for referring to Folders.
    * @param url URLName that represents the desired folder
    * @exception NoSuchProviderException If a provider for the given URLName 
    * is not found.
    * @param MessagingException if the Folder could not be located or created.
    */
-  public Folder getFolder (URLName url)
+  public Folder getFolder(URLName url)
     throws MessagingException
   {
-    Store store = getStore (url);
-    store.connect ();
-    return store.getFolder (url);
+    Store store = getStore(url);
+    store.connect();
+    return store.getFolder(url);
   }
 
-  private Object getService (Provider provider, URLName url)
+  private Object getService(Provider provider, URLName url)
     throws NoSuchProviderException
   {
     if (provider == null)
       {
-        throw new NoSuchProviderException ("null");
+        throw new NoSuchProviderException("null");
       }
     if (url == null)
       {
-        url = new URLName (provider.getProtocol (), null, -1, null, null,
+        url = new URLName(provider.getProtocol(), null, -1, null, null,
                            null);
       }
     
@@ -749,29 +749,29 @@ public final class Session
     ClassLoader loader;
     if (authenticator != null)
       {
-        loader = authenticator.getClass ().getClassLoader ();
+        loader = authenticator.getClass().getClassLoader();
       }
     else
       {
-        loader = getClass ().getClassLoader ();
+        loader = getClass().getClassLoader();
       }
     try
       {
-        providerClass = loader.loadClass (provider.getClassName ());
+        providerClass = loader.loadClass(provider.getClassName());
       }
     catch (Exception e)
       {
         try
           {
-            providerClass = Class.forName (provider.getClassName ());
+            providerClass = Class.forName(provider.getClassName());
           }
         catch (Exception e2)
           {
             if (debug)
               {
-                e2.printStackTrace ();
+                e2.printStackTrace();
               }
-            throw new NoSuchProviderException (provider.getProtocol ());
+            throw new NoSuchProviderException(provider.getProtocol());
           }
       }
     try
@@ -779,24 +779,24 @@ public final class Session
         Class[] parameterTypes = {
           javax.mail.Session.class, javax.mail.URLName.class
         };
-        Constructor constructor = providerClass.getConstructor (parameterTypes);
+        Constructor constructor = providerClass.getConstructor(parameterTypes);
         Object[] parameters = {
           this, url
         };
-        return constructor.newInstance (parameters);
+        return constructor.newInstance(parameters);
       }
     catch (Exception e)
       {
         if (debug)
           {
-            e.printStackTrace ();
+            e.printStackTrace();
           }
-        throw new NoSuchProviderException (provider.getProtocol ());
+        throw new NoSuchProviderException(provider.getProtocol());
       }
   }
 
   /**
-   * Save a PasswordAuthentication for this (store or transport) URLName.
+   * Save a PasswordAuthentication for this(store or transport) URLName.
    * If <code>pw</code> is null the entry corresponding to the URLName 
    * is removed.
    * <p>
@@ -804,26 +804,26 @@ public final class Session
    * allow authentication information to be shared among multiple uses of a
    * session.
    */
-  public void setPasswordAuthentication (URLName url,
+  public void setPasswordAuthentication(URLName url,
                                          PasswordAuthentication pw)
   {
     if (pw == null)
       {
-        authTable.remove (url);
+        authTable.remove(url);
       }
     else
       {
-        authTable.put (url, pw);
+        authTable.put(url, pw);
       }
   }
 
   /**
-   * Return any saved PasswordAuthentication for this (store or transport)
+   * Return any saved PasswordAuthentication for this(store or transport)
    * URLName. Normally used only by store or transport implementations.
    */
-  public PasswordAuthentication getPasswordAuthentication (URLName url)
+  public PasswordAuthentication getPasswordAuthentication(URLName url)
   {
-    return (PasswordAuthentication) authTable.get (url);
+    return (PasswordAuthentication) authTable.get(url);
   }
 
   /**
@@ -836,12 +836,12 @@ public final class Session
    User Name: <defaultUserName>
    Password:
    * @param addr InetAddress of the host. may be null.
-   * @param protocol protocol scheme (e.g. imap, pop3, etc.)
+   * @param protocol protocol scheme(e.g. imap, pop3, etc.)
    * @param prompt any additional String to show as part of the prompt; may be
    * null.
    * @param defaultUserName the default username. may be null.
    */
-  public PasswordAuthentication requestPasswordAuthentication (
+  public PasswordAuthentication requestPasswordAuthentication(
       InetAddress address, int port, String protocol, String prompt,
       String defaultUserName)
   {
@@ -857,7 +857,7 @@ public final class Session
   /**
    * Returns the Properties object associated with this Session.
    */
-  public Properties getProperties ()
+  public Properties getProperties()
   {
     return props;
   }
@@ -866,9 +866,9 @@ public final class Session
    * Returns the value of the specified property.
    * Returns null if this property does not exist.
    */
-  public String getProperty (String name)
+  public String getProperty(String name)
   {
-    return props.getProperty (name);
+    return props.getProperty(name);
   }
 
   /**
@@ -880,13 +880,13 @@ public final class Session
    * @param out the PrintStream to use for debugging output
    * @since JavaMail 1.3
    */
-  public void setDebugOut (PrintStream out)
+  public void setDebugOut(PrintStream out)
   {
     if (out == null)
       {
         out = System.out;
       }
-    logger = new PrintStreamLogger (out);
+    logger = new PrintStreamLogger(out);
   }
 
   /**
@@ -894,9 +894,9 @@ public final class Session
    * been set, <code>System.out</code> is returned.
    * @since JavaMail 1.3
    */
-  public PrintStream getDebugOut ()
+  public PrintStream getDebugOut()
   {
-    return logger.getPrintStream ();
+    return logger.getPrintStream();
   }
 
 }

@@ -1,13 +1,13 @@
 /*
  * FolderNotFoundException.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,30 +43,30 @@ public class FolderNotFoundException
    */
   private Folder folder;
 
-  public FolderNotFoundException ()
+  public FolderNotFoundException()
   {
   }
 
-  public FolderNotFoundException (Folder folder)
+  public FolderNotFoundException(Folder folder)
   {
     this.folder = folder;
   }
 
-  public FolderNotFoundException (Folder folder, String message)
+  public FolderNotFoundException(Folder folder, String message)
   {
-    super (message);
+    super(message);
     this.folder = folder;
   }
 
-  public FolderNotFoundException (String message, Folder folder)
+  public FolderNotFoundException(String message, Folder folder)
   {
-    this (folder, message);
+    this(folder, message);
   }
 
   /**
    * Returns the offending Folder object.
    */
-  public Folder getFolder ()
+  public Folder getFolder()
   {
     return folder;
   }

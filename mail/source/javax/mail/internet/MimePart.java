@@ -1,13 +1,13 @@
 /*
  * MimePart.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,7 @@ import javax.mail.Part;
 
 /**
  * The MimePart interface models an Entity as defined by MIME
- * (RFC2045, Section 2.4).
+ *(RFC2045, Section 2.4).
  * <p>
  * MimePart extends the Part interface to add additional RFC822 and MIME 
  * specific semantics and attributes. It provides the base interface for 
@@ -47,9 +47,9 @@ import javax.mail.Part;
  * used to to achieve this. Callers of the <code>setHeader</code>, 
  * <code>addHeader</code>, and <code>addHeaderLine</code> methods are 
  * responsible for enforcing the MIME requirements for the specified headers.
- * In addition, these header fields must be folded (wrapped) before being 
+ * In addition, these header fields must be folded(wrapped) before being 
  * sent if they exceed the line length limitation for the transport 
- * (1000 bytes for SMTP). Received headers may have been folded. 
+ *(1000 bytes for SMTP). Received headers may have been folded. 
  * The application is responsible for folding and unfolding headers as 
  * appropriate.
  *
@@ -67,7 +67,7 @@ public interface MimePart
    * @param header_name the name of this header
    * @return the value fields for all headers with this name
    */
-  String getHeader (String header_name, String delimiter)
+  String getHeader(String header_name, String delimiter)
     throws MessagingException;
 
   /**
@@ -77,7 +77,7 @@ public interface MimePart
    * @exception IllegalStateException if this Part is obtained from a READ_ONLY
    * folder
    */
-  void addHeaderLine (String line)
+  void addHeaderLine(String line)
     throws MessagingException;
 
   /**
@@ -85,7 +85,7 @@ public interface MimePart
    * A Header line is a raw RFC822 header-line,
    * containing both the "name" and "value" field.
    */
-  Enumeration getAllHeaderLines ()
+  Enumeration getAllHeaderLines()
     throws MessagingException;
 
   /**
@@ -93,7 +93,7 @@ public interface MimePart
    * A Header line is a raw RFC822 header-line,
    * containing both the "name" and "value" field.
    */
-  Enumeration getMatchingHeaderLines (String[] names)
+  Enumeration getMatchingHeaderLines(String[] names)
     throws MessagingException;
 
   /**
@@ -101,14 +101,14 @@ public interface MimePart
    * A Header line is a raw RFC822 header-line,
    * containing both the "name" and "value" field.
    */
-  Enumeration getNonMatchingHeaderLines (String[] names)
+  Enumeration getNonMatchingHeaderLines(String[] names)
     throws MessagingException;
 
   /**
    * Get the transfer encoding of this part.
    * @return content-transfer-encoding
    */
-  String getEncoding ()
+  String getEncoding()
     throws MessagingException;
 
   /**
@@ -116,7 +116,7 @@ public interface MimePart
    * Returns null if none present.
    * @return content-ID
    */
-  String getContentID ()
+  String getContentID()
     throws MessagingException;
 
   /**
@@ -124,7 +124,7 @@ public interface MimePart
    * Returns null if none present.
    * @return content-MD5
    */
-  String getContentMD5 ()
+  String getContentMD5()
     throws MessagingException;
 
   /**
@@ -135,7 +135,7 @@ public interface MimePart
    * @param IllegalStateException if this Part is obtained from a READ_ONLY 
    * folder
    */
-  void setContentMD5 (String md5)
+  void setContentMD5(String md5)
     throws MessagingException;
 
   /**
@@ -143,7 +143,7 @@ public interface MimePart
    * MimePart. The Content-Language header is defined by RFC 1766.
    * Returns null if this header is not available.
    */
-  String[] getContentLanguage ()
+  String[] getContentLanguage()
     throws MessagingException;
 
   /**
@@ -155,7 +155,7 @@ public interface MimePart
    * @exception IllegalStateException if this Part is obtained from a READ_ONLY
    * folder
    */
-  void setContentLanguage (String[] languages)
+  void setContentLanguage(String[] languages)
     throws MessagingException;
 
   /**
@@ -171,7 +171,7 @@ public interface MimePart
    * If the charset is already known, use the <code>setText()</code> version 
    * that takes the <code>charset</code> parameter.
    */
-  void setText (String text)
+  void setText(String text)
     throws MessagingException;
 
   /**
@@ -180,7 +180,7 @@ public interface MimePart
    * string will be charset-encoded using the specified charset. The charset is
    * also used to set "charset" parameter.
    */
-  void setText (String text, String charset)
+  void setText(String text, String charset)
     throws MessagingException;
   
 }

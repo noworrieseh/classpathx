@@ -1,13 +1,13 @@
 /*
  * Message.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,11 +51,11 @@ import javax.mail.search.SearchTerm;
  * are normally retrieved from a folder named "INBOX".
  * <p>
  * A Message object obtained from a folder is just a lightweight reference to 
- * the actual message. The Message is 'lazily' filled up (on demand) when 
+ * the actual message. The Message is 'lazily' filled up(on demand) when 
  * each item is requested from the message. Note that certain folder 
  * implementations may return Message objects that are pre-filled with certain 
  * user-specified items. To send a message, an appropriate subclass of 
- * Message (e.g., MimeMessage) is instantiated, the attributes and content 
+ * Message(e.g., MimeMessage) is instantiated, the attributes and content 
  * are filled in, and the message is sent using the <code>Transport.send</code>
  * method.
  *
@@ -82,19 +82,19 @@ public abstract class Message
   {
 
     /**
-     * The "To" (primary) recipients.
+     * The "To"(primary) recipients.
      */
-    public static final RecipientType TO = new RecipientType ("To");
+    public static final RecipientType TO = new RecipientType("To");
 
     /**
-     * The "Cc" (carbon copy) recipients.
+     * The "Cc"(carbon copy) recipients.
      */
-    public static final RecipientType CC = new RecipientType ("Cc");
+    public static final RecipientType CC = new RecipientType("Cc");
 
     /**
-     * The "Bcc" (blind carbon copy) recipients.
+     * The "Bcc"(blind carbon copy) recipients.
      */
-    public static final RecipientType BCC = new RecipientType ("Bcc");
+    public static final RecipientType BCC = new RecipientType("Bcc");
 
     /**
      * The type of recipient, usually the name of a corresponding Internet
@@ -105,7 +105,7 @@ public abstract class Message
     /**
      * Constructor for use by subclasses.
      */
-    protected RecipientType (String type)
+    protected RecipientType(String type)
     {
       this.type = type;
     }
@@ -116,22 +116,22 @@ public abstract class Message
      * Subclasses must implement their own readResolve method that checks 
      * for their known instances before calling this super method.
      */
-    protected Object readResolve ()
+    protected Object readResolve()
       throws ObjectStreamException
     {
-      if (type.equals ("To"))
+      if (type.equals("To"))
         {
           return TO;
         }
-      if (type.equals ("Cc"))
+      if (type.equals("Cc"))
         {
           return CC;
         }
-      if (type.equals ("Bcc"))
+      if (type.equals("Bcc"))
         {
           return BCC;
         }
-      throw new InvalidObjectException ("Unknown RecipientType: " + type);
+      throw new InvalidObjectException("Unknown RecipientType: " + type);
     }
 
   }
@@ -160,7 +160,7 @@ public abstract class Message
   /**
    * No-arg version of the constructor.
    */
-  protected Message ()
+  protected Message()
   {
     folder = null;
     session = null;
@@ -172,7 +172,7 @@ public abstract class Message
    * @param folder containing folder
    * @param msgnum this message's sequence number within this folder
    */
-  protected Message (Folder folder, int msgnum)
+  protected Message(Folder folder, int msgnum)
   {
     this.folder = folder;
     this.msgnum = msgnum;
@@ -184,7 +184,7 @@ public abstract class Message
    * Used for client created Message objects.
    * @param session A Session object
    */
-  protected Message (Session session)
+  protected Message(Session session)
   {
     folder = null;
     this.session = session;
@@ -202,7 +202,7 @@ public abstract class Message
    * Returns an empty array if this attribute is present, but contains no
    * addresses.
    */
-  public abstract Address[] getFrom ()
+  public abstract Address[] getFrom()
     throws MessagingException;
 
   /**
@@ -214,7 +214,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from a 
    * READ_ONLY folder.
    */
-  public abstract void setFrom ()
+  public abstract void setFrom()
     throws MessagingException;
 
   /**
@@ -225,7 +225,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from a 
    * READ_ONLY folder.
    */
-  public abstract void setFrom (Address address)
+  public abstract void setFrom(Address address)
     throws MessagingException;
 
   /**
@@ -236,7 +236,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from a 
    * READ_ONLY folder.
    */
-  public abstract void addFrom (Address[] addresses)
+  public abstract void addFrom(Address[] addresses)
     throws MessagingException;
 
   /**
@@ -247,7 +247,7 @@ public abstract class Message
    * contains no addresses.
    * @param type the recipient type
    */
-  public abstract Address[] getRecipients (RecipientType type)
+  public abstract Address[] getRecipients(RecipientType type)
     throws MessagingException;
 
   /**
@@ -259,12 +259,12 @@ public abstract class Message
    * this message. Returns an empty array if any recipient header is present,
    * but contains no addresses.
    */
-  public Address[] getAllRecipients ()
+  public Address[] getAllRecipients()
     throws MessagingException
   {
-    Address[] to = getRecipients (RecipientType.TO);
-    Address[] cc = getRecipients (RecipientType.CC);
-    Address[] bcc = getRecipients (RecipientType.BCC);
+    Address[] to = getRecipients(RecipientType.TO);
+    Address[] cc = getRecipients(RecipientType.CC);
+    Address[] bcc = getRecipients(RecipientType.BCC);
    
     if (cc == null && bcc == null)
       return to;
@@ -276,17 +276,17 @@ public abstract class Message
     int offset = 0;
     if (to != null)
       {
-        System.arraycopy (to, 0, all, offset, to.length);
+        System.arraycopy(to, 0, all, offset, to.length);
         offset += to.length;
       }
     if (cc != null)
       {
-        System.arraycopy (cc, 0, all, offset, cc.length);
+        System.arraycopy(cc, 0, all, offset, cc.length);
         offset += cc.length;
       }
     if (bcc != null)
       {
-        System.arraycopy (bcc, 0, all, offset, bcc.length);
+        System.arraycopy(bcc, 0, all, offset, bcc.length);
         offset += bcc.length;
       }
     return all;
@@ -303,7 +303,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void setRecipients (RecipientType type, Address[] addresses)
+  public abstract void setRecipients(RecipientType type, Address[] addresses)
     throws MessagingException;
 
   /**
@@ -314,7 +314,7 @@ public abstract class Message
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public void setRecipient (RecipientType type, Address address)
+  public void setRecipient(RecipientType type, Address address)
     throws MessagingException
   {
     setRecipients(type, new Address[] { address });
@@ -329,7 +329,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void addRecipients (RecipientType type, Address[] addresses)
+  public abstract void addRecipients(RecipientType type, Address[] addresses)
     throws MessagingException;
 
   /**
@@ -339,7 +339,7 @@ public abstract class Message
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
-  public void addRecipient (RecipientType type, Address address)
+  public void addRecipient(RecipientType type, Address address)
     throws MessagingException
   {
     addRecipients(type, new Address[] { address });
@@ -356,31 +356,31 @@ public abstract class Message
    * Returns an empty array if the header is present, but contains no 
    * addresses.
    */
-  public Address[] getReplyTo ()
+  public Address[] getReplyTo()
     throws MessagingException
   {
-    return getFrom ();
+    return getFrom();
   }
 
   /**
    * Set the addresses to which replies should be directed.
-   * (Normally only a single address will be specified.)
+   *(Normally only a single address will be specified.)
    * Not all message types allow this to be specified separately from 
    * the sender of the message.
    * <p>
    * The default implementation provided here just throws the
    * MethodNotSupportedException.
    */
-  public void setReplyTo (Address[] addresses)
+  public void setReplyTo(Address[] addresses)
     throws MessagingException
   {
-    throw new MethodNotSupportedException ();
+    throw new MethodNotSupportedException();
   }
 
   /**
    * Get the subject of this message.
    */
-  public abstract String getSubject ()
+  public abstract String getSubject()
     throws MessagingException;
 
   /**
@@ -391,13 +391,13 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void setSubject (String subject)
+  public abstract void setSubject(String subject)
     throws MessagingException;
 
   /**
    * Get the date this message was sent.
    */
-  public abstract Date getSentDate ()
+  public abstract Date getSentDate()
     throws MessagingException;
 
   /**
@@ -408,13 +408,13 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void setSentDate (Date date)
+  public abstract void setSentDate(Date date)
     throws MessagingException;
 
   /**
    * Get the date this message was received.
    */
-  public abstract Date getReceivedDate ()
+  public abstract Date getReceivedDate()
     throws MessagingException;
 
   /**
@@ -423,7 +423,7 @@ public abstract class Message
    * Modifying any of the flags in this returned Flags object will not affect
    * the flags of this message. Use <code>setFlags()</code> to do that.
    */
-  public abstract Flags getFlags ()
+  public abstract Flags getFlags()
     throws MessagingException;
 
   /**
@@ -434,10 +434,10 @@ public abstract class Message
    * @param flag the flag
    * @return value of the specified flag for this message
    */
-  public boolean isSet (Flags.Flag flag)
+  public boolean isSet(Flags.Flag flag)
     throws MessagingException
   {
-    return getFlags ().contains (flag);
+    return getFlags().contains(flag);
   }
 
   /**
@@ -454,7 +454,7 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void setFlags (Flags flag, boolean set)
+  public abstract void setFlags(Flags flag, boolean set)
     throws MessagingException;
 
   /**
@@ -468,10 +468,10 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public void setFlag (Flags.Flag flag, boolean set)
+  public void setFlag(Flags.Flag flag, boolean set)
     throws MessagingException
   {
-    setFlags (new Flags (flag), set);
+    setFlags(new Flags(flag), set);
   }
 
   /**
@@ -482,10 +482,10 @@ public abstract class Message
    * are deleted and expunged.
    * <p>
    * Valid message numbers start at 1. Messages that do not belong to any 
-   * folder (like newly composed or derived messages) have 0 as their 
+   * folder(like newly composed or derived messages) have 0 as their 
    * message number.
    */
-  public int getMessageNumber ()
+  public int getMessageNumber()
   {
     return msgnum;
   }
@@ -494,7 +494,7 @@ public abstract class Message
    * Set the Message number for this Message. 
    * This method is invoked only by the implementation classes.
    */
-  protected void setMessageNumber (int msgnum)
+  protected void setMessageNumber(int msgnum)
   {
     this.msgnum = msgnum;
   }
@@ -503,7 +503,7 @@ public abstract class Message
    * Get the folder from which this message was obtained.
    * If this is a new message or nested message, this method returns null.
    */
-  public Folder getFolder ()
+  public Folder getFolder()
   {
     return folder;
   }
@@ -524,7 +524,7 @@ public abstract class Message
    * expunge handling.
    * @see Folder#expunge
    */
-  public boolean isExpunged ()
+  public boolean isExpunged()
   {
     return expunged;
   }
@@ -533,7 +533,7 @@ public abstract class Message
    * Sets the expunged flag for this Message.
    * This method is to be used only by the implementation classes.
    */
-  protected void setExpunged (boolean expunged)
+  protected void setExpunged(boolean expunged)
   {
     this.expunged = expunged;
   }
@@ -547,22 +547,22 @@ public abstract class Message
    * <p>
    * If <code>replyToAll</code> is set, the new Message will be addressed 
    * to all recipients of this message. Otherwise, the reply will be 
-   * addressed to only the sender of this message (using the value of the 
+   * addressed to only the sender of this message(using the value of the 
    * <code>getReplyTo</code> method).
    * <p>
    * The "Subject" field is filled in with the original subject prefixed with
-   * "Re:" (unless it already starts with "Re:").
+   * "Re:"(unless it already starts with "Re:").
    * <p>
    * The reply message will use the same session as this message.
    * @param replyToAll reply should be sent to all recipients of this message
    */
-  public abstract Message reply (boolean replyToAll)
+  public abstract Message reply(boolean replyToAll)
     throws MessagingException;
 
   /**
    * Save any changes made to this message into the message-store when the
    * containing folder is closed, if the message is contained in a folder.
-   * (Some implementations may save the changes immediately.) 
+   *(Some implementations may save the changes immediately.) 
    * Update any header fields to be consistent with the changed message 
    * contents. If any part of a message's headers or contents are changed,
    * <code>saveChanges</code> must be called to ensure that those changes 
@@ -577,17 +577,17 @@ public abstract class Message
    * @exception IllegalStateException if this message is obtained from 
    * a READ_ONLY folder.
    */
-  public abstract void saveChanges ()
+  public abstract void saveChanges()
     throws MessagingException;
 
   /**
    * Apply the specified Search criterion to this message.
    * @param term the Search criterion
    */
-  public boolean match (SearchTerm term)
+  public boolean match(SearchTerm term)
     throws MessagingException
   {
-    return term.match (this);
+    return term.match(this);
   }
 
 }

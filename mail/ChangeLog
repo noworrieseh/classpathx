@@ -1,3 +1,8 @@
+2004-12-08  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Fixed relative META-INF.
+	* all: Reformatted according to GNU Classpath guidelines. 
+
 2004-12-04  Chris Burdess  <dog@gnu.org>
 
 	* IMAPStore.java,IMAPFolder.java: Expose quota functionality of

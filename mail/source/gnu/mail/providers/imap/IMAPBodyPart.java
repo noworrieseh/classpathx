@@ -1,13 +1,13 @@
 /*
  * IMAPBodyPart.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -80,7 +80,7 @@ implements IMAPConstants
   /**
    * Called by the IMAPMessage.
    */
-  protected IMAPBodyPart (IMAPMessage message,
+  protected IMAPBodyPart(IMAPMessage message,
                           IMAPMultipart parent,
                           String section,
                           InternetHeaders headers,
@@ -88,7 +88,7 @@ implements IMAPConstants
                           int lines)
     throws MessagingException
   {
-    super (headers, null);
+    super(headers, null);
     this.parent = parent;
     this.message = message;
     this.section = section;
@@ -99,41 +99,41 @@ implements IMAPConstants
   /**
    * Fetches the message body.
    */
-  void fetchContent ()
+  void fetchContent()
     throws MessagingException
   {
     String[] commands = new String[1];
     commands[0] = "BODY.PEEK[" + section + "]";
-    fetch (commands);
+    fetch(commands);
   }
 
   /*
    * Perform the IMAP fetch.
    */
-  void fetch (String[] commands)
+  void fetch(String[] commands)
     throws MessagingException
   {
     try
       {
         IMAPConnection connection =
-          ((IMAPStore) message.getFolder ().getStore ()).getConnection ();
-        int msgnum = message.getMessageNumber ();
+         ((IMAPStore) message.getFolder().getStore()).getConnection();
+        int msgnum = message.getMessageNumber();
         int[] messages = new int[] { msgnum };
         synchronized (connection)
           {
-            MessageStatus[] ms = connection.fetch (messages, commands);
+            MessageStatus[] ms = connection.fetch(messages, commands);
             for (int i = 0; i < ms.length; i++)
               {
-                if (ms[i].getMessageNumber () == msgnum)
+                if (ms[i].getMessageNumber() == msgnum)
                   {
-                    update (ms[i]);
+                    update(ms[i]);
                   }
               }
           }
       }
     catch (IOException e)
       {
-        throw new MessagingException (e.getMessage (), e);
+        throw new MessagingException(e.getMessage(), e);
       }
   }
 
@@ -141,21 +141,21 @@ implements IMAPConstants
    * Update this body part's content from the specified message status
    * object.
    */
-  void update (MessageStatus status)
+  void update(MessageStatus status)
     throws MessagingException
   {
-    List code = status.getCode ();
-    int clen = code.size ();
+    List code = status.getCode();
+    int clen = code.size();
     for (int i = 0; i < clen; i += 2)
       {
-        Object item = code.get (i);
+        Object item = code.get(i);
         String key = null;
         List params = Collections.EMPTY_LIST;
         if (item instanceof Pair)
           {
             Pair pair = (Pair) item;
-            key = pair.getKey ();
-            params = pair.getValue ();
+            key = pair.getKey();
+            params = pair.getValue();
           }
         else if (item instanceof String)
           {
@@ -163,15 +163,15 @@ implements IMAPConstants
           }
         else
           {
-            throw new MessagingException ("Unexpected status item: " + item);
+            throw new MessagingException("Unexpected status item: " + item);
           }
         
         if (key == BODY)
           {
-            int plen = params.size ();
+            int plen = params.size();
             if (plen > 0)
               {
-                Object pitem = params.get (0);
+                Object pitem = params.get(0);
                 String pkey = null;
                 if (pitem instanceof String)
                   {
@@ -179,28 +179,28 @@ implements IMAPConstants
                   }
                 else
                   {
-                    throw new MessagingException ("Unexpected status item: " +
+                    throw new MessagingException("Unexpected status item: " +
                                                   pitem);
                   }
                 
-                if (pkey.equals (section))
+                if (pkey.equals(section))
                   {
-                    content = (byte[]) code.get (i + 1);
+                    content = (byte[]) code.get(i + 1);
                   }
                 else
                   {
-                    throw new MessagingException ("Unexpected section number: " +
+                    throw new MessagingException("Unexpected section number: " +
                                                   pkey);
                   }
               }
             else
               {
-                throw new MessagingException ("Not a section!");
+                throw new MessagingException("Not a section!");
               }
           }
         else
           {
-            throw new MessagingException ("Unknown section status key: " + key);
+            throw new MessagingException("Unknown section status key: " + key);
           }
       }
   }
@@ -210,7 +210,7 @@ implements IMAPConstants
   /**
    * Returns the content size of this body part in bytes.
    */
-  public int getSize ()
+  public int getSize()
     throws MessagingException
   {
     return size;
@@ -219,7 +219,7 @@ implements IMAPConstants
   /**
    * Returns the number of text lines in the content of this body part.
    */
-  public int getLineCount ()
+  public int getLineCount()
     throws MessagingException
   {
     return lines;
@@ -230,47 +230,47 @@ implements IMAPConstants
   /**
    * Returns a data handler for this part's content.
    */
-  public DataHandler getDataHandler ()
+  public DataHandler getDataHandler()
     throws MessagingException
   {
-    ContentType ct = new ContentType (getContentType ());
-    if ("multipart".equalsIgnoreCase (ct.getPrimaryType ()))
+    ContentType ct = new ContentType(getContentType());
+    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
       {
         // Our multipart object should already have been configured
-        return new DataHandler (new IMAPMultipartDataSource (multipart));
+        return new DataHandler(new IMAPMultipartDataSource(multipart));
       }
     else
       {
         if (content == null)
           {
-            fetchContent ();
+            fetchContent();
           }
-        return super.getDataHandler ();
+        return super.getDataHandler();
       }
   }
 
-  public Object getContent ()
+  public Object getContent()
     throws MessagingException, IOException
   {
-    ContentType ct = new ContentType (getContentType ());
-    if ("multipart".equalsIgnoreCase (ct.getPrimaryType ()))
+    ContentType ct = new ContentType(getContentType());
+    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
       {
         return multipart;
       }
-    return super.getContent ();
+    return super.getContent();
   }
   
   /**
    * Returns the raw content stream.
    */
-  protected InputStream getContentStream ()
+  protected InputStream getContentStream()
     throws MessagingException
   {
     if (content == null)
       {
-        fetchContent ();
+        fetchContent();
       }
-    return super.getContentStream ();
+    return super.getContentStream();
   }
 
 }

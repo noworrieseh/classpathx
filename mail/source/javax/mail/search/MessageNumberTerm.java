@@ -1,13 +1,13 @@
 /*
  * MessageNumberTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +43,7 @@ public final class MessageNumberTerm
    * Constructor.
    * @param number the Message number
    */
-  public MessageNumberTerm (int number)
+  public MessageNumberTerm(int number)
   {
     super(EQ, number);
   }
@@ -53,11 +53,11 @@ public final class MessageNumberTerm
    * @param msg the Message number is matched with this Message
    * @param true if the match succeeds, otherwise false
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        return super.match (msg.getMessageNumber ());
+        return super.match(msg.getMessageNumber());
       }
     catch (Exception e)
       {
@@ -68,9 +68,9 @@ public final class MessageNumberTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
-    return (other instanceof MessageNumberTerm && super.equals (other));
+    return (other instanceof MessageNumberTerm && super.equals(other));
   }
 
 }

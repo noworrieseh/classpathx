@@ -1,13 +1,13 @@
 /*
  * NNTPMessage.java
- * Copyright (C) 2002 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2002 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,168 +53,168 @@ public final class NNTPMessage
               int msgnum,
               String messageId)
     {
-      super (folder, msgnum);
+      super(folder, msgnum);
       this.messageId = messageId;
       headers = null;
       // Set SEEN state
-      flags = folder.getPermanentFlags ();
-      if (folder.isSeen (msgnum))
+      flags = folder.getPermanentFlags();
+      if (folder.isSeen(msgnum))
         {
-          flags.add (Flags.Flag.SEEN);
+          flags.add(Flags.Flag.SEEN);
         }
       else
         {
-          flags.remove (Flags.Flag.SEEN);
+          flags.remove(Flags.Flag.SEEN);
         }
     }
 
-  public String getMessageId ()
+  public String getMessageId()
     {
       return messageId;
     }
 
-  void requestHeaders ()
+  void requestHeaders()
     throws MessagingException
     {
-      FetchProfile fp = new FetchProfile ();
-      fp.add (FetchProfile.Item.ENVELOPE);
+      FetchProfile fp = new FetchProfile();
+      fp.add(FetchProfile.Item.ENVELOPE);
       NNTPMessage[] messages = new NNTPMessage[1];
       messages[0] = this;
-      folder.fetch (messages, fp);
+      folder.fetch(messages, fp);
     }
 
   /*
    * Called by NNTPFolder
    */
-  void updateHeaders (InputStream in)
+  void updateHeaders(InputStream in)
     throws MessagingException, IOException
     {
-      headers = new InternetHeaders (in);
+      headers = new InternetHeaders(in);
     }
 
-  void requestContent ()
+  void requestContent()
     throws MessagingException
     {
-      FetchProfile fp = new FetchProfile ();
-      fp.add (FetchProfile.Item.CONTENT_INFO);
+      FetchProfile fp = new FetchProfile();
+      fp.add(FetchProfile.Item.CONTENT_INFO);
       NNTPMessage[] messages = new NNTPMessage[1];
       messages[0] = this;
-      folder.fetch (messages, fp);
+      folder.fetch(messages, fp);
     }
 
   /*
    * Called by NNTPFolder
    */
-  void updateContent (byte[] content)
+  void updateContent(byte[] content)
     {
       this.content = content;
     }
 
   // -- Header retrieval --
 
-  public String[] getHeader (String name)
+  public String[] getHeader(String name)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getHeader (name);
+      return super.getHeader(name);
     }
 
-  public String getHeader (String name, String delimiter)
+  public String getHeader(String name, String delimiter)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getHeader (name, delimiter);
+      return super.getHeader(name, delimiter);
     }
 
-  public Enumeration getAllHeaders ()
+  public Enumeration getAllHeaders()
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getAllHeaders ();
+      return super.getAllHeaders();
     }
 
-  public Enumeration getMatchingHeaders (String[] names)
+  public Enumeration getMatchingHeaders(String[] names)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getMatchingHeaders (names);
+      return super.getMatchingHeaders(names);
     }
 
-  public Enumeration getNonMatchingHeaders (String[] names)
+  public Enumeration getNonMatchingHeaders(String[] names)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getNonMatchingHeaders (names);
+      return super.getNonMatchingHeaders(names);
     }
 
-  public Enumeration getAllHeaderLines ()
+  public Enumeration getAllHeaderLines()
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getAllHeaderLines ();
+      return super.getAllHeaderLines();
     }
 
-  public Enumeration getMatchingHeaderLines (String[] names)
+  public Enumeration getMatchingHeaderLines(String[] names)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getMatchingHeaderLines (names);
+      return super.getMatchingHeaderLines(names);
     }
 
-  public Enumeration getNonMatchingHeaderLines (String[] names)
+  public Enumeration getNonMatchingHeaderLines(String[] names)
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
-      return super.getNonMatchingHeaderLines (names);
+      return super.getNonMatchingHeaderLines(names);
     }
 
   // setHeader / addHeader / removeHeader
 
   // -- Content retrieval --
 
-  public int getSize ()
+  public int getSize()
     throws MessagingException
     {
       if (content == null)
         {
-          requestContent ();
+          requestContent();
         }
-      return super.getSize ();
+      return super.getSize();
     }
 
-  public int getLineCount ()
+  public int getLineCount()
     throws MessagingException
     {
-      String value = getHeader ("Lines", ",");
+      String value = getHeader("Lines", ",");
       if (value != null)
         {
           try
             {
-              return Integer.parseInt (value.trim ());
+              return Integer.parseInt(value.trim());
             }
           catch (NumberFormatException e)
             {
@@ -223,41 +223,41 @@ public final class NNTPMessage
       return -1;
     }
 
-  public InputStream getContentStream ()
+  public InputStream getContentStream()
     throws MessagingException
     {
       if (content == null)
         {
-          requestContent ();
+          requestContent();
         }
-      return super.getContentStream ();
+      return super.getContentStream();
     }
 
   // setContent(Object o, tring type), setContent(Multpart)
 
-  public void saveChanges ()
+  public void saveChanges()
     throws MessagingException
     {
       if (headers == null)
         {
-          requestHeaders ();
+          requestHeaders();
         }
       if (content == null)
         {
-          requestContent ();
+          requestContent();
         }
     }
 
   // -- Update SEEN flag if necessary --
 
-  public void setFlags (Flags flag, boolean set)
+  public void setFlags(Flags flag, boolean set)
     throws MessagingException
     {
-      if (flag.contains (Flags.Flag.SEEN))
+      if (flag.contains(Flags.Flag.SEEN))
         {
-          ((NNTPFolder) folder).setSeen (msgnum, set);
+         ((NNTPFolder) folder).setSeen(msgnum, set);
         }
-      super.setFlags (flag, set);
+      super.setFlags(flag, set);
     }
 
 }

@@ -1,13 +1,13 @@
 /*
  * MessagingException.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,18 +48,18 @@ public class MessagingException
   /**
    * Constructs a MessagingException with no detail message.
    */
-  public MessagingException ()
+  public MessagingException()
   {
-    this (null, null);
+    this(null, null);
   }
 
   /**
    * Constructs a MessagingException with the specified detail message.
    * @param message the detail message
    */
-  public MessagingException (String message)
+  public MessagingException(String message)
   {
-    this (message, null);
+    this(message, null);
   }
 
   /**
@@ -68,9 +68,9 @@ public class MessagingException
    * @param message the detail message
    * @param exception the embedded exception
    */
-  public MessagingException (String message, Exception exception)
+  public MessagingException(String message, Exception exception)
   {
-    super (message);
+    super(message);
     nextException = exception;
   }
 
@@ -79,7 +79,7 @@ public class MessagingException
    * If the next exception is a MessagingException, the chain may extend 
    * further.
    */
-  public Exception getNextException ()
+  public Exception getNextException()
   {
     return nextException;
   }
@@ -91,16 +91,16 @@ public class MessagingException
    * @param exception the new end of the Exception chain
    * @return true if the this Exception was added, false otherwise.
    */
-  public synchronized boolean setNextException (Exception exception)
+  public synchronized boolean setNextException(Exception exception)
   {
     Object o;
     for (o = this;
-        (o instanceof MessagingException) && 
-        ((MessagingException) o).nextException != null;
+       (o instanceof MessagingException) && 
+       ((MessagingException) o).nextException != null;
         o = ((MessagingException) o).nextException);
     if (o instanceof MessagingException)
       {
-        ((MessagingException) o).nextException = exception;
+       ((MessagingException) o).nextException = exception;
         return true;
       }
     return false;
@@ -110,37 +110,37 @@ public class MessagingException
    * Produce the message, include the message from the nested exception 
    * if there is one.
    */
-  public String getMessage ()
+  public String getMessage()
   {
-    String message = super.getMessage ();
+    String message = super.getMessage();
     if (nextException != null)
       {
-        StringBuffer buffer = new StringBuffer ();
-        buffer.append (message);
-        buffer.append (";\n  nested exception is: \n\t");
-        buffer.append (nextException.toString ());
-        message = buffer.toString ();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(message);
+        buffer.append(";\n  nested exception is: \n\t");
+        buffer.append(nextException.toString());
+        message = buffer.toString();
       }
     return message;
   }
 
-  public void printStackTrace (PrintStream out)
+  public void printStackTrace(PrintStream out)
   {
-    super.printStackTrace (out);
+    super.printStackTrace(out);
     if (nextException != null)
       {
-        out.println ("nested exception is:");
-        nextException.printStackTrace (out);
+        out.println("nested exception is:");
+        nextException.printStackTrace(out);
       }
   }
   
   public void printStackTrace(PrintWriter out)
   {
-    super.printStackTrace (out);
+    super.printStackTrace(out);
     if (nextException != null)
       {
-        out.println ("nested exception is:");
-        nextException.printStackTrace (out);
+        out.println("nested exception is:");
+        nextException.printStackTrace(out);
       }
   }
   

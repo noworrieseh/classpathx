@@ -1,13 +1,13 @@
 /*
  * MimePartDataSource.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -61,7 +61,7 @@ public class MimePartDataSource
   /**
    * Constructor, that constructs a DataSource from a MimePart.
    */
-  public MimePartDataSource (MimePart part)
+  public MimePartDataSource(MimePart part)
   {
     this.part = part;
   }
@@ -78,7 +78,7 @@ public class MimePartDataSource
    * <code>MimeUtility.decode()</code> method.
    * @return decoded input stream
    */
-  public InputStream getInputStream ()
+  public InputStream getInputStream()
     throws IOException
   {
     try
@@ -86,23 +86,23 @@ public class MimePartDataSource
         InputStream is;
         if (part instanceof MimeBodyPart)
           {
-            is = ((MimeBodyPart) part).getContentStream ();
+            is = ((MimeBodyPart) part).getContentStream();
           }
         else if (part instanceof MimeMessage)
           {
-            is = ((MimeMessage) part).getContentStream ();
+            is = ((MimeMessage) part).getContentStream();
           }
         else
           {
-            throw new MessagingException ("Unknown part type");
+            throw new MessagingException("Unknown part type");
           }
         
-        String encoding = part.getEncoding ();
-        return (encoding != null) ? MimeUtility.decode (is, encoding) : is;
+        String encoding = part.getEncoding();
+        return (encoding != null) ? MimeUtility.decode(is, encoding) : is;
       }
     catch (MessagingException e)
       {
-        throw new IOException (e.getMessage ());
+        throw new IOException(e.getMessage());
       }
   }
 
@@ -111,10 +111,10 @@ public class MimePartDataSource
    * <p>
    * This implementation throws the UnknownServiceException.
    */
-  public OutputStream getOutputStream ()
+  public OutputStream getOutputStream()
     throws IOException
   {
-    throw new UnknownServiceException ();
+    throw new UnknownServiceException();
   }
 
   /**
@@ -123,11 +123,11 @@ public class MimePartDataSource
    * This implementation just invokes the getContentType method on the 
    * MimePart.
    */
-  public String getContentType ()
+  public String getContentType()
   {
     try
       {
-        return part.getContentType ();
+        return part.getContentType();
       }
     catch (MessagingException e)
       {
@@ -140,7 +140,7 @@ public class MimePartDataSource
    * <p>
    * This implementation just returns an empty string.
    */
-  public String getName ()
+  public String getName()
   {
     // Shouldn't this return the filename parameter of the
     // Content-Disposition of a MimeBodyPart, if available?
@@ -150,11 +150,11 @@ public class MimePartDataSource
   /**
    * Return the MessageContext for the current part.
    */
-  public MessageContext getMessageContext ()
+  public MessageContext getMessageContext()
   {
     if (context == null)
       {
-        context = new MessageContext (part);
+        context = new MessageContext(part);
       }
     return context;
   }

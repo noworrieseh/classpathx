@@ -1,13 +1,13 @@
 /*
  * Flags.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,7 +47,7 @@ import java.util.Iterator;
  * that holds all the flags that are supported by that folder
  * implementation.
  * <p>
- * A Flags object is serializable so that (for example) the use of Flags 
+ * A Flags object is serializable so that(for example) the use of Flags 
  * objects in search terms can be serialized along with the search terms.
  * <p>
  * The below code sample illustrates how to set, examine and get 
@@ -92,14 +92,14 @@ public class Flags
      * flag objects.
      * It is used internally by the Flags class.
      */
-    private static final HashMap flag2flag = new HashMap (7);
+    private static final HashMap flag2flag = new HashMap(7);
     
     /**
      * This message has been answered.
      * This flag is set by clients to indicate that this message 
      * has been answered to.
      */
-    public static final Flag ANSWERED = new Flag (0x00000001);
+    public static final Flag ANSWERED = new Flag(0x00000001);
 
     /**
      * This message is marked deleted.
@@ -107,20 +107,20 @@ public class Flags
      * The expunge operation on a folder removes all messages in that
      * folder that are marked for deletion.
      */
-    public static final Flag DELETED = new Flag (0x00000002);
+    public static final Flag DELETED = new Flag(0x00000002);
 
     /**
      * This message is a draft.
      * This flag is set by clients to indicate that the message is
      * a draft message.
      */
-    public static final Flag DRAFT = new Flag (0x00000004);
+    public static final Flag DRAFT = new Flag(0x00000004);
 
     /**
      * This message is flagged.
      * No semantic is defined for this flag. Clients alter this flag.
      */
-    public static final Flag FLAGGED = new Flag (0x00000008);
+    public static final Flag FLAGGED = new Flag(0x00000008);
 
     /**
      * This message is recent.
@@ -130,7 +130,7 @@ public class Flags
      * <p>
      * Clients cannot alter this flag.
      */
-    public static final Flag RECENT = new Flag (0x00000010);
+    public static final Flag RECENT = new Flag(0x00000010);
 
     /**
      * This message is seen.
@@ -141,7 +141,7 @@ public class Flags
      * <p>
      * Clients can alter this flag.
      */
-    public static final Flag SEEN = new Flag (0x00000020);
+    public static final Flag SEEN = new Flag(0x00000020);
 
     /**
      * A special flag that indicates that this folder supports 
@@ -152,17 +152,17 @@ public class Flags
      * a folder supports user defined flags by using
      * <code>folder.getPermanentFlags().contains(Flags.Flag.USER)</code>.
      */
-    public static final Flag USER = new Flag (0x80000000);
+    public static final Flag USER = new Flag(0x80000000);
 
     private int flag;
 
     /*
      * Constructor.
      */
-    private Flag (int flag)
+    private Flag(int flag)
     {
       this.flag = flag;
-      flag2flag.put (new Integer (flag), this);
+      flag2flag.put(new Integer(flag), this);
     }
     
   }
@@ -174,7 +174,7 @@ public class Flags
   /**
    * Construct an empty Flags object.
    */
-  public Flags ()
+  public Flags()
   {
     systemFlags = 0;
     userFlags = null;
@@ -184,12 +184,12 @@ public class Flags
    * Construct a Flags object initialized with the given flags.
    * @param flags the flags for initialization
    */
-  public Flags (Flags flags)
+  public Flags(Flags flags)
   {
     systemFlags = flags.systemFlags;
     if (flags.userFlags != null)
       {
-        userFlags = (HashMap) flags.userFlags.clone ();
+        userFlags = (HashMap) flags.userFlags.clone();
       }
     else
       {
@@ -201,7 +201,7 @@ public class Flags
    * Construct a Flags object initialized with the given system flag.
    * @param flag the flag for initialization
    */
-  public Flags (Flag flag)
+  public Flags(Flag flag)
   {
     systemFlags = systemFlags | flag.flag;
     userFlags = null;
@@ -211,18 +211,18 @@ public class Flags
    * Construct a Flags object initialized with the given user flag.
    * @param flag the flag for initialization
    */
-  public Flags (String flag)
+  public Flags(String flag)
   {
     systemFlags = 0;
-    userFlags = new HashMap (1);
-    userFlags.put (flag.toLowerCase (), flag);
+    userFlags = new HashMap(1);
+    userFlags.put(flag.toLowerCase(), flag);
   }
 
   /**
    * Add the specified system flag to this Flags object.
    * @param flag the flag to add
    */
-  public void add (Flag flag)
+  public void add(Flag flag)
   {
     systemFlags = systemFlags | flag.flag;
   }
@@ -231,15 +231,15 @@ public class Flags
    * Add the specified user flag to this Flags object.
    * @param flag the flag to add
    */
-  public void add (String flag)
+  public void add(String flag)
   {
     if (userFlags == null)
       {
-        userFlags = new HashMap (1);
+        userFlags = new HashMap(1);
       }
     synchronized (userFlags)
       {
-        userFlags.put (flag.toLowerCase (), flag);
+        userFlags.put(flag.toLowerCase(), flag);
       }
   }
 
@@ -247,7 +247,7 @@ public class Flags
    * Add all the flags in the given Flags object to this Flags object.
    * @param flags the Flags object to add flags from
    */
-  public void add (Flags flags)
+  public void add(Flags flags)
   {
     systemFlags = systemFlags | flags.systemFlags;
     if (flags.userFlags != null)
@@ -256,13 +256,13 @@ public class Flags
           {
             if (userFlags == null)
               {
-                userFlags = new HashMap (flags.userFlags);
+                userFlags = new HashMap(flags.userFlags);
               }
             else
               {
                 synchronized (userFlags)
                   {
-                    userFlags.putAll (flags.userFlags);
+                    userFlags.putAll(flags.userFlags);
                   }
               }
           }
@@ -273,7 +273,7 @@ public class Flags
    * Remove the specified system flag from this Flags object.
    * @param flag the flag to be removed
    */
-  public void remove (Flag flag)
+  public void remove(Flag flag)
   {
     systemFlags = systemFlags & ~flag.flag;
   }
@@ -282,13 +282,13 @@ public class Flags
    * Remove the specified user flag from this Flags object.
    * @param flag the flag to be removed
    */
-  public void remove (String flag)
+  public void remove(String flag)
   {
     if (userFlags != null)
       {
         synchronized (userFlags)
           {
-            userFlags.remove (flag.toLowerCase ());
+            userFlags.remove(flag.toLowerCase());
           }
       }
   }
@@ -297,7 +297,7 @@ public class Flags
    * Remove all flags in the given Flags object from this Flags object.
    * @param flags the flags to be removed
    */
-  public void remove (Flags flags)
+  public void remove(Flags flags)
   {
     systemFlags = systemFlags & ~flags.systemFlags;
     if (userFlags != null && flags.userFlags != null)
@@ -306,10 +306,10 @@ public class Flags
           {
             synchronized (userFlags)
               {
-                for (Iterator i = flags.userFlags.keySet ().iterator ();
-                     i.hasNext (); )
+                for (Iterator i = flags.userFlags.keySet().iterator();
+                     i.hasNext(); )
                   {
-                    userFlags.remove (i.next ());
+                    userFlags.remove(i.next());
                   }
               }
           }
@@ -320,7 +320,7 @@ public class Flags
    * Indicates whether the specified system flag is present 
    * in this Flags object.
    */
-  public boolean contains (Flag flag)
+  public boolean contains(Flag flag)
   {
     return (systemFlags & flag.flag) != 0;
   }
@@ -329,20 +329,20 @@ public class Flags
    * Indicates whether the specified user flag is present 
    * in this Flags object.
    */
-  public boolean contains (String flag)
+  public boolean contains(String flag)
   {
     if (userFlags == null)
       {
         return false;
       }
-    return userFlags.containsKey (flag.toLowerCase ());
+    return userFlags.containsKey(flag.toLowerCase());
   }
 
   /**
    * Indicates whether all the flags in the specified Flags object 
    * are present in this Flags object.
    */
-  public boolean contains (Flags flags)
+  public boolean contains(Flags flags)
   {
     if ((systemFlags & flags.systemFlags) == 0)
       {
@@ -356,10 +356,10 @@ public class Flags
           }
         synchronized (userFlags)
           {
-            String[] fuf = flags.getUserFlags ();
+            String[] fuf = flags.getUserFlags();
             for (int i = 0; i < fuf.length; i++)
               {
-                if (!userFlags.containsKey (fuf[i].toLowerCase ()))
+                if (!userFlags.containsKey(fuf[i].toLowerCase()))
                   {
                     return false;
                   }
@@ -372,7 +372,7 @@ public class Flags
   /**
    * Indicates whether the two Flags objects are equal.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other == this)
       {
@@ -392,18 +392,18 @@ public class Flags
         return true;
       }
     return (flags.userFlags != null && userFlags != null &&
-            flags.userFlags.equals (userFlags));
+            flags.userFlags.equals(userFlags));
   }
 
   /**
    * Returns a hash code for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
     int hashCode = systemFlags;
     if (userFlags != null)
       {
-        hashCode += userFlags.hashCode ();
+        hashCode += userFlags.hashCode();
       }
     return hashCode;
   }
@@ -412,19 +412,19 @@ public class Flags
    * Return all the system flags in this Flags object.
    * Returns an array of size zero if no flags are set.
    */
-  public Flag[] getSystemFlags ()
+  public Flag[] getSystemFlags()
   {
-    ArrayList acc = new ArrayList (7);
-    for (Iterator i = Flag.flag2flag.keySet ().iterator (); i.hasNext (); )
+    ArrayList acc = new ArrayList(7);
+    for (Iterator i = Flag.flag2flag.keySet().iterator(); i.hasNext(); )
       {
-        Integer flag = (Integer) i.next ();
-        if ((systemFlags & flag.intValue ()) != 0)
+        Integer flag = (Integer) i.next();
+        if ((systemFlags & flag.intValue()) != 0)
           {
-            acc.add (Flag.flag2flag.get (flag));
+            acc.add(Flag.flag2flag.get(flag));
           }
       }
-    Flag[] f = new Flag[acc.size ()];
-    acc.toArray (f);
+    Flag[] f = new Flag[acc.size()];
+    acc.toArray(f);
     return f;
   }
 
@@ -432,7 +432,7 @@ public class Flags
    * Return all the user flags in this Flags object.
    * Returns an array of size zero if no flags are set.
    */    
-  public String[] getUserFlags ()
+  public String[] getUserFlags()
   {
     if (userFlags == null)
       {
@@ -442,11 +442,11 @@ public class Flags
       {
         synchronized (userFlags)
           {
-            String[] f = new String[userFlags.size ()];
+            String[] f = new String[userFlags.size()];
             int index = 0;
-            for (Iterator i = userFlags.keySet ().iterator (); i.hasNext (); )
+            for (Iterator i = userFlags.keySet().iterator(); i.hasNext(); )
               {
-                f[index++] = (String) userFlags.get (i.next ());
+                f[index++] = (String) userFlags.get(i.next());
               }
             return f;
           }
@@ -456,9 +456,9 @@ public class Flags
   /**
    * Returns a clone of this Flags object.
    */
-  public Object clone ()
+  public Object clone()
   {
-    return new Flags (this);
+    return new Flags(this);
   }
 
 }

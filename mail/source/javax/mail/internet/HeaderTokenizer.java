@@ -1,13 +1,13 @@
 /*
  * HeaderTokenizer.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ package javax.mail.internet;
  * This class tokenizes RFC822 and MIME headers into the basic symbols 
  * specified by RFC822 and MIME.
  * <p>
- * This class handles folded headers (ie headers with embedded CRLF SPACE
+ * This class handles folded headers(ie headers with embedded CRLF SPACE
  * sequences). The folds are removed in the returned tokens.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
@@ -85,7 +85,7 @@ public class HeaderTokenizer
      * @param type Token type
      * @param value Token value
      */
-    public Token (int type, String value)
+    public Token(int type, String value)
     {
       this.type = type;
       this.value = value;
@@ -103,7 +103,7 @@ public class HeaderTokenizer
      * <li>COMMENT A sequence of ASCII characters within '(' and ')'.
      * <li>EOF End of header
      */
-    public int getType ()
+    public int getType()
     {
       return type;
     }
@@ -115,7 +115,7 @@ public class HeaderTokenizer
      * When the current token is a comment, this field contains the body
      * of the comment.
      */
-    public String getValue ()
+    public String getValue()
     {
       return value;
     }
@@ -135,7 +135,7 @@ public class HeaderTokenizer
   /*
    * The EOF token.
    */
-  private static final Token EOF = new Token (Token.EOF, null);
+  private static final Token EOF = new Token(Token.EOF, null);
 
   /*
    * The header string to parse.
@@ -180,14 +180,14 @@ public class HeaderTokenizer
    * @param skipComments If true, comments are skipped and not returned 
    * as tokens
    */
-  public HeaderTokenizer (String header, String delimiters,
+  public HeaderTokenizer(String header, String delimiters,
                           boolean skipComments)
   {
     this.header = (header == null) ? "" : header;
     this.delimiters = delimiters;
     this.skipComments = skipComments;
     pos = next = peek = 0;
-    maxPos = header.length ();
+    maxPos = header.length();
   }
 
   /**
@@ -196,9 +196,9 @@ public class HeaderTokenizer
    * @param header The header that is tokenized
    * @param delimiters The delimiters to be used
    */
-  public HeaderTokenizer (String header, String delimiters)
+  public HeaderTokenizer(String header, String delimiters)
   {
-    this (header, delimiters, true);
+    this(header, delimiters, true);
   }
 
   /**
@@ -206,9 +206,9 @@ public class HeaderTokenizer
    * The RFC822 defined delimiters - RFC822 - are used to delimit ATOMS.
    * Also comments are skipped and not returned as tokens
    */
-  public HeaderTokenizer (String header)
+  public HeaderTokenizer(String header)
   {
-    this (header, RFC822, true);
+    this(header, RFC822, true);
   }
 
   /**
@@ -219,11 +219,11 @@ public class HeaderTokenizer
    * @return the next token
    * @exception ParseException if the parse fails
    */
-  public Token next ()
+  public Token next()
     throws ParseException
   {
     pos = next;
-    Token token = token ();
+    Token token = token();
     next = pos;
     peek = next;
     return token;
@@ -237,11 +237,11 @@ public class HeaderTokenizer
    * @return the next peek token
    * @param ParseException if the parse fails
    */
-  public Token peek ()
+  public Token peek()
     throws ParseException
   {
     pos = peek;
-    Token token = token ();
+    Token token = token();
     peek = pos;
     return token;
   }
@@ -249,22 +249,22 @@ public class HeaderTokenizer
   /**
    * Return the rest of the header.
    */
-  public String getRemainder ()
+  public String getRemainder()
   {
-    return header.substring (next);
+    return header.substring(next);
   }
 
   /*
    * Returns the next token.
    */
-  private Token token ()
+  private Token token()
     throws ParseException
   {
     if (pos >= maxPos)
       {
         return EOF;
       }
-    if (skipWhitespace () == Token.EOF)
+    if (skipWhitespace() == Token.EOF)
       {
         return EOF;
       }
@@ -273,13 +273,13 @@ public class HeaderTokenizer
     char c;
     
     // comment
-    for (c = header.charAt (pos); c == '('; c = header.charAt (pos))
+    for (c = header.charAt(pos); c == '('; c = header.charAt(pos))
       {
         int start = ++pos;
         int parenCount = 1;
         while (parenCount > 0 && pos < maxPos)
           {
-            c = header.charAt (pos);
+            c = header.charAt(pos);
             if (c == '\\')
               {
                 pos++;
@@ -302,18 +302,18 @@ public class HeaderTokenizer
         
         if (parenCount != 0)
           {
-            throw new ParseException ("Illegal comment");
+            throw new ParseException("Illegal comment");
           }
         
         if (!skipComments)
           {
             String ret = needsFilter ?
-              filter (header, start, pos - 1) :
-              header.substring (start, pos - 1);
-            return new Token (Token.COMMENT, ret);
+              filter(header, start, pos - 1) :
+              header.substring(start, pos - 1);
+            return new Token(Token.COMMENT, ret);
           }
         
-        if (skipWhitespace () == Token.EOF)
+        if (skipWhitespace() == Token.EOF)
           {
             return EOF;
           }
@@ -325,7 +325,7 @@ public class HeaderTokenizer
         int start = ++pos;
         while (pos < maxPos)
           {
-            c = header.charAt (pos);
+            c = header.charAt(pos);
             if (c == '\\')
               {
                 pos++;
@@ -339,46 +339,46 @@ public class HeaderTokenizer
               {
                 pos++;
                 String ret = needsFilter ?
-                  filter (header, start, pos - 1) :
-                  header.substring (start, pos - 1);
-                return new Token (Token.QUOTEDSTRING, ret);
+                  filter(header, start, pos - 1) :
+                  header.substring(start, pos - 1);
+                return new Token(Token.QUOTEDSTRING, ret);
               }
             pos++;
           }
-        throw new ParseException ("Illegal quoted string");
+        throw new ParseException("Illegal quoted string");
       }
     
     // delimiter
-    if (c < ' ' || c >= '\177' || delimiters.indexOf (c) >= 0)
+    if (c < ' ' || c >= '\177' || delimiters.indexOf(c) >= 0)
       {
         pos++;
         char[] chars = new char[] { c };
-        return new Token (c, new String (chars));
+        return new Token(c, new String(chars));
       }
     
     // atom
     int start = pos;
     while (pos < maxPos)
       {
-        c = header.charAt (pos);
+        c = header.charAt(pos);
         if (c < ' ' || c >= '\177' || c == '(' || c == ' ' || c == '"' || 
-            delimiters.indexOf (c) >= 0)
+            delimiters.indexOf(c) >= 0)
           {
             break;
           }
         pos++;
       }
-    return new Token (Token.ATOM, header.substring (start, pos));
+    return new Token(Token.ATOM, header.substring(start, pos));
   }
   
   /*
    * Advance pos over any whitespace delimiters.
    */
-  private int skipWhitespace ()
+  private int skipWhitespace()
   {
     while (pos < maxPos)
       {
-        char c = header.charAt (pos);
+        char c = header.charAt(pos);
         if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
           {
             return pos;
@@ -389,16 +389,16 @@ public class HeaderTokenizer
   }
 
   /*
-   * Process out CR and backslash (line continuation) bytes.
+   * Process out CR and backslash(line continuation) bytes.
    */
-  private String filter (String s, int start, int end)
+  private String filter(String s, int start, int end)
   {
-    StringBuffer buffer = new StringBuffer ();
+    StringBuffer buffer = new StringBuffer();
     boolean backslash = false;
     boolean cr = false;
     for (int i = start; i < end; i++)
       {
-        char c = s.charAt (i);
+        char c = s.charAt(i);
         if (c == '\n' && cr)
           {
             cr = false;
@@ -418,17 +418,17 @@ public class HeaderTokenizer
                   }
                 else
                   {
-                    buffer.append (c);
+                    buffer.append(c);
                   }
               }
             else
               {
-                buffer.append (c);
+                buffer.append(c);
                 backslash = false;
               }
           }
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
 }

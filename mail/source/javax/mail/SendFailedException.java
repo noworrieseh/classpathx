@@ -1,13 +1,13 @@
 /*
  * SendFailedException.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,18 +45,18 @@ public class SendFailedException
   protected transient Address[] validSent;
   protected transient Address[] validUnsent;
 
-  public SendFailedException ()
+  public SendFailedException()
   {
   }
 
-  public SendFailedException (String message)
+  public SendFailedException(String message)
   {
-    super (message);
+    super(message);
   }
 
-  public SendFailedException (String message, Exception exception)
+  public SendFailedException(String message, Exception exception)
   {
-    super (message, exception);
+    super(message, exception);
   }
 
   /**
@@ -68,11 +68,11 @@ public class SendFailedException
    * @param validUnsent valid addresses to which message was not sent
    * @param invalid the invalid addresses
    */
-  public SendFailedException (String message, Exception exception,
+  public SendFailedException(String message, Exception exception,
                               Address[] validSent, Address[] validUnsent,
                               Address[] invalid)
   {
-    super (message, exception);
+    super(message, exception);
     this.validSent = validSent;
     this.validUnsent = validUnsent;
     this.invalid = invalid;
@@ -81,7 +81,7 @@ public class SendFailedException
   /**
    * Return the addresses to which this message was sent succesfully.
    */
-  public Address[] getValidSentAddresses ()
+  public Address[] getValidSentAddresses()
   {
     return validSent;
   }
@@ -89,7 +89,7 @@ public class SendFailedException
   /**
    * Return the addresses that are valid but to which this message was not sent.
    */
-  public Address[] getValidUnsentAddresses ()
+  public Address[] getValidUnsentAddresses()
   {
     return validUnsent;
   }
@@ -97,7 +97,7 @@ public class SendFailedException
   /**
    * Return the addresses to which this message could not be sent.
    */
-  public Address[] getInvalidAddresses ()
+  public Address[] getInvalidAddresses()
   {
     return invalid;
   }

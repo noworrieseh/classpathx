@@ -1,13 +1,13 @@
 /*
  * SubjectTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,9 +44,9 @@ public final class SubjectTerm
    * Constructor.
    * @param pattern the pattern to search for
    */
-  public SubjectTerm (String pattern)
+  public SubjectTerm(String pattern)
   {
-    super (pattern);
+    super(pattern);
   }
 
   /**
@@ -54,14 +54,14 @@ public final class SubjectTerm
    * @param msg the pattern match is applied to this Message's subject header
    * @return true if the pattern match succeeds, otherwise false
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        String subject = msg.getSubject ();
+        String subject = msg.getSubject();
         if (subject != null)
           {
-            return super.match (subject);
+            return super.match(subject);
           }
       }
     catch (Exception e)
@@ -73,9 +73,9 @@ public final class SubjectTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
-    return (other instanceof SubjectTerm && super.equals (other));
+    return (other instanceof SubjectTerm && super.equals(other));
   }
 
 }

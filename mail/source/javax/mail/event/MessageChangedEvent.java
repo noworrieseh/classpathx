@@ -1,13 +1,13 @@
 /*
  * MessageChangedEvent.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ public class MessageChangedEvent
   public static final int FLAGS_CHANGED = 1;
 
   /**
-   * The message's envelope (headers, but not body) changed.
+   * The message's envelope(headers, but not body) changed.
    */
   public static final int ENVELOPE_CHANGED = 2;
 
@@ -65,9 +65,9 @@ public class MessageChangedEvent
    * @param type The change type
    * @param msg The changed message
    */
-  public MessageChangedEvent (Object source, int type, Message msg)
+  public MessageChangedEvent(Object source, int type, Message msg)
   {
-    super (source);
+    super(source);
     this.msg = msg;
     this.type = type;
   }
@@ -75,7 +75,7 @@ public class MessageChangedEvent
   /**
    * Return the type of this event.
    */
-  public int getMessageChangeType ()
+  public int getMessageChangeType()
   {
     return type;
   }
@@ -83,7 +83,7 @@ public class MessageChangedEvent
   /**
    * Return the changed Message.
    */
-  public Message getMessage ()
+  public Message getMessage()
   {
     return msg;
   }
@@ -91,9 +91,9 @@ public class MessageChangedEvent
   /**
    * Invokes the appropriate MessageChangedListener method.
    */
-  public void dispatch (Object listener)
+  public void dispatch(Object listener)
   {
-    ((MessageChangedListener) listener).messageChanged (this);
+   ((MessageChangedListener) listener).messageChanged(this);
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * MboxStore.java
- * Copyright (C) 1999 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -136,7 +136,7 @@ public final class MboxStore
         inboxname = null;
       if (inboxname==null && attemptFallback) 
       {
-        // Try some common (UNIX) locations.
+        // Try some common(UNIX) locations.
         try 
         {
           String username = System.getProperty("user.name");
@@ -225,7 +225,7 @@ public final class MboxStore
   /**
    * Adds a status listener to this store.
    * The listener will be informed of state changes during potentially
-   * lengthy procedures (opening and closing mboxes).
+   * lengthy procedures(opening and closing mboxes).
    * @param l the status listener
    * @see #removeStatusListener
    */

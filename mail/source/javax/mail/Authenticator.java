@@ -1,13 +1,13 @@
 /*
  * Authenticator.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,9 +37,9 @@ import java.net.InetAddress;
  * Applications use this class by creating a subclass, and registering an
  * instance of that subclass with the session when it is created.
  * When authentication is required, the system will invoke a method on the
- * subclass (like getPasswordAuthentication). The subclass's method can
+ * subclass(like getPasswordAuthentication). The subclass's method can
  * query about the authentication being requested with a number of inherited
- * methods (getRequestingXXX()), and form an appropriate message for the
+ * methods(getRequestingXXX()), and form an appropriate message for the
  * user.
  * <p>
  * All methods that request authentication have a default implementation that
@@ -69,13 +69,13 @@ public abstract class Authenticator
     this.requestingProtocol = requestingProtocol;
     this.requestingPrompt = requestingPrompt;
     this.defaultUserName = defaultUserName;
-    return getPasswordAuthentication ();
+    return getPasswordAuthentication();
   }
 
   /**
    * Returns the default user name given by the requestor.
    */
-  protected final String getDefaultUserName ()
+  protected final String getDefaultUserName()
   {
     return defaultUserName;
   }
@@ -88,7 +88,7 @@ public abstract class Authenticator
    * information, the dialog needs to block until the user supplies the
    * information. This method can not simply return after showing the dialog.
    */
-  protected PasswordAuthentication getPasswordAuthentication ()
+  protected PasswordAuthentication getPasswordAuthentication()
   {
     return null;
   }
@@ -96,7 +96,7 @@ public abstract class Authenticator
   /**
    * Returns the port for the requested connection.
    */
-  protected final int getRequestingPort ()
+  protected final int getRequestingPort()
   {
     return requestingPort;
   }
@@ -104,7 +104,7 @@ public abstract class Authenticator
   /**
    * Returns the prompt string given by the requestor.
    */
-  protected final String getRequestingPrompt ()
+  protected final String getRequestingPrompt()
   {
     return requestingPrompt;
   }
@@ -113,7 +113,7 @@ public abstract class Authenticator
    * Returns the protocol requesting the connection.
    * Often this will be based on a URLName.
    */
-  protected final String getRequestingProtocol ()
+  protected final String getRequestingProtocol()
   {
     return requestingProtocol;
   }
@@ -122,7 +122,7 @@ public abstract class Authenticator
    * Returns the address of the site requesting authorization,
    * or null if not available.
    */
-  protected final InetAddress getRequestingSite ()
+  protected final InetAddress getRequestingSite()
   {
     return requestingSite;
   }

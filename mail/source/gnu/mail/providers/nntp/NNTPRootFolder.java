@@ -1,13 +1,13 @@
 /*
  * NNTPRootFolder.java
- * Copyright (C) 2002 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 2002 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -55,70 +55,70 @@ final class NNTPRootFolder
 extends Folder
 {
 
-  NNTPRootFolder (NNTPStore store)
+  NNTPRootFolder(NNTPStore store)
     {
-      super (store);
+      super(store);
     }
 
-  public String getName ()
+  public String getName()
     {
       NNTPStore ns = (NNTPStore) store;
-      return ns.getURLName ().getHost ();
+      return ns.getURLName().getHost();
     }
 
-  public String getFullName ()
+  public String getFullName()
     {
       NNTPStore ns = (NNTPStore) store;
-      return ns.connection.getWelcome ();
+      return ns.connection.getWelcome();
     }
 
   /**
    * Returns the list of folders matching the specified pattern.
    * @param pattern the JavaMail pattern
    */
-  public Folder[] list (String pattern)
+  public Folder[] list(String pattern)
     throws MessagingException
     {
-      pattern = pattern.replace ('%', '*'); // convert pattern to wildmat
+      pattern = pattern.replace('%', '*'); // convert pattern to wildmat
       try
         {
           NNTPStore ns = (NNTPStore) store;
           // Indicates whether to *really* list all folders.
-          boolean listAll = ns.isListAll ();
+          boolean listAll = ns.isListAll();
           
-          List acc = new LinkedList ();
+          List acc = new LinkedList();
           synchronized (ns.connection)
             {
               GroupIterator i = listAll ?
-                ns.connection.listActive (pattern) :
-                ns.connection.listSubscriptions ();
-              while (i.hasNext ())
+                ns.connection.listActive(pattern) :
+                ns.connection.listSubscriptions();
+              while (i.hasNext())
                 {
-                  Group group = i.nextGroup ();
-                  NNTPFolder folder = new NNTPFolder (ns, group.getName ());
-                  acc.add (folder);
+                  Group group = i.nextGroup();
+                  NNTPFolder folder = new NNTPFolder(ns, group.getName());
+                  acc.add(folder);
                 }
             }
-          int len = acc.size ();
+          int len = acc.size();
           Folder[] folders = new Folder[len];
-          acc.toArray (folders);
+          acc.toArray(folders);
           return folders;
         }
       catch (NNTPException e)
         {
-          switch (e.getResponse ().getStatus ())
+          switch (e.getResponse().getStatus())
             {
             case NNTPConstants.COMMAND_NOT_RECOGNIZED:
             case NNTPConstants.SYNTAX_ERROR:
             case NNTPConstants.INTERNAL_ERROR:
-              return listSubscribed (pattern);
+              return listSubscribed(pattern);
             default:
-              throw new MessagingException (e.getMessage (), e);
+              throw new MessagingException(e.getMessage(), e);
             }
         }
       catch (IOException e)
         {
-          throw new MessagingException (e.getMessage (), e);
+          throw new MessagingException(e.getMessage(), e);
         }
     }
 
@@ -126,33 +126,33 @@ extends Folder
    * Returns the list of subscribed folders matching the specified pattern.
    * @param pattern the JavaMail pattern
    */
-  public Folder[] listSubscribed (String pattern)
+  public Folder[] listSubscribed(String pattern)
     throws MessagingException
     {
-      pattern = pattern.replace ('%', '*'); // convert pattern to wildmat
+      pattern = pattern.replace('%', '*'); // convert pattern to wildmat
       // Does the pattern contain any wildcards?
-      boolean hasWildcard = pattern.indexOf ('*') >- 1;
+      boolean hasWildcard = pattern.indexOf('*') >- 1;
       // Does the pattern contain only a wildcard?
-      boolean onlyWildcard = hasWildcard && (pattern.length () == 0);
+      boolean onlyWildcard = hasWildcard &&(pattern.length() == 0);
       
       NNTPStore ns = (NNTPStore) store;
-      List acc = new LinkedList ();
-      Iterator i = ns.newsrc.list ();
-      while (i.hasNext ())
+      List acc = new LinkedList();
+      Iterator i = ns.newsrc.list();
+      while (i.hasNext())
         {
-          String name = (String) i.next ();
+          String name = (String) i.next();
           // Check that name matches pattern
           if (!onlyWildcard)
             {
-              if (hasWildcard && matches (name, pattern))
-                acc.add (new NNTPFolder (ns, name));
-              else if (!hasWildcard && pattern.equals (name))
-                acc.add (new NNTPFolder (ns, name));
+              if (hasWildcard && matches(name, pattern))
+                acc.add(new NNTPFolder(ns, name));
+              else if (!hasWildcard && pattern.equals(name))
+                acc.add(new NNTPFolder(ns, name));
             }
         }
-      int len = acc.size ();
+      int len = acc.size();
       Folder[] folders = new Folder[len];
-      acc.toArray (folders);
+      acc.toArray(folders);
       return folders;
     }
   
@@ -160,18 +160,18 @@ extends Folder
    * Implements a subset of wildmat matching on the client side.
    * This is necessary for newsgroup matching from newsrc lists.
    */
-  boolean matches (String name, String pattern)
+  boolean matches(String name, String pattern)
     {
-      int i1 = pattern.indexOf ('*');
+      int i1 = pattern.indexOf('*');
       int pn = 0, pp = 0;
       while (i1 >- 1)
         {
           if (i1 > 0)
             {
-              String ps = pattern.substring (pp, i1);
-              int len = ps.length ();
-              String ns = name.substring (pn, len);
-              if (!ps.equals (ns))
+              String ps = pattern.substring(pp, i1);
+              int len = ps.length();
+              String ns = name.substring(pn, len);
+              if (!ps.equals(ns))
                 {
                   return false;
                 }
@@ -182,21 +182,21 @@ extends Folder
           else
             {
               pp = i1 + 1;
-              i1 = pattern.indexOf ('*', pp);
+              i1 = pattern.indexOf('*', pp);
               String ps = null;
               if (i1 == -1)
                 {
-                  ps = pattern.substring (pp);
+                  ps = pattern.substring(pp);
                 }
               else
                 {
-                  ps = pattern.substring (pp, i1);
+                  ps = pattern.substring(pp, i1);
                 }
-              int len = ps.length ();
+              int len = ps.length();
               if (len > 0)
                 {
-                  String ns = name.substring (pn, len);
-                  if (!ps.equals (ns))
+                  String ns = name.substring(pn, len);
+                  if (!ps.equals(ns))
                     {
                       return false;
                     }
@@ -209,20 +209,20 @@ extends Folder
   /**
    * Returns a new Folder object associated with the specified name.
    */
-  public Folder getFolder (String name)
+  public Folder getFolder(String name)
     throws MessagingException
     {
       NNTPStore ns = (NNTPStore) store;
-      return new NNTPFolder (ns, name);
+      return new NNTPFolder(ns, name);
     }
 
-  public Folder getParent ()
+  public Folder getParent()
     throws MessagingException
     {
       return null;
     }
 
-  public boolean exists ()
+  public boolean exists()
     throws MessagingException
     {
       return true;
@@ -232,7 +232,7 @@ extends Folder
    * As we're dealing with a flat namespace, the value of this is
    * irrelevant.
    */
-  public char getSeparator ()
+  public char getSeparator()
     throws MessagingException
     {
       return '.';
@@ -241,95 +241,95 @@ extends Folder
   /**
    * This folder contains only folders.
    */
-  public int getType ()
+  public int getType()
     {
       return HOLDS_FOLDERS;
     }
 
-  public void open (int mode)
+  public void open(int mode)
     throws MessagingException
     {
       // Although we will never actually _be_ open,
       // it's always good to remind people....
       if (mode != READ_ONLY)
         {
-          throw new IllegalWriteException ("Folder is read-only");
+          throw new IllegalWriteException("Folder is read-only");
         }
     }
 
-  public void close (boolean expunge)
+  public void close(boolean expunge)
     throws MessagingException
     {
     }
 
-  public Message[] expunge ()
+  public Message[] expunge()
     throws MessagingException
     {
-      throw new IllegalWriteException ("Folder is read-only");
+      throw new IllegalWriteException("Folder is read-only");
     }
 
-  public boolean isOpen ()
+  public boolean isOpen()
     {
       return false;
     }
 
-  public Flags getPermanentFlags ()
+  public Flags getPermanentFlags()
     {
-      return new Flags ();
+      return new Flags();
     }
 
-  public int getMessageCount ()
+  public int getMessageCount()
     throws MessagingException
     {
       return -1;
     }
 
-  public Message getMessage (int msgnum)
+  public Message getMessage(int msgnum)
     throws MessagingException
     {
-      throw new IllegalStateException ("Folder not open");
+      throw new IllegalStateException("Folder not open");
     }
 
   /**
    * This folder is always &quot;subscribed&quot;.
    */
-  public void setSubscribed (boolean flag)
+  public void setSubscribed(boolean flag)
     throws MessagingException
     {
       if (!flag)
         {
-          throw new IllegalWriteException ("Can't unsubscribe root folder");
+          throw new IllegalWriteException("Can't unsubscribe root folder");
         }
     }
 
-  public boolean hasNewMessages ()
+  public boolean hasNewMessages()
     throws MessagingException
     {
       return false;
     }
 
-  public void appendMessages (Message[] messages)
+  public void appendMessages(Message[] messages)
     throws MessagingException
     {
-      throw new IllegalWriteException ("Folder is read-only");
+      throw new IllegalWriteException("Folder is read-only");
     }
 
-  public boolean create (int type)
+  public boolean create(int type)
     throws MessagingException
     {
-      throw new MessagingException ("Folder already exists");
+      throw new MessagingException("Folder already exists");
     }
 
-  public boolean delete (boolean flag)
+  public boolean delete(boolean flag)
     throws MessagingException
     {
-      throw new IllegalWriteException ("Folder is read-only");
+      throw new IllegalWriteException("Folder is read-only");
     }
 
-  public boolean renameTo (Folder folder)
+  public boolean renameTo(Folder folder)
     throws MessagingException
     {
-      throw new IllegalWriteException ("Folder is read-only");
+      throw new IllegalWriteException("Folder is read-only");
     }
 
 }

@@ -1,13 +1,13 @@
 /*
  * POP3Folder.java
- * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999, 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,16 +64,16 @@ extends Folder
   /**
    * Constructor.
    */
-  protected POP3Folder (Store store, int type) 
+  protected POP3Folder(Store store, int type) 
   {
-    super (store);
+    super(store);
     this.type = type;
   }
 
   /**
    * Returns the name of this folder.
    */
-  public String getName () 
+  public String getName() 
   {
     switch (type) 
       {
@@ -89,16 +89,16 @@ extends Folder
   /**
    * Returns the full name of this folder.
    */
-  public String getFullName () 
+  public String getFullName() 
   {
-    return getName ();
+    return getName();
   }
 
   /**
    * Returns the type of this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getType () 
+  public int getType() 
     throws MessagingException 
   {
     return type;
@@ -108,7 +108,7 @@ extends Folder
    * Indicates whether this folder exists.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean exists () 
+  public boolean exists() 
     throws MessagingException 
   {
     return (type == HOLDS_MESSAGES);
@@ -118,31 +118,31 @@ extends Folder
    * Indicates whether this folder contains new messages.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean hasNewMessages () 
+  public boolean hasNewMessages() 
     throws MessagingException 
   {
-    return getNewMessageCount () > 0;
+    return getNewMessageCount() > 0;
   }
 
   /**
    * Opens this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public void open (int mode) 
+  public void open(int mode) 
     throws MessagingException 
   {
     switch (mode)
       {
       case READ_WRITE:
         readonly = false;
-        deleted = new ArrayList ();
+        deleted = new ArrayList();
         break;
       case READ_ONLY:
         readonly = true;
         break;
       }
     open = true;
-    notifyConnectionListeners (ConnectionEvent.OPENED);
+    notifyConnectionListeners(ConnectionEvent.OPENED);
   }
 
   /**
@@ -150,20 +150,20 @@ extends Folder
    * @param expunge if the folder is to be expunged before it is closed
    * @exception MessagingException if a messaging error occurred
    */
-  public void close (boolean expunge) 
+  public void close(boolean expunge) 
     throws MessagingException 
   {
     if (!open)
       {
-        throw new MessagingException ("Folder is not open");
+        throw new MessagingException("Folder is not open");
       }
     if (expunge)
       {
-        expunge ();
+        expunge();
       }
     deleted = null;
     open = false;
-    notifyConnectionListeners (ConnectionEvent.CLOSED);
+    notifyConnectionListeners(ConnectionEvent.CLOSED);
   }
 
   /**
@@ -171,44 +171,44 @@ extends Folder
    * This deletes all the messages marked as deleted.
    * @exception MessagingException if a messaging error occurred
    */
-  public Message[] expunge () 
+  public Message[] expunge() 
     throws MessagingException 
   {
     if (!open)
       {
-        throw new MessagingException ("Folder is not open");
+        throw new MessagingException("Folder is not open");
       }
     if (readonly)
       {
-        throw new MessagingException ("Folder was opened read-only");
+        throw new MessagingException("Folder was opened read-only");
       }
     POP3Connection connection = ((POP3Store) store).connection;
     synchronized (connection)
       {
         try
           {
-            for (Iterator i = deleted.iterator (); i.hasNext (); )
+            for (Iterator i = deleted.iterator(); i.hasNext(); )
               {
-                Message msg = (Message) i.next ();
-                int msgnum = msg.getMessageNumber ();
-                connection.dele (msgnum);
+                Message msg = (Message) i.next();
+                int msgnum = msg.getMessageNumber();
+                connection.dele(msgnum);
               }
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
     }
-    Message[] d = new Message[deleted.size ()];
-    deleted.toArray (d);
-    deleted.clear ();
+    Message[] d = new Message[deleted.size()];
+    deleted.toArray(d);
+    deleted.clear();
     return d;
   }
 
   /**
    * Indicates whether this folder is open.
    */
-  public boolean isOpen () 
+  public boolean isOpen() 
   {
     return open;
   }
@@ -216,9 +216,9 @@ extends Folder
   /**
    * Returns the permanent flags for this folder.
    */
-  public Flags getPermanentFlags () 
+  public Flags getPermanentFlags() 
   {
-    return new Flags ();
+    return new Flags();
   }
 
   /**
@@ -227,7 +227,7 @@ extends Folder
    * count is always delivered.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getMessageCount () 
+  public int getMessageCount() 
     throws MessagingException 
   {
     POP3Connection connection = ((POP3Store) store).connection;
@@ -235,11 +235,11 @@ extends Folder
       {
         try
           {
-            return connection.stat ();
+            return connection.stat();
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -249,24 +249,24 @@ extends Folder
    * @param msgnum the message number
    * @exception MessagingException if a messaging error occurred
    */
-  public Message getMessage (int msgnum) 
+  public Message getMessage(int msgnum) 
     throws MessagingException 
   {
     if (!open)
       {
-        throw new MessagingException ("Folder is not open");
+        throw new MessagingException("Folder is not open");
       }
     POP3Connection connection = ((POP3Store) store).connection;
     synchronized (connection)
       {
         try
           {
-            int size = connection.list (msgnum);
-            return new POP3Message (this, msgnum, size);
+            int size = connection.list(msgnum);
+            return new POP3Message(this, msgnum, size);
           }
         catch (IOException e)
           {
-            throw new MessagingException (e.getMessage (), e);
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }
@@ -274,24 +274,24 @@ extends Folder
   /**
    * You can't append messages to a POP3 folder.
    */
-  public void appendMessages (Message[] messages) 
+  public void appendMessages(Message[] messages) 
     throws MessagingException 
   {
-    throw new IllegalWriteException ();
+    throw new IllegalWriteException();
   }
 
   /**
    * Fetches headers and/or content for the specified messages.
    * @exception MessagingException ignore
    */
-  public void fetch (Message[] messages, FetchProfile fp) 
+  public void fetch(Message[] messages, FetchProfile fp) 
     throws MessagingException 
   {
     // Determine whether to fetch headers or content
     boolean fetchHeaders = false;
     boolean fetchContent = false;
     boolean fetchUid = false;
-    FetchProfile.Item[] items = fp.getItems ();
+    FetchProfile.Item[] items = fp.getItems();
     for (int i = 0; i < items.length; i++)
       {
         if (items[i] == UIDFolder.FetchProfileItem.UID)
@@ -307,7 +307,7 @@ extends Folder
             fetchHeaders = true;
           }
       }
-    if (fp.getHeaderNames ().length > 0)
+    if (fp.getHeaderNames().length > 0)
       {
         fetchHeaders = true;
       }
@@ -323,15 +323,15 @@ extends Folder
             POP3Message m = (POP3Message) messages[i];
             if (fetchUid)
               {
-                m.fetchUid ();
+                m.fetchUid();
               }
             if (fetchContent)
               {
-                m.fetchContent ();
+                m.fetchContent();
               }
             else
               {
-                m.fetchHeaders ();
+                m.fetchHeaders();
               }
           }
       }
@@ -340,7 +340,7 @@ extends Folder
   /**
    * Returns the subfolders for this folder.
    */
-  public Folder[] list () 
+  public Folder[] list() 
     throws MessagingException 
   {
     switch (type)
@@ -348,19 +348,19 @@ extends Folder
       case HOLDS_FOLDERS:
         if (inbox == null)
           {
-            inbox = new POP3Folder (store, HOLDS_MESSAGES);
+            inbox = new POP3Folder(store, HOLDS_MESSAGES);
           }
         Folder[] folders = { inbox };
         return folders;
       default:
-        throw new MessagingException ("This folder can't contain subfolders");
+        throw new MessagingException("This folder can't contain subfolders");
       }
   }
 
   /**
    * Returns the subfolders for this folder.
    */
-  public Folder[] list (String pattern) 
+  public Folder[] list(String pattern) 
     throws MessagingException 
   {
     return list();
@@ -369,7 +369,7 @@ extends Folder
   /**
    * POP3 folders can't have parents.
    */
-  public Folder getParent () 
+  public Folder getParent() 
     throws MessagingException 
   {
     switch (type)
@@ -377,14 +377,14 @@ extends Folder
       case HOLDS_MESSAGES:
         return ((POP3Store) store).root;
       default:
-        throw new MessagingException ("Root folders can't have a parent");
+        throw new MessagingException("Root folders can't have a parent");
       }
   }
 
   /**
    * POP3 folders can't contain subfolders.
    */
-  public Folder getFolder (String s) 
+  public Folder getFolder(String s) 
     throws MessagingException 
   {
     switch (type)
@@ -392,18 +392,18 @@ extends Folder
       case HOLDS_FOLDERS:
         if (inbox == null)
           {
-            inbox = new POP3Folder (store, HOLDS_MESSAGES);
+            inbox = new POP3Folder(store, HOLDS_MESSAGES);
           }
         return inbox;
       default:
-        throw new MessagingException ("This folder can't contain subfolders");
+        throw new MessagingException("This folder can't contain subfolders");
       }
   }
 
   /**
    * Returns the path separator charcter.
    */
-  public char getSeparator () 
+  public char getSeparator() 
     throws MessagingException 
   {
     return '\u0000';
@@ -414,28 +414,28 @@ extends Folder
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean create (int i) 
+  public boolean create(int i) 
     throws MessagingException 
   {
-    throw new IllegalWriteException ();
+    throw new IllegalWriteException();
   }
 
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean delete (boolean flag) 
+  public boolean delete(boolean flag) 
     throws MessagingException 
   {
-    throw new IllegalWriteException ("Folder can't be deleted");
+    throw new IllegalWriteException("Folder can't be deleted");
   }
 
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean renameTo (Folder folder) 
+  public boolean renameTo(Folder folder) 
     throws MessagingException 
   {
-    throw new IllegalWriteException ("Folder can't be renamed");
+    throw new IllegalWriteException("Folder can't be renamed");
   }
 
   // -- UIDL --
@@ -445,12 +445,12 @@ extends Folder
    * not available.
    * @param message the message
    */
-  public String getUID (Message message)
+  public String getUID(Message message)
     throws MessagingException
   {
     if (message instanceof POP3Message)
       {
-        return ((POP3Message) message).getUID ();
+        return ((POP3Message) message).getUID();
       }
     return null;
   }

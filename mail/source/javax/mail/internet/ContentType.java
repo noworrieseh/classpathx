@@ -1,13 +1,13 @@
 /*
  * ContentType.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,7 +56,7 @@ public class ContentType
   /**
    * No-arg Constructor.
    */
-  public ContentType ()
+  public ContentType()
   {
   }
 
@@ -66,7 +66,7 @@ public class ContentType
    * @param subType the subtype
    * @param list the list of additional parameters
    */
-  public ContentType (String primaryType, String subType, ParameterList list)
+  public ContentType(String primaryType, String subType, ParameterList list)
   {
     this.primaryType = primaryType;
     this.subType = subType;
@@ -80,38 +80,38 @@ public class ContentType
    * @param s the Content-Type string.
    * @exception ParseException if the parse fails.
    */
-  public ContentType (String s)
+  public ContentType(String s)
     throws ParseException
   {
-    HeaderTokenizer ht = new HeaderTokenizer (s, HeaderTokenizer.MIME);
-    HeaderTokenizer.Token token = ht.next ();
-    if (token.getType () != HeaderTokenizer.Token.ATOM)
+    HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
+    HeaderTokenizer.Token token = ht.next();
+    if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
-    primaryType = token.getValue ();
-    token = ht.next ();
-    if (token.getType () != 0x2f) // '/'
+    primaryType = token.getValue();
+    token = ht.next();
+    if (token.getType() != 0x2f) // '/'
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
-    token = ht.next ();
-    if (token.getType () != HeaderTokenizer.Token.ATOM)
+    token = ht.next();
+    if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException ();
+        throw new ParseException();
       }
-    subType = token.getValue ();
-    s = ht.getRemainder ();
+    subType = token.getValue();
+    s = ht.getRemainder();
     if (s != null)
       {
-        list = new ParameterList (s);
+        list = new ParameterList(s);
       }
   }
 
   /**
    * Return the primary type.
    */
-  public String getPrimaryType ()
+  public String getPrimaryType()
   {
     return primaryType;
   }
@@ -119,7 +119,7 @@ public class ContentType
   /**
    * Return the subtype.
    */
-  public String getSubType ()
+  public String getSubType()
   {
     return subType;
   }
@@ -129,29 +129,29 @@ public class ContentType
    * The returned value is basically the concatenation of the primaryType,
    * the '/' character and the secondaryType.
    */
-  public String getBaseType ()
+  public String getBaseType()
   {
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append (primaryType);
-    buffer.append ('/');
-    buffer.append (subType);
-    return buffer.toString ();
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(primaryType);
+    buffer.append('/');
+    buffer.append(subType);
+    return buffer.toString();
   }
 
   /**
    * Return the specified parameter value.
    * Returns null if this parameter is absent.
    */
-  public String getParameter (String name)
+  public String getParameter(String name)
   {
-    return (list == null) ? null : list.get (name);
+    return (list == null) ? null : list.get(name);
   }
 
   /**
    * Return a ParameterList object that holds all the available parameters.
    * Returns null if no parameters are available.
    */
-  public ParameterList getParameterList ()
+  public ParameterList getParameterList()
   {
     return list;
   }
@@ -161,7 +161,7 @@ public class ContentType
    * Overrides existing primary type.
    * @param primaryType the primary type
    */
-  public void setPrimaryType (String primaryType)
+  public void setPrimaryType(String primaryType)
   {
     this.primaryType = primaryType;
   }
@@ -171,7 +171,7 @@ public class ContentType
    * Overrides existing subtype
    * @param type the subtype
    */
-  public void setSubType (String subType)
+  public void setSubType(String subType)
   {
     this.subType = subType;
   }
@@ -182,20 +182,20 @@ public class ContentType
    * @param name the parameter name
    * @param value the parameter value
    */
-  public void setParameter (String name, String value)
+  public void setParameter(String name, String value)
   {
     if (list == null)
       {
-        list = new ParameterList ();
+        list = new ParameterList();
       }
-    list.set (name, value);
+    list.set(name, value);
   }
 
   /**
    * Set a new parameter list.
    * @param list the Parameter list
    */
-  public void setParameterList (ParameterList list)
+  public void setParameterList(ParameterList list)
   {
     this.list = list;
   }
@@ -205,26 +205,26 @@ public class ContentType
    * Returns null if the conversion failed.
    * @return RFC2045 style string
    */
-  public String toString ()
+  public String toString()
   {
     if (primaryType == null || subType == null)
       {
         return null;
       }
     
-    StringBuffer buffer = new StringBuffer ();
-    buffer.append (primaryType);
-    buffer.append ('/');
-    buffer.append (subType);
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(primaryType);
+    buffer.append('/');
+    buffer.append(subType);
     if (list != null)
       {
         // Add the parameters, using the toString(int) method
         // which allows the resulting string to fold properly onto the next
         // header line.
-        int used = buffer.length () + 14; // "Content-Type: ".length()
-        buffer.append (list.toString (used));
+        int used = buffer.length() + 14; // "Content-Type: ".length()
+        buffer.append(list.toString(used));
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
@@ -240,18 +240,18 @@ public class ContentType
    * ContentTypes for "text/plain" and "text/*"
    * @param cType the content type to compare this against
    */
-  public boolean match (ContentType cType)
+  public boolean match(ContentType cType)
   {
-    if (!primaryType.equalsIgnoreCase (cType.getPrimaryType ()))
+    if (!primaryType.equalsIgnoreCase(cType.getPrimaryType()))
       {
         return false;
       }
-    String cTypeSubType = cType.getSubType ();
-    if (subType.charAt (0) == '*' || cTypeSubType.charAt (0) == '*')
+    String cTypeSubType = cType.getSubType();
+    if (subType.charAt(0) == '*' || cTypeSubType.charAt(0) == '*')
       {
         return true;
       }
-    return subType.equalsIgnoreCase (cTypeSubType);
+    return subType.equalsIgnoreCase(cTypeSubType);
   }
 
   /**
@@ -267,11 +267,11 @@ public class ContentType
    * ContentType for "text/plain" with "text/*"
    * @param s the string representation of the content type to match
    */
-  public boolean match (String s)
+  public boolean match(String s)
   {
     try
       {
-        return match (new ContentType (s));
+        return match(new ContentType(s));
       }
     catch (ParseException e)
       {

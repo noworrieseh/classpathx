@@ -1,13 +1,13 @@
 /*
  * InternetAddress.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright(C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -69,7 +69,7 @@ public class InternetAddress
   /**
    * Default constructor.
    */
-  public InternetAddress ()
+  public InternetAddress()
   {
   }
 
@@ -78,10 +78,10 @@ public class InternetAddress
    * @param address the address in RFC822 format
    * @exception AddressException if the parse failed
    */
-  public InternetAddress (String address)
+  public InternetAddress(String address)
     throws AddressException
   {
-    this (address, true);
+    this(address, true);
   }
 
   /**
@@ -93,20 +93,20 @@ public class InternetAddress
    * @exception AddressException if the parse failed
    * @since JavaMail 1.3
    */
-  public InternetAddress (String address, boolean strict)
+  public InternetAddress(String address, boolean strict)
     throws AddressException
   {
-    InternetAddress[] addresses = parseHeader (address, strict);
+    InternetAddress[] addresses = parseHeader(address, strict);
     if (addresses.length != 1)
       {
-        throw new AddressException ("Illegal address", address);
+        throw new AddressException("Illegal address", address);
       }
     this.address = addresses[0].address;
     this.personal = addresses[0].personal;
     this.encodedPersonal = addresses[0].encodedPersonal;
     if (strict)
       {
-        validate (address, true, true);
+        validate(address, true, true);
       }
   }
 
@@ -116,10 +116,10 @@ public class InternetAddress
    * @param address the address in RFC822 format
    * @param personal the personal name
    */
-  public InternetAddress (String address, String personal)
+  public InternetAddress(String address, String personal)
     throws UnsupportedEncodingException
   {
-    this (address, personal, null);
+    this(address, personal, null);
   }
 
   /**
@@ -129,19 +129,19 @@ public class InternetAddress
    * @param personal the personal name
    * @param charset the charset for the name
    */
-  public InternetAddress (String address, String personal, String charset)
+  public InternetAddress(String address, String personal, String charset)
     throws UnsupportedEncodingException
   {
     this.address = address;
-    setPersonal (personal, charset);
+    setPersonal(personal, charset);
   }
 
   /**
    * Return a copy of this InternetAddress object.
    */
-  public Object clone ()
+  public Object clone()
   {
-    InternetAddress address = new InternetAddress ();
+    InternetAddress address = new InternetAddress();
     address.address = this.address;
     address.personal = personal;
     address.encodedPersonal = encodedPersonal;
@@ -152,7 +152,7 @@ public class InternetAddress
    * Return the type of this address. The type of an InternetAddress is
    * "rfc822".
    */
-  public String getType ()
+  public String getType()
   {
     return RFC822;
   }
@@ -164,15 +164,15 @@ public class InternetAddress
    * details.
    * @since JavaMail 1.3
    */
-  public boolean isGroup ()
+  public boolean isGroup()
   {
-    int start = address.indexOf (':');
+    int start = address.indexOf(':');
     if (start == -1)
       {
         return false;
       }
-    int end = address.length () - 1;
-    return (address.charAt (end) == ';');
+    int end = address.length() - 1;
+    return (address.charAt(end) == ';');
   }
 
   /**
@@ -184,22 +184,22 @@ public class InternetAddress
    * @exception AddressException if the group list can't be parsed
    * @since JavaMail 1.3
    */
-  public InternetAddress[] getGroup (boolean strict)
+  public InternetAddress[] getGroup(boolean strict)
     throws AddressException
   {
-    int start = address.indexOf (':');
-    int end = address.length () - 1;
-    if (start == -1 || address.charAt (end) == ';')
+    int start = address.indexOf(':');
+    int end = address.length() - 1;
+    if (start == -1 || address.charAt(end) == ';')
       {
         return null;
       }
-    return parseHeader (address.substring (start + 1, end), strict);
+    return parseHeader(address.substring(start + 1, end), strict);
   }
 
   /**
    * Set the email address.
    */
-  public void setAddress (String address)
+  public void setAddress(String address)
   {
     this.address = address;
   }
@@ -214,7 +214,7 @@ public class InternetAddress
    * @param charset charset to be used to encode the name as per RFC 2047.
    * @param UnsupportedEncodingException if the charset encoding fails.
    */
-  public void setPersonal (String name, String charset)
+  public void setPersonal(String name, String charset)
     throws UnsupportedEncodingException
   {
     personal = name;
@@ -222,11 +222,11 @@ public class InternetAddress
       {
         if (charset == null)
           {
-            encodedPersonal = MimeUtility.encodeWord (name);
+            encodedPersonal = MimeUtility.encodeWord(name);
           }
         else
           {
-            encodedPersonal = MimeUtility.encodeWord (name, charset, null);
+            encodedPersonal = MimeUtility.encodeWord(name, charset, null);
           }
       }
     else
@@ -244,16 +244,16 @@ public class InternetAddress
    * @param name - personal name
    * @exception UnsupportedEncodingException - if the charset encoding fails.
    */
-  public void setPersonal (String name)
+  public void setPersonal(String name)
     throws UnsupportedEncodingException
   {
-    setPersonal (name, null);
+    setPersonal(name, null);
   }
 
   /**
    * Get the email address.
    */
-  public String getAddress ()
+  public String getAddress()
   {
     return address;
   }
@@ -264,7 +264,7 @@ public class InternetAddress
    * into Unicode. If the decoding or convertion fails, the raw data is 
    * returned as is.
    */
-  public String getPersonal ()
+  public String getPersonal()
   {
     if (personal != null)
       {
@@ -274,7 +274,7 @@ public class InternetAddress
       {
         try
           {
-            personal = MimeUtility.decodeText (encodedPersonal);
+            personal = MimeUtility.decodeText(encodedPersonal);
             return personal;
           }
         catch (Exception e)
@@ -293,10 +293,10 @@ public class InternetAddress
    * @exception AddressException if the address isn't valid
    * @since JavaMail 1.3
    */
-  public void validate ()
+  public void validate()
     throws AddressException
   {
-    validate (address, true, true);
+    validate(address, true, true);
   }
 
   /**
@@ -304,108 +304,108 @@ public class InternetAddress
    * The resulting string contains only US-ASCII characters,
    * and hence is mail-safe.
    */
-  public String toString ()
+  public String toString()
   {
     if (encodedPersonal == null && personal != null)
       {
         try
           {
-            encodedPersonal = MimeUtility.encodeWord (personal);
+            encodedPersonal = MimeUtility.encodeWord(personal);
           }
         catch (UnsupportedEncodingException e)
           {
           }
       }
     
-    StringBuffer buffer = new StringBuffer ();
+    StringBuffer buffer = new StringBuffer();
     if (encodedPersonal != null)
       {
-        buffer.append (quote (encodedPersonal));
-        buffer.append (' ');
-        buffer.append ('<');
-        buffer.append (address);
-        buffer.append ('>');
+        buffer.append(quote(encodedPersonal));
+        buffer.append(' ');
+        buffer.append('<');
+        buffer.append(address);
+        buffer.append('>');
       }
-    else if (isGroupAddress (address) || isSimpleAddress (address))
+    else if (isGroupAddress(address) || isSimpleAddress(address))
       {
-        buffer.append (address);
+        buffer.append(address);
       }
     else
       {
-        buffer.append ('<');
-        buffer.append (address);
-        buffer.append ('>');
+        buffer.append('<');
+        buffer.append(address);
+        buffer.append('>');
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
-   * Returns a properly formatted address (RFC 822 syntax) of Unicode
+   * Returns a properly formatted address(RFC 822 syntax) of Unicode
    * characters.
    */
-  public String toUnicodeString ()
+  public String toUnicodeString()
   {
-    StringBuffer buffer = new StringBuffer ();
-    if (getPersonal () != null)
+    StringBuffer buffer = new StringBuffer();
+    if (getPersonal() != null)
       {
-        buffer.append (quote (personal));
-        buffer.append (' ');
-        buffer.append ('<');
-        buffer.append (address);
-        buffer.append ('>');
+        buffer.append(quote(personal));
+        buffer.append(' ');
+        buffer.append('<');
+        buffer.append(address);
+        buffer.append('>');
       }
-    else if (isGroupAddress (address) || isSimpleAddress (address))
+    else if (isGroupAddress(address) || isSimpleAddress(address))
       {
-        buffer.append (address);
+        buffer.append(address);
       }
     else
       {
-        buffer.append ('<');
-        buffer.append (address);
-        buffer.append ('>');
+        buffer.append('<');
+        buffer.append(address);
+        buffer.append('>');
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /*
    * Indicates if this address is simple.
    */
-  private static boolean isSimpleAddress (String address)
+  private static boolean isSimpleAddress(String address)
   {
-    return (address.indexOf ('"') == -1) &&
-      (address.indexOf ('(') == -1) &&
-      (address.indexOf (')') == -1) &&
-      (address.indexOf (',') == -1) &&
-      (address.indexOf (':') == -1) &&
-      (address.indexOf (';') == -1) &&
-      (address.indexOf ('<') == -1) &&
-      (address.indexOf ('>') == -1) &&
-      (address.indexOf ('[') == -1) &&
-      (address.indexOf ('\\') == -1) &&
-      (address.indexOf (']') == -1);
+    return (address.indexOf('"') == -1) &&
+     (address.indexOf('(') == -1) &&
+     (address.indexOf(')') == -1) &&
+     (address.indexOf(',') == -1) &&
+     (address.indexOf(':') == -1) &&
+     (address.indexOf(';') == -1) &&
+     (address.indexOf('<') == -1) &&
+     (address.indexOf('>') == -1) &&
+     (address.indexOf('[') == -1) &&
+     (address.indexOf('\\') == -1) &&
+     (address.indexOf(']') == -1);
   }
 
   /*
-   * Indicates if this address is a group address (see RFC822).
+   * Indicates if this address is a group address(see RFC822).
    */
-  private static boolean isGroupAddress (String address)
+  private static boolean isGroupAddress(String address)
   {
-    int len = address.length ();
+    int len = address.length();
     return (len > 0 &&
-            address.indexOf (':') > 0 &&
-            address.charAt (len - 1) == ';');
+            address.indexOf(':') > 0 &&
+            address.charAt(len - 1) == ';');
   }
 
   /**
    * The equality operator.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof InternetAddress)
       {
-        String otherAddress = ((InternetAddress) other).getAddress ();
+        String otherAddress = ((InternetAddress) other).getAddress();
         return (this == other || 
-                (address != null && address.equalsIgnoreCase (otherAddress)));
+               (address != null && address.equalsIgnoreCase(otherAddress)));
       }
     return false;
   }
@@ -413,9 +413,9 @@ public class InternetAddress
   /**
    * Compute a hash code for the address.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return (address == null) ? 0 : address.hashCode ();
+    return (address == null) ? 0 : address.hashCode();
   }
 
   /**
@@ -428,9 +428,9 @@ public class InternetAddress
    * @exception ClassCastException if any address object in the given array 
    * is not an InternetAddress objects. Note that this is a RuntimeException.
    */
-  public static String toString (Address[] addresses)
+  public static String toString(Address[] addresses)
   {
-    return toString (addresses, 0);
+    return toString(addresses, 0);
   }
 
   /**
@@ -450,39 +450,39 @@ public class InternetAddress
    * @exception ClassCastException if any address object in the given array 
    * is not an InternetAddress object. Note that this is a RuntimeException.
    */
-  public static String toString (Address[] addresses, int used)
+  public static String toString(Address[] addresses, int used)
   {
     if (addresses == null || addresses.length == 0)
       {
         return null;
       }
     String crlf = "\r\n";
-    StringBuffer buffer = new StringBuffer ();
+    StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < addresses.length; i++)
       {
         if (i != 0)
           {
-            buffer.append (", ");
+            buffer.append(", ");
             used += 2;
           }
-        String addressText = addresses[i].toString ();
-        int len = addressText.length ();
-        int fl = addressText.indexOf (crlf); // pos of first crlf
+        String addressText = addresses[i].toString();
+        int len = addressText.length();
+        int fl = addressText.indexOf(crlf); // pos of first crlf
         if (fl < 0)
           {
-            fl = addressText.length ();
+            fl = addressText.length();
           }
-        int ll = addressText.lastIndexOf (crlf); // pos of last crlf
+        int ll = addressText.lastIndexOf(crlf); // pos of last crlf
         
         if ((used + fl) > 76)
           {
-            buffer.append ("\r\n\t");
+            buffer.append("\r\n\t");
             used = 8;
           }
-        buffer.append (addressText);
-        used = (ll > -1) ? (used + len) : (len - ll - 2);
+        buffer.append(addressText);
+        used = (ll > -1) ?(used + len) :(len - ll - 2);
       }
-    return buffer.toString ();
+    return buffer.toString();
   }
 
   /**
@@ -497,7 +497,7 @@ public class InternetAddress
    * @param session Session object used for property lookup
    * @return current user's email address
    */
-  public static InternetAddress getLocalAddress (Session session)
+  public static InternetAddress getLocalAddress(Session session)
   {
     String username = null;
     String hostname = null;
@@ -506,45 +506,45 @@ public class InternetAddress
       {
         if (session == null)
           {
-            username = System.getProperty ("user.name");
-            hostname = InetAddress.getLocalHost ().getHostName ();
+            username = System.getProperty("user.name");
+            hostname = InetAddress.getLocalHost().getHostName();
           }
         else
           {
-            address = session.getProperty ("mail.from");
+            address = session.getProperty("mail.from");
             if (address == null)
               {
-                username = session.getProperty ("mail.user");
+                username = session.getProperty("mail.user");
                 if (username == null)
                   {
-                    username = session.getProperty ("user.name");
+                    username = session.getProperty("user.name");
                   }
                 if (username == null)
                   {
-                    username = System.getProperty ("user.name");
+                    username = System.getProperty("user.name");
                   }
-                hostname = session.getProperty ("mail.host");
+                hostname = session.getProperty("mail.host");
                 if (hostname == null)
                   {
-                    InetAddress localhost = InetAddress.getLocalHost ();
+                    InetAddress localhost = InetAddress.getLocalHost();
                     if (localhost != null)
                       {
-                        hostname = localhost.getHostName ();
+                        hostname = localhost.getHostName();
                       }
                   }
               }
           }
         if (address == null && username != null && hostname != null)
           {
-            StringBuffer buffer = new StringBuffer ();
-            buffer.append (username);
-            buffer.append ('@');
-            buffer.append (hostname);
-            address = buffer.toString ();
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(username);
+            buffer.append('@');
+            buffer.append(hostname);
+            address = buffer.toString();
           }
         if (address != null)
           {
-            return new InternetAddress (address);
+            return new InternetAddress(address);
           }
       }
     catch (AddressException e)
@@ -567,18 +567,18 @@ public class InternetAddress
    * @return array of InternetAddress objects
    * @exception AddressException if the parse failed
    */
-  public static InternetAddress[] parse (String addresslist)
+  public static InternetAddress[] parse(String addresslist)
     throws AddressException
   {
-    return parse (addresslist, true);
+    return parse(addresslist, true);
   }
 
   /**
    * Parse the given sequence of addresses into InternetAddress objects.
    * If <code>strict</code> is false, simple email addresses separated by 
-   * spaces are also allowed. If strict is true, many (but not all) of the 
+   * spaces are also allowed. If strict is true, many(but not all) of the 
    * RFC822 syntax rules are enforced. In particular, even if strict is true,
-   * addresses composed of simple names (with no "@domain" part) are allowed.
+   * addresses composed of simple names(with no "@domain" part) are allowed.
    * Such "illegal" addresses are not uncommon in real messages.
    * <p>
    * Non-strict parsing is typically used when parsing a list of mail 
@@ -590,16 +590,16 @@ public class InternetAddress
    * @return array of InternetAddress objects
    * @exception AddressException if the parse failed
    */
-  public static InternetAddress[] parse (String addresslist, boolean strict)
+  public static InternetAddress[] parse(String addresslist, boolean strict)
     throws AddressException
   {
-    return parse (addresslist, strict ? STRICT : NONE);
+    return parse(addresslist, strict ? STRICT : NONE);
   }
 
   /**
    * Parse the given sequence of addresses into InternetAddress objects. If
    * <code>strict</code> is false, the full syntax rules for individual
-   * addresses are not enforced. If <code>strict</code> is true, many (but
+   * addresses are not enforced. If <code>strict</code> is true, many(but
    * not all) of the RFC822 syntax rules are enforced.
    * <p>
    * Non-strict parsing is typically used when parsing a list of mail
@@ -609,11 +609,11 @@ public class InternetAddress
    * @param strict enforce RFC822 syntax
    * @since JavaMail 1.3
    */
-  public static InternetAddress[] parseHeader (String addresslist,
+  public static InternetAddress[] parseHeader(String addresslist,
                                                boolean strict)
     throws AddressException
   {
-    return parse (addresslist, strict ? STRICT_OR_LAX : LAX);
+    return parse(addresslist, strict ? STRICT_OR_LAX : LAX);
   }
 
   private static final int NONE = 0x00;
@@ -621,7 +621,7 @@ public class InternetAddress
   private static final int STRICT = 0x02;
   private static final int STRICT_OR_LAX = 0x03;
 
-  private static InternetAddress[] parse (String addresslist, int rules)
+  private static InternetAddress[] parse(String addresslist, int rules)
     throws AddressException
   {
     /*
@@ -646,17 +646,17 @@ public class InternetAddress
     boolean inGroup = false;
     boolean gotDelimiter = false;
     boolean inAddress = false;
-    int len = addresslist.length ();
+    int len = addresslist.length();
     int pEnd = -1;
     int pStart = -1;
     int start = -1;
     int end = -1;
-    ArrayList acc = new ArrayList ();
+    ArrayList acc = new ArrayList();
 
     int pos;
     for (pos = 0; pos < len; pos++)
       {
-        char c = addresslist.charAt (pos);
+        char c = addresslist.charAt(pos);
         //System.out.println("c="+c);
         switch (c)
           {
@@ -670,7 +670,7 @@ public class InternetAddress
             inAddress = true;
             if (gotDelimiter)
               {
-                throw new AddressException ("Too many route-addr",
+                throw new AddressException("Too many route-addr",
                                             addresslist, pos);
               }
             if (!inGroup)
@@ -687,7 +687,7 @@ public class InternetAddress
             boolean gotKet = false;
             while (pos<len && !gotKet)
               {
-                char c2 = addresslist.charAt (pos);
+                char c2 = addresslist.charAt(pos);
                 //System.out.println("c2="+c2);
                 switch (c2)
                   {
@@ -711,16 +711,16 @@ public class InternetAddress
               {
                 if (inQuote)
                   {
-                    throw new AddressException ("Unmatched '\"'",
+                    throw new AddressException("Unmatched '\"'",
                                                 addresslist, pos);
                   }
-                throw new AddressException ("Unmatched '<'", addresslist, pos);
+                throw new AddressException("Unmatched '<'", addresslist, pos);
               }
             gotDelimiter = true;
             pEnd = pos;
             break;
           case '>':
-            throw new AddressException ("Unmatched '>'", addresslist, pos);
+            throw new AddressException("Unmatched '>'", addresslist, pos);
             
           case '(': // paren delimited personal
             inAddress = true;
@@ -736,7 +736,7 @@ public class InternetAddress
             int parenCount = 1;
             while (pos < len && parenCount > 0)
               {
-                c = addresslist.charAt (pos);
+                c = addresslist.charAt(pos);
                 switch (c)
                   {
                   case '(':
@@ -753,7 +753,7 @@ public class InternetAddress
               }
             if (parenCount > 0)
               {
-                throw new AddressException ("Unmatched '('", addresslist, pos);
+                throw new AddressException("Unmatched '('", addresslist, pos);
               }
             pos--;
             if (end == -1)
@@ -762,7 +762,7 @@ public class InternetAddress
               }
             break;
           case ')':
-            throw new AddressException ("Unmatched ')'", addresslist, pos);
+            throw new AddressException("Unmatched ')'", addresslist, pos);
             
           case '"': // quote delimited personal
             inAddress = true;
@@ -774,7 +774,7 @@ public class InternetAddress
             boolean gotQuote = false;
             while (pos < len && !gotQuote)
               {
-                c = addresslist.charAt (pos);
+                c = addresslist.charAt(pos);
                 switch (c)
                   {
                   case '"':
@@ -789,7 +789,7 @@ public class InternetAddress
               }
             if (pos >= len)
               {
-                throw new AddressException ("Unmatched '\"'",
+                throw new AddressException("Unmatched '\"'",
                                             addresslist, pos);
               }
             break;
@@ -800,7 +800,7 @@ public class InternetAddress
             boolean gotBracket = false;
             while (pos < len && !gotBracket)
               {
-                c = addresslist.charAt (pos);
+                c = addresslist.charAt(pos);
                 switch (c)
                   {
                   case ']':
@@ -815,7 +815,7 @@ public class InternetAddress
               }
             if (pos >= len)
               {
-                throw new AddressException ("Unmatched '['",
+                throw new AddressException("Unmatched '['",
                                             addresslist, pos);
               }
             break;
@@ -837,35 +837,35 @@ public class InternetAddress
                 pEnd = pos;
               }
               {
-                String addressText = addresslist.substring (pStart, pEnd);
-                addressText = addressText.trim ();
-                if (inAddress || (rules | STRICT_OR_LAX) != 0)
+                String addressText = addresslist.substring(pStart, pEnd);
+                addressText = addressText.trim();
+                if (inAddress ||(rules | STRICT_OR_LAX) != 0)
                   {
-                    if ((rules & STRICT) != 0 || (rules & LAX) == 0)
+                    if ((rules & STRICT) != 0 ||(rules & LAX) == 0)
                       {
-                        validate (addressText, gotDelimiter, false);
+                        validate(addressText, gotDelimiter, false);
                       }
-                    InternetAddress address = new InternetAddress ();
-                    address.setAddress (addressText);
+                    InternetAddress address = new InternetAddress();
+                    address.setAddress(addressText);
                     if (start >= 0)
                       {
-                        String personal = addresslist.substring (start, end);
-                        personal = personal.trim ();
-                        address.encodedPersonal = unquote (personal);
+                        String personal = addresslist.substring(start, end);
+                        personal = personal.trim();
+                        address.encodedPersonal = unquote(personal);
                         start = end = -1;
                       }
-                    acc.add (address);
+                    acc.add(address);
                   }
                 else
                   {
-                    StringTokenizer st = new StringTokenizer (addressText);
-                    while (st.hasMoreTokens ())
+                    StringTokenizer st = new StringTokenizer(addressText);
+                    while (st.hasMoreTokens())
                       {
-                        addressText = st.nextToken ();
-                        validate (addressText, false, false);
-                        InternetAddress address = new InternetAddress ();
-                        address.setAddress (addressText);
-                        acc.add (address);
+                        addressText = st.nextToken();
+                        validate(addressText, false, false);
+                        InternetAddress address = new InternetAddress();
+                        address.setAddress(addressText);
+                        acc.add(address);
                       }
                   }
               }
@@ -879,7 +879,7 @@ public class InternetAddress
             inAddress = true;
             if (inGroup)
               {
-                throw new AddressException ("Cannot have nested group",
+                throw new AddressException("Cannot have nested group",
                                             addresslist, pos);
               }
             inGroup = true;
@@ -887,17 +887,17 @@ public class InternetAddress
           case ';': // group delimiter
             if (!inGroup)
               {
-                throw new AddressException ("Unexpected ';'",
+                throw new AddressException("Unexpected ';'",
                                             addresslist, pos);
               }
             inGroup = false;
             pEnd = pos + 1;
               {
-                String addressText = addresslist.substring (pStart, pEnd);
-                addressText = addressText.trim ();
-                InternetAddress address = new InternetAddress ();
-                address.setAddress (addressText);
-                acc.add (address);
+                String addressText = addresslist.substring(pStart, pEnd);
+                addressText = addressText.trim();
+                InternetAddress address = new InternetAddress();
+                address.setAddress(addressText);
+                acc.add(address);
               }
             gotDelimiter = false;
             pStart = pEnd = -1;
@@ -918,44 +918,44 @@ public class InternetAddress
           {
             pEnd = pos;
           }
-        String addressText = addresslist.substring (pStart, pEnd);
-        addressText = addressText.trim ();
-        if (inAddress || (rules | STRICT_OR_LAX) != 0)
+        String addressText = addresslist.substring(pStart, pEnd);
+        addressText = addressText.trim();
+        if (inAddress ||(rules | STRICT_OR_LAX) != 0)
           {
-            if ((rules & STRICT) != 0 || (rules & LAX) == 0)
+            if ((rules & STRICT) != 0 ||(rules & LAX) == 0)
               {
-                validate (addressText, gotDelimiter, false);
+                validate(addressText, gotDelimiter, false);
               }
-            InternetAddress address = new InternetAddress ();
-            address.setAddress (addressText);
+            InternetAddress address = new InternetAddress();
+            address.setAddress(addressText);
             if (start >= 0)
               {
-                String personal = addresslist.substring (start, end);
-                personal = personal.trim ();
-                address.encodedPersonal = unquote (personal);
+                String personal = addresslist.substring(start, end);
+                personal = personal.trim();
+                address.encodedPersonal = unquote(personal);
               }
-            acc.add (address);
+            acc.add(address);
           }
         else
           {
-            StringTokenizer st = new StringTokenizer (addressText);
-            while (st.hasMoreTokens ())
+            StringTokenizer st = new StringTokenizer(addressText);
+            while (st.hasMoreTokens())
               {
-                addressText = st.nextToken ();
-                validate (addressText, false, false);
-                InternetAddress address = new InternetAddress ();
-                address.setAddress (addressText);
-                acc.add (address);
+                addressText = st.nextToken();
+                validate(addressText, false, false);
+                InternetAddress address = new InternetAddress();
+                address.setAddress(addressText);
+                acc.add(address);
               }
           }
       }
     
-    InternetAddress[] addresses = new InternetAddress[acc.size ()];
-    acc.toArray (addresses);
+    InternetAddress[] addresses = new InternetAddress[acc.size()];
+    acc.toArray(addresses);
     return addresses;
   }
 
-  private static void validate (String address, boolean gotDelimiter,
+  private static void validate(String address, boolean gotDelimiter,
                                 boolean strict)
     throws AddressException
   {
@@ -963,23 +963,23 @@ public class InternetAddress
     int pos = 0;
     if (!strict || gotDelimiter)
     {
-      int i = address.indexOf (',', pos);
+      int i = address.indexOf(',', pos);
       if (i < 0)
         {
-          i = address.indexOf (':', pos);
+          i = address.indexOf(':', pos);
         }
       while (i > -1)
         {
-          if (address.charAt (pos) != '@')
+          if (address.charAt(pos) != '@')
             {
-              throw new AddressException ("Illegal route-addr", address);
+              throw new AddressException("Illegal route-addr", address);
             }
-          if (address.charAt (i) != ':')
+          if (address.charAt(i) != ':')
             {
-              i = address.indexOf (',', pos);
+              i = address.indexOf(',', pos);
               if (i < 0)
                 {
-                  i = address.indexOf (':', pos);
+                  i = address.indexOf(':', pos);
                 }
             }
           else
@@ -993,23 +993,23 @@ public class InternetAddress
     // Get atomic parts
     String localName = address;
     String domain = null;
-    int atIndex = address.indexOf ('@', pos);
+    int atIndex = address.indexOf('@', pos);
     if (atIndex > -1)
       {
         if (atIndex == pos)
           {
-            throw new AddressException ("Missing local name", address);
+            throw new AddressException("Missing local name", address);
           }
-        if (atIndex == address.length () - 1)
+        if (atIndex == address.length() - 1)
           {
-            throw new AddressException ("Missing domain", address);
+            throw new AddressException("Missing domain", address);
           }
-        localName = address.substring (pos, atIndex);
-        domain = address.substring (atIndex + 1);
+        localName = address.substring(pos, atIndex);
+        domain = address.substring(atIndex + 1);
       }
     else if (strict)
       {
-        throw new AddressException ("Missing final @domain", address);
+        throw new AddressException("Missing final @domain", address);
       }
     
     // Check atomic parts
@@ -1017,27 +1017,27 @@ public class InternetAddress
     int len = 4; // illegalWS.length()
     for (int i = 0; i < len; i++)
       {
-        if (address.indexOf (illegalWS.charAt (i)) > -1)
+        if (address.indexOf(illegalWS.charAt(i)) > -1)
           {
-            throw new AddressException ("Illegal whitespace", address);
+            throw new AddressException("Illegal whitespace", address);
           }
       }
     String illegalName = "\"(),:;<>@[\\]";
     len = 12; // illegalName.length()
     for (int i = 0; i < len; i++)
       {
-        if (localName.indexOf (illegalName.charAt (i)) > -1)
+        if (localName.indexOf(illegalName.charAt(i)) > -1)
           {
-            throw new AddressException ("Illegal local name", address);
+            throw new AddressException("Illegal local name", address);
           }
       }
     if (domain != null)
       {
         for (int i = 0; i < len; i++)
           {
-            if (domain.indexOf (illegalName.charAt (i)) > -1)
+            if (domain.indexOf(illegalName.charAt(i)) > -1)
               {
-                throw new AddressException ("Illegal domain", address);
+                throw new AddressException("Illegal domain", address);
               }
           }
       }
@@ -1051,32 +1051,32 @@ public class InternetAddress
   /*
    * Quote-escapes the specified text.
    */
-  private static String quote (String text)
+  private static String quote(String text)
   {
-    int len = text.length ();
+    int len = text.length();
     boolean needsQuotes = false;
     for (int i = 0; i < len; i++)
       {
-        char c = text.charAt (i);
+        char c = text.charAt(i);
         if (c=='"' || c=='\\')
           {
-            StringBuffer buffer = new StringBuffer (len + 3);
-            buffer.append ('"');
+            StringBuffer buffer = new StringBuffer(len + 3);
+            buffer.append('"');
             for (int j = 0; j < len; j++)
               {
-                c = text.charAt (j);
+                c = text.charAt(j);
                 if (c == '"' || c == '\\')
                   {
-                    buffer.append ('\\');
+                    buffer.append('\\');
                   }
-                buffer.append (c);
+                buffer.append(c);
               }
-            buffer.append ('"');
-            return buffer.toString ();
+            buffer.append('"');
+            return buffer.toString();
           }
         if ((c < ' ' && c != '\r' && c != '\n' && c != '\t') ||
-            (c >= '\177') ||
-            needsQuoting.indexOf (c ) > -1)
+           (c >= '\177') ||
+            needsQuoting.indexOf(c ) > -1)
           {
             needsQuotes = true;
           }
@@ -1084,11 +1084,11 @@ public class InternetAddress
     
     if (needsQuotes)
       {
-        StringBuffer buffer = new StringBuffer (len + 2);
-        buffer.append ('"');
-        buffer.append (text);
-        buffer.append ('"');
-        text = buffer.toString ();
+        StringBuffer buffer = new StringBuffer(len + 2);
+        buffer.append('"');
+        buffer.append(text);
+        buffer.append('"');
+        text = buffer.toString();
       }
     return text;
   }
@@ -1096,26 +1096,26 @@ public class InternetAddress
   /*
    * Un-quote-escapes the specified text.
    */
-  private static String unquote (String text)
+  private static String unquote(String text)
   {
-    int len = text.length ();
-    if (len > 2 && text.charAt (0) == '"' && text.charAt (len - 1) == '"')
+    int len = text.length();
+    if (len > 2 && text.charAt(0) == '"' && text.charAt(len - 1) == '"')
       {
-        text = text.substring (1, len - 1);
-        if (text.indexOf ('\\') > -1)
+        text = text.substring(1, len - 1);
+        if (text.indexOf('\\') > -1)
           {
             len -= 2;
-            StringBuffer buffer = new StringBuffer (len);
+            StringBuffer buffer = new StringBuffer(len);
             for (int i = 0; i < len; i++)
               {
-                char c = text.charAt (i);
-                if (c == '\\' && i < (len - 1))
+                char c = text.charAt(i);
+                if (c == '\\' && i <(len - 1))
                   {
-                    c = text.charAt (++i);
+                    c = text.charAt(++i);
                   }
-                buffer.append (c);
+                buffer.append(c);
               }
-            text = buffer.toString ();
+            text = buffer.toString();
           }
       }
     return text;

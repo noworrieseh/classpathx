@@ -1,13 +1,13 @@
 /*
  * IntegerComparisonTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,7 @@ public abstract class IntegerComparisonTerm
    */
   protected int number;
 
-  protected IntegerComparisonTerm (int comparison, int number)
+  protected IntegerComparisonTerm(int comparison, int number)
   {
     this.comparison = comparison;
     this.number = number;
@@ -51,7 +51,7 @@ public abstract class IntegerComparisonTerm
   /**
    * Return the number to compare with.
    */
-  public int getNumber ()
+  public int getNumber()
   {
     return number;
   }
@@ -59,12 +59,12 @@ public abstract class IntegerComparisonTerm
   /** 
    * Return the type of comparison.
    */
-  public int getComparison ()
+  public int getComparison()
   {
     return super.comparison;
   }
 
-  protected boolean match (int i)
+  protected boolean match(int i)
   {
     switch (comparison)
       {
@@ -87,18 +87,18 @@ public abstract class IntegerComparisonTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     return (other instanceof IntegerComparisonTerm &&
-        ((IntegerComparisonTerm) other).number == number &&
-        super.equals (other));
+       ((IntegerComparisonTerm) other).number == number &&
+        super.equals(other));
   }
 
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return number + super.hashCode ();
+    return number + super.hashCode();
   }
 }

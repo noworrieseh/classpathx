@@ -1,13 +1,13 @@
 /*
  * PrintStreamLogger.java
- * Copyright (C) 2004 The Free Software Foundation
+ * Copyright(C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ public class PrintStreamLogger
    * Constructor.
    * @param out the underlying print stream to write to
    */
-  public PrintStreamLogger (PrintStream out)
+  public PrintStreamLogger(PrintStream out)
   {
     this.out = out;
   }
@@ -53,29 +53,29 @@ public class PrintStreamLogger
   /**
    * Returns the underlying print stream used by this logger.
    */
-  public PrintStream getPrintStream ()
+  public PrintStream getPrintStream()
   {
     return out;
   }
 
-  public void config (String message)
+  public void config(String message)
   {
-    out.print ("DEBUG: ");
-    out.println (message);
+    out.print("DEBUG: ");
+    out.println(message);
   }
 
-  public void log (String protocol, String message)
+  public void log(String protocol, String message)
   {
-    out.print (protocol);
-    out.print (": ");
-    out.println (message);
+    out.print(protocol);
+    out.print(": ");
+    out.println(message);
   }
 
-  public void error (String protocol, Throwable t)
+  public void error(String protocol, Throwable t)
   {
-    out.print (protocol);
-    out.print (": ");
-    t.printStackTrace (out);
+    out.print(protocol);
+    out.print(": ");
+    t.printStackTrace(out);
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * FlagTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,7 +57,7 @@ public final class FlagTerm
    * @param flags Flags object containing the flags to check for
    * @param set the flag setting to check for
    */
-  public FlagTerm (Flags flags, boolean set)
+  public FlagTerm(Flags flags, boolean set)
   {
     this.flags = flags;
     this.set = set;
@@ -66,15 +66,15 @@ public final class FlagTerm
   /**
    * Return the Flags to test.
    */
-  public Flags getFlags ()
+  public Flags getFlags()
   {
-    return (Flags) flags.clone ();
+    return (Flags) flags.clone();
   }
 
   /**
    * Return true if testing whether the flags are set.
    */
-  public boolean getTestSet ()
+  public boolean getTestSet()
   {
     return set;
   }
@@ -84,24 +84,24 @@ public final class FlagTerm
    * @param msg The flag comparison is applied to this Message
    * @return true if the comparson succeeds, otherwise false.
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        Flags messageFlags = msg.getFlags ();
+        Flags messageFlags = msg.getFlags();
         if (set)
           {
-            return messageFlags.contains (flags);
+            return messageFlags.contains(flags);
           }
-        Flags.Flag[] systemFlags = flags.getSystemFlags ();
+        Flags.Flag[] systemFlags = flags.getSystemFlags();
         for (int i = 0; i < systemFlags.length; i++)
           {
-            if (messageFlags.contains (systemFlags[i]))
+            if (messageFlags.contains(systemFlags[i]))
               {
                 return false;
               }
           }
-        String[] userFlags = flags.getUserFlags ();
+        String[] userFlags = flags.getUserFlags();
         for (int i = 0; i < userFlags.length; i++)
           {
             if (messageFlags.contains(userFlags[i]))
@@ -120,12 +120,12 @@ public final class FlagTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof FlagTerm)
       {
         FlagTerm ft = (FlagTerm) other;
-        return (ft.set == set && ft.flags.equals (flags));
+        return (ft.set == set && ft.flags.equals(flags));
       }
     return false;
   }
@@ -133,9 +133,9 @@ public final class FlagTerm
   /**
    * Compute a hashCode for this object.
    */
-  public int hashCode ()
+  public int hashCode()
   {
-    return set ?  flags.hashCode () : ~flags.hashCode ();
+    return set ?  flags.hashCode() : ~flags.hashCode();
   }
   
 }

@@ -1,13 +1,13 @@
 /*
  * PasswordAuthentication.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,7 +53,7 @@ public final class PasswordAuthentication
    * @param userName the user name
    * @param password The user's password
    */
-  public PasswordAuthentication (String userName, String password)
+  public PasswordAuthentication(String userName, String password)
   {
     this.userName = userName;
     this.password = password;
@@ -62,7 +62,7 @@ public final class PasswordAuthentication
   /**
    * @return the user name
    */
-  public String getUserName ()
+  public String getUserName()
   {
     return userName;
   }
@@ -70,7 +70,7 @@ public final class PasswordAuthentication
   /**
    * @return the password
    */
-  public String getPassword ()
+  public String getPassword()
   {
     return password;
   }

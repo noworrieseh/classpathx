@@ -1,13 +1,13 @@
 /*
- * $Id: MailboxURLConnection.java,v 1.1 2004-05-27 09:11:44 dog Exp $
- * Copyright (C) 2004 The Free Software Foundation
+ * $Id: MailboxURLConnection.java,v 1.2 2004-12-09 17:22:12 dog Exp $
+ * Copyright(C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -58,7 +58,7 @@ import javax.mail.search.SearchTerm;
  * API.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version $Revision: 1.1 $ $Date: 2004-05-27 09:11:44 $
+ * @version $Revision: 1.2 $ $Date: 2004-12-09 17:22:12 $
  */
 public class MailboxURLConnection
 extends URLConnection
@@ -263,7 +263,7 @@ extends URLConnection
       try
       {
         if (message instanceof MimeMessage)
-          ((MimeMessage)message).writeTo(out);
+         ((MimeMessage)message).writeTo(out);
         else
         {
           // TODO

@@ -1,13 +1,13 @@
 /*
  * MessagingException.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -39,15 +39,15 @@ public abstract class MailEvent
   extends EventObject
 {
 
-  public MailEvent (Object source)
+  public MailEvent(Object source)
   {
-    super (source);
+    super(source);
   }
 
   /**
    * This method invokes the appropriate method on a listener for this event.
    * Subclasses provide the implementation.
    */
-  public abstract void dispatch (Object listener);
+  public abstract void dispatch(Object listener);
   
 }

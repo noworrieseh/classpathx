@@ -1,13 +1,13 @@
 /*
  * HeaderTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright(C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *(at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,16 +50,16 @@ public final class HeaderTerm
    * @param headerName The name of the header
    * @param pattern The pattern to search for
    */
-  public HeaderTerm (String headerName, String pattern)
+  public HeaderTerm(String headerName, String pattern)
   {
-    super (pattern);
+    super(pattern);
     this.headerName = headerName;
   }
 
   /**
    * Return the name of the header to compare with.
    */
-  public String getHeaderName ()
+  public String getHeaderName()
   {
     return headerName;
   }
@@ -69,16 +69,16 @@ public final class HeaderTerm
    * @param msg The match is applied to this Message's header
    * @return true if the match succeeds, otherwise false
    */
-  public boolean match (Message msg)
+  public boolean match(Message msg)
   {
     try
       {
-        String[] headers = msg.getHeader (headerName);
+        String[] headers = msg.getHeader(headerName);
         if (headers != null)
           {
             for (int i = 0; i < headers.length; i++)
               {
-                if (super.match (headers[i]))
+                if (super.match(headers[i]))
                   {
                     return true;
                   }
@@ -94,13 +94,13 @@ public final class HeaderTerm
   /**
    * Equality comparison.
    */
-  public boolean equals (Object other)
+  public boolean equals(Object other)
   {
     if (other instanceof HeaderTerm)
       {
         HeaderTerm ht = (HeaderTerm) other;
-        return ht.headerName.equalsIgnoreCase (headerName) &&
-          super.equals (ht);
+        return ht.headerName.equalsIgnoreCase(headerName) &&
+          super.equals(ht);
       }
     return false;
   }
