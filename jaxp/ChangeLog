@@ -1,13 +1,17 @@
 2004-04-15  Arnaud Vandyck  <avdyk@ressource-toi.org>
 
-	* src/gnu/xml/pipeline/WellFormednessFilter.java (startDTD)
-	(notationDecl, unparsedEntityDecl): if string-interning use the
-	'==' comparison, else, use 'equals'
+	* src/gnu/xml/aelfred2/SAXDriver.java (SAXDriver): removed the
+	comparison choice because an org.xml.sax.SAXNotSupportedException
+	must be caught, so it'll slow the benefit of the interned strings!
 
-	* src/gnu/xml/pipeline/ValidationConsumer.java:
-	http://xml.org/sax/features/string-interning can now be set to
-	false so comparison if perform using equals (if true, comparison
-	is performed with '==').
+	* src/gnu/xml/pipeline/WellFormednessFilter.java (startDTD)
+	(notationDecl, unparsedEntityDecl): reverted the '==' comparison
+	between String's because they are internaled and there is no way
+	to choose if the comparison must use '==' or 'equals'
+
+	* src/gnu/xml/pipeline/ValidationConsumer.java: reverted the '=='
+	comparison between String's because they are internaled and there
+	is no way to choose if the comparison must use '==' or 'equals'
 
 	* src/gnu/xml/pipeline/DomConsumer.java:
 	(populateAttributes): using equals because I'm not sure "" is
