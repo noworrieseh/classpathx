@@ -30,6 +30,8 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
 
+import javax.mail.Flags;
+
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
  *
@@ -53,6 +55,14 @@ public class IMAPStore
       javax.mail.Message[] m = f.getMessages();
       for (int i=0; i<m.length; i++) {
         System.out.println(m[i].getSubject());
+        //System.out.println("------->"+m[i].getContentType());
+        //System.out.println(m[i].getContent());
+        Flags flags = m[i].getFlags();
+        if (flags.contains(Flags.Flag.FLAGGED))
+          flags.remove(Flags.Flag.FLAGGED);
+        else
+          flags.add(Flags.Flag.FLAGGED);
+        m[i].setFlags(flags, true);
       }
       f.close(false);
       s.close();

@@ -558,11 +558,53 @@ public class IMAPConnection implements IMAPConstants
     }
   }
 
-  public OutputStream append(String mailbox)
+  /**
+   * Append a message to the specified mailbox.
+   * This method returns an OutputStream to which the message should be
+   * written and then closed.
+   * @param mailbox the mailbox name
+   * @param flags optional list of flags to specify for the message
+   * @param content the message body (including headers)
+   * @return true if successful, false if error in flags/text
+   */
+  public boolean append(String mailbox, String[] flags, byte[] content)
     throws IOException
   {
-    // TODO
-    return null;
+    String tag = newTag();
+    StringBuffer buffer = new StringBuffer(APPEND)
+      .append(' ')
+      .append(mailbox)
+      .append(' ');
+    if (flags!=null)
+    {
+      buffer.append('(');
+      for (int i=0; i<flags.length; i++)
+      {
+        if (i>0)
+          buffer.append(' ');
+        buffer.append(flags[i]);
+      }
+      buffer.append(')');
+      buffer.append(' ');
+    }
+    buffer.append('{');
+    buffer.append(content.length);
+    buffer.append('}');
+    sendCommand(tag, buffer.toString());
+    out.write(content); // write the message body
+    while (true)
+    {
+      IMAPResponse response = readResponse();
+      if (response.isTagged()) {
+        String id = response.getID();
+        if (id==OK)
+          return true;
+        else if (id==NO)
+          return false;
+        else
+          throw new IMAPException(id, response.getText());
+      }
+    }
   }
 
   /**
@@ -732,7 +774,7 @@ public class IMAPConnection implements IMAPConstants
     for (int i=0; i<flags.length; i++)
     {
       if (i>0)
-        buffer.append(',');
+        buffer.append(' ');
       buffer.append(flags[i]);
     }
     buffer.append(')');
@@ -744,7 +786,28 @@ public class IMAPConnection implements IMAPConstants
       String id = response.getID();
       if (response.isUntagged())
       {
-        if (id==FETCH_FLAGS)
+        // 2 different styles returned by server: FETCH or FETCH FLAGS
+        if (id==FETCH)
+        {
+          MessageStatus mf = new MessageStatus(response.getCount());
+          List code = response.getResponseCode();
+          int len = code.size();
+          for (int i=0; i<len; i++)
+          {
+            Object key = code.get(i);
+            if (key instanceof String && (i+1)<len)
+            {
+              Object value = code.get(i+1);
+              if (value instanceof List)
+              {
+                mf.put((String)key, value);
+                i++;
+              }
+            }
+          }
+          list.add(mf);
+        }
+        else if (id==FETCH_FLAGS)
         {
           MessageStatus mf = new MessageStatus(response.getCount());
           mf.put(FLAGS, response.getResponseCode());

@@ -48,5 +48,5 @@ public class MailboxStatus
   public List permanentFlags;
 
   public boolean readWrite;
-  
+
 }

@@ -22,15 +22,20 @@
 
 package gnu.mail.providers.imap4;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.FolderNotFoundException;
+import javax.mail.IllegalWriteException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
 import javax.mail.event.ConnectionEvent;
+import javax.mail.event.FolderEvent;
+import javax.mail.internet.MimeMessage;
 
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
@@ -39,7 +44,8 @@ import javax.mail.event.ConnectionEvent;
  * @version 0.1
  */
 public class IMAPFolder 
-  extends Folder 
+  extends Folder
+  implements IMAPConstants
 {
 
   /**
@@ -61,6 +67,10 @@ public class IMAPFolder
 
   protected char delimiter = '\u0000';
 
+  protected int messageCount = -1;
+
+  protected int newMessageCount = -1;
+
   /**
    * Constructor.
    */
@@ -68,6 +78,65 @@ public class IMAPFolder
   {
     super(store);
     this.path = path;
+  }
+
+  /*
+   * Updates this folder from the specified mailbox status object.
+   */
+  void update(MailboxStatus status, boolean fireEvents)
+    throws MessagingException
+  {
+    if (status==null)
+      throw new FolderNotFoundException(this);
+    mode = status.readWrite ? Folder.READ_WRITE : Folder.READ_ONLY;
+    if (status.permanentFlags!=null)
+      permanentFlags = readFlags(status.permanentFlags);
+    // message counts
+    int oldMessageCount = messageCount;
+    messageCount = status.messageCount;
+    newMessageCount = status.newMessageCount;
+    // fire events if necessary
+    if (fireEvents)
+    {
+      if (messageCount>oldMessageCount)
+      {
+        Message[] m = new Message[messageCount-oldMessageCount];
+        for (int i=oldMessageCount; i<messageCount; i++)
+          m[i-oldMessageCount] = getMessage(i);
+        notifyMessageAddedListeners(m);
+      }
+      else if (messageCount<oldMessageCount)
+      {
+        Message[] m = new Message[oldMessageCount-messageCount];
+        for (int i=messageCount; i<oldMessageCount; i++)
+          m[i-messageCount] = getMessage(i);
+        notifyMessageRemovedListeners(false, m);
+      }
+    }
+  }
+
+  Flags readFlags(List sflags)
+  {
+    Flags flags = new Flags();
+    int len = sflags.size();
+    for (int i=0; i<len; i++)
+    {
+      String flag = (String)sflags.get(i);
+      if (flag==FLAG_ANSWERED)
+        flags.add(Flags.Flag.ANSWERED);
+      else if (flag==FLAG_DELETED)
+        flags.add(Flags.Flag.DELETED);
+      else if (flag==FLAG_DRAFT)
+        flags.add(Flags.Flag.DRAFT);
+      else if (flag==FLAG_FLAGGED)
+        flags.add(Flags.Flag.FLAGGED);
+      else if (flag==FLAG_RECENT)
+        flags.add(Flags.Flag.RECENT);
+      else if (flag==FLAG_SEEN)
+        flags.add(Flags.Flag.SEEN);
+      // user flags?
+    }
+    return flags;
   }
 
   /**
@@ -128,23 +197,19 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      MailboxStatus ms = null;
+      MailboxStatus status = null;
       switch (mode)
       {
-        case READ_WRITE:
-          ms = connection.select(getFullName());
-          this.mode = mode;
+        case Folder.READ_WRITE:
+          status = connection.select(getFullName());
           break;
-        case READ_ONLY:
-          ms = connection.examine(getFullName());
-          this.mode = mode;
+        case Folder.READ_ONLY:
+          status = connection.examine(getFullName());
           break;
         default:
           throw new MessagingException("No such mode: "+mode);
       }
-      if (ms==null)
-        throw new FolderNotFoundException(this);
-      // TODO update this from ms ?
+      update(status, false);
       notifyConnectionListeners(ConnectionEvent.OPENED);
     }
     catch (IOException e)
@@ -167,7 +232,13 @@ public class IMAPFolder
         path = new StringBuffer(path)
           .append(getSeparator())
           .toString();
-      return connection.create(path); 
+      if (connection.create(path))
+      {
+        notifyFolderListeners(FolderEvent.CREATED);
+        return true;
+      }
+      else
+        return false;
     }
     catch (IOException e)
     {
@@ -184,7 +255,13 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      return connection.delete(path);
+      if (connection.delete(path))
+      {
+        notifyFolderListeners(FolderEvent.DELETED);
+        return true;
+      }
+      else
+        return false;
     }
     catch (IOException e)
     {
@@ -201,7 +278,14 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      return connection.rename(path, folder.getFullName());
+      if (connection.rename(path, folder.getFullName()))
+      {
+        // do we have to close?
+        notifyFolderRenamedListeners(folder);
+        return true;
+      }
+      else
+        return false;
     }
     catch (IOException e)
     {
@@ -244,7 +328,7 @@ public class IMAPFolder
   {
     if (!isOpen())
       throw new MessagingException("Folder is not open");
-    if (mode==READ_ONLY)
+    if (mode==Folder.READ_ONLY)
       throw new MessagingException("Folder was opened read-only");
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
@@ -254,6 +338,8 @@ public class IMAPFolder
       IMAPMessage[] messages = new IMAPMessage[messageNumbers.length];
       for (int i=0; i<messages.length; i++)
         messages[i] = new IMAPMessage(this, messageNumbers[i]);
+      // do we need to do this?
+      notifyMessageRemovedListeners(true, messages);
       return messages;
     }
     catch (IOException e)
@@ -285,18 +371,49 @@ public class IMAPFolder
   public int getMessageCount() 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
-    try
+    if (mode==-1 || messageCount<0)
     {
-      String[] items = new String[1];
-      items[0] = IMAPConnection.MESSAGES;
-      MailboxStatus ms = connection.status(path, items);
-      return ms.messageCount;
+      IMAPConnection connection = ((IMAPStore)store).connection;
+      try
+      {
+        String[] items = new String[1];
+        items[0] = IMAPConnection.MESSAGES;
+        MailboxStatus ms = connection.status(path, items);
+        update(ms, true);
+      }
+      catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
     }
-    catch (IOException e)
+    // TODO else NOOP
+    return messageCount;
+  }
+
+  /**
+   * Returns the number of new messages in this folder.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public int getNewMessageCount() 
+    throws MessagingException 
+  {
+    if (mode==-1 || newMessageCount<0)
     {
-      throw new MessagingException(e.getMessage(), e);
+      IMAPConnection connection = ((IMAPStore)store).connection;
+      try
+      {
+        String[] items = new String[1];
+        items[0] = IMAPConnection.RECENT;
+        MailboxStatus ms = connection.status(path, items);
+        update(ms, true);
+      }
+      catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
     }
+    // TODO else NOOP
+    return newMessageCount;
   }
 
   /**
@@ -310,15 +427,48 @@ public class IMAPFolder
   public Message getMessage(int msgnum) 
     throws MessagingException 
   {
-    if (!isOpen())
+    if (mode==-1)
       throw new MessagingException("Folder is not open");
     return new IMAPMessage(this, msgnum);
   }
 
+  /**
+   * Appends the specified set of messages to this folder.
+   * Only <code>MimeMessage</code>s are accepted.
+   */
   public void appendMessages(Message[] messages) 
     throws MessagingException 
   {
-    // TODO
+    if (mode==Folder.READ_ONLY)
+      throw new IllegalWriteException("Folder is read-only");
+    MimeMessage[] m = new MimeMessage[messages.length];
+    try
+    {
+      for (int i=0; i<messages.length; i++)
+        m[i] = (MimeMessage)messages[i];
+    }
+    catch (ClassCastException e)
+    {
+      throw new MessagingException("Only MimeMessages can be appended to "+
+          "this folder");
+    }
+    try
+    {
+      IMAPStore s = (IMAPStore)store;
+      for (int i=0; i<m.length; i++)
+      {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        m[i].writeTo(out);
+        byte[] content = out.toByteArray();
+        out = null;
+        s.connection.append(path, null, content);
+      }
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    notifyMessageAddedListeners(m);
   }
 
   public void fetch(Message[] messages, FetchProfile fetchprofile) 

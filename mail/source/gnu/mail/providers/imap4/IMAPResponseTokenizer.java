@@ -238,7 +238,7 @@ public class IMAPResponseTokenizer implements IMAPConstants
         case STATE_STATUS:
           if (b==0x20) // delimiter
           {
-            response.text = genericSink.toString();
+            response.mailbox = genericSink.toString();
             genericSink.reset();
             state = STATE_MAYBE_CODE;
           }

@@ -1306,7 +1306,7 @@ public abstract class Folder
   {
     MessageCountEvent event = new MessageCountEvent(this, 
         MessageCountEvent.REMOVED, removed, msgs);
-    fireMessagesAdded(event);
+    fireMessagesRemoved(event);
   }
 
   /*

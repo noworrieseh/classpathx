@@ -59,6 +59,11 @@ public class IMAPResponse
   protected int count = -1;
 
   /**
+   * The mailbox (for STATUS responses).
+   */
+  protected String mailbox;
+
+  /**
    * The response code.
    */
   protected List code;
@@ -134,6 +139,12 @@ public class IMAPResponse
     buffer.append(" \u001b[01m");
     buffer.append(id);
     buffer.append("\u001b[00m");
+    if (mailbox!=null)
+    {
+      buffer.append(" \u001b[00;35m");
+      buffer.append(mailbox);
+      buffer.append("\u001b[00m");
+    }
     if (code!=null)
     {
       buffer.append(" \u001b[00;36m");

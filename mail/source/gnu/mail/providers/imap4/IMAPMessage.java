@@ -319,7 +319,7 @@ public class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
         else if (f==Flags.Flag.SEEN)
           iflags.add(FLAG_SEEN);
       }
-      iflags.add(Arrays.asList(uflags));
+      iflags.addAll(Arrays.asList(uflags));
       String[] aflags = new String[iflags.size()];
       iflags.toArray(aflags);
       // Perform store
