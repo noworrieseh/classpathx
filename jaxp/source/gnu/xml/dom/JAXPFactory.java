@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.4 2001-10-23 17:42:25 db Exp $
+ * $Id: JAXPFactory.java,v 1.5 2001-11-04 01:15:00 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -53,7 +53,7 @@ import javax.xml.parsers.SAXParserFactory;
  * @see Consumer
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-04 01:15:00 $
  */
 public final class JAXPFactory extends DocumentBuilderFactory
 {
@@ -131,22 +131,15 @@ public final class JAXPFactory extends DocumentBuilderFactory
 		throw new ParserConfigurationException (e.getMessage ());
 	    }
 
-	    // JAXP defaults: true, noise nodes is good (bleech)
-	    consumer.setExpandingReferences (
+	    // JAXP defaults: true, noise nodes are good (bleech)
+	    consumer.setHidingReferences (
 		    factory.isExpandEntityReferences ());
 	    consumer.setHidingComments (
 		    factory.isIgnoringComments ());
 	    consumer.setHidingWhitespace (
 		    factory.isIgnoringElementContentWhitespace ());
-
-	    // JAXP default:  save all this noise (bleech).
-	    consumer.setSavingExtraNodes (!(
-		       factory.isCoalescing ()
-			    // coalesce == ignore CDATA boundaries
-		    ));
-
-	    // JAXP default: false
-	    consumer.setUsingNamespaces (factory.isNamespaceAware ());
+	    consumer.setHidingCDATA (
+		    factory.isCoalescing ());
 
 	    // set up producer side
 	    producer = parser;
@@ -156,6 +149,21 @@ public final class JAXPFactory extends DocumentBuilderFactory
 	    try {
 		String	id;
 
+		// if validating, report validity errors, and default
+		// to treating them as fatal
+		if (factory.isValidating ()) {
+		    producer.setFeature (FEATURE + "validating",
+			true);
+		    producer.setErrorHandler (this);
+		}
+
+		// always save prefix info, maybe do namespace processing
+		producer.setFeature (FEATURE + "namespace-prefixes",
+		    true);
+		producer.setFeature (FEATURE + "namespaces",
+		    factory.isNamespaceAware ());
+
+		// set important handlers
 		id = PROPERTY + "lexical-handler";
 		producer.setProperty (id, consumer.getProperty (id));
 
@@ -165,10 +173,6 @@ public final class JAXPFactory extends DocumentBuilderFactory
 	    } catch (SAXException e) {
 		throw new ParserConfigurationException (e.getMessage ());
 	    }
-
-	    // if validating, default to treating validity errors as fatal
-	    if (factory.isValidating ())
-	    	producer.setErrorHandler (this);
 	}
 
 
@@ -180,7 +184,14 @@ public final class JAXPFactory extends DocumentBuilderFactory
 	}
 
 	public boolean isNamespaceAware ()
-	    { return consumer.isUsingNamespaces (); }
+	{
+	    try {
+		return producer.getFeature (FEATURE + "namespaces");
+	    } catch (SAXException e) {
+		// "can't happen"
+		throw new RuntimeException (e.getMessage ());
+	    }
+	}
 
 	public boolean isValidating ()
 	{
