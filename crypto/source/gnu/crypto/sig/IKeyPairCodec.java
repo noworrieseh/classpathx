@@ -1,7 +1,7 @@
 package gnu.crypto.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: IKeyPairCodec.java,v 1.1 2001-12-30 15:59:06 raif Exp $
+// $Id: IKeyPairCodec.java,v 1.2 2002-01-11 21:39:43 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -35,11 +35,11 @@ import java.security.PublicKey;
 
 /**
  * The visible methods of an object that knows how to encode and decode
- * cryptographic asymmetric keypairs. Codecs are useful for (a) externalising 
- * public and private keys for storage and on-the-wire transmission, as well as 
+ * cryptographic asymmetric keypairs. Codecs are useful for (a) externalising
+ * public and private keys for storage and on-the-wire transmission, as well as
  * (b) re-creating their internal Java representation from external sources.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface IKeyPairCodec {
 
@@ -64,7 +64,7 @@ public interface IKeyPairCodec {
     * Encodes an instance of a public key for storage or transmission purposes.<p>
     *
     * @param key the non-null key to encode.
-    * @return a byte sequence representing the encoding of the designated key 
+    * @return a byte sequence representing the encoding of the designated key
     * according to the format supported by this codec.
     * @exception IllegalArgumentException if the designated key is not supported
     * by this codec.
@@ -75,7 +75,7 @@ public interface IKeyPairCodec {
     * Encodes an instance of a private key for storage or transmission purposes.<p>
     *
     * @param key the non-null key to encode.
-    * @return a byte sequence representing the encoding of the designated key 
+    * @return a byte sequence representing the encoding of the designated key
     * according to the format supported by this codec.
     * @exception IllegalArgumentException if the designated key is not supported
     * by this codec.
@@ -90,7 +90,7 @@ public interface IKeyPairCodec {
     * @return a concrete instance of a public key, reconstructed from the
     * designated input.
     * @exception IllegalArgumentException if the designated input does not
-    * contain a known representation of a public key for the format supported by 
+    * contain a known representation of a public key for the format supported by
     * the concrete codec.
     */
    PublicKey decodePublicKey(byte[] input);

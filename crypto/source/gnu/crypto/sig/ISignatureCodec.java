@@ -1,7 +1,7 @@
 package gnu.crypto.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: ISignatureCodec.java,v 1.1 2001-12-30 15:59:06 raif Exp $
+// $Id: ISignatureCodec.java,v 1.2 2002-01-11 21:40:18 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@ import java.security.PublicKey;
  * output data for storage and on-the-wire transmission, as well as (b) re-
  * creating their internal Java representation from external sources.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface ISignatureCodec {
 
