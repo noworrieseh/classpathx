@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: MDGenerator.java,v 1.4 2002-01-21 10:12:33 raif Exp $
+// $Id: MDGenerator.java,v 1.5 2002-06-08 05:21:28 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,12 +34,18 @@ import gnu.crypto.Registry;
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
 
-import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * <p>A simple pseudo-random number generator that relies on a hash algorithm,
+ * that (a) starts its operation by hashing a <code>seed</code>, and then (b)
+ * continuously re-hashing its output. If no hash algorithm name is specified
+ * in the {@link Map} of attributes used to initialise the instance then the
+ * SHA-160 algorithm is used as the underlying hash function. Also, if no
+ * <code>seed</code> is given, an empty octet sequence is used.</p>
+ *
+ * @version $Revision: 1.5 $
+ */
 public class MDGenerator extends BasePRNG {
 
    // Constants and variables
@@ -50,9 +56,6 @@ public class MDGenerator extends BasePRNG {
 
    /** Property name of seed material. */
    public static final String SEEED = "gnu.crypto.prng.md.seed";
-
-   /** The next block to digest. */
-   private byte[] data;
 
    /** The underlying hash instance. */
    private IMessageDigest md;
@@ -89,11 +92,9 @@ public class MDGenerator extends BasePRNG {
       md.update(seed, 0, seed.length);
    }
 
-   public byte[] nextBlock() throws LimitReachedException {
+   public void fillBlock() throws LimitReachedException {
       IMessageDigest mdc = (IMessageDigest) md.clone();
-      byte[] result = mdc.digest();
-      md.update(result, 0, result.length);
-
-      return result;
+      buffer= mdc.digest();
+      md.update(buffer, 0, buffer.length);
    }
 }
