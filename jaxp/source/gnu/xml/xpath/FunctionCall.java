@@ -38,6 +38,7 @@
 
 package gnu.xml.xpath;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -74,40 +75,34 @@ extends Expr
 
   public Object evaluate (Node context)
   {
-    if ("last".equals (name))
+    int arity = args.size();
+    if ("last".equals (name) && arity == 0)
       {
         return new Double (_last (context));
       }
-    else if ("position".equals (name))
+    else if ("position".equals (name) && arity == 0)
       {
         return new Double (_position (context));
       }
-    else if ("count".equals (name))
+    else if ("count".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Collection)
           {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Collection)
-              {
-                Collection ns = (Collection) val;
-                return new Double (_count (context, ns));
-              }
+            Collection ns = (Collection) val;
+            return new Double (_count (context, ns));
           }
       }
-    else if ("id".equals (name))
+    else if ("id".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
-          {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            return _id (context, val);
-          }
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        return _id (context, val);
       }
     else if ("local-name".equals (name))
       {
-        
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return _local_name (context, null);
@@ -123,7 +118,7 @@ extends Expr
       }
     else if ("namespace-uri".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return _namespace_uri (context, null);
@@ -139,7 +134,7 @@ extends Expr
       }
     else if ("name".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return _name (context, null);
@@ -155,7 +150,7 @@ extends Expr
       }
     else if ("string".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return _string (context, null);
@@ -165,87 +160,70 @@ extends Expr
             return _string (context, val);
           }
       }
-    else if ("concat".equals (name))
+    else if ("concat".equals (name) && arity >= 2)
       {
-        int len = args.size ();
-        if (len >= 2)
+        StringBuffer buf = new StringBuffer ();
+        for (int i = 0; i < arity; i++)
           {
-            StringBuffer buf = new StringBuffer ();
-            for (int i = 0; i < len; i++)
-              {
-                Expr arg = (Expr) args.get (i);
-                Object val = arg.evaluate (context);
-                if (val instanceof String)
-                  {
-                    buf.append ((String) val);
-                  }
-              }
-            return buf.toString ();
+            Expr arg = (Expr) args.get (i);
+            Object ret = arg.evaluate (context);
+            String val = _string(context, ret);
+            buf.append (val);
+          }
+        return buf.toString ();
+      }
+    else if ("starts-with".equals (name) && arity == 2)
+      {
+        Expr arg1 = (Expr) args.get (0);
+        Expr arg2 = (Expr) args.get (1);
+        Object val1 = arg1.evaluate (context);
+        Object val2 = arg2.evaluate (context);
+        if (val1 instanceof String && val2 instanceof String)
+          {
+            return _starts_with (context, (String) val1, (String) val2) ?
+              Boolean.TRUE : Boolean.FALSE;
           }
       }
-    else if ("starts-with".equals (name))
+    else if ("contains".equals (name) && arity == 2)
       {
-        if (args.size () == 2)
+        Expr arg1 = (Expr) args.get (0);
+        Expr arg2 = (Expr) args.get (1);
+        Object val1 = arg1.evaluate (context);
+        Object val2 = arg2.evaluate (context);
+        if (val1 instanceof String && val2 instanceof String)
           {
-            Expr arg1 = (Expr) args.get (0);
-            Expr arg2 = (Expr) args.get (1);
-            Object val1 = arg1.evaluate (context);
-            Object val2 = arg2.evaluate (context);
-            if (val1 instanceof String && val2 instanceof String)
-              {
-                return _starts_with (context, (String) val1, (String) val2) ?
-                  Boolean.TRUE : Boolean.FALSE;
-              }
+            return _contains (context, (String) val1, (String) val2) ?
+              Boolean.TRUE : Boolean.FALSE;
           }
       }
-    else if ("contains".equals (name))
+    else if ("substring-before".equals (name) && arity == 2)
       {
-        if (args.size () == 2)
+        Expr arg1 = (Expr) args.get (0);
+        Expr arg2 = (Expr) args.get (1);
+        Object val1 = arg1.evaluate (context);
+        Object val2 = arg2.evaluate (context);
+        if (val1 instanceof String && val2 instanceof String)
           {
-            Expr arg1 = (Expr) args.get (0);
-            Expr arg2 = (Expr) args.get (1);
-            Object val1 = arg1.evaluate (context);
-            Object val2 = arg2.evaluate (context);
-            if (val1 instanceof String && val2 instanceof String)
-              {
-                return _contains (context, (String) val1, (String) val2) ?
-                  Boolean.TRUE : Boolean.FALSE;
-              }
+            return _substring_before (context, (String) val1, (String) val2);
           }
       }
-    else if ("substring-before".equals (name))
+    else if ("substring-after".equals (name) && arity == 2)
       {
-        if (args.size () == 2)
+        Expr arg1 = (Expr) args.get (0);
+        Expr arg2 = (Expr) args.get (1);
+        Object val1 = arg1.evaluate (context);
+        Object val2 = arg2.evaluate (context);
+        if (val1 instanceof String && val2 instanceof String)
           {
-            Expr arg1 = (Expr) args.get (0);
-            Expr arg2 = (Expr) args.get (1);
-            Object val1 = arg1.evaluate (context);
-            Object val2 = arg2.evaluate (context);
-            if (val1 instanceof String && val2 instanceof String)
-              {
-                return _substring_before (context, (String) val1, (String) val2);
-              }
-          }
-      }
-    else if ("substring-after".equals (name))
-      {
-        if (args.size () == 2)
-          {
-            Expr arg1 = (Expr) args.get (0);
-            Expr arg2 = (Expr) args.get (1);
-            Object val1 = arg1.evaluate (context);
-            Object val2 = arg2.evaluate (context);
-            if (val1 instanceof String && val2 instanceof String)
-              {
-                return _substring_after (context, (String) val1, (String) val2);
-              }
+            return _substring_after (context, (String) val1, (String) val2);
           }
       }
     else if ("substring".equals (name))
       {
-        int len = args.size ();
-        if (len == 2 || len == 3)
+        switch (arity)
           {
+          case 2:
+          case 3:
             Expr arg1 = (Expr) args.get (0);
             Expr arg2 = (Expr) args.get (1);
             Object val1 = arg1.evaluate (context);
@@ -255,7 +233,7 @@ extends Expr
                 String s = (String) val1;
                 double p = ((Double) val2).doubleValue ();
                 double l = (double) (s.length () + 1);
-                if (len == 3)
+                if (arity == 3)
                   {
                     Expr arg3 = (Expr) args.get (2);
                     Object val3 = arg3.evaluate (context);
@@ -270,7 +248,7 @@ extends Expr
       }
     else if ("string-length".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return new Double (_string_length (context, null));
@@ -285,7 +263,7 @@ extends Expr
       }
     else if ("normalize-space".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return _normalize_space (context, null);
@@ -298,74 +276,56 @@ extends Expr
               }
           }
       }
-    else if ("translate".equals (name))
+    else if ("translate".equals (name) && arity == 3)
       {
-        if (args.size () == 3)
+        Expr arg1 = (Expr) args.get (0);
+        Expr arg2 = (Expr) args.get (1);
+        Expr arg3 = (Expr) args.get (2);
+        Object val1 = arg1.evaluate (context);
+        Object val2 = arg2.evaluate (context);
+        Object val3 = arg3.evaluate (context);
+        String s1 = _string(context, val1);
+        String s2 = _string(context, val2);
+        String s3 = _string(context, val3);
+        return _translate (context, s1, s2, s3);
+      }
+    else if ("boolean".equals (name) && arity == 1)
+      {
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        return _boolean (context, val) ? Boolean.TRUE : Boolean.FALSE;
+      }
+    else if ("not".equals (name) && arity == 1)
+      {
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Boolean)
           {
-            Expr arg1 = (Expr) args.get (0);
-            Expr arg2 = (Expr) args.get (1);
-            Expr arg3 = (Expr) args.get (2);
-            Object val1 = arg1.evaluate (context);
-            Object val2 = arg2.evaluate (context);
-            Object val3 = arg3.evaluate (context);
-            String s1 = _string(context, val1);
-            String s2 = _string(context, val2);
-            String s3 = _string(context, val3);
-            return _translate (context, s1, s2, s3);
+            return ((Boolean) val).booleanValue () ?
+              Boolean.FALSE : Boolean.TRUE;
           }
       }
-    else if ("boolean".equals (name))
+    else if ("true".equals (name) && arity == 0)
       {
-        if (args.size () == 1)
-          {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            return _boolean (context, val) ? Boolean.TRUE : Boolean.FALSE;
-          }
+        return Boolean.TRUE;
       }
-    else if ("not".equals (name))
+    else if ("false".equals (name) && arity == 0)
       {
-        if (args.size () == 1)
-          {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Boolean)
-              {
-                return ((Boolean) val).booleanValue () ?
-                  Boolean.FALSE : Boolean.TRUE;
-              }
-          }
+        return Boolean.FALSE;
       }
-    else if ("true".equals (name))
+    else if ("lang".equals (name) && arity == 1)
       {
-        if (args.size () == 0)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof String)
           {
-            return Boolean.TRUE;
-          }
-      }
-    else if ("false".equals (name))
-      {
-        if (args.size () == 0)
-          {
-            return Boolean.FALSE;
-          }
-      }
-    else if ("lang".equals (name))
-      {
-        if (args.size () == 1)
-          {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof String)
-              {
-                return _lang (context, (String) val) ? Boolean.TRUE :
-                  Boolean.FALSE;
-              }
+            return _lang (context, (String) val) ? Boolean.TRUE :
+              Boolean.FALSE;
           }
       }
     else if ("number".equals (name))
       {
-        switch (args.size ())
+        switch (arity)
           {
           case 0:
             return new Double (_number (context, null));
@@ -375,72 +335,66 @@ extends Expr
             return new Double (_number (context, val));
           }
       }
-    else if ("sum".equals (name))
+    else if ("sum".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Collection)
           {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Collection)
-              {
-                Collection ns = (Collection) val;
-                return new Double (_sum (context, ns));
-              }
+            Collection ns = (Collection) val;
+            return new Double (_sum (context, ns));
           }
       }
-    else if ("floor".equals (name))
+    else if ("floor".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Double)
           {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Double)
-              {
-                double n = ((Double) val).doubleValue ();
-                return new Double (_floor (context, n));
-              }
+            double n = ((Double) val).doubleValue ();
+            return new Double (_floor (context, n));
           }
       }
-    else if ("ceiling".equals (name))
+    else if ("ceiling".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Double)
           {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Double)
-              {
-                double n = ((Double) val).doubleValue ();
-                return new Double (_ceiling (context, n));
-              }
+            double n = ((Double) val).doubleValue ();
+            return new Double (_ceiling (context, n));
           }
       }
-    else if ("round".equals (name))
+    else if ("round".equals (name) && arity == 1)
       {
-        if (args.size () == 1)
+        Expr arg = (Expr) args.get (0);
+        Object val = arg.evaluate (context);
+        if (val instanceof Double)
           {
-            Expr arg = (Expr) args.get (0);
-            Object val = arg.evaluate (context);
-            if (val instanceof Double)
-              {
-                double n = ((Double) val).doubleValue ();
-                return new Double (_round (context, n));
-              }
+            double n = ((Double) val).doubleValue ();
+            return new Double (_round (context, n));
           }
       }
     if (resolver != null)
       {
         QName qname = QName.valueOf(name);
-        XPathFunction function = resolver.resolveFunction(qname, args.size());
+        XPathFunction function = resolver.resolveFunction(qname, arity);
         if (function != null)
           {
+            List values = new ArrayList(arity);
+            for (int i = 0; i < arity; i++)
+              {
+                Expr arg = (Expr) args.get(i);
+                values.add(arg.evaluate(context));
+              }
             try
               {
-                return function.evaluate(args);
+                return function.evaluate(values);
               }
             catch (XPathFunctionException e)
               {
-                throw new RuntimeException("Error executing XPath function",
-                                           e);
+                e.printStackTrace(System.err); // FIXME
+                throw new RuntimeException(e.getMessage(), e);
               }
           }
       }
@@ -453,7 +407,7 @@ extends Expr
     StringBuffer buf = new StringBuffer ();
     buf.append (name);
     buf.append ('(');
-    int len = args.size ();
+    int len = args.size();
     for (int i = 0; i < len; i++)
       {
         if (i > 0)

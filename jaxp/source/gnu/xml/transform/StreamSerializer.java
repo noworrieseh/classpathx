@@ -73,9 +73,14 @@ public class StreamSerializer
     namespaces = new HashMap();
   }
 
-  public void serialize(Node node, OutputStream out, int mode)
+  public void serialize(final Node node, final OutputStream out,
+                        final int mode)
     throws IOException
   {
+    if (out == null)
+      {
+        throw new NullPointerException("no output stream");
+      }
     String value;
     Node children;
     Node next = node.getNextSibling();

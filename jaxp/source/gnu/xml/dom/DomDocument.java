@@ -863,7 +863,7 @@ nyi (); // FIXME createTreeWalker
             {
               node = (DomNode) node.cloneNode(true);
             }
-          node.owner = this;
+          node.setOwner(this);
           return node;
         }
       return null;

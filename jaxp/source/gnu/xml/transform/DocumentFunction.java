@@ -38,6 +38,9 @@
 
 package gnu.xml.transform;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -63,17 +66,17 @@ final class DocumentFunction
   implements XPathFunction
 {
 
-  final TransformerImpl transformer;
+  final Stylesheet stylesheet;
 
-  DocumentFunction(TransformerImpl transformer)
+  DocumentFunction(Stylesheet stylesheet)
   {
-    this.transformer = transformer;
+    this.stylesheet = stylesheet;
   }
 
   public Object evaluate(List args)
     throws XPathFunctionException
   {
-    String base = null;
+    String base = stylesheet.systemId;
     switch (args.size())
       {
       case 2:
@@ -107,19 +110,33 @@ final class DocumentFunction
   Node _document(String uri, String base)
     throws XPathFunctionException
   {
+    InputStream in = null;
     if (base != null)
       {
         try
           {
-            uri = new URL(new URL(base), uri).toString();
+            try
+              {
+                URL url = new URL(new URL(base), uri);
+                uri = url.toString();
+                in = url.openStream();
+              }
+            catch (MalformedURLException e)
+              {
+                in = new FileInputStream(uri);
+              }
           }
-        catch (MalformedURLException e)
+        catch (IOException e2)
           {
+            throw new XPathFunctionException("can't open " + uri);
           }
       }
-    URIResolver uriResolver = transformer.uriResolver;
-    ErrorListener errorListener = transformer.errorListener;
-    StreamSource source = new StreamSource(uri);
+    URIResolver uriResolver = (stylesheet.transformer == null) ? null :
+      stylesheet.transformer.uriResolver;
+    ErrorListener errorListener = (stylesheet.transformer == null) ? null:
+      stylesheet.transformer.errorListener;
+    StreamSource source = new StreamSource(in);
+    source.setSystemId(uri);
     DOMSourceWrapper wrapper = new DOMSourceWrapper(source,
                                                     uriResolver,
                                                     errorListener);

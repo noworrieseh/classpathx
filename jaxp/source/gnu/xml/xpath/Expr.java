@@ -262,10 +262,8 @@ public abstract class Expr
       {
         return context.getLocalName ();
       }
-    Document doc = (context instanceof Document) ? (Document) context :
-      context.getOwnerDocument ();
-    Node node = firstNode (doc, nodeSet);
-    return (node == null ) ? null : node.getLocalName ();
+    Node node = (Node) nodeSet.iterator().next();
+    return node.getLocalName ();
   }
 
   /**
@@ -282,10 +280,8 @@ public abstract class Expr
       {
         return context.getNamespaceURI ();
       }
-    Document doc = (context instanceof Document) ? (Document) context :
-      context.getOwnerDocument ();
-    Node node = firstNode (doc, nodeSet);
-    return (node == null ) ? null : node.getNamespaceURI ();
+    Node node = (Node) nodeSet.iterator().next();
+    return node.getNamespaceURI ();
   }
   
   /**
@@ -310,34 +306,8 @@ public abstract class Expr
       {
         return context.getNodeName ();
       }
-    Document doc = (context instanceof Document) ? (Document) context :
-      context.getOwnerDocument ();
-    Node node = firstNode (doc, nodeSet);
-    return (node == null ) ? null : node.getNodeName ();
-  }
-
-  /*
-   * Descend the node in document order and return the first matching node
-   * in the node-set.
-   */
-  public static Node firstNode (Node node, Collection nodeSet)
-  {
-    if (nodeSet.contains (node))
-      {
-        return node;
-      }
-    NodeList children = node.getChildNodes ();
-    int len = children.getLength ();
-    for (int i = 0; i < len; i++)
-      {
-        Node child = children.item (i);
-        Node test = firstNode (child, nodeSet);
-        if (test != null)
-          {
-            return test;
-          }
-      }
-    return null;
+    Node node = (Node) nodeSet.iterator().next();
+    return node.getNodeName ();
   }
 
   /* -- 4.2 String Functions -- */
@@ -376,12 +346,10 @@ public abstract class Expr
           {
             return "";
           }
-        Document doc = (context instanceof Document) ? (Document) context : 
-          context.getOwnerDocument ();
-        Node node = firstNode (doc, nodeSet);
-        return (node == null) ? "" : stringValue (node);
+        Node node = (Node) nodeSet.iterator().next();
+        return stringValue (node);
       }
-    return null;
+    throw new IllegalArgumentException(object.toString());
   }
 
   /**

@@ -220,7 +220,7 @@ public class Consumer extends DomConsumer
 	    Attributes2		attrs = (Attributes2) atts;
 	    int			length = atts.getLength ();
 
-	    map.compact ();
+	    //map.compact ();
 	    for (int i = 0; i < length; i++) {
 		if (attrs.isSpecified (i))
 		    continue;

@@ -51,12 +51,16 @@ public class NameTest
 {
 
   final String uri;
+  final String prefix;
   final String name;
   final boolean anyLocalName;
   final boolean any;
 
-  public NameTest (String name, boolean anyLocalName, boolean any)
+  public NameTest(String name, boolean anyLocalName, boolean any)
   {
+    this.anyLocalName = anyLocalName;
+    this.any = any;
+    
     int start = name.indexOf('{');
     int end = name.indexOf('}');
     if (start != -1 && end > start)
@@ -68,9 +72,25 @@ public class NameTest
       {
         uri = null;
       }
-    this.name = name;
-    this.anyLocalName = anyLocalName;
-    this.any = any;
+    if (anyLocalName)
+      {
+        prefix = name;
+        this.name = null;
+      }
+    else
+      {
+        start = name.indexOf(':');
+        if (start != -1)
+          {
+            prefix = name.substring(0, start);
+            name = name.substring(start + 1);
+          }
+        else
+          {
+            prefix = null;
+          }
+        this.name = name;
+      }
   }
 
   public boolean matchesAny()
@@ -83,9 +103,9 @@ public class NameTest
     return anyLocalName;
   }
 
-  public boolean matches (Node node)
+  public boolean matches(Node node)
   {
-    switch (node.getNodeType ())
+    switch (node.getNodeType())
       {
       case Node.DOCUMENT_TYPE_NODE:
       case Node.ENTITY_NODE:
@@ -98,21 +118,25 @@ public class NameTest
       {
         return true;
       }
-    String nodeUri = node.getNamespaceURI();
-    String nodeName = anyLocalName ? node.getPrefix() : node.getNodeName();
-    if (uri != null && uri.length() > 0)
+    if (uri != null)
       {
-        if (!uri.equals(nodeUri))
+        if (!uri.equals(node.getNamespaceURI()))
           {
             return false;
           }
       }
-    else if (nodeUri != null && nodeUri.length() > 0)
+    if (prefix != null)
       {
-        return false;
+        if (!prefix.equals(node.getPrefix()))
+          {
+            return false;
+          }
       }
-    //System.err.println("TEST: "+localName+" == "+nodeLocalName);
-    return (name.equals(nodeName));
+    if (anyLocalName)
+      {
+        return true;
+      }
+    return (name.equals(node.getLocalName()));
   }
 
   public String toString ()
@@ -121,11 +145,27 @@ public class NameTest
       {
         return "*";
       }
+    StringBuffer buf = new StringBuffer();
     if (uri != null)
       {
-        return "{" + uri + "}" + (anyLocalName ? name + ":*" : name);
+        buf.append('{');
+        buf.append(uri);
+        buf.append('}');
       }
-    return anyLocalName ? name + ":*" : name;
+    if (prefix != null)
+      {
+        buf.append(prefix);
+        buf.append(':');
+      }
+    if (anyLocalName)
+      {
+        buf.append('*');
+      }
+    else
+      {
+        buf.append(name);
+      }
+    return buf.toString();
   }
   
 }

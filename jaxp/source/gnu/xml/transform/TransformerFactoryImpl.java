@@ -96,6 +96,7 @@ public class TransformerFactoryImpl
     throws TransformerConfigurationException
   {
     Document doc = null;
+    String systemId = null;
     if (source != null)
       {
         DOMSource ds =
@@ -107,8 +108,9 @@ public class TransformerFactoryImpl
           }
         doc = (node instanceof Document) ? (Document) node :
           node.getOwnerDocument();
+        systemId = source.getSystemId();
       }
-    return new Stylesheet(this, doc, precedence);
+    return new Stylesheet(this, doc, systemId, precedence);
   }
 
   public Source getAssociatedStylesheet(Source source,

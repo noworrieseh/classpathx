@@ -69,14 +69,17 @@ import org.w3c.dom.events.MutationEvent;
  *
  * @author David Brownell
  */
-public class DomAttr extends DomNsNode implements Attr
+public class DomAttr
+  extends DomNsNode
+  implements Attr
 {
+  
     private boolean	specified;
 
     // NOTE:  it could be possible to rework this code a bit so that
     // this extra field isn't needed; "parent" might do double duty,
     // with appropriate safeguards.  Using less space is healthy!
-    private DomElement	element;
+    DomElement	element;
 
 
     /**
@@ -94,14 +97,14 @@ public class DomAttr extends DomNsNode implements Attr
      *	this is used to uniquely identify a type of attribute
      * @param name Name of this attribute, which may include a prefix
      */
-    protected DomAttr (Document owner, String namespaceURI, String name)
+    protected DomAttr(Document owner, String namespaceURI, String name)
     {
-	super (ATTRIBUTE_NODE, owner, namespaceURI, name);
-	specified = true;
-
-	// XXX register self to get insertion/removal events
-	// and character data change events and when they happen,
-	// report self-mutation
+      super(ATTRIBUTE_NODE, owner, namespaceURI, name);
+      specified = true;
+      
+      // XXX register self to get insertion/removal events
+      // and character data change events and when they happen,
+      // report self-mutation
     }
 
 
@@ -109,9 +112,9 @@ public class DomAttr extends DomNsNode implements Attr
      * <b>DOM L1</b>
      * Returns the attribute name (same as getNodeName)
      */
-    final public String getName ()
+    public final String getName()
     {
-	return getNodeName ();
+      return getNodeName();
     }
 
 
@@ -119,18 +122,18 @@ public class DomAttr extends DomNsNode implements Attr
      * <b>DOM L1</b>
      * Returns true if a parser reported this was in the source text.
      */
-    final public boolean getSpecified ()
+    public final boolean getSpecified()
     {
-	return specified;
+      return specified;
     }
 
 
     /**
      * Records whether this attribute was in the source text.
      */
-    final public void setSpecified (boolean value)
+    public final void setSpecified(boolean value)
     {
-	specified = value;
+      specified = value;
     }
 
 
@@ -140,29 +143,22 @@ public class DomAttr extends DomNsNode implements Attr
      * references substituted.
      * <em>NOTE:  entity refs as children aren't currently handled.</em>
      */
-    public String getNodeValue ()
+    public String getNodeValue()
     {
-	int	length = getLength ();
-	String	retval = null;
-
-	for (int i = 0; i < length; i++) {
-	    Node	n = item (i);
-
-	    if (n.getNodeType () == TEXT_NODE) {
-		if (retval == null)
-		    retval = n.getNodeValue ();
-		else
-		    retval += n.getNodeValue ();
-		continue;
-	    }
-	    
-	    // XXX entity ref child of attribute
-	    // contents exclude comments, PIs, elements
-	    throw new DomEx (DomEx.NOT_SUPPORTED_ERR);
-	}
-	if (retval == null)
-	    retval = "";
-	return retval;
+      StringBuffer buf = new StringBuffer();
+      for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+        {
+          switch (ctx.nodeType)
+            {
+            case Node.TEXT_NODE:
+              buf.append(ctx.getNodeValue());
+              break;
+            case Node.ENTITY_REFERENCE_NODE:
+              // TODO
+              break;
+            }
+        }
+      return buf.toString();
     }
 
 
@@ -172,9 +168,9 @@ public class DomAttr extends DomNsNode implements Attr
      * which is a text node with the specified value (same as
      * setNodeValue).
      */
-    final public void setValue (String value)
+    public final void setValue(String value)
     {
-	setNodeValue (value);
+      setNodeValue(value);
     }
 
 
@@ -184,9 +180,9 @@ public class DomAttr extends DomNsNode implements Attr
      * as getNodeValue.
      * <em>NOTE:  entity refs as children aren't currently handled.</em>
      */
-    final public String getValue ()
+    public final String getValue()
     {
-	return getNodeValue ();
+      return getNodeValue();
     }
 
 
@@ -196,21 +192,23 @@ public class DomAttr extends DomNsNode implements Attr
      * character references will exist.
      * Causes a DOMAttrModified mutation event to be sent.
      */
-    public void setNodeValue (String value)
+    public void setNodeValue(String value)
     {
-	int	len = getLength ();
-	String	oldValue;
-
-	if (isReadonly ())
-	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-
-	oldValue = getValue ();
-	for (int i = 0; i < len; i++)
-	    removeChild (getLastChild ());
-	appendChild (getOwnerDocument ().createTextNode (value));
-	specified = true;
-	
-	mutating (oldValue, value, MutationEvent.MODIFICATION);
+      if (isReadonly())
+        {
+          throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+        }
+      
+      String oldValue = getValue ();
+      while (last != null)
+        {
+          removeChild(last);
+        }
+      Node text = owner.createTextNode(value);
+      appendChild(text);
+      specified = true;
+      
+      mutating(oldValue, value, MutationEvent.MODIFICATION);
     }
 
 
@@ -218,39 +216,42 @@ public class DomAttr extends DomNsNode implements Attr
      * <b>DOM L2</b>
      * Returns the element with which this attribute is associated.
      */
-    final public Element getOwnerElement ()
+    public final Element getOwnerElement()
     {
-	return element;
+      return element;
     }
 
 
     /**
      * Records the element with which this attribute is associated.
      */
-    final public void setOwnerElement (Element e)
+    public final void setOwnerElement(Element e)
     {
-	if (element != null)
-	    throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
-	if (!(e instanceof DomElement))
-	    throw new DomEx (DomEx.WRONG_DOCUMENT_ERR);
-	element = (DomElement) e;
+      if (element != null)
+        {
+          throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
+        }
+      if (!(e instanceof DomElement))
+        {
+          throw new DomEx(DomEx.WRONG_DOCUMENT_ERR);
+        }
+      element = (DomElement) e;
     }
-
 
     /**
      * Shallow clone of the attribute, breaking all ties with any
      * elements.
      */
-    public Object clone ()
+    public Object clone()
     {
-	DomAttr retval = (DomAttr) super.clone ();
-
-	retval.element = null;
-	retval.specified = false;
-	return retval;
+      DomAttr retval = (DomAttr) super.clone();
+      
+      retval.element = null;
+      retval.specified = false;
+      return retval;
     }
-
-    private void mutating (String oldValue, String newValue, short why)
+    
+    private void mutating(String oldValue, String newValue, short why)
     {
 	if (!reportMutations || element == null)
 	    return;
@@ -268,16 +269,16 @@ public class DomAttr extends DomNsNode implements Attr
 
     // DOM Level 3 methods
 
-    public TypeInfo getSchemaTypeInfo ()
-      {
-        // TODO
-        return null;
-      }
+    public TypeInfo getSchemaTypeInfo()
+    {
+      // TODO
+      return null;
+    }
 
-    public boolean isId ()
-      {
-        // TODO
-        return false;
-      }
+    public boolean isId()
+    {
+      // TODO
+      return false;
+    }
 
 }

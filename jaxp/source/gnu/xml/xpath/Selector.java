@@ -143,8 +143,6 @@ extends Expr
         candidates.add (context);
         break;
       }
-    if (axis==ATTRIBUTE)
-      System.out.println("selected: "+candidates);
     // Now filter them
     int tlen = tests.length;
     if (tlen > 0)
@@ -161,8 +159,6 @@ extends Expr
               }
           }
       }
-    if (axis==ATTRIBUTE)
-      System.out.println("filtered: "+candidates);
     return candidates;
   }
 

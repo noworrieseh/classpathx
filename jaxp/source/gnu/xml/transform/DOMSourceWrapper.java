@@ -104,7 +104,7 @@ class DOMSourceWrapper
                 builder.setErrorHandler(new ErrorListenerErrorHandler(errorListener));
               }
             String systemId = absolutize(source.getSystemId());
-            //System.out.println("Loading "+systemId);
+            System.err.println("Loading "+systemId);
             if (source instanceof SAXSource)
               {
                 InputSource in = ((SAXSource) source).getInputSource();

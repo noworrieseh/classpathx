@@ -363,6 +363,18 @@ public abstract class DomNode
       }
   }
 
+  /**
+   * Used to adopt a node to a new document.
+   */
+  void setOwner(Document doc)
+  {
+    this.owner = doc;
+    for (DomNode ctx = first; ctx != null; ctx = ctx.next)
+      {
+        ctx.setOwner(doc);
+      }
+  }
+
   // we need to have at least N more kids
   /*private void ensureEnough (int n)
     {

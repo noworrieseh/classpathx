@@ -38,6 +38,9 @@
 
 package gnu.xml.transform;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -90,6 +93,7 @@ class Stylesheet
   final TransformerFactoryImpl factory;
   TransformerImpl transformer;
   final XPathImpl xpath;
+  final String systemId;
   final int precedence;
 
   /**
@@ -139,10 +143,12 @@ class Stylesheet
   TemplateNode builtInNodeTemplate;
   TemplateNode builtInTextTemplate;
 
-  Stylesheet(TransformerFactoryImpl factory, Document doc, int precedence)
+  Stylesheet(TransformerFactoryImpl factory, Document doc, String systemId,
+             int precedence)
     throws TransformerConfigurationException
   {
     this.factory = factory;
+    this.systemId = systemId;
     this.precedence = precedence;
     stripSpace = new LinkedHashSet();
     preserveSpace = new LinkedHashSet();
@@ -218,7 +224,7 @@ class Stylesheet
                     tname = null;
                   }
                 String m = element.getAttribute("match");
-                Expr match = (m != null) ?
+                Expr match = (m != null && m.length() > 0) ?
                   (Expr) xpath.compile(m) : null;
                 String priority = element.getAttribute("priority");
                 String mode = element.getAttribute("mode");
@@ -266,8 +272,12 @@ class Stylesheet
             else if ("include".equals(name) || "import".equals(name))
               {
                 int p = "import".equals(name) ? -1 : 0;
-                String systemId = element.getAttribute("href");
-                Source source = new StreamSource(systemId);
+                String href = element.getAttribute("href");
+                if (systemId != null)
+                  {
+                    href = getURL(systemId, href).toString();
+                  }
+                Source source = new StreamSource(href);
                 Stylesheet stylesheet =
                   factory.newStylesheet(source, precedence + p);
                 templates.addAll(stylesheet.templates);
@@ -276,7 +286,7 @@ class Stylesheet
             else if ("output".equals(name))
               {
                 String method = element.getAttribute("method");
-                if ("xml".equals(method))
+                if ("xml".equals(method) || method.length() == 0)
                   {
                     outputMethod = OUTPUT_XML;
                   }
@@ -374,13 +384,46 @@ class Stylesheet
             parse(node.getNextSibling(), false);
           }
       }
+    catch (MalformedURLException e)
+      {
+        DOMSourceLocator l = new DOMSourceLocator(node);
+        throw new TransformerConfigurationException(e.getMessage(), l, e);
+      }
     catch (DOMException e)
       {
-        throw new TransformerConfigurationException(e);
+        DOMSourceLocator l = new DOMSourceLocator(node);
+        throw new TransformerConfigurationException(e.getMessage(), l, e);
       }
     catch (XPathExpressionException e)
       {
-        throw new TransformerConfigurationException(e);
+        DOMSourceLocator l = new DOMSourceLocator(node);
+        throw new TransformerConfigurationException(e.getMessage(), l, e);
+      }
+  }
+
+  URL getURL(String base, String href)
+    throws MalformedURLException
+  {
+    try
+      {
+        return new URL(getURL(base), href);
+      }
+    catch (MalformedURLException e)
+      {
+        return new File(new File(base), href).toURL();
+      }
+  }
+
+  URL getURL(String href)
+    throws MalformedURLException
+  {
+    try
+      {
+        return new URL(href);
+      }
+    catch (MalformedURLException e)
+      {
+        return new File(href).toURL();
       }
   }
 
@@ -544,7 +587,7 @@ class Stylesheet
         String localName = name.getLocalName();
         if ("document".equals(localName) && (arity == 1 || arity == 2))
           {
-            return new DocumentFunction(transformer);
+            return new DocumentFunction(this);
           }
       }
     return null;

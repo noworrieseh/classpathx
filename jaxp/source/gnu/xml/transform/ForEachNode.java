@@ -74,6 +74,7 @@ final class ForEachNode
     if (children != null)
       {
         Object ret = select.evaluate(context);
+        //System.out.println(toString() + ": " + context+" -> "+ret);
         if (ret instanceof Collection)
           {
             Collection ns = (Collection) ret;
@@ -94,6 +95,16 @@ final class ForEachNode
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);
       }
+  }
+
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(getClass().getName());
+    buf.append('[');
+    buf.append("select=");
+    buf.append(select);
+    buf.append(']');
+    return buf.toString();
   }
   
 }

@@ -232,7 +232,7 @@ class Template
               {
                 String mode = element.getAttribute("mode");
                 String s = element.getAttribute("select");
-                if (s == null)
+                if (s == null || s.length() == 0)
                   {
                     s = "child::node()";
                   }
@@ -253,6 +253,12 @@ class Template
             else if ("value-of".equals(name))
               {
                 String s = element.getAttribute("select");
+                if (s == null || s.length() == 0)
+                  {
+                    String msg = "select attribute is required on value-of";
+                    DOMSourceLocator l = new DOMSourceLocator(element);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
                 Expr select = (Expr) stylesheet.xpath.compile(s);
                 String doe = element.getAttribute("disable-output-escaping");
                 boolean d = "yes".equals(doe);
@@ -261,6 +267,12 @@ class Template
             else if ("for-each".equals(name))
               {
                 String s = element.getAttribute("select");
+                if (s == null || s.length() == 0)
+                  {
+                    String msg = "select attribute is required on for-each";
+                    DOMSourceLocator l = new DOMSourceLocator(element);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
                 Expr select = (Expr) stylesheet.xpath.compile(s);
                 List sortKeys = parseSortKeys(children);
                 return new ForEachNode(parse(children), parse(next), select, sortKeys);
@@ -272,6 +284,12 @@ class Template
             else if ("if".equals(name))
               {
                 String t = element.getAttribute("test");
+                if (t == null || t.length() == 0)
+                  {
+                    String msg = "test attribute is required on if";
+                    DOMSourceLocator l = new DOMSourceLocator(element);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
                 Expr test = (Expr) stylesheet.xpath.compile(t);
                 return new IfNode(parse(children), parse(next), test);
               }
@@ -282,6 +300,12 @@ class Template
             else if ("when".equals(name))
               {
                 String t = element.getAttribute("test");
+                if (t == null || t.length() == 0)
+                  {
+                    String msg = "test attribute is required on when";
+                    DOMSourceLocator l = new DOMSourceLocator(element);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
                 Expr test = (Expr) stylesheet.xpath.compile(t);
                 return new WhenNode(parse(children), parse(next), test);
               }
@@ -404,6 +428,18 @@ class Template
                   }
                 return new ParameterNode(parse(children), parse(next),
                                          paramName, content, global);
+              }
+            else if ("copy-of".equals(name))
+              {
+                String s = element.getAttribute("select");
+                if (s == null || s.length() == 0)
+                  {
+                    String msg = "select attribute is required on copy-of";
+                    DOMSourceLocator l = new DOMSourceLocator(element);
+                    throw new TransformerConfigurationException(msg, l);
+                  }
+                Expr select = (Expr) stylesheet.xpath.compile(s);
+                return new CopyOfNode(parse(children), parse(next), select);
               }
           }
         catch (XPathExpressionException e)

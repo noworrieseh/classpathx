@@ -157,18 +157,15 @@ public abstract class DomNsNode
 
     /**
      * <b>DOM L2</b>
-     * Returns the local part of the node's name (after any colon),
-     * <em>or null</em> if the node name is not namespace scoped.
+     * Returns the local part of the node's name (after any colon).
      */
     public String getLocalName ()
     {
-	if (namespace == null)
-	    return null;
-
 	int index = name.indexOf (':');
 	if (index < 0)
 	    return name;
 	else
 	    return name.substring (index + 1);
     }
+    
 }

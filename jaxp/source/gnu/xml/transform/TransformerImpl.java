@@ -38,8 +38,12 @@
 
 package gnu.xml.transform;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -188,6 +192,21 @@ class TransformerImpl
         try
           {
             OutputStream out = sr.getOutputStream();
+            if (out == null)
+              {
+                String systemId = sr.getSystemId();
+                try
+                  {
+                    URL url = new URL(systemId);
+                    URLConnection connection = url.openConnection();
+                    connection.setDoOutput(true);
+                    out = connection.getOutputStream();
+                  }
+                catch (MalformedURLException e)
+                  {
+                    out = new FileOutputStream(systemId);
+                  }
+              }
             StreamSerializer serializer = new StreamSerializer(encoding);
             serializer.serialize(parent, out, outputMethod);
             out.close();
