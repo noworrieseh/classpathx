@@ -1,5 +1,5 @@
 /*
- * $Id: XMLWriter.java,v 1.7 2001-11-04 01:38:52 db Exp $
+ * $Id: XMLWriter.java,v 1.8 2001-11-20 01:15:45 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -27,6 +27,7 @@
 
 package gnu.xml.util;
 
+import java.io.BufferedWriter;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -91,7 +92,7 @@ import org.xml.sax.helpers.*;
  * @see gnu.xml.pipeline.TextConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 01:38:52 $
+ * @version $Date: 2001-11-20 01:15:45 $
  */
 public class XMLWriter
     implements ContentHandler, LexicalHandler, DTDHandler, DeclHandler
@@ -302,6 +303,8 @@ public class XMLWriter
 	out = writer;
 	if (out != null)
 	    setEncoding (encoding);
+	if (!(out instanceof BufferedWriter))
+	    out = new BufferedWriter (out);
 	space.push ("default");
     }
 
@@ -715,7 +718,11 @@ public class XMLWriter
 	}
     }
 
-    /** <b>SAX1</b>:  indicates the completion of a parse */
+    /**
+     * <b>SAX1</b>:  indicates the completion of a parse.
+     * Note that all complete SAX event streams make this call, even
+     * if an error is reported during a parse.
+     */
     // NOT final
     public void endDocument ()
     throws SAXException
@@ -1820,8 +1827,13 @@ public class XMLWriter
     private void rawWrite (String s)
     throws SAXException, IOException
     {
-	char data [] = s.toCharArray ();
-	rawWrite (data, 0, data.length);
+	if (prettyPrinting && "default".equals (space.peek ())) {
+	    char data [] = s.toCharArray ();
+	    rawWrite (data, 0, data.length);
+	} else {
+	    out.write (s);
+	    column += s.length ();
+	}
     }
 
     // NOTE:  if xhtml, the REC gives some rules about whitespace
