@@ -677,12 +677,11 @@ public class MboxFolder
   {
     if ('/' != File.separatorChar)
       {
-        String rtn = name.replace('/', File.separatorChar);
         if (name.startsWith("//"))
           {
-            rtn = rtn.substring(2);
+            name = name.substring(2);
           }
-        return rtn;
+        name = name.replace('/', File.separatorChar);
       }
     return name;
   }
