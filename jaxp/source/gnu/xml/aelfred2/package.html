@@ -9,7 +9,7 @@
  * Copyright (c) 1999-2001 by David Brownell.
  * This file is distributed under the GPL.
  *
- * $Id: package.html,v 1.2 2001-06-20 20:43:22 db Exp $
+ * $Id: package.html,v 1.3 2001-07-04 16:50:30 db Exp $
  */
 -->
 </head><body>
@@ -165,11 +165,14 @@ all XML parsers are required to support:</p> <ul>
     essentially the native encoding used by Java.  </li>
 
     <li> ISO-10646-UCS-4 ... a seldom-used four byte encoding,
-    with four different byte orderings.  Some operating systems
+    also known as UTF-32BE.  Four byte order variants are supported,
+    including one known as UTF-32LE.  Some operating systems
     standardized on UCS-4 despite its significant size penalty,
     in anticipation that Unicode (even with surrogate pairs)
     would eventually become limiting.  UCS-4 permits encoding
-    of non-Unicode characters, which Java can't represent.  </li>
+    of non-Unicode characters, which Java can't represent (and
+    XML doesn't allow).  
+    </li>
 
     </ul>
 
@@ -195,13 +198,13 @@ such problems, some of them can be worked around in this parser.
 <p>Known conformance issues should be of negligible importance for 
 most applications, and include: </p><ul>
     
-    <li> Rather than following the voluminous "Appendix A" rules about
+    <li> Rather than following the voluminous "Appendix B" rules about
     what characters may appear in names (and name tokens), the Unicode
-    rules are used.  This means that some names are inappropriately
-    rejected, and others are inappropriately accepted.  (XML has some
-    very complicated rules in this area.  It's much simpler
-    to avoid that much special case code, although there is at last
-    an open routine available that I'll trust to get it right.)</li>
+    rules embedded in <em>java.lang.Character</em> are used.
+    This means mostly that some names are inappropriately accepted,
+    though a few are inappropriately rejected.  (It's much simpler
+    to avoid that much special case code.  Recent OASIS/NIST test
+    cases may have these rules be realistically testable.) </li>
 
     <li> Text containing "]]&gt;" is not rejected unless it fully resides
     in an internal buffer ... which is, thankfully, the typical case.  This
@@ -210,18 +213,15 @@ most applications, and include: </p><ul>
     substantially simplifies parsing text.) </li>
 
     <li> Surrogate characters that aren't correctly paired are ignored
-    rather than rejected.  (This simplifies parsing text; in any case,
-    no documents today should use Unicode surrogates, since at this writing
-    there are no formal assignments for those character codes.
-    Even JDK 1.3 doesn't handle such issues well.) </li>
+    rather than rejected, unless they were encoded using UTF-8.  (This
+    simplifies parsing text.)  Unicode 3.1 assigned the first characters
+    to those character codes, in early 2001, so few documents (or tools)
+    use such characters in any case. </li>
 
     <li> Declarations following references to an undefined parameter
     entity reference are not ignored. (Not maintaining and using state
-    about this validity error simplifies declaration handling.) </li>
-
-    <li> Tab characters in PUBLIC identifiers are treated like ordinary
-    whitespace, rather than causing fatal errors.  (Removing this 
-    special case keeps the parser simpler.) </li>
+    about this validity error simplifies declaration handling; few
+    XML parsers address this constraint in any case.) </li>
 
     <li> Well formedness constraints for general entity references
     are not enforced.  (The code to handle the "content" production
@@ -291,7 +291,7 @@ SAX2 APIs. </p>
 boolean feature descriptors.  It supports the "DeclHandler" property
 to provide access to all DTD declarations not already exposed
 through the SAX1 API.  The "LexicalHandler" property is supported,
-except that entity references are hidden; this means you can see
+exposing entity boundaries (including the unnamed external subset) and
 things like comments and CDATA boundaries.  SAX1 compatibility is
 currently provided.</p>
 
@@ -350,6 +350,9 @@ cleanly layered as allowed by SAX2.</p>
 	surrogate pairs. </li>
 
 	<li> Correctly handles UTF-8 encodings of surrogate pairs. </li>
+
+	<li> Correctly handles Unicode 3.1 rules about illegal UTF-8
+	encodings: there is only one legal encoding per character. </li>
 
 	<li> PUBLIC identifiers are now rejected if they have illegal
 	characters. </li>
