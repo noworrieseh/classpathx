@@ -164,7 +164,7 @@ public class TransportTest
     }
     catch (IOException e)
     {
-      throw new RuntimeException("Can't load transport URLs");
+      System.err.println("No transport URLs");
     }
     return suite;
 	}

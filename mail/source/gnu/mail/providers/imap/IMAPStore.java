@@ -93,7 +93,9 @@ public class IMAPStore
     {
       try
       {
-        connection = createConnection(host, port);
+        if (port<0)
+          port = DEFAULT_PORT;
+        connection = new IMAPConnection(host, port);
         
         if (session.getDebug())
           connection.setDebug(true);
@@ -101,10 +103,14 @@ public class IMAPStore
           connection.setAnsiDebug(true);
         
         List capabilities = connection.capability();
+        if (capabilities.contains(STARTTLS))
+          connection.starttls();
         if (capabilities.contains("AUTH="+CRAM_MD5))
           return connection.authenticate_CRAM_MD5(username, password);
-        else
+        else if (!capabilities.contains(LOGINDISABLED))
           return connection.login(username, password);
+        else
+          return false; // sorry
       }
       catch (UnknownHostException e)
       {
@@ -116,22 +122,11 @@ public class IMAPStore
       }
       finally
       {
-        if (connection.alertsPending())
+        if (connection!=null && connection.alertsPending())
           processAlerts();
       }
     }
   }
-
-	/**
-	 * Returns a new connection for this store.
-	 */
-	protected IMAPConnection createConnection(String host, int port)
-		throws UnknownHostException, IOException
-	{
-    if (port<0)
-			port = DEFAULT_PORT;
-		return new IMAPConnection(host, port);
-	}
 
   /**
    * Closes the connection.

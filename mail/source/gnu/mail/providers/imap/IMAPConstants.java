@@ -61,6 +61,7 @@ public interface IMAPConstants
   public static final String STORE = "STORE".intern();
   public static final String COPY = "COPY".intern();
   public static final String UID = "UID".intern();
+  public static final String STARTTLS = "STARTTLS".intern();
   
   // Server responses
   public static final String OK = "OK".intern();
@@ -163,5 +164,6 @@ public interface IMAPConstants
   public static final String GSSAPI = "GSSAPI";
   public static final String SKEY = "SKEY";
   public static final String CRAM_MD5 = "CRAM-MD5";
+  public static final String LOGINDISABLED = "LOGINDISABLED";
 
 }

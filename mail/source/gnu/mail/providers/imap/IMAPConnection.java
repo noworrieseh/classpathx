@@ -108,33 +108,12 @@ public class IMAPConnection implements IMAPConstants
   public IMAPConnection(String host, int port)
     throws UnknownHostException, IOException
   {
-		this(host, port, false);
-	}
-	
-  /**
-   * Constructor.
-	 * @param host the name of the host to connect to
-	 * @param port the port to connect to
-	 * @param secure if true, use TLS
-   */
-  public IMAPConnection(String host, int port, boolean secure)
-    throws UnknownHostException, IOException
-  {
-    socket = createSocket(host, port);
+    socket = new Socket(host, port);
     in = new IMAPResponseTokenizer(socket.getInputStream());
     out = socket.getOutputStream();
     asyncResponses = new ArrayList();
     alerts = new ArrayList();
   }
-
-	/**
-	 * Creates the socket to connect to the host.
-	 */
-	protected Socket createSocket(String host , int port)
-		throws UnknownHostException, IOException
-	{
-		return new Socket(host, port);
-	}
 
   /**
    * Sets whether to log debugging output to stderr.
@@ -166,7 +145,7 @@ public class IMAPConnection implements IMAPConstants
     throws IOException
   {
     if (debug)
-      System.err.println("> "+tag+" "+command);
+      System.err.println("imap: > "+tag+" "+command);
     byte[] bytes = new StringBuffer(tag)
       .append(' ')
       .append(command)
@@ -225,9 +204,9 @@ public class IMAPConnection implements IMAPConstants
     if (debug)
     {
       if (ansiDebug)
-        System.err.println("< "+response.toANSIString());
+        System.err.println("imap: < "+response.toANSIString());
       else
-        System.err.println("< "+response.toString());
+        System.err.println("imap: < "+response.toString());
     }
     return response;
   }
@@ -337,6 +316,65 @@ public class IMAPConnection implements IMAPConstants
       }
       else
         throw new IMAPException(id, response.getText());
+    }
+  }
+
+  /**
+   * Attempts to start TLS on the specified connection.
+   * @see RFC 2595
+   * @return true if successful, false otherwise
+   */
+  public boolean starttls()
+    throws IOException
+  {
+    String tag = newTag();
+    sendCommand(tag, STARTTLS);
+    while (true)
+    {
+      IMAPResponse response = readResponse();
+      if (response.isTagged() && tag.equals(response.getTag()))
+      {
+        processAlerts(response);
+        String id = response.getID();
+        if (id==OK)
+          break; // negotiate TLS
+        else if (id==BAD)
+          return false;
+      }
+      else
+        asyncResponses.add(response);
+    }
+    try
+    {
+      // Attempt to instantiate an SSLSocketFactory
+      // This requires introspection, as the class may not be available in
+      // all runtimes.
+      Class factoryClass = Class.forName("javax.net.ssl.SSLSocketFactory");
+      java.lang.reflect.Method getDefault =
+        factoryClass.getMethod("getDefault", new Class[0]);
+      Object factory = getDefault.invoke(null, new Object[0]);
+      // Use the factory to negotiate a TLS session and wrap the current
+      // socket.
+      Class[] pt = new Class[4];
+      pt[0] = Socket.class;
+      pt[1] = String.class;
+      pt[2] = Integer.TYPE;
+      pt[3] = Boolean.TYPE;
+      java.lang.reflect.Method createSocket =
+        factoryClass.getMethod("createSocket", pt);
+      Object[] args = new Object[4];
+      args[0] = socket;
+      args[1] = socket.getInetAddress().getHostName();
+      args[2] = new Integer(socket.getPort());
+      args[3] = Boolean.TRUE;
+      socket = (Socket)createSocket.invoke(factory, args);
+      in = new IMAPResponseTokenizer(socket.getInputStream());
+      out = socket.getOutputStream();
+      return true;
+    }
+    catch (Exception e)
+    {
+      return false;
     }
   }
 

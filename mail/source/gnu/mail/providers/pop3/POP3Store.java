@@ -30,6 +30,7 @@ package gnu.mail.providers.pop3;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -88,6 +89,12 @@ public final class POP3Store
         String disableApop = session.getProperty("mail.pop3.disable-apop");
         if ("true".equals(disableApop))
           connection.timestamp = null;
+        List capa = connection.capa();
+        if (capa!=null)
+        {
+          if (capa.contains(POP3Connection.STLS))
+            connection.stls();
+        }
 				return connection.authenticate(username, password);
       }
       catch (UnknownHostException e)

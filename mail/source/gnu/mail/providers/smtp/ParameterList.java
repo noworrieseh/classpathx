@@ -1,5 +1,5 @@
 /*
- * IMAPSStore.java
+ * ParameterList.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -25,45 +25,43 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package gnu.mail.providers.imap;
+package gnu.mail.providers.smtp;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import javax.mail.Session;
-import javax.mail.URLName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The storage class implementing the IMAP4rev1 mail protocol with
- * transport-level encryption.
+ * A list of ESMTP parameters.
  *
- * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 0.1
+ * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
-public class IMAPSStore
-  extends IMAPStore
+public final class ParameterList
 {
-	/**
-	 * The default IMAPS port.
-	 */
-	public static final int DEFAULT_PORT = 993;
-		
+
+  private List parameters = new ArrayList();
+  
   /**
-   * Constructor.
+   * Returns the number of parameters in the list.
    */
-  public IMAPSStore(Session session, URLName url)
+  public int size()
   {
-    super(session, url);
+    return parameters.size();
   }
 
-	/**
-	 * Returns a new connection for this store.
-	 */
-	protected IMAPConnection createConnection(String host, int port)
-		throws UnknownHostException, IOException
-	{
-		if (port<0)
-			port = DEFAULT_PORT;
-		return new IMAPConnection(host, port);
-	}
+  /**
+   * Returns the parameter at the specified index.
+   */
+  public Parameter get(int index)
+  {
+    return (Parameter)parameters.get(index);
+  }
 
+  /**
+   * Adds a new parameter to the list.
+   */
+  public void add(Parameter parameter)
+  {
+    parameters.add(parameter);
+  }
+  
 }

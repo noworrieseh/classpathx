@@ -38,5 +38,12 @@ No filtering mechanism is currently supplied. It was originally hoped that
 JavaMail would provide a standard architecture for this, but this
 possibility now seems remote. Suggestions are welcome.
 
+Session properties
+
+The following session properties may be set:
+
+mail.pop3.disable-apop            boolean  if true, disable all attempts at
+                                           APOP authentication
+
 
 Chris Burdess, August 2001

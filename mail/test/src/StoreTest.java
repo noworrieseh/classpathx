@@ -158,7 +158,7 @@ public class StoreTest
     }
     catch (IOException e)
     {
-      throw new RuntimeException("Can't load store URLs");
+      System.err.println("No store URLs");
     }
     return suite;
 	}

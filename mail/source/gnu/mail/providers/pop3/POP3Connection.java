@@ -34,6 +34,8 @@ import java.net.ProtocolException;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
@@ -43,7 +45,10 @@ import gnu.mail.util.MessageInputStream;
  * A POP3 client connection.
  * This implements the entire POP3 specification as detailed in RFC 1939,
  * with the exception of the no-arg LIST and UIDL commands (use STAT
- * followed by multiple LIST and/or UIDL instead).
+ * followed by multiple LIST and/or UIDL instead) and TOP with a specified
+ * number of content lines. It also implements the POP3 extension mechanism
+ * CAPA, documented in RFC 2449, as well as the STLS command to initiate TLS
+ * over POP3 documented in RFC 2595.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.3
@@ -71,6 +76,8 @@ public class POP3Connection
 	protected static final String USER = "USER";
 	protected static final String PASS = "PASS";
 	protected static final String APOP = "APOP";
+	protected static final String CAPA = "CAPA";
+	protected static final String STLS = "STLS";
 
 	/**
 	 * The socket used to communicate with the server.
@@ -123,17 +130,6 @@ public class POP3Connection
 			throw new ProtocolException("Connect failed: "+response);
 		// APOP timestamp
 		timestamp = parseTimestamp(response);
-    /* TODO
-    // Try STARTTLS method
-    send("STLS");
-    if (getResponse())
-    {
-      SocketFactory factory = SSLSocketFactory.getDefault();
-      socket = factory.createSocket(socket, hostname, port, true);
-      in = new CRLFInputStream(socket.getInputStream());
-      out = new CRLFOutputStream(socket.getOutputStream());
-    }
-    */
 	}
 
 	/**
@@ -218,6 +214,52 @@ public class POP3Connection
 		return getResponse();
 	}
 
+  /**
+   * Attempts to start TLS on the specified connection.
+   * @see RFC 2595
+   * @return true if successful, false otherwise
+   */
+  public boolean stls()
+    throws IOException
+  {
+    send(STLS);
+    if (!getResponse())
+      return false;
+    try
+    {
+      // Attempt to instantiate an SSLSocketFactory
+      // This requires introspection, as the class may not be available in
+      // all runtimes.
+      Class factoryClass = Class.forName("javax.net.ssl.SSLSocketFactory");
+      java.lang.reflect.Method getDefault =
+        factoryClass.getMethod("getDefault", new Class[0]);
+      Object factory = getDefault.invoke(null, new Object[0]);
+      // Use the factory to negotiate a TLS session and wrap the current
+      // socket.
+      Class[] pt = new Class[4];
+      pt[0] = Socket.class;
+      pt[1] = String.class;
+      pt[2] = Integer.TYPE;
+      pt[3] = Boolean.TYPE;
+      java.lang.reflect.Method createSocket =
+        factoryClass.getMethod("createSocket", pt);
+      Object[] args = new Object[4];
+      args[0] = socket;
+      args[1] = socket.getInetAddress().getHostName();
+      args[2] = new Integer(socket.getPort());
+      args[3] = Boolean.TRUE;
+      socket = (Socket)createSocket.invoke(factory, args);
+      // set up streams
+      in = new CRLFInputStream(socket.getInputStream());
+      out = new CRLFOutputStream(socket.getOutputStream());
+      return true;
+    }
+    catch (Exception e)
+    {
+      return false;
+    }
+  }
+  
 	/**
 	 * Returns the number of messages in the maildrop.
 	 */
@@ -377,6 +419,28 @@ public class POP3Connection
 		return response.substring(response.indexOf(' ')+1);
 	}
 
+  /**
+   * Returns a list of capabilities supported by the POP3 server.
+   * If the server does not support POP3 extensions, returns
+   * <code>null</code>.
+   */
+  public List capa()
+    throws IOException
+  {
+    send(CAPA);
+    if (getResponse())
+    {
+      final String DOT = ".";
+      List list = new ArrayList();
+      for (String line = in.readLine();
+          !DOT.equals(line);
+          line = in.readLine())
+        list.add(line);
+      return list;
+    }
+    return null;
+  }
+
   /** 
    * Send the command to the server.
    * If <code>debug</code> is <code>true</code>,
@@ -386,7 +450,7 @@ public class POP3Connection
     throws IOException
   {
     if (debug)
-      System.err.println("POP> "+command);
+      System.err.println("pop3: > "+command);
     out.write(command);
     out.writeln();
     out.flush();
@@ -402,7 +466,7 @@ public class POP3Connection
   {
     response = in.readLine();
     if (debug)
-      System.err.println("POP< "+response);
+      System.err.println("pop3: < "+response);
     if (response.indexOf(OK)==0)
     {
       response = response.substring(3).trim();

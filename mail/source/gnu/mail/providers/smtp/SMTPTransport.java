@@ -124,11 +124,6 @@ public class SMTPTransport
     }
   }
 
-  void log(String message)
-  {
-    System.err.println("smtp: "+message);
-  }
-
   /**
    * Describe <code>protocolConnect</code> method here.
    *
@@ -187,7 +182,7 @@ public class SMTPTransport
         } 
         catch (SocketException se)
         {
-          log("WARNING: unable to set socket timeout property");
+          System.err.println("smtp: WARNING: unable to set socket timeout property");
         }
         catch (NumberFormatException e)
         {
@@ -210,7 +205,7 @@ public class SMTPTransport
       
       // EHLO/HELO
       String smtpEhlo = session.getProperty("mail.smtp.ehlo");
-      if (smtpEhlo==null || new Boolean(smtpEhlo).booleanValue())
+      if ("false".equals(smtpEhlo))
         helo(localHostName);
       else if (!ehlo(localHostName)) 
         helo(localHostName);
@@ -227,7 +222,7 @@ public class SMTPTransport
           else if (authenticationMechanisms.contains("PLAIN"))
             return authPlain(user, password);
           else
-            log("No supported authentication mechanisms");
+            System.err.println("smtp: No supported authentication mechanisms");
         }
         return false;
       }
@@ -235,7 +230,7 @@ public class SMTPTransport
     catch (IOException e)
     {
       if (session.getDebug())
-        log(e.getMessage());
+        System.err.println("smtp: "+e.getMessage());
       return false;
     }
     return true;
@@ -381,8 +376,56 @@ public class SMTPTransport
         while (st.hasMoreTokens())
           authenticationMechanisms.add(st.nextToken());
       }
+      if ("STARTTLS".equals(response.text))
+        starttls();
       if (response.last)
         return (response.code==OK);
+    }
+  }
+
+  private boolean starttls()
+    throws MessagingException
+  {
+    sendCommand("STARTTLS");
+    Response response = readResponse();
+    if (response.code!=OK)
+      return false;
+    try
+    {
+      // Attempt to instantiate an SSLSocketFactory
+      // This requires introspection, as the class may not be available in
+      // all runtimes.
+      Class factoryClass = Class.forName("javax.net.ssl.SSLSocketFactory");
+      java.lang.reflect.Method getDefault =
+        factoryClass.getMethod("getDefault", new Class[0]);
+      Object factory = getDefault.invoke(null, new Object[0]);
+      // Use the factory to negotiate a TLS session and wrap the current
+      // socket.
+      Class[] pt = new Class[4];
+      pt[0] = Socket.class;
+      pt[1] = String.class;
+      pt[2] = Integer.TYPE;
+      pt[3] = Boolean.TYPE;
+      java.lang.reflect.Method createSocket =
+        factoryClass.getMethod("createSocket", pt);
+      Object[] args = new Object[4];
+      args[0] = socket;
+      args[1] = socket.getInetAddress().getHostName();
+      args[2] = new Integer(socket.getPort());
+      args[3] = Boolean.TRUE;
+      socket = (Socket)createSocket.invoke(factory, args);
+      // Set up streams
+      in = new CRLFInputStream(
+          new BufferedInputStream(
+            socket.getInputStream()));
+      out = new CRLFOutputStream(
+          new BufferedOutputStream(
+            socket.getOutputStream()));
+      return true;
+    }
+    catch (Exception e)
+    {
+      return false;
     }
   }
 
@@ -574,7 +617,7 @@ public class SMTPTransport
     finally
     {
       if (session.getDebug())
-        log("< " + line);
+        System.err.println("smtp: < " + line);
     }
   }
 
@@ -615,7 +658,7 @@ public class SMTPTransport
     finally
     {
       if (session.getDebug()) 
-        log("> " + command);
+        System.err.println("smtp: > " + command);
     }
   }
 

@@ -147,10 +147,6 @@ source/gnu/mail/providers/imap/MessageStatus.java \
 source/gnu/mail/providers/imap/Pair.java \
 source/gnu/mail/providers/imap/UTF7imap.java
 
-# IMAP SSL classes
-IMAPS_JAVASRC = source/gnu/mail/providers/imap/IMAPSStore.java \
-source/gnu/mail/providers/imap/IMAPSConnection.java
-
 # The SMTP provider
 SMTP_JAVASRC = source/gnu/mail/providers/smtp/BASE64.java \
 source/gnu/mail/providers/smtp/SMTPOutputStream.java \
@@ -228,7 +224,6 @@ $(GNUMAILJAR): $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
 		   JARCOMPILER_JAR=@JAR@ \
                          ./jarcompiler $(GNUMAILJAR)
 
-#imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(IMAPS_JAVASRC) $(MAIL_META)
 imap.jar: $(GNUMAILJAR) $(IMAP_JAVASRC) $(MAIL_META)
 	echo $? | JARCOMPILER_JAVAC="@JAVAC@" \
 		   JARCOMPILER_JAR=@JAR@ \

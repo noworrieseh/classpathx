@@ -155,7 +155,7 @@ public class FolderTest
     }
     catch (IOException e)
     {
-      throw new RuntimeException("Can't load store URLs");
+      System.err.println("No folder URLs");
     }
     return suite;
 	}
