@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: CTR.java,v 1.3 2002-01-11 21:53:00 raif Exp $
+// $Id: CTR.java,v 1.4 2002-06-08 05:10:40 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,28 +36,34 @@ import gnu.crypto.cipher.IBlockCipher;
 import java.math.BigInteger;
 
 /**
- * The implementation of the Counter Mode.<p>
+ * <p>The implementation of the Counter Mode.</p>
  *
- * The algorithm steps are formally described as follows:
+ * <p>The algorithm steps are formally described as follows:</p>
+ *
  * <pre>
  *    CTR Encryption: O[j] = E(K)(T[j]); for j = 1, 2...n;
  *                    C[j] = P[j] ^ O[j]; for j = 1, 2...n.
  *    CTR Decryption: O[j] = E(K)(T[j]); for j = 1, 2...n;
  *                    P[j] = C[j] ^ O[j]; for j = 1, 2...n.
  * </pre>
- * where <tt>P</tt> is the plaintext, <tt>C</tt> is the ciphertext, <tt>E(K)</tt>
- * is the underlying block cipher encryption function parametrised with the
- * session key <tt>K</tt>, and <tt>T</tt> is the Counter.<p>
  *
- * This implementation, uses a standard incrementing function with a step of 1,
- * and an initial value similar to that described in the NIST document.<p>
+ * <p>where <code>P</code> is the plaintext, <code>C</code> is the ciphertext,
+ * <code>E(K)</code> is the underlying block cipher encryption function
+ * parametrised with the session key <code>K</code>, and <code>T</code> is the
+ * <i>Counter</i>.</p>
  *
- * References:<br>
- * <a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
- * Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
- * Morris Dworkin.<p>
+ * <p>This implementation, uses a standard incrementing function with a step of
+ * 1, and an initial value similar to that described in the NIST document.</p>
  *
- * @version $Revision: 1.3 $
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
+ *    Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
+ *    Morris Dworkin.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.4 $
  */
 public class CTR extends BaseMode implements Cloneable {
 
@@ -71,7 +77,7 @@ public class CTR extends BaseMode implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the Factory class.<p>
+    * <p>Trivial package-private constructor for use by the Factory class.</p>
     *
     * @param underlyingCipher the underlying cipher implementation.
     * @param cipherBlockSize the underlying cipher block size to use.
@@ -80,9 +86,13 @@ public class CTR extends BaseMode implements Cloneable {
       super(Registry.CTR_MODE, underlyingCipher, cipherBlockSize);
    }
 
-   /** Private constructor for cloning purposes. */
+   /**
+    * <p>Private constructor for cloning purposes.</p>
+    *
+    * @param that the instance to clone.
+    */
    private CTR(CTR that) {
-      this(that.cipher, that.cipherBlockSize);
+      this((IBlockCipher) that.cipher.clone(), that.cipherBlockSize);
    }
 
    // Class methods
