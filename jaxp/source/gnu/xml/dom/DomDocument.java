@@ -1158,6 +1158,11 @@ public class DomDocument
     if (source instanceof DomNode)
       {
         DomNode src = (DomNode) source;
+        if (src.owner == this)
+          {
+            // Already owner
+            return src;
+          }
         DomNode dst = src;
         if (dst.parent != null)
           {

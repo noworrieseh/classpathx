@@ -1,3 +1,13 @@
+2004-12-06  Mark Wielaard  <mark@klomp.org>
+
+   	* TransformerImpl.java: Use StreamResult's Writer if no byte stream
+   	is present.
+   	
+2004-12-05  Chris Burdess  <dog@gnu.org>
+
+	* TransformerImpl.java,XSLURIResolver.java: Permit identity
+	transforms with target nodes and null system IDs.
+
 2004-12-04  Dalibor Topic  <robilad@kaffe.org>
 
    	* ElementAvailableFunction.java,FunctionAvailableFunction.java,

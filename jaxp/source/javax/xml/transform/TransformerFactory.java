@@ -49,7 +49,7 @@ import java.util.Properties;
 /**
  * Factory for obtaining transformation contexts.
  *
- * @author <a href='mailro:dog@gnu.org'>Chris Burdess</a>
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public abstract class TransformerFactory
 {
@@ -109,7 +109,7 @@ public abstract class TransformerFactory
     try
       {
         Class t =
-          Class.forName("gnu.xml.libxmlj.transform.GnomeTransformerFactory");
+          Class.forName("gnu.xml.transform.TransformerFactoryImpl");
         return (TransformerFactory) t.newInstance();
       }
     catch (Exception e)
