@@ -324,8 +324,8 @@ javadoc:
 	javadoc -d apidoc \
 	    -windowtitle "GNU JAXP Library" \
 	    -nodeprecatedlist \
-	    -version -author \
-	    -footer "<p>Source code is GPL'd in the JAXP subproject at \
+	    -version -author -use \
+	    -bottom "<p>Source code is GPL'd in the JAXP subproject at \
 		<a href='http://savannah.gnu.org/projects/classpathx'> \
 		http://savannah.gnu.org/projects/classpathx</a> \
 		<br>This documentation was derived from that\
