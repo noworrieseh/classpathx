@@ -1,7 +1,7 @@
 package test.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRSAKeyGeneration.java,v 1.2 2002-01-17 11:55:36 raif Exp $
+// $Id: TestOfRSAKeyGeneration.java,v 1.3 2002-07-06 07:43:49 olf Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -53,7 +53,7 @@ import java.util.Random;
 /**
  * Conformance tests for the RSA key-pair generation implementation.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfRSAKeyGeneration extends TestCase {
 
@@ -145,15 +145,15 @@ public class TestOfRSAKeyGeneration extends TestCase {
       assertTrue("0 < dQ < q-1",
             ZERO.compareTo(dQ) < 0 && dQ.compareTo(q_minus_1) < 0);
       // satisfying
-      //    e · dP = 1 (mod p?1);
-      //    e · dQ = 1 (mod q?1),
-      assertTrue("e·dP == 1 (mod p?1)", e.multiply(dP).mod(p_minus_1).equals(ONE));
-      assertTrue("e·dQ == 1 (mod q?1)", e.multiply(dQ).mod(q_minus_1).equals(ONE));
+      //    e . dP = 1 (mod p?1);
+      //    e . dQ = 1 (mod q?1),
+      assertTrue("e.dP == 1 (mod p?1)", e.multiply(dP).mod(p_minus_1).equals(ONE));
+      assertTrue("e.dQ == 1 (mod q?1)", e.multiply(dQ).mod(q_minus_1).equals(ONE));
 
       // and the CRT coefficient qInv is a positive integer less than p
       // satisfying
-      //    q · qInv = 1 (mod p).
-      assertTrue("q·qInv == 1 (mod p)", q.multiply(qInv).mod(p).equals(ONE));
+      //    q . qInv = 1 (mod p).
+      assertTrue("q.qInv == 1 (mod p)", q.multiply(qInv).mod(p).equals(ONE));
 
       BigInteger phi = p_minus_1.multiply(q_minus_1);
       assertTrue("gcd(e, phi) == 1", e.gcd(phi).equals(ONE));
