@@ -1,3 +1,7 @@
+2004-11-15  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Improved DOM Level 3 conformance.
+   	
 2004-11-14  Chris Burdess  <dog@gnu.org>
 
    	* dom: TypeInfo implementations for DTD-specified type declarations.

@@ -84,13 +84,18 @@ public class DomImpl
   public boolean hasFeature(String name, String version)
   {
     name = name.toLowerCase();
+    if (name.charAt(0) == '+')
+      {
+        name = name.substring(1);
+      }
     
     if ("xml".equals(name) || "core".equals(name))
       {
         return (version == null ||
                 "".equals(version) ||
                 "1.0".equals(version) ||
-                "2.0".equals(version));
+                "2.0".equals(version) ||
+                "3.0".equals(version));
       
       }
     else if ("ls".equals(name) || "ls-async".equals(name))

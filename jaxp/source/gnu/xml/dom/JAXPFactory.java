@@ -123,7 +123,14 @@ public final class JAXPFactory
   public void setAttribute(String name, Object value)
     throws IllegalArgumentException
   {
-    throw new IllegalArgumentException(name);
+    if ("http://java.sun.com/xml/jaxp/properties/schemaLanguage".equals(name))
+      {
+        // TODO
+      }
+    else
+      {
+        throw new IllegalArgumentException(name);
+      }
   }
 
   /** There seems to be no useful specification for attribute names */

@@ -169,7 +169,6 @@ public class DomElement
    */
   public boolean hasAttribute(String name)
   {
-    // FIXME DTD defaulted case
     return getAttributeNode(name) != null;
   }
 
@@ -180,7 +179,6 @@ public class DomElement
    */
   public boolean hasAttributeNS(String namespaceURI, String local)
   {
-    // FIXME DTD defaulted case
     return getAttributeNodeNS(namespaceURI, local) != null;
   }
 
@@ -350,6 +348,103 @@ public class DomElement
 
   // DOM Level 3 methods
 
+  public String lookupPrefix(String namespaceURI)
+  {
+    String namespace = getNamespaceURI();
+    if (namespace != null && namespace.equals(namespaceURI))
+      {
+        return getPrefix();
+      }
+    if (attributes != null)
+      {
+        for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
+          {
+            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+              {
+                String qName = ctx.getNodeName();
+                if ("xmlns".equals(qName))
+                  {
+                    return null;
+                  }
+                else
+                  {
+                    return qName.substring(6);
+                  }
+              }
+          }
+      }
+    return super.lookupPrefix(namespaceURI);
+  }
+
+  public boolean isDefaultNamespace(String namespaceURI)
+  {
+    String namespace = getNamespaceURI();
+    if (namespace != null && namespace.equals(namespaceURI))
+      {
+        return getPrefix() == null;
+      }
+    if (attributes != null)
+      {
+        for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
+          {
+            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+              {
+                String qName = ctx.getNodeName();
+                return ("xmlns".equals(qName));
+              }
+          }
+      }
+    return super.isDefaultNamespace(namespaceURI);
+  }
+
+  public String lookupNamespaceURI(String prefix)
+  {
+    String namespace = getNamespaceURI();
+    if (equal(prefix, getPrefix()) && namespace != null)
+      {
+        return namespace;
+      }
+    if (attributes != null)
+      {
+        for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
+          {
+            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+              {
+                String qName = ctx.getNodeName();
+                if ("xmlns".equals(qName))
+                  {
+                    if (prefix == null)
+                      {
+                        return ctx.getNodeValue();
+                      }
+                  }
+                else
+                  {
+                    if (prefix.equals(qName.substring(6)))
+                      {
+                        return ctx.getNodeValue();
+                      }
+                  }
+              }
+          }
+      }
+    return super.lookupNamespaceURI(prefix);
+  }
+  
+  public String getBaseURI()
+  {
+    if (attributes != null)
+      {
+        Node xmlBase =
+          attributes.getNamedItemNS(DomDocument.xmlNamespace, "base");
+        if (xmlBase != null)
+          {
+            return xmlBase.getNodeValue();
+          }
+      }
+    return super.getBaseURI();
+  }
+  
   public TypeInfo getSchemaTypeInfo()
   {
     // DTD implementation

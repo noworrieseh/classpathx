@@ -95,7 +95,8 @@ class SAXEventSink
     ctx = doc;
   }
 
-  public void xmlDecl(String version, String encoding, boolean standalone)
+  public void xmlDecl(String version, String encoding, boolean standalone,
+                      String inputEncoding)
     throws SAXException
   {
     if (interrupted)
@@ -105,11 +106,17 @@ class SAXEventSink
     doc.setXmlVersion(version);
     doc.setXmlEncoding(encoding);
     doc.setXmlStandalone(standalone);
+    doc.setInputEncoding(inputEncoding);
   }
 
   public void endDocument()
     throws SAXException
   {
+    DomDoctype doctype = (DomDoctype) doc.getDoctype();
+    if (doctype != null)
+      {
+        doctype.makeReadonly();
+      }
     ctx = null;
     locator = null;
   }

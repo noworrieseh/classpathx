@@ -142,7 +142,24 @@ public class DomText
   
   public boolean isElementContentWhitespace()
   {
-    return getTextContent().trim().length() == 0;
+    if (parent != null)
+      {
+        DomDoctype doctype = (DomDoctype) owner.getDoctype();
+        if (doctype != null)
+          {
+            DTDElementTypeInfo info =
+              doctype.getElementTypeInfo(parent.getNodeName());
+            if (info != null)
+              {
+                if (info.model == null && info.model.indexOf("#PCDATA") != -1)
+                  {
+                    return false;
+                  }
+                return getNodeValue().trim().length() == 0;
+              }
+          }
+      }
+    return false;
   }
 
   public String getWholeText()

@@ -69,7 +69,7 @@ class DTDElementTypeInfo
 
   public final String getTypeNamespace()
   {
-    return null;
+    return "http://www.w3.org/TR/REC-xml";
   }
 
   public final boolean isDerivedFrom(String typeNamespace, String typeName,

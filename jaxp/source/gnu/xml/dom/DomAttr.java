@@ -78,7 +78,7 @@ public class DomAttr
   implements Attr
 {
   
-  private boolean	specified;
+  private boolean specified;
   
   /**
    * Constructs an Attr node associated with the specified document.
@@ -244,8 +244,7 @@ public class DomAttr
   public Object clone()
   {
     DomAttr retval = (DomAttr) super.clone();
-    
-    retval.specified = false;
+    retval.specified = true;
     return retval;
   }
     

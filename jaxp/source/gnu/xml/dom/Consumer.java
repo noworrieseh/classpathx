@@ -141,7 +141,8 @@ public class Consumer extends DomConsumer
 
 	    super.startDTD (name, publicId, systemId);
 	    // DOM L2 doctype creation model is bizarre
-	    doc.appendChild (new DomDoctype (doc, name, publicId, systemId));
+	    DomDoctype dt = new DomDoctype (doc, name, publicId, systemId);
+	    doc.appendChild (dt);
 	}
 
 	// SAX2 "lexical" event
@@ -310,13 +311,15 @@ public class Consumer extends DomConsumer
          */
         public void xmlDecl(String version,
                             String encoding,
-                            boolean standalone)
+                            boolean standalone,
+                            String inputEncoding)
           throws SAXException
         {
-          super.xmlDecl(version, encoding, standalone);
+          super.xmlDecl(version, encoding, standalone, inputEncoding);
 
           DomDocument doc = (DomDocument) getDocument();
           doc.setXmlEncoding(encoding);
+          doc.setInputEncoding(inputEncoding);
         }
 
 	public void endDocument ()
@@ -325,6 +328,11 @@ public class Consumer extends DomConsumer
 	    DomDocument		doc = (DomDocument) getDocument ();
 	    doc.setStrictErrorChecking(true);
 	    doc.compact ();
+            DomDoctype doctype = getDoctype();
+            if (doctype != null)
+              {
+                doctype.makeReadonly();
+              }
 	    super.endDocument ();
 	}
 

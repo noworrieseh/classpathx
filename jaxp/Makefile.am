@@ -305,6 +305,7 @@ $(src)/gnu/xml/dom/DomCharacterData.java \
 $(src)/gnu/xml/dom/DomComment.java \
 $(src)/gnu/xml/dom/DomDoctype.java \
 $(src)/gnu/xml/dom/DomDocument.java \
+$(src)/gnu/xml/dom/DomDocumentConfiguration.java \
 $(src)/gnu/xml/dom/DomElement.java \
 $(src)/gnu/xml/dom/DomEntity.java \
 $(src)/gnu/xml/dom/DomEntityReference.java \

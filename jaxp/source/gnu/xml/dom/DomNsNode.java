@@ -191,6 +191,6 @@ public abstract class DomNsNode
         return name.substring(index + 1);
       }
   }
-    
+  
 }
 

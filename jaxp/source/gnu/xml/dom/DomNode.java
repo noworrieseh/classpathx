@@ -95,6 +95,10 @@ public abstract class DomNode
   implements Node, NodeList, EventTarget, DocumentEvent, Cloneable, Comparable
 {
 
+  // package private
+  final static String xmlNamespace = "http://www.w3.org/XML/1998/namespace";
+  final static String xmlnsURI = "http://www.w3.org/2000/xmlns/";
+
   // tunable
   //	NKIDS_* affects arrays of children (which grow)
   // (currently) fixed size:
@@ -314,7 +318,7 @@ public abstract class DomNode
         throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
                         null, this, 0);
       }
-    for (DomNode ctx = parent; ctx != null; ctx = ctx.parent)
+    for (DomNode ctx = this; ctx != null; ctx = ctx.parent)
       {
         if (child == ctx)
           {
@@ -528,9 +532,11 @@ public abstract class DomNode
               {
                 checkMisc(ctx);
               }
-            for (DomNode ctx = child.first; ctx != null; ctx = ctx.next)
+            for (DomNode ctx = child.first; ctx != null; )
               {
+                DomNode ctxNext = ctx.next;
                 appendChild(ctx);
+                next = ctxNext;
               }
           }
         else
@@ -598,7 +604,6 @@ public abstract class DomNode
       {
         DomNode	child = (DomNode) newChild;
         DomNode ref = (DomNode) refChild;
-        
         if (child.nodeType == DOCUMENT_FRAGMENT_NODE)
           {
             // Append all nodes in the fragment to this node
@@ -606,14 +611,26 @@ public abstract class DomNode
               {
                 checkMisc(ctx);
               }
-            for (DomNode ctx = child.first; ctx != null; ctx = ctx.next)
+            for (DomNode ctx = child.first; ctx != null; )
               {
-                insertBefore(ctx, refChild);
+                DomNode ctxNext = ctx.next;
+                insertBefore(ctx, ref);
+                ctx = ctxNext;
               }
           }
         else
           {
             checkMisc(child);
+            if (ref.parent != this)
+              {
+                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+              }
+            if (ref == child)
+              {
+                throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
+                                "can't insert node before itself", ref, 0);
+              }
+        
             if (child.parent != null)
               {
                 child.parent.removeChild(child);
@@ -822,15 +839,19 @@ public abstract class DomNode
    */
   public Node removeChild(Node refChild)
   {
-    if (readonly)
-      {
-        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
-                        null, this, 0);
-      }
-
     try
       {
         DomNode ref = (DomNode) refChild;
+
+        if (ref.parent != this)
+          {
+            throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+          }
+        if (readonly)
+          {
+            throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
+                            null, this, 0);
+          }
         
         for (DomNode child = first; child != null; child = child.next)
           {
@@ -1090,9 +1111,12 @@ public abstract class DomNode
     
     if (deep)
       {
+        Document doc = (nodeType == DOCUMENT_NODE) ?
+          (Document) node : node.owner;
         for (DomNode ctx = first; ctx != null; ctx = ctx.next)
           {
             DomNode newChild = (DomNode) ctx.cloneNode(deep);
+            newChild.owner = doc;
             node.appendChild(newChild);
           }
       }
@@ -1799,7 +1823,7 @@ public abstract class DomNode
 
   public String getBaseURI()
   {
-    return owner.getDocumentURI();
+    return (parent != null) ? parent.getBaseURI() : null;
   }
 
   public short compareDocumentPosition(Node other)
@@ -1850,7 +1874,7 @@ public abstract class DomNode
     return (c != 0) ? c : n1.index - n2.index;
   }
 
-  public String getTextContent()
+  public final String getTextContent()
     throws DOMException
   {
     switch (nodeType)
@@ -1872,11 +1896,15 @@ public abstract class DomNode
         return buffer.toString();
       case TEXT_NODE:
       case CDATA_SECTION_NODE:
+        if (!((Text) this).isElementContentWhitespace())
+          {
+            return getNodeValue();
+          }
+        // fall through
       case COMMENT_NODE:
       case PROCESSING_INSTRUCTION_NODE:
-        return getNodeValue();
       default:
-        return null;
+        return "";
       }
   }
 
@@ -1918,20 +1946,20 @@ public abstract class DomNode
 
   public String lookupPrefix(String namespaceURI)
   {
-    // TODO
-    return null;
+    return (parent == null || parent == owner) ? null :
+      parent.lookupPrefix(namespaceURI);
   }
 
   public boolean isDefaultNamespace(String namespaceURI)
   {
-    // TODO
-    return false;
+    return (parent == null || parent == owner) ? false :
+      parent.isDefaultNamespace(namespaceURI);
   }
 
   public String lookupNamespaceURI(String prefix)
   {
-    // TODO
-    return null;
+    return (parent == null || parent == owner) ? null :
+      parent.lookupNamespaceURI(prefix);
   }
 
   public boolean isEqualNode(Node arg)
@@ -1981,7 +2009,7 @@ public abstract class DomNode
       {
         Node child1 = arg1.item(i);
         Node child2 = arg2.item(i);
-        if (child1.isSameNode(child2))
+        if (!child1.isSameNode(child2))
           {
             return false;
           }
@@ -1991,6 +2019,12 @@ public abstract class DomNode
 
   public Object getFeature(String feature, String version)
   {
+    DOMImplementation impl = (nodeType == DOCUMENT_NODE) ?
+      ((Document) this).getImplementation() : owner.getImplementation();
+    if (impl.hasFeature(feature, version))
+      {
+        return this;
+      }
     return null;
   }
 

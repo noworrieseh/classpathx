@@ -582,14 +582,16 @@ final public class SAXDriver
 
     void xmlDecl(String version,
                  String encoding,
-                 boolean standalone)
+                 boolean standalone,
+                 String inputEncoding)
       throws SAXException
     {
       if (contentHandler instanceof ContentHandler2)
         {
           ((ContentHandler2) contentHandler).xmlDecl(version,
                                                      encoding,
-                                                     standalone);
+                                                     standalone,
+                                                     inputEncoding);
         }
     }
 

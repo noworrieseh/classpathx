@@ -73,9 +73,12 @@ class FilteredSAXEventSink
   public void startDocument()
     throws SAXException
   {
-    super.startDocument();
     nodes = new LinkedList();
     decisions = new LinkedList();
+    super.startDocument();
+    //short decision = getDecision(ctx);
+    nodes.addLast(ctx);
+    //decisions.addLast(new Short(decision));
   }
 
   public void endDocument()
@@ -87,6 +90,10 @@ class FilteredSAXEventSink
   }
 
   // TODO
+
+  /*short getDecision(Node node)
+  {
+  }*/
 
 }
 
