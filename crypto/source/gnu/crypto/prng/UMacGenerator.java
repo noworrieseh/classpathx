@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: UMacGenerator.java,v 1.1 2002-06-08 05:18:41 raif Exp $
+// $Id: UMacGenerator.java,v 1.2 2002-07-06 23:58:44 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -31,7 +31,6 @@ package gnu.crypto.prng;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
-import gnu.crypto.mac.IMac;
 import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
 
@@ -51,7 +50,6 @@ import java.security.InvalidKeyException;
  * feedback mode (OFB), as a <b>strong</b> pseudo-random number generator.</p>
  *
  * <p><code>UMacGenerator</code> requires an <code>index</code> parameter to
- * generate, using the same <code>key</code> material, different pseudo-random
  * outputs.</p>
  *
  * <p>References:</p>
@@ -62,7 +60,7 @@ import java.security.InvalidKeyException;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class UMacGenerator extends BasePRNG {
 
@@ -71,7 +69,7 @@ public class UMacGenerator extends BasePRNG {
 
    /**
     * <p>Property name of the KDF <code>index</code> value to use in this
-    * instance. The value is taken to be an {@link java.lang.Integer} less than
+    * instance. The value is taken to be an {@link Integer} less than
     * <code>256</code>.</p>
     */
    public static final String INDEX = "gnu.crypto.prng.umac.kdf.index";
@@ -86,11 +84,28 @@ public class UMacGenerator extends BasePRNG {
       super(Registry.UMAC_PRNG);
    }
 
+   /**
+    * <p>Private constructor for cloning purposes.</p>
+    *
+    * @param that the instance to clone.
+    */
+   private UMacGenerator(UMacGenerator that) {
+      this();
+
+      this.aes = (that.aes == null ? null : (IBlockCipher) that.aes.clone());
+   }
+
    // Class methods
    // -------------------------------------------------------------------------
 
    // Instance methods
    // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
+   public Object clone() {
+      return new UMacGenerator(this);
+   }
 
    // Implementation of abstract methods in BasePRNG --------------------------
 
