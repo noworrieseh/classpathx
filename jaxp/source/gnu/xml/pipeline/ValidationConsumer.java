@@ -1,5 +1,5 @@
 /*
- * $Id: ValidationConsumer.java,v 1.3 2001-07-10 21:23:38 db Exp $
+ * $Id: ValidationConsumer.java,v 1.4 2001-07-11 16:55:23 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: ValidationConsumer.java,v 1.3 2001-07-10 21:23:38 db Exp $
+// $Id: ValidationConsumer.java,v 1.4 2001-07-11 16:55:23 db Exp $
 
 /**
  * This class checks SAX2 events to report validity errors; it works as
@@ -172,7 +172,7 @@ import gnu.xml.util.DefaultHandler;
  * @see gnu.xml.aelfred2.SAXDriver
  * @see gnu.xml.aelfred2.XmlReader
  *
- * @version $Date: 2001-07-10 21:23:38 $
+ * @version $Date: 2001-07-11 16:55:23 $
  * @author David Brownell
  */
 public final class ValidationConsumer extends EventFilter
@@ -754,9 +754,11 @@ public final class ValidationConsumer extends EventFilter
 
 	if (info.attributes.get (attribute) == null)
 	    info.attributes.put (attribute, ainfo);
+	/*
 	else
 	    warning ("Element '" + element
 		+ "' already has an attribute named '" + attribute + "'");
+	*/
 
 	if ("xml:space".equals (attribute)) {
 	    if (!("(default|preserve)".equals (type)
