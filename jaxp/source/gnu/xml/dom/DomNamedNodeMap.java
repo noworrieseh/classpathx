@@ -1,6 +1,6 @@
 /*
- * $Id: DomNamedNodeMap.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomNamedNodeMap.java,v 1.3 2001-11-16 20:14:40 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -31,14 +31,16 @@ import java.util.Vector;
 
 import org.w3c.dom.*;
 
+import DomDoctype.ElementInfo;
 
-// $Id: DomNamedNodeMap.java,v 1.2 2001-10-23 17:42:25 db Exp $
+
+// $Id: DomNamedNodeMap.java,v 1.3 2001-11-16 20:14:40 db Exp $
 
 /**
  * <p> "NamedNodeMap" implementation. </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-16 20:14:40 $
  */
 public class DomNamedNodeMap implements NamedNodeMap
 {
@@ -230,6 +232,25 @@ public class DomNamedNodeMap implements NamedNodeMap
 	return null;
     }
 
+    private void maybeRestoreDefault (String name)
+    {
+	DomDoctype	doctype = (DomDoctype)owner.getDoctype ();
+	ElementInfo	info;
+	String		value;
+	DomAttr		attr;
+
+	if (doctype == null)
+	    return;
+	if ((info = doctype.getElementInfo (element.getNodeName ())) == null)
+	    return;
+	if ((value = info.getAttrDefault (name)) == null)
+	    return;
+	attr = (DomAttr) owner.createAttribute (name);
+	attr.setNodeValue (value);
+	attr.setSpecified (false);
+	setNamedItem (attr);
+    }
+
     /**
      * <b>DOM L1</b>
      * Removes the named item from the map, or reports an exception;
@@ -247,6 +268,8 @@ public class DomNamedNodeMap implements NamedNodeMap
 	    if (temp.getNodeName ().equals (name)) {
 // maybe attribute REMOVAL
 		v.removeElementAt (i);
+		if (element != null)
+		    maybeRestoreDefault (name);
 		return temp;
 	    }
 	}
