@@ -1,7 +1,7 @@
 package gnu.crypto.tool;
 
 // ----------------------------------------------------------------------------
-// $Id: CipherSpeed.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: CipherSpeed.java,v 1.4 2001-12-15 02:08:19 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -40,7 +40,7 @@ import java.util.Iterator;
  * A tool to exercise a block cipher in order to measure its performance in
  * terms of encrypted/decrypted bytes per second.
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class CipherSpeed {
 
@@ -60,11 +60,11 @@ public final class CipherSpeed {
 
    /**
     * Accepts 0, 1 or 2 arguments. If no arguments are provided, this method
-    * exercises every block cipher implementation using the cipher's default key
-    * size. If one argument is provided, it's assumed to be the name of the
-    * block sipher. that cipher is then exercises using its default key size.
-    * Finally if two arguments are provided, the first is assumed to be the
-    * block cipher name and the second its key size.
+    * exercises every block cipher implementation using the cipher's default
+    * key size. If one argument is provided, it's assumed to be the name of a
+    * block cipher to exercise. That cipher is then exercised using its default
+    * key size. Finally if two arguments are provided, the first is assumed to
+    * be the block cipher name and the second its key size.
     */
    public static void main(String[] args) {
       if (args == null) {
@@ -72,7 +72,7 @@ public final class CipherSpeed {
       }
 
       switch (args.length) {
-      case 0: //exercise all ciphers
+      case 0: // exercise all ciphers
          for (Iterator cit = CipherFactory.getNames().iterator(); cit.hasNext(); ) {
             speed((String) cit.next());
          }
