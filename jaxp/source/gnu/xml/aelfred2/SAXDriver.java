@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.23 2001-11-19 05:23:36 db Exp $
+ * $Id: SAXDriver.java,v 1.24 2001-11-19 18:27:20 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.23 2001-11-19 05:23:36 db Exp $
+// $Id: SAXDriver.java,v 1.24 2001-11-19 18:27:20 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -120,7 +120,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-19 05:23:36 $
+ * @version $Date: 2001-11-19 18:27:20 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -793,9 +793,10 @@ final public class SAXDriver
 	// the context, and two chunks of name processing.
 	//
 
-	if (!attributes)
-	    prefixStack.pushContext ();
-	else if (namespaces) {
+	if (!attributes) {
+	    if (namespaces)
+		prefixStack.pushContext ();
+	} else if (namespaces) {
 
 	    // now we can patch up namespace refs; we saw all the
 	    // declarations, so now we'll do the Right Thing
