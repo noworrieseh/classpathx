@@ -1,3 +1,7 @@
+2005-02-07  Chris Burdess  <dog@gnu.org>
+
+	* validation: Experimental framework for XML Schema processing.
+
 2004-12-07  Chris Burdess  <dog@gnu.org>
 
 	* dom: Minor DOM Level 3 Core conformance improvements.

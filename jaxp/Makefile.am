@@ -582,7 +582,81 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/UnparsedEntityUriFunction.java \
 	source/gnu/xml/transform/MessageNode.java \
 	source/gnu/xml/transform/AttributeSet.java \
-	source/gnu/xml/transform/Key.java
+	source/gnu/xml/transform/Key.java \
+	source/gnu/xml/validation/datatype/Annotation.java \
+	source/gnu/xml/validation/datatype/AnySimpleType.java \
+	source/gnu/xml/validation/datatype/AnyType.java \
+	source/gnu/xml/validation/datatype/AnyURIType.java \
+	source/gnu/xml/validation/datatype/AtomicSimpleType.java \
+	source/gnu/xml/validation/datatype/Base64BinaryType.java \
+	source/gnu/xml/validation/datatype/BooleanType.java \
+	source/gnu/xml/validation/datatype/ByteType.java \
+	source/gnu/xml/validation/datatype/DateTimeType.java \
+	source/gnu/xml/validation/datatype/DateType.java \
+	source/gnu/xml/validation/datatype/DecimalType.java \
+	source/gnu/xml/validation/datatype/DoubleType.java \
+	source/gnu/xml/validation/datatype/DurationType.java \
+	source/gnu/xml/validation/datatype/EntitiesType.java \
+	source/gnu/xml/validation/datatype/EntityType.java \
+	source/gnu/xml/validation/datatype/EnumerationFacet.java \
+	source/gnu/xml/validation/datatype/Facet.java \
+	source/gnu/xml/validation/datatype/FloatType.java \
+	source/gnu/xml/validation/datatype/FractionDigitsFacet.java \
+	source/gnu/xml/validation/datatype/GDayType.java \
+	source/gnu/xml/validation/datatype/GMonthDayType.java \
+	source/gnu/xml/validation/datatype/GMonthType.java \
+	source/gnu/xml/validation/datatype/GYearMonthType.java \
+	source/gnu/xml/validation/datatype/GYearType.java \
+	source/gnu/xml/validation/datatype/HexBinaryType.java \
+	source/gnu/xml/validation/datatype/IDRefType.java \
+	source/gnu/xml/validation/datatype/IDRefsType.java \
+	source/gnu/xml/validation/datatype/IDType.java \
+	source/gnu/xml/validation/datatype/IntType.java \
+	source/gnu/xml/validation/datatype/IntegerType.java \
+	source/gnu/xml/validation/datatype/LanguageType.java \
+	source/gnu/xml/validation/datatype/LengthFacet.java \
+	source/gnu/xml/validation/datatype/ListSimpleType.java \
+	source/gnu/xml/validation/datatype/LongType.java \
+	source/gnu/xml/validation/datatype/MaxExclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MaxInclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MaxLengthFacet.java \
+	source/gnu/xml/validation/datatype/MinExclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MinInclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MinLengthFacet.java \
+	source/gnu/xml/validation/datatype/NCNameType.java \
+	source/gnu/xml/validation/datatype/NMTokenType.java \
+	source/gnu/xml/validation/datatype/NMTokensType.java \
+	source/gnu/xml/validation/datatype/NameType.java \
+	source/gnu/xml/validation/datatype/NegativeIntegerType.java \
+	source/gnu/xml/validation/datatype/NonNegativeIntegerType.java \
+	source/gnu/xml/validation/datatype/NonPositiveIntegerType.java \
+	source/gnu/xml/validation/datatype/NormalizedStringType.java \
+	source/gnu/xml/validation/datatype/NotationType.java \
+	source/gnu/xml/validation/datatype/PatternFacet.java \
+	source/gnu/xml/validation/datatype/PositiveIntegerType.java \
+	source/gnu/xml/validation/datatype/QNameType.java \
+	source/gnu/xml/validation/datatype/ShortType.java \
+	source/gnu/xml/validation/datatype/SimpleType.java \
+	source/gnu/xml/validation/datatype/StringType.java \
+	source/gnu/xml/validation/datatype/TimeType.java \
+	source/gnu/xml/validation/datatype/TokenType.java \
+	source/gnu/xml/validation/datatype/TotalDigitsFacet.java \
+	source/gnu/xml/validation/datatype/Type.java \
+	source/gnu/xml/validation/datatype/UnionSimpleType.java \
+	source/gnu/xml/validation/datatype/UnsignedByteType.java \
+	source/gnu/xml/validation/datatype/UnsignedIntType.java \
+	source/gnu/xml/validation/datatype/UnsignedLongType.java \
+	source/gnu/xml/validation/datatype/UnsignedShortType.java \
+	source/gnu/xml/validation/datatype/WhiteSpaceFacet.java \
+	source/gnu/xml/validation/xmlschema/AttributeDeclaration.java \
+	source/gnu/xml/validation/xmlschema/AttributeUse.java \
+	source/gnu/xml/validation/xmlschema/ElementDeclaration.java \
+	source/gnu/xml/validation/xmlschema/Particle.java \
+	source/gnu/xml/validation/xmlschema/XMLSchema.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java
 
 lib_gnu_xml_la_LDFLAGS = -release-info $(VERSION)
 lib_gnu_xml_la_LIBADD = -l-javax-xml -l-org-w3c-dom -l-org-xml-sax

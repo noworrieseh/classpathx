@@ -316,7 +316,81 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/transform/UnparsedEntityUriFunction.lo \
 	source/gnu/xml/transform/MessageNode.lo \
 	source/gnu/xml/transform/AttributeSet.lo \
-	source/gnu/xml/transform/Key.lo
+	source/gnu/xml/transform/Key.lo \
+	source/gnu/xml/validation/datatype/Annotation.lo \
+	source/gnu/xml/validation/datatype/AnySimpleType.lo \
+	source/gnu/xml/validation/datatype/AnyType.lo \
+	source/gnu/xml/validation/datatype/AnyURIType.lo \
+	source/gnu/xml/validation/datatype/AtomicSimpleType.lo \
+	source/gnu/xml/validation/datatype/Base64BinaryType.lo \
+	source/gnu/xml/validation/datatype/BooleanType.lo \
+	source/gnu/xml/validation/datatype/ByteType.lo \
+	source/gnu/xml/validation/datatype/DateTimeType.lo \
+	source/gnu/xml/validation/datatype/DateType.lo \
+	source/gnu/xml/validation/datatype/DecimalType.lo \
+	source/gnu/xml/validation/datatype/DoubleType.lo \
+	source/gnu/xml/validation/datatype/DurationType.lo \
+	source/gnu/xml/validation/datatype/EntitiesType.lo \
+	source/gnu/xml/validation/datatype/EntityType.lo \
+	source/gnu/xml/validation/datatype/EnumerationFacet.lo \
+	source/gnu/xml/validation/datatype/Facet.lo \
+	source/gnu/xml/validation/datatype/FloatType.lo \
+	source/gnu/xml/validation/datatype/FractionDigitsFacet.lo \
+	source/gnu/xml/validation/datatype/GDayType.lo \
+	source/gnu/xml/validation/datatype/GMonthDayType.lo \
+	source/gnu/xml/validation/datatype/GMonthType.lo \
+	source/gnu/xml/validation/datatype/GYearMonthType.lo \
+	source/gnu/xml/validation/datatype/GYearType.lo \
+	source/gnu/xml/validation/datatype/HexBinaryType.lo \
+	source/gnu/xml/validation/datatype/IDRefType.lo \
+	source/gnu/xml/validation/datatype/IDRefsType.lo \
+	source/gnu/xml/validation/datatype/IDType.lo \
+	source/gnu/xml/validation/datatype/IntType.lo \
+	source/gnu/xml/validation/datatype/IntegerType.lo \
+	source/gnu/xml/validation/datatype/LanguageType.lo \
+	source/gnu/xml/validation/datatype/LengthFacet.lo \
+	source/gnu/xml/validation/datatype/ListSimpleType.lo \
+	source/gnu/xml/validation/datatype/LongType.lo \
+	source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo \
+	source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo \
+	source/gnu/xml/validation/datatype/MaxLengthFacet.lo \
+	source/gnu/xml/validation/datatype/MinExclusiveFacet.lo \
+	source/gnu/xml/validation/datatype/MinInclusiveFacet.lo \
+	source/gnu/xml/validation/datatype/MinLengthFacet.lo \
+	source/gnu/xml/validation/datatype/NCNameType.lo \
+	source/gnu/xml/validation/datatype/NMTokenType.lo \
+	source/gnu/xml/validation/datatype/NMTokensType.lo \
+	source/gnu/xml/validation/datatype/NameType.lo \
+	source/gnu/xml/validation/datatype/NegativeIntegerType.lo \
+	source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo \
+	source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo \
+	source/gnu/xml/validation/datatype/NormalizedStringType.lo \
+	source/gnu/xml/validation/datatype/NotationType.lo \
+	source/gnu/xml/validation/datatype/PatternFacet.lo \
+	source/gnu/xml/validation/datatype/PositiveIntegerType.lo \
+	source/gnu/xml/validation/datatype/QNameType.lo \
+	source/gnu/xml/validation/datatype/ShortType.lo \
+	source/gnu/xml/validation/datatype/SimpleType.lo \
+	source/gnu/xml/validation/datatype/StringType.lo \
+	source/gnu/xml/validation/datatype/TimeType.lo \
+	source/gnu/xml/validation/datatype/TokenType.lo \
+	source/gnu/xml/validation/datatype/TotalDigitsFacet.lo \
+	source/gnu/xml/validation/datatype/Type.lo \
+	source/gnu/xml/validation/datatype/UnionSimpleType.lo \
+	source/gnu/xml/validation/datatype/UnsignedByteType.lo \
+	source/gnu/xml/validation/datatype/UnsignedIntType.lo \
+	source/gnu/xml/validation/datatype/UnsignedLongType.lo \
+	source/gnu/xml/validation/datatype/UnsignedShortType.lo \
+	source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo \
+	source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo \
+	source/gnu/xml/validation/xmlschema/AttributeUse.lo \
+	source/gnu/xml/validation/xmlschema/ElementDeclaration.lo \
+	source/gnu/xml/validation/xmlschema/Particle.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchema.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo
 lib_gnu_xml_la_OBJECTS = $(am_lib_gnu_xml_la_OBJECTS)
 lib_javax_xml_la_LIBADD =
 am_lib_javax_xml_la_OBJECTS =  \
@@ -1255,7 +1329,81 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/transform/UnparsedEntityUriFunction.java \
 	source/gnu/xml/transform/MessageNode.java \
 	source/gnu/xml/transform/AttributeSet.java \
-	source/gnu/xml/transform/Key.java
+	source/gnu/xml/transform/Key.java \
+	source/gnu/xml/validation/datatype/Annotation.java \
+	source/gnu/xml/validation/datatype/AnySimpleType.java \
+	source/gnu/xml/validation/datatype/AnyType.java \
+	source/gnu/xml/validation/datatype/AnyURIType.java \
+	source/gnu/xml/validation/datatype/AtomicSimpleType.java \
+	source/gnu/xml/validation/datatype/Base64BinaryType.java \
+	source/gnu/xml/validation/datatype/BooleanType.java \
+	source/gnu/xml/validation/datatype/ByteType.java \
+	source/gnu/xml/validation/datatype/DateTimeType.java \
+	source/gnu/xml/validation/datatype/DateType.java \
+	source/gnu/xml/validation/datatype/DecimalType.java \
+	source/gnu/xml/validation/datatype/DoubleType.java \
+	source/gnu/xml/validation/datatype/DurationType.java \
+	source/gnu/xml/validation/datatype/EntitiesType.java \
+	source/gnu/xml/validation/datatype/EntityType.java \
+	source/gnu/xml/validation/datatype/EnumerationFacet.java \
+	source/gnu/xml/validation/datatype/Facet.java \
+	source/gnu/xml/validation/datatype/FloatType.java \
+	source/gnu/xml/validation/datatype/FractionDigitsFacet.java \
+	source/gnu/xml/validation/datatype/GDayType.java \
+	source/gnu/xml/validation/datatype/GMonthDayType.java \
+	source/gnu/xml/validation/datatype/GMonthType.java \
+	source/gnu/xml/validation/datatype/GYearMonthType.java \
+	source/gnu/xml/validation/datatype/GYearType.java \
+	source/gnu/xml/validation/datatype/HexBinaryType.java \
+	source/gnu/xml/validation/datatype/IDRefType.java \
+	source/gnu/xml/validation/datatype/IDRefsType.java \
+	source/gnu/xml/validation/datatype/IDType.java \
+	source/gnu/xml/validation/datatype/IntType.java \
+	source/gnu/xml/validation/datatype/IntegerType.java \
+	source/gnu/xml/validation/datatype/LanguageType.java \
+	source/gnu/xml/validation/datatype/LengthFacet.java \
+	source/gnu/xml/validation/datatype/ListSimpleType.java \
+	source/gnu/xml/validation/datatype/LongType.java \
+	source/gnu/xml/validation/datatype/MaxExclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MaxInclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MaxLengthFacet.java \
+	source/gnu/xml/validation/datatype/MinExclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MinInclusiveFacet.java \
+	source/gnu/xml/validation/datatype/MinLengthFacet.java \
+	source/gnu/xml/validation/datatype/NCNameType.java \
+	source/gnu/xml/validation/datatype/NMTokenType.java \
+	source/gnu/xml/validation/datatype/NMTokensType.java \
+	source/gnu/xml/validation/datatype/NameType.java \
+	source/gnu/xml/validation/datatype/NegativeIntegerType.java \
+	source/gnu/xml/validation/datatype/NonNegativeIntegerType.java \
+	source/gnu/xml/validation/datatype/NonPositiveIntegerType.java \
+	source/gnu/xml/validation/datatype/NormalizedStringType.java \
+	source/gnu/xml/validation/datatype/NotationType.java \
+	source/gnu/xml/validation/datatype/PatternFacet.java \
+	source/gnu/xml/validation/datatype/PositiveIntegerType.java \
+	source/gnu/xml/validation/datatype/QNameType.java \
+	source/gnu/xml/validation/datatype/ShortType.java \
+	source/gnu/xml/validation/datatype/SimpleType.java \
+	source/gnu/xml/validation/datatype/StringType.java \
+	source/gnu/xml/validation/datatype/TimeType.java \
+	source/gnu/xml/validation/datatype/TokenType.java \
+	source/gnu/xml/validation/datatype/TotalDigitsFacet.java \
+	source/gnu/xml/validation/datatype/Type.java \
+	source/gnu/xml/validation/datatype/UnionSimpleType.java \
+	source/gnu/xml/validation/datatype/UnsignedByteType.java \
+	source/gnu/xml/validation/datatype/UnsignedIntType.java \
+	source/gnu/xml/validation/datatype/UnsignedLongType.java \
+	source/gnu/xml/validation/datatype/UnsignedShortType.java \
+	source/gnu/xml/validation/datatype/WhiteSpaceFacet.java \
+	source/gnu/xml/validation/xmlschema/AttributeDeclaration.java \
+	source/gnu/xml/validation/xmlschema/AttributeUse.java \
+	source/gnu/xml/validation/xmlschema/ElementDeclaration.java \
+	source/gnu/xml/validation/xmlschema/Particle.java \
+	source/gnu/xml/validation/xmlschema/XMLSchema.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java \
+	source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java
 
 lib_gnu_xml_la_LDFLAGS = -release-info $(VERSION)
 lib_gnu_xml_la_LIBADD = -l-javax-xml -l-org-w3c-dom -l-org-xml-sax
@@ -2054,6 +2202,240 @@ source/gnu/xml/transform/AttributeSet.lo:  \
 source/gnu/xml/transform/Key.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/$(am__dirstamp):
+	@$(mkdir_p) source/gnu/xml/validation/datatype
+	@: > source/gnu/xml/validation/datatype/$(am__dirstamp)
+source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) source/gnu/xml/validation/datatype/$(DEPDIR)
+	@: > source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/Annotation.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/AnySimpleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/AnyType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/AnyURIType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/AtomicSimpleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/Base64BinaryType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/BooleanType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/ByteType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/DateTimeType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/DateType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/DecimalType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/DoubleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/DurationType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/EntitiesType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/EntityType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/EnumerationFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/Facet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/FloatType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/FractionDigitsFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/GDayType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/GMonthDayType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/GMonthType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/GYearMonthType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/GYearType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/HexBinaryType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/IDRefType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/IDRefsType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/IDType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/IntType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/IntegerType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/LanguageType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/LengthFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/ListSimpleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/LongType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MaxLengthFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MinExclusiveFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MinInclusiveFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/MinLengthFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NCNameType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NMTokenType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NMTokensType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NameType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NegativeIntegerType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NormalizedStringType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/NotationType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/PatternFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/PositiveIntegerType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/QNameType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/ShortType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/SimpleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/StringType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/TimeType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/TokenType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/TotalDigitsFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/Type.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/UnionSimpleType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/UnsignedByteType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/UnsignedIntType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/UnsignedLongType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/UnsignedShortType.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo:  \
+	source/gnu/xml/validation/datatype/$(am__dirstamp) \
+	source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/$(am__dirstamp):
+	@$(mkdir_p) source/gnu/xml/validation/xmlschema
+	@: > source/gnu/xml/validation/xmlschema/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) source/gnu/xml/validation/xmlschema/$(DEPDIR)
+	@: > source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/AttributeUse.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/ElementDeclaration.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/Particle.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchema.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo:  \
+	source/gnu/xml/validation/xmlschema/$(am__dirstamp) \
+	source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
 lib-gnu-xml.la: $(lib_gnu_xml_la_OBJECTS) $(lib_gnu_xml_la_DEPENDENCIES) 
 	$(GCJLINK) -rpath $(libdir) $(lib_gnu_xml_la_LDFLAGS) $(lib_gnu_xml_la_OBJECTS) $(lib_gnu_xml_la_LIBADD) $(LIBS)
 source/javax/xml/datatype/$(am__dirstamp):
@@ -3219,6 +3601,154 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/util/XHTMLWriter.lo
 	-rm -f source/gnu/xml/util/XMLWriter.$(OBJEXT)
 	-rm -f source/gnu/xml/util/XMLWriter.lo
+	-rm -f source/gnu/xml/validation/datatype/Annotation.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/Annotation.lo
+	-rm -f source/gnu/xml/validation/datatype/AnySimpleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/AnySimpleType.lo
+	-rm -f source/gnu/xml/validation/datatype/AnyType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/AnyType.lo
+	-rm -f source/gnu/xml/validation/datatype/AnyURIType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/AnyURIType.lo
+	-rm -f source/gnu/xml/validation/datatype/AtomicSimpleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/AtomicSimpleType.lo
+	-rm -f source/gnu/xml/validation/datatype/Base64BinaryType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/Base64BinaryType.lo
+	-rm -f source/gnu/xml/validation/datatype/BooleanType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/BooleanType.lo
+	-rm -f source/gnu/xml/validation/datatype/ByteType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/ByteType.lo
+	-rm -f source/gnu/xml/validation/datatype/DateTimeType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/DateTimeType.lo
+	-rm -f source/gnu/xml/validation/datatype/DateType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/DateType.lo
+	-rm -f source/gnu/xml/validation/datatype/DecimalType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/DecimalType.lo
+	-rm -f source/gnu/xml/validation/datatype/DoubleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/DoubleType.lo
+	-rm -f source/gnu/xml/validation/datatype/DurationType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/DurationType.lo
+	-rm -f source/gnu/xml/validation/datatype/EntitiesType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/EntitiesType.lo
+	-rm -f source/gnu/xml/validation/datatype/EntityType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/EntityType.lo
+	-rm -f source/gnu/xml/validation/datatype/EnumerationFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/EnumerationFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/Facet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/Facet.lo
+	-rm -f source/gnu/xml/validation/datatype/FloatType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/FloatType.lo
+	-rm -f source/gnu/xml/validation/datatype/FractionDigitsFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/FractionDigitsFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/GDayType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/GDayType.lo
+	-rm -f source/gnu/xml/validation/datatype/GMonthDayType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/GMonthDayType.lo
+	-rm -f source/gnu/xml/validation/datatype/GMonthType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/GMonthType.lo
+	-rm -f source/gnu/xml/validation/datatype/GYearMonthType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/GYearMonthType.lo
+	-rm -f source/gnu/xml/validation/datatype/GYearType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/GYearType.lo
+	-rm -f source/gnu/xml/validation/datatype/HexBinaryType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/HexBinaryType.lo
+	-rm -f source/gnu/xml/validation/datatype/IDRefType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/IDRefType.lo
+	-rm -f source/gnu/xml/validation/datatype/IDRefsType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/IDRefsType.lo
+	-rm -f source/gnu/xml/validation/datatype/IDType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/IDType.lo
+	-rm -f source/gnu/xml/validation/datatype/IntType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/IntType.lo
+	-rm -f source/gnu/xml/validation/datatype/IntegerType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/IntegerType.lo
+	-rm -f source/gnu/xml/validation/datatype/LanguageType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/LanguageType.lo
+	-rm -f source/gnu/xml/validation/datatype/LengthFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/LengthFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/ListSimpleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/ListSimpleType.lo
+	-rm -f source/gnu/xml/validation/datatype/LongType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/LongType.lo
+	-rm -f source/gnu/xml/validation/datatype/MaxExclusiveFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/MaxInclusiveFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/MaxLengthFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MaxLengthFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/MinExclusiveFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MinExclusiveFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/MinInclusiveFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MinInclusiveFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/MinLengthFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/MinLengthFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/NCNameType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NCNameType.lo
+	-rm -f source/gnu/xml/validation/datatype/NMTokenType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NMTokenType.lo
+	-rm -f source/gnu/xml/validation/datatype/NMTokensType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NMTokensType.lo
+	-rm -f source/gnu/xml/validation/datatype/NameType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NameType.lo
+	-rm -f source/gnu/xml/validation/datatype/NegativeIntegerType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NegativeIntegerType.lo
+	-rm -f source/gnu/xml/validation/datatype/NonNegativeIntegerType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo
+	-rm -f source/gnu/xml/validation/datatype/NonPositiveIntegerType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo
+	-rm -f source/gnu/xml/validation/datatype/NormalizedStringType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NormalizedStringType.lo
+	-rm -f source/gnu/xml/validation/datatype/NotationType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/NotationType.lo
+	-rm -f source/gnu/xml/validation/datatype/PatternFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/PatternFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/PositiveIntegerType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/PositiveIntegerType.lo
+	-rm -f source/gnu/xml/validation/datatype/QNameType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/QNameType.lo
+	-rm -f source/gnu/xml/validation/datatype/ShortType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/ShortType.lo
+	-rm -f source/gnu/xml/validation/datatype/SimpleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/SimpleType.lo
+	-rm -f source/gnu/xml/validation/datatype/StringType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/StringType.lo
+	-rm -f source/gnu/xml/validation/datatype/TimeType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/TimeType.lo
+	-rm -f source/gnu/xml/validation/datatype/TokenType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/TokenType.lo
+	-rm -f source/gnu/xml/validation/datatype/TotalDigitsFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/TotalDigitsFacet.lo
+	-rm -f source/gnu/xml/validation/datatype/Type.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/Type.lo
+	-rm -f source/gnu/xml/validation/datatype/UnionSimpleType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/UnionSimpleType.lo
+	-rm -f source/gnu/xml/validation/datatype/UnsignedByteType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/UnsignedByteType.lo
+	-rm -f source/gnu/xml/validation/datatype/UnsignedIntType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/UnsignedIntType.lo
+	-rm -f source/gnu/xml/validation/datatype/UnsignedLongType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/UnsignedLongType.lo
+	-rm -f source/gnu/xml/validation/datatype/UnsignedShortType.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/UnsignedShortType.lo
+	-rm -f source/gnu/xml/validation/datatype/WhiteSpaceFacet.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo
+	-rm -f source/gnu/xml/validation/xmlschema/AttributeDeclaration.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo
+	-rm -f source/gnu/xml/validation/xmlschema/AttributeUse.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/AttributeUse.lo
+	-rm -f source/gnu/xml/validation/xmlschema/ElementDeclaration.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/ElementDeclaration.lo
+	-rm -f source/gnu/xml/validation/xmlschema/Particle.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/Particle.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchema.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchema.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaValidator.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.$(OBJEXT)
+	-rm -f source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo
 	-rm -f source/gnu/xml/xpath/AndExpr.$(OBJEXT)
 	-rm -f source/gnu/xml/xpath/AndExpr.lo
 	-rm -f source/gnu/xml/xpath/ArithmeticExpr.$(OBJEXT)
@@ -3975,6 +4505,80 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/util/$(DEPDIR)/XCat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/util/$(DEPDIR)/XHTMLWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/util/$(DEPDIR)/XMLWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/Annotation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/AnySimpleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/AnyType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/AnyURIType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/AtomicSimpleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/Base64BinaryType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/BooleanType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/ByteType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/DateTimeType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/DateType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/DecimalType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/DoubleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/DurationType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/EntitiesType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/EntityType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/EnumerationFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/Facet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/FloatType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/FractionDigitsFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/GDayType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthDayType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/GYearMonthType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/GYearType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/HexBinaryType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefsType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/IDType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/IntType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/IntegerType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/LanguageType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/LengthFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/ListSimpleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/LongType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MaxExclusiveFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MaxInclusiveFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MaxLengthFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MinExclusiveFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MinInclusiveFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/MinLengthFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NCNameType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokenType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokensType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NameType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NegativeIntegerType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NonNegativeIntegerType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NonPositiveIntegerType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NormalizedStringType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/NotationType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/PatternFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/PositiveIntegerType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/QNameType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/ShortType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/SimpleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/StringType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/TimeType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/TokenType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/TotalDigitsFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/Type.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnionSimpleType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedByteType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedIntType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/xpath/$(DEPDIR)/AndExpr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/xpath/$(DEPDIR)/ArithmeticExpr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/xpath/$(DEPDIR)/BooleanFunction.Plo@am__quote@
@@ -5904,6 +6508,524 @@ source/gnu/xml/transform/Key.lo: source/gnu/xml/transform/Key.java
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/Key.lo `test -f 'source/gnu/xml/transform/Key.java' || echo '$(srcdir)/'`source/gnu/xml/transform/Key.java
 
+source/gnu/xml/validation/datatype/Annotation.lo: source/gnu/xml/validation/datatype/Annotation.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/Annotation.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/Annotation.Tpo" -c -o source/gnu/xml/validation/datatype/Annotation.lo `test -f 'source/gnu/xml/validation/datatype/Annotation.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Annotation.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Annotation.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/Annotation.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Annotation.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/Annotation.java' object='source/gnu/xml/validation/datatype/Annotation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/Annotation.lo `test -f 'source/gnu/xml/validation/datatype/Annotation.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Annotation.java
+
+source/gnu/xml/validation/datatype/AnySimpleType.lo: source/gnu/xml/validation/datatype/AnySimpleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/AnySimpleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/AnySimpleType.Tpo" -c -o source/gnu/xml/validation/datatype/AnySimpleType.lo `test -f 'source/gnu/xml/validation/datatype/AnySimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnySimpleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnySimpleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/AnySimpleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnySimpleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/AnySimpleType.java' object='source/gnu/xml/validation/datatype/AnySimpleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/AnySimpleType.lo `test -f 'source/gnu/xml/validation/datatype/AnySimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnySimpleType.java
+
+source/gnu/xml/validation/datatype/AnyType.lo: source/gnu/xml/validation/datatype/AnyType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/AnyType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyType.Tpo" -c -o source/gnu/xml/validation/datatype/AnyType.lo `test -f 'source/gnu/xml/validation/datatype/AnyType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnyType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/AnyType.java' object='source/gnu/xml/validation/datatype/AnyType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/AnyType.lo `test -f 'source/gnu/xml/validation/datatype/AnyType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnyType.java
+
+source/gnu/xml/validation/datatype/AnyURIType.lo: source/gnu/xml/validation/datatype/AnyURIType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/AnyURIType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyURIType.Tpo" -c -o source/gnu/xml/validation/datatype/AnyURIType.lo `test -f 'source/gnu/xml/validation/datatype/AnyURIType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnyURIType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyURIType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyURIType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AnyURIType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/AnyURIType.java' object='source/gnu/xml/validation/datatype/AnyURIType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/AnyURIType.lo `test -f 'source/gnu/xml/validation/datatype/AnyURIType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AnyURIType.java
+
+source/gnu/xml/validation/datatype/AtomicSimpleType.lo: source/gnu/xml/validation/datatype/AtomicSimpleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/AtomicSimpleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/AtomicSimpleType.Tpo" -c -o source/gnu/xml/validation/datatype/AtomicSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/AtomicSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AtomicSimpleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AtomicSimpleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/AtomicSimpleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/AtomicSimpleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/AtomicSimpleType.java' object='source/gnu/xml/validation/datatype/AtomicSimpleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/AtomicSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/AtomicSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/AtomicSimpleType.java
+
+source/gnu/xml/validation/datatype/Base64BinaryType.lo: source/gnu/xml/validation/datatype/Base64BinaryType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/Base64BinaryType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/Base64BinaryType.Tpo" -c -o source/gnu/xml/validation/datatype/Base64BinaryType.lo `test -f 'source/gnu/xml/validation/datatype/Base64BinaryType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Base64BinaryType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Base64BinaryType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/Base64BinaryType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Base64BinaryType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/Base64BinaryType.java' object='source/gnu/xml/validation/datatype/Base64BinaryType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/Base64BinaryType.lo `test -f 'source/gnu/xml/validation/datatype/Base64BinaryType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Base64BinaryType.java
+
+source/gnu/xml/validation/datatype/BooleanType.lo: source/gnu/xml/validation/datatype/BooleanType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/BooleanType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/BooleanType.Tpo" -c -o source/gnu/xml/validation/datatype/BooleanType.lo `test -f 'source/gnu/xml/validation/datatype/BooleanType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/BooleanType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/BooleanType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/BooleanType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/BooleanType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/BooleanType.java' object='source/gnu/xml/validation/datatype/BooleanType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/BooleanType.lo `test -f 'source/gnu/xml/validation/datatype/BooleanType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/BooleanType.java
+
+source/gnu/xml/validation/datatype/ByteType.lo: source/gnu/xml/validation/datatype/ByteType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/ByteType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/ByteType.Tpo" -c -o source/gnu/xml/validation/datatype/ByteType.lo `test -f 'source/gnu/xml/validation/datatype/ByteType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ByteType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ByteType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/ByteType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ByteType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/ByteType.java' object='source/gnu/xml/validation/datatype/ByteType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/ByteType.lo `test -f 'source/gnu/xml/validation/datatype/ByteType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ByteType.java
+
+source/gnu/xml/validation/datatype/DateTimeType.lo: source/gnu/xml/validation/datatype/DateTimeType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/DateTimeType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/DateTimeType.Tpo" -c -o source/gnu/xml/validation/datatype/DateTimeType.lo `test -f 'source/gnu/xml/validation/datatype/DateTimeType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DateTimeType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DateTimeType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/DateTimeType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DateTimeType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/DateTimeType.java' object='source/gnu/xml/validation/datatype/DateTimeType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/DateTimeType.lo `test -f 'source/gnu/xml/validation/datatype/DateTimeType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DateTimeType.java
+
+source/gnu/xml/validation/datatype/DateType.lo: source/gnu/xml/validation/datatype/DateType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/DateType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/DateType.Tpo" -c -o source/gnu/xml/validation/datatype/DateType.lo `test -f 'source/gnu/xml/validation/datatype/DateType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DateType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DateType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/DateType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DateType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/DateType.java' object='source/gnu/xml/validation/datatype/DateType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/DateType.lo `test -f 'source/gnu/xml/validation/datatype/DateType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DateType.java
+
+source/gnu/xml/validation/datatype/DecimalType.lo: source/gnu/xml/validation/datatype/DecimalType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/DecimalType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/DecimalType.Tpo" -c -o source/gnu/xml/validation/datatype/DecimalType.lo `test -f 'source/gnu/xml/validation/datatype/DecimalType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DecimalType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DecimalType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/DecimalType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DecimalType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/DecimalType.java' object='source/gnu/xml/validation/datatype/DecimalType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/DecimalType.lo `test -f 'source/gnu/xml/validation/datatype/DecimalType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DecimalType.java
+
+source/gnu/xml/validation/datatype/DoubleType.lo: source/gnu/xml/validation/datatype/DoubleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/DoubleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/DoubleType.Tpo" -c -o source/gnu/xml/validation/datatype/DoubleType.lo `test -f 'source/gnu/xml/validation/datatype/DoubleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DoubleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DoubleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/DoubleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DoubleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/DoubleType.java' object='source/gnu/xml/validation/datatype/DoubleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/DoubleType.lo `test -f 'source/gnu/xml/validation/datatype/DoubleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DoubleType.java
+
+source/gnu/xml/validation/datatype/DurationType.lo: source/gnu/xml/validation/datatype/DurationType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/DurationType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/DurationType.Tpo" -c -o source/gnu/xml/validation/datatype/DurationType.lo `test -f 'source/gnu/xml/validation/datatype/DurationType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DurationType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DurationType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/DurationType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/DurationType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/DurationType.java' object='source/gnu/xml/validation/datatype/DurationType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/DurationType.lo `test -f 'source/gnu/xml/validation/datatype/DurationType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/DurationType.java
+
+source/gnu/xml/validation/datatype/EntitiesType.lo: source/gnu/xml/validation/datatype/EntitiesType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/EntitiesType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/EntitiesType.Tpo" -c -o source/gnu/xml/validation/datatype/EntitiesType.lo `test -f 'source/gnu/xml/validation/datatype/EntitiesType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EntitiesType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EntitiesType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/EntitiesType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EntitiesType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/EntitiesType.java' object='source/gnu/xml/validation/datatype/EntitiesType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/EntitiesType.lo `test -f 'source/gnu/xml/validation/datatype/EntitiesType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EntitiesType.java
+
+source/gnu/xml/validation/datatype/EntityType.lo: source/gnu/xml/validation/datatype/EntityType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/EntityType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/EntityType.Tpo" -c -o source/gnu/xml/validation/datatype/EntityType.lo `test -f 'source/gnu/xml/validation/datatype/EntityType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EntityType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EntityType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/EntityType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EntityType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/EntityType.java' object='source/gnu/xml/validation/datatype/EntityType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/EntityType.lo `test -f 'source/gnu/xml/validation/datatype/EntityType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EntityType.java
+
+source/gnu/xml/validation/datatype/EnumerationFacet.lo: source/gnu/xml/validation/datatype/EnumerationFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/EnumerationFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/EnumerationFacet.Tpo" -c -o source/gnu/xml/validation/datatype/EnumerationFacet.lo `test -f 'source/gnu/xml/validation/datatype/EnumerationFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EnumerationFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EnumerationFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/EnumerationFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/EnumerationFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/EnumerationFacet.java' object='source/gnu/xml/validation/datatype/EnumerationFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/EnumerationFacet.lo `test -f 'source/gnu/xml/validation/datatype/EnumerationFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/EnumerationFacet.java
+
+source/gnu/xml/validation/datatype/Facet.lo: source/gnu/xml/validation/datatype/Facet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/Facet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/Facet.Tpo" -c -o source/gnu/xml/validation/datatype/Facet.lo `test -f 'source/gnu/xml/validation/datatype/Facet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Facet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Facet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/Facet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Facet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/Facet.java' object='source/gnu/xml/validation/datatype/Facet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/Facet.lo `test -f 'source/gnu/xml/validation/datatype/Facet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Facet.java
+
+source/gnu/xml/validation/datatype/FloatType.lo: source/gnu/xml/validation/datatype/FloatType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/FloatType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/FloatType.Tpo" -c -o source/gnu/xml/validation/datatype/FloatType.lo `test -f 'source/gnu/xml/validation/datatype/FloatType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/FloatType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/FloatType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/FloatType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/FloatType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/FloatType.java' object='source/gnu/xml/validation/datatype/FloatType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/FloatType.lo `test -f 'source/gnu/xml/validation/datatype/FloatType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/FloatType.java
+
+source/gnu/xml/validation/datatype/FractionDigitsFacet.lo: source/gnu/xml/validation/datatype/FractionDigitsFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/FractionDigitsFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/FractionDigitsFacet.Tpo" -c -o source/gnu/xml/validation/datatype/FractionDigitsFacet.lo `test -f 'source/gnu/xml/validation/datatype/FractionDigitsFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/FractionDigitsFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/FractionDigitsFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/FractionDigitsFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/FractionDigitsFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/FractionDigitsFacet.java' object='source/gnu/xml/validation/datatype/FractionDigitsFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/FractionDigitsFacet.lo `test -f 'source/gnu/xml/validation/datatype/FractionDigitsFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/FractionDigitsFacet.java
+
+source/gnu/xml/validation/datatype/GDayType.lo: source/gnu/xml/validation/datatype/GDayType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/GDayType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/GDayType.Tpo" -c -o source/gnu/xml/validation/datatype/GDayType.lo `test -f 'source/gnu/xml/validation/datatype/GDayType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GDayType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GDayType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/GDayType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GDayType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/GDayType.java' object='source/gnu/xml/validation/datatype/GDayType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/GDayType.lo `test -f 'source/gnu/xml/validation/datatype/GDayType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GDayType.java
+
+source/gnu/xml/validation/datatype/GMonthDayType.lo: source/gnu/xml/validation/datatype/GMonthDayType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/GMonthDayType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthDayType.Tpo" -c -o source/gnu/xml/validation/datatype/GMonthDayType.lo `test -f 'source/gnu/xml/validation/datatype/GMonthDayType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GMonthDayType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthDayType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthDayType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthDayType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/GMonthDayType.java' object='source/gnu/xml/validation/datatype/GMonthDayType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/GMonthDayType.lo `test -f 'source/gnu/xml/validation/datatype/GMonthDayType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GMonthDayType.java
+
+source/gnu/xml/validation/datatype/GMonthType.lo: source/gnu/xml/validation/datatype/GMonthType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/GMonthType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthType.Tpo" -c -o source/gnu/xml/validation/datatype/GMonthType.lo `test -f 'source/gnu/xml/validation/datatype/GMonthType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GMonthType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GMonthType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/GMonthType.java' object='source/gnu/xml/validation/datatype/GMonthType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/GMonthType.lo `test -f 'source/gnu/xml/validation/datatype/GMonthType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GMonthType.java
+
+source/gnu/xml/validation/datatype/GYearMonthType.lo: source/gnu/xml/validation/datatype/GYearMonthType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/GYearMonthType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearMonthType.Tpo" -c -o source/gnu/xml/validation/datatype/GYearMonthType.lo `test -f 'source/gnu/xml/validation/datatype/GYearMonthType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GYearMonthType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearMonthType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearMonthType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearMonthType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/GYearMonthType.java' object='source/gnu/xml/validation/datatype/GYearMonthType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/GYearMonthType.lo `test -f 'source/gnu/xml/validation/datatype/GYearMonthType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GYearMonthType.java
+
+source/gnu/xml/validation/datatype/GYearType.lo: source/gnu/xml/validation/datatype/GYearType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/GYearType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearType.Tpo" -c -o source/gnu/xml/validation/datatype/GYearType.lo `test -f 'source/gnu/xml/validation/datatype/GYearType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GYearType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/GYearType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/GYearType.java' object='source/gnu/xml/validation/datatype/GYearType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/GYearType.lo `test -f 'source/gnu/xml/validation/datatype/GYearType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/GYearType.java
+
+source/gnu/xml/validation/datatype/HexBinaryType.lo: source/gnu/xml/validation/datatype/HexBinaryType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/HexBinaryType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/HexBinaryType.Tpo" -c -o source/gnu/xml/validation/datatype/HexBinaryType.lo `test -f 'source/gnu/xml/validation/datatype/HexBinaryType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/HexBinaryType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/HexBinaryType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/HexBinaryType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/HexBinaryType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/HexBinaryType.java' object='source/gnu/xml/validation/datatype/HexBinaryType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/HexBinaryType.lo `test -f 'source/gnu/xml/validation/datatype/HexBinaryType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/HexBinaryType.java
+
+source/gnu/xml/validation/datatype/IDRefType.lo: source/gnu/xml/validation/datatype/IDRefType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/IDRefType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefType.Tpo" -c -o source/gnu/xml/validation/datatype/IDRefType.lo `test -f 'source/gnu/xml/validation/datatype/IDRefType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDRefType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/IDRefType.java' object='source/gnu/xml/validation/datatype/IDRefType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/IDRefType.lo `test -f 'source/gnu/xml/validation/datatype/IDRefType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDRefType.java
+
+source/gnu/xml/validation/datatype/IDRefsType.lo: source/gnu/xml/validation/datatype/IDRefsType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/IDRefsType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefsType.Tpo" -c -o source/gnu/xml/validation/datatype/IDRefsType.lo `test -f 'source/gnu/xml/validation/datatype/IDRefsType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDRefsType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefsType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefsType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDRefsType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/IDRefsType.java' object='source/gnu/xml/validation/datatype/IDRefsType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/IDRefsType.lo `test -f 'source/gnu/xml/validation/datatype/IDRefsType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDRefsType.java
+
+source/gnu/xml/validation/datatype/IDType.lo: source/gnu/xml/validation/datatype/IDType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/IDType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/IDType.Tpo" -c -o source/gnu/xml/validation/datatype/IDType.lo `test -f 'source/gnu/xml/validation/datatype/IDType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/IDType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IDType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/IDType.java' object='source/gnu/xml/validation/datatype/IDType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/IDType.lo `test -f 'source/gnu/xml/validation/datatype/IDType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IDType.java
+
+source/gnu/xml/validation/datatype/IntType.lo: source/gnu/xml/validation/datatype/IntType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/IntType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/IntType.Tpo" -c -o source/gnu/xml/validation/datatype/IntType.lo `test -f 'source/gnu/xml/validation/datatype/IntType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IntType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IntType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/IntType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IntType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/IntType.java' object='source/gnu/xml/validation/datatype/IntType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/IntType.lo `test -f 'source/gnu/xml/validation/datatype/IntType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IntType.java
+
+source/gnu/xml/validation/datatype/IntegerType.lo: source/gnu/xml/validation/datatype/IntegerType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/IntegerType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/IntegerType.Tpo" -c -o source/gnu/xml/validation/datatype/IntegerType.lo `test -f 'source/gnu/xml/validation/datatype/IntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IntegerType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IntegerType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/IntegerType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/IntegerType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/IntegerType.java' object='source/gnu/xml/validation/datatype/IntegerType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/IntegerType.lo `test -f 'source/gnu/xml/validation/datatype/IntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/IntegerType.java
+
+source/gnu/xml/validation/datatype/LanguageType.lo: source/gnu/xml/validation/datatype/LanguageType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/LanguageType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/LanguageType.Tpo" -c -o source/gnu/xml/validation/datatype/LanguageType.lo `test -f 'source/gnu/xml/validation/datatype/LanguageType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LanguageType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LanguageType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/LanguageType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LanguageType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/LanguageType.java' object='source/gnu/xml/validation/datatype/LanguageType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/LanguageType.lo `test -f 'source/gnu/xml/validation/datatype/LanguageType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LanguageType.java
+
+source/gnu/xml/validation/datatype/LengthFacet.lo: source/gnu/xml/validation/datatype/LengthFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/LengthFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/LengthFacet.Tpo" -c -o source/gnu/xml/validation/datatype/LengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/LengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LengthFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LengthFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/LengthFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LengthFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/LengthFacet.java' object='source/gnu/xml/validation/datatype/LengthFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/LengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/LengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LengthFacet.java
+
+source/gnu/xml/validation/datatype/ListSimpleType.lo: source/gnu/xml/validation/datatype/ListSimpleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/ListSimpleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/ListSimpleType.Tpo" -c -o source/gnu/xml/validation/datatype/ListSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/ListSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ListSimpleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ListSimpleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/ListSimpleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ListSimpleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/ListSimpleType.java' object='source/gnu/xml/validation/datatype/ListSimpleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/ListSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/ListSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ListSimpleType.java
+
+source/gnu/xml/validation/datatype/LongType.lo: source/gnu/xml/validation/datatype/LongType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/LongType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/LongType.Tpo" -c -o source/gnu/xml/validation/datatype/LongType.lo `test -f 'source/gnu/xml/validation/datatype/LongType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LongType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LongType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/LongType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/LongType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/LongType.java' object='source/gnu/xml/validation/datatype/LongType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/LongType.lo `test -f 'source/gnu/xml/validation/datatype/LongType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/LongType.java
+
+source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo: source/gnu/xml/validation/datatype/MaxExclusiveFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxExclusiveFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxExclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxExclusiveFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxExclusiveFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxExclusiveFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxExclusiveFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MaxExclusiveFacet.java' object='source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MaxExclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxExclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxExclusiveFacet.java
+
+source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo: source/gnu/xml/validation/datatype/MaxInclusiveFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxInclusiveFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxInclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxInclusiveFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxInclusiveFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxInclusiveFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxInclusiveFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MaxInclusiveFacet.java' object='source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MaxInclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxInclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxInclusiveFacet.java
+
+source/gnu/xml/validation/datatype/MaxLengthFacet.lo: source/gnu/xml/validation/datatype/MaxLengthFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MaxLengthFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxLengthFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MaxLengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxLengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxLengthFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxLengthFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxLengthFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MaxLengthFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MaxLengthFacet.java' object='source/gnu/xml/validation/datatype/MaxLengthFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MaxLengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/MaxLengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MaxLengthFacet.java
+
+source/gnu/xml/validation/datatype/MinExclusiveFacet.lo: source/gnu/xml/validation/datatype/MinExclusiveFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MinExclusiveFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MinExclusiveFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MinExclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinExclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinExclusiveFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinExclusiveFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MinExclusiveFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinExclusiveFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MinExclusiveFacet.java' object='source/gnu/xml/validation/datatype/MinExclusiveFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MinExclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinExclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinExclusiveFacet.java
+
+source/gnu/xml/validation/datatype/MinInclusiveFacet.lo: source/gnu/xml/validation/datatype/MinInclusiveFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MinInclusiveFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MinInclusiveFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MinInclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinInclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinInclusiveFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinInclusiveFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MinInclusiveFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinInclusiveFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MinInclusiveFacet.java' object='source/gnu/xml/validation/datatype/MinInclusiveFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MinInclusiveFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinInclusiveFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinInclusiveFacet.java
+
+source/gnu/xml/validation/datatype/MinLengthFacet.lo: source/gnu/xml/validation/datatype/MinLengthFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/MinLengthFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/MinLengthFacet.Tpo" -c -o source/gnu/xml/validation/datatype/MinLengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinLengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinLengthFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinLengthFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/MinLengthFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/MinLengthFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/MinLengthFacet.java' object='source/gnu/xml/validation/datatype/MinLengthFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/MinLengthFacet.lo `test -f 'source/gnu/xml/validation/datatype/MinLengthFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/MinLengthFacet.java
+
+source/gnu/xml/validation/datatype/NCNameType.lo: source/gnu/xml/validation/datatype/NCNameType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NCNameType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NCNameType.Tpo" -c -o source/gnu/xml/validation/datatype/NCNameType.lo `test -f 'source/gnu/xml/validation/datatype/NCNameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NCNameType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NCNameType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NCNameType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NCNameType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NCNameType.java' object='source/gnu/xml/validation/datatype/NCNameType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NCNameType.lo `test -f 'source/gnu/xml/validation/datatype/NCNameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NCNameType.java
+
+source/gnu/xml/validation/datatype/NMTokenType.lo: source/gnu/xml/validation/datatype/NMTokenType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NMTokenType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokenType.Tpo" -c -o source/gnu/xml/validation/datatype/NMTokenType.lo `test -f 'source/gnu/xml/validation/datatype/NMTokenType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NMTokenType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokenType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokenType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokenType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NMTokenType.java' object='source/gnu/xml/validation/datatype/NMTokenType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NMTokenType.lo `test -f 'source/gnu/xml/validation/datatype/NMTokenType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NMTokenType.java
+
+source/gnu/xml/validation/datatype/NMTokensType.lo: source/gnu/xml/validation/datatype/NMTokensType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NMTokensType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokensType.Tpo" -c -o source/gnu/xml/validation/datatype/NMTokensType.lo `test -f 'source/gnu/xml/validation/datatype/NMTokensType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NMTokensType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokensType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokensType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NMTokensType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NMTokensType.java' object='source/gnu/xml/validation/datatype/NMTokensType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NMTokensType.lo `test -f 'source/gnu/xml/validation/datatype/NMTokensType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NMTokensType.java
+
+source/gnu/xml/validation/datatype/NameType.lo: source/gnu/xml/validation/datatype/NameType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NameType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NameType.Tpo" -c -o source/gnu/xml/validation/datatype/NameType.lo `test -f 'source/gnu/xml/validation/datatype/NameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NameType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NameType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NameType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NameType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NameType.java' object='source/gnu/xml/validation/datatype/NameType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NameType.lo `test -f 'source/gnu/xml/validation/datatype/NameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NameType.java
+
+source/gnu/xml/validation/datatype/NegativeIntegerType.lo: source/gnu/xml/validation/datatype/NegativeIntegerType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NegativeIntegerType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NegativeIntegerType.Tpo" -c -o source/gnu/xml/validation/datatype/NegativeIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NegativeIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NegativeIntegerType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NegativeIntegerType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NegativeIntegerType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NegativeIntegerType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NegativeIntegerType.java' object='source/gnu/xml/validation/datatype/NegativeIntegerType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NegativeIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NegativeIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NegativeIntegerType.java
+
+source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo: source/gnu/xml/validation/datatype/NonNegativeIntegerType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NonNegativeIntegerType.Tpo" -c -o source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NonNegativeIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NonNegativeIntegerType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NonNegativeIntegerType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NonNegativeIntegerType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NonNegativeIntegerType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NonNegativeIntegerType.java' object='source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NonNegativeIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NonNegativeIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NonNegativeIntegerType.java
+
+source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo: source/gnu/xml/validation/datatype/NonPositiveIntegerType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NonPositiveIntegerType.Tpo" -c -o source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NonPositiveIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NonPositiveIntegerType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NonPositiveIntegerType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NonPositiveIntegerType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NonPositiveIntegerType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NonPositiveIntegerType.java' object='source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NonPositiveIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/NonPositiveIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NonPositiveIntegerType.java
+
+source/gnu/xml/validation/datatype/NormalizedStringType.lo: source/gnu/xml/validation/datatype/NormalizedStringType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NormalizedStringType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NormalizedStringType.Tpo" -c -o source/gnu/xml/validation/datatype/NormalizedStringType.lo `test -f 'source/gnu/xml/validation/datatype/NormalizedStringType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NormalizedStringType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NormalizedStringType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NormalizedStringType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NormalizedStringType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NormalizedStringType.java' object='source/gnu/xml/validation/datatype/NormalizedStringType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NormalizedStringType.lo `test -f 'source/gnu/xml/validation/datatype/NormalizedStringType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NormalizedStringType.java
+
+source/gnu/xml/validation/datatype/NotationType.lo: source/gnu/xml/validation/datatype/NotationType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/NotationType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/NotationType.Tpo" -c -o source/gnu/xml/validation/datatype/NotationType.lo `test -f 'source/gnu/xml/validation/datatype/NotationType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NotationType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NotationType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/NotationType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/NotationType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/NotationType.java' object='source/gnu/xml/validation/datatype/NotationType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/NotationType.lo `test -f 'source/gnu/xml/validation/datatype/NotationType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/NotationType.java
+
+source/gnu/xml/validation/datatype/PatternFacet.lo: source/gnu/xml/validation/datatype/PatternFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/PatternFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/PatternFacet.Tpo" -c -o source/gnu/xml/validation/datatype/PatternFacet.lo `test -f 'source/gnu/xml/validation/datatype/PatternFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/PatternFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/PatternFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/PatternFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/PatternFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/PatternFacet.java' object='source/gnu/xml/validation/datatype/PatternFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/PatternFacet.lo `test -f 'source/gnu/xml/validation/datatype/PatternFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/PatternFacet.java
+
+source/gnu/xml/validation/datatype/PositiveIntegerType.lo: source/gnu/xml/validation/datatype/PositiveIntegerType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/PositiveIntegerType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/PositiveIntegerType.Tpo" -c -o source/gnu/xml/validation/datatype/PositiveIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/PositiveIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/PositiveIntegerType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/PositiveIntegerType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/PositiveIntegerType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/PositiveIntegerType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/PositiveIntegerType.java' object='source/gnu/xml/validation/datatype/PositiveIntegerType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/PositiveIntegerType.lo `test -f 'source/gnu/xml/validation/datatype/PositiveIntegerType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/PositiveIntegerType.java
+
+source/gnu/xml/validation/datatype/QNameType.lo: source/gnu/xml/validation/datatype/QNameType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/QNameType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/QNameType.Tpo" -c -o source/gnu/xml/validation/datatype/QNameType.lo `test -f 'source/gnu/xml/validation/datatype/QNameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/QNameType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/QNameType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/QNameType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/QNameType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/QNameType.java' object='source/gnu/xml/validation/datatype/QNameType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/QNameType.lo `test -f 'source/gnu/xml/validation/datatype/QNameType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/QNameType.java
+
+source/gnu/xml/validation/datatype/ShortType.lo: source/gnu/xml/validation/datatype/ShortType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/ShortType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/ShortType.Tpo" -c -o source/gnu/xml/validation/datatype/ShortType.lo `test -f 'source/gnu/xml/validation/datatype/ShortType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ShortType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ShortType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/ShortType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/ShortType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/ShortType.java' object='source/gnu/xml/validation/datatype/ShortType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/ShortType.lo `test -f 'source/gnu/xml/validation/datatype/ShortType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/ShortType.java
+
+source/gnu/xml/validation/datatype/SimpleType.lo: source/gnu/xml/validation/datatype/SimpleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/SimpleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/SimpleType.Tpo" -c -o source/gnu/xml/validation/datatype/SimpleType.lo `test -f 'source/gnu/xml/validation/datatype/SimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/SimpleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/SimpleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/SimpleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/SimpleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/SimpleType.java' object='source/gnu/xml/validation/datatype/SimpleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/SimpleType.lo `test -f 'source/gnu/xml/validation/datatype/SimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/SimpleType.java
+
+source/gnu/xml/validation/datatype/StringType.lo: source/gnu/xml/validation/datatype/StringType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/StringType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/StringType.Tpo" -c -o source/gnu/xml/validation/datatype/StringType.lo `test -f 'source/gnu/xml/validation/datatype/StringType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/StringType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/StringType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/StringType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/StringType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/StringType.java' object='source/gnu/xml/validation/datatype/StringType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/StringType.lo `test -f 'source/gnu/xml/validation/datatype/StringType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/StringType.java
+
+source/gnu/xml/validation/datatype/TimeType.lo: source/gnu/xml/validation/datatype/TimeType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/TimeType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/TimeType.Tpo" -c -o source/gnu/xml/validation/datatype/TimeType.lo `test -f 'source/gnu/xml/validation/datatype/TimeType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TimeType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TimeType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/TimeType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TimeType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/TimeType.java' object='source/gnu/xml/validation/datatype/TimeType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/TimeType.lo `test -f 'source/gnu/xml/validation/datatype/TimeType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TimeType.java
+
+source/gnu/xml/validation/datatype/TokenType.lo: source/gnu/xml/validation/datatype/TokenType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/TokenType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/TokenType.Tpo" -c -o source/gnu/xml/validation/datatype/TokenType.lo `test -f 'source/gnu/xml/validation/datatype/TokenType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TokenType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TokenType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/TokenType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TokenType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/TokenType.java' object='source/gnu/xml/validation/datatype/TokenType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/TokenType.lo `test -f 'source/gnu/xml/validation/datatype/TokenType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TokenType.java
+
+source/gnu/xml/validation/datatype/TotalDigitsFacet.lo: source/gnu/xml/validation/datatype/TotalDigitsFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/TotalDigitsFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/TotalDigitsFacet.Tpo" -c -o source/gnu/xml/validation/datatype/TotalDigitsFacet.lo `test -f 'source/gnu/xml/validation/datatype/TotalDigitsFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TotalDigitsFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TotalDigitsFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/TotalDigitsFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/TotalDigitsFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/TotalDigitsFacet.java' object='source/gnu/xml/validation/datatype/TotalDigitsFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/TotalDigitsFacet.lo `test -f 'source/gnu/xml/validation/datatype/TotalDigitsFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/TotalDigitsFacet.java
+
+source/gnu/xml/validation/datatype/Type.lo: source/gnu/xml/validation/datatype/Type.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/Type.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/Type.Tpo" -c -o source/gnu/xml/validation/datatype/Type.lo `test -f 'source/gnu/xml/validation/datatype/Type.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Type.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Type.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/Type.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/Type.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/Type.java' object='source/gnu/xml/validation/datatype/Type.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/Type.lo `test -f 'source/gnu/xml/validation/datatype/Type.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/Type.java
+
+source/gnu/xml/validation/datatype/UnionSimpleType.lo: source/gnu/xml/validation/datatype/UnionSimpleType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/UnionSimpleType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/UnionSimpleType.Tpo" -c -o source/gnu/xml/validation/datatype/UnionSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/UnionSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnionSimpleType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnionSimpleType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/UnionSimpleType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnionSimpleType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/UnionSimpleType.java' object='source/gnu/xml/validation/datatype/UnionSimpleType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/UnionSimpleType.lo `test -f 'source/gnu/xml/validation/datatype/UnionSimpleType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnionSimpleType.java
+
+source/gnu/xml/validation/datatype/UnsignedByteType.lo: source/gnu/xml/validation/datatype/UnsignedByteType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/UnsignedByteType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedByteType.Tpo" -c -o source/gnu/xml/validation/datatype/UnsignedByteType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedByteType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedByteType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedByteType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedByteType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedByteType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/UnsignedByteType.java' object='source/gnu/xml/validation/datatype/UnsignedByteType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/UnsignedByteType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedByteType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedByteType.java
+
+source/gnu/xml/validation/datatype/UnsignedIntType.lo: source/gnu/xml/validation/datatype/UnsignedIntType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/UnsignedIntType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedIntType.Tpo" -c -o source/gnu/xml/validation/datatype/UnsignedIntType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedIntType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedIntType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedIntType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedIntType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedIntType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/UnsignedIntType.java' object='source/gnu/xml/validation/datatype/UnsignedIntType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/UnsignedIntType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedIntType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedIntType.java
+
+source/gnu/xml/validation/datatype/UnsignedLongType.lo: source/gnu/xml/validation/datatype/UnsignedLongType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/UnsignedLongType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Tpo" -c -o source/gnu/xml/validation/datatype/UnsignedLongType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedLongType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedLongType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedLongType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/UnsignedLongType.java' object='source/gnu/xml/validation/datatype/UnsignedLongType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/UnsignedLongType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedLongType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedLongType.java
+
+source/gnu/xml/validation/datatype/UnsignedShortType.lo: source/gnu/xml/validation/datatype/UnsignedShortType.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/UnsignedShortType.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Tpo" -c -o source/gnu/xml/validation/datatype/UnsignedShortType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedShortType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedShortType.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/UnsignedShortType.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/UnsignedShortType.java' object='source/gnu/xml/validation/datatype/UnsignedShortType.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/UnsignedShortType.lo `test -f 'source/gnu/xml/validation/datatype/UnsignedShortType.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/UnsignedShortType.java
+
+source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo: source/gnu/xml/validation/datatype/WhiteSpaceFacet.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo -MD -MP -MF "source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Tpo" -c -o source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo `test -f 'source/gnu/xml/validation/datatype/WhiteSpaceFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/WhiteSpaceFacet.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Tpo" "source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Plo"; else rm -f "source/gnu/xml/validation/datatype/$(DEPDIR)/WhiteSpaceFacet.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/datatype/WhiteSpaceFacet.java' object='source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/datatype/WhiteSpaceFacet.lo `test -f 'source/gnu/xml/validation/datatype/WhiteSpaceFacet.java' || echo '$(srcdir)/'`source/gnu/xml/validation/datatype/WhiteSpaceFacet.java
+
+source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo: source/gnu/xml/validation/xmlschema/AttributeDeclaration.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo" -c -o source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo `test -f 'source/gnu/xml/validation/xmlschema/AttributeDeclaration.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AttributeDeclaration.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeDeclaration.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/AttributeDeclaration.java' object='source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/AttributeDeclaration.lo `test -f 'source/gnu/xml/validation/xmlschema/AttributeDeclaration.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AttributeDeclaration.java
+
+source/gnu/xml/validation/xmlschema/AttributeUse.lo: source/gnu/xml/validation/xmlschema/AttributeUse.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/AttributeUse.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Tpo" -c -o source/gnu/xml/validation/xmlschema/AttributeUse.lo `test -f 'source/gnu/xml/validation/xmlschema/AttributeUse.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AttributeUse.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/AttributeUse.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/AttributeUse.java' object='source/gnu/xml/validation/xmlschema/AttributeUse.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/AttributeUse.lo `test -f 'source/gnu/xml/validation/xmlschema/AttributeUse.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/AttributeUse.java
+
+source/gnu/xml/validation/xmlschema/ElementDeclaration.lo: source/gnu/xml/validation/xmlschema/ElementDeclaration.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/ElementDeclaration.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Tpo" -c -o source/gnu/xml/validation/xmlschema/ElementDeclaration.lo `test -f 'source/gnu/xml/validation/xmlschema/ElementDeclaration.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/ElementDeclaration.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/ElementDeclaration.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/ElementDeclaration.java' object='source/gnu/xml/validation/xmlschema/ElementDeclaration.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/ElementDeclaration.lo `test -f 'source/gnu/xml/validation/xmlschema/ElementDeclaration.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/ElementDeclaration.java
+
+source/gnu/xml/validation/xmlschema/Particle.lo: source/gnu/xml/validation/xmlschema/Particle.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/Particle.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Tpo" -c -o source/gnu/xml/validation/xmlschema/Particle.lo `test -f 'source/gnu/xml/validation/xmlschema/Particle.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/Particle.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/Particle.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/Particle.java' object='source/gnu/xml/validation/xmlschema/Particle.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/Particle.lo `test -f 'source/gnu/xml/validation/xmlschema/Particle.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/Particle.java
+
+source/gnu/xml/validation/xmlschema/XMLSchema.lo: source/gnu/xml/validation/xmlschema/XMLSchema.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchema.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchema.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchema.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchema.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchema.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchema.java' object='source/gnu/xml/validation/xmlschema/XMLSchema.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchema.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchema.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchema.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo: source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaBuilder.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaBuilder.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo: source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaTypeInfoProvider.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaTypeInfoProvider.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo: source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaValidator.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaValidator.java
+
+source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo: source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo -MD -MP -MF "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Tpo" -c -o source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Tpo" "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Plo"; else rm -f "source/gnu/xml/validation/xmlschema/$(DEPDIR)/XMLSchemaValidatorHandler.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java' object='source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.lo `test -f 'source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java' || echo '$(srcdir)/'`source/gnu/xml/validation/xmlschema/XMLSchemaValidatorHandler.java
+
 source/javax/xml/datatype/DatatypeConfigurationException.lo: source/javax/xml/datatype/DatatypeConfigurationException.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/javax/xml/datatype/DatatypeConfigurationException.lo -MD -MP -MF "source/javax/xml/datatype/$(DEPDIR)/DatatypeConfigurationException.Tpo" -c -o source/javax/xml/datatype/DatatypeConfigurationException.lo `test -f 'source/javax/xml/datatype/DatatypeConfigurationException.java' || echo '$(srcdir)/'`source/javax/xml/datatype/DatatypeConfigurationException.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/javax/xml/datatype/$(DEPDIR)/DatatypeConfigurationException.Tpo" "source/javax/xml/datatype/$(DEPDIR)/DatatypeConfigurationException.Plo"; else rm -f "source/javax/xml/datatype/$(DEPDIR)/DatatypeConfigurationException.Tpo"; exit 1; fi
@@ -7558,6 +8680,8 @@ clean-libtool:
 	-rm -rf source/gnu/xml/pipeline/.libs source/gnu/xml/pipeline/_libs
 	-rm -rf source/gnu/xml/transform/.libs source/gnu/xml/transform/_libs
 	-rm -rf source/gnu/xml/util/.libs source/gnu/xml/util/_libs
+	-rm -rf source/gnu/xml/validation/datatype/.libs source/gnu/xml/validation/datatype/_libs
+	-rm -rf source/gnu/xml/validation/xmlschema/.libs source/gnu/xml/validation/xmlschema/_libs
 	-rm -rf source/gnu/xml/xpath/.libs source/gnu/xml/xpath/_libs
 	-rm -rf source/javax/xml/.libs source/javax/xml/_libs
 	-rm -rf source/javax/xml/datatype/.libs source/javax/xml/datatype/_libs
@@ -7818,6 +8942,10 @@ distclean-generic:
 	-rm -f source/gnu/xml/transform/$(am__dirstamp)
 	-rm -f source/gnu/xml/util/$(DEPDIR)/$(am__dirstamp)
 	-rm -f source/gnu/xml/util/$(am__dirstamp)
+	-rm -f source/gnu/xml/validation/datatype/$(DEPDIR)/$(am__dirstamp)
+	-rm -f source/gnu/xml/validation/datatype/$(am__dirstamp)
+	-rm -f source/gnu/xml/validation/xmlschema/$(DEPDIR)/$(am__dirstamp)
+	-rm -f source/gnu/xml/validation/xmlschema/$(am__dirstamp)
 	-rm -f source/gnu/xml/xpath/$(DEPDIR)/$(am__dirstamp)
 	-rm -f source/gnu/xml/xpath/$(am__dirstamp)
 	-rm -f source/javax/xml/$(DEPDIR)/$(am__dirstamp)
@@ -7880,7 +9008,7 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool clean-local \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) source/gnu/xml/aelfred2/$(DEPDIR) source/gnu/xml/dom/$(DEPDIR) source/gnu/xml/dom/ls/$(DEPDIR) source/gnu/xml/libxmlj/$(DEPDIR) source/gnu/xml/libxmlj/dom/$(DEPDIR) source/gnu/xml/libxmlj/sax/$(DEPDIR) source/gnu/xml/libxmlj/transform/$(DEPDIR) source/gnu/xml/libxmlj/util/$(DEPDIR) source/gnu/xml/pipeline/$(DEPDIR) source/gnu/xml/transform/$(DEPDIR) source/gnu/xml/util/$(DEPDIR) source/gnu/xml/xpath/$(DEPDIR) source/javax/xml/$(DEPDIR) source/javax/xml/datatype/$(DEPDIR) source/javax/xml/namespace/$(DEPDIR) source/javax/xml/parsers/$(DEPDIR) source/javax/xml/transform/$(DEPDIR) source/javax/xml/transform/dom/$(DEPDIR) source/javax/xml/transform/sax/$(DEPDIR) source/javax/xml/transform/stream/$(DEPDIR) source/javax/xml/validation/$(DEPDIR) source/javax/xml/xpath/$(DEPDIR) source/org/w3c/dom/$(DEPDIR) source/org/w3c/dom/bootstrap/$(DEPDIR) source/org/w3c/dom/css/$(DEPDIR) source/org/w3c/dom/events/$(DEPDIR) source/org/w3c/dom/html2/$(DEPDIR) source/org/w3c/dom/ls/$(DEPDIR) source/org/w3c/dom/ranges/$(DEPDIR) source/org/w3c/dom/stylesheets/$(DEPDIR) source/org/w3c/dom/traversal/$(DEPDIR) source/org/w3c/dom/views/$(DEPDIR) source/org/w3c/dom/xpath/$(DEPDIR) source/org/xml/sax/$(DEPDIR) source/org/xml/sax/ext/$(DEPDIR) source/org/xml/sax/helpers/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) source/gnu/xml/aelfred2/$(DEPDIR) source/gnu/xml/dom/$(DEPDIR) source/gnu/xml/dom/ls/$(DEPDIR) source/gnu/xml/libxmlj/$(DEPDIR) source/gnu/xml/libxmlj/dom/$(DEPDIR) source/gnu/xml/libxmlj/sax/$(DEPDIR) source/gnu/xml/libxmlj/transform/$(DEPDIR) source/gnu/xml/libxmlj/util/$(DEPDIR) source/gnu/xml/pipeline/$(DEPDIR) source/gnu/xml/transform/$(DEPDIR) source/gnu/xml/util/$(DEPDIR) source/gnu/xml/validation/datatype/$(DEPDIR) source/gnu/xml/validation/xmlschema/$(DEPDIR) source/gnu/xml/xpath/$(DEPDIR) source/javax/xml/$(DEPDIR) source/javax/xml/datatype/$(DEPDIR) source/javax/xml/namespace/$(DEPDIR) source/javax/xml/parsers/$(DEPDIR) source/javax/xml/transform/$(DEPDIR) source/javax/xml/transform/dom/$(DEPDIR) source/javax/xml/transform/sax/$(DEPDIR) source/javax/xml/transform/stream/$(DEPDIR) source/javax/xml/validation/$(DEPDIR) source/javax/xml/xpath/$(DEPDIR) source/org/w3c/dom/$(DEPDIR) source/org/w3c/dom/bootstrap/$(DEPDIR) source/org/w3c/dom/css/$(DEPDIR) source/org/w3c/dom/events/$(DEPDIR) source/org/w3c/dom/html2/$(DEPDIR) source/org/w3c/dom/ls/$(DEPDIR) source/org/w3c/dom/ranges/$(DEPDIR) source/org/w3c/dom/stylesheets/$(DEPDIR) source/org/w3c/dom/traversal/$(DEPDIR) source/org/w3c/dom/views/$(DEPDIR) source/org/w3c/dom/xpath/$(DEPDIR) source/org/xml/sax/$(DEPDIR) source/org/xml/sax/ext/$(DEPDIR) source/org/xml/sax/helpers/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-libtool distclean-tags
@@ -7910,7 +9038,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) source/gnu/xml/aelfred2/$(DEPDIR) source/gnu/xml/dom/$(DEPDIR) source/gnu/xml/dom/ls/$(DEPDIR) source/gnu/xml/libxmlj/$(DEPDIR) source/gnu/xml/libxmlj/dom/$(DEPDIR) source/gnu/xml/libxmlj/sax/$(DEPDIR) source/gnu/xml/libxmlj/transform/$(DEPDIR) source/gnu/xml/libxmlj/util/$(DEPDIR) source/gnu/xml/pipeline/$(DEPDIR) source/gnu/xml/transform/$(DEPDIR) source/gnu/xml/util/$(DEPDIR) source/gnu/xml/xpath/$(DEPDIR) source/javax/xml/$(DEPDIR) source/javax/xml/datatype/$(DEPDIR) source/javax/xml/namespace/$(DEPDIR) source/javax/xml/parsers/$(DEPDIR) source/javax/xml/transform/$(DEPDIR) source/javax/xml/transform/dom/$(DEPDIR) source/javax/xml/transform/sax/$(DEPDIR) source/javax/xml/transform/stream/$(DEPDIR) source/javax/xml/validation/$(DEPDIR) source/javax/xml/xpath/$(DEPDIR) source/org/w3c/dom/$(DEPDIR) source/org/w3c/dom/bootstrap/$(DEPDIR) source/org/w3c/dom/css/$(DEPDIR) source/org/w3c/dom/events/$(DEPDIR) source/org/w3c/dom/html2/$(DEPDIR) source/org/w3c/dom/ls/$(DEPDIR) source/org/w3c/dom/ranges/$(DEPDIR) source/org/w3c/dom/stylesheets/$(DEPDIR) source/org/w3c/dom/traversal/$(DEPDIR) source/org/w3c/dom/views/$(DEPDIR) source/org/w3c/dom/xpath/$(DEPDIR) source/org/xml/sax/$(DEPDIR) source/org/xml/sax/ext/$(DEPDIR) source/org/xml/sax/helpers/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) source/gnu/xml/aelfred2/$(DEPDIR) source/gnu/xml/dom/$(DEPDIR) source/gnu/xml/dom/ls/$(DEPDIR) source/gnu/xml/libxmlj/$(DEPDIR) source/gnu/xml/libxmlj/dom/$(DEPDIR) source/gnu/xml/libxmlj/sax/$(DEPDIR) source/gnu/xml/libxmlj/transform/$(DEPDIR) source/gnu/xml/libxmlj/util/$(DEPDIR) source/gnu/xml/pipeline/$(DEPDIR) source/gnu/xml/transform/$(DEPDIR) source/gnu/xml/util/$(DEPDIR) source/gnu/xml/validation/datatype/$(DEPDIR) source/gnu/xml/validation/xmlschema/$(DEPDIR) source/gnu/xml/xpath/$(DEPDIR) source/javax/xml/$(DEPDIR) source/javax/xml/datatype/$(DEPDIR) source/javax/xml/namespace/$(DEPDIR) source/javax/xml/parsers/$(DEPDIR) source/javax/xml/transform/$(DEPDIR) source/javax/xml/transform/dom/$(DEPDIR) source/javax/xml/transform/sax/$(DEPDIR) source/javax/xml/transform/stream/$(DEPDIR) source/javax/xml/validation/$(DEPDIR) source/javax/xml/xpath/$(DEPDIR) source/org/w3c/dom/$(DEPDIR) source/org/w3c/dom/bootstrap/$(DEPDIR) source/org/w3c/dom/css/$(DEPDIR) source/org/w3c/dom/events/$(DEPDIR) source/org/w3c/dom/html2/$(DEPDIR) source/org/w3c/dom/ls/$(DEPDIR) source/org/w3c/dom/ranges/$(DEPDIR) source/org/w3c/dom/stylesheets/$(DEPDIR) source/org/w3c/dom/traversal/$(DEPDIR) source/org/w3c/dom/views/$(DEPDIR) source/org/w3c/dom/xpath/$(DEPDIR) source/org/xml/sax/$(DEPDIR) source/org/xml/sax/ext/$(DEPDIR) source/org/xml/sax/helpers/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
