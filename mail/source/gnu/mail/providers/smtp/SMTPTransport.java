@@ -26,6 +26,7 @@ import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -222,7 +223,11 @@ public class SMTPTransport
         {
           // TODO more authentication mechanisms eg CRAM-MD5
           if (authenticationMechanisms.contains("LOGIN"))
-            return login(user, password);
+            return authLogin(user, password);
+          else if (authenticationMechanisms.contains("PLAIN"))
+            return authPlain(user, password);
+          else
+            log("No supported authentication mechanisms");
         }
         return false;
       }
@@ -390,22 +395,61 @@ public class SMTPTransport
   }
 
   /**
-   * Attempts a username/password login.
+   * LOGIN authentication mechanism.
    */
-  private boolean login(String user, String password)
+  private boolean authLogin(String username, String password)
     throws MessagingException
   {
-    String command = new StringBuffer("AUTH LOGIN ")
-      .append(user)
-      .append(' ')
-      .append(password)
-      .toString();
-    switch (simpleCommand(command))
+    if (simpleCommand("AUTH LOGIN")==334)
     {
-      case 235:
-        return true;
-      default:
-        return false;
+      try
+      {
+        String US_ASCII = "US-ASCII";
+        byte[] bytes = username.getBytes(US_ASCII);
+        String encoded = new String(BASE64.encode(bytes), US_ASCII);
+        if (simpleCommand(encoded)==334)
+        {
+          bytes = password.getBytes(US_ASCII);
+          encoded = new String(BASE64.encode(bytes), US_ASCII);
+          if (simpleCommand(encoded)==235)
+            return ehlo(localHostName); // Re-issue EHLO
+        }
+      }
+      catch (UnsupportedEncodingException e)
+      {
+        // Should not happen according to JDK docs
+        throw new MessagingException(e.getMessage(), e);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * PLAIN authentication mechanism.
+   */
+  private boolean authPlain(String username, String password)
+    throws MessagingException
+  {
+    try
+    {
+      String plain = new StringBuffer(username)
+        .append('\u0000')
+        .append(username)
+        .append('\u0000')
+        .append(password)
+        .toString();
+      String US_ASCII = "US-ASCII";
+      byte[] bytes = plain.getBytes(US_ASCII);
+      String encoded = new String(BASE64.encode(bytes), US_ASCII);
+      String command = new StringBuffer("AUTH PLAIN ")
+        .append(encoded)
+        .toString();
+      return (simpleCommand(command)==235);
+    }
+    catch (UnsupportedEncodingException e)
+    {
+      // Should not happen according to JDK docs
+      throw new MessagingException(e.getMessage(), e);
     }
   }
 
