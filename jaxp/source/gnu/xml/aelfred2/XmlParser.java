@@ -2414,14 +2414,93 @@ loop:
 		  default:
 // FIXME ... per IBM's OASIS test submission, these:
 //   ?		U+06dd 
-// REJECT
-//   BaseChar	U+0132 U+0133 U+013F U+0140 U+0149 U+017F U+01C4 U+01CC
-//		U+01F1 U+01F3 U+0E46 U+1011 U+1104 U+1108 U+110A U+110D
-//		U+113B U+113F U+1141 U+114D U+114F U+1151 U+1156 U+1162
-//		U+1164 U+1166 U+116B U+116F U+1174 U+119F U+11AC U+11B6
-//		U+11B9 U+11BB U+11C3 U+11F1 U+212F U+0587
 //   Combining	U+309B
-
+		    //these switches are kind of ugly but at least we won't
+		    //have to go over the whole lits for each char
+		    if (isName && i == readBufferPos){
+			    char c2 = (char) (c & 0x00f0);
+	                    switch (c & 0xff00){
+	                    	//starting with 01
+	                    	case 0x0100:
+	                       	    switch (c2){
+	                    	        case 0x0030:
+	                    	            if (c == 0x0132 || c == 0x0133 || c == 0x013f)
+	                    	            	error ("Not a name start character, U+"
+	              				       + Integer.toHexString (c));
+	                    	        break;
+	                    	        case 0x0040:
+	                	            if (c == 0x0140 || c == 0x0149)
+	                	            	error ("Not a name start character, U+"
+	          				       + Integer.toHexString (c));
+	                	        break;
+	                    	        case 0x00c0:
+	            	                    if (c == 0x01c4 || c == 0x01cc)
+	            	            	        error ("Not a name start character, U+"
+	      				               + Integer.toHexString (c));
+	            	                break;
+	                    	        case 0x00f0:
+	        	                    if (c == 0x01f1 || c == 0x01f3)
+	        	            	        error ("Not a name start character, U+"
+	  				               + Integer.toHexString (c));
+	        	                break;
+	                    	        case 0x00b0:
+	    	                            if (c == 0x01f1 || c == 0x01f3)
+	    	            	                error ("Not a name start character, U+"
+					               + Integer.toHexString (c));
+	    	                        break;
+	        	                default:
+	        	                    if (c == 0x017f)
+	                	            	error ("Not a name start character, U+"
+	          				        + Integer.toHexString (c));	
+	                    	    }
+				    
+	                    	break;
+	                    	//starting with 11
+	                    	case 0x1100:
+	                            switch (c2){
+	                                case 0x0000:
+	                                    if (c == 0x1104 || c == 0x1108 ||
+	                                    	c == 0x110a || c == 0x110d)
+	                                      	error ("Not a name start character, U+"
+	                      		             + Integer.toHexString (c));
+	                                break;
+	                                case 0x0030:
+	                                    if (c == 0x113b || c == 0x113f)
+	                                      	error ("Not a name start character, U+"
+	                          	               + Integer.toHexString (c));
+	                                break;
+	                                case 0x0040:
+	                                    if (c == 0x1141 || c == 0x114d
+	                                        || c == 0x114f )
+	                                      	error ("Not a name start character, U+"
+	                          	               + Integer.toHexString (c));
+	                                break;
+	                                case 0x0050:
+	                                     if (c == 0x1151 || c == 0x1156)
+	                                         error ("Not a name start character, U+"
+	                          		        + Integer.toHexString (c));
+	                                break;
+	                                case 0x00b0:
+	                                     if (c == 0x11b6 || c == 0x11b9
+	                                         || c == 0x11bb || c == 0x116f)
+	                                         error ("Not a name start character, U+"
+	                          		        + Integer.toHexString (c));
+	                                break;
+	                                default:
+	                                    if (c == 0x1174 || c == 0x119f
+	                                    	|| c == 0x11ac || c == 0x11c3
+						|| c == 0x11f1)
+	                                        error ("Not a name start character, U+"
+	                                                + Integer.toHexString (c));
+	                            }
+	                        break;
+	                        default:
+	                           if (c == 0x0e46 || c == 0x1011 
+	                               || c == 0x212f || c == 0x0587)
+	                	       error ("Not a name start character, U+"
+	          		              + Integer.toHexString (c));
+	                    }
+		    }
 		    // punt on exact tests from Appendix A; approximate
 		    // them using the Unicode ID start/part rules
 		    if (i == readBufferPos && isName) {
