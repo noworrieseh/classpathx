@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.2 2001-06-20 20:43:22 db Exp $
+ * $Id: SAXDriver.java,v 1.3 2001-06-24 04:06:47 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.2 2001-06-20 20:43:22 db Exp $
+// $Id: SAXDriver.java,v 1.3 2001-06-24 04:06:47 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -78,7 +78,7 @@ import gnu.xml.util.DefaultHandler;
  *	<td>Value defaults to <em>false</em> (but XML 1.0 names are
  *		always reported)</td></tr>
  * <tr><td>(URL)/lexical-handler/parameter-entities</td>
- *	<td>Value is fixed at <em>false</em></td></tr>
+ *	<td>Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/namespaces</td>
  *	<td>Value defaults to <em>true</em></td></tr>
  * <tr><td>(URL)/string-interning</td>
@@ -115,7 +115,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-20 20:43:22 $
+ * @version $Date: 2001-06-24 04:06:47 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -305,15 +305,6 @@ final public class SAXDriver
 	    try {
 		String	systemId = source.getSystemId ();
 
-		// duplicate first entry, in case startDocument handler
-		// needs to use Locator.getSystemId(), before entities
-		// start to get reported by the parser
-
-		if (systemId != null)
-		    entityStack.push (systemId);
-		else
-		    entityStack.push ("illegal:unknown system ID");
-
 		parser.doParse (systemId,
 			      source.getPublicId (),
 			      source.getCharacterStream (),
@@ -349,7 +340,7 @@ final public class SAXDriver
     // Implementation of SAX2 "XMLReader" interface
     //
     static final String	FEATURE = "http://xml.org/sax/features/";
-    static final String	HANDLER = "http://xml.org/sax/properties/";
+    static final String	PROPERTY = "http://xml.org/sax/properties/";
 
     /**
      * <b>SAX2</b>: Tells the value of the specified feature flag.
@@ -366,7 +357,7 @@ final public class SAXDriver
 	// external entities (both types) are currently always included
 	if ((FEATURE + "external-general-entities").equals (featureId)
 		|| (FEATURE + "external-parameter-entities")
-		.equals (featureId))
+		    .equals (featureId))
 	    return true;
 
 	// element/attribute names are as written in document; no mangling
@@ -377,9 +368,9 @@ final public class SAXDriver
 	if ((FEATURE + "namespaces").equals (featureId))
 	    return namespaces;
 
-	// no PE (or GE!) reporting
+	// all PEs and GEs are reported
 	if ((FEATURE + "lexical-handler/parameter-entities").equals (featureId))
-	    return false;
+	    return true;
 
 	// always interns
 	if ((FEATURE + "string-interning").equals (featureId))
@@ -400,10 +391,10 @@ final public class SAXDriver
     public Object getProperty (String propertyId)
     throws SAXNotRecognizedException
     {
-	if ((HANDLER + "declaration-handler").equals (propertyId))
+	if ((PROPERTY + "declaration-handler").equals (propertyId))
 	    return declHandler;
 
-	if ((HANDLER + "lexical-handler").equals (propertyId))
+	if ((PROPERTY + "lexical-handler").equals (propertyId))
 	    return lexicalHandler;
 	
 	if (properties != null && properties.containsKey (propertyId))
@@ -475,7 +466,7 @@ final public class SAXDriver
 	    // Properties with a defined value, we just change it if we can.
 	    value = getProperty (propertyId);
 
-	    if ((HANDLER + "declaration-handler").equals (propertyId)) {
+	    if ((PROPERTY + "declaration-handler").equals (propertyId)) {
 		if (property == null)
 		    declHandler = base;
 		else if (! (property instanceof DeclHandler))
@@ -485,7 +476,7 @@ final public class SAXDriver
 		return ;
 	    }
 
-	    if ((HANDLER + "lexical-handler").equals (propertyId)) {
+	    if ((PROPERTY + "lexical-handler").equals (propertyId)) {
 		if (property == null)
 		    lexicalHandler = base;
 		else if (! (property instanceof LexicalHandler))
@@ -566,16 +557,34 @@ final public class SAXDriver
     }
 
 
-    void startExternalEntity (String systemId)
+    void startExternalEntity (String name, String systemId)
     throws SAXException
     {
+	if (!"[document]".equals (name))
+	    lexicalHandler.startEntity (name);
+	else if (systemId == null)
+	    warn ("document URI was not reported to parser");
 	entityStack.push (systemId);
     }
 
-    void endExternalEntity (String systemId)
+    void endExternalEntity (String name, String systemId)
     throws SAXException
     {
 	entityStack.pop ();
+	if (!"[document]".equals (name))
+	    lexicalHandler.endEntity (name);
+    }
+
+    void startInternalEntity (String name)
+    throws SAXException
+    {
+	lexicalHandler.startEntity (name);
+    }
+
+    void endInternalEntity (String name)
+    throws SAXException
+    {
+	lexicalHandler.endEntity (name);
     }
 
     void doctypeDecl (String name, String publicId, String systemId)
@@ -625,10 +634,8 @@ final public class SAXDriver
 			String		prefix = aname.substring (index + 1);
 
 			if (value.length () == 0) {
-			    errorHandler.error (new SAXParseException (
-				    "missing URI in namespace decl attribute: "
-					+ aname,
-				    this));
+			    verror ("missing URI in namespace decl attribute: "
+					+ aname);
 			} else {
 			    prefixStack.declarePrefix (prefix, value);
 			    contentHandler.startPrefixMapping (prefix, value);
@@ -698,9 +705,7 @@ final public class SAXDriver
 		if (aname.indexOf (':') > 0) {
 		    if (prefixStack.processName (aname, nsTemp, true)
 			    == null)
-			errorHandler.error (new SAXParseException (
-				"undeclared attribute prefix in: " + aname,
-				this));
+			verror ("undeclared attribute prefix in: " + aname);
 		    else {
 			attributeNamespaces.setElementAt (nsTemp [0], i);
 			attributeLocalNames.setElementAt (nsTemp [1], i);
@@ -714,9 +719,7 @@ final public class SAXDriver
 	elementName = elname;
 	if (namespaces) {
 	    if (prefixStack.processName (elname, nsTemp, false) == null) {
-		errorHandler.error (new SAXParseException (
-			"undeclared element prefix in: " + elname,
-			this));
+		verror ("undeclared element prefix in: " + elname);
 		nsTemp [0] = nsTemp [1] = "";
 	    }
 	    handler.startElement (nsTemp [0], nsTemp [1], elname, this);
@@ -798,12 +801,12 @@ final public class SAXDriver
 	    lexicalHandler.comment (ch, start, length);
     }
 
-    void error (String message, String url, int line, int column)
+    void fatal (String message)
     throws SAXException
     {
 	SAXParseException fatal;
 	
-	fatal = new SAXParseException (message, null, url, line, column);
+	fatal = new SAXParseException (message, this);
 	errorHandler.fatalError (fatal);
 
 	// Even if the application can continue ... we can't!
@@ -812,13 +815,22 @@ final public class SAXDriver
 
     // We can safely report a few validity errors that
     // make layered SAX2 DTD validation more conformant
-    void verror (String message, String url, int line, int column)
+    void verror (String message)
     throws SAXException
     {
 	SAXParseException err;
 	
-	err = new SAXParseException (message, null, url, line, column);
+	err = new SAXParseException (message, this);
 	errorHandler.error (err);
+    }
+
+    void warn (String message)
+    throws SAXException
+    {
+	SAXParseException err;
+	
+	err = new SAXParseException (message, this);
+	errorHandler.warning (err);
     }
 
 
@@ -963,8 +975,7 @@ final public class SAXDriver
 			break;
 
 		    default:
-			errorHandler.fatalError (new SAXParseException (
-				  "internal error, att type", this));
+			fatal ("internal error, att type");
 			type = null;
 		    }
 
@@ -984,8 +995,7 @@ final public class SAXDriver
 			break;
 
 		    default:
-			errorHandler.fatalError (new SAXParseException (
-				    "internal error, att default", this));
+			fatal ("internal error, att default");
 			valueDefault = null;
 		    }
 
@@ -1196,7 +1206,10 @@ final public class SAXDriver
      */
     public String getSystemId ()
     {
-	return (String) entityStack.peek ();
+	if (entityStack.empty ())
+	    return null;
+	else
+	    return (String) entityStack.peek ();
     }
 
     /**

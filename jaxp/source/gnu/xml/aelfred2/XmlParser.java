@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.2 2001-06-20 20:43:22 db Exp $
+ * $Id: XmlParser.java,v 1.3 2001-06-24 04:06:47 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.2 2001-06-20 20:43:22 db Exp $
+// $Id: XmlParser.java,v 1.3 2001-06-24 04:06:47 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-06-20 20:43:22 $
+ * @version $Date: 2001-06-24 04:06:47 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -148,10 +148,10 @@ final class XmlParser
 	setInternalEntity ("apos", "&#39;");
 	setInternalEntity ("quot", "&#34;");
 
-	handler.startDocument ();
-
 	pushURL ("[document]", basePublicId, baseURI,
 		baseReader, baseInputStream, encoding);
+
+	handler.startDocument ();
 
 	try {
 	    parseDocument ();
@@ -396,7 +396,6 @@ final class XmlParser
     private final static int INPUT_NONE = 0;
     private final static int INPUT_INTERNAL = 1;
     private final static int INPUT_STREAM = 3;
-    private final static int INPUT_BUFFER = 4;
     private final static int INPUT_READER = 5;
 
 
@@ -450,12 +449,7 @@ final class XmlParser
 	if (textExpected != null) {
 	    message = message + " (expected \"" + textExpected + "\")";
 	}
-	String uri = null;
-
-	if (externalEntity != null) {
-	    uri = externalEntity.getURL ().toString ();
-	}
-	handler.error (message, uri, line, column);
+	handler.fatal (message);
 
 	// "can't happen"
 	throw new SAXException (message);
@@ -477,18 +471,7 @@ final class XmlParser
     private void error (String message)
     throws SAXException
     {
-	error (message, null, null);
-    }
-
-    /** report validity error */
-    private void verror (String message)
-    throws SAXException
-    {
-	String uri = null;
-
-	if (externalEntity != null)
-	    uri = externalEntity.getURL ().toString ();
-	handler.verror (message, uri, line, column);
+	handler.fatal (message);
     }
 
 
@@ -905,7 +888,9 @@ final class XmlParser
 
 	// Read the external subset, if any
 	if (ids [1] != null) {
-	    pushURL ("[external subset]", ids [0], ids [1], null, null, null);
+	    // NOTE:  [dtd] is so we say what SAX2 expects,
+	    // even though it's misleading, 
+	    pushURL ("[dtd]", ids [0], ids [1], null, null, null);
 
 	    // Loop until we end up back at '>'
 	    while (true) {
@@ -1822,7 +1807,7 @@ loop2:
 	switch (getEntityType (name)) {
 	case ENTITY_UNDECLARED:
 	    // VC: Entity Declared
-	    verror ("reference to undeclared parameter entity " + name);
+	    handler.verror ("reference to undeclared parameter entity " + name);
 
 	    // we should disable handling of all subsequent declarations
 	    // unless this is a standalone document (info discarded)
@@ -2328,7 +2313,7 @@ loop:
 
 				// VC: Entity Declared
 				else
-				    verror (message);
+				    handler.verror (message);
 			    }
 			    dataBufferAppend ('&');
 			    dataBufferAppend (name);
@@ -2820,7 +2805,8 @@ loop:
 		element [1] = contentModel;
 	    } else
 		// VC: Unique Element Type Declaration
-		verror ("multiple declarations for element type: " + name);
+		handler.verror ("multiple declarations for element type: "
+			+ name);
 	}
 
 	// first <!ATTLIST ...>, before <!ELEMENT ...> ?
@@ -3305,7 +3291,7 @@ loop:
 	    notationInfo.put (nname, notation);
 	} else {
 	    // VC: Unique Notation Name
-	    verror ("Duplicate notation name decl: " + nname);
+	    handler.verror ("Duplicate notation name decl: " + nname);
 	}
     }
 
@@ -3350,7 +3336,6 @@ loop:
      * position in external entities, but it's not entirely accurate.
      * @return The next available input character.
      * @see #unread (char)
-     * @see #unread (String)
      * @see #readDataChunk
      * @see #readBuffer
      * @see #line
@@ -3415,15 +3400,13 @@ loop:
     /**
      * Push a single character back onto the current input stream.
      * <p>This method usually pushes the character back onto
-     * the readBuffer, while the unread (String) method treats the
-     * string as a new internal entity.
+     * the readBuffer.
      * <p>I don't think that this would ever be called with 
      * readBufferPos = 0, because the methods always reads a character
      * before unreading it, but just in case, I've added a boundary
      * condition.
      * @param c The character to push back.
      * @see #readCh
-     * @see #unread (String)
      * @see #unread (char[])
      * @see #readBuffer
      */
@@ -3449,7 +3432,6 @@ loop:
      * haven't actually read: use pushString () instead.
      * @see #readCh
      * @see #unread (char)
-     * @see #unread (String)
      * @see #readBuffer
      * @see #pushString
      */
@@ -3466,7 +3448,6 @@ loop:
 	    readBufferPos -= length;
 	} else {
 	    pushCharArray (null, ch, 0, length);
-	    sourceType = INPUT_BUFFER;
 	}
     }
 
@@ -3542,9 +3523,9 @@ loop:
 
 	// Start the entity.
 	if (systemId != null) {
-	    handler.startExternalEntity (systemId);
+	    handler.startExternalEntity (ename, systemId);
 	} else {
-	    handler.startExternalEntity ("[unidentified data stream]");
+	    handler.startExternalEntity (ename, "[unidentified data stream]");
 	}
 
 	// If there's an explicit character stream, just
@@ -3673,7 +3654,7 @@ loop:
      * in the document (using only US-ASCII characters).
      *
      * <p> Because this part starts to fill parser buffers with this data,
-     * it's tricky to to a reader so that Java's built-in decoders can be
+     * it's tricky to setup a reader so that Java's built-in decoders can be
      * used for the character encodings that aren't built in to this parser
      * (such as EUC-JP, KOI8-R, Big5, etc).
      *
@@ -3685,7 +3666,7 @@ loop:
     {
 	// Read the XML/text declaration.
 	if (tryRead ("<?xml")) {
-	    dataBufferFlush ();
+	    dataBufferFlush ();		// for reading external entities
 	    if (tryWhitespace ()) {
 		if (inputStack.size () > 0) {
 		    return parseTextDecl (ignoreEncoding);
@@ -3693,7 +3674,9 @@ loop:
 		    return parseXMLDecl (ignoreEncoding);
 		}
 	    } else {
-		unread ("xml".toCharArray (), 3);
+		unread ('l');
+		unread ('m');
+		unread ('x');
 		parsePI ();
 	    }
 	}
@@ -3880,6 +3863,8 @@ loop:
     {
 	// Push the existing status
 	pushInput (ename);
+	if (ename != null)
+	    handler.startInternalEntity (ename);
 	sourceType = INPUT_INTERNAL;
 	readBuffer = ch;
 	readBufferPos = start;
@@ -3924,7 +3909,7 @@ loop:
 	    Enumeration entities = entityStack.elements ();
 	    while (entities.hasMoreElements ()) {
 		String e = (String) entities.nextElement ();
-		if (e == ename) {
+		if (e != null && e == ename) {
 		    error ("recursive reference to entity", ename, null);
 		}
 	    }
@@ -3975,6 +3960,7 @@ loop:
     throws SAXException, IOException
     {
 	String uri;
+	String ename = (String) entityStack.pop ();
 
 	if (externalEntity != null)
 	    uri = externalEntity.getURL ().toString ();
@@ -3983,16 +3969,16 @@ loop:
 
 	switch (sourceType) {
 	case INPUT_STREAM:
-	    if (uri != null) {
-		handler.endExternalEntity (uri);
-	    }
+	    handler.endExternalEntity (ename, uri);
 	    is.close ();
 	    break;
 	case INPUT_READER:
-	    if (uri != null) {
-		handler.endExternalEntity (uri);
-	    }
+	    handler.endExternalEntity (ename, uri);
 	    reader.close ();
+	    break;
+	case INPUT_INTERNAL:
+	    if (ename != null)
+		handler.endInternalEntity (ename);
 	    break;
 	}
 
@@ -4003,7 +3989,6 @@ loop:
 	}
 
 	Object input [] = (Object[]) inputStack.pop ();
-	entityStack.pop ();
 
 	sourceType = ((Integer) input [0]).intValue ();
 	externalEntity = (URLConnection) input [1];
@@ -4058,8 +4043,6 @@ loop:
      * read the string again if the method succeeds.
      * <p>This method will push back a character rather than an
      * array whenever possible (probably the majority of cases).
-     * <p><b>NOTE:</b> This method currently has a hard-coded limit
-     * of 100 characters for the delimiter.
      * @param delim The string that should appear next.
      * @return true if the string was successfully read, or false if
      *	 it was not.
@@ -4584,18 +4567,10 @@ loop:
     private void encodingError (String message, int value, int offset)
     throws SAXException
     {
-	String uri;
-
-	if (value != -1) {
+	if (value != -1)
 	    message = message + " (character code: 0x" +
 		      Integer.toHexString (value) + ')';
-	}
-	if (externalEntity != null) {
-	    uri = externalEntity.getURL ().toString ();
-	} else {
-	    uri = baseURI;
-	}
-	handler.error (message, uri, -1, offset + currentByteCount);
+	error (message);
     }
 
 
