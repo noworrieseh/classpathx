@@ -8,6 +8,9 @@ Barreto, Paulo S. L. M. <sao19677@terra.com.br>
 Louchart-Fletcher, Olivier <olivier@zipworld.com.au>
    + enabling the build process with the GNU tools.
 
+Marshall, Casey <mstatic@metastatic.org>
+   + implementation of the Serpent symmetric-key block cipher.
+
 Naffah, Raif S. <raif@fl.net.au>
    + starting the project.
    + designing the basic API.
