@@ -93,6 +93,12 @@ implements XPathResult
           return new Double (getNumberValue ()).toString ();
         case BOOLEAN_TYPE:
           return Boolean.valueOf (getBooleanValue ()).toString ();
+        case UNORDERED_NODE_SNAPSHOT_TYPE:
+          Node node = getSingleNodeValue ();
+          if (node != null)
+            {
+              return node.toString ();
+            }
         default:
           return getClass ().getName () + "[type=" + type + ",length=" +
             getSnapshotLength () + ']';

@@ -41,7 +41,15 @@ xmljGetNodeID (JNIEnv * env, jobject self)
   xmlNodePtr node;
 
   cls = (*env)->GetObjectClass (env, self);
+  if (cls == NULL)
+    {
+      return NULL;
+    }
   field = (*env)->GetFieldID (env, cls, "id", "J");
+  if (field == NULL)
+    {
+      return NULL;
+    }
   id = (*env)->GetLongField (env, self, field);
   if (id == 0LL)
     {
@@ -70,9 +78,16 @@ xmljGetNodeInstance (JNIEnv * env, xmlNodePtr node)
 
   /* Invoke the GnomeNode.newInstance class method */
   cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeNode");
+  if (cls == NULL)
+    {
+      return NULL;
+    }
   method = (*env)->GetStaticMethodID (env, cls, "newInstance",
                                       "(JJI)Lgnu/xml/libxmlj/dom/GnomeNode;");
-  
+  if (method == NULL)
+    {
+      return NULL;
+    }
   return (*env)->CallStaticObjectMethod (env, cls, method,
                                          xmljAsField (node->doc),
                                          xmljAsField (node),
@@ -87,7 +102,15 @@ xmljFreeDoc (JNIEnv * env, xmlDocPtr doc)
 
   /* Invoke the GnomeNode.freeDocument class method */
   cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeNode");
+  if (cls == NULL)
+    {
+      return;
+    }
   method = (*env)->GetStaticMethodID (env, cls, "freeDocument", "(J)V");
+  if (method == NULL)
+    {
+      return;
+    }
   (*env)->CallStaticVoidMethod (env, cls, method, xmljAsField (doc));
 }
 
