@@ -126,6 +126,7 @@ public interface ServletResponse
    * @param size the size in bytes of the buffer
    *
    * @since Servlet API 2.2
+   * @throws IllegalStateException if content has already been sent.
    */
   void setBufferSize(int size);
 
@@ -142,6 +143,7 @@ public interface ServletResponse
    * reset the current response cache buffer.
    *
    * @since Servlet API 2.2
+   * @throws IllegalStateException if content has already been sent.
    */
   void reset();
 
@@ -187,5 +189,24 @@ public interface ServletResponse
    * @since Servlet API 2.2
    */
   Locale getLocale();
+
+  /**
+   * get the content type if it has been set.
+   * 
+   * @since Servlet API 2.4
+   * 
+   * @return the content type if set or null if not.
+   */
+  String getContentType();
+
+  /**
+   * sets the character encoding.
+   * 
+   * @since Servlet API 2.4
+   *
+   * @parameter a IANA Character Sets
+   * {@link (http://www.iana.org/assignments/character-sets)} string.
+   */
+    void setCharacterEncoding(String encoding);
 
 }
