@@ -1,3 +1,7 @@
+2004-09-30  Chris Burdess  <dog@bluezoo.org>
+
+	* MANIFEST.MF: Added Implementation-* entries.
+
 2004-09-29  Chris Burdess  <dog@bluezoo.org>
 
 	* IMAPStore.java: Implement IMAP namespaces.

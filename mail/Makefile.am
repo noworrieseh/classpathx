@@ -279,6 +279,8 @@ providers_meta = \
 @srcdir@/META-INF/javamail.default.providers \
 @srcdir@/META-INF/javamail.default.address.map
 
+manifest_mf = @srcdir@/MANIFEST.MF
+
 # Classpaths
 classpath = $(src):$(activation_jar):$(inetlib_jar):$(jsse_jar)
 
@@ -352,7 +354,7 @@ $(dst):
 # Jars
 
 $(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
-	$(JAR) cf $(gnumail_jar) \
+	$(JAR) cfm $(gnumail_jar) $(manifest_mf) \
 		$(gnumail_meta) \
 		-C $(dst) javax \
 		-C $(dst) gnu/mail/handler \
@@ -361,7 +363,7 @@ $(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
 $(providers_jar): $(providers_meta) $(provider_classes) $(smtp_classes) \
 	$(imap_classes) $(pop3_classes) $(nntp_classes) $(mbox_classes) \
 	$(maildir_classes)
-	$(JAR) cf $(providers_jar) \
+	$(JAR) cfm $(providers_jar) $(manifest_mf) \
 		$(providers_meta) \
 		-C $(dst) gnu/mail/providers \
 		-C $(dst) gnu/mail/treeutil
