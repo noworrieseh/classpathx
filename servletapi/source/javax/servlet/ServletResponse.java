@@ -57,17 +57,26 @@ public interface ServletResponse
 
   /**
    * Creates a ServletOutputStream for the servlet to write the data to.
-   * <code>setContentLength</code> and <code>setContentType</code> can
-   * only be called before anything is written to this stream.
+   * The stream might have a buffer attached to it, the size of which the
+   * user might be able to alter.
+   *
+   * <p>
+   * No encoding of data written to this stream is done by the container.
+   * </p>
+   *
+   * <p>
    * It is only possible to call <code>getWriter</code> or
    * <code>getOutputStream</code> on a response, but not both.
+   * </p>
    *
    * @since Servlet API 1.0
    *
    * @return ServletOutputStream to write binary data
    * @throws IOException if a i/o exception occurs
    * @throws IllegalStateException if <code>getWriter</code> was already
-   * called on this response
+   *   called on this response
+   * @see #setContentLength which the container might use to provide a buffer
+   *   for this stream.
    */
   ServletOutputStream getOutputStream()
   throws IOException;
@@ -75,18 +84,26 @@ public interface ServletResponse
 
   /**
    * Creates a PrintWriter for the servlet to print text to.
-   * The contenttype must be set before calling this method.
+   * The writer will have the charset associated with any previously
+   * specified content type IF the content type has already been set.
+   * If the default char set is acceptable them content type need not be
+   * set before this method is called.
+   *
+   * <p>
    * It is only possible to call <code>getWriter</code> or
    * <code>getOutputStream</code> on a response, but not both.
+   * </p>
    *
    * @since Servlet API 2.0
    *
    * @return the created PrintWriter
    * @throws IOException if a i/o exception occurs
    * @throws IllegalStateException if <code>getOutputStream</code> was
-   * already called on this response
+   *   already called on this response
    * @throws java.io.UnsupportedEncodingException if no suitable character
-   * encoding can be used
+   *   encoding can be used
+   * @see #setContentType which must be called before this if you want to specify
+   *  a charset to affect this writer.
    */
   PrintWriter getWriter()
   throws IOException;
