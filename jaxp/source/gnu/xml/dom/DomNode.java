@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.13 2002-04-21 21:32:51 nferrier Exp $
+ * $Id: DomNode.java,v 1.14 2002-10-15 21:01:12 nferrier Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.13 2002-04-21 21:32:51 nferrier Exp $
+// $Id: DomNode.java,v 1.14 2002-10-15 21:01:12 nferrier Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2002-04-21 21:32:51 $
+ * @version $Date: 2002-10-15 21:01:12 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -339,6 +339,13 @@ public abstract class DomNode
 			null, child, 0);
 	}
 
+	// Test code.
+	// 	System.out.println("DOMNode node type = " + nodeType
+	// 			   + " new type: " + newType);
+	
+	// 	if (newType == 3)
+	// 	  System.out.println("child content = " + child.getNodeValue());
+	
 	// enforce various structural constraints
 	switch (nodeType) {
 	    case DOCUMENT_NODE:
@@ -900,8 +907,14 @@ public abstract class DomNode
     
 
     /** This forces GCJ compatibility.
+     * Without this method GCJ is unable to compile to byte code.
      */
     public abstract short getNodeType ();
+
+    /** This forces GCJ compatibility.
+     * Without this method GCJ seems unable to natively compile GNUJAXP.
+     */
+    public abstract String getNodeName ();
 
     /**
      * <b>DOM L2</b>
@@ -1543,7 +1556,7 @@ public abstract class DomNode
 
 	// if neither has a namespace, this is a "no-namespace" name.
 	if (ns1 == null && ns2 == null) {
-	    if (getNodeName ().equals (other.getNodeName ()) == false)
+	    if (getNodeName().equals (other.getNodeName ()) == false)
 		return false;
 	    // can test the non-normative "per-element-type" scope here.
 	    // if this is an attribute node and both nodes have been bound
