@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.1 2001-06-20 20:39:39 db Exp $
+ * $Id: JAXPFactory.java,v 1.2 2001-06-23 05:14:33 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ public final class JAXPFactory extends SAXParserFactory
      * Constructs a factory which normally returns a non-validating
      * parser.
      */
-    JAXPFactory () { }
+    public JAXPFactory () { }
 
     public SAXParser newSAXParser ()
     throws ParserConfigurationException, SAXException
