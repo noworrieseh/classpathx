@@ -1,3 +1,7 @@
+2004-11-18  Chris Burdess  <dog@gnu.org>
+
+   	* ls: Implemented more of FilteredSAXEventSink.
+   	
 2004-11-16  Chris Burdess  <dog@gnu.org>
 
    	* dom: Implemented Document.renameNode, Document.normalizeDocument,

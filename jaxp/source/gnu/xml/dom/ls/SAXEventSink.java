@@ -38,6 +38,7 @@
 
 package gnu.xml.dom.ls;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -157,41 +158,49 @@ class SAXEventSink
       doc.createElement(qName);
     // add attributes
     int len = atts.getLength();
-    Attributes2 atts2 = (atts instanceof Attributes2) ? (Attributes2) atts :
-      null;
     NamedNodeMap attrs = element.getAttributes();
     for (int i = 0; i < len; i++)
       {
         // create attribute
-        DomAttr attr;
-        if (namespaceAware)
+        Attr attr = createAttr(atts, i);
+        if (attr != null)
           {
-            String a_uri = atts.getURI(i);
-            String a_localName = atts.getLocalName(i);
-            attr = (DomAttr) doc.createAttributeNS(a_uri, a_localName);
-          }
-        else
-          {
-            String a_qName = atts.getQName(i);
-            attr = (DomAttr) doc.createAttribute(a_qName);
-          }
-        attr.setNodeValue(atts.getValue(i));
-        if (atts2 != null)
-          {
-            // TODO attr.setDeclared(atts2.isDeclared(i));
-            attr.setSpecified(atts2.isSpecified(i));
-          }
-        // add attribute to element
-        if (namespaceAware)
-          {
-            attrs.setNamedItemNS(attr);
-          }
-        else
-          {
-            attrs.setNamedItem(attr);
+            // add attribute to element
+            if (namespaceAware)
+              {
+                attrs.setNamedItemNS(attr);
+              }
+            else
+              {
+                attrs.setNamedItem(attr);
+              }
           }
       }
     return element;
+  }
+
+  protected Attr createAttr(Attributes atts, int index)
+  {
+    DomAttr attr;
+    if (namespaceAware)
+      {
+        String a_uri = atts.getURI(index);
+        String a_localName = atts.getLocalName(index);
+        attr = (DomAttr) doc.createAttributeNS(a_uri, a_localName);
+      }
+    else
+      {
+        String a_qName = atts.getQName(index);
+        attr = (DomAttr) doc.createAttribute(a_qName);
+      }
+    attr.setNodeValue(atts.getValue(index));
+    if (atts instanceof Attributes2)
+      {
+        Attributes2 atts2 = (Attributes2) atts;
+        // TODO attr.setDeclared(atts2.isDeclared(index));
+        attr.setSpecified(atts2.isSpecified(index));
+      }
+    return attr;
   }
 
   public void endElement(String uri, String localName, String qName)
@@ -245,9 +254,14 @@ class SAXEventSink
       }
     if (!inDTD)
       {
-        Node pi = doc.createProcessingInstruction(target, data);
+        Node pi = createProcessingInstruction(target, data);
         ctx.appendChild(pi);
       }
+  }
+
+  protected Node createProcessingInstruction(String target, String data)
+  {
+    return doc.createProcessingInstruction(target, data);
   }
 
   public void skippedEntity(String name)
@@ -265,10 +279,16 @@ class SAXEventSink
       {
         return;
       }
-    DomDoctype doctype = new DomDoctype(doc, name, publicId, systemId);
+    Node doctype = createDocumentType(name, publicId, systemId);
     doc.appendChild(doctype);
     ctx = doctype;
     inDTD = true;
+  }
+
+  protected Node createDocumentType(String name, String publicId,
+                                    String systemId)
+  {
+    return new DomDoctype(doc, name, publicId, systemId);
   }
 
   public void endDTD()
@@ -323,9 +343,14 @@ class SAXEventSink
       }
     if (!inDTD)
       {
-        Node comment = doc.createComment(new String(c, off, len));
+        Node comment = createComment(c, off, len);
         ctx.appendChild(comment);
       }
+  }
+
+  protected Node createComment(char[] c, int off, int len)
+  {
+    return doc.createComment(new String(c, off, len));
   }
 
   // -- DTDHandler --
