@@ -107,6 +107,7 @@ xmljThrowException (JNIEnv *env,
   jthrowable ex;
   jstring jmsg;
 
+  /*fprintf(stderr, "Throwing exception %s %s\n", classname, message);*/
   cls = (*env)->FindClass (env, classname);
   if (cls == NULL)
     {

@@ -53,6 +53,7 @@ extends DocumentBuilderFactory
   public DocumentBuilder newDocumentBuilder ()
     throws ParserConfigurationException
   {
+    /*
     if (!isNamespaceAware ())
       {
         String msg = "Parser must be namespace-aware";
@@ -68,6 +69,7 @@ extends DocumentBuilderFactory
         String msg = "Ignoring element content whitespace not supported";
         throw new ParserConfigurationException (msg);
       }
+      */
     return new GnomeDocumentBuilder (isValidating (),
                                      isCoalescing (),
                                      isExpandEntityReferences ());

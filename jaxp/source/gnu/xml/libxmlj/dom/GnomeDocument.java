@@ -210,7 +210,9 @@ implements Document, XPathEvaluator
                                  Object result)
     throws XPathException, DOMException;
 
-  public String toString()
+  // -- Debugging --
+  
+  public String toString ()
   {
     StringBuffer buffer = new StringBuffer (getClass ().getName ());
     buffer.append ("[version=");

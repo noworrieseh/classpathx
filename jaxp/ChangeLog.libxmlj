@@ -1,3 +1,7 @@
+2004-06-28  Chris Burdess <dog@gnu.org>
+
+	* dom: Fixed name matching.
+
 2004-06-26  Chris Burdess <dog@gnu.org>
 
 	* dom: Added GnomeTypeInfo.

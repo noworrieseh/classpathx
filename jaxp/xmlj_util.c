@@ -125,12 +125,11 @@ jmethodID xmljGetMethodID (JNIEnv *env,
                                                             (jobject)cls,
                                                             nm);
       const char * c_clsName = (*env)->GetStringUTFChars (env, clsname, 0);
-      char * cat = (char *) malloc (sizeof (char));
+      char cat[512] = "[method signature too long]";
       sprintf (cat, "%s.%s %s", c_clsName, name, signature);
       xmljThrowException (env,
                           "java/lang/NoSuchMethodException",
                           cat);
-      free (cat);
       (*env)->ReleaseStringUTFChars (env, clsname, c_clsName);
     }
   return ret;

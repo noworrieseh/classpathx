@@ -36,11 +36,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-resolveEntitySAXFunc defaultResolveEntity;
-warningSAXFunc defaultWarning;
-errorSAXFunc defaultError;
-fatalErrorSAXFunc defaultFatalError;
-
 JNIEnv *dom_cb_env;
 jobject dom_cb_obj;
 
@@ -831,17 +826,25 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv * env,
   jint count;
 
   node = xmljGetNodeID (env, self);
-  attr = node->properties;
-  for (count = 0; attr != NULL && count < index; count++)
-    attr = attr->next;
-  if (attr == NULL)
+  switch (node->type)
     {
-      char msg[1024];
-      sprintf (msg, "No attribute at index %d\n", index);
-      xmljThrowException (env, "java/lang/NullPointerException", msg);
+    case XML_ELEMENT_NODE:
+      attr = node->properties;
+      for (count = 0; attr != NULL && count < index; count++)
+        {
+          attr = attr->next;
+        }
+      if (attr == NULL)
+        {
+          char msg[1024];
+          sprintf (msg, "No attribute at index %d\n", index);
+          xmljThrowException (env, "java/lang/NullPointerException", msg);
+          return NULL;
+        }
+      return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+    default:
       return NULL;
     }
-  return xmljGetNodeInstance (env, (xmlNodePtr) attr);
 }
 
 JNIEXPORT jint JNICALL
@@ -853,14 +856,20 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getLength (JNIEnv * env,
   jint count;
 
   node = xmljGetNodeID (env, self);
-  count = 0;
-  attr = node->properties;
-  while (attr != NULL)
+  switch (node->type)
     {
-      count++;
-      attr = attr->next;
+    case XML_ELEMENT_NODE:
+      count = 0;
+      attr = node->properties;
+      while (attr != NULL)
+        {
+          count++;
+          attr = attr->next;
+        }
+      return count;
+    default:
+      return -1;
     }
-  return count;
 }
 
 JNIEXPORT jobject JNICALL
@@ -967,7 +976,13 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_getNodeType (JNIEnv * env, jobject self)
   xmlNodePtr node;
 
   node = xmljGetNodeID (env, self);
-  return node->type;
+  switch (node->type)
+    {
+    case XML_DTD_NODE:
+      return XML_DOCUMENT_TYPE_NODE;
+    default:
+      return node->type;
+    }
 }
 
 JNIEXPORT jobject JNICALL
@@ -1421,12 +1436,16 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv * env,
       if (ns)
         {
           while (node != NULL && xmljMatchNS (s_uri, s_name, node))
-            node = node->next;
+            {
+              node = node->next;
+            }
         }
       else
         {
           while (node != NULL && xmljMatch (s_name, node))
-            node = node->next;
+            {
+              node = node->next;
+            }
         }
       count++;
     }

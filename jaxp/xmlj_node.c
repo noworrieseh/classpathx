@@ -107,22 +107,23 @@ int
 xmljMatch (const xmlChar * name, xmlNodePtr node)
 {
   xmlNsPtr ns;
-  xmlChar *qName;
-  int ret;
 
-  ns = node->ns;
-  if (ns == NULL || ns->prefix == NULL)
-    qName = xmlStrdup (node->name);
-  else
+  switch (node->type)
     {
-      qName = xmlCharStrdup ("");
-      xmlStrcat (qName, ns->prefix);
-      xmlStrcat (qName, xmlCharStrdup (":"));
-      xmlStrcat (qName, node->name);
+    case XML_ELEMENT_NODE:
+    case XML_ATTRIBUTE_NODE:
+      ns = node->ns;
+      if (ns == NULL || ns->prefix == NULL)
+        {
+          return xmlStrcmp (node->name, name);
+        }
+      else
+        {
+          return xmlStrQEqual (node->ns->prefix, node->name, name);
+        }
+    default:
+      return 0;
     }
-  ret = xmlStrcmp (name, qName);
-  free (qName);
-  return ret;
 }
 
 int
@@ -130,17 +131,28 @@ xmljMatchNS (const xmlChar * uri, const xmlChar * localName, xmlNodePtr node)
 {
   xmlNsPtr ns;
 
-  ns = node->ns;
-  if (ns == NULL || ns->href == NULL)
+  switch (node->type)
     {
-      if (uri != NULL)
-        return 0;
-      return xmlStrcmp (localName, node->name);
-    }
-  else
-    {
-      if (uri == NULL)
-        return 0;
-      return (xmlStrcmp (localName, node->name) && xmlStrcmp (uri, ns->href));
+    case XML_ELEMENT_NODE:
+    case XML_ATTRIBUTE_NODE:
+      ns = node->ns;
+      if (ns == NULL || ns->href == NULL)
+        {
+          if (uri != NULL)
+            {
+              return 0;
+            }
+          return xmlStrcmp (localName, node->name);
+        }
+      else
+        {
+          if (uri == NULL)
+            {
+              return 0;
+            }
+          return (xmlStrcmp (localName, node->name) && xmlStrcmp (uri, ns->href));
+        }
+    default:
+      return 0;
     }
 }

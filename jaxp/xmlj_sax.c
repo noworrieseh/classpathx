@@ -235,7 +235,7 @@ xmljNewSAXHandler (jboolean contentHandler,
       sax->comment = &xmljSAXComment;
       sax->cdataBlock = &xmljSAXCDataBlock;
     }
-  else
+  else if (contentHandler)
     {
       sax->cdataBlock = &xmljSAXCharacters;
     }

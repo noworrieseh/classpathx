@@ -506,7 +506,6 @@ xmljParseDocument2 (JNIEnv * env,
       switch (mode)
         {
         case 0:
-          
           xmljSAXFatalError (ctx, msg);
           break;
         case 1:
