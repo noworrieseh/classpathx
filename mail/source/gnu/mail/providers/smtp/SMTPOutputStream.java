@@ -2,12 +2,13 @@
  * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
  ********************************************************************/
 
-package oje.mail.smtp;
+package gnu.mail.providers.smtp;
 
 // Imports
 import java.io.IOException;
 import java.io.OutputStream;
-import oje.mail.util.CRLFOutputStream;
+import gnu.mail.util.CRLFOutputStream;
+
 
 /** a stream to handle SMTP's concept of full stop.
  * This stream wraps the Output stream that is generated in

@@ -2,7 +2,7 @@
  * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
  ********************************************************************/
 
-package oje.mail.smtp;
+package gnu.mail.providers.smtp;
 
 // Imports
 import java.net.*;
@@ -10,11 +10,12 @@ import java.io.*;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
-import oje.mail.util.*;
+import gnu.mail.util.*;
 
-/**
- * SMTP Transport.  This transport handles communications with an
- * SMTP server.
+
+/** SMTP Transport.
+ * This transport handles communications with an SMTP server.
+ *
  * @author	Andrew Selkirk
  * @version	1.0
  */
