@@ -1,7 +1,7 @@
 package test.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfRSAKeyGeneration.java,v 1.1 2002-01-11 22:03:28 raif Exp $
+// $Id: TestOfRSAKeyGeneration.java,v 1.2 2002-01-17 11:55:36 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -53,7 +53,7 @@ import java.util.Random;
 /**
  * Conformance tests for the RSA key-pair generation implementation.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfRSAKeyGeneration extends TestCase {
 
@@ -107,7 +107,7 @@ public class TestOfRSAKeyGeneration extends TestCase {
       BigInteger q =  ((RSAPrivateCrtKey) kp.getPrivate()).getPrimeQ();
 
       assertTrue("n1 == pq", n1.equals(p.multiply(q)));
-      assertTrue("n2 == pq", n1.equals(p.multiply(q)));
+      assertTrue("n2 == pq", n2.equals(p.multiply(q)));
    }
 
    public void testRSAParams() {
