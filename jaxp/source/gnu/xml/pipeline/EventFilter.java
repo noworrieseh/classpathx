@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.6 2001-07-11 16:56:24 db Exp $
+ * $Id: EventFilter.java,v 1.7 2001-07-29 18:58:08 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import java.util.Hashtable;
 
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 import gnu.xml.util.DefaultHandler;
 
@@ -40,26 +41,31 @@ import gnu.xml.util.DefaultHandler;
  *
  * </ul>
  *
- * <p> Additionally, SAX handlers may be provided, which completely replace
- * handlers from the consumer provided through the constructor.  To make
+ * <p> Additionally, SAX handlers may be assigned, which completely replace
+ * the "upstream" view (through {@link EventConsumer}) of handlers, initially
+ * null or the "next" consumer provided to the constructor.  To make
  * it easier to build specialized filter classes, this class implements
  * all the standard SAX consumer handlers, and those implementations
- * will delegate to the consumer accessed by {@link #getNext}.
+ * delegate "downstream" to the consumer accessed by {@link #getNext}.
  *
  * <p> The simplest way to create a custom a filter class is to create a
- * subclass which overrides one or more handler interface methods, and
- * then itself registers as a handler (for those interfaces) to the base
- * class using a call such as <em>setContentHandler(this)</em>.  That way,
- * those overridden methods will intercept those event callbacks, and
- * all other event callbacks will pass events to the next consumer.
+ * subclass which overrides one or more handler interface methods.  The
+ * constructor for that subclass then registers itself as a handler for
+ * those interfaces using a call such as <em>setContentHandler(this)</em>,
+ * so the "upstream" view of event delivery is modified from the state
+ * established in the base class constructor.  That way,
+ * the overridden methods intercept those event callbacks
+ * as they go "downstream", and
+ * all other event callbacks will pass events to any next consumer.
  * Overridden methods may invoke superclass methods (perhaps after modifying
- * parameters) should they wish to delegate such calls.  Such subclasses
- * should use shared ErrorHandler to report errors.
+ * parameters) if they wish to delegate such calls.  Such subclasses
+ * should use {@link #getErrorHandler} to report errors using the
+ * common error reporting mechanism.
  *
  * <p> Another important technique is to construct a filter consisting
  * of only a few specific types of handler.  For example, one could easily
  * prune out lexical events or various declarations by providing handlers
- * which don't pass the events on, or null handlers.
+ * which don't pass those events downstream, or by providing null handlers.
  *
  * <hr />
  *
@@ -77,24 +83,33 @@ import gnu.xml.util.DefaultHandler;
  *	And it implements {@link EventConsumer}, which groups related
  *	consumer methods together, rather than leaving them separated.
  *
- *	<li> ErrorHandler support is separated, on the grounds that
- *	pipeline stages need to share the same error handling policy.
- *
- *	<li> The chaining which is visible is to the next consumer,
- *	not to the preceding producer.  It supports "fan-in", where
+ *	<li> The chaining which is visible is "downstream" to the next
+ *	consumer, not "upstream" to the preceding producer.
+ *	It supports "fan-in", where
  *	a consumer can be fed by several producers.  (For "fan-out",
  *	see the {@link TeeConsumer} class.)
  *
- *	<li> The chaining is set up differently.  It is intended to be
- *	set up fron terminus towards producer, during filter construction,
- *	as described above.  This is part of an early binding model;
+ *	<li> Event chaining is set up differently.  It is intended to
+ *	work "upstream" from terminus towards producer, during filter
+ *	construction, as described above.
+ *	This is part of an early binding model:
  *	events don't need to pass through stages which ignore them.
+ *
+ *	<li> ErrorHandler support is separated, on the grounds that
+ *	pipeline stages need to share the same error handling policy.
+ *	For the same reason, error handler setup goes "downstream":
+ *	when error handlers get set, they are passed to subsequent
+ *	consumers.
  *
  *	</ul>
  *
+ * <p> The {@link #chainTo chainTo()} convenience routine supports chaining to
+ * an XMLFilterImpl, in its role as a limited functionality event
+ * consumer.  Its event producer role ({@link XMLFilter}) is ignored.
+ *
  * <hr />
  *
- * <p> The {@link #bind} routine may be used associate event pipelines
+ * <p> The {@link #bind bind()} routine may be used associate event pipelines
  * with any kind of {@link XMLReader} that will produce the events.
  * Such pipelines don't necessarily need to have any members which are
  * implemented using this class.  That routine has some intelligence
@@ -103,7 +118,7 @@ import gnu.xml.util.DefaultHandler;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-07-11 16:56:24 $
+ * @version $Date: 2001-07-29 18:58:08 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -285,8 +300,57 @@ public class EventFilter
     }
 
     /**
+     * Treats the XMLFilterImpl as a limited functionality event consumer,
+     * by arranging to deliver events to it; this lets such classes be
+     * "wrapped" as pipeline stages.
+     *
+     * <p> <em>Upstream Event Setup:</em>
+     * If no handlers have been assigned to this EventFilter, then the
+     * handlers from specified XMLFilterImpl are returned from this
+     * {@link EventConsumer}: the XMLFilterImpl is just "wrapped".
+     * Otherwise the specified handlers will be returned.
+     *
+     * <p> <em>Downstream Event Setup:</em>
+     * Subclasses chain event delivery to the specified XMLFilterImpl,
+     * as if their constructor passed a "next" EventConsumer to the
+     * constructor for this class.
+     * If this EventFilter has an ErrorHandler, it is assigned as
+     * the error handler for the XMLFilterImpl, just as would be
+     * done for a next stage implementing {@link EventConsumer}.
+     *
+     * @exception IllegalStateException if the "next" consumer has
+     *	already been set through the constructor.
+     */
+    public void chainTo (XMLFilterImpl next)
+    {
+	if (this.next != null)
+	    throw new IllegalStateException ();
+
+	docNext = next.getContentHandler ();
+	if (docHandler == null)
+	    docHandler = docNext;
+	dtdNext = next.getDTDHandler ();;
+	if (dtdHandler == null)
+	    dtdHandler = dtdNext;
+
+	try {
+	    declNext = (DeclHandler) next.getProperty (DECL_HANDLER);
+	    if (declHandler == null)
+		declHandler = declNext;
+	} catch (SAXException e) { /* leave value null */ }
+	try {
+	    lexNext = (LexicalHandler) next.getProperty (LEXICAL_HANDLER);
+	    if (lexHandler == null)
+		lexHandler = lexNext;
+	} catch (SAXException e) { /* leave value null */ }
+
+	if (errHandler != null)
+	    next.setErrorHandler (errHandler);
+    }
+
+    /**
      * Records the error handler that should be used by this stage, and
-     * passes it on to any subsequent stage.
+     * passes it "downstream" to any subsequent stage.
      */
     final public void setErrorHandler (ErrorHandler handler)
     {
