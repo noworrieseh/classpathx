@@ -20,13 +20,37 @@
 
 package javax.servlet.jsp;
 
+import java.io.Writer;
 import java.io.IOException;
 
 /**
- * XXX
+ * The output stream used by JSP engines.
+ *
+ * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
+ * @author Mark Wielaard <mark@klomp.org>
  */
-public interface JspWriter 
+public abstract class JspWriter extends Writer
 {
+
+  protected boolean autoFlush;
+
+  protected int bufferSize;
+
+  public static final int DEFAULT_BUFFER = -1;
+
+  public static final int NO_BUFFER = -2;
+
+  public static final int UNBOUNDED_BUFFER = -3;
+
+
+  /** Make a JSP io stream.
+   */
+  protected JspWriter (int bufferSize, boolean autoFlush)
+  {
+    super();
+    this.autoFlush = autoFlush;
+    this.bufferSize = bufferSize;
+  }
 
   /**
    * XXX
@@ -34,49 +58,64 @@ public interface JspWriter
    * @exception IOException if an error occurs
    * @exception IllegalStateException XXX
    */
-  void clear() throws IOException, IllegalStateException;
+  public abstract  void clear() throws IOException, IllegalStateException;
+
+  /**
+   * Clears the output buffer.
+   *
+   * @exception IOException if an error occurs
+   * @exception IllegalStateException XXX
+   */
+  public abstract  void clearBuffer ()
+    throws IOException, IllegalStateException;
 
   /**
    * XXX
    *
    * @exception IOException if an error occurs
    */
-  void close() throws IOException;
+  public abstract  void close() throws IOException;
 
   /**
    * XXX
    *
    * @exception IOException if an error occurs
    */
-  void flush() throws IOException;
+  public abstract  void flush() throws IOException;
 
   /**
    * XXX
    *
    * @return XXX
    */
-  int getBufferSize();
+  public int getBufferSize()
+  {
+    return bufferSize;
+  }
 
   /**
    * XXX
    *
    * @return XXX
    */
-  int getRemainingSize();
+  public abstract  int getRemainingSize();
 
   /**
    * XXX
    *
    * @return XXX
    */
-  boolean isAutoFlush();
+  public boolean isAutoFlush()
+  {
+    return autoFlush;
+  }
 
   /**
    * XXX
    *
    * @exception IOException if an error occurs
    */
-  void newLine() throws IOException;
+  public abstract  void newLine() throws IOException;
 
   /**
    * XXX
@@ -84,7 +123,7 @@ public interface JspWriter
    * @param b XXX
    * @throws IOException if an error occurs
    */
-  void print(boolean b) throws IOException;
+  public abstract  void print(boolean b) throws IOException;
 
   /**
    * XXX
@@ -92,7 +131,7 @@ public interface JspWriter
    * @param c XXX
    * @throws IOException if an error occurs
    */
-  void print(char c) throws IOException;
+  public abstract  void print(char c) throws IOException;
 
   /**
    * XXX
@@ -100,7 +139,7 @@ public interface JspWriter
    * @param cb XXX
    * @throws IOException if an error occurs
    */
-  void print(char[] cb) throws IOException;
+  public abstract  void print(char[] cb) throws IOException;
 
   /**
    * XXX
@@ -108,7 +147,7 @@ public interface JspWriter
    * @param d XXX
    * @throws IOException if an error occurs
    */
-  void print(double d) throws IOException;
+  public abstract  void print(double d) throws IOException;
 
   /**
    * XXX
@@ -116,7 +155,7 @@ public interface JspWriter
    * @param f XXX
    * @throws IOException if an error occurs
    */
-  void print(float f) throws IOException;
+  public abstract  void print(float f) throws IOException;
 
   /**
    * XXX
@@ -124,7 +163,7 @@ public interface JspWriter
    * @param i XXX
    * @throws IOException if an error occurs
    */
-  void print(int i) throws IOException;
+  public abstract  void print(int i) throws IOException;
 
   /**
    * XXX
@@ -132,7 +171,7 @@ public interface JspWriter
    * @param l XXX
    * @throws IOException if an error occurs
    */
-  void print(long l) throws IOException;
+  public abstract  void print(long l) throws IOException;
 
   /**
    * XXX
@@ -140,7 +179,7 @@ public interface JspWriter
    * @param o XXX
    * @throws IOException if an error occurs
    */
-  void print(Object o) throws IOException;
+  public abstract  void print(Object o) throws IOException;
 
   /**
    * XXX
@@ -148,14 +187,14 @@ public interface JspWriter
    * @param s XXX
    * @throws IOException if an error occurs
    */
-  void print(String s) throws IOException;
+  public abstract  void print(String s) throws IOException;
 
   /**
    * XXX
    *
    * @exception IOException if an error occurs
    */
-  void println() throws IOException;
+  public abstract  void println() throws IOException;
 
   /**
    * XXX
@@ -163,7 +202,7 @@ public interface JspWriter
    * @param b XXX
    * @throws IOException if an error occurs
    */
-  void println(boolean b) throws IOException;
+  public abstract  void println(boolean b) throws IOException;
 
   /**
    * XXX
@@ -171,7 +210,7 @@ public interface JspWriter
    * @param c XXX
    * @throws IOException if an error occurs
    */
-  void println(char c) throws IOException;
+  public abstract  void println(char c) throws IOException;
 
   /**
    * XXX
@@ -179,7 +218,7 @@ public interface JspWriter
    * @param cb XXX
    * @throws IOException if an error occurs
    */
-  void println(char[] cb) throws IOException;
+  public abstract  void println(char[] cb) throws IOException;
 
   /**
    * XXX
@@ -187,7 +226,7 @@ public interface JspWriter
    * @param d XXX
    * @throws IOException if an error occurs
    */
-  void println(double d) throws IOException;
+  public abstract  void println(double d) throws IOException;
 
   /**
    * XXX
@@ -195,7 +234,7 @@ public interface JspWriter
    * @param f XXX
    * @throws IOException if an error occurs
    */
-  void println(float f) throws IOException;
+  public abstract  void println(float f) throws IOException;
 
   /**
    * XXX
@@ -203,7 +242,7 @@ public interface JspWriter
    * @param i XXX
    * @throws IOException if an error occurs
    */
-  void println(int i) throws IOException;
+  public abstract  void println(int i) throws IOException;
 
   /**
    * XXX
@@ -211,7 +250,7 @@ public interface JspWriter
    * @param l XXX
    * @throws IOException if an error occurs
    */
-  void println(long l) throws IOException;
+  public abstract  void println(long l) throws IOException;
 
   /**
    * XXX
@@ -219,7 +258,7 @@ public interface JspWriter
    * @param o XXX
    * @throws IOException if an error occurs
    */
-  void println(Object o) throws IOException;
+  public abstract  void println(Object o) throws IOException;
 
   /**
    * XXX
@@ -227,7 +266,7 @@ public interface JspWriter
    * @param s XXX
    * @throws IOException if an error occurs
    */
-  void println(String s) throws IOException;
+  public abstract  void println(String s) throws IOException;
 
   /**
    * XXX
@@ -235,7 +274,7 @@ public interface JspWriter
    * @param cb XXX
    * @exception IOException if an error occurs
    */
-  void write(char[] cb) throws IOException;
+  public abstract  void write(char[] cb) throws IOException;
 
   /**
    * XXX
@@ -245,7 +284,7 @@ public interface JspWriter
    * @param len XXX
    * @exception IOException if an error occurs
    */
-  void write(char[] cb, int off, int len) throws IOException;
+  public abstract  void write(char[] cb, int off, int len) throws IOException;
 
   /**
    * XXX
@@ -253,7 +292,7 @@ public interface JspWriter
    * @param c XXX
    * @exception IOException if an error occurs
    */
-  void write(int c) throws IOException;
+  public abstract  void write(int c) throws IOException;
 
   /**
    * XXX
@@ -261,7 +300,7 @@ public interface JspWriter
    * @param s XXX
    * @exception IOException if an error occurs
    */
-  void write(String s) throws IOException;
+  public abstract  void write(String s) throws IOException;
 
   /**
    * XXX
@@ -271,7 +310,7 @@ public interface JspWriter
    * @param len XXX
    * @exception IOException if an error occurs
    */
-  void write(String s, int off, int len) throws IOException;
+  public abstract  void write(String s, int off, int len) throws IOException;
 
 }
 
