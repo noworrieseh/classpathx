@@ -752,29 +752,40 @@ final public class SAXDriver
           if (!xmlNames)
             return;
         }
+        // NS prefix declaration?
+        else if ((index = qname.indexOf (':')) == 5
+                 && qname.startsWith ("xmlns")) {
+          String		prefix = qname.substring (6);
+          
+          if (value.length () == 0) {
+            verror ("missing URI in namespace decl attribute: "
+                    + qname);
+          } else
+            declarePrefix (prefix, value);
+          if (!xmlNames)
+            return;
+        }
       } else {
         if ("xmlns".equals(qname)) {
           declarePrefix ("", value);
           if (!xmlNames)
             return;
         }
+        // NS prefix declaration?
+        else if ((index = qname.indexOf (':')) == 5
+                 && qname.startsWith ("xmlns")) {
+          String		prefix = qname.substring (6);
+          
+          if (value.length () == 0) {
+            verror ("missing URI in namespace decl attribute: "
+                    + qname);
+          } else
+            declarePrefix (prefix, value);
+          if (!xmlNames)
+            return;
+        }
       }
-      
-	    // NS prefix declaration?
-	    else if ((index = qname.indexOf (':')) == 5
-		    && qname.startsWith ("xmlns")) {
-		String		prefix = qname.substring (6);
-
-		if (value.length () == 0) {
-		    verror ("missing URI in namespace decl attribute: "
-				+ qname);
-		} else
-		    declarePrefix (prefix, value);
-		if (!xmlNames)
-		    return;
-	    }
-	}
-
+  }
 	// remember this attribute ...
 
 	if (attributeCount == attributeSpecified.length) { 	// grow array?
@@ -1015,13 +1026,8 @@ final public class SAXDriver
 	if (type == null)
 	    return "CDATA";
 	// ... use DeclHandler.attributeDecl to see enumerations
-    if (getFeature (FEATURE + "string-interning")) {
       if (type == "ENUMERATION")
         return "NMTOKEN";
-    } else {
-      if (type.equals("ENUMERATION"))
-        return "NMTOKEN";
-    }
 	return type;
     }
 
