@@ -160,7 +160,6 @@ public class SMTPTransport
                         if (tmt == null)
                           {
                             connection.starttls ();
-                            extensions = connection.ehlo (localHostName);
                           }
                         else
                           {
@@ -175,6 +174,7 @@ public class SMTPTransport
                                 throw new MessagingException (e.getMessage (), e);
                               }
                           }
+                        extensions = connection.ehlo (localHostName);
                       }
                   }
                 else if ("required".equals (getProperty ("tls")))
@@ -284,7 +284,8 @@ public class SMTPTransport
             String reversePath = from.getAddress ();
             // DSN RET
             String dsnRet = getProperty ("dsn.ret");
-            if (dsnRet != null && extensions != null)
+            if (dsnRet != null && extensions != null &&
+                extensions.contains ("DSN"))
               {
                 String FULL = "FULL", HDRS = "HDRS";
                 String value = null;
@@ -311,7 +312,8 @@ public class SMTPTransport
             
             // DSN NOTIFY
             String dsnNotify = getProperty ("dsn.notify");
-            if (dsnNotify != null && extensions != null)
+            if (dsnNotify != null && extensions != null &&
+                extensions.contains ("DSN"))
               {
                 String NEVER = "NEVER", SUCCESS = "SUCCESS";
                 String FAILURE = "FAILURE", DELAY = "DELAY";
