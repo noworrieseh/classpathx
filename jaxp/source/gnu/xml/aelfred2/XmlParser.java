@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.7 2001-07-07 18:15:57 db Exp $
+ * $Id: XmlParser.java,v 1.8 2001-07-10 23:05:52 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.7 2001-07-07 18:15:57 db Exp $
+// $Id: XmlParser.java,v 1.8 2001-07-10 23:05:52 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-07 18:15:57 $
+ * @version $Date: 2001-07-10 23:05:52 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -638,9 +638,8 @@ final class XmlParser
 	require ("version");
 	parseEq ();
 	version = readLiteral (flags);
-	if (!version.equals ("1.0")) {
-	    error ("unsupported XML version", version, "1.0");
-	}
+	if (!version.equals ("1.0"))
+	    handler.warn ("expected XML version 1.0, not: " + version);
 
 	// Try reading an encoding declaration.
 	boolean white = tryWhitespace ();
@@ -697,9 +696,8 @@ final class XmlParser
 	    String version;
 	    parseEq ();
 	    version = readLiteral (flags);
-	    if (!version.equals ("1.0")) {
-		error ("unsupported XML version", version, "1.0");
-	    }
+	    if (!version.equals ("1.0"))
+		handler.warn ("expected XML version 1.0, not: " + version);
 	    requireWhitespace ();
 	}
 
