@@ -205,6 +205,8 @@ META-INF/javamail.default.address.map
 # Targets
 BUILT_SOURCES = $(GNUMAILJAR) smtp.jar imap.jar pop3.jar nntp.jar mbox.jar maildir.jar
 
+EXTRA_DIST = jarcompiler $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
+
 #if ENABLE_SMTP
 #smtp.jar \
 #endif
