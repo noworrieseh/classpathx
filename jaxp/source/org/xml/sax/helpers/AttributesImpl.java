@@ -1,8 +1,9 @@
 // AttributesImpl.java - default implementation of Attributes.
-// Written by David Megginson, sax@megginson.com
+// http://sax.sourceforge.net
+// Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
 
-// $Id: AttributesImpl.java,v 1.3 2001-08-03 18:53:37 db Exp $
+// $Id: AttributesImpl.java,v 1.4 2001-09-29 05:34:42 db Exp $
 
 
 package org.xml.sax.helpers;
@@ -39,8 +40,7 @@ import org.xml.sax.Attributes;
  * implementation using a single array rather than a set of Vectors.</p>
  *
  * @since SAX 2.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
+ * @author David Megginson
  * @version 2.0r2pre
  */
 public class AttributesImpl implements Attributes

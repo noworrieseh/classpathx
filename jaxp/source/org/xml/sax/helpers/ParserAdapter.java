@@ -1,8 +1,9 @@
 // ParserAdapter.java - adapt a SAX1 Parser to a SAX2 XMLReader.
-// Written by David Megginson, sax@megginson.com
+// http://sax.sourceforge.net
+// Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
 
-// $Id: ParserAdapter.java,v 1.3 2001-08-03 18:57:24 db Exp $
+// $Id: ParserAdapter.java,v 1.4 2001-09-29 05:34:42 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -46,8 +47,7 @@ import org.xml.sax.SAXNotSupportedException;
  * attribute names.</p>
  *
  * @since SAX 2.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
+ * @author David Megginson
  * @version 2.0r2pre
  * @see org.xml.sax.helpers.XMLReaderAdapter
  * @see org.xml.sax.XMLReader
@@ -750,11 +750,12 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 	String parts[] = nsSupport.processName(qName, nameParts,
 					       isAttribute);
 	if (parts == null) {
-	    parts = new String[3];
-	    parts[2] = qName.intern();
 	    if (useException)
 		throw makeException("Undeclared prefix: " + qName);
 	    reportError("Undeclared prefix: " + qName);
+	    parts = new String[3];
+	    parts[0] = parts[1] = "";
+	    parts[2] = qName.intern();
 	}
 	return parts;
     }

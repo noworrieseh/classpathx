@@ -1,8 +1,9 @@
 // NamespaceSupport.java - generic Namespace support for SAX.
-// Written by David Megginson, sax@megginson.com
+// http://sax.sourceforge.net
+// Written by David Megginson
 // This class is in the Public Domain.  NO WARRANTY!
 
-// $Id: NamespaceSupport.java,v 1.3 2001-08-03 18:56:13 db Exp $
+// $Id: NamespaceSupport.java,v 1.4 2001-09-29 05:34:42 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -58,8 +59,7 @@ import java.util.Vector;
  * class will be somewhat less efficient.</p>
  *
  * @since SAX 2.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
+ * @author David Megginson
  * @version 2.0r2pre
  */
 public class NamespaceSupport
@@ -204,15 +204,15 @@ public class NamespaceSupport
      * context; the prefix will remain in force until this context
      * is popped, unless it is shadowed in a descendant context.</p>
      *
-     * <p>To declare a default Namespace, use the empty string.  The
-     * prefix must not be "xml" or "xmlns".</p>
+     * <p>To declare a default Namespace, use the empty string as
+     * the prefix.  The prefix must not be "xml" or "xmlns".</p>
      *
      * <p>Note that you must <em>not</em> declare a prefix after
      * you've pushed and popped another Namespace.</p>
      *
-     * <p>Note that there is an asymmetry in this library: while {@link
+     * <p>Note that there is an asymmetry in this library: {@link
      * #getPrefix getPrefix} will not return the default "" prefix,
-     * even if you have declared one; to check for a default prefix,
+     * even if you have declared one.  To check for a default prefix,
      * you have to look it up explicitly using {@link #getURI getURI}.
      * This asymmetry exists to make it easier to look up prefixes
      * for attribute names, where the default prefix is not allowed.</p>
