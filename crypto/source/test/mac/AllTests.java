@@ -1,7 +1,7 @@
-package test;
+package test.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.5 2002-05-14 08:47:37 raif Exp $
+// $Id: AllTests.java,v 1.1 2002-05-14 08:47:38 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -37,9 +37,9 @@ import junit.textui.TestRunner;
 
 /**
  * <p>A <a href="www.junit.org">JUnit</a> {@link TestSuite} that runs all tests
- * for all GNU Crypto packages.</p>
+ * of the <code>gnu.crypto.mac</code> package.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.1 $
  */
 public class AllTests extends TestCase {
 
@@ -61,16 +61,9 @@ public class AllTests extends TestCase {
    }
 
    public static Test suite() {
-      TestSuite result = new TestSuite("GNU Crypto regression tests");
+      TestSuite result = new TestSuite("GNU Crypto MAC package tests");
 
-      result.addTest(test.cipher.AllTests.suite());
-      result.addTest(test.mode.AllTests.suite());
-      result.addTest(test.pad.AllTests.suite());
-      result.addTest(test.hash.AllTests.suite());
-      result.addTest(test.prng.AllTests.suite());
-      result.addTest(test.sig.AllTests.suite());
-      result.addTest(test.mac.AllTests.suite());
-      result.addTest(test.jce.AllTests.suite());
+      result.addTest(TestOfHMacFactory.suite());
 
       return result;
    }

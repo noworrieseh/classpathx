@@ -1,7 +1,7 @@
-package test;
+package test.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.5 2002-05-14 08:47:37 raif Exp $
+// $Id: TestOfHMacFactory.java,v 1.1 2002-05-14 08:47:38 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -35,46 +35,57 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import gnu.crypto.mac.HMacFactory;
+import gnu.crypto.mac.IMac;
+
+import java.util.Iterator;
+
 /**
- * <p>A <a href="www.junit.org">JUnit</a> {@link TestSuite} that runs all tests
- * for all GNU Crypto packages.</p>
+ * <p>Conformance test for the {@link HMacFactory} implementation.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.1 $
  */
-public class AllTests extends TestCase {
+public class TestOfHMacFactory extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   public AllTests(String name) {
-      super(name);
-   }
-
    // Constructor(s)
    // -------------------------------------------------------------------------
+
+   public TestOfHMacFactory(String name) {
+      super(name);
+   }
 
    // Class methods
    // -------------------------------------------------------------------------
 
    public static void main(String[] args) {
-      TestRunner.run(suite()); // run the regression tests
+      TestRunner.run(suite());
    }
 
    public static Test suite() {
-      TestSuite result = new TestSuite("GNU Crypto regression tests");
-
-      result.addTest(test.cipher.AllTests.suite());
-      result.addTest(test.mode.AllTests.suite());
-      result.addTest(test.pad.AllTests.suite());
-      result.addTest(test.hash.AllTests.suite());
-      result.addTest(test.prng.AllTests.suite());
-      result.addTest(test.sig.AllTests.suite());
-      result.addTest(test.mac.AllTests.suite());
-      result.addTest(test.jce.AllTests.suite());
-
-      return result;
+      return new TestSuite(TestOfHMacFactory.class);
    }
 
    // Instance methods
    // -------------------------------------------------------------------------
+
+   public void testGetInstance() {
+      String mac;
+      IMac algorithm;
+      for (Iterator it = HMacFactory.getNames().iterator(); it.hasNext(); ) {
+         mac = (String) it.next();
+         try {
+            algorithm = null;
+            algorithm = HMacFactory.getInstance(mac);
+            assertNotNull("getInstance("+String.valueOf(mac)+")", algorithm);
+         } catch (InternalError x) {
+            fail("getInstance("+String.valueOf(mac)+"): "+String.valueOf(x));
+         }
+      }
+   }
+
+   protected void setUp() throws Exception {
+   }
 }
