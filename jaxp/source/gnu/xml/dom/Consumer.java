@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.7 2001-11-04 01:17:18 db Exp $
+ * $Id: Consumer.java,v 1.8 2001-11-04 03:58:48 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -64,7 +64,7 @@ import gnu.xml.pipeline.EventConsumer;
  * be partially recreated...)
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 01:17:18 $
+ * @version $Date: 2001-11-04 03:58:48 $
  */
 public class Consumer extends DomConsumer
 {
@@ -237,9 +237,13 @@ public class Consumer extends DomConsumer
 	// DOM L2 has no way to create or access such declarations,
 	// except implicitly.
 
-// FIXME:
-// override clearDocument(), delegate then:
-// doc.setCheckingCharacters (true);
+	public void endDocument ()
+	throws SAXException
+	{
+	    DomDocument		doc = (DomDocument) getDocument ();
+	    doc.setCheckingCharacters (true);
+	    super.endDocument ();
+	}
 
 	// these three methods collaborate to populate entity
 	// refs, marking contents readonly on end-of-entity
