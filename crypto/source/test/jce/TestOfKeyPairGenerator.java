@@ -1,7 +1,7 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfKeyPairGenerator.java,v 1.1 2002-01-17 11:54:47 raif Exp $
+// $Id: TestOfKeyPairGenerator.java,v 1.2 2002-08-07 10:07:54 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,13 +30,14 @@ package test.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+import gnu.crypto.jce.GnuCrypto;
+import gnu.crypto.util.Prime;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-
-import gnu.crypto.jce.GnuCrypto;
-import gnu.crypto.util.Prime;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -51,14 +52,12 @@ import java.security.interfaces.RSAPublicKey;
 /**
  * Conformance tests for the JCE keypair generation implementations.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfKeyPairGenerator extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   private String GNU = "GNU";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -84,7 +83,7 @@ public class TestOfKeyPairGenerator extends TestCase {
    /** Should fail with an unknown algorithm. */
    public void testUnknownGenerator() {
       try {
-         KeyPairGenerator.getInstance("ABC", GNU);
+         KeyPairGenerator.getInstance("ABC", Registry.GNU_CRYPTO);
          fail("testUnknownGenerator()");
       } catch (Exception x) {
          assertTrue("testUnknownGenerator()", true);
@@ -92,7 +91,7 @@ public class TestOfKeyPairGenerator extends TestCase {
    }
 
    public void testDSAKeyPairGenerator() throws Exception {
-      KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", GNU);
+      KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", Registry.GNU_CRYPTO);
 
       // modulus length should be between 512, and 1024 in increments of 64
       try {
@@ -122,7 +121,7 @@ public class TestOfKeyPairGenerator extends TestCase {
    }
 
    public void testRSAKeyPairGenerator() throws Exception {
-      KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", GNU);
+      KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", Registry.GNU_CRYPTO);
 
       // modulus length should be at least 1024
       try {

@@ -1,7 +1,7 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfMessageDigest.java,v 1.1 2002-01-17 11:54:47 raif Exp $
+// $Id: TestOfMessageDigest.java,v 1.2 2002-08-07 10:07:54 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,35 +30,31 @@ package test.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
+import gnu.crypto.Registry;
 import gnu.crypto.hash.HashFactory;
 import gnu.crypto.hash.IMessageDigest;
 import gnu.crypto.jce.GnuCrypto;
 import gnu.crypto.util.Util;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+
 import java.security.MessageDigest;
-import java.security.Provider;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Conformance tests for the JCE Provider implementations of MessageDigest SPI
  * classes.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfMessageDigest extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   private String GNU = "GNU";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -84,7 +80,7 @@ public class TestOfMessageDigest extends TestCase {
    /** Should fail with an unknown algorithm. */
    public void testUnknownHash() {
       try {
-         MessageDigest.getInstance("Gaudot", GNU);
+         MessageDigest.getInstance("Gaudot", Registry.GNU_CRYPTO);
          fail("testUnknownHash()");
       } catch (Exception x) {
          assertTrue("testUnknownHash()", true);
@@ -111,7 +107,7 @@ public class TestOfMessageDigest extends TestCase {
          }
 
          try {
-            jce = MessageDigest.getInstance(mdName, GNU);
+            jce = MessageDigest.getInstance(mdName, Registry.GNU_CRYPTO);
             assertNotNull("MessageDigest.getInstance()", jce);
          } catch (Exception x) {
             x.printStackTrace(System.err);
@@ -139,7 +135,7 @@ public class TestOfMessageDigest extends TestCase {
       byte[] ba1, ba2;
       for (Iterator it = GnuCrypto.getMessageDigestNames().iterator(); it.hasNext(); ) {
          mdName = (String) it.next();
-         md1 = MessageDigest.getInstance(mdName, GNU);
+         md1 = MessageDigest.getInstance(mdName, Registry.GNU_CRYPTO);
 
          md1.update(abc); // start with abc
          md2 = (MessageDigest) md1.clone(); // now clone it

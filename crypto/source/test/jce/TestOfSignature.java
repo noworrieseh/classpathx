@@ -1,7 +1,7 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfSignature.java,v 1.1 2002-01-18 02:26:48 raif Exp $
+// $Id: TestOfSignature.java,v 1.2 2002-08-07 10:07:54 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,12 +30,13 @@ package test.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+import gnu.crypto.jce.GnuCrypto;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-
-import gnu.crypto.jce.GnuCrypto;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -45,14 +46,12 @@ import java.security.Signature;
 /**
  * Conformance tests for the JCE signature scheme implementations.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestOfSignature extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   private String GNU = "GNU";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -78,7 +77,7 @@ public class TestOfSignature extends TestCase {
    /** Should fail with an unknown scheme. */
    public void testUnknownScheme() {
       try {
-         Signature.getInstance("ABC", GNU);
+         Signature.getInstance("ABC", Registry.GNU_CRYPTO);
          fail("testUnknownScheme()");
       } catch (Exception x) {
          assertTrue("testUnknownScheme()", true);
@@ -86,11 +85,11 @@ public class TestOfSignature extends TestCase {
    }
 
    public void testDSSRawSignature() throws Exception {
-      KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", GNU);
+      KeyPairGenerator kpg = KeyPairGenerator.getInstance("DSA", Registry.GNU_CRYPTO);
       kpg.initialize(512);
       KeyPair kp = kpg.generateKeyPair();
 
-      Signature alice = Signature.getInstance("DSA", GNU);
+      Signature alice = Signature.getInstance("DSA", Registry.GNU_CRYPTO);
       Signature bob = (Signature) alice.clone();
 
       byte[] message = "1 if by land, 2 if by sea...".getBytes();
@@ -106,11 +105,11 @@ public class TestOfSignature extends TestCase {
    }
 
    public void testRSAPSSRawSignature() throws Exception {
-      KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", GNU);
+      KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", Registry.GNU_CRYPTO);
       kpg.initialize(1024);
       KeyPair kp = kpg.generateKeyPair();
 
-      Signature alice = Signature.getInstance("RSA-PSS", GNU);
+      Signature alice = Signature.getInstance("RSA-PSS", Registry.GNU_CRYPTO);
       Signature bob = (Signature) alice.clone();
 
       byte[] message = "Que du magnifique...".getBytes();

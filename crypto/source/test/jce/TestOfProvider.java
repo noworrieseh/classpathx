@@ -1,7 +1,7 @@
 package test.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfProvider.java,v 1.2 2002-07-27 00:21:31 raif Exp $
+// $Id: TestOfProvider.java,v 1.3 2002-08-07 10:07:54 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -30,12 +30,14 @@ package test.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+import gnu.crypto.jce.GnuCrypto;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import gnu.crypto.jce.GnuCrypto;
 import java.security.MessageDigest;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -48,14 +50,12 @@ import java.util.Random;
 /**
  * <p>Conformance tests for the JCE Provider implementation.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestOfProvider extends TestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
-
-   private String GNU = "GNU";
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -79,13 +79,13 @@ public class TestOfProvider extends TestCase {
    // -------------------------------------------------------------------------
 
    public void testProviderName() {
-      Provider us = Security.getProvider(GNU);
-      assertTrue("testProviderName()", GNU.equals(us.getName()));
+      Provider us = Security.getProvider(Registry.GNU_CRYPTO);
+      assertTrue("testProviderName()", Registry.GNU_CRYPTO.equals(us.getName()));
    }
 
    public void testSha() {
       try {
-         MessageDigest md = MessageDigest.getInstance("SHA", GNU);
+         MessageDigest md = MessageDigest.getInstance("SHA", Registry.GNU_CRYPTO);
          assertNotNull("testSha()", md);
       } catch (Exception x) {
          x.printStackTrace(System.err);
@@ -95,7 +95,7 @@ public class TestOfProvider extends TestCase {
 
    public void testWhirlpool() {
       try {
-         MessageDigest md = MessageDigest.getInstance("Whirlpool", GNU);
+         MessageDigest md = MessageDigest.getInstance("Whirlpool", Registry.GNU_CRYPTO);
          assertNotNull("testWhirlpool()", md);
       } catch (Exception x) {
          x.printStackTrace(System.err);
@@ -105,7 +105,7 @@ public class TestOfProvider extends TestCase {
 
    public void testShaPRNG() {
       try {
-         SecureRandom rnd = SecureRandom.getInstance("SHA1PRNG", GNU);
+         SecureRandom rnd = SecureRandom.getInstance("SHA1PRNG", Registry.GNU_CRYPTO);
          assertNotNull("testShaPRNG()", rnd);
       } catch (Exception x) {
          x.printStackTrace(System.err);
@@ -115,7 +115,7 @@ public class TestOfProvider extends TestCase {
 
    public void testWhirlpoolPRNG() {
       try {
-         SecureRandom rnd = SecureRandom.getInstance("WHIRLPOOLPRNG", GNU);
+         SecureRandom rnd = SecureRandom.getInstance("WHIRLPOOLPRNG", Registry.GNU_CRYPTO);
          assertNotNull("testWhirlpoolPRNG()", rnd);
       } catch (Exception x) {
          x.printStackTrace(System.err);
@@ -130,7 +130,7 @@ public class TestOfProvider extends TestCase {
          rand = (String) it.next();
          try {
             algorithm = null;
-            algorithm = SecureRandom.getInstance(rand, GNU);
+            algorithm = SecureRandom.getInstance(rand, Registry.GNU_CRYPTO);
             assertNotNull("getInstance("+String.valueOf(rand)+")", algorithm);
          } catch (NoSuchProviderException x) {
             fail("getInstance("+String.valueOf(rand)+"): "+String.valueOf(x));
