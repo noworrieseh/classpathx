@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.26 2001-11-14 21:13:44 db Exp $
+ * $Id: XmlParser.java,v 1.27 2001-11-18 23:29:05 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.26 2001-11-14 21:13:44 db Exp $
+// $Id: XmlParser.java,v 1.27 2001-11-18 23:29:05 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-14 21:13:44 $
+ * @version $Date: 2001-11-18 23:29:05 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -427,6 +427,9 @@ final class XmlParser
     	}
     }
 
+    static final char	startDelimComment [] = { '<', '!', '-', '-' };
+    static final char	endDelimComment [] = { '-', '-' };
+
     /**
      * Skip a comment.
      * <pre>
@@ -441,12 +444,15 @@ final class XmlParser
 	boolean saved = expandPE;
 
 	expandPE = false;
-	parseUntil ("--");
+	parseUntil (endDelimComment);
 	require ('>');
 	expandPE = saved;
 	handler.comment (dataBuffer, 0, dataBufferPos);
 	dataBufferPos = 0;
     }
+
+    static final char	startDelimPI [] = { '<', '?' };
+    static final char	endDelimPI [] = { '?', '>' };
 
     /**
      * Parse a processing instruction and do a call-back.
@@ -468,14 +474,16 @@ final class XmlParser
 	name = readNmtoken (true);
 	if ("xml".equalsIgnoreCase (name))
 	    error ("Illegal processing instruction target", name, null);
-	if (!tryRead ("?>")) {
+	if (!tryRead (endDelimPI)) {
 	    requireWhitespace ();
-	    parseUntil ("?>");
+	    parseUntil (endDelimPI);
 	}
 	expandPE = saved;
 	handler.processingInstruction (name, dataBufferToString ());
     }
 
+
+    static final char	endDelimCDATA [] = { ']', ']', '>' };
 
     /**
      * Parse a CDATA section.
@@ -490,7 +498,7 @@ final class XmlParser
     private void parseCDSect ()
     throws Exception
     {
-	parseUntil ("]]>");
+	parseUntil (endDelimCDATA);
 	dataBufferFlush ();
     }
 
@@ -763,9 +771,9 @@ final class XmlParser
     {
 	while (true) {
 	    skipWhitespace ();
-	    if (tryRead ("<?")) {
+	    if (tryRead (startDelimPI)) {
 		parsePI ();
-	    } else if (tryRead ("<!--")) {
+	    } else if (tryRead (startDelimComment)) {
 		parseComment ();
 	    } else {
 		return;
@@ -894,9 +902,9 @@ final class XmlParser
 	    parseEntityDecl ();
 	} else if (tryRead ("<!NOTATION")) {
 	    parseNotationDecl ();
-	} else if (tryRead ("<?")) {
+	} else if (tryRead (startDelimPI)) {
 	    parsePI ();
-	} else if (tryRead ("<!--")) {
+	} else if (tryRead (startDelimComment)) {
 	    parseComment ();
 	} else if (tryRead ("<![")) {
 	    if (inputStack.size () > 0)
@@ -3946,7 +3954,12 @@ loop:
     private boolean tryRead (String delim)
     throws SAXException, IOException
     {
-	char ch[] = delim.toCharArray ();
+	return tryRead (delim.toCharArray ());
+    }
+
+    private boolean tryRead (char ch [])
+    throws SAXException, IOException
+    {
 	char c;
 
 	// Compare the input, character-
@@ -4001,6 +4014,12 @@ loop:
     private void parseUntil (String delim)
     throws SAXException, IOException
     {
+	parseUntil (delim.toCharArray ());
+    }
+
+    private void parseUntil (char delim [])
+    throws SAXException, IOException
+    {
 	char c;
 	int startLine = line;
 
@@ -4012,7 +4031,7 @@ loop:
 	} catch (EOFException e) {
 	    error ("end of input while looking for delimiter "
 		+ "(started on line " + startLine
-		+ ')', null, delim);
+		+ ')', null, new String (delim));
 	}
     }
 
