@@ -38,15 +38,16 @@ META-INF/mime.types: META-INF $(PROJECTROOT)/mime.types
 META-INF/mailcap: META-INF $(PROJECTROOT)/mailcap
 	cp $(PROJECTROOT)/mailcap $@
 
-# TODO Admin file targets.
-#META-INF/COPYING: META-INF COPYING
-#	cp $(PROJECTROOT)/COPYING $@
+# Admin file targets.
+META-INF/COPYING: META-INF COPYING
+	cp $(PROJECTROOT)/COPYING $@
 
 SUPPORTFILES = \
 	META-INF/javamail.default.address.map \
 	META-INF/javamail.default.providers \
 	META-INF/mailcap \
-	META-INF/mime.types
+	META-INF/mime.types \
+	META-INF/COPYING
 
 # This is an automakejar target.
 mail.jar:
