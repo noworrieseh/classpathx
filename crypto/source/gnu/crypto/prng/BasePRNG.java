@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: BasePRNG.java,v 1.5 2002-06-08 05:25:41 raif Exp $
+// $Id: BasePRNG.java,v 1.6 2002-07-06 23:54:34 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * <p>An abstract class to facilitate implementing PRNG algorithms.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public abstract class BasePRNG implements IRandom {
 
@@ -133,6 +133,8 @@ public abstract class BasePRNG implements IRandom {
    }
 
    // abstract methods to implement by subclasses -----------------------------
+
+   public abstract Object clone();
 
    public abstract void setup(Map attributes);
 
