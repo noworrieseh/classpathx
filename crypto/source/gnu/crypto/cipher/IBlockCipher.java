@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: IBlockCipher.java,v 1.4 2002-06-08 05:00:29 raif Exp $
+// $Id: IBlockCipher.java,v 1.5 2002-06-28 13:09:40 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -53,10 +53,10 @@ import java.util.Map;
  *    generating the cipher's session key(s). This value is <b>mandatory</b>
  *    and should be included in the initialisation parameters. If it isn't,
  *    an {@link java.lang.IllegalStateException} will be thrown if any method,
- *    other than <tt>reset()</tt> is invoked on the instance.</li>
+ *    other than <code>reset()</code> is invoked on the instance.</li>
  * </ul>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public interface IBlockCipher extends Cloneable {
 
@@ -127,8 +127,8 @@ public interface IBlockCipher extends Cloneable {
     * <p>Initialises the algorithm with designated attributes. Permissible names
     * and values are described in the class documentation above.</p>
     *
-    * @param attributes a set of name-value pairs that describe the desired
-    * future instance behaviour.
+    * @param attributes a set of name-value pairs that describes the desired
+    * future behaviour of this instance.
     * @exception InvalidKeyException if the key data is invalid.
     * @exception IllegalStateException if the instance is already initialised.
     * @see #KEY_MATERIAL
@@ -178,11 +178,12 @@ public interface IBlockCipher extends Cloneable {
    throws IllegalStateException;
 
    /**
-    * <p>A basic symmetric encryption/decryption test for all supported block
-    * and key sizes.</p>
+    * <p>A <i>correctness</i> test that consists of basic symmetric encryption /
+    * decryption test(s) for all supported block and key sizes, as well as one
+    * (1) variable key Known Answer Test (KAT).</p>
     *
-    * @return <code>true</code> if the implementation passes a basic symmetric
-    * self-test. Returns <code>false</code> otherwise.
+    * @return <code>true</code> if the implementation passes simple
+    * <i>correctness</i> tests. Returns <code>false</code> otherwise.
     */
    boolean selfTest();
 }
