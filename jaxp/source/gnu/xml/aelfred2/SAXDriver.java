@@ -740,7 +740,30 @@ final public class SAXDriver
 
 	// FIXME:  char [0] must be ascii alpha; chars [1..index]
 	// must be ascii alphanumeric or in "+-." [RFC 2396]
-
+	
+	//Namespace Constraints
+	//name for xml prefix must be http://www.w3.org/XML/1998/namespace
+	boolean prefixEquality = prefix.equals("xml");
+	boolean uriEquality = uri.equals("http://www.w3.org/XML/1998/namespace");
+	if ((prefixEquality || uriEquality) && !(prefixEquality && uriEquality))
+	   fatal ("xml is by definition bound to the namespace name " +
+	   		"http://www.w3.org/XML/1998/namespace");
+	
+        //xmlns prefix declaration is illegal but xml prefix declaration is llegal...
+	if (prefixEquality && uriEquality)
+	   return;
+	
+        //name for xmlns prefix must be http://www.w3.org/2000/xmlns/
+	prefixEquality = prefix.equals("xmlns");
+	uriEquality = uri.equals("http://www.w3.org/2000/xmlns/");
+	if ((prefixEquality || uriEquality) && !(prefixEquality && uriEquality))
+	   fatal("http://www.w3.org/2000/xmlns/ is by definition bound" +
+	   		" to prefix xmlns");
+	
+	//even if the uri is http://www.w3.org/2000/xmlns/ it is illegal to declare it
+	if (prefixEquality && uriEquality)
+	   fatal ("declaring the xmlns prefix is illegal");
+		
 	uri = uri.intern ();
 	prefixStack.declarePrefix (prefix, uri);
 	contentHandler.startPrefixMapping (prefix, uri);
