@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: MacFactory.java,v 1.1 2002-06-08 05:06:33 raif Exp $
+// $Id: MacFactory.java,v 1.2 2002-07-06 23:44:32 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -32,16 +32,16 @@ package gnu.crypto.mac;
 
 import gnu.crypto.Registry;
 
-import java.util.Set;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Collections;
+import java.util.Set;
 
 /**
  * <p>A <i>Factory</i> that instantiates instances of every supported Message
  * Authentication Code algorithms, including all <i>HMAC</i> algorithms.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class MacFactory implements Registry {
 
@@ -82,7 +82,12 @@ public class MacFactory implements Registry {
          result = new UHash32();
       } else if (name.equalsIgnoreCase(UMAC32)) {
          result = new UMac32();
+      } else if (name.equalsIgnoreCase(TMMH16)) {
+         result = new TMMH16();
       }
+//      else if (name.equalsIgnoreCase(TMMH32)) {
+//         result = new TMMH32();
+//      }
 
       if (result != null && !result.selfTest()) {
          throw new InternalError(result.name());
@@ -102,6 +107,8 @@ public class MacFactory implements Registry {
       hs.addAll(HMacFactory.getNames());
       hs.add(UHASH32);
       hs.add(UMAC32);
+      hs.add(TMMH16);
+//      hs.add(TMMH32);
 
       return Collections.unmodifiableSet(hs);
    }
