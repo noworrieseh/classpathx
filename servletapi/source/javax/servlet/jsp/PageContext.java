@@ -419,6 +419,18 @@ public abstract class PageContext
     throws IOException, IllegalArgumentException;
 
   /**
+   * Initialize the JSP page context.
+   */
+  public abstract void initialize (Servlet servlet,
+				   ServletRequest request,
+				   ServletResponse response,
+				   String errorPageURL,
+				   boolean needsSession,
+				   int bufferSize,
+				   boolean autoFlush)
+    throws IOException, IllegalStateException, IllegalArgumentException;
+
+  /**
    * XXX
    *
    * @param urlPath
@@ -459,4 +471,8 @@ public abstract class PageContext
   public abstract void handlePageException (Throwable t)
     throws ServletException, IOException;
 
+  /**
+   * Release this page context.
+   */
+  public abstract void release ();
 }
