@@ -1,9 +1,9 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: SecureRandomAdapter.java,v 1.1 2002-01-17 11:49:41 raif Exp $
+// $Id: SecureRandomAdapter.java,v 1.2 2002-07-27 00:25:44 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,7 +30,6 @@ package gnu.crypto.jce;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import gnu.crypto.Registry;
 import gnu.crypto.prng.LimitReachedException;
 import gnu.crypto.prng.MDGenerator;
 
@@ -39,17 +38,17 @@ import java.security.SecureRandomSpi;
 import java.util.HashMap;
 
 /**
- * The implementation of a generic {@link java.security.SecureRandom} adapter
- * class to wrap gnu.crypto prng instances.<p>
+ * <p>The implementation of a generic {@link SecureRandom} adapter class to wrap
+ * gnu.crypto prng instances based on Message Digest algorithms.</p>
  *
- * This class defines the <i>Service Provider Interface</i> (<b>SPI</b>) for the
- * {@link java.security.SecureRandom} class, which provides the functionality
- * of a cryptographically strong pseudo-random number generator.<p>
+ * <p>This class defines the <i>Service Provider Interface</i> (<b>SPI</b>) for
+ * the {@link SecureRandom} class, which provides the functionality of a
+ * cryptographically strong pseudo-random number generator.</p>
  *
- * All the abstract methods in the {@link java.security.SecureRandomSpi} class
- * are implemented by this class and all its sub-classes.<p>
+ * <p>All the abstract methods in the {@link SecureRandomSpi} class are
+ * implemented by this class and all its sub-classes.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 abstract class SecureRandomAdapter extends SecureRandomSpi {
 
@@ -66,7 +65,7 @@ abstract class SecureRandomAdapter extends SecureRandomSpi {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial protected constructor.
+    * <p>Trivial protected constructor.</p>
     *
     * @param mdName the canonical name of the underlying hash algorithm.
     */
@@ -79,14 +78,18 @@ abstract class SecureRandomAdapter extends SecureRandomSpi {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // java.security.SecureRandomSpi interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
 
-   public void engineSetSeed(byte[] seed) {
-      HashMap attributes = new HashMap();
-      attributes.put(MDGenerator.MD_NAME, mdName);
-      attributes.put(MDGenerator.SEEED, seed);
-      adaptee.setup(attributes);
+   // java.security.SecureRandomSpi interface implementation ------------------
+
+   public byte[] engineGenerateSeed(int numBytes) {
+      if (numBytes < 1) {
+         return new byte[0];
+      }
+      byte[] result = new byte[numBytes];
+      this.engineNextBytes(result);
+      return result;
    }
 
    public void engineNextBytes(byte[] bytes) {
@@ -99,15 +102,10 @@ abstract class SecureRandomAdapter extends SecureRandomSpi {
       }
    }
 
-   public byte[] engineGenerateSeed(int numBytes) {
-      if (numBytes < 1) {
-         return new byte[0];
-      }
-      byte[] result = new byte[numBytes];
-      this.engineNextBytes(result);
-      return result;
+   public void engineSetSeed(byte[] seed) {
+      HashMap attributes = new HashMap();
+      attributes.put(MDGenerator.MD_NAME, mdName);
+      attributes.put(MDGenerator.SEEED, seed);
+      adaptee.setup(attributes);
    }
-
-   // Other instance methods
-   // -------------------------------------------------------------------------
 }
