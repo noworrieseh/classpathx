@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: ICM.java,v 1.3 2002-01-11 21:53:00 raif Exp $
+// $Id: ICM.java,v 1.4 2002-06-08 05:12:55 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,26 +31,21 @@ package gnu.crypto.mode;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
-import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
 
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
- * An implementation of David McGrew Integer Counter Mode (ICM) as an
- * {@link gnu.crypto.mode.IMode}.<p>
+ * <p>An implementation of David McGrew Integer Counter Mode (ICM) as an
+ * {@link IMode}.</p>
  *
- * ICM is a way to define a pseudorandom keystream generator using a block
+ * <p>ICM is a way to define a pseudorandom keystream generator using a block
  * cipher. The keystream can be used for additive encryption, key derivation,
  * or any other application requiring pseudorandom data. In the case of this
  * class, it is used as additive encryption, XOR-ing the keystream with the
- * input text --for both encryption and decryption.<p>
+ * input text --for both encryption and decryption.</p>
  *
- * In ICM, the keystream is logically broken into segments. Each segment is
+ * <p>In ICM, the keystream is logically broken into segments. Each segment is
  * identified with a segment index, and the segments have equal lengths. This
  * segmentation makes ICM especially appropriate for securing packet-based
  * protocols. ICM also allows a variety of configurations based, among other
@@ -59,27 +54,32 @@ import java.util.NoSuchElementException;
  * <i>segment index length</i> and <i>block index length</i> <b>must not</b>
  * half the <i>block size</i> of the underlying cipher. This requirement
  * protects the ICM keystream generator from potentially failing to be
- * pseudorandom.<p>
+ * pseudorandom.</p>
  *
- * For simplicity, this implementation, fixes these two values to the
- * following:
+ * <p>For simplicity, this implementation, fixes these two values to the
+ * following:</p>
+ *
  * <ul>
  *    <li>block index length: is half the underlying cipher block size, and</li>
  *    <li>segment index length: is zero.</li>
  * </ul>
- * For a 128-bit block cipher, the above values imply a maximum keystream length
- * of 295,147,905,179,352,825,856 octets, since in ICM, each segment must not
- * exceed the value <tt>(256 ^ <i>block index length</i>) * <i>block length</i></tt>
- * octets.<p>
  *
- * Finally, for this implementation of the ICM, the IV placeholder will be used
- * to pass the value of the <i>Offset</i> in the keystream segment.<p>
+ * <p>For a 128-bit block cipher, the above values imply a maximum keystream
+ * length of 295,147,905,179,352,825,856 octets, since in ICM, each segment must
+ * not exceed the value <code>(256 ^ <i>block index length</i>) * <i>block length</i>
+ * </code> octets.</p>
  *
- * References:<br>
- * <a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
- * Integer Counter Mode</a>, David A. McGrew.<p>
+ * <p>Finally, for this implementation of the ICM, the IV placeholder will be
+ * used to pass the value of the <i>Offset</i> in the keystream segment.</p>
  *
- * @version $Revision: 1.3 $
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
+ *    Integer Counter Mode</a>, David A. McGrew.<p></li>
+ * </ol>
+ *
+ * @version $Revision: 1.4 $
  */
 public class ICM extends BaseMode implements Cloneable {
 
@@ -105,7 +105,7 @@ public class ICM extends BaseMode implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the Factory class.<p>
+    * <p>Trivial package-private constructor for use by the Factory class.</p>
     *
     * @param underlyingCipher the underlying cipher implementation.
     * @param cipherBlockSize the underlying cipher block size to use.
@@ -114,9 +114,13 @@ public class ICM extends BaseMode implements Cloneable {
       super(Registry.ICM_MODE, underlyingCipher, cipherBlockSize);
    }
 
-   /** Private constructor for cloning purposes. */
+   /**
+    * <p>Private constructor for cloning purposes.<p>
+    *
+    * @param that the instance to clone.
+    */
    private ICM(ICM that) {
-      this(that.cipher, that.cipherBlockSize);
+      this((IBlockCipher) that.cipher.clone(), that.cipherBlockSize);
    }
 
    // Class methods

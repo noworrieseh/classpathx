@@ -1,9 +1,9 @@
 package gnu.crypto.mode;
 
 // ----------------------------------------------------------------------------
-// $Id: ECB.java,v 1.3 2002-01-11 21:53:00 raif Exp $
+// $Id: ECB.java,v 1.4 2002-06-08 05:11:50 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,14 +34,33 @@ import gnu.crypto.Registry;
 import gnu.crypto.cipher.IBlockCipher;
 
 /**
- * The implementation of the Electronic Codebook mode.<p>
+ * <p>The implementation of the Electronic Codebook mode.</p>
  *
- * References:<br>
- * <a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
- * Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
- * Morris Dworkin.<p>
+ * <p>The Electronic Codebook (ECB) mode is a confidentiality mode that is
+ * defined as follows:</p>
  *
- * @version $Revision: 1.3 $
+ * <ul>
+ *    <li>ECB Encryption: C<sub>j</sub> = CIPH<sub>K</sub>(P<sub>j</sub>) for j = 1...n</li>
+ *    <li>ECB Decryption: P<sub>j</sub> = CIPH<sup>-1</sup><sub>K</sub>(C<sub>j</sub>) for j = 1...n</li>
+ * </ul>
+ *
+ * <p>In ECB encryption, the forward cipher function is applied directly, and
+ * independently, to each block of the plaintext. The resulting sequence of
+ * output blocks is the ciphertext.</p>
+ *
+ * <p>In ECB decryption, the inverse cipher function is applied directly, and
+ * independently, to each block of the ciphertext. The resulting sequence of
+ * output blocks is the plaintext.</p>
+ *
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://csrc.nist.gov/encryption/modes/Recommendation/Modes01.pdf">
+ *    Recommendation for Block Cipher Modes of Operation Methods and Techniques</a>,
+ *    Morris Dworkin.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.4 $
  */
 public class ECB extends BaseMode implements Cloneable {
 
@@ -52,7 +71,7 @@ public class ECB extends BaseMode implements Cloneable {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial package-private constructor for use by the Factory class.<p>
+    * <p>Trivial package-private constructor for use by the Factory class.</p>
     *
     * @param underlyingCipher the underlying cipher implementation.
     * @param cipherBlockSize the underlying cipher block size to use.
@@ -61,27 +80,32 @@ public class ECB extends BaseMode implements Cloneable {
       super(Registry.ECB_MODE, underlyingCipher, cipherBlockSize);
    }
 
-   /** Private constructor for cloning purposes. */
+   /**
+    * <p>Private constructor for cloning purposes.</p>
+    *
+    * @param that the mode to clone.
+    */
    private ECB(ECB that) {
-      this(that.cipher, that.cipherBlockSize);
+      this((IBlockCipher) that.cipher.clone(), that.cipherBlockSize);
    }
 
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Cloneable interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
 
    public Object clone() {
       return new ECB(this);
    }
 
-   // Implementation of abstract methods in BaseMode
-   // -------------------------------------------------------------------------
+   // Implementation of abstract methods in BaseMode --------------------------
 
    public void setup() {
       if (modeBlockSize != cipherBlockSize) {
-         throw new IllegalArgumentException();
+         throw new IllegalArgumentException(IMode.MODE_BLOCK_SIZE);
       }
    }
 
@@ -95,7 +119,4 @@ public class ECB extends BaseMode implements Cloneable {
    public void decryptBlock(byte[] in, int i, byte[] out, int o) {
       cipher.decryptBlock(in, i, out, o);
    }
-
-   // own methods
-   // -------------------------------------------------------------------------
 }
