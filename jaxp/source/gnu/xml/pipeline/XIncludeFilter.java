@@ -1,5 +1,5 @@
 /*
- * $Id: XIncludeFilter.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: XIncludeFilter.java,v 1.3 2001-10-25 07:32:04 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -50,7 +50,7 @@ import gnu.xml.util.Resolver;
 
 
 
-// $Id: XIncludeFilter.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: XIncludeFilter.java,v 1.3 2001-10-25 07:32:04 db Exp $
 
 /**
  * Filter to process an XPointer-free subset of
@@ -80,7 +80,7 @@ import gnu.xml.util.Resolver;
  * <p>TBD: "IURI" handling.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-25 07:32:04 $
  */
 public class XIncludeFilter extends EventFilter implements Locator
 {
@@ -122,12 +122,16 @@ public class XIncludeFilter extends EventFilter implements Locator
 	super.setDocumentLocator (this);
     }
 
+    /** Used for proxy locator; do not call directly. */
     public String getSystemId ()
 	{ return (locator == null) ? null : locator.getSystemId (); }
+    /** Used for proxy locator; do not call directly. */
     public String getPublicId ()
 	{ return (locator == null) ? null : locator.getPublicId (); }
+    /** Used for proxy locator; do not call directly. */
     public int getLineNumber ()
 	{ return (locator == null) ? -1 : locator.getLineNumber (); }
+    /** Used for proxy locator; do not call directly. */
     public int getColumnNumber ()
 	{ return (locator == null) ? -1 : locator.getColumnNumber (); }
 
@@ -211,18 +215,19 @@ public class XIncludeFilter extends EventFilter implements Locator
     //
     // External general entity boundaries get both treatments.
     //
-    public void externalEntityDecl (String name, String pubId, String sysId)
+    public void externalEntityDecl (String name,
+    	String publicId, String systemId)
     throws SAXException
     {
 	if (name.charAt (0) == '%')
 	    return;
 	try {
 	    URL	url = new URL (locator.getSystemId ());
-	    sysId = new URL (url, sysId).toString ();
+	    systemId = new URL (url, systemId).toString ();
 	} catch (IOException e) {
 	    // what could we do?
 	}
-	extEntities.put (name, sysId);
+	extEntities.put (name, systemId);
     }
 
     public void startEntity (String name)
@@ -259,7 +264,7 @@ public class XIncludeFilter extends EventFilter implements Locator
     // unless they're XInclude elements.
     //
     public void
-    startElement (String uri, String local, String qName, Attributes atts)
+    startElement (String uri, String localName, String qName, Attributes atts)
     throws SAXException
     {
 	if (ignoreCount != 0) {
@@ -292,7 +297,7 @@ public class XIncludeFilter extends EventFilter implements Locator
 	}
 
 	if ("http://www.w3.org/2001/XInclude".equals (uri)
-		&& "include".equals (local)) {
+		&& "include".equals (localName)) {
 	    String	href = atts.getValue ("href");
 	    String	parse = atts.getValue ("parse");
 	    String	encoding = atts.getValue ("encoding");
@@ -324,10 +329,10 @@ public class XIncludeFilter extends EventFilter implements Locator
 	    ignoreCount++;
 
 	} else
-	    super.startElement (uri, local, qName, atts);
+	    super.startElement (uri, localName, qName, atts);
     }
 
-    public void endElement (String uri, String local, String qName)
+    public void endElement (String uri, String localName, String qName)
     throws SAXException
     {
 	if (ignoreCount != 0) {
@@ -337,18 +342,18 @@ public class XIncludeFilter extends EventFilter implements Locator
 
 	uris.pop ();
 	if (!("http://www.w3.org/2001/XInclude".equals (uri)
-		&& "include".equals (local)))
-	    super.endElement (uri, local, qName);
+		&& "include".equals (localName)))
+	    super.endElement (uri, localName, qName);
     }
 
     //
     // ignore all content within non-empty xi:include elements
     //
-    public void characters (char buf [], int offset, int len)
+    public void characters (char ch [], int start, int length)
     throws SAXException
     {
 	if (ignoreCount == 0)
-	    super.characters (buf, offset, len);
+	    super.characters (ch, start, length);
     }
 
     public void processingInstruction (String target, String value)
@@ -358,18 +363,18 @@ public class XIncludeFilter extends EventFilter implements Locator
 	    super.processingInstruction (target, value);
     }
 
-    public void ignorableWhitespace (char buf [], int offset, int len)
+    public void ignorableWhitespace (char ch [], int start, int length)
     throws SAXException
     {
 	if (ignoreCount == 0)
-	    super.ignorableWhitespace (buf, offset, len);
+	    super.ignorableWhitespace (ch, start, length);
     }
 
-    public void comment (char buf [], int offset, int len)
+    public void comment (char ch [], int start, int length)
     throws SAXException
     {
 	if (ignoreCount == 0)
-	    super.comment (buf, offset, len);
+	    super.comment (ch, start, length);
     }
 
     public void startCDATA () throws SAXException
@@ -437,9 +442,9 @@ public class XIncludeFilter extends EventFilter implements Locator
 	    { fatal (new SAXParseException (message, locator)); }
 	
 	// only the DTD from the "base document" gets reported
-	public void startDTD (String root, String pubId, String sysId)
+	public void startDTD (String root, String publicId, String systemId)
 	throws SAXException
-	    { reject ("XIncluded DTD: " + sysId); }
+	    { reject ("XIncluded DTD: " + systemId); }
 	public void endDTD ()
 	throws SAXException
 	    { reject ("XIncluded DTD"); }
