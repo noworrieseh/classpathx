@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.3 2004-03-28 18:57:11 dog Exp $
+# $Id: configure.ac,v 1.4 2005-01-19 19:12:33 dog Exp $
 # Copyright (C) 2003 The Free Software Foundation
 # 
 # This file is part of GNU classpathx activation.
@@ -22,12 +22,12 @@
 # 02111-1307 USA. 
 #
 
-AC_INIT(activation, 0.1)
+AC_INIT(activation, 1.0)
 AC_CONFIG_SRCDIR(source/javax/activation/DataSource.java)
 AM_INIT_AUTOMAKE
 
 PACKAGE="activation"
-VERSION="0.1"
+VERSION="1.0"
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 

@@ -357,14 +357,14 @@ meta-inf: $(META_INF) $(META_INF_FILES)
 $(META_INF):
 	test ! -d $(dst)/META-INF && mkdir -p $(dst)/META-INF
 
-$(META_INF)/COPYING: COPYING
-	cp COPYING $(META_INF)/
+$(META_INF)/COPYING: @srcdir@/COPYING
+	cp @srcdir@/COPYING $(META_INF)/
 
-$(META_INF)/mailcap.default: mailcap.default
-	cp mailcap.default $(META_INF)/
+$(META_INF)/mailcap.default: @srcdir@/mailcap.default
+	cp @srcdir@/mailcap.default $(META_INF)/
 
-$(META_INF)/mimetypes.default: mimetypes.default
-	cp mimetypes.default $(META_INF)/
+$(META_INF)/mimetypes.default: @srcdir@/mimetypes.default
+	cp @srcdir@/mimetypes.default $(META_INF)/
 
 # Compilation
 

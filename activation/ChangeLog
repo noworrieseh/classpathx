@@ -1,3 +1,7 @@
+2005-01-19  Chris Burdess  <dog@bluezoo.org>
+
+	* configure.ac: Permit building in separate directory.
+
 2004-06-09  Chris Burdess  <dog@bluezoo.org>
 
 	* MailcapCommandMap: Fixed bug whereby x-java prefix was not
