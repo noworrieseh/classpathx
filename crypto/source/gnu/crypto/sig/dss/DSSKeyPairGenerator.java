@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSKeyPairGenerator.java,v 1.1 2001-12-30 15:57:53 raif Exp $
+// $Id: DSSKeyPairGenerator.java,v 1.2 2001-12-31 21:46:16 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -53,7 +53,7 @@ import java.util.Map;
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
  * National Institute of Standards and Technology.
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class DSSKeyPairGenerator {
 
@@ -160,15 +160,6 @@ public class DSSKeyPairGenerator {
 
    // Class methods
    // -------------------------------------------------------------------------
-
-   private static final void notifyMaintainer(BigInteger n, boolean isGnuPrime) {
-      System.err.println("The gnu.crypto library and the JDK disagree on "
-      	+"whether 0x"+n.toString(16)+" is a prime or not.");
-      System.err.println("While this library claims it is"
-      	+(isGnuPrime ? "" : " not")+", the JDK claims the opposite.");
-      System.err.println("Please contact the maintainer of this library, and "
-      	+"provide this message for further investigation. TIA");
-   }
 
    // Instance methods
    // -------------------------------------------------------------------------
@@ -282,7 +273,6 @@ public class DSSKeyPairGenerator {
       BigInteger SEED, alpha, U, OFFSET, SEED_PLUS_OFFSET, W, X, c;
       byte[] a, u;
       byte[] kb = new byte[20]; // to hold 160 bits of randomness
-      boolean isGnuPrime;
 
       // Let L-1 = n*160 + b, where b and n are integers and 0 <= b < 160.
       int b = (L-1) % 160;
@@ -321,12 +311,8 @@ public class DSSKeyPairGenerator {
             // q is prime(1). A robust primality test is one where the
             // probability of a non-prime number passing the test is at
             // most 1/2**80.
-            isGnuPrime = isProbablePrime(q);
-            if (isGnuPrime != q.isProbablePrime(100)) {
-               notifyMaintainer(q, isGnuPrime);
-            }
             // 5. If q is not prime, go to step 1.
-            if (isGnuPrime) {
+            if (isProbablePrime(q)) {
                break step1;
             }
          } // step1
@@ -365,12 +351,8 @@ public class DSSKeyPairGenerator {
             // 10. If p < 2**(L-1), then go to step 13.
             if (p.compareTo(TWO.pow(L-1)) >= 0) {
                // 11. Perform a robust primality test on p.
-               isGnuPrime = isProbablePrime(p);
-               if (isGnuPrime != p.isProbablePrime(100)) {
-                  notifyMaintainer(p, isGnuPrime);
-               }
                // 12. If p passes the test performed in step 11, go to step 15.
-               if (isGnuPrime) {
+               if (isProbablePrime(p)) {
                   break algorithm;
                }
             }
@@ -463,9 +445,9 @@ public class DSSKeyPairGenerator {
     *
     * <b>IMPORTANT</b>: This implementation does not rely on the Miller-Rabin
     * strong probabilistic primality test solely to claim the primality of the
-    * designated number. It instead, tries dividing the designated number by 
+    * designated number. It instead, tries dividing the designated number by
     * the first 1000 small primes, and if no divisor was found, invokes a port
-    * of Colin Plumb's implementation of the Euler Criterion, with the option 
+    * of Colin Plumb's implementation of the Euler Criterion, with the option
     * --set by setting the DO_MILLER_RABIN class variable to true and
     * recompiling-- to follow with a Miller-Rabin test.
     *
@@ -487,7 +469,7 @@ public class DSSKeyPairGenerator {
          return false;
       }
 
-		// the following code is commented out since it's a special case (base 2)
+      // the following code is commented out since it's a special case (base 2)
       // of Euler's criterion.
 //      if (Prime.passFermatLittleTheorem(w)) {
 //         if (DEBUG && debuglevel > 4) {
@@ -529,6 +511,15 @@ public class DSSKeyPairGenerator {
 
       if (DEBUG && debuglevel > 4) {
          debug(w.toString(16)+" is probable prime. Accepted...");
+      }
+      // now compare to JDK primality test
+      if (!w.isProbablePrime(100)) {
+         System.err.println("The gnu.crypto library and the JDK disagree on "
+            +"whether 0x"+w.toString(16)+" is a prime or not.");
+         System.err.println("While this library claims it is, the JDK claims "
+            +"the opposite.");
+         System.err.println("Please contact the maintainer of this library, and "
+            +"provide this message for further investigation. TIA");
       }
       return true;
    }
