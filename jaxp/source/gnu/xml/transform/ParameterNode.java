@@ -38,8 +38,11 @@
 
 package gnu.xml.transform;
 
+import java.util.Collections;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
 
@@ -82,7 +85,7 @@ final class ParameterNode
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    boolean apply = !stylesheet.bindings.containsKey(name, global);
+    boolean apply = global || !stylesheet.bindings.containsKey(name, global);
     if (apply)
       {
         // push the variable context
@@ -95,6 +98,7 @@ final class ParameterNode
           }
       }
     // variable and param don't process children as such
+    // all subsequent instructions are processed with that variable context
     if (next != null)
       {
         next.apply(stylesheet, mode,
@@ -110,14 +114,23 @@ final class ParameterNode
   
   Object getValue(Stylesheet stylesheet, QName mode,
                   Node context, int pos, int len)
+    throws TransformerException
   {
     if (select != null)
       {
         return select.evaluate(context, pos, len);
       }
+    else if (children != null)
+      {
+        Document doc = (context instanceof Document) ? (Document) context :
+          context.getOwnerDocument();
+        DocumentFragment fragment = doc.createDocumentFragment();
+        children.apply(stylesheet, mode, context, pos, len, fragment, null);
+        return Collections.singleton(fragment);
+      }
     else
       {
-        return children;
+        return null;
       }
   }
   

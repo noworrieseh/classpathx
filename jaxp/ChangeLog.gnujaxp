@@ -1,3 +1,10 @@
+2004-12-01  Chris Burdess  <dog@gnu.org>
+
+   	* StreamSerializer.java: Use BOM for UTF-16 output.
+   	* XSLComparator.java: Implemented number data types.
+   	* SortKey.java: Implemented AVTs.
+   	* ApplyImportsNode.java: apply-imports implementation.
+   	
 2004-11-29  Chris Burdess  <dog@gnu.org>
 
 	* ls: Corrections to attribute namespaces.

@@ -268,6 +268,7 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/xpath/Predicate.lo \
 	source/gnu/xml/xpath/NamespaceTest.lo \
 	source/gnu/xml/transform/AbstractNumberNode.lo \
+	source/gnu/xml/transform/ApplyImportsNode.lo \
 	source/gnu/xml/transform/ApplyTemplatesNode.lo \
 	source/gnu/xml/transform/AttributeNode.lo \
 	source/gnu/xml/transform/Bindings.lo \
@@ -1227,6 +1228,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/xpath/Predicate.java \
 	source/gnu/xml/xpath/NamespaceTest.java \
 	source/gnu/xml/transform/AbstractNumberNode.java \
+	source/gnu/xml/transform/ApplyImportsNode.java \
 	source/gnu/xml/transform/ApplyTemplatesNode.java \
 	source/gnu/xml/transform/AttributeNode.java \
 	source/gnu/xml/transform/Bindings.java \
@@ -1923,6 +1925,9 @@ source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp):
 	@$(mkdir_p) source/gnu/xml/transform/$(DEPDIR)
 	@: > source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/AbstractNumberNode.lo:  \
+	source/gnu/xml/transform/$(am__dirstamp) \
+	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/transform/ApplyImportsNode.lo:  \
 	source/gnu/xml/transform/$(am__dirstamp) \
 	source/gnu/xml/transform/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/transform/ApplyTemplatesNode.lo:  \
@@ -3152,6 +3157,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/pipeline/XsltFilter.lo
 	-rm -f source/gnu/xml/transform/AbstractNumberNode.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/AbstractNumberNode.lo
+	-rm -f source/gnu/xml/transform/ApplyImportsNode.$(OBJEXT)
+	-rm -f source/gnu/xml/transform/ApplyImportsNode.lo
 	-rm -f source/gnu/xml/transform/ApplyTemplatesNode.$(OBJEXT)
 	-rm -f source/gnu/xml/transform/ApplyTemplatesNode.lo
 	-rm -f source/gnu/xml/transform/AttributeNode.$(OBJEXT)
@@ -3982,6 +3989,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/pipeline/$(DEPDIR)/XIncludeFilter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/pipeline/$(DEPDIR)/XsltFilter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/AbstractNumberNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ApplyImportsNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/ApplyTemplatesNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/AttributeNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/transform/$(DEPDIR)/AttributeSet.Plo@am__quote@
@@ -5632,6 +5640,13 @@ source/gnu/xml/transform/AbstractNumberNode.lo: source/gnu/xml/transform/Abstrac
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/AbstractNumberNode.java' object='source/gnu/xml/transform/AbstractNumberNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/AbstractNumberNode.lo `test -f 'source/gnu/xml/transform/AbstractNumberNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/AbstractNumberNode.java
+
+source/gnu/xml/transform/ApplyImportsNode.lo: source/gnu/xml/transform/ApplyImportsNode.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ApplyImportsNode.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ApplyImportsNode.Tpo" -c -o source/gnu/xml/transform/ApplyImportsNode.lo `test -f 'source/gnu/xml/transform/ApplyImportsNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ApplyImportsNode.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/transform/$(DEPDIR)/ApplyImportsNode.Tpo" "source/gnu/xml/transform/$(DEPDIR)/ApplyImportsNode.Plo"; else rm -f "source/gnu/xml/transform/$(DEPDIR)/ApplyImportsNode.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/transform/ApplyImportsNode.java' object='source/gnu/xml/transform/ApplyImportsNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/transform/ApplyImportsNode.lo `test -f 'source/gnu/xml/transform/ApplyImportsNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ApplyImportsNode.java
 
 source/gnu/xml/transform/ApplyTemplatesNode.lo: source/gnu/xml/transform/ApplyTemplatesNode.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/transform/ApplyTemplatesNode.lo -MD -MP -MF "source/gnu/xml/transform/$(DEPDIR)/ApplyTemplatesNode.Tpo" -c -o source/gnu/xml/transform/ApplyTemplatesNode.lo `test -f 'source/gnu/xml/transform/ApplyTemplatesNode.java' || echo '$(srcdir)/'`source/gnu/xml/transform/ApplyTemplatesNode.java; \

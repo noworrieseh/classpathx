@@ -62,6 +62,7 @@ class Template
 
   static final double DEFAULT_PRIORITY = 0.5d;
 
+  final Stylesheet stylesheet;
   final QName name;
   final Pattern match;
   final TemplateNode node;
@@ -69,9 +70,11 @@ class Template
   final int precedence;
   final QName mode;
 
-  Template(QName name, Pattern match, TemplateNode node,
+  Template(Stylesheet stylesheet, 
+           QName name, Pattern match, TemplateNode node,
            int precedence, double priority, QName mode)
   {
+    this.stylesheet = stylesheet;
     this.name = name;
     this.match = match;
     this.node = node;
@@ -115,7 +118,10 @@ class Template
 
   Template clone(Stylesheet stylesheet)
   {
-    return new Template(name,
+    // FIXME by cloning we lose the imports() functionality, so
+    // apply-imports will be broken.
+    return new Template(stylesheet,
+                        name,
                         (match == null) ? null :
                         (Pattern) match.clone(stylesheet),
                         (node == null) ? null : node.clone(stylesheet),
@@ -174,6 +180,20 @@ class Template
   boolean matches(QName name)
   {
     return name.equals(this.name);
+  }
+
+  boolean imports(Template other)
+  {
+    for (Stylesheet ctx = other.stylesheet.parent;
+         ctx != null;
+         ctx = ctx.parent)
+      {
+        if (ctx == stylesheet)
+          {
+            return true;
+          }
+      }
+    return false;
   }
 
   /**

@@ -91,6 +91,9 @@ final class ForEachNode
   {
     if (children != null)
       {
+        // Set current template to null
+        Template saved = stylesheet.currentTemplate;
+        stylesheet.currentTemplate = null;
         Object ret = select.evaluate(context, pos, len);
         //System.err.println(toString() + ": " + context+" -> "+ret);
         if (ret instanceof Collection)
@@ -99,12 +102,19 @@ final class ForEachNode
             List list = new ArrayList(ns);
             if (sortKeys != null)
               {
+                for (Iterator i = sortKeys.iterator(); i.hasNext(); )
+                  {
+                    SortKey sortKey = (SortKey) i.next();
+                    sortKey.init(stylesheet, mode, context, pos, len, parent,
+                                 nextSibling);
+                  }
                 Collections.sort(list, new XSLComparator(sortKeys));
               }
             else
               {
                 Collections.sort(list, documentOrderComparator);
               }
+            // Perform children for each node
             int l = list.size();
             int p = 1;
             for (Iterator i = list.iterator(); i.hasNext(); )
@@ -116,6 +126,8 @@ final class ForEachNode
                                parent, nextSibling);
               }
           }
+        // Restore current template
+        stylesheet.currentTemplate = saved;
       }
     if (next != null)
       {

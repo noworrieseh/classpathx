@@ -71,6 +71,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
+import gnu.xml.dom.DomDoctype;
 import gnu.xml.dom.DomDocument;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.Root;
@@ -149,8 +150,11 @@ class TransformerImpl
     boolean created = false;
     if (parent == null)
       {
-        // Create a document fragment to hold the result
-        parent = doc.createDocumentFragment();
+        // Create a new document to hold the result
+        DomDocument resultDoc = new DomDocument();
+        resultDoc.setBuilding(true);
+        resultDoc.setCheckWellformedness(false);
+        parent = resultDoc;
         created = true;
       }
     // Transformation
@@ -164,7 +168,8 @@ class TransformerImpl
         // XSLT transformation
         try
           {
-            TemplateNode t = stylesheet.getTemplate(null, context);
+            stylesheet.initTopLevelVariables(context);
+            TemplateNode t = stylesheet.getTemplate(null, context, false);
             if (t != null)
               {
                 stylesheet.current = context;
@@ -176,64 +181,54 @@ class TransformerImpl
             String systemId = stylesheet.outputSystemId;
             if (created)
               {
-                Node root = parent.getFirstChild();
-                while (root != null && root.getNodeType() != Node.ELEMENT_NODE)
+                // Discover document element
+                DomDocument resultDoc = (DomDocument) parent;
+                Node root = resultDoc.getDocumentElement();
+                // Add doctype if specified
+                if ((publicId != null || systemId != null) &&
+                    root != null)
                   {
-                    root = root.getNextSibling();
+                    // We must know the name of the root element to
+                    // create the document type
+                    resultDoc.appendChild(new DomDoctype(resultDoc,
+                                                         root.getNodeName(),
+                                                         publicId,
+                                                         systemId));
                   }
-                if (root != null)
+                resultDoc.setBuilding(false);
+                resultDoc.setCheckWellformedness(true);
+              }
+            else if (publicId != null || systemId != null)
+              {
+                switch (parent.getNodeType())
                   {
-                    // Now that we know the name of the root element,
-                    // we can create the document
-                    DOMImplementation impl = doc.getImplementation();
+                  case Node.DOCUMENT_NODE:
+                  case Node.DOCUMENT_FRAGMENT_NODE:
+                    Document resultDoc = (parent instanceof Document) ?
+                      (Document) parent :
+                      parent.getOwnerDocument();
+                    DOMImplementation impl = resultDoc.getImplementation();
                     DocumentType doctype =
-                      (publicId != null || systemId != null) ?
-                      impl.createDocumentType(root.getNodeName(),
+                      impl.createDocumentType(resultDoc.getNodeName(),
                                               publicId,
-                                              systemId) :
-                      null;
-                    Document newDoc =
-                      impl.createDocument(root.getNamespaceURI(),
-                                          root.getNodeName(),
-                                          doctype);
-                    Node newRoot = newDoc.getDocumentElement();
-                    copyAttributes(newDoc, root, newRoot);
-                    copyChildren(newDoc, root, newRoot);
-                    parent = newDoc;
+                                              systemId);
+                    // Try to insert doctype before first element
+                    Node ctx = parent.getFirstChild();
+                    for (; ctx != null &&
+                         ctx.getNodeType() != Node.ELEMENT_NODE;
+                         ctx = ctx.getNextSibling())
+                      {
+                      }
+                    if (ctx != null)
+                      {
+                        parent.insertBefore(doctype, ctx);
+                      }
+                    else
+                      {
+                        parent.appendChild(doctype);
+                      }
                   }
               }
-            /*
-               else if (publicId != null || systemId != null)
-               {
-               switch (parent.getNodeType())
-               {
-              case Node.DOCUMENT_NODE:
-              case Node.DOCUMENT_FRAGMENT_NODE:
-              Document doc = (parent instanceof Document) ?
-              (Document) parent :
-              parent.getOwnerDocument();
-              DOMImplementation impl = doc.getImplementation();
-              DocumentType doctype =
-              impl.createDocumentType(doc.getNodeName(),
-              publicId,
-              systemId);
-                // Try to insert doctype before first element
-                Node ctx = parent.getFirstChild();
-                for (; ctx != null && ctx.getNodeType() != Node.ELEMENT_NODE;
-                ctx = ctx.getNextSibling())
-                {
-                }
-                if (ctx != null)
-                {
-                parent.insertBefore(doctype, ctx);
-                }
-                else
-                {
-                parent.appendChild(doctype);
-                }
-                }
-                }
-             */
             if (stylesheet.outputVersion != null)
               {
                 parent.setUserData("version", stylesheet.outputVersion,
@@ -247,9 +242,13 @@ class TransformerImpl
               {
                 parent.setUserData("standalone", "yes", stylesheet);
               }
+            if (stylesheet.outputMediaType != null)
+              {
+                parent.setUserData("media-type", stylesheet.outputMediaType,
+                                   stylesheet);
+              }
             // TODO cdata-section-elements
             // TODO indent
-            // TODO media-type
           }
         catch (TransformerException e)
           {
@@ -349,6 +348,7 @@ class TransformerImpl
    * Strip whitespace from the source tree.
    */
   void strip(Node node)
+    throws TransformerConfigurationException
   {
     short nt = node.getNodeType();
     if (nt == Node.TEXT_NODE) // CDATA sections ?
@@ -418,22 +418,6 @@ class TransformerImpl
           }
         catch (IOException e)
           {
-          }
-      }
-  }
-
-  void copyAttributes(Document dstDoc, Node src, Node dst)
-  {
-    NamedNodeMap srcAttrs = src.getAttributes();
-    NamedNodeMap dstAttrs = dst.getAttributes();
-    if (srcAttrs != null && dstAttrs != null)
-      {
-        int len = srcAttrs.getLength();
-        for (int i = 0; i < len; i++)
-          {
-            Node node = srcAttrs.item(i);
-            node = dstDoc.adoptNode(node);
-            dstAttrs.setNamedItemNS(node);
           }
       }
   }

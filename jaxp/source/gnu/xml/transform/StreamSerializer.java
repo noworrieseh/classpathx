@@ -162,14 +162,21 @@ public class StreamSerializer
             out.write(SPACE);
             out.write(encodeText(nsname));
             out.write(EQ);
-            String nsvalue = "'" + encode(uri, true) + "'";
+            String nsvalue = "'" + encode(uri, true, true) + "'";
             out.write(nsvalue.getBytes(encoding));
             defined = true;
           }
         out.write(SPACE);
-        out.write(encodeText(node.getNodeName()));
+        String a_nodeName = node.getNodeName();
+        out.write(encodeText(a_nodeName));
+        String a_nodeValue = node.getNodeValue();
+        if (mode == Stylesheet.OUTPUT_HTML &&
+            a_nodeName.equals(a_nodeValue))
+          {
+            break;
+          }
         out.write(EQ);
-        value = "'" + encode(node.getNodeValue(), true) + "'";
+        value = "'" + encode(a_nodeValue, true, true) + "'";
         out.write(encodeText(value));
         break;
       case Node.ELEMENT_NODE:
@@ -183,7 +190,7 @@ public class StreamSerializer
             out.write(SPACE);
             out.write(encodeText(nsname));
             out.write(EQ);
-            String nsvalue = "'" + encode(uri, true) + "'";
+            String nsvalue = "'" + encode(uri, true, true) + "'";
             out.write(encodeText(nsvalue));
             defined = true;
           }
@@ -225,7 +232,7 @@ public class StreamSerializer
         value = node.getNodeValue();
         if (!"yes".equals(node.getUserData("disable-output-escaping")))
           {
-            value = encode(value, false);
+            value = encode(value, false, false);
           }
         out.write(encodeText(value));
         break;
@@ -246,6 +253,11 @@ public class StreamSerializer
       case Node.DOCUMENT_FRAGMENT_NODE:
         if (mode == Stylesheet.OUTPUT_XML)
           {
+            if ("UTF-16".equalsIgnoreCase(encoding))
+              {
+                out.write(0xfe);
+                out.write(0xff);
+              }
             if (!"yes".equals(node.getUserData("omit-xml-declaration")) &&
                 xmlDeclaration)
               {
@@ -286,7 +298,12 @@ public class StreamSerializer
         else if (mode == Stylesheet.OUTPUT_HTML)
           {
             // Ensure that encoding is accessible
-            String contentType = "text/html; charset=" +
+            String mediaType = (String) node.getUserData("media-type");
+            if (mediaType == null)
+              {
+                mediaType = "text/html";
+              }
+            String contentType = mediaType + "; charset=" +
               ((encoding.indexOf(' ') != -1) ?
                 "\"" + encoding + "\"" :
                 encoding);
@@ -376,7 +393,16 @@ public class StreamSerializer
             if (meta == null)
               {
                 meta = doc.createElement("meta");
-                head.appendChild(meta);
+                // Insert first
+                Node first = head.getFirstChild();
+                if (first == null)
+                  {
+                    head.appendChild(meta);
+                  }
+                else
+                  {
+                    head.insertBefore(meta, first);
+                  }
                 Node metaHttpEquiv = doc.createAttribute("http-equiv");
                 meta.getAttributes().setNamedItem(metaHttpEquiv);
                 metaHttpEquiv.setNodeValue("Content-Type");
@@ -506,7 +532,7 @@ public class StreamSerializer
     return text.getBytes(encoding);
   }
 
-  static String encode(String text, boolean encodeCtl)
+  String encode(String text, boolean encodeCtl, boolean inAttr)
   {
     int len = text.length();
     StringBuffer buf = null;
@@ -531,13 +557,24 @@ public class StreamSerializer
           }
         else if (c == '&')
           {
-            if (buf == null)
+            if (mode == Stylesheet.OUTPUT_HTML && (i + 1) < len &&
+                text.charAt(i + 1) == '{')
               {
-                buf = new StringBuffer(text.substring(0, i));
+                if (buf != null)
+                  {
+                    buf.append(c);
+                  }
               }
-            buf.append("&amp;");
+            else
+              {
+                if (buf == null)
+                  {
+                    buf = new StringBuffer(text.substring(0, i));
+                  }
+                buf.append("&amp;");
+              }
           }
-        else if (c == '\'')
+        else if (c == '\'' && inAttr)
           {
             if (buf == null)
               {
@@ -545,7 +582,7 @@ public class StreamSerializer
               }
             buf.append("&apos;");
           }
-        else if (c == '"')
+        else if (c == '"' && inAttr)
           {
             if (buf == null)
               {

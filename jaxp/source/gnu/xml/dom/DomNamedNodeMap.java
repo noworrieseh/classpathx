@@ -288,7 +288,7 @@ public class DomNamedNodeMap
    */
   public Node removeNamedItemNS(String namespaceURI, String localName)
   {
-    return removeNamedItem(namespaceURI, localName, false);
+    return removeNamedItem(namespaceURI, localName, true);
   }
 
   Node removeNamedItem(String uri, String name, boolean ns)

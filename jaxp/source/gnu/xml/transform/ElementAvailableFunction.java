@@ -95,6 +95,7 @@ class ElementAvailableFunction
     acc.add("sort");
     acc.add("with-param");
     acc.add("fallback");
+    acc.add("apply-imports");
     elements = Collections.unmodifiableSet(acc);
   }
 

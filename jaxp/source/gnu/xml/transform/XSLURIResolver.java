@@ -145,7 +145,6 @@ class XSLURIResolver
                   }
               }
             systemId = url.toString();
-            lastModified = getLastModified(url);
           }
         catch (MalformedURLException e)
           {
@@ -171,23 +170,34 @@ class XSLURIResolver
               }
             url = file.toURL();
             systemId = url.toString();
-            lastModified = file.lastModified();
-          }		
+          }
+        node = (Node) nodeCache.get(systemId);
+        // Is the resource up to date?
+        URLConnection conn = url.openConnection();
         Long llm = (Long) lastModifiedCache.get(systemId);
-        if (llm == null || lastModified == 0L ||
-            lastModified > llm.longValue())
+        if (llm != null)
           {
-            lastModifiedCache.put(systemId, new Long(lastModified));
-            InputStream in = url.openStream();
+            lastLastModified = llm.longValue();
+            conn.setIfModifiedSince(lastLastModified);
+          }
+        conn.connect();
+        lastModified = conn.getLastModified();
+        if (node != null && 
+            lastModified > 0L &&
+            lastModified <= lastLastModified)
+          {
+            // Resource unchanged
+          }
+        else
+          {
+            // Resource new or modified
+            InputStream in = conn.getInputStream();
             InputSource input = new InputSource(in);
             input.setSystemId(systemId);
             DocumentBuilder builder = getDocumentBuilder();
             node = builder.parse(input);
             nodeCache.put(systemId, node);
-          }
-        else
-          {
-            node = (Node) nodeCache.get(systemId);
+            lastModifiedCache.put(systemId, new Long(lastModified));
           }
         return new DOMSource(node, systemId);
       }
@@ -199,35 +209,6 @@ class XSLURIResolver
       {
         throw new TransformerException(e);
       }
-  }
-  
-  long getLastModified(URL url)
-    throws IOException
-  {
-    URLConnection connection = url.openConnection();
-    if (connection instanceof HttpURLConnection)
-      {
-        ((HttpURLConnection) connection).setRequestMethod("HEAD");
-      }
-    long ret = connection.getLastModified();
-    // Read the associated stream and close it
-    try
-      {
-        InputStream in = connection.getInputStream();
-        if (in != null)
-          {
-            byte[] buf = new byte[Math.max(in.available(), 4096)];
-            for (int len = in.read(buf); len != -1; len = in.read(buf))
-              {
-              }
-            in.close();
-          }
-      }
-    catch (IOException e)
-      {
-        // We tried, anyway
-      }
-    return ret;
   }
   
   DocumentBuilder getDocumentBuilder()

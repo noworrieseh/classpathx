@@ -122,6 +122,12 @@ final class ApplyTemplatesNode
         List nodes = new ArrayList(ns);
         if (sortKeys != null)
           {
+            for (Iterator i = sortKeys.iterator(); i.hasNext(); )
+              {
+                SortKey sortKey = (SortKey) i.next();
+                sortKey.init(stylesheet, mode, context, pos, len, parent,
+                             nextSibling);
+              }
             Collections.sort(nodes, new XSLComparator(sortKeys));
           }
         else
@@ -133,7 +139,8 @@ final class ApplyTemplatesNode
         for (int i = 0; i < l; i++)
           {
             Node node = (Node) nodes.get(i);
-            TemplateNode t = stylesheet.getTemplate(effectiveMode, node);
+            TemplateNode t = stylesheet.getTemplate(effectiveMode, node,
+                                                    false);
             if (t != null)
               {
                 if (stylesheet.debug)

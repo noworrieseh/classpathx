@@ -214,6 +214,9 @@ public final class Selector
                 Node node = (Node) candidates.get(i);
                 if (cascade)
                   {
+                    // Documents and DocumentFragments should be considered
+                    // if part of a location path where the axis involves
+                    // the SELF concept
                     short nodeType = node.getNodeType();
                     if ((nodeType == Node.DOCUMENT_NODE ||
                          nodeType == Node.DOCUMENT_FRAGMENT_NODE) &&
@@ -228,7 +231,9 @@ public final class Selector
                         continue;
                       }
                   }
-                if (test.matches(node, i + 1, len))
+                int p = getContextPosition(node);
+                int l = getContextSize(node);
+                if (test.matches(node, p, l))
                   {
                     successful.add(node);
                   }

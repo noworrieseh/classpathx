@@ -460,6 +460,7 @@ implements XPathParser.yyInput
                       case XPathParser.MOD:
                       case XPathParser.OR:
                       case XPathParser.AND:
+                      case XPathParser.SLASH:
                         return new XPathToken(XPathParser.NAME, name);
                       }
                     break;

@@ -79,7 +79,8 @@ public abstract class Expr
     new DocumentOrderComparator();
 
   protected static final DecimalFormat decimalFormat =
-    new DecimalFormat("################################.################################",
+    new DecimalFormat("####################################################" +
+                      ".####################################################",
                       new DecimalFormatSymbols(Locale.US));
 
   public Object evaluate(Object item, QName returnType)

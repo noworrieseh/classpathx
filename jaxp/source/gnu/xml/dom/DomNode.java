@@ -321,8 +321,9 @@ public abstract class DomNode
           }
       }
 
-    Document owner = (nodeType == DOCUMENT_NODE) ? (Document) this : this.owner;
-    Document childOwner = child.owner;
+    DomDocument owner = (nodeType == DOCUMENT_NODE) ? (DomDocument) this :
+      this.owner;
+    DomDocument childOwner = child.owner;
     short childNodeType = child.nodeType;
     
     if (childOwner != owner)
@@ -374,9 +375,13 @@ public abstract class DomNode
           }
         break;
       }
-    throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                    "can't append " + nodeTypeToString(childNodeType) +
-                    " to node of type " + nodeTypeToString(nodeType), this, 0);
+    if (owner.checkingWellformedness)
+      {
+        throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
+                        "can't append " + nodeTypeToString(childNodeType) +
+                        " to node of type " + nodeTypeToString(nodeType),
+                        this, 0);
+      }
   }
   
   // Here's hoping a good optimizer will detect the case when the

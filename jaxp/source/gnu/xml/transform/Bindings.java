@@ -151,29 +151,11 @@ public class Bindings
             ret = pctx.get(name);
           }
       }
-    if (ret instanceof TemplateNode && context != null)
-      {
-        Document doc = (context instanceof Document) ? (Document) context :
-          context.getOwnerDocument();
-        DocumentFragment fragment = doc.createDocumentFragment();
-        try
-          {
-            ((TemplateNode) ret).apply(stylesheet, null,
-                                       context, pos, len,
-                                       fragment, null);
-          }
-        catch (TransformerException e)
-          {
-            // FIXME
-            e.printStackTrace(System.err);
-          }
-        ret = Expr.stringValue(fragment);
-      }
-    if (ret instanceof Expr && context != null)
+    /*if (ret instanceof Expr && context != null)
       {
         Expr expr = (Expr) ret;
         ret = expr.evaluate(context, 1, 1);
-      }
+      }*/
     if (ret instanceof Node)
       {
         ret = Collections.singleton(ret);

@@ -90,7 +90,7 @@ public class DomDocument
 
   private final DOMImplementation implementation;
   private boolean checkingCharacters = true;
-  private boolean checkingWellformedness = true;
+  boolean checkingWellformedness = true;
 
   boolean building; // if true, skip mutation events in the tree
   

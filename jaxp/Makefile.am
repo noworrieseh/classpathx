@@ -545,6 +545,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/xpath/Predicate.java \
 	source/gnu/xml/xpath/NamespaceTest.java \
 	source/gnu/xml/transform/AbstractNumberNode.java \
+	source/gnu/xml/transform/ApplyImportsNode.java \
 	source/gnu/xml/transform/ApplyTemplatesNode.java \
 	source/gnu/xml/transform/AttributeNode.java \
 	source/gnu/xml/transform/Bindings.java \

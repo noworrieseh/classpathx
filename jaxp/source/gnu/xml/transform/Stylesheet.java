@@ -158,6 +158,11 @@ class Stylesheet
   List attributeSets;
 
   /**
+   * Variables.
+   */
+  List variables;
+
+  /**
    * Variable and parameter bindings.
    */
   Bindings bindings;
@@ -181,16 +186,13 @@ class Stylesheet
   /**
    * Set by a terminating message.
    */
-  boolean terminated;
+  transient boolean terminated;
 
   /**
-   * Functions that refer to this stylesheet.
+   * Current template in force.
    */
-  DocumentFunction documentFunction;
-  KeyFunction keyFunction;
-  CurrentFunction currentFunction;
-  FormatNumberFunction formatNumberFunction;
-  
+  transient Template currentTemplate;
+
   Stylesheet(TransformerFactoryImpl factory,
              Stylesheet parent,
              Document doc,
@@ -212,6 +214,7 @@ class Stylesheet
       {
         bindings = new Bindings(this);
         attributeSets = new LinkedList();
+        variables = new LinkedList();
         namespaceAliases = new LinkedHashMap();
         templates = new LinkedList();
         keys = new LinkedList();
@@ -235,6 +238,7 @@ class Stylesheet
         Stylesheet root = getRootStylesheet();
         bindings = root.bindings;
         attributeSets = root.attributeSets;
+        variables = root.variables;
         namespaceAliases = root.namespaceAliases;
         templates = root.templates;
         keys = root.keys;
@@ -325,6 +329,14 @@ class Stylesheet
           }
         clone.attributeSets = attributeSets2;
 
+        LinkedList variables2 = new LinkedList();
+        for (Iterator i = variables.iterator(); i.hasNext(); )
+          {
+            ParameterNode var = (ParameterNode) i.next();
+            variables2.add(var.clone(clone));
+          }
+        clone.variables = variables2;
+
         LinkedList keys2 = new LinkedList();
         for (Iterator i = keys.iterator(); i.hasNext(); )
           {
@@ -338,6 +350,20 @@ class Stylesheet
     catch (CloneNotSupportedException e)
       {
         throw new Error(e.getMessage());
+      }
+  }
+
+  // -- Variable evaluation --
+
+  void initTopLevelVariables(Node context)
+    throws TransformerException
+  {
+    for (Iterator i = variables.iterator(); i.hasNext(); )
+      {
+        ParameterNode var = (ParameterNode) i.next();
+        bindings.set(var.name,
+                     var.getValue(this, null, context, 1, 1),
+                     var.global);
       }
   }
 
@@ -361,7 +387,7 @@ class Stylesheet
   
   // -- Template selection --
   
-  TemplateNode getTemplate(QName mode, Node context)
+  TemplateNode getTemplate(QName mode, Node context, boolean applyImports)
     throws TransformerException
   {
     //System.err.println("getTemplate: mode="+mode+" context="+context);
@@ -370,6 +396,19 @@ class Stylesheet
       {
         Template t = (Template) j.next();
         boolean isMatch = t.matches(mode, context);
+        if (applyImports)
+          {
+            if (currentTemplate == null)
+              {
+                String msg = "current template may not be null " +
+                  "during apply-imports";
+                throw new TransformerException(msg);
+              }
+            if (!currentTemplate.imports(t))
+              {
+                isMatch = false;
+              }
+          }
         //System.err.println("\t"+context+" "+t+"="+isMatch);
         if (isMatch)
           {
@@ -380,6 +419,7 @@ class Stylesheet
     if (candidates.isEmpty())
       {
         // Apply built-in template
+        // Current template is unchanged
         //System.err.println("\tbuiltInTemplate context="+context);
         switch (context.getNodeType())
           {
@@ -390,12 +430,6 @@ class Stylesheet
           case Node.COMMENT_NODE:
             return builtInNodeTemplate;
           case Node.TEXT_NODE:
-            // Whitespace stripping doen initially by transformer
-            /*if (!isPreserved((Text) context))
-              {
-                return null;
-              }*/
-            // fall through
           case Node.ATTRIBUTE_NODE:
             return builtInTextTemplate;
           default:
@@ -405,6 +439,8 @@ class Stylesheet
     else
       {
         Template t = (Template) candidates.iterator().next();
+        // Set current template
+        currentTemplate = t;
         //System.err.println("\ttemplate="+t+" context="+context);
         return t.node;
       }
@@ -462,7 +498,7 @@ class Stylesheet
     QName mode = (mm == null) ? null : getQName(mm);
     double priority = (p == null) ? Template.DEFAULT_PRIORITY :
       Double.parseDouble(p);
-    return new Template(name, match, parse(node.getFirstChild()),
+    return new Template(this, name, match, parse(node.getFirstChild()),
                         precedence, priority, mode);
   }
 
@@ -666,8 +702,8 @@ class Stylesheet
                      "variable".equals(name))
               {
                 boolean global = "variable".equals(name);
-                Object content = parse(node.getFirstChild());
-                String paramName = getAttribute(attrs, "name");
+                TemplateNode content = parse(node.getFirstChild());
+                String paramName = getRequiredAttribute(attrs, "name", node);
                 String select = getAttribute(attrs, "select");
                 if (select != null && select.length() > 0)
                   {
@@ -678,11 +714,16 @@ class Stylesheet
                         DOMSourceLocator l = new DOMSourceLocator(node);
                         throw new TransformerConfigurationException(msg, l);
                       }
-                    content = xpath.compile(select);
+                    Expr expr = (Expr) xpath.compile(select);
+                    variables.add(new ParameterNode(null, null,
+                                                    paramName,
+                                                    expr, global));
                   }
-                if (content == null)
+                else
                   {
-                    content = "";
+                    variables.add(new ParameterNode(content, null,
+                                                    paramName,
+                                                    null, global));
                   }
                 bindings.set(paramName, content, global);
               }
@@ -763,7 +804,8 @@ class Stylesheet
             Node rootClone = node.cloneNode(true);
             NamedNodeMap attrs = rootClone.getAttributes();
             attrs.removeNamedItemNS(XSL_NS, "version");
-            templates.add(new Template(null, new Root(), parse(rootClone),
+            templates.add(new Template(this, null, new Root(),
+                                       parse(rootClone),
                                        precedence,
                                        Template.DEFAULT_PRIORITY,
                                        null));
@@ -922,6 +964,7 @@ class Stylesheet
   }
 
   boolean isPreserved(Text text)
+    throws TransformerConfigurationException
   {
     // Check characters in text
     String value = text.getData();
@@ -980,6 +1023,11 @@ class Stylesheet
             else if ("preserve".equals(xmlSpace))
               {
                 return true;
+              }
+            else if (xmlSpace.length() > 0)
+              {
+                String msg = "Illegal value for xml:space: " + xmlSpace;
+                throw new TransformerConfigurationException(msg);
               }
             else if ("text".equals(ctx.getLocalName()) &&
                      XSL_NS.equals(ctx.getNamespaceURI()))
@@ -1413,6 +1461,10 @@ class Stylesheet
               {
                 return parseMessage(node, children, next);
               }
+            else if ("apply-imports".equals(name))
+              {
+                return new ApplyImportsNode(parse(children), parse(next));
+              }
             else
               {
                 // xsl:fallback
@@ -1522,18 +1574,25 @@ class Stylesheet
             "sort".equals(node.getLocalName()))
           {
             NamedNodeMap attrs = node.getAttributes();
-            String s = getRequiredAttribute(attrs, "select", node);
+            String s = getAttribute(attrs, "select");
+            if (s == null)
+              {
+                s = ".";
+              }
             Expr select = (Expr) xpath.compile(s);
-            String lang = getAttribute(attrs, "lang");
-            String dataType = getAttribute(attrs, "data-type");
-            String order = getAttribute(attrs, "order");
-            boolean descending = "descending".equals(order);
-            String caseOrder = getAttribute(attrs, "case-order");
-            int co =
-              "upper-first".equals(caseOrder) ? SortKey.UPPER_FIRST :
-              "lower-first".equals(caseOrder) ? SortKey.LOWER_FIRST :
-              SortKey.DEFAULT;
-            ret.add(new SortKey(select, lang, dataType, descending, co));
+            String l = getAttribute(attrs, "lang");
+            TemplateNode lang = (l == null) ? null :
+              parseAttributeValueTemplate(l, node);
+            String dt = getAttribute(attrs, "data-type");
+            TemplateNode dataType = (dt == null) ? null :
+              parseAttributeValueTemplate(dt, node);
+            String o = getAttribute(attrs, "order");
+            TemplateNode order = (o == null) ? null :
+              parseAttributeValueTemplate(o, node);
+            String co = getAttribute(attrs, "case-order");
+            TemplateNode caseOrder = (co == null) ? null :
+              parseAttributeValueTemplate(co, node);
+            ret.add(new SortKey(select, lang, dataType, order, caseOrder));
           }
         node = node.getNextSibling();
       }
@@ -1634,7 +1693,16 @@ class Stylesheet
   static final String getAttribute(NamedNodeMap attrs, String name)
   {
     Node attr = attrs.getNamedItem(name);
-    return (attr == null) ? null : attr.getNodeValue();
+    if (attr == null)
+      {
+        return null;
+      }
+    String ret = attr.getNodeValue();
+    if (ret.length() == 0)
+      {
+        return null;
+      }
+    return ret;
   }
 
   static final String getRequiredAttribute(NamedNodeMap attrs, String name,
