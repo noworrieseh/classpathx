@@ -1,6 +1,6 @@
 /*
   GNU-Classpath Extensions:	jaxp
-  Copyright (C) 2001 Andrew Selkirk
+  Copyright (C) 2001 Andrew Selkirk, David Brownell
 
   For more information on the classpathx please mail: classpathx-discuss@gnu.org
 
@@ -29,7 +29,7 @@ import javax.xml.transform.Result;
 
 /**
  * Stream Result
- * @author	Andrew Selkirk
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
 public class StreamResult implements Result {
@@ -51,23 +51,23 @@ public class StreamResult implements Result {
 	//-------------------------------------------------------------
 
 	public StreamResult() {
-	} // StreamResult()
+	}
 
 	public StreamResult(OutputStream stream) {
 		this.outputStream = stream;
-	} // StreamResult()
+	}
 
 	public StreamResult(Writer writer) {
 		this.writer = writer;
-	} // StreamResult()
+	}
 
 	public StreamResult(String systemID) {
 		this.systemId = systemID;
-	} // StreamResult()
+	}
 
 	public StreamResult(File file) {
-		this(file.getName());
-	} // StreamResult()
+		setSystemId (file);
+	}
 
 
 	//-------------------------------------------------------------
@@ -76,33 +76,35 @@ public class StreamResult implements Result {
 
 	public OutputStream getOutputStream() {
 		return outputStream;
-	} // getOutputStream()
-
-	public void setOutputStream(OutputStream stream) {
-		this.outputStream = stream;
-	} // setOutputStream()
-
-	public void setWriter(Writer writer) {
-		this.writer = writer;
-	} // setWriter()
-
-	public Writer getWriter() {
-		return writer;
-	} // getWriter()
-
-	public void setSystemId(String systemID) {
-		this.systemId = systemID;
-	} // setSystemId()
-
-	public void setSystemId(File file) {
-		this.systemId = file.getName();
-	} // setSystemId()
+	}
 
 	public String getSystemId() {
 		return systemId;
-	} // getSystemId()
+	}
 
+	public Writer getWriter() {
+		return writer;
+	}
 
-} // StreamResult
+	public void setOutputStream(OutputStream stream) {
+		this.outputStream = stream;
+	}
 
+	public void setWriter(Writer writer) {
+		this.writer = writer;
+	}
 
+	public void setSystemId(File file) {
+	    try {
+// FIXME:  this jdk 1.2 dependency should not exist
+		this.systemId = file.toURL().toString ();
+	    } catch (java.net.MalformedURLException e) {
+		// can't happen
+		throw new RuntimeException (e.getMessage ());
+	    }
+	}
+
+	public void setSystemId(String systemID) {
+		this.systemId = systemID;
+	}
+}

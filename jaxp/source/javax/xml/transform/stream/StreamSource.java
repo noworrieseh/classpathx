@@ -52,33 +52,33 @@ public class StreamSource implements Source {
 	//-------------------------------------------------------------
 
 	public StreamSource() {
-	} // StreamSource()
+	}
+
+	public StreamSource(File file) {
+	    setSystemId (file);
+	}
 
 	public StreamSource(InputStream stream) {
 		this.inputStream = stream;
-	} // StreamSource()
+	}
 
 	public StreamSource(InputStream stream, String systemID) {
 		this.inputStream = stream;
 		this.systemId = systemID;
-	} // StreamSource()
+	}
 
 	public StreamSource(Reader reader) {
 		this.reader = reader;
-	} // StreamSource()
+	}
 
 	public StreamSource(Reader reader, String systemID) {
 		this.reader = reader;
 		this.systemId = systemID;
-	} // StreamSource()
+	}
 
 	public StreamSource(String systemID) {
 		this.systemId = systemID;
-	} // StreamSource()
-
-	public StreamSource(File file) {
-		this(file.getName());
-	} // StreamSource()
+	}
 
 
 	//-------------------------------------------------------------
@@ -87,40 +87,44 @@ public class StreamSource implements Source {
 
 	public InputStream getInputStream() {
 		return inputStream;
-	} // getInputStream()
-
-	public void setInputStream(InputStream stream) {
-		this.inputStream = stream;
-	} // setInputStream()
-
-	public void setReader(Reader reader) {
-		this.reader = reader;
-	} // setReader()
-
-	public Reader getReader() {
-		return reader;
-	} // getReader()
-
-	public void setPublicId(String publicID) {
-		this.publicId = publicID;
-	} // setPublicId()
+	}
 
 	public String getPublicId() {
 		return publicId;
-	} // getPublicId()
+	}
 
-	public void setSystemId(String systemID) {
-		this.systemId = systemID;
-	} // setSystemId()
-
-	public void setSystemId(File file) {
-		this.systemId = file.getName();
-	} // setSystemId()
+	public Reader getReader() {
+		return reader;
+	}
 
 	public String getSystemId() {
 		return systemId;
-	} // getSystemId()
+	}
 
 
-} // StreamSource
+	public void setInputStream(InputStream stream) {
+		this.inputStream = stream;
+	}
 
+	public void setPublicId(String publicID) {
+		this.publicId = publicID;
+	}
+
+	public void setReader(Reader reader) {
+		this.reader = reader;
+	}
+
+	public void setSystemId(File file) {
+	    try {
+// FIXME:  this jdk 1.2 dependency should not exist
+		this.systemId = file.toURL().toString ();
+	    } catch (java.net.MalformedURLException e) {
+		// can't happen
+		throw new RuntimeException (e.getMessage ());
+	    }
+	}
+
+	public void setSystemId(String systemID) {
+		this.systemId = systemID;
+	}
+}
