@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.27 2003-01-20 23:46:33 nferrier Exp $
+ * $Id: SAXDriver.java,v 1.28 2003-01-21 18:18:15 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -66,7 +66,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.27 2003-01-20 23:46:33 nferrier Exp $
+// $Id: SAXDriver.java,v 1.28 2003-01-21 18:18:15 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -123,7 +123,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2003-01-20 23:46:33 $
+ * @version $Date: 2003-01-21 18:18:15 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -318,6 +318,8 @@ final public class SAXDriver
 	    parser = new XmlParser ();
 	    if (namespaces)
 		prefixStack = new NamespaceSupport ();
+	    else if (!xmlNames)
+		throw new IllegalStateException ();
 	    parser.setHandler (this);
 
 	    try {
