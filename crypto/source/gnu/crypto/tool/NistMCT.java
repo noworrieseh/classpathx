@@ -1,9 +1,9 @@
 package gnu.crypto.tool;
 
 // ----------------------------------------------------------------------------
-// $Id: NistMCT.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: NistMCT.java,v 1.3 2002-06-22 09:59:57 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -37,16 +37,23 @@ import java.security.InvalidKeyException;
 import java.util.HashMap;
 
 /**
- * For a designated symmetric block cipher algorithm, this command generates and
- * exercises Monte Carlo Tests data for both Encryption and Decryption in
- * Electronic Codebook (ECB) and Cipher Block Chaining (CBC) modes.<p>
+ * <p>For a designated symmetric block cipher algorithm, this command generates
+ * and exercises Monte Carlo Tests data for both Encryption and Decryption in
+ * Electronic Codebook (ECB) and Cipher Block Chaining (CBC) modes.</p>
  *
- * NistMCT's output file format is in conformance with the layout described in
- * Section 4 of NIST's document "Description of Known Answer Tests and Monte
+ * <p>NistMCT's output file format is in conformance with the layout described
+ * in Section 4 of NIST's document "Description of Known Answer Tests and Monte
  * Carlo Tests for Advanced Encryption Standard (AES) Candidate Algorithm
- * Submissions" dated January 7, 1998.
+ * Submissions" dated January 7, 1998.</p>
  *
- * @version $Revision: 1.2 $
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://csrc.nist.gov/encryption/aes/katmct/katmct.htm">Known
+ *    Answer Test (KAT) and Monte Carlo Test (MCT) Information</a></li>
+ * </ol>
+ *
+ * @version $Revision: 1.3 $
  */
 public class NistMCT
 {
@@ -77,33 +84,254 @@ public class NistMCT
    // Class methods
    // -------------------------------------------------------------------------
 
+   /**
+    * <p>The main entry point for the tool.</p>
+    *
+    * <pre>
+    * Usage:
+    *    gnu.crypto.tool.NistKat (options) cipher [key-size]
+    *
+    * Where:
+    *    cipher
+    *       The canonical name of the cipher algorithm.
+    *    key-size
+    *       The key-size in bits to use for the algorithm.  If unspecified,
+    *       then the three NIST key-sizes 128, 192 and 256 shall be used.
+    *
+    * Options:
+    *    -E | -C | -A
+    *       Generate Monte Carlo Test (MCT) data for ECB mode only, CBC mode
+    *       only, or both.  For backward compatibility, if this option is
+    *       unspecified, then -A (both modes) is activated.
+    *    -e | -d | -a
+    *       Generate Monte Carlo Test (MCT) data for a designated cipher in
+    *       the selected mode(s), for Encryption only, Decryption only, or
+    *       both.  For backward compatibility, if this option is unspecified,
+    *       then -a (both states) is activated.
+    *    -h
+    *       Print this help page.
+    * </pre>
+    */
    public static void main (String[] args) {
-      try {
-         String cipherName = args[0];
-         IBlockCipher cipher = CipherFactory.getInstance(cipherName);
+      if (args == null || args.length == 0) {
+         printUsage();
+         return;
+      }
 
-         int keySize = cipher.defaultKeySize() * 8;
-         if (args.length > 1) {
-            keySize = Integer.parseInt(args[1]);
+      try {
+         // set defaults
+         boolean doECB = false; // set to true if -E or -A is specified
+         boolean doCBC = false; // set to true if -C or -A is specified
+         boolean doEnc = false; // set to true if -e or -a is specified
+         boolean doDec = false; // set to true if -d or -a is specified
+         String cipherName = null;
+         String kSize = null;
+
+         // parse arguments
+         for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (arg.startsWith("-")) { // an option
+               String option = arg.substring(1);
+               if (option.equals("E")) { // ECB ON
+                  doECB = true;
+                  continue;
+               }
+               if (option.equals("C")) { // CBC ON
+                  doCBC = true;
+                  continue;
+               }
+               if (option.equals("A")) { // both ON
+                  doECB = true;
+                  doCBC = true;
+                  continue;
+               }
+               if (option.equals("e")) { // encryption ON
+                  doEnc = true;
+                  continue;
+               }
+               if (option.equals("d")) { // decryption ON
+                  doDec = true;
+                  continue;
+               }
+               if (option.equals("a")) { // both ON
+                  doEnc = true;
+                  doDec = true;
+                  continue;
+               }
+               if (option.equals("h")) {
+                  printUsage();
+                  continue;
+               }
+            }
+            if (cipherName == null) {
+               cipherName = args[i++];
+               continue;
+            }
+            if (kSize == null) {
+               kSize = args[i++];
+               break; // ignore anything after this
+            }
          }
 
-         long time = -System.currentTimeMillis();
-         NistMCT cmd = new NistMCT(cipherName, cipher, keySize);
+         // validity checks
+         if (!doECB && !doCBC) { // for backward compatibility turn'em ON
+            doECB = true;
+            doCBC = true;
+         }
+         if (!doEnc && !doDec) { // for backward compatibility turn'em ON
+            doEnc = true;
+            doDec = true;
+         }
 
-         cmd.ecb();
-         cmd.cbc();
+         if (cipherName == null) {
+            System.err.println("Missing cipher name...");
+            printUsage();
+            return;
+         }
+
+         IBlockCipher cipher = CipherFactory.getInstance(cipherName);
+
+//         int keySize = cipher.defaultKeySize() * 8;
+//         if (args.length > 1) {
+//            keySize = Integer.parseInt(args[1]);
+//         }
+
+         long time = -System.currentTimeMillis();
+//         NistMCT cmd = new NistMCT(cipherName, cipher, keySize);
+
+         NistMCT[] cmd;
+         if (kSize == null) {
+            cmd = new NistMCT[] {
+               new NistMCT(cipherName, cipher, 128),
+               new NistMCT(cipherName, cipher, 192),
+               new NistMCT(cipherName, cipher, 256)
+            };
+         } else {
+            cmd = new NistMCT[] {
+               new NistMCT(cipherName, cipher, Integer.parseInt(kSize))
+            };
+         }
+
+         int i;
+         if (doECB) {
+            if (doEnc) {
+               // print preamble
+               System.out.println();
+               System.out.println("=========================");
+               System.out.println();
+               System.out.println("Electronic Codebook (ECB) Mode - ENCRYPTION");
+               System.out.println("Monte Carlo Test");
+               System.out.println();
+               System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+               System.out.println();
+               System.out.println("==========");
+
+               for (i = 0; i < cmd.length; i++) {
+                  cmd[i].ecbEncrypt();
+               }
+            }
+            if (doDec) {
+               // print preamble
+               System.out.println();
+               System.out.println("=========================");
+               System.out.println();
+               System.out.println("Electronic Codebook (ECB) Mode - DECRYPTION");
+               System.out.println("Monte Carlo Test");
+               System.out.println();
+               System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+               System.out.println();
+               System.out.println("==========");
+
+               for (i = 0; i < cmd.length; i++) {
+                  cmd[i].ecbDecrypt();
+               }
+            }
+         }
+
+         if (doCBC) {
+            if (doEnc) {
+               // print preamble
+               System.out.println();
+               System.out.println("=========================");
+               System.out.println();
+               System.out.println("Cipher Block Chaining (CBC) Mode - ENCRYPTION");
+               System.out.println("Monte Carlo Test");
+               System.out.println();
+               System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+               System.out.println();
+               System.out.println("==========");
+
+               for (i = 0; i < cmd.length; i++) {
+                  cmd[i].cbcEncrypt();
+               }
+            }
+            if (doDec) {
+               // print preamble
+               System.out.println();
+               System.out.println("=========================");
+               System.out.println();
+               System.out.println("Cipher Block Chaining (CBC) Mode - DECRYPTION");
+               System.out.println("Monte Carlo Test");
+               System.out.println();
+               System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+               System.out.println();
+               System.out.println("==========");
+
+               for (i = 0; i < cmd.length; i++) {
+                  cmd[i].cbcDecrypt();
+               }
+            }
+         }
 
          time += System.currentTimeMillis();
+         long encryptions = 0L;
+         long decryptions = 0L;
+         long keySetups = 0L;
+         for (i = 0; i < cmd.length; i++) {
+            encryptions += cmd[i].encBlocks;
+            decryptions += cmd[i].decBlocks;
+            keySetups += cmd[i].keyCount;
+         }
+
+         // print postamble
          System.out.println();
          System.out.println("Total execution time (ms): "+String.valueOf(time));
          System.out.println("During this time, "+String.valueOf(cipherName)+ ":");
-         System.out.println("  Encrypted "+String.valueOf(cmd.encBlocks)+" blocks");
-         System.out.println("  Decrypted "+String.valueOf(cmd.decBlocks)+" blocks");
-         System.out.println("  Created "+String.valueOf(cmd.keyCount)+" session keys");
+         System.out.println("  Encrypted "+String.valueOf(encryptions)+" blocks");
+         System.out.println("  Decrypted "+String.valueOf(decryptions)+" blocks");
+         System.out.println("  Created "+String.valueOf(keySetups)+" session keys");
 
       } catch (Exception x) {
          x.printStackTrace(System.err);
       }
+   }
+
+   /** Prints a simple help page to <code>System.err</code>. */
+   private static final void printUsage() {
+      System.err.println();
+      System.err.println("Usage:");
+      System.err.println("   gnu.crypto.tool.NistKat (options) cipher [key-size]");
+      System.err.println();
+      System.err.println("Where:");
+      System.err.println("   cipher");
+      System.err.println("      The canonical name of the cipher algorithm.");
+      System.err.println("   key-size");
+      System.err.println("      The key-size in bits to use for the algorithm.  If unspecified,");
+      System.err.println("      then the three NIST key-sizes 128, 192 and 256 shall be used.");
+      System.err.println();
+      System.err.println("Options:");
+      System.err.println("   -E | -C | -A");
+      System.err.println("      Generate Monte Carlo Test (MCT) data for ECB mode only, CBC mode");
+      System.err.println("      only, or both.  For backward compatibility, if this option is ");
+      System.err.println("      unspecified, then -A (both modes) is activated.");
+      System.err.println("   -e | -d | -a");
+      System.err.println("      Generate Monte Carlo Test (MCT) data for a designated cipher in");
+      System.err.println("      the selected mode(s), for Encryption only, Decryption only, or");
+      System.err.println("      both.  For backward compatibility, if this option is unspecified,");
+      System.err.println("      then -a (both states) is activated.");
+      System.err.println("   -h");
+      System.err.println("      Print this help page.");
+      System.err.println();
    }
 
    // Instance methods
@@ -124,15 +352,15 @@ public class NistMCT
       byte[] ct_1 = new byte[size];  // ciphertext @round 9998
       int j, k, count;               // temp vars
 
-      System.out.println();
-      System.out.println("=========================");
-      System.out.println();
-      System.out.println("Electronic Codebook (ECB) Mode - ENCRYPTION");
-      System.out.println("Monte Carlo Test");
-      System.out.println();
-      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
-      System.out.println();
-      System.out.println("==========");
+//      System.out.println();
+//      System.out.println("=========================");
+//      System.out.println();
+//      System.out.println("Electronic Codebook (ECB) Mode - ENCRYPTION");
+//      System.out.println("Monte Carlo Test");
+//      System.out.println();
+//      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+//      System.out.println();
+//      System.out.println("==========");
       System.out.println();
       System.out.println("KEYSIZE="+String.valueOf(keySize));
       System.out.println();
@@ -209,15 +437,15 @@ public class NistMCT
       byte[] ct_1 = new byte[size];  // ciphertext @round 9998
       int j, k, count;                // temp vars
 
-      System.out.println();
-      System.out.println("=========================");
-      System.out.println();
-      System.out.println("Electronic Codebook (ECB) Mode - DECRYPTION");
-      System.out.println("Monte Carlo Test");
-      System.out.println();
-      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
-      System.out.println();
-      System.out.println("==========");
+//      System.out.println();
+//      System.out.println("=========================");
+//      System.out.println();
+//      System.out.println("Electronic Codebook (ECB) Mode - DECRYPTION");
+//      System.out.println("Monte Carlo Test");
+//      System.out.println();
+//      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+//      System.out.println();
+//      System.out.println("==========");
       System.out.println();
       System.out.println("KEYSIZE="+String.valueOf(keySize));
       System.out.println();
@@ -299,15 +527,15 @@ public class NistMCT
       byte[] iv = new byte[size];    // initialization vector
       int j, k, count;               // temp vars
 
-      System.out.println();
-      System.out.println("=========================");
-      System.out.println();
-      System.out.println("Cipher Block Chaining (CBC) Mode - ENCRYPTION");
-      System.out.println("Monte Carlo Test");
-      System.out.println();
-      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
-      System.out.println();
-      System.out.println("==========");
+//      System.out.println();
+//      System.out.println("=========================");
+//      System.out.println();
+//      System.out.println("Cipher Block Chaining (CBC) Mode - ENCRYPTION");
+//      System.out.println("Monte Carlo Test");
+//      System.out.println();
+//      System.out.println("Algorithm Name: "+String.valueOf(cipherName));
+//      System.out.println();
+//      System.out.println("==========");
       System.out.println();
       System.out.println("KEYSIZE="+String.valueOf(keySize));
       System.out.println();
