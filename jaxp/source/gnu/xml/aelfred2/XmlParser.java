@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.28 2001-11-20 22:23:07 db Exp $
+ * $Id: XmlParser.java,v 1.29 2001-12-03 21:35:10 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -65,7 +65,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.28 2001-11-20 22:23:07 db Exp $
+// $Id: XmlParser.java,v 1.29 2001-12-03 21:35:10 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-20 22:23:07 $
+ * @version $Date: 2001-12-03 21:35:10 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -1949,44 +1949,59 @@ loop2:
     private void parseCharData ()
     throws Exception
     {
-	char c;
+	char	c;
+	int	state = 0;
+	boolean pureWhite = false;
 
-	// Start with a little cheat -- in most
-	// cases, the entire sequence of
-	// character data will already be in
-	// the readBuffer; if not, fall through to
-	// the normal approach.
-	if (USE_CHEATS) {
+	// could have <![CDATA[...]]> text or char ref expansions
+	if (dataBufferPos != 0)
+	    dataBufferFlush ();
+
+	// are we expecting pure whitespace?  it might be dirty...
+	if (currentElementContent == CONTENT_ELEMENTS && !inCDATA)
+	    pureWhite = true;
+
+	// always report right out of readBuffer
+	// to minimize (pointless) buffer copies
+	while (true) {
 	    int lineAugment = 0;
 	    int columnAugment = 0;
+	    int i;
 
 loop:
-	    for (int i = readBufferPos; i < readBufferLength; i++) {
+	    for (i = readBufferPos; i < readBufferLength; i++) {
 		switch (c = readBuffer [i]) {
 		case '\n':
 		    lineAugment++;
 		    columnAugment = 0;
+		    // pureWhite unmodified
+		    break;
+		case '\r':	// should not happen!!
+		case '\t':
+		case ' ':
+		    // pureWhite unmodified
+		    columnAugment++;
 		    break;
 		case '&':
 		case '<':
-		    int start = readBufferPos;
 		    columnAugment++;
-		    readBufferPos = i;
-		    if (lineAugment > 0) {
-			line += lineAugment;
-			column = columnAugment;
-		    } else {
-			column += columnAugment;
-		    }
-		    dataBufferAppend (readBuffer, start, i - start);
-		    return;
+		    // pureWhite unmodified
+		    // CLEAN end of text sequence
+		    state = 1;
+		    break loop;
 		case ']':
-		    // FIXME missing two end-of-buffer cases
+		    // that's not a whitespace char, and
+		    // can not terminate pure whitespace either
+		    pureWhite = false;
 		    if ((i + 2) < readBufferLength) {
 			if (readBuffer [i + 1] == ']'
 				&& readBuffer [i + 2] == '>') {
-			    error ("character data may not contain ']]>'");
+			    // ERROR end of text sequence
+			    state = 2;
+			    break loop;
 			}
+		    } else {
+			// FIXME missing two end-of-buffer cases
 		    }
 		    columnAugment++;
 		    break;
@@ -1994,29 +2009,43 @@ loop:
 		    if (c < 0x0020 || c > 0xFFFD)
 			error ("illegal XML character U+"
 				+ Integer.toHexString (c));
-		    // FALLTHROUGH
-		case '\r':
-		case '\t':
+		    // that's not a whitespace char
+		    pureWhite = false;
 		    columnAugment++;
 		}
 	    }
+
+	    // report text thus far
+	    if (lineAugment > 0) {
+		line += lineAugment;
+		column = columnAugment;
+	    } else {
+		column += columnAugment;
+	    }
+
+	    // report characters/whitspace
+	    int		length = i - readBufferPos;
+
+	    if (length != 0) {
+		if (pureWhite)
+		    handler.ignorableWhitespace (readBuffer,
+		    		readBufferPos, length);
+		else
+		    handler.charData (readBuffer, readBufferPos, length);
+		readBufferPos = i;
+	    }
+	    
+	    if (state != 0)
+		break;
+
+	    // fill next buffer from this entity, or
+	    // pop stack and continue with previous entity
+	    unread (readCh ());
 	}
 
-	// OK, the cheat didn't work; start over
-	// and do it by the book.
-	while (true) {
-	    c = readCh ();
-	    switch (c) {
-	    case '<':
-	    case '&':
-		unread (c);
-		return;
-	    // FIXME "]]>" precluded ...
-	    default:
-		dataBufferAppend (c);
-		break;
-	    }
-	}
+	// finish, maybe with error
+	if (state != 1)	// finish, no error
+	    error ("character data may not contain ']]>'");
     }
 
 
