@@ -1769,6 +1769,81 @@ loop:
     parseCharRef (true /* do flushDataBuffer by default */);
   }
 
+  /**
+   * Try to read a character reference without consuming data from buffer.
+   * <pre>
+   * [66] CharRef ::= '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';'
+   * </pre>
+   * <p>NOTE: the '&#' has already been read.
+   */
+  private void tryReadCharRef ()
+  throws SAXException, IOException
+  {
+  	int value = 0;
+	char c;
+
+	if (tryRead ('x')) {
+loop1:
+	    while (true) {
+		c = readCh ();
+		int n;
+		switch (c) {
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+		    n = c - '0';
+		    break;
+		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+		    n = (c - 'a') + 10;
+		    break;
+		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+		    n = (c - 'A') + 10;
+		    break;
+		case ';':
+		    break loop1;
+		default:
+		    error ("illegal character in character reference", c, null);
+		    break loop1;
+		}
+		value *= 16;
+		value += n;
+	    }
+	} else {
+loop2:
+	    while (true) {
+		c = readCh ();
+		switch (c) {
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+		    value *= 10;
+		    value += c - '0';
+		    break;
+		case ';':
+		    break loop2;
+		default:
+		    error ("illegal character in character reference", c, null);
+		    break loop2;
+		}
+	    }
+	}
+
+	// check for character refs being legal XML
+	if ((value < 0x0020
+		&& ! (value == '\n' || value == '\t' || value == '\r'))
+		|| (value >= 0xD800 && value <= 0xDFFF)
+		|| value == 0xFFFE || value == 0xFFFF
+		|| value > 0x0010ffff)
+	    error ("illegal XML character reference U+"
+		    + Integer.toHexString (value));
+
+	// Check for surrogates: 00000000 0000xxxx yyyyyyyy zzzzzzzz
+	//  (1101|10xx|xxyy|yyyy + 1101|11yy|zzzz|zzzz:
+	if (value > 0x0010ffff) {
+	    // too big for surrogate
+	    error ("character reference " + value + " is too large for UTF-16",
+		   new Integer (value).toString (), null);
+	}
+  }
+  
     /**
      * Read and interpret a character reference.
      * <pre>
@@ -2428,12 +2503,23 @@ loop:
 			    dataBufferAppend ('&');
 			    break;
 			}
-      parseCharRef (false /* Do not do flushDataBuffer */);
+                        parseCharRef (false /* Do not do flushDataBuffer */);
 
 			// exotic WFness risk: this is an entity literal,
 			// dataBuffer [dataBufferPos - 1] == '&', and
 			// following chars are a _partial_ entity/char ref
-
+                        
+                        int bufferPosMark = readBufferPos;
+                        if (dataBuffer [dataBufferPos - 1] == '&'){
+                            char t = 0;
+                            if ((t = readCh()) == '#'){ 
+                               //try to match a character ref
+                               tryReadCharRef ();
+                               readBufferPos = bufferPosMark;
+                            }
+                            else
+                            	unread (t);
+                        }
 		    // It looks like an entity ref ...
 		    } else {
 			unread (c);
