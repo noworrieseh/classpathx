@@ -66,6 +66,8 @@ import org.w3c.dom.xpath.XPathException;
 import org.w3c.dom.xpath.XPathExpression;
 import org.w3c.dom.xpath.XPathNSResolver;
 
+import gnu.xml.dom.DomNodeIterator;
+
 /**
  * A DOM document node implemented in libxml2.
  *
@@ -529,8 +531,8 @@ public class GnomeDocument
                                          boolean entityReferenceExpansion)
     throws DOMException
   {
-    return new GnomeNodeIterator(root, whatToShow, filter,
-                                 entityReferenceExpansion, false);
+    return new DomNodeIterator(root, whatToShow, filter,
+                               entityReferenceExpansion, false);
   }
 
   public TreeWalker createTreeWalker(Node root,
@@ -539,8 +541,8 @@ public class GnomeDocument
                                     boolean entityReferenceExpansion)
     throws DOMException
   {
-    return new GnomeNodeIterator(root, whatToShow, filter,
-                                 entityReferenceExpansion, true);
+    return new DomNodeIterator(root, whatToShow, filter,
+                               entityReferenceExpansion, true);
   }
 
   // -- Debugging --

@@ -1,8 +1,12 @@
-2004-12-10  Chris Burdess	<dog@gnu.org>
+2004-12-15  Mark Wielaard  <mark@klomp.org>
+
+	* GnomeNodeIterator.java: Renamed to DomNodeIterator.java.
+
+2004-12-10  Chris Burdess  <dog@gnu.org>
 
 	* org/xml/sax: Updated version of SAX API to sax2r3 final.
 
-2004-12-04  Chris Burdess	<dog@gnu.org>
+2004-12-04  Chris Burdess  <dog@gnu.org>
 
 	* README,INSTALL,AUTHORS: Updated documentation.
 
@@ -10,7 +14,7 @@
 
 	* autogen.sh: New file.
 
-2004-11-27  Chris Burdess	<dog@gnu.org>
+2004-11-27  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Removed redundant 'sources' and 'classes' makefile
 	variables. Added -W-no-long-long to libxmlj compilation flags.
@@ -26,11 +30,11 @@
 	* config/config.sub: Likewise.
 	* config/ltmain.sh: Likewise.
 
-2004-10-06  Chris Burdess	<dog@gnu.org>
+2004-10-06  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Fixes to permit gcj compilation.
 
-2004-10-27  Chris Burdess	<dog@gnu.org>
+2004-10-27  Chris Burdess  <dog@gnu.org>
 
 	* parsers, transform, dom, sax, stream: API rewritten from
 	scratch to satisfy copyright assignment.
@@ -40,24 +44,24 @@
 	Reported by John Kristian <jk2004@engineer.com>:
 	* manifest.mf: added Implementation Version field.
 	
-2004-10-06  Chris Burdess	<dog@gnu.org>
+2004-10-06  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Make invocation of javadoc gjdoc-compatible.
 
-2004-09-03  Chris Burdess	<dog@gnu.org>
+2004-09-03  Chris Burdess  <dog@gnu.org>
 
 	* all: Replaced GPL exception with new exception text.
 
-2004-09-01  Chris Burdess	<dog@gnu.org>
+2004-09-01  Chris Burdess  <dog@gnu.org>
 
 	* all: Reassigned David Brownell's copyright to FSF.
 
-2004-05-12  Chris Burdess	<dog@gnu.org>
+2004-05-12  Chris Burdess  <dog@gnu.org>
 
 	* (dom): Updated to DOM Level 3 Core and L&S interfaces.
 	* GnomeDocumentBuilder.java: Fixed stream retrieval bug.
 
-2004-05-05  Chris Burdess	<dog@gnu.org>
+2004-05-05  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am, acinclude.m4: Added gcjh detection. Makefile will now
 	rebuild out of date JNI headers and gnujaxp.jar.

@@ -409,6 +409,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/dom/DomIterator.java \
 	source/gnu/xml/dom/DomNamedNodeMap.java \
 	source/gnu/xml/dom/DomNode.java \
+	source/gnu/xml/dom/DomNodeIterator.java \
 	source/gnu/xml/dom/DomNotation.java \
 	source/gnu/xml/dom/DomNsNode.java \
 	source/gnu/xml/dom/DomNSResolverContext.java \
@@ -438,7 +439,6 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
 	source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java \
 	source/gnu/xml/libxmlj/dom/GnomeNode.java \
-	source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java \
 	source/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 	source/gnu/xml/libxmlj/dom/GnomeNotation.java \
 	source/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \

@@ -1,5 +1,5 @@
 /*
- * GnomeNodeIterator.java
+ * DomNodeIterator.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@
  * obliged to do so.  If you do not wish to do so, delete this
  * exception statement from your version.
  */
-package gnu.xml.libxmlj.dom;
+package gnu.xml.dom;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -48,7 +48,7 @@ import org.w3c.dom.traversal.TreeWalker;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class GnomeNodeIterator
+public class DomNodeIterator
   implements NodeIterator, TreeWalker
 {
 
@@ -59,12 +59,12 @@ public class GnomeNodeIterator
   final boolean walk;
   Node current;
 
-  public GnomeNodeIterator(Node root, int whatToShow, NodeFilter filter,
-                           boolean entityReferenceExpansion, boolean walk)
+  public DomNodeIterator(Node root, int whatToShow, NodeFilter filter,
+                         boolean entityReferenceExpansion, boolean walk)
   {
     if (root == null)
       {
-        throw new GnomeDOMException(DOMException.NOT_SUPPORTED_ERR, null);
+        throw new DomEx(DOMException.NOT_SUPPORTED_ERR);
       }
     this.root = root;
     this.whatToShow = whatToShow;
@@ -99,7 +99,7 @@ public class GnomeNodeIterator
   {
     if (root == null)
       {
-        throw new GnomeDOMException(DOMException.INVALID_STATE_ERR, null);
+        throw new DomEx(DOMException.INVALID_STATE_ERR);
       }
     Node ret;
     do
@@ -149,7 +149,7 @@ public class GnomeNodeIterator
   {
     if (root == null)
       {
-        throw new GnomeDOMException(DOMException.INVALID_STATE_ERR, null);
+        throw new DomEx(DOMException.INVALID_STATE_ERR);
       }
     Node ret;
     do
@@ -204,7 +204,7 @@ public class GnomeNodeIterator
   {
     if (current == null)
       {
-        throw new GnomeDOMException(DOMException.NOT_SUPPORTED_ERR, null);
+        throw new DomEx(DOMException.NOT_SUPPORTED_ERR);
       }
     this.current = current;
   }

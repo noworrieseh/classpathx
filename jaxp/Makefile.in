@@ -137,6 +137,7 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/dom/DomIterator.lo \
 	source/gnu/xml/dom/DomNamedNodeMap.lo \
 	source/gnu/xml/dom/DomNode.lo \
+	source/gnu/xml/dom/DomNodeIterator.lo \
 	source/gnu/xml/dom/DomNotation.lo \
 	source/gnu/xml/dom/DomNsNode.lo \
 	source/gnu/xml/dom/DomNSResolverContext.lo \
@@ -165,7 +166,6 @@ am_lib_gnu_xml_la_OBJECTS = source/gnu/xml/aelfred2/JAXPFactory.lo \
 	source/gnu/xml/libxmlj/dom/GnomeEntityReference.lo \
 	source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.lo \
 	source/gnu/xml/libxmlj/dom/GnomeNode.lo \
-	source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo \
 	source/gnu/xml/libxmlj/dom/GnomeNodeList.lo \
 	source/gnu/xml/libxmlj/dom/GnomeNotation.lo \
 	source/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.lo \
@@ -1093,6 +1093,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/dom/DomIterator.java \
 	source/gnu/xml/dom/DomNamedNodeMap.java \
 	source/gnu/xml/dom/DomNode.java \
+	source/gnu/xml/dom/DomNodeIterator.java \
 	source/gnu/xml/dom/DomNotation.java \
 	source/gnu/xml/dom/DomNsNode.java \
 	source/gnu/xml/dom/DomNSResolverContext.java \
@@ -1122,7 +1123,6 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/libxmlj/dom/GnomeEntityReference.java \
 	source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.java \
 	source/gnu/xml/libxmlj/dom/GnomeNode.java \
-	source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java \
 	source/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 	source/gnu/xml/libxmlj/dom/GnomeNotation.java \
 	source/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
@@ -1485,6 +1485,9 @@ source/gnu/xml/dom/DomNamedNodeMap.lo:  \
 	source/gnu/xml/dom/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/dom/DomNode.lo: source/gnu/xml/dom/$(am__dirstamp) \
 	source/gnu/xml/dom/$(DEPDIR)/$(am__dirstamp)
+source/gnu/xml/dom/DomNodeIterator.lo:  \
+	source/gnu/xml/dom/$(am__dirstamp) \
+	source/gnu/xml/dom/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/dom/DomNotation.lo: source/gnu/xml/dom/$(am__dirstamp) \
 	source/gnu/xml/dom/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/dom/DomNsNode.lo: source/gnu/xml/dom/$(am__dirstamp) \
@@ -1571,9 +1574,6 @@ source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.lo:  \
 	source/gnu/xml/libxmlj/dom/$(am__dirstamp) \
 	source/gnu/xml/libxmlj/dom/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/libxmlj/dom/GnomeNode.lo:  \
-	source/gnu/xml/libxmlj/dom/$(am__dirstamp) \
-	source/gnu/xml/libxmlj/dom/$(DEPDIR)/$(am__dirstamp)
-source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo:  \
 	source/gnu/xml/libxmlj/dom/$(am__dirstamp) \
 	source/gnu/xml/libxmlj/dom/$(DEPDIR)/$(am__dirstamp)
 source/gnu/xml/libxmlj/dom/GnomeNodeList.lo:  \
@@ -3004,6 +3004,8 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/dom/DomNamedNodeMap.lo
 	-rm -f source/gnu/xml/dom/DomNode.$(OBJEXT)
 	-rm -f source/gnu/xml/dom/DomNode.lo
+	-rm -f source/gnu/xml/dom/DomNodeIterator.$(OBJEXT)
+	-rm -f source/gnu/xml/dom/DomNodeIterator.lo
 	-rm -f source/gnu/xml/dom/DomNotation.$(OBJEXT)
 	-rm -f source/gnu/xml/dom/DomNotation.lo
 	-rm -f source/gnu/xml/dom/DomNsNode.$(OBJEXT)
@@ -3080,8 +3082,6 @@ mostlyclean-compile:
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNamedNodeMap.lo
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNode.$(OBJEXT)
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNode.lo
-	-rm -f source/gnu/xml/libxmlj/dom/GnomeNodeIterator.$(OBJEXT)
-	-rm -f source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNodeList.$(OBJEXT)
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNodeList.lo
 	-rm -f source/gnu/xml/libxmlj/dom/GnomeNotation.$(OBJEXT)
@@ -3917,6 +3917,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNSResolverContext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNamedNodeMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNodeIterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNotation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomNsNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/dom/$(DEPDIR)/DomPI.Plo@am__quote@
@@ -3955,7 +3956,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeEntityReference.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNamedNodeMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeIterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNotation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeProcessingInstruction.Plo@am__quote@
@@ -4697,6 +4697,13 @@ source/gnu/xml/dom/DomNode.lo: source/gnu/xml/dom/DomNode.java
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/dom/DomNode.lo `test -f 'source/gnu/xml/dom/DomNode.java' || echo '$(srcdir)/'`source/gnu/xml/dom/DomNode.java
 
+source/gnu/xml/dom/DomNodeIterator.lo: source/gnu/xml/dom/DomNodeIterator.java
+@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/dom/DomNodeIterator.lo -MD -MP -MF "source/gnu/xml/dom/$(DEPDIR)/DomNodeIterator.Tpo" -c -o source/gnu/xml/dom/DomNodeIterator.lo `test -f 'source/gnu/xml/dom/DomNodeIterator.java' || echo '$(srcdir)/'`source/gnu/xml/dom/DomNodeIterator.java; \
+@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/dom/$(DEPDIR)/DomNodeIterator.Tpo" "source/gnu/xml/dom/$(DEPDIR)/DomNodeIterator.Plo"; else rm -f "source/gnu/xml/dom/$(DEPDIR)/DomNodeIterator.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/dom/DomNodeIterator.java' object='source/gnu/xml/dom/DomNodeIterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/dom/DomNodeIterator.lo `test -f 'source/gnu/xml/dom/DomNodeIterator.java' || echo '$(srcdir)/'`source/gnu/xml/dom/DomNodeIterator.java
+
 source/gnu/xml/dom/DomNotation.lo: source/gnu/xml/dom/DomNotation.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/dom/DomNotation.lo -MD -MP -MF "source/gnu/xml/dom/$(DEPDIR)/DomNotation.Tpo" -c -o source/gnu/xml/dom/DomNotation.lo `test -f 'source/gnu/xml/dom/DomNotation.java' || echo '$(srcdir)/'`source/gnu/xml/dom/DomNotation.java; \
 @am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/dom/$(DEPDIR)/DomNotation.Tpo" "source/gnu/xml/dom/$(DEPDIR)/DomNotation.Plo"; else rm -f "source/gnu/xml/dom/$(DEPDIR)/DomNotation.Tpo"; exit 1; fi
@@ -4899,13 +4906,6 @@ source/gnu/xml/libxmlj/dom/GnomeNode.lo: source/gnu/xml/libxmlj/dom/GnomeNode.ja
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/libxmlj/dom/GnomeNode.java' object='source/gnu/xml/libxmlj/dom/GnomeNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/libxmlj/dom/GnomeNode.lo `test -f 'source/gnu/xml/libxmlj/dom/GnomeNode.java' || echo '$(srcdir)/'`source/gnu/xml/libxmlj/dom/GnomeNode.java
-
-source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo: source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java
-@am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo -MD -MP -MF "source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeIterator.Tpo" -c -o source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo `test -f 'source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java' || echo '$(srcdir)/'`source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java; \
-@am__fastdepGCJ_TRUE@	then mv -f "source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeIterator.Tpo" "source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeIterator.Plo"; else rm -f "source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeIterator.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	source='source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java' object='source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepGCJ_FALSE@	DEPDIR=$(DEPDIR) $(GCJDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepGCJ_FALSE@	$(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -o source/gnu/xml/libxmlj/dom/GnomeNodeIterator.lo `test -f 'source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java' || echo '$(srcdir)/'`source/gnu/xml/libxmlj/dom/GnomeNodeIterator.java
 
 source/gnu/xml/libxmlj/dom/GnomeNodeList.lo: source/gnu/xml/libxmlj/dom/GnomeNodeList.java
 @am__fastdepGCJ_TRUE@	if $(LIBTOOL) --mode=compile --tag=GCJ $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -MT source/gnu/xml/libxmlj/dom/GnomeNodeList.lo -MD -MP -MF "source/gnu/xml/libxmlj/dom/$(DEPDIR)/GnomeNodeList.Tpo" -c -o source/gnu/xml/libxmlj/dom/GnomeNodeList.lo `test -f 'source/gnu/xml/libxmlj/dom/GnomeNodeList.java' || echo '$(srcdir)/'`source/gnu/xml/libxmlj/dom/GnomeNodeList.java; \
