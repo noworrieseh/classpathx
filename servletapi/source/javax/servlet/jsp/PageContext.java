@@ -178,6 +178,13 @@ public abstract class PageContext
   //  Constructor
 
   /**
+   * The JSP API constructor.
+   */
+  public PageContext ()
+  {
+  }
+  
+  /**
    * XXX
    *
    * @param fac XXX
@@ -201,6 +208,7 @@ public abstract class PageContext
 			 boolean autoflush)
     throws IOException, IllegalStateException, IllegalArgumentException 
   {
+    // What on earth is this for? Is it GNUJSP specific?
     this.factory = fac;
     this.servlet = s;
     this.request = req;
@@ -219,10 +227,11 @@ public abstract class PageContext
     if (req instanceof HttpServletRequest) 
       {
 	session = ((HttpServletRequest)request).getSession();
-      } else 
-	{
-	  session = null; //  XXX [mjw] ehe...
-	}
+      }
+    else 
+      {
+	session = null; //  XXX [mjw] ehe...
+      }
   }
 
   //  Instance Methods
