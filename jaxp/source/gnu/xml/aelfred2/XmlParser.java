@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.11 2001-07-29 19:26:03 db Exp $
+ * $Id: XmlParser.java,v 1.12 2001-07-31 06:38:18 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.MalformedURLException;
 
 // maintaining 1.1 compatibility for now ...
 // Iterator and Hashmap ought to be faster
@@ -55,7 +56,7 @@ import java.util.Stack;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.11 2001-07-29 19:26:03 db Exp $
+// $Id: XmlParser.java,v 1.12 2001-07-31 06:38:18 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -65,7 +66,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-29 19:26:03 $
+ * @version $Date: 2001-07-31 06:38:18 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -115,7 +116,7 @@ final class XmlParser
      * <p>You may parse more than one document, but that must be done
      * sequentially.  Only one thread at a time may use this parser.
      *
-     * @param systemId The URI of the document; should never be null,
+     * @param systemId Absolute URI of the document; should never be null,
      *	but may be so iff a reader <em>or</em> a stream is provided.
      * @param publicId The public identifier of the document, or null.
      * @param reader A character stream; must be null if stream isn't.
@@ -134,6 +135,13 @@ final class XmlParser
     {
 	if (handler == null)
 	    throw new IllegalStateException ("no callback handler");
+
+	// Insist any system ID (URI/URL) is absolute.  There's a case
+	// where it may be null:  parser was invoked without providing
+	// one, e.g. since the XML data came from a memory buffer.
+
+	if (systemId != null)
+	    systemId = new URL (systemId).toString ();
 
 	basePublicId = publicId;
 	baseURI = systemId;
@@ -939,10 +947,12 @@ loop:
 			continue loop;
 		    }
 		}
-		// I guess not...
-		handler.attribute (aname,
-				   getAttributeExpandedValue (gi, aname),
-				   false);
+		// ... or has a default
+		String value = getAttributeExpandedValue (gi, aname);
+
+		if (value == null)
+		    continue;
+		handler.attribute (aname, value, false);
 	    }
 	}
 
@@ -1694,7 +1704,6 @@ loop2:
 
 	name = readNmtoken (true);
 	require (';');
-	dataBufferFlush ();
 	switch (getEntityType (name)) {
 	case ENTITY_UNDECLARED:
 	    error ("reference to undeclared entity", name, null);
@@ -2335,11 +2344,40 @@ loop:
 	} else if (tryRead ("SYSTEM")) {
 	    requireWhitespace ();
 	    ids [1] = readLiteral (flags);
-	}
+	} 
 
-	// XXX should normalize system IDs as follows:
-	// - Convert to UTF-8
-	// - Map reserved and non-ASCII characters to %HH
+// FIXME:  SAX spec says these always get absolutized ... 
+
+	// postprocessing for URIs
+	if (ids [1] != null && !inNotation) {
+
+	    // XXX should probably normalize system IDs as follows:
+	    // - Convert to UTF-8
+	    // - Map reserved and non-ASCII characters to %HH
+	    // Unclear if that needs to be done before passing URIs
+	    // to the JVM, or how the JVM does handles non-ASCII...
+
+	    // absolutize the system ID immediately,
+	    // relative to the appropriate base URI
+	    try {
+		URL	base;
+
+		if (externalEntity != null)
+		    base = externalEntity.getURL ();
+		else if (baseURI != null)
+		    base = new URL (baseURI);
+		else {
+		    handler.warn ("No base URI; hope this is absolute: "
+			    + ids [1]);
+		    base = null;
+		}
+		if (base != null)
+		    ids [1] = new URL (base, ids [1]).toString ();
+	    } catch (MalformedURLException e) {
+		handler.warn ("Can't understand URI, hope it's absolute: <"
+			+ ids [1] + ">");
+	    }
+	}
 
 	return ids;
     }
@@ -3401,22 +3439,15 @@ loop:
 	column = 0;
 	currentByteCount = 0;
 
-	// Make any system ID (URI/URL) absolute.  There's one case
-	// where it may be null:  parser was invoked without providing
-	// one, e.g. since the XML data came from a memory buffer.
-
-// FIXME use the real URI reported by the last resolver call
-
-	if (systemId != null && externalEntity != null) {
-	    systemId = new URL (externalEntity.getURL (), systemId).toString ();
-	} else if (baseURI != null) {
-	    systemId = new URL (new URL (baseURI), systemId).toString ();
-	    // throws IOException if couldn't create new URL
-	}
+	// systemID was already absolutized
 
 	// See if the application wants to
 	// redirect the system ID and/or
 	// supply its own character stream.
+
+// FIXME resolver might provide stream/reader _and_ a URI
+// ... remember that URI as the base URI, not the original!!
+
 	if (reader == null && stream == null && systemId != null) {
 	    Object input = handler.resolveEntity (publicId, systemId);
 	    if (input != null) {
@@ -3889,7 +3920,6 @@ loop:
     {
 	String ename = (String) entityStack.pop ();
 
-	dataBufferFlush ();
 	switch (sourceType) {
 	case INPUT_STREAM:
 	    handler.endExternalEntity (ename);
