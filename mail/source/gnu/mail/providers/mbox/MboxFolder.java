@@ -1,6 +1,6 @@
 /*
  * MboxFolder.java
- * Copyright(C) 1999 Chris Burdess <dog@gnu.org>
+ * Copyright(C) 1999,2005 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -27,6 +27,7 @@
  * Contributor(s): Daniel Thor Kristjan <danielk@cat.nyu.edu>
  *                   close and expunge clarification.
  *                 Sverre Huseby <sverrehu@online.no> gzipped mailboxes
+ *                 Countach <yahoo@canberracity.org> Win32 support
  */
 
 package gnu.mail.providers.mbox;
@@ -79,6 +80,7 @@ public class MboxFolder
   static final String FROM = "From ";
 	
   File file;
+  String name;
   MboxMessage[] messages;
   boolean open;
   boolean readOnly;
@@ -90,11 +92,18 @@ public class MboxFolder
   /**
    * Constructor.
    */
-  protected MboxFolder(Store store, String filename, boolean inbox) 
+  protected MboxFolder(MboxStore store, String name, boolean inbox)
   {
     super(store);
-    
-    file = new File(filename);
+    this.name = name;
+    if (0 < name.length() && name.charAt(0) == '/')
+      {
+        file = new File(canonicalNameToLocal(name));
+      }
+    else
+      {
+        file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
+      }
     if (file.exists() && file.isDirectory())
       {
         type = HOLDS_FOLDERS;
@@ -112,9 +121,9 @@ public class MboxFolder
   /**
    * Constructor.
    */
-  protected MboxFolder(Store store, String filename) 
+  protected MboxFolder(MboxStore store, String name)
   {
-    this(store, filename, false);
+    this(store, name, false);
   }
 
   /**
@@ -138,7 +147,7 @@ public class MboxFolder
       {
         return "INBOX";
       }
-    return file.getPath();
+    return name;
   }
 
   /**
@@ -642,9 +651,42 @@ public class MboxFolder
   public Folder getParent() 
     throws MessagingException 
   {
-    return store.getFolder(file.getParent());
+    int i = name.length() - 1;
+    while (i >= 0 && name.charAt(i) == '/')
+      {
+        i--;
+      }
+    if (i <= 0)
+      {
+        return store.getDefaultFolder();
+      }
+    while (i >= 0 && name.charAt(i) != '/')
+      {
+        i--;
+      }
+    return store.getFolder(name.substring(0, i + 1));
   }
 
+  /**
+   * Convert into a valid filename for this platform.
+   * This allows you to use "//c:/foo/bar" as a hack for "c:/foo/bar".
+   * This is because the MboxStore specification specifies that only
+   * names starting with the separator ( / ) are treated as absolute.
+   */
+  static String canonicalNameToLocal(String name)
+  {
+    if ('/' != File.separatorChar)
+      {
+        String rtn = name.replace('/', File.separatorChar);
+        if (name.startsWith("//"))
+          {
+            rtn = rtn.substring(2);
+          }
+        return rtn;
+      }
+    return name;
+  }
+  
   /**
    * Returns the subfolders of this folder.
    */
@@ -661,9 +703,7 @@ public class MboxFolder
         Folder[] folders = new Folder[files.length];
         for (int i = 0; i < files.length; i++)
           {
-            folders[i] = store.getFolder(file.getAbsolutePath() +
-                                         File.separator +
-                                         files[i]);
+            folders[i] = store.getFolder(makeName(name, files[i]));
           }
         return folders;
       }
@@ -689,9 +729,7 @@ public class MboxFolder
         Folder[] folders = new Folder[files.length];
         for (int i = 0; i < files.length; i++)
           {
-            folders[i] = store.getFolder(file.getAbsolutePath() +
-                                         File.separator +
-                                         files[i]);
+            folders[i] = store.getFolder(makeName(name, files[i]));
           }
         return folders;
       } 
@@ -832,10 +870,13 @@ public class MboxFolder
   {
     try 
       {
-        String filename = folder.getFullName();
-        if (filename != null) 
+        if (folder.getFullName() != null)
           {
-            if (!file.renameTo(new File(filename)))
+            MboxStore ms = (MboxStore) store;
+            File newfile =
+              new File(ms.getMailRootDir(),
+                       canonicalNameToLocal(folder.getFullName()));
+            if (!file.renameTo(newfile))
               {
                 return false;
               }
@@ -856,11 +897,11 @@ public class MboxFolder
   /**
    * Returns the subfolder of this folder with the specified name.
    */
-  public Folder getFolder(String filename) 
+  public Folder getFolder(String fname)
     throws MessagingException 
   {
-    String INBOX = "INBOX";
-    if (INBOX.equalsIgnoreCase(filename))
+/*    String INBOX = "/INBOX";
+    if (INBOX.equalsIgnoreCase(fname))
       {
         try
           {
@@ -870,10 +911,30 @@ public class MboxFolder
           {
             // fall back to standard behaviour
           }
+      } */
+
+    if (!fname.startsWith("/"))
+      {
+        fname = makeName(name, fname);
       }
-    return store.getFolder(file.getAbsolutePath() + File.separator + filename);
+    return store.getFolder(fname);
   }
 
+  static String makeName(String parent, String child)
+  {
+    if (parent.length() == 0)
+      {
+        return child;
+      }
+    else if (parent.endsWith("/"))
+      {
+        return parent + child;
+      }
+    else
+      {
+        return parent + '/' + child;
+      }
+  }
   /**
    * Checks if the current file is or is supposed to be
    * compressed. Uses the filename to figure it out.

@@ -41,6 +41,7 @@ import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
 
 import gnu.inet.util.Logger;
+import java.io.IOException;
 
 /**
  * The storage class implementing the Mbox mailbox file format.
@@ -83,21 +84,29 @@ public final class MboxStore
   {
     return true;
   }
-
+  
   /**
    * Returns the default folder.
    */
-  public Folder getDefaultFolder() 
-    throws MessagingException 
+  public Folder getDefaultFolder()
+    throws MessagingException
+  {
+    return getFolder("");
+  }
+
+  /**
+   * Returns the root directory for mailbox files.
+   */
+  public File getMailRootDir()
   {
     // If the url used to contruct the store references a file directly,
     // return this file.
-    if (url!=null) 
+    if (url != null) 
       {
         String file = url.getFile();
         if (file != null && file.length() > 0) 
           {
-            return getFolder(file);
+            return new File(file);
           }
       }
     // Otherwise attempt to return a sensible root folder.
@@ -123,21 +132,22 @@ public final class MboxStore
             mailhome = "/";
           }
       }
-    return getFolder(mailhome);
+    return new File(mailhome);
   }
 
   /**
    * Returns the folder with the specified filename.
    */
-  public Folder getFolder(String filename) 
+  public Folder getFolder(String name)
     throws MessagingException
   {
-    if (filename == null)
+    if (name == null)
       {
-        filename = "";
+        name = "";
       }
     boolean inbox = false;
-    if (INBOX.equalsIgnoreCase(filename)) 
+    if (INBOX.equalsIgnoreCase(name) &&
+        !new File(getMailRootDir(), name).exists())
       {
         // First try the session property mail.mbox.inbox.
         String inboxname = session.getProperty("mail.mbox.inbox");
@@ -174,31 +184,14 @@ public final class MboxStore
                 log("unable to access system properties");
               }
           }
-        if (inboxname!=null)
+        if (inboxname != null)
           {
-            filename = inboxname;
+            name = inboxname;
             inbox = true;
           }
         // otherwise we assume it is actually a file called "inbox"
       }
-    
-    // convert into a valid filename for this platform
-    StringBuffer buf = new StringBuffer();
-    if (filename.length() < 1 || filename.charAt(0) != separatorChar)
-      {
-        buf.append(File.separator);
-      }
-    if (separatorChar!=File.separatorChar)
-      {
-        buf.append(filename.replace(separatorChar, File.separatorChar));
-      }
-    else
-      {
-        buf.append(filename);
-      }
-    filename = buf.toString();
-    
-    return new MboxFolder(this, filename, inbox);
+    return new MboxFolder(this, name, inbox);
   }
 
   /*

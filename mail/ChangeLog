@@ -1,3 +1,7 @@
+2005-02-15  Countach  <yahoo@canberracity.org>
+
+	* MboxFolder.java,MboxStore.java: Support Windows filenames.
+
 2005-02-14  Neil Campbell  <batneil@thebatcave.org.uk>
 
 	* IMAPFolder.java: Allow folders to hold both messages and folders.
