@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.13 2001-11-11 03:27:56 db Exp $
+ * $Id: EventFilter.java,v 1.14 2001-12-13 19:20:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -27,6 +27,8 @@
 
 package gnu.xml.pipeline;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Hashtable;
 
 import org.xml.sax.*;
@@ -124,7 +126,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
  * sets of parsers.
  *
  * @author David Brownell
- * @version $Date: 2001-11-11 03:27:56 $
+ * @version $Date: 2001-12-13 19:20:42 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -157,6 +159,68 @@ public class EventFilter
     /** SAX2 property identifier for {@link LexicalHandler} events */
     public static final String		LEXICAL_HANDLER
 	= PROPERTY_URI + "lexical-handler";
+    
+    //
+    // These class objects will be null if the relevant class isn't linked.
+    // Small configurations (pJava and some kinds of embedded systems) need
+    // to facilitate smaller executables.  So "instanceof" is undesirable
+    // when bind() sees if it can remove some stages.
+    //
+    // SECURITY NOTE:  assuming all these classes are part of the same sealed
+    // package, there's no problem saving these in the instance of this class
+    // that's associated with "this" class loader.  But that wouldn't be true
+    // for classes in another package.
+    //
+    private static boolean		loaded;
+    private static Class		nsClass;
+    private static Class		validClass;
+    private static Class		wfClass;
+    private static Class		xincClass;
+
+    static ClassLoader getClassLoader ()
+    {
+        Method m = null;
+
+        try {
+            m = Thread.class.getMethod("getContextClassLoader", null);
+        } catch (NoSuchMethodException e) {
+            // Assume that we are running JDK 1.1, use the current ClassLoader
+            return EventFilter.class.getClassLoader();
+        }
+
+        try {
+            return (ClassLoader) m.invoke(Thread.currentThread(), null);
+        } catch (IllegalAccessException e) {
+            // assert(false)
+            throw new UnknownError(e.getMessage());
+        } catch (InvocationTargetException e) {
+            // assert(e.getTargetException() instanceof SecurityException)
+            throw new UnknownError(e.getMessage());
+        }
+    }
+
+    static Class loadClass (ClassLoader classLoader, String className)
+    {
+	try {
+	    if (classLoader == null)
+		return Class.forName(className);
+	    else
+		return classLoader.loadClass(className);
+	} catch (Exception e) {
+	    return null;
+	}
+    }
+
+    static private void loadClasses ()
+    {
+	ClassLoader	loader = getClassLoader ();
+
+	nsClass = loadClass (loader, "gnu.xml.pipeline.NSFilter");
+	validClass = loadClass (loader, "gnu.xml.pipeline.ValidationConsumer");
+	wfClass = loadClass (loader, "gnu.xml.pipeline.WellFormednessFilter");
+	xincClass = loadClass (loader, "gnu.xml.pipeline.XIncludeFilter");
+	loaded = true;
+    }
 
 
     /**
@@ -167,6 +231,9 @@ public class EventFilter
      * application-specific handlers need to be bound separately.
      * The {@link ErrorHandler} is handled differently:  the producer's
      * error handler is passed through to the consumer pipeline.
+     * The producer is told to include namespace prefix information if it
+     * can, since many pipeline stages need that Infoset information to
+     * work well.
      *
      * <p> At the head of the pipeline, certain standard event filters are
      * recognized and handled specially.  This facilitates construction
@@ -205,24 +272,43 @@ public class EventFilter
      *
      * @param producer will deliver events to the specified consumer 
      * @param consumer pipeline supplying event handlers to be associated
-     *	with the producer
+     *	with the producer (may not be null)
      */
     public static void bind (XMLReader producer, EventConsumer consumer)
     {
-	while (consumer != null) {
+	Class	klass = null;
+	boolean	prefixes;
 
-	    // change problematic SAX2 default
-	    if (consumer instanceof NSFilter) {
-		try {
-		    producer.setFeature (FEATURE_URI + "namespace-prefixes",
-			true);
-		    consumer = ((NSFilter)consumer).getNext ();
-		} catch (SAXException e) {
+	if (!loaded)
+	    loadClasses ();
+
+	// DOM building, printing, layered validation, and other
+	// things don't work well when prefix info is discarded.
+	// Include it by default, whenever possible.
+	try {
+	    producer.setFeature (FEATURE_URI + "namespace-prefixes",
+		true);
+	    prefixes = true;
+	} catch (SAXException e) {
+	    prefixes = false;
+	}
+
+	// NOTE:  This loop doesn't use "instanceof", since that
+	// would prevent compiling/linking without those classes
+	// being present.
+	while (consumer != null) {
+	    klass = consumer.getClass ();
+
+	    // we might have already changed this problematic SAX2 default.
+	    if (nsClass != null && nsClass.isAssignableFrom (klass)) {
+		if (!prefixes)
 		    break;
-		}
+		consumer = ((EventFilter)consumer).getNext ();
 
 	    // the parser _might_ do DTD validation by default ...
-	    } else if (consumer instanceof ValidationConsumer) {
+	    // if not, maybe we can change this setting.
+	    } else if (validClass != null
+		    && validClass.isAssignableFrom (klass)) {
 		try {
 		    producer.setFeature (FEATURE_URI + "validation",
 			true);
@@ -232,22 +318,22 @@ public class EventFilter
 		}
 
 	    // parsers are required not to have such bugs
-	    } else if (consumer instanceof WellFormednessFilter) {
+	    } else if (wfClass != null && wfClass.isAssignableFrom (klass)) {
 		consumer = ((WellFormednessFilter)consumer).getNext ();
 
 	    // stop on the first pipeline stage we can't remove
 	    } else
 		break;
+	    
+	    if (consumer == null)
+		klass = null;
 	}
 
-	if (consumer instanceof XIncludeFilter) {
-	    try {
-		((XIncludeFilter)consumer).setSavingPrefixes (
-		    producer.getFeature (FEATURE_URI + "namespace-prefixes"));
-	    } catch (SAXException e) {
-		// "can't happen"
-	    }
-	}
+	// the actual setting here doesn't matter as much
+	// as that producer and consumer agree
+	if (xincClass != null && klass != null
+		&& xincClass.isAssignableFrom (klass))
+	    ((XIncludeFilter)consumer).setSavingPrefixes (prefixes);
 
 	// Some SAX parsers can't handle null handlers -- bleech
 	DefaultHandler2	h = new DefaultHandler2 ();
