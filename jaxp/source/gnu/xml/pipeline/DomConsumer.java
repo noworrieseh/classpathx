@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.3 2001-06-23 21:13:31 db Exp $
+ * $Id: DomConsumer.java,v 1.4 2001-06-24 04:10:17 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -67,13 +67,20 @@ import org.xml.sax.helpers.AttributesImpl;
  * @see DomProducer
  *
  * @author David Brownell
- * @version $Date: 2001-06-23 21:13:31 $
+ * @version $Date: 2001-06-24 04:10:17 $
  */
 public class DomConsumer implements EventConsumer
 {
     private Class		domImpl;
 
     private boolean		saveExtra;
+    // FIXME:  for better JAXP integration, split out:
+    //	- whether to hide CDATA boundaries
+    //	- doctype stuff
+
+    private boolean		hidingComments;
+    private boolean		hidingWhitespace;
+
     private boolean		usingNamespaces = true;
     private boolean		expandingReferences = true;
     private Handler		handler;
@@ -175,9 +182,7 @@ public class DomConsumer implements EventConsumer
     /**
      * Returns true if the consumer is expanding entity references in place
      * (the default), and false if childless EntityReference nodes should
-     * instead be created.  If such extra nodes are not being saved, this
-     * flag is ignored and all references will be expanded (without any
-     * parent EntityReference node, and without being marked readonly).
+     * instead be created.
      *
      * @see #setExpandingReferences
      */
@@ -187,8 +192,6 @@ public class DomConsumer implements EventConsumer
     /**
      * Controls whether the consumer will expand entity references in place,
      * or will instead replace them with childless entity reference nodes.
-     * If such extra nodes are not being saved, this flag is ignored and
-     * all references will be expanded.
      *
      * @see #isExpandingReferences
      * @param flag True iff extra nodes should be saved; false otherwise.
@@ -198,10 +201,47 @@ public class DomConsumer implements EventConsumer
     
 
     /**
+     * Returns true if the consumer is hiding comments (the default),
+     * and false if they should be placed into the output document.
+     *
+     * @see #setHidingComments
+     */
+    public final boolean isHidingComments ()
+	{ return hidingComments; }
+
+    /**
+     * Controls whether the consumer is hiding comments.
+     *
+     * @see #isHidingComments
+     */
+    public final void setHidingComments (boolean flag)
+	{ hidingComments = flag; }
+
+
+    /**
+     * Returns true if the consumer is hiding ignorable whitespace
+     * (the default), and false if such whitespace should be placed
+     * into the output document as children of element nodes.
+     *
+     * @see #setHidingWhitespace
+     */
+    public final boolean isHidingWhitespace ()
+	{ return hidingWhitespace; }
+
+    /**
+     * Controls whether the consumer hides ignorable whitespace
+     *
+     * @see #isHidingComments
+     */
+    public final void setHidingWhitespace (boolean flag)
+	{ hidingWhitespace = flag; }
+
+
+    /**
      * Returns true if the consumer is saving "extra" nodes, and false (the
-     * default) otherwise.  "Extra" nodes are defined to be ignorable
-     * whitespace, comments, the use of CDATA nodes in addition to normal
-     * text nodes, DocumentType and EntityReference nodes.  (Notation and
+     * default) otherwise.  "Extra" nodes are currently defined to be
+     * CDATA nodes (instead of normal
+     * text nodes), DocumentType and EntityReference nodes.  (Notation and
      * Entity nodes can't be portably created, and won't show up regardless
      * of the setting of this flag.)
      *
@@ -690,8 +730,9 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	public void ignorableWhitespace (char buf [], int off, int len)
 	throws SAXException
 	{
-	    if (consumer.isSavingExtraNodes ())
-		characters (buf, off, len);
+	    if (consumer.isHidingWhitespace ())
+		return;
+	    characters (buf, off, len);
 	}
 
 	// SAX2 lexical event
@@ -717,6 +758,9 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	//    the other DTD declaration methods, NOT HERE.
 	//	- IDs for the optional external subset ... belongs here
 	//    with other lexical information.
+	//
+	// ...and it doesn't include the internal DTD subset, desired
+	// both to support DOM L2 and to enable "pass through" processing
 	//
 	public void startDTD (String name, String pubid, String sysid)
 	throws SAXException
@@ -769,7 +813,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly)
-	    if (!consumer.isSavingExtraNodes ()
+	    if (consumer.isHidingComments ()
 		    || inDTD
 		    || currentEntity != null)
 		return;
@@ -782,8 +826,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	throws SAXException
 	{
 	    // Avoid creating entity ref nodes
-	    if (!consumer.isSavingExtraNodes ()
-		    || consumer.isExpandingReferences ())
+	    if (consumer.isExpandingReferences ())
 		return;
 
 	    // we can't create populated entity ref nodes using
@@ -791,7 +834,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	    if (currentEntity != null)
 		return;
 
-	    // SAX2 shows parameter entities DOM doesn't care about
+	    // SAX2 shows parameter entities; DOM doesn't care
 	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
 		return;
 
@@ -812,9 +855,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	public void endEntity (String name)
 	throws SAXException
 	{
-	    if (!consumer.isSavingExtraNodes () 
-		    || consumer.isExpandingReferences ()
-		    || currentEntity == null)
+	    if (consumer.isExpandingReferences () || currentEntity == null)
 		return;
 	    if (currentEntity.equals (name))
 		currentEntity = null;
