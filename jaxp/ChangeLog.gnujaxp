@@ -1,5 +1,10 @@
 2004-08-10  Musachy Barroso  <musachy@gmail.com>
 
+   	* XmlParser.java: Fixed bug while reading 0x2028. Check
+   	for document version in external subset.
+   	
+2004-08-10  Musachy Barroso  <musachy@gmail.com>
+
    	* XmlParser.java: Convert 0x2028 to '\r' when document is 1.1
    	
 2004-08-08  Musachy Barroso  <musachy@gmail.com>

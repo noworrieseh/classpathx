@@ -582,9 +582,12 @@ final class XmlParser
 	parseEq ();
 	checkLegalVersion (version = readLiteral (flags));
 	if (!version.equals ("1.0")){
-	    if(version.equals ("1.1"))
+	    if(version.equals ("1.1")){
+	    	handler.warn ("expected XML version 1.0, not: " + version);
 	    	xmlVersion = XML_11;
-	    handler.warn ("expected XML version 1.0, not: " + version);
+	    }else {
+	    	error("illegal XML version", version, "1.0 or 1.1");
+	    }
 	}
 	else
 	    xmlVersion = XML_10;
@@ -645,8 +648,16 @@ final class XmlParser
 	    String version;
 	    parseEq ();
 	    checkLegalVersion (version = readLiteral (flags));
-	    if (!version.equals ("1.0"))
+	    
+	    if (version.equals ("1.1")){
+	    	if (xmlVersion == XML_10){
+	    	   error ("external subset has later version number.", "1.0", version);    
+	    	}
 		handler.warn ("expected XML version 1.0, not: " + version);
+		xmlVersion = XML_11;
+             }else if(!version.equals ("1.0")) {
+		 error("illegal XML version", version, "1.0 or 1.1");
+	     }
 	    requireWhitespace ();
 	}
 
@@ -2255,9 +2266,11 @@ loop:
 		    columnAugment++;
 		    break;
 		default:
-		    if (c < 0x0020 || c > 0xFFFD)
-			error ("illegal XML character U+"
-				+ Integer.toHexString (c));
+			if ((c < 0x0020 || c > 0xFFFD)
+			   || ((c >= 0x007f) && (c <= 0x009f) && (c != 0x0085) 
+			       && xmlVersion == XML_11)) 
+				error ("illegal XML character U+"
+					+ Integer.toHexString (c));
 		    // that's not a whitespace char
 		    pureWhite = false;
 		    columnAugment++;
@@ -3586,7 +3599,7 @@ loop:
 	}
 
 	char c = readBuffer [readBufferPos++];
-
+       
 	if (c == '\n') {
 	    line++;
 	    column = 0;
@@ -4643,6 +4656,7 @@ loop:
 		    //[4] the single character #x2028
 		    if(c == 0x2028 && xmlVersion == XML_11){
 		       	readBuffer[j++] = '\r';
+		       	sawCR = true;
 		       	continue;
 		    }
 		    if (c < 0x0800 || (c >= 0xd800 && c <= 0xdfff))
