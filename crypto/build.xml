@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.4 2001-12-08 21:21:49 raif Exp $
+   $Id: build.xml,v 1.5 2001-12-08 22:51:26 raif Exp $
 
    Copyright (C) 2001 Free Software Foundation, Inc.
 
@@ -337,26 +337,36 @@
          <classpath>
             <pathelement location="${main.jar}"/>
          </classpath>
+         <group title="GNU Crypto Algorithms"
+                packages="gnu.crypto.cipher*,gnu.crypto.hash*,gnu.crypto.mode*,gnu.crypto.pad*,gnu.crypto.prng*"/>
+         <group title="GNU Crypto Tools" packages="gnu.crypto.tool*"/>
+         <group title="GNU Crypto utilities" packages="gnu.crypto.util*"/>
       </javadoc>
    </target>
 
    <!--
    Make distribution ..........................................................
    -->
-   <target name="dist" depends="distclean,jar"
+   <target name="dist" depends="distclean,jar,docs"
            description="Create .tar.gz and .zip deliverables for the project">
-      <property name="build.dir" value="build/${package}"/>
+      <property name="build.dir" value="build/${package}-${version}"/>
       <copy todir="${build.dir}">
          <fileset dir="${basedir}">
             <patternset refid="toplevel_files"/>
             <include name="build.xml"/>
-            <include name="ChangeLog"/>
+            <include name="configure"/>
+            <include name="configure.in"/>
+            <include name="Makefile.in"/>
          </fileset>
+      </copy>
+      <copy todir="${build.dir}/${docs.dir}">
+         <fileset dir="${docs.dir}" includes="api/**/*"/>
       </copy>
       <copy todir="${build.dir}/${etc.dir}">
          <fileset dir="${etc.dir}"/>
       </copy>
       <copy todir="${build.dir}/${lib.dir}" file="${main.jar}"/>
+      <copy todir="${build.dir}/${lib.dir}" file="${test.jar}"/>
       <copy todir="${build.dir}/${src.dir}">
          <fileset dir="${src.dir}">
             <include name="**/*.java"/>
