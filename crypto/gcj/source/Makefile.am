@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 2002-06-15 06:59:35 olf Exp $
+## $Id: Makefile.am,v 1.5 2002-07-06 07:56:16 olf Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -30,15 +30,14 @@
 ## ----------------------------------------------------------------------------
 ##
 ## Process this file with automake to produce Makefile.in.
-##
-AUTOMAKE_OPTIONS = gnu
 
 # #############################################################################
 # Variables
 #
 crypto_jar = gnu-crypto.jar
 encoding_flag = --encoding=UTF-8
-AM_GCJFLAGS = $(encoding_flag) -fassume-compiled -fCLASSPATH=.
+AM_JAVACFLAGS = $(encoding_flag) -fCLASSPATH=$(srcdir) -d .
+AM_GCJFLAGS = $(encoding_flag) -fassume-compiled -fCLASSPATH=@junit_cp@.:$(srcdir)
 
 BUILT_SOURCES = $(crypto_jar)
 data_DATA = $(crypto_jar)
@@ -47,14 +46,22 @@ EXTRA_DIST =
 # #############################################################################
 # Libraries and executables to compile.
 #
-lib_LTLIBRARIES = lib-gnu-crypto.la
-check_PROGRAMS = \
+tool_tests = \
  nessieCipherTVEmitter \
  nessieHashTVEmitter \
  cipherSpeed \
  hashSpeed \
  nistKat \
  nistMCT
+
+if JUNIT
+  junit_tests = junitTest
+else
+  junit_tests =
+endif
+
+lib_LTLIBRARIES = lib-gnu-crypto.la
+check_PROGRAMS = $(junit_tests) $(tool_tests)
 
 # #############################################################################
 # Crypto library config
@@ -104,6 +111,13 @@ nistKat_LDFLAGS = --main=gnu.crypto.tool.NistKat
 nistMCT_SOURCES = gnu/crypto/tool/NistMCT.java
 nistMCT_LDADD   = -l-gnu-crypto
 nistMCT_LDFLAGS = --main=gnu.crypto.tool.NistMCT
+
+# #############################################################################
+# JUnit test executable
+#
+junitTest_SOURCES = $(junit_test_sources)
+junitTest_LDADD   = -l-gnu-crypto -l-junit
+junitTest_LDFLAGS = --main=test.AllTests
 
 # #############################################################################
 # library source files.
@@ -164,8 +178,8 @@ crypto_sources = \
  gnu/crypto/mode/OFB.java \
  gnu/crypto/pad/BasePad.java \
  gnu/crypto/pad/IPad.java \
- gnu/crypto/pad/PadFactory.java \
  gnu/crypto/pad/PKCS7.java \
+ gnu/crypto/pad/PadFactory.java \
  gnu/crypto/pad/TBC.java \
  gnu/crypto/pad/WrongPaddingException.java \
  gnu/crypto/prng/BasePRNG.java \
@@ -175,9 +189,6 @@ crypto_sources = \
  gnu/crypto/prng/MDGenerator.java \
  gnu/crypto/prng/PRNGFactory.java \
  gnu/crypto/prng/UMacGenerator.java \
- gnu/crypto/util/Prime.java \
- gnu/crypto/util/PRNG.java \
- gnu/crypto/util/Util.java \
  gnu/crypto/sig/BaseSignature.java \
  gnu/crypto/sig/IKeyPairCodec.java \
  gnu/crypto/sig/IKeyPairGenerator.java \
@@ -200,24 +211,89 @@ crypto_sources = \
  gnu/crypto/sig/rsa/RSAKeyPairGenerator.java \
  gnu/crypto/sig/rsa/RSAKeyPairRawCodec.java \
  gnu/crypto/sig/rsa/RSAPSSSignature.java \
- gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java
+ gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java \
+ gnu/crypto/util/PRNG.java \
+ gnu/crypto/util/Prime.java \
+ gnu/crypto/util/Util.java
 
-## ################################################################
+junit_test_sources = \
+ test/AllTests.java \
+ test/cipher/AllTests.java \
+ test/cipher/BaseCipherTestCase.java \
+ test/cipher/TestOfAnubis.java \
+ test/cipher/TestOfCipherFactory.java \
+ test/cipher/TestOfKhazad.java \
+ test/cipher/TestOfNistVectors.java \
+ test/cipher/TestOfNullCipher.java \
+ test/cipher/TestOfRijndael.java \
+ test/cipher/TestOfSerpent.java \
+ test/cipher/TestOfSquare.java \
+ test/cipher/TestOfTwofish.java \
+ test/hash/AllTests.java \
+ test/hash/TestOfHashFactory.java \
+ test/hash/TestOfMD4.java \
+ test/hash/TestOfMD5.java \
+ test/hash/TestOfRipeMD128.java \
+ test/hash/TestOfRipeMD160.java \
+ test/hash/TestOfSha160.java \
+ test/hash/TestOfWhirlpool.java \
+ test/jce/AllTests.java \
+ test/jce/TestOfKeyPairGenerator.java \
+ test/jce/TestOfMessageDigest.java \
+ test/jce/TestOfProvider.java \
+ test/jce/TestOfSignature.java \
+ test/mac/AllTests.java \
+ test/mac/TestOfHMacFactory.java \
+ test/mac/TestOfMacFactory.java \
+ test/mode/AllTests.java \
+ test/mode/TestOfECB.java \
+ test/mode/TestOfModeFactory.java \
+ test/mode/TestOfOFB.java \
+ test/pad/AllTests.java \
+ test/pad/TestOfPKCS7.java \
+ test/pad/TestOfPadFactory.java \
+ test/pad/TestOfTBC.java \
+ test/prng/AllTests.java \
+ test/prng/TestOfICMGenerator.java \
+ test/prng/TestOfPRNGFactory.java \
+ test/sig/AllTests.java \
+ test/sig/TestOfKeyPairGeneratorFactory.java \
+ test/sig/TestOfSignatureFactory.java \
+ test/sig/dss/AllTests.java \
+ test/sig/dss/TestOfDSSCodec.java \
+ test/sig/dss/TestOfDSSKeyGeneration.java \
+ test/sig/dss/TestOfDSSSignature.java \
+ test/sig/rsa/AllTests.java \
+ test/sig/rsa/TestOfRSACodec.java \
+ test/sig/rsa/TestOfRSAKeyGeneration.java \
+ test/sig/rsa/TestOfRSAPSSSignature.java
+
+# #############################################################################
+# .class files
+#
+crypto_classes = $(crypto_sources:.java=.class)
+junit_test_classes = $(junit_test_sources:.java=.class)
+
+## ############################################################################
 ## Extra targets.
 ##
 SUFFIXES = .java .lo .o .obj .class .jar
 
 %.class: %.java
-	$(GCJ) -C $(encoding_flag) -fCLASSPATH=$(srcdir) -d . $<
+	$(GCJ) $(AM_JAVACFLAGS) -C $<
 
-CLASSFILES = $(lib_gnu_crypto_la_SOURCES:.java=.class)
+$(crypto_jar): $(crypto_classes)
+	jar cf $@ $(crypto_classes)
 
-$(crypto_jar): $(CLASSFILES)
-	jar cf $@ `find ./ -name \*.class`
+MOSTLYCLEANFILES = $(crypto_jar) $(crypto_classes) $(junit_test_classes)
 
-MOSTLYCLEANFILES = $(crypto_jar)
+#clean-local:
+#	find . -name '*.class' -print | xargs rm -f
+#	find . -name '*.txt' -print | xargs rm -f
 
-clean-local:
-## We just remove every .class and .txt file that was created.
-	find . -name '*.class' -print | xargs rm -f
-	find . -name '*.txt' -print | xargs rm -f
+## ############################################################################
+# Remove internal automake dependencies.
+#
+$(srcdir)/Makefile.in:
+
+Makefile:

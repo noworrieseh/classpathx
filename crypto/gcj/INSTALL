@@ -21,13 +21,13 @@ First a few conventions:
 This build does not allow the compilation in the source tree. You must 
 build the software in a temporary directory.
 Lets assume that you have installed the crypto sources under 
-$HOME/crypto and created a tmp directory under $HOME/crypto_tmp.
+$HOME/crypto and created a tmp directory: $HOME/crypto_tmp.
 
 For the rest of this discussion I am going to refer to the gcj
 sub-directory ($HOME/crypto/gcj) as GCJ_CRYPTO_ROOT and the tmp 
 directory as CRYPTO_TMP.
 
-so:
+so we have:
 
   GCJ_CRYPTO_ROOT=$HOME/crypto/gcj
   CRYPTO_TMP=$HOME/crypto_tmp
@@ -53,19 +53,64 @@ then
 and that should be it!
 
 
-Optionally you can run the "minimal test suite":
+Running the test suite
+----------------------
+
+Gnu-crypto comes with a minimal, self sufficient, test suite and a 
+more complete JUnit test suite.
+
+The minimal test suite does not require extra software. To run it:
 
   make check
-
-compiles the test programs, then
-
   make test-vectors
 
-runs the tests, they should all execute. The output goes in the
-subdirectory "tv"
+All tests should execute. The output goes in the subdirectory "tv".
+
+JUnit test suite
+----------------
+
+In order to compile and run the JUnit tests you must have a JUnit
+shared library compiled with GCJ. Instructions to compile
+such a library can be found at 
+http://www.zipworld.com.au/~olivier/gcj.html
+
+Once you have it, add the path of the junit "lib" directory to your
+LD_LIBRARY_PATH environment variable and reconfigure the build with
+the extra flag: --with-junit-jar=/path/to/junit.jar as follow:
+
+   LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/junit/lib
+   export  LD_LIBRARY_PATH
+
+   $GCJ_CRYPTO_ROOT/configure --prefix=/usr/local/gnu_crypto --with-junit-jar=/path/to/junit.jar
+
+  make
+  make check
+
+This time you will have the extra executable "source/junitTest". To
+run the JUnit test suite:
+
+  source/junitTest
 
 
-If you have any problem with the GCJ build please email to the gnu-crypto
-mailing list: classpathx-crypto@gnu.org.
+Good luck!
+
+
+
+
+If you have any problem with the GCJ build please send an email to the 
+gnu-crypto mailing list: classpathx-crypto@gnu.org.
 
 Olivier LF
+
+
+
+
+-------------------------------------------------------------------------------
+Maintainer documentation.
+
+Following are a few instructions for regenerating the gcj tool chain.
+
+[   TODO   ]
+- Files to check in.
+
+

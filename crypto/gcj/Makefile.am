@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 2002-06-22 10:02:31 raif Exp $
+## $Id: Makefile.am,v 1.6 2002-07-06 07:56:16 olf Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -29,15 +29,21 @@
 ## be covered by the GNU General Public License.
 ## ----------------------------------------------------------------------------
 ##
+## Process this file with automake to produce Makefile.in.
 
-AUTOMAKE_OPTIONS = gnu
 EXTRA_DIST =
 SUBDIRS = source
 
 ###############################################################################
 # test targets
 test-vectors:
-	test -e tv || mkdir tv/nessie || mkdir tv/nist
+	@ test -e tv || mkdir tv
+	@ test -e tv/nessie || mkdir tv/nessie
+	@ test -e tv/nist || mkdir tv/nist
+	@ test -e tv/nist/anubis || mkdir tv/nist/anubis
+	@ test -e tv/nist/rijndael || mkdir tv/nist/rijndael
+	@ test -e tv/nist/serpent || mkdir tv/nist/serpent
+	@ test -e tv/nist/twofish || mkdir tv/nist/twofish
 	source/nessieCipherTVEmitter anubis 128 > tv/nessie/anubis-128-tv.txt
 	source/nessieCipherTVEmitter anubis 160 > tv/nessie/anubis-160-tv.txt
 	source/nessieCipherTVEmitter anubis 192 > tv/nessie/anubis-192-tv.txt
@@ -73,4 +79,17 @@ test-vectors:
 	source/nistMCT -C -d twofish > tv/nist/twofish/cbc_d_m.txt
 	source/cipherSpeed
 	source/hashSpeed
+
+###############################################################################
+# Remove internal automake dependencies.
+#
+$(srcdir)/Makefile.in:
+
+Makefile:
+
+$(top_builddir)/config.status:
+
+$(srcdir)/configure:
+
+$(ACLOCAL_M4):
 

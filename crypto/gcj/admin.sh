@@ -5,8 +5,8 @@ case $1 in
   # Reconfigure the tool chain. This is needed each time configure.in
   # or the various Makefile.am are updated.
   conf )
-    echo 'aclocal && automake && autoconf'
-    aclocal && automake && autoconf
+    echo 'aclocal && automake && autoconf2.50'
+    aclocal && automake && autoconf2.50
     ;;
 
   # Build the sym links. Automake requires a numbers of files to be
@@ -15,6 +15,7 @@ case $1 in
   links )
     cd source
     test -e gnu || ln -s ../../source/gnu gnu
+    test -e test || ln -s ../../source/test test
     cd ..
     test -e NEWS || ln -s ../NEWS NEWS
     test -e README || ln -s ../README README
@@ -28,7 +29,7 @@ case $1 in
   # CVS check-in.
   clean )
     rm -f NEWS README COPYING AUTHORS ChangeLog *~
-    rm -f source/gnu source/*~
+    rm -f source/gnu source/test source/*~
     rm -fr autom4te.cache
     ;;
 
@@ -36,7 +37,7 @@ case $1 in
   # Usefull for maintainers.
   cleanall )
     rm -f NEWS README COPYING AUTHORS ChangeLog *~
-    rm -f source/gnu source/*~
+    rm -f source/gnu source/test source/*~
     rm -fr autom4te.cache
     rm -f configure aclocal.m4 Makefile.in source/Makefile.in
     ;;
