@@ -114,13 +114,14 @@ implements DOMImplementation
     InputStream in = input.getByteStream();
     
     // Load entire stream into memory
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    /*ByteArrayOutputStream bout = new ByteArrayOutputStream();
     byte[] buf = new byte[Math.max(1024, in.available())];
     for (int len = in.read(buf); len != -1; len = in.read(buf))
       bout.write(buf, 0, len);
-    
     in = new PushbackInputStream(
-        new ByteArrayInputStream(bout.toByteArray()), 50);
+        new ByteArrayInputStream(bout.toByteArray()), 50);*/
+
+    in = new PushbackInputStream(in, 50);
     String publicId = input.getPublicId();
     String systemId = input.getSystemId();
     return parseStream(in, publicId, systemId, validate, coalesce,

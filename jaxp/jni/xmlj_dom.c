@@ -239,10 +239,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createElementNS (JNIEnv *env,
   if (uri != NULL)
   {
     s_uri = xmljGetStringChars(env, uri);
-    /* FIXME separate prefix and localName */
-    s_prefix = NULL;
-    s_localName = s_qName;
-    ns = NULL;
+    s_prefix = xmljGetPrefix(s_qName);
+    s_localName = xmljGetLocalName(s_qName);
+    ns = xmlNewNs((xmlNodePtr)doc, s_uri, s_prefix);
     element = xmlNewDocNode(doc, ns, s_localName, NULL);
   }
   else
@@ -269,10 +268,9 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_createAttributeNS (JNIEnv *env,
   if (uri != NULL)
   {
     s_uri = xmljGetStringChars(env, uri);
-    /* FIXME separate prefix and localName */
-    s_prefix = NULL;
-    s_localName = s_qName;
-    ns = NULL;
+    s_prefix = xmljGetPrefix(s_qName);
+    s_localName = xmljGetLocalName(s_qName);
+    ns = xmlNewNs((xmlNodePtr)doc, s_uri, s_prefix);
     attr = (xmlNodePtr)xmlNewNsProp((xmlNodePtr)doc, ns, s_localName, NULL);
   }
   else
@@ -635,9 +633,8 @@ Java_gnu_xml_libxmlj_dom_GnomeElement_setAttributeNS (JNIEnv *env,
   }
   else
   {
-    /* FIXME separate localName and prefix from qName */
-    s_prefix = NULL;
-    s_localName = s_qName;
+    s_prefix = xmljGetPrefix(s_qName);
+    s_localName = xmljGetLocalName(s_qName);
     s_uri = xmljGetStringChars(env, uri);
     ns = xmlNewNs(node, s_uri, s_prefix);
     xmlSetNsProp(node, ns, s_localName, s_value);

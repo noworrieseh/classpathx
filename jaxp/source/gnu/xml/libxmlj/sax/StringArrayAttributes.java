@@ -63,27 +63,37 @@ implements Attributes
 
   public String getURI(int index)
   {
+    if (index < 0 || index >= len)
+      return null;
     return keys[index].uri;
   }
 
   public String getLocalName(int index)
   {
+    if (index < 0 || index >= len)
+      return null;
     return keys[index].localName;
   }
 
   public String getQName(int index)
   {
+    if (index < 0 || index >= len)
+      return null;
     return keys[index].qName;
   }
 
   public String getType(int index)
   {
+    if (index < 0 || index >= len)
+      return null;
     // TODO can we get this information from libxml2?
     return "CDATA";
   }
 
   public String getValue(int index)
   {
+    if (index < 0 || index >= len)
+      return null;
     return values[index];
   }
 

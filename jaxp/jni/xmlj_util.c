@@ -25,20 +25,27 @@
  * executable file might be covered by the GNU General Public License.
  */
 #include "xmlj_util.h"
+#include <libxml/tree.h>
+#include <unistd.h>
 
 jstring
 xmljNewString(JNIEnv *env,
 		const xmlChar *text)
 {
   char *s_text;
+  jstring ret;
   
   if (text == NULL)
     return NULL;
+  /*s_text = (char *)malloc(sizeof(char *));
+  sprintf(s_text, "%s", text);*/
   s_text = (char *)text; /* TODO signedness? */
-  return (*env)->NewStringUTF(env, s_text);
+  ret = (*env)->NewStringUTF(env, s_text);
+  /*free(s_text);*/
+  return ret;
 }
 
-xmlChar *
+const xmlChar *
 xmljGetStringChars(JNIEnv *env,
 		jstring text)
 {
@@ -56,5 +63,41 @@ xmljGetStringChars(JNIEnv *env,
   }
   (*env)->ReleaseStringUTFChars(env, text, s_text);
   return x_text;
+}
+
+const xmlChar *
+xmljGetPrefix (const xmlChar * qName)
+{
+  const xmlChar *localName;
+  const xmlChar *ret;
+  xmlChar **prefix;
+
+  prefix = (xmlChar **)malloc(sizeof(xmlChar *));
+  localName = xmlSplitQName2(qName, prefix);
+  if (localName == NULL)
+    return NULL;
+  else
+  {
+    ret = *prefix;
+    free(prefix);
+    return ret;
+  }
+}
+
+const xmlChar *
+xmljGetLocalName (const xmlChar * qName)
+{
+  const xmlChar *localName;
+  xmlChar **prefix;
+
+  prefix = (xmlChar **)malloc(sizeof(xmlChar *));
+  localName = xmlSplitQName2(qName, prefix);
+  if (localName == NULL)
+    return qName;
+  else
+  {
+    free(prefix);
+    return localName;
+  }
 }
 

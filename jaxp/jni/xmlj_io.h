@@ -43,6 +43,21 @@
 #include <libxml/xmlIO.h>
 #include "xmlj_error.h"
 
+xmlParserCtxtPtr
+xmljEstablishParserContext (JNIEnv * env,
+    jobject inputStream,
+    jstring inSystemId,
+    jstring inPublicId,
+    jboolean validate,
+    jboolean coalesce,
+    jboolean expandEntities,
+    jobject saxEntityResolver,
+    jobject saxErrorAdapter,
+    int useSaxErrorContext);
+
+void
+xmljReleaseParserContext (xmlParserCtxtPtr inputParserCtx);
+
 xmlDocPtr 
 xmljParseJavaInputStream (JNIEnv * env,
     jobject inputStream,
@@ -53,6 +68,11 @@ xmljParseJavaInputStream (JNIEnv * env,
     jboolean expandEntities,
     jobject saxEntityResolver,
     jobject saxErrorAdapter);
+
+xmlDocPtr
+xmljParseDocument (JNIEnv *env,
+    xmlParserCtxtPtr inputParserCtx);
+
 void xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
 					xmlDocPtr tree,
 					const char *outputEncoding);

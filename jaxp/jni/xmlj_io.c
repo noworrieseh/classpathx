@@ -311,7 +311,8 @@ xmljEstablishParserContext (JNIEnv * env,
     jboolean coalesce,
     jboolean expandEntities,
     jobject saxEntityResolver,
-    jobject saxErrorAdapter)
+    jobject saxErrorAdapter,
+    int useSaxErrorContext)
 {
   int options;
   SaxErrorContext *saxErrorContext;
@@ -343,14 +344,15 @@ xmljEstablishParserContext (JNIEnv * env,
       if (expandEntities)
         options |= XML_PARSE_NOENT;
       
-      /* FIXME this doesn't work */
       xmlCtxtUseOptions(inputParserCtx, options);
+      inputParserCtx->userData = inputParserCtx;
+      
+      if (!useSaxErrorContext)
+        return inputParserCtx;
       
       /* TODO set up SAX entity resolver */
       
       xmljInitErrorHandling (inputParserCtx->sax);
-      
-      inputParserCtx->userData = inputParserCtx;
       
       /* Set up SAX error context */
       saxErrorContext
@@ -405,7 +407,6 @@ xmljParseJavaInputStream (JNIEnv * env,
               jobject saxErrorAdapter)
 {
   xmlDocPtr tree = NULL;
-  int ret;
 
   xmlParserCtxtPtr inputParserCtx
     = xmljEstablishParserContext (env, inputStream,
@@ -415,30 +416,40 @@ xmljParseJavaInputStream (JNIEnv * env,
                   coalesce,
                   expandEntities,
                   saxEntityResolver,
-				  saxErrorAdapter);
+				  saxErrorAdapter,
+                  1);
 
   if (NULL != inputParserCtx)
-    {
-      xmljSetThreadContext ((SaxErrorContext *) inputParserCtx->_private);
-
-      ret = xmlParseDocument (inputParserCtx);
-      if (0 == ret)
-        tree = inputParserCtx->myDoc;
-      else
-      {
-        printf("ERROR[%d]: %s\n", ret, inputParserCtx->lastError.message);
-        xmljThrowDOMException (env, ret, inputParserCtx->lastError.message);
-      }
-
-      xmljClearThreadContext ();
-
-      xmljReleaseParserContext (inputParserCtx);
-    }
-
-
+  {
+    tree = xmljParseDocument(env, inputParserCtx);
+    xmljReleaseParserContext (inputParserCtx);
+  }
+  
   return tree;
 }
 
+xmlDocPtr
+xmljParseDocument (JNIEnv *env,
+    xmlParserCtxtPtr inputParserCtx)
+{
+  xmlDocPtr tree = NULL;
+  int ret;
+
+  xmljSetThreadContext ((SaxErrorContext *) inputParserCtx->_private);
+
+  ret = xmlParseDocument (inputParserCtx);
+  if (0 == ret)
+    tree = inputParserCtx->myDoc;
+  else
+  {
+    printf("ERROR[%d]: %s\n", ret, inputParserCtx->lastError.message);
+    xmljThrowDOMException (env, ret, inputParserCtx->lastError.message);
+  }
+  
+  xmljClearThreadContext ();
+
+  return tree;
+}
 
 void
 xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,

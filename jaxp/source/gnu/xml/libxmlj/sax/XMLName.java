@@ -56,4 +56,9 @@ class XMLName
     }
   }
 
+  public String toString()
+  {
+    return qName;
+  }
+
 }

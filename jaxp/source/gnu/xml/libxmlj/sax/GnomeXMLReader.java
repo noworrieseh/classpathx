@@ -26,9 +26,11 @@
  */
 package gnu.xml.libxmlj.sax;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,10 +94,7 @@ implements XMLReader
 
   private transient Namespaces namespaces;
 
-  /*
-   * xmlParserCtxtPtr
-   */
-  private int context;
+  int context; // TODO remove
 
   public GnomeXMLReader()
   {
@@ -106,19 +105,8 @@ implements XMLReader
   {
     this.namespaceAware = namespaceAware;
     this.validating = validating;
-    // TODO validation on SAX parse
-    context = createContext();
     namespaces = new Namespaces();
   }
-
-  protected void finalize()
-  {
-    clearContext(context);
-  }
-
-  native int createContext();
-
-  native int clearContext(int context);
 
   public ContentHandler getContentHandler()
   {
@@ -233,35 +221,35 @@ implements XMLReader
   
   // Parse
 
+  public void parse(String filename)
+    throws IOException, SAXException
+  {
+    File file = new File(filename);
+    String url  = file.getAbsolutePath();
+    if (File.separatorChar != '/')
+      url = url.replace (File.separatorChar, '/');
+    if (!url.startsWith ("/"))
+      url = "/" + url;
+    if (!url.endsWith ("/") && file.isDirectory ())
+      url = url + "/";
+    url = "file:" + url;
+    InputSource source = new InputSource(url);
+    source.setByteStream(new FileInputStream(file));
+    parse(source);
+  }
+
   public synchronized void parse(InputSource input)
     throws IOException, SAXException
   {
+    InputStream in = input.getByteStream();
+    in = new PushbackInputStream(in, 50);
+    String publicId = input.getPublicId();
     String systemId = input.getSystemId();
-    if (systemId != null)
-      parseFile(context, systemId);
-    else
-    {
-      InputStream in = input.getByteStream();
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      int max = in.available();
-      byte[] buf = new byte[max];
-      for (int len = in.read(buf); len != -1; len = in.read(buf))
-        out.write(buf, 0, len);
-      buf = null;
-      parseMemory(context, out.toByteArray());
-    }
+    parseStream(in, publicId, systemId, validating);
   }
 
-  public synchronized void parse(String systemId)
-    throws IOException, SAXException
-  {
-    parseFile(context, systemId);
-  }
-  
-  native int parseFile(int context, String filename)
-    throws IOException, SAXException;
-
-  native int parseMemory(int context, byte[] buf)
+  native void parseStream(InputStream in, String publicId, String systemId,
+      boolean validate)
     throws IOException, SAXException;
 
   String getURI(String prefix)
@@ -341,7 +329,8 @@ implements XMLReader
       }
       // Construct attributes
       Attributes atts = new StringArrayAttributes(this, attrs);
-      contentHandler.startElement(xName.uri, xName.localName, xName.qName,
+      String uri = (xName.uri == null) ? "" : xName.uri;
+      contentHandler.startElement(uri, xName.localName, xName.qName,
           atts);
     }
   }
@@ -352,7 +341,8 @@ implements XMLReader
     if (contentHandler != null)
     {
       XMLName xName = new XMLName(this, name);
-      contentHandler.endElement(xName.uri, xName.localName, xName.qName);
+      String uri = (xName.uri == null) ? "" : xName.uri;
+      contentHandler.endElement(uri, xName.localName, xName.qName);
       // Handle undefining namespaces
       if (namespaceAware)
       {
