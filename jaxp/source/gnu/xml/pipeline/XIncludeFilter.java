@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2002 David Brownell
+ * XIncludeFilter.java
+ * Copyright (C) 2001,2002 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *

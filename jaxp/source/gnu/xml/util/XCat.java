@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001 David Brownell
+ * XCat.java
+ * Copyright (C) 2001 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001 David Brownell
+ * JAXPFactory.java
+ * Copyright (C) 2001 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -23,7 +24,6 @@
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License. 
  */
-
 
 package gnu.xml.dom;
 

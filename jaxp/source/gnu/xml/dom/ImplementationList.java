@@ -1,4 +1,5 @@
 /*
+ * ImplementationList.java
  * Copyright (C) 2004 The Free Software Foundation, Inc.
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,6 +31,11 @@ import java.util.List;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DOMImplementationList;
 
+/**
+ * Implementation list for GNU JAXP.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
 public class ImplementationList
 implements DOMImplementationList
 {

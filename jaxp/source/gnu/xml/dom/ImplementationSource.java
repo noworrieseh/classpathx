@@ -1,4 +1,5 @@
 /*
+ * ImplementationSource.java
  * Copyright (C) 2004 The Free Software Foundation, Inc.
  * 
  * This file is part of GNU JAXP, a library.
@@ -34,6 +35,11 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DOMImplementationList;
 import org.w3c.dom.DOMImplementationSource;
 
+/**
+ * Implementation source for GNU JAXP.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
 public class ImplementationSource
 implements DOMImplementationSource
 {

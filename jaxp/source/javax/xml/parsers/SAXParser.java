@@ -1,6 +1,7 @@
 /*
+ * SAXParser.java
  * Copyright (C) 2001 Andrew Selkirk
- * Copyright (C) 2001 David Brownell
+ * Copyright (C) 2001 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
