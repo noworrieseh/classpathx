@@ -1,7 +1,7 @@
 package test;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.5 2002-05-14 08:47:37 raif Exp $
+// $Id: AllTests.java,v 1.6 2002-07-14 01:26:31 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@ import junit.textui.TestRunner;
  * <p>A <a href="www.junit.org">JUnit</a> {@link TestSuite} that runs all tests
  * for all GNU Crypto packages.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class AllTests extends TestCase {
 
@@ -71,6 +71,7 @@ public class AllTests extends TestCase {
       result.addTest(test.sig.AllTests.suite());
       result.addTest(test.mac.AllTests.suite());
       result.addTest(test.jce.AllTests.suite());
+      result.addTest(test.exp.AllTests.suite());
 
       return result;
    }
