@@ -1,4 +1,5 @@
-# Default MIME types for Knife.
+# Default MIME type registry
+# author: Chris Burdess: dog@dog.net.uk
 
 application/activemessage
 application/andrew-inset
