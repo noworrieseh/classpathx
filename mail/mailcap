@@ -1,0 +1,9 @@
+#
+# mailcap
+#
+# JAF data content handlers for GNU Javamail
+#
+application/octet-stream;;x-java-content-handler=gnu.mail.handler.ApplicationOctetStream
+text/plain;;x-java-content-handler=gnu.mail.handler.TextPlain
+text/xml;;x-java-content-handler=gnu.mail.handler.TextXml
+text/html;;x-java-content-handler=gnu.mail.handler.TextHtml

@@ -134,7 +134,11 @@ public final class Session
   private void loadProviders(InputStream in, String description)
   {
     if (in==null)
+    {
+      if (debug)
+        System.out.println("DEBUG: no "+description+" providers");
       return;
+    }
     try
       {
 	BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -142,7 +146,8 @@ public final class Session
 	     line!=null;
 	     line = reader.readLine()) 
 	  {
-	    if (!line.startsWith("#"))
+      line = line.trim();
+	    if (!line.startsWith("#") && line.length()>0)
 	      {
 		Provider.Type type = null;
 		String protocol = null;
@@ -207,7 +212,11 @@ public final class Session
   private void loadAddressMap(InputStream in, String description)
   {
     if (in==null)
+    {
+      if (debug)
+        System.out.println("DEBUG: no "+description+" address map");
       return;
+    }
     try
       {
 	addressMap.load(in);
