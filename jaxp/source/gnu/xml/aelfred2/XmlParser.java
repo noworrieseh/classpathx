@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.24 2001-11-11 06:53:29 db Exp $
+ * $Id: XmlParser.java,v 1.25 2001-11-11 23:15:55 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -66,7 +66,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.24 2001-11-11 06:53:29 db Exp $
+// $Id: XmlParser.java,v 1.25 2001-11-11 23:15:55 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -76,7 +76,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-11 06:53:29 $
+ * @version $Date: 2001-11-11 23:15:55 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -813,10 +813,7 @@ ee.printStackTrace ();
 	ids = readExternalIds (false, true);
 
 	// report (a) declaration of name, (b) lexical info (ids)
-	handler.doctypeDecl (doctypeName, ids [0],
-		    (ids [1] != null && handler.resolveURIs ())
-			? absolutize (ids, true) // FIXME: ASSUMES not skipped
-			: ids [1]);
+	handler.doctypeDecl (doctypeName, ids [0], ids [1]);
 
 	// Internal subset is parsed first, if present
 	skipWhitespace ();
