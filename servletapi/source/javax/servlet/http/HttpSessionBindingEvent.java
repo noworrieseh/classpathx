@@ -20,7 +20,6 @@
 */
 package javax.servlet.http;
 
-import java.util.EventObject;
 
 /**
  * Send to an Object that implements <code>HttpSessionBindingListener</code>
@@ -33,14 +32,15 @@ import java.util.EventObject;
  * @see javax.servlet.http.HttpSession#invalidate()
  * @see javax.servlet.http.HttpSessionBindingListener
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.3
  * @since Servlet API 2.0
  */
 public class HttpSessionBindingEvent
-extends EventObject 
+extends HttpSessionEvent
 {
 
   private String myName;
+  private Object myValue = null;
 
   /**
    * Creates a new <code>HttpSessionBindingEvent</code> given the session
@@ -59,6 +59,23 @@ extends EventObject
 
 
   /**
+   * Creates a new <code>HttpSessionBindingEvent</code> given the session
+   * and the name used.
+   *
+   * @since Servlet API 2.3
+   *
+   * @param session which the Object was bound to or unbound from
+   * @param name which was used to refer to the object
+   * @param value 
+   */
+  public HttpSessionBindingEvent(HttpSession session, String name, Object value) 
+  {
+    this(session,name);
+    myValue = value;
+  }
+
+
+  /**
    * Returns the name used to refer to this Object.
    *
    * @since Servlet API 2.0
@@ -70,12 +87,12 @@ extends EventObject
 
 
   /**
-   * Returns the session the Object was bound to or unbound from.
+   * Returns the value.
    *
-   * @since Servlet API 2.0
+   * @since Servlet API 2.3
    */
-  public HttpSession getSession() 
+  public Object getValue() 
   {
-    return (HttpSession)getSource();
+    return myValue;
   }
 }
