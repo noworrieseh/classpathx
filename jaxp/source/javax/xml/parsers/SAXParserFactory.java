@@ -1,6 +1,7 @@
 /*
   GNU-Classpath Extensions:	jaxp
   Copyright (C) 2001 Andrew Selkirk
+  Copyright (C) 2001 David Brownell
 
   For more information on the classpathx please mail: classpathx-discuss@gnu.org
 
@@ -41,11 +42,9 @@ import org.xml.sax.*;
  * flags relate to the SAX2 feature flags controlling those
  * same features.
  *
- * @author	Andrew Selkirk
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
-
-// some javadoc added by David Brownell
 
 public abstract class SAXParserFactory {
 
@@ -55,9 +54,6 @@ public abstract class SAXParserFactory {
 
 	private static final	String defaultPropName	=
 		"javax.xml.parsers.SAXParserFactory";
-
-	private static		String foundFactory	= null;
-	private static final	boolean debug		= false;
 
 	private 		boolean validating	= false;
 	private 		boolean namespaceAware	= false;
@@ -76,31 +72,16 @@ public abstract class SAXParserFactory {
 	//-------------------------------------------------------------
 
 	public static SAXParserFactory newInstance() {
-
-		// Variables
-		Class			classObject;
-		SAXParserFactory	factory;
-
-		// Locate Factory
-		foundFactory = findFactory(defaultPropName,
-			"gnu.xml.aelfred2.JAXPFactory");
-
 		try {
-
-			// Get Class
-			classObject = Class.forName(foundFactory);
-
-			// Instantiate Class
-			factory = (SAXParserFactory) classObject.newInstance();
-
-			// Return Instance
-			return factory;
-
-		} catch (Exception e) {
-			throw new FactoryConfigurationError(e);
-		} // try		
-
-	} // newInstance()
+		    return (SAXParserFactory)
+			ClassStuff.createFactory (
+				defaultPropName, 
+				"gnu.xml.aelfred2.JAXPFactory");
+		} catch (ClassCastException e) {
+			throw new FactoryConfigurationError (e,
+				"Factory class is the wrong type");
+		}
+	}
 
 	/**
 	 * Returns a new instance of a SAXParser using the platform
@@ -169,78 +150,6 @@ public abstract class SAXParserFactory {
 		throws	ParserConfigurationException, 
 			SAXNotRecognizedException, 
 			SAXNotSupportedException;
-
-	private static String
-	findFactory(String property, String defaultValue)
-	{
-		// Variables
-		String		factory;
-		String		javaHome;
-		File		file;
-		Properties	props;
-		ClassLoader	loader;
-		BufferedReader	br;
-		InputStream	stream;
-
-		// Four ordered steps, as listed in the
-		// JAXP spec for the "pluggability".
-
-		// Check System Property
-		// ... normally fails in applet environments
-		try {
-			factory = System.getProperty(property);
-		} catch (SecurityException se) {
-			factory = null;
-		}
-
-		// Check $JAVA_HOME/lib/jaxp.properties
-		try {
-			if (factory == null) {
-				javaHome = System.getProperty("java.home");
-				file = new File(new File(javaHome, "lib"), "jaxp.properties");
-				if (file.exists() == true) {
-					props = new Properties();
-					props.load(new FileInputStream(file));
-					factory = props.getProperty(property);
-				} // if
-			} // if
-		} catch (Exception e1) {
-		} // try
-
-		// Check Services API
-		try {
-			if (factory == null) {
-
-				// Get Class Loader for Accessing resources
-				loader = SAXParserFactory.class.getClassLoader();
-				if (loader == null) {
-					loader = ClassLoader.getSystemClassLoader();
-				} // if
-			
-				// Get Resource Stream
-				stream = loader.getResourceAsStream(
-					"META-INF/services/" + property);
-
-				// Stream Found, Read Entry
-				if (stream != null) {
-					br = new BufferedReader(new InputStreamReader(stream));
-					factory = br.readLine();
-				} // if
-
-			} // if
-		} catch (Exception e2) {
-		} // try
-
-		// Otherwise, Use default
-		if (factory == null) {
-			factory = defaultValue;
-		} // if
-
-		// Return Factory
-		return factory;
-
-	} // findFactory()
-
 
 } // SAXParserFactory
 

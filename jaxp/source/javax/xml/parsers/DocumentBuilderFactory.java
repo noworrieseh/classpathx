@@ -38,7 +38,7 @@ import org.xml.sax.*;
  * W3C DOM APIs don't include portable bootstrapping.
  *
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilderFactory.java,v 1.4 2001-07-16 16:11:59 db Exp $
+ * @version	$Id: DocumentBuilderFactory.java,v 1.5 2001-10-15 04:06:42 db Exp $
  */
 public abstract class DocumentBuilderFactory {
 
@@ -48,9 +48,6 @@ public abstract class DocumentBuilderFactory {
 
 	private static final	String defaultPropName	= 
 		"javax.xml.parsers.DocumentBuilderFactory";
-
-	private static		String foundFactory	= null;
-	private static final	boolean debug		= false;
 
 	private 		boolean validating	= false;
 	private 		boolean namespaceAware	= false;
@@ -103,32 +100,16 @@ public abstract class DocumentBuilderFactory {
 		throws ParserConfigurationException;
 
 	public static DocumentBuilderFactory newInstance() {
-
-		// Variables
-		Class			classObject;
-		DocumentBuilderFactory	factory;
-
-		// Locate Factory
-		foundFactory = findFactory(defaultPropName, 
-			"gnu.xml.dom.JAXPFactory");
-
 		try {
-
-			// Get Class
-			classObject = Class.forName(foundFactory);
-
-			// Instantiate Class
-			factory = (DocumentBuilderFactory)
-				classObject.newInstance();
-
-			// Return Instance
-			return factory;
-
-		} catch (Exception e) {
-			throw new FactoryConfigurationError(e);
-		} // try		
-
-	} // newInstance()
+		    return (DocumentBuilderFactory)
+			ClassStuff.createFactory (
+				defaultPropName, 
+				"gnu.xml.dom.JAXPFactory");
+		} catch (ClassCastException e) {
+			throw new FactoryConfigurationError (e,
+				"Factory class is the wrong type");
+		}
+	}
 
 	public abstract void setAttribute(String name, Object value) 
 		throws IllegalArgumentException;
@@ -156,78 +137,4 @@ public abstract class DocumentBuilderFactory {
 	public void setValidating(boolean value) {
 		validating = value;
 	} // setValidating()
-	
-	//
-	// INTERNALS
-	//
-	private static String
-	findFactory (String property, String defaultValue)
-	{
-		// Variables
-		String		factory;
-		String		javaHome;
-		File		file;
-		Properties	props;
-		ClassLoader	loader;
-		BufferedReader	br;
-		InputStream	stream;
-
-		// Check System Property
-		try {
-		    factory = System.getProperty(property);
-		} catch (SecurityException e) {
-		    factory = null;
-		}
-
-		// Check in $JAVA_HOME/lib/jaxp.properties
-		try {
-			if (factory == null) {
-				javaHome = System.getProperty("java.home");
-				file = new File(new File(javaHome, "lib"),
-					"jaxp.properties");
-				if (file.exists() == true) {
-					props = new Properties();
-					props.load(new FileInputStream(file));
-					factory = props.getProperty(property);
-				} // if
-			} // if
-		} catch (Exception e1) {
-		} // try
-
-		// Check Services API
-		try {
-			if (factory == null) {
-
-				// Get Class Loader for Accessing resources
-				loader = DocumentBuilderFactory.class
-						.getClassLoader();
-				if (loader == null) {
-					loader = ClassLoader
-						.getSystemClassLoader();
-				} // if
-			
-				// Get Resource Stream
-				stream = loader.getResourceAsStream(
-					"META-INF/services/" + property);
-
-				// Stream Found, Read Entry
-				if (stream != null) {
-					br = new BufferedReader(
-					    new InputStreamReader(stream));
-					factory = br.readLine();
-				} // if
-
-			} // if
-		} catch (Exception e2) {
-		} // try
-
-		// Otherwise, Use default
-		if (factory == null) {
-			factory = defaultValue;
-		} // if
-
-		// Return Factory
-		return factory;
-
-	} // findFactory()
 }
