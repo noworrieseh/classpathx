@@ -139,6 +139,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/xml/util/DoParse.java \
 	$(SOURCEDIR)/gnu/xml/util/DomParser.java \
 	$(SOURCEDIR)/gnu/xml/util/Resolver.java \
+	$(SOURCEDIR)/gnu/xml/util/SAXNullTransformerFactory.java \
 	$(SOURCEDIR)/gnu/xml/util/XCat.java \
 	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java \
 	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
