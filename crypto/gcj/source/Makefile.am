@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.7 2002-07-28 06:00:49 olf Exp $
+## $Id: Makefile.am,v 1.8 2002-08-14 16:13:17 raif Exp $
 ##
 ## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
@@ -52,7 +52,8 @@ tool_tests = \
  cipherSpeed \
  hashSpeed \
  nistKat \
- nistMCT
+ nistMCT \
+ ent
 
 if JUNIT
   junit_tests = junitTest
@@ -113,6 +114,13 @@ nistMCT_LDADD   = -l-gnu-crypto
 nistMCT_LDFLAGS = --main=gnu.crypto.tool.NistMCT
 
 # #############################################################################
+# ent executable
+#
+ent_SOURCES = gnu/crypto/tool/Ent.java
+ent_LDADD   = -l-gnu-crypto
+ent_LDFLAGS = --main=gnu.crypto.tool.Ent
+
+# #############################################################################
 # JUnit test executable
 #
 junitTest_SOURCES = $(junit_test_sources)
@@ -152,6 +160,7 @@ crypto_sources = \
  gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
+ gnu/crypto/jce/ICMRandomSpi.java \
  gnu/crypto/jce/KeyPairGeneratorAdapter.java \
  gnu/crypto/jce/MD4RandomSpi.java \
  gnu/crypto/jce/MD4Spi.java \
