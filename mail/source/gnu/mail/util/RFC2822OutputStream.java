@@ -76,14 +76,14 @@ public class RFC2822OutputStream
   public void write(int ch)
     throws IOException
   {
-    if (ch==CR || ch==LF)
+    if (ch == CR || ch == LF)
     {
       out.write(ch);
       count = 0;
     }
     else
     {
-      if (count>998)
+      if (count > 998)
       {
         out.write(LF);
         count = 0;
@@ -97,7 +97,7 @@ public class RFC2822OutputStream
    * Writes a byte array to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
-  public void write(byte b[])
+  public void write(byte[] b)
     throws IOException
   {
     write(b, 0, b.length);
@@ -107,23 +107,24 @@ public class RFC2822OutputStream
    * Writes a portion of a byte array to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
-  public void write(byte b[], int off, int len)
+  public void write(byte[] b, int off, int len)
     throws IOException
   {
     int d = off;
     len += off;
-    for (int i=off; i<len; i++)
+    int i;
+    for (i = off; i < len; i++)
     {
       count++;
-      if (b[i]==CR || b[i]==LF)
+      if (b[i] == CR || b[i] == LF)
       {
-        out.write(b, d, i+1-d);
+        out.write(b, d, i + 1 - d);
         d = i + 1;
         count = 0;
       }
       else
       {
-        if (count>998)
+        if (count > 998)
         {
           out.write(b, d, count);
           out.write(LF);
@@ -132,8 +133,9 @@ public class RFC2822OutputStream
         }
       }
     }
-    if (count>0)
-      out.write(b, d, count);
+    int leftToWrite = i - d;
+    if (leftToWrite > 0)
+      out.write(b, d, leftToWrite);
   }
 
 }

@@ -1,3 +1,8 @@
+2004-01-23  Chris Burdess  <dog@bluezoo.org>
+
+	* RFC2822OutputStream.java: Applied O/yvind Harboe's patch to correct
+	    UTF-8 encoding problem in gcj runtime.
+
 2004-01-19  Chris Burdess  <dog@bluezoo.org>
 
     * Makefile.am: Workarounds to avoid recursion.
