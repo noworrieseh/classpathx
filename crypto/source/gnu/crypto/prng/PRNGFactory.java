@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: PRNGFactory.java,v 1.4 2002-01-11 21:46:43 raif Exp $
+// $Id: PRNGFactory.java,v 1.5 2002-06-08 05:19:55 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,13 +34,12 @@ import gnu.crypto.Registry;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate pseudo random number generators.<p>
+ * <p>A Factory to instantiate pseudo random number generators.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class PRNGFactory implements Registry {
 
@@ -50,7 +49,7 @@ public class PRNGFactory implements Registry {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
-   /** Trivial constructor to enforce Singleton pattern. */
+   /** Trivial constructor to enforce <i>Singleton</i> pattern. */
    private PRNGFactory() {
       super();
    }
@@ -59,7 +58,7 @@ public class PRNGFactory implements Registry {
    // -------------------------------------------------------------------------
 
    /**
-    * Returns an instance of a padding algorithm given its name.<p>
+    * <p>Returns an instance of a padding algorithm given its name.</p>
     *
     * @param prng the case-insensitive name of the PRNG.
     * @return an instance of the pseudo-random number generator.
@@ -77,21 +76,25 @@ public class PRNGFactory implements Registry {
          result = new ICMGenerator();
       } else if (prng.equalsIgnoreCase(MD_PRNG)) {
          result = new MDGenerator();
+      } else if (prng.equalsIgnoreCase(UMAC_PRNG)) {
+         result = new UMacGenerator();
       }
 
       return result;
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of padding algorithms supported
-    * by this <i>Factory</i>.<p>
+    * <p>Returns a {@link Set} of names of padding algorithms supported by this
+    * <i>Factory</i>.</p>
     *
-    * @return a {@link java.util.Set} of padding algorithm names (Strings).
+    * @return a {@link Set} of pseudo-random number generator algorithm names
+    * (Strings).
     */
    public static final Set getNames() {
       HashSet hs = new HashSet();
       hs.add(ICM_PRNG);
       hs.add(MD_PRNG);
+      hs.add(UMAC_PRNG);
 
       return Collections.unmodifiableSet(hs);
    }
