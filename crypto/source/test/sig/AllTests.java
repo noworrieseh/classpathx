@@ -1,7 +1,7 @@
 package test.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.1 2001-12-30 16:01:07 raif Exp $
+// $Id: AllTests.java,v 1.2 2002-01-11 22:00:55 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -36,9 +36,9 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * TestSuite that runs all tests for all packages.
+ * TestSuite that runs all tests for all subordinate packages.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AllTests extends TestCase {
 
@@ -60,9 +60,13 @@ public class AllTests extends TestCase {
    }
 
    public static Test suite() {
-      TestSuite result = new TestSuite("GNU Crypto Signature schemes tests");
+      TestSuite result =
+         new TestSuite("GNU Crypto keypair generator and signature tests");
 
+      result.addTest(test.sig.TestOfKeyPairGeneratorFactory.suite());
+      result.addTest(test.sig.TestOfSignatureFactory.suite());
       result.addTest(test.sig.dss.AllTests.suite());
+      result.addTest(test.sig.rsa.AllTests.suite());
 
       return result;
    }
