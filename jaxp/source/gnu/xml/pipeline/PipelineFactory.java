@@ -1,13 +1,15 @@
 /*
- * $Id: PipelineFactory.java,v 1.3 2001-10-18 22:20:55 db Exp $
+ * $Id: PipelineFactory.java,v 1.4 2001-10-23 17:42:25 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of GNU JAXP, a library.
+ *
+ * GNU JAXP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * GNU JAXP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,6 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License. 
  */
 
 package gnu.xml.pipeline;
@@ -33,7 +41,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: PipelineFactory.java,v 1.3 2001-10-18 22:20:55 db Exp $
+// $Id: PipelineFactory.java,v 1.4 2001-10-23 17:42:25 db Exp $
 
 /**
  * This provides static factory methods for creating simple event pipelines.
@@ -155,6 +163,17 @@ import gnu.xml.util.DefaultHandler;
 	a document.
 	</td>
     </tr>
+    <tr valign="top" align="center">
+	<td><a href="XsltFilter.html">xslt</a></td>
+	<td><em>required</em><br> XSLT stylesheet URI</td>
+	<td>no</td>
+	<td align="left">This stage handles XSLT transformation
+	according to a stylesheet.
+	The implementation of the transformation may not actually
+	stream data, although if such an XSLT engine is in use
+	then that can happen.
+	</td>
+    </tr>
 
  </table>
  
@@ -166,7 +185,7 @@ import gnu.xml.util.DefaultHandler;
  * it's absolutely necessary.
  *
  * @author David Brownell
- * @version $Date: 2001-10-18 22:20:55 $
+ * @version $Date: 2001-10-23 17:42:25 $
  */
 public class PipelineFactory
 {
@@ -310,6 +329,7 @@ public class PipelineFactory
 	{ "validate",	"gnu.xml.pipeline.ValidationConsumer" },
 	{ "wf",		"gnu.xml.pipeline.WellFormednessFilter" },
 	{ "xinclude",	"gnu.xml.pipeline.XIncludeFilter" },
+	{ "xslt",	"gnu.xml.pipeline.XsltFilter" },
 
 // XXX want:  option for validate, to preload external part of a DTD
 

@@ -9,7 +9,7 @@
  * Copyright (c) 1999-2001 by David Brownell.
  * This file is distributed under the GPL.
  *
- * $Id: package.html,v 1.4 2001-07-05 02:04:21 db Exp $
+ * $Id: package.html,v 1.5 2001-10-23 17:42:25 db Exp $
  */
 -->
 </head><body>
@@ -185,11 +185,17 @@ make sure to label your data appropriately: </p>
 
 <p> Encodings accessed through <code>java.io.InputStreamReader</code>
 are now fully supported for both external labels (such as MIME types)
-and internal types (as shown above).  Note that Java defines its
+and internal types (as shown above).
+There is one limitation in the support for internal labels:
+the encodings must be derived from the US-ASCII encoding,
+the EBCDIC family of encodings is not recognized.
+Note that Java defines its
 own encoding names, which don't always correspond to the standard
 Internet encoding names defined by the IETF/IANA, and that Java
-may even require use of nonstandard encoding names.  Please report
-such problems, some of them can be worked around in this parser.
+may even <em>require</em> use of nonstandard encoding names.
+Please report
+such problems; some of them can be worked around in this parser,
+and many can be worked around by using external labels.
 </p>
 
 

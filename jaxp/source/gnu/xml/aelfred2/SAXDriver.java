@@ -1,13 +1,15 @@
 /*
- * $Id: SAXDriver.java,v 1.15 2001-10-18 06:39:26 db Exp $
+ * $Id: SAXDriver.java,v 1.16 2001-10-23 17:42:25 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of GNU JAXP, a library.
+ *
+ * GNU JAXP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * GNU JAXP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,6 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License. 
  */
 
 //
@@ -55,7 +63,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.15 2001-10-18 06:39:26 db Exp $
+// $Id: SAXDriver.java,v 1.16 2001-10-23 17:42:25 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -108,7 +116,7 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-10-18 06:39:26 $
+ * @version $Date: 2001-10-23 17:42:25 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver

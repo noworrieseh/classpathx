@@ -1,13 +1,15 @@
 /*
- * $Id: DomConsumer.java,v 1.6 2001-08-24 21:43:18 db Exp $
+ * $Id: DomConsumer.java,v 1.7 2001-10-23 17:42:25 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of GNU JAXP, a library.
+ *
+ * GNU JAXP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
+ * GNU JAXP is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,6 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License. 
  */
 
 package gnu.xml.pipeline;
@@ -69,7 +77,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-08-24 21:43:18 $
+ * @version $Date: 2001-10-23 17:42:25 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -90,9 +98,13 @@ public class DomConsumer implements EventConsumer
 
     private EventConsumer	next;
 
+    // FIXME:  this can't be a generic pipeline stage just now,
+    // since its input became a Class not a String (to be turned
+    // into a class, using the right class loader)
+
 
     /**
-     * Configures this consumer to use the specified implementation
+     * Configures this pipeline terminus to use the specified implementation
      * of DOM when constructing its result value.
      *
      * @param impl class implementing {@link org.w3c.dom.Document Document}
@@ -101,7 +113,6 @@ public class DomConsumer implements EventConsumer
      * @exception SAXException when there is a problem creating an
      *	empty DOM document using the specified implementation
      */
-	// constructor used by PipelineFactory
     public DomConsumer (Class impl)
     throws SAXException
     {
@@ -138,7 +149,7 @@ public class DomConsumer implements EventConsumer
 
 
     /**
-     * Configures this consumer as a buffer/filter, using the system default
+     * Configures this consumer as a buffer/filter, using the specified
      * DOM implementation when constructing its result value.
      *
      * <p> This event consumer acts as a buffer and filter, in that it
@@ -155,7 +166,6 @@ public class DomConsumer implements EventConsumer
      * @exception SAXException when there is a problem creating an
      *	empty DOM document using the specified DOM implementation
      */
-	// constructor used by PipelineFactory
     public DomConsumer (Class impl, EventConsumer n)
     throws SAXException
     {
