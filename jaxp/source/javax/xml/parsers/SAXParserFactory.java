@@ -33,10 +33,20 @@ import org.w3c.dom.*;
 import org.xml.sax.*;
 
 /**
- * SAXParserFactory
+ * SAXParserFactory is used to bootstrap JAXP wrappers for
+ * SAX parsers.
+ *
+ * <para> Note that the JAXP 1.1 spec does not specify how
+ * the <em>isValidating()</em> or <em>isNamespaceAware()</em>
+ * flags relate to the SAX2 feature flags controlling those
+ * same features.
+ *
  * @author	Andrew Selkirk
  * @version	1.0
  */
+
+// some javadoc added by David Brownell
+
 public abstract class SAXParserFactory {
 
 	//-------------------------------------------------------------
@@ -73,7 +83,7 @@ public abstract class SAXParserFactory {
 
 		// Locate Factory
 		foundFactory = findFactory(defaultPropName,
-			"org.apache.crimson.jaxp.SAXParserFactoryImpl");
+			"gnu.xml.aelfred2.JAXPFactory");
 
 		try {
 
@@ -92,6 +102,20 @@ public abstract class SAXParserFactory {
 
 	} // newInstance()
 
+	/**
+	 * Returns a new instance of a SAXParser using the platform
+	 * default implementation and the currently specified factory
+	 * feature flag settings.
+	 *
+	 * @exception ParserConfigurationException
+	 *	when the parameter combination is not supported
+	 * @exception SAXNotRecognizedException
+	 *	if one of the specified SAX2 feature flags is not recognized
+	 * @exception SAXNotSupportedException
+	 *	if one of the specified SAX2 feature flags values can
+	 *	not be set, perhaps because of sequencing requirements
+	 *	(which could be met by using SAX2 directly)
+	 */
 	public abstract SAXParser newSAXParser()
 		throws ParserConfigurationException, SAXException;
 
@@ -111,18 +135,44 @@ public abstract class SAXParserFactory {
 		return validating;
 	} // isValidating()
 
-	public abstract void setFeature(String value1, boolean value2) 
+	/**
+	 * Establishes a factory parameter corresponding to the
+	 * specified feature flag.
+	 *
+	 * @param name identifies the feature flag
+	 * @param value specifies the desired flag value
+	 *
+	 * @exception SAXNotRecognizedException
+	 *	if the specified SAX2 feature flag is not recognized
+	 * @exception SAXNotSupportedException
+	 *	if the specified SAX2 feature flag values can not be set,
+	 *	perhaps because of sequencing requirements (which could
+	 *	be met by using SAX2 directly)
+	 */
+	public abstract void setFeature (String name, boolean value) 
 		throws	ParserConfigurationException, 
 			SAXNotRecognizedException, 
 			SAXNotSupportedException;
 
-	public abstract boolean getFeature(String value) 
+	/**
+	 * Retrieves a current factory feature flag setting.
+	 *
+	 * @param name identifies the feature flag
+	 *
+	 * @exception SAXNotRecognizedException
+	 *	if the specified SAX2 feature flag is not recognized
+	 * @exception SAXNotSupportedException
+	 *	if the specified SAX2 feature flag values can not be
+	 *	accessed before parsing begins.
+	 */
+	public abstract boolean getFeature (String name) 
 		throws	ParserConfigurationException, 
 			SAXNotRecognizedException, 
 			SAXNotSupportedException;
 
-	private static String findFactory(String property, String defaultValue) {
-
+	private static String
+	findFactory(String property, String defaultValue)
+	{
 		// Variables
 		String		factory;
 		String		javaHome;
@@ -132,10 +182,18 @@ public abstract class SAXParserFactory {
 		BufferedReader	br;
 		InputStream	stream;
 
-		// Check System Property
-		factory = System.getProperty(property);
+		// Four ordered steps, as listed in the
+		// JAXP spec for the "pluggability".
 
-		// Check JAVA_HOME
+		// Check System Property
+		// ... normally fails in applet environments
+		try {
+			factory = System.getProperty(property);
+		} catch (SecurityException se) {
+			factory = null;
+		}
+
+		// Check $JAVA_HOME/lib/jaxp.properties
 		try {
 			if (factory == null) {
 				javaHome = System.getProperty("java.home");
@@ -185,6 +243,4 @@ public abstract class SAXParserFactory {
 
 
 } // SAXParserFactory
-
-
 
