@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.33 2003-09-13 13:43:30 avdyk Exp $
+ * $Id: XmlParser.java,v 1.34 2003-11-06 11:18:34 avdyk Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -69,7 +69,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.33 2003-09-13 13:43:30 avdyk Exp $
+// $Id: XmlParser.java,v 1.34 2003-11-06 11:18:34 avdyk Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -79,7 +79,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2003-09-13 13:43:30 $
+ * @version $Date: 2003-11-06 11:18:34 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -3449,10 +3449,15 @@ loop:
 
 	    // we might be using alternate IDs/encoding
 	    systemId = source.getSystemId ();
+	    // The following warning and setting systemId was deleted bcause
+	    // the application has the option of not setting systemId
+	    // provided that it has set the characte/byte stream.
+	    /*
 	    if (systemId == null) {
 		handler.warn ("missing system ID, using " + ids [1]);
 		systemId = ids [1];
 	    }
+	    */
 	} else {
 	    // "[document]", or "[dtd]" via getExternalSubset()
 	    scratch.setCharacterStream (reader);
