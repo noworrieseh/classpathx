@@ -21,14 +21,28 @@
 
 package gnu.mail.providers.smtp;
 
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
-import javax.mail.internet.*;
-import gnu.mail.util.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import gnu.mail.util.CRLFOutputStream;
 
 /** 
  * This transport handles communications with an SMTP server.

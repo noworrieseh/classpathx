@@ -4,8 +4,11 @@ import java.lang.reflect.*;
 import java.io.*;
 import java.util.Properties;
 import javax.activation.*;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Folder;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.internet.MimeMessage;
 
 
 /** this is a very basic testing class.

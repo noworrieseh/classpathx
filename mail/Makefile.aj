@@ -43,7 +43,7 @@ META-INF/mailcap: META-INF $(PROJECTROOT)/mailcap
 #	cp $(PROJECTROOT)/COPYING $@
 
 SUPPORTFILES = \
-    META-INF/javamail.default.address.map \
+	META-INF/javamail.default.address.map \
 	META-INF/javamail.default.providers
 
 # This is an automakejar target.

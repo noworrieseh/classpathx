@@ -27,7 +27,14 @@
 
 package javax.mail.internet;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
@@ -35,7 +42,16 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import gnu.mail.util.*;
+import gnu.mail.util.Base64InputStream;
+import gnu.mail.util.Base64OutputStream;
+import gnu.mail.util.BOutputStream;
+import gnu.mail.util.LineInputStream;
+import gnu.mail.util.QInputStream;
+import gnu.mail.util.QOutputStream;
+import gnu.mail.util.QPInputStream;
+import gnu.mail.util.QPOutputStream;
+import gnu.mail.util.UUDecoderStream;
+import gnu.mail.util.UUEncoderStream;
 
 /**
  * This is a utility class that provides various MIME related functionality.
