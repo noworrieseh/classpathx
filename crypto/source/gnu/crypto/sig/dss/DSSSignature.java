@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSSignature.java,v 1.1 2001-12-30 15:57:53 raif Exp $
+// $Id: DSSSignature.java,v 1.2 2002-01-11 21:34:55 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -30,10 +30,10 @@ package gnu.crypto.sig.dss;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
 import gnu.crypto.hash.Sha160;
-import gnu.crypto.prng.IRandom;
-import gnu.crypto.prng.LimitReachedException;
-import gnu.crypto.prng.MDGenerator;
+import gnu.crypto.sig.ISignature;
+import gnu.crypto.util.PRNG;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -64,9 +64,9 @@ import java.util.HashMap;
  *
  * The integers <code>p</code>, <code>q</code>, and <code>g</code> can be
  * public and can be common to a group of users. A user's private and public
- * keys are <code>x</code> and <code>y</code>, respectively. They are normally 
- * fixed for a period of time. Parameters <code>x</code> and <code>k</code> are 
- * used for signature generation only, and must be kept secret. Parameter 
+ * keys are <code>x</code> and <code>y</code>, respectively. They are normally
+ * fixed for a period of time. Parameters <code>x</code> and <code>k</code> are
+ * used for signature generation only, and must be kept secret. Parameter
  * <code>k</code> must be regenerated for each signature.<p>
  *
  * The signature of a message <code>M</code> is the pair of numbers <code>r</code>
@@ -85,8 +85,8 @@ import java.util.HashMap;
  * integer.<p>
  *
  * As an option, one may wish to check if <code>r == 0</code> or <code>s == 0
- * </code>. If either <code>r == 0</code> or <code>s == 0</code>, a new value 
- * of <code>k</code> should be generated and the signature should be 
+ * </code>. If either <code>r == 0</code> or <code>s == 0</code>, a new value
+ * of <code>k</code> should be generated and the signature should be
  * recalculated (it is extremely unlikely that <code>r == 0</code> or <code>s ==
  * 0</code> if signatures are generated properly).<p>
  *
@@ -95,32 +95,21 @@ import java.util.HashMap;
  * References:<br>
  * <a href="http://www.itl.nist.gov/fipspubs/fip186.htm">Digital Signature
  * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
- * National Institute of Standards and Technology.
+ * National Institute of Standards and Technology.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class DSSSignature implements Cloneable {
+public class DSSSignature implements ISignature, Cloneable {
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   /** The PRNG used to generate values for the DSS parameter <code>k</code>. */
-   private static final IRandom prng;
-   static {
-      prng = new MDGenerator();
-      try {
-         prng.init(new HashMap()); // default is to use SHA
-      } catch (Exception x) {
-         throw new ExceptionInInitializerError(x);
-      }
-   }
-
    /** The public key to use when verifying signatures. */
    private DSAPublicKey publicKey;
-   
+
    /** The private key to use when generating signatures (signing). */
    private DSAPrivateKey privateKey;
-   
+
    /** The SHS instance to use for digesting messages when signing/verifying. */
    private Sha160 sha;
 
@@ -151,14 +140,13 @@ public class DSSSignature implements Cloneable {
       return new DSSSignature(this);
    }
 
-   // Instance methods
+   // gnu.crypto.sig.ISignature interface implementation
    // -------------------------------------------------------------------------
 
-   /**
-    * Initialises this instance for signature verification.<p>
-    *
-    * @param key the public key to use for verification.
-    */
+   public String name() {
+      return Registry.DSS_SIG;
+   }
+
    public void setupVerify(PublicKey key) throws IllegalArgumentException {
       if (!(key instanceof DSAPublicKey)) {
          throw new IllegalArgumentException();
@@ -167,11 +155,6 @@ public class DSSSignature implements Cloneable {
       publicKey = (DSAPublicKey) key;
    }
 
-   /**
-    * Initialises this instance for signature generation.<p>
-    *
-    * @param key the private key to use for signing.
-    */
    public void setupSign(PrivateKey key) throws IllegalArgumentException {
       if (!(key instanceof DSAPrivateKey)) {
          throw new IllegalArgumentException();
@@ -180,11 +163,6 @@ public class DSSSignature implements Cloneable {
       privateKey = (DSAPrivateKey) key;
    }
 
-   /**
-    * Digests one byte of a message for signing or verification.<p>
-    *
-    * @param b the message byte to digest.
-    */
    public void update(byte b) {
       if (sha == null) {
          throw new IllegalStateException();
@@ -192,16 +170,6 @@ public class DSSSignature implements Cloneable {
       sha.update(b);
    }
 
-   /**
-    * Digests a sequence of bytes from a message for signing or verification.<p>
-    *
-    * @param b the byte sequence to consider.
-    * @param off the byte poisition in <code>b</code> of the first byte to 
-    * consider.
-    * @param len the number of bytes in <code>b</code> starting from position
-    * <code>off</code> to digest.
-    * @exception IllegalStateException if this instance was not setup.
-    */
    public void update(byte[] b, int off, int len) {
       if (sha == null) {
          throw new IllegalStateException();
@@ -209,14 +177,6 @@ public class DSSSignature implements Cloneable {
       sha.update(b, off, len);
    }
 
-   /**
-    * Terminates a signature generation phase by digesting and processing the
-    * context of the underlying SHS (Secure HashStandard, or SHA) instance.<p>
-    *
-    * @return the pair of big integers representing the output of the DSS.
-    * @exception IllegalStateException if this instance was not setup for
-    * signature generation.
-    */
    public Object sign() {
       if (sha == null || privateKey == null) {
          throw new IllegalStateException();
@@ -231,10 +191,7 @@ public class DSSSignature implements Cloneable {
 
       byte[] kb = new byte[20]; // we'll use 159 bits only
       while (true) {
-         try {
-            prng.nextBytes(kb, 0, 20);
-         } catch (LimitReachedException ignored) {
-         }
+         PRNG.nextBytes(kb);
          k = new BigInteger(1, kb);
          k.clearBit(159);
          r = g.modPow(k, p).mod(q);
@@ -251,22 +208,11 @@ public class DSSSignature implements Cloneable {
       return encodeSignature(r, s);
    }
 
-   /**
-    * Terminates a signature verification phase by digesting and processing the
-    * context of the underlying SHS (Secure HashStandard, or SHA) instance.<p>
-    *
-    * @param sig a signature object previously generated by an invocation of
-    * the <code>sign()</code> method.
-    * @return <code>true</code> iff the outpout of the verification phase of
-    * this instance matches the designated one.
-    * @exception IllegalStateException if this instance was not setup for
-    * signature verification.
-    */
    public boolean verify(Object sig) {
       if (sha == null || publicKey == null) {
          throw new IllegalStateException();
       }
-      
+
       BigInteger[] dsa = decodeSignature(sig);
       BigInteger r = dsa[0];
       BigInteger s = dsa[1];
@@ -285,7 +231,7 @@ public class DSSSignature implements Cloneable {
       return v.equals(r);
    }
 
-   // helper methods
+   // Other instance methods
    // -------------------------------------------------------------------------
 
    /** Initialises the internal fields of this instance. */
