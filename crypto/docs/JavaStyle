@@ -15,7 +15,7 @@ All source files should begin with (a) the package statement, followed by
 package gnu.crypto.x.y.z;
 
 // ----------------------------------------------------------------------------
-// $Id: JavaStyle,v 1.1.1.1 2001-11-20 13:40:24 raif Exp $
+// $Id: JavaStyle,v 1.1 2001-11-20 13:57:21 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
