@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.2 2001-06-23 21:13:31 db Exp $
+ * $Id: JAXPFactory.java,v 1.3 2001-06-24 04:11:24 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ import javax.xml.parsers.SAXParserFactory;
  * @see Consumer
  *
  * @author David Brownell
- * @version $Date: 2001-06-23 21:13:31 $
+ * @version $Date: 2001-06-24 04:11:24 $
  */
 public final class JAXPFactory extends DocumentBuilderFactory
 {
@@ -123,18 +123,18 @@ public final class JAXPFactory extends DocumentBuilderFactory
 		throw new ParserConfigurationException (e.getMessage ());
 	    }
 
-	    // JAXP default: true (bleech)
+	    // JAXP defaults: true, noise nodes is good (bleech)
 	    consumer.setExpandingReferences (
 		    factory.isExpandEntityReferences ());
+	    consumer.setHidingComments (
+		    factory.isIgnoringComments ());
+	    consumer.setHidingWhitespace (
+		    factory.isIgnoringElementContentWhitespace ());
 
 	    // JAXP default:  save all this noise (bleech).
-	    // DomConsumer could give more granular control;
-	    // for now, follow the JAXP pro-noise bias.
 	    consumer.setSavingExtraNodes (!(
 		       factory.isCoalescing ()
 			    // coalesce == ignore CDATA boundaries
-		    || factory.isIgnoringComments ()
-		    || factory.isIgnoringElementContentWhitespace ()
 		    ));
 
 	    // JAXP default: false
@@ -145,21 +145,19 @@ public final class JAXPFactory extends DocumentBuilderFactory
 	    producer.setContentHandler (consumer.getContentHandler ());
 	    producer.setDTDHandler (consumer.getDTDHandler ());
 
-	    if (consumer.isSavingExtraNodes ()) {
-		try {
-		    String	id;
+	    try {
+		String	id;
 
-		    id = PROPERTY + "lexical-handler";
-		    producer.setProperty (id, consumer.getProperty (id));
+		id = PROPERTY + "lexical-handler";
+		producer.setProperty (id, consumer.getProperty (id));
 
-		    id = PROPERTY + "declaration-handler";
-		    producer.setProperty (id, consumer.getProperty (id));
+		id = PROPERTY + "declaration-handler";
+		producer.setProperty (id, consumer.getProperty (id));
 
-		} catch (SAXException e) {
-		    throw new ParserConfigurationException (e.getMessage ());
-		}
+	    } catch (SAXException e) {
+		throw new ParserConfigurationException (e.getMessage ());
 	    }
-	    
+
 	    // if validating, default to treating validity errors as fatal
 	    if (factory.isValidating ())
 	    	producer.setErrorHandler (this);
