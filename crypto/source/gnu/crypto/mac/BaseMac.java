@@ -6,7 +6,7 @@ import java.util.Map;
 import java.security.InvalidKeyException;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseMac.java,v 1.1 2002-05-14 08:45:41 raif Exp $
+// $Id: BaseMac.java,v 1.2 2002-07-06 23:46:19 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@ import java.security.InvalidKeyException;
  * <p>A base abstract class to facilitate <i>MAC</i> (Message Authentication
  * Code) implementations.</p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class BaseMac implements IMac {
 
@@ -56,7 +56,7 @@ public abstract class BaseMac implements IMac {
    protected int truncatedSize;
 
    /** The authentication key for this instance. */
-   protected transient byte[] K;
+//   protected transient byte[] K;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
