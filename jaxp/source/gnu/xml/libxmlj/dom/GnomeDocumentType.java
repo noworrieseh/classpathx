@@ -49,9 +49,15 @@ implements DocumentType
     return getNodeName ();
   }
 
-  public native NamedNodeMap getEntities ();
+  public NamedNodeMap getEntities ()
+  {
+    return new GnomeNamedNodeMap (id, 1);
+  }
 
-  public native NamedNodeMap getNotations ();
+  public NamedNodeMap getNotations ()
+  {
+    return new GnomeNamedNodeMap (id, 2);
+  }
 
   public native String getPublicId ();
 

@@ -185,7 +185,7 @@ implements Node
 
   public NamedNodeMap getAttributes ()
   {
-    return new GnomeNamedNodeMap (id);
+    return new GnomeNamedNodeMap (id, 0);
   }
 
   public native Document getOwnerDocument ();

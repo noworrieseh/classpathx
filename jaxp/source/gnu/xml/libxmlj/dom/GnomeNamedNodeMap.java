@@ -44,9 +44,18 @@ implements NamedNodeMap
    */
   private final Object id;
 
-  GnomeNamedNodeMap (Object id)
+  /**
+   * The map type.
+   * 0=attributes
+   * 1=entities
+   * 2=notations
+   */
+  private final int type;
+
+  GnomeNamedNodeMap (Object id, int type)
   {
     this.id = id;
+    this.type = type;
   }
 
   public native Node getNamedItem (String name);

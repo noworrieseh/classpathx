@@ -39,6 +39,14 @@
 JNIEnv *dom_cb_env;
 jobject dom_cb_obj;
 
+typedef struct
+{
+  int index;
+  int count;
+  xmlNodePtr node;
+}
+xmljHashScanData;
+
 /*
  * Determines whether a child node is suitable for insertion in the list of
  * children for a given parent node.
@@ -788,30 +796,6 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument
 
 /* -- GnomeDocumentType -- */
 
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getEntities (JNIEnv * env,
-                                                        jobject self)
-{
-  xmlDtdPtr dtd;
-
-  dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
-  /* TODO dtd->entities */
-  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
-  return NULL;
-}
-
-JNIEXPORT jobject JNICALL
-Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getNotations (JNIEnv * env,
-                                                         jobject self)
-{
-  xmlDtdPtr dtd;
-
-  dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
-  /* TODO dtd->entities */
-  xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
-  return NULL;
-}
-
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentType_getPublicId (JNIEnv * env,
                                                         jobject self)
@@ -1132,10 +1116,38 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItem (JNIEnv * env,
                                                          jobject self,
                                                          jstring name)
 {
-  xmlAttrPtr attr;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  attr = xmljGetNamedItem (env, self, name);
-  return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
+    {
+      xmlAttrPtr attr;
+      
+      attr = xmljGetNamedItem (env, self, name);
+      return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+    }
+  else
+    {
+      xmlDtdPtr dtd;
+      xmlHashTablePtr hash;
+      const xmlChar *s_name;
+      xmlNodePtr ret;
+
+      dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
+      hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
+      if (hash == NULL)
+        {
+          return NULL;
+        }
+      s_name = xmljGetStringChars (env, name);
+      ret = (xmlNodePtr) xmlHashLookup (hash, s_name);
+      return xmljGetNodeInstance (env, ret);
+    }
 }
 
 JNIEXPORT jobject JNICALL
@@ -1143,18 +1155,58 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_setNamedItem (JNIEnv * env,
                                                          jobject self,
                                                          jobject arg)
 {
+  jclass cls;
+  jfieldID field;
+  jint type;
   xmlNodePtr node;
   xmlNodePtr argNode;
+
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
 
   node = xmljGetNodeID (env, self);
   argNode = xmljGetNodeID (env, arg);
 
   if (argNode->doc != node->doc)
-    xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
-  if (argNode->parent != NULL)
-    xmljThrowDOMException (env, 10, NULL);	/* INUSE_ATTRIBUTE_ERR */
-  if (!xmlAddChild (node, argNode))
-    xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+    {
+      xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+    }
+  xmljValidateChildNode (env, node, argNode);
+  if ((*env)->ExceptionOccurred (env))
+    {
+      return NULL;
+    }
+  if (type == 0)
+    {
+      if (argNode->parent != NULL)
+        {
+          xmljThrowDOMException (env, 10, NULL);  /* INUSE_ATTRIBUTE_ERR */
+          return NULL;
+        }
+      xmlAddChild (node, argNode);
+    }
+  else
+    {
+      xmlDtdPtr dtd;
+      xmlHashTablePtr hash;
+
+      dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
+      hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
+      if (hash == NULL)
+        {
+          hash = xmlHashCreate (10);
+          if (type == 1)
+            {
+              dtd->entities = hash;
+            }
+          else
+            {
+              dtd->notations = hash;
+            }
+        }
+      xmlHashAddEntry (hash, argNode->name, argNode);
+    }
   return arg;
 }
 
@@ -1163,48 +1215,127 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItem (JNIEnv * env,
                                                             jobject self,
                                                             jstring name)
 {
-  xmlAttrPtr attr;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  attr = xmljGetNamedItem (env, self, name);
-  if (attr == NULL)
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
     {
-      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
-      return NULL;
-    }
-  else
-    {
+      xmlAttrPtr attr;
+
+      attr = xmljGetNamedItem (env, self, name);
+      if (attr == NULL)
+        {
+          xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+          return NULL;
+        }
       xmlUnlinkNode ((xmlNodePtr) attr);
       return xmljGetNodeInstance (env, (xmlNodePtr) attr);
     }
+  else
+    {
+      xmlDtdPtr dtd;
+      xmlHashTablePtr hash;
+      const xmlChar *s_name;
+      xmlNodePtr ret;
+
+      dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
+      hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
+      if (hash == NULL)
+        {
+          return NULL;
+        }
+      s_name = xmljGetStringChars (env, name);
+      ret = (xmlNodePtr) xmlHashLookup (hash, s_name);
+      if (ret != NULL)
+        {
+          xmlHashRemoveEntry (hash, s_name, NULL);
+        }
+      return xmljGetNodeInstance (env, ret);
+    }
+}
+
+void
+xmljHashScanner (void *payload, void *vdata, xmlChar *name)
+{
+  xmljHashScanData *data;
+
+  data = (xmljHashScanData *) vdata;
+  if (data->count <= data->index)
+    {
+      data->node = (xmlNodePtr) payload;
+    }
+  data->count++;
 }
 
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_item (JNIEnv * env,
                                                  jobject self, jint index)
 {
-  xmlNodePtr node;
-  xmlAttrPtr attr;
-  jint count;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  node = xmljGetNodeID (env, self);
-  switch (node->type)
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
     {
-    case XML_ELEMENT_NODE:
-      attr = node->properties;
-      for (count = 0; attr != NULL && count < index; count++)
+      xmlNodePtr node;
+      xmlAttrPtr attr;
+      jint count;
+      
+      node = xmljGetNodeID (env, self);
+      switch (node->type)
         {
-          attr = attr->next;
-        }
-      if (attr == NULL)
-        {
-          char msg[1024];
-          sprintf (msg, "No attribute at index %d\n", index);
-          xmljThrowException (env, "java/lang/NullPointerException", msg);
+        case XML_ELEMENT_NODE:
+          attr = node->properties;
+          for (count = 0; attr != NULL && count < index; count++)
+            {
+              attr = attr->next;
+            }
+          if (attr == NULL)
+            {
+              char msg[1024];
+              sprintf (msg, "No attribute at index %d\n", index);
+              xmljThrowException (env, "java/lang/NullPointerException", msg);
+              return NULL;
+            }
+          return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+        default:
           return NULL;
         }
-      return xmljGetNodeInstance (env, (xmlNodePtr) attr);
-    default:
-      return NULL;
+    }
+  else
+    {
+      xmlDtdPtr dtd;
+      xmlHashTablePtr hash;
+      xmljHashScanData *data;
+      xmlNodePtr ret;
+
+      dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
+      hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
+      if (hash == NULL)
+        {
+          return NULL;
+        }
+      data = (xmljHashScanData *) malloc (sizeof (xmljHashScanData));
+      if (data == NULL)
+        {
+          return NULL;
+        }
+      data->index = index;
+      data->count = 0;
+      data->node = NULL;
+      xmlHashScan (hash, xmljHashScanner, data);
+      ret = data->node;
+      free (data);
+      return xmljGetNodeInstance (env, ret);
     }
 }
 
@@ -1212,24 +1343,61 @@ JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getLength (JNIEnv * env,
                                                       jobject self)
 {
-  xmlNodePtr node;
-  xmlAttrPtr attr;
-  jint count;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  node = xmljGetNodeID (env, self);
-  switch (node->type)
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
     {
-    case XML_ELEMENT_NODE:
-      count = 0;
-      attr = node->properties;
-      while (attr != NULL)
+      xmlNodePtr node;
+      xmlAttrPtr attr;
+      jint count;
+      
+      node = xmljGetNodeID (env, self);
+      switch (node->type)
         {
-          count++;
-          attr = attr->next;
+        case XML_ELEMENT_NODE:
+          count = 0;
+          attr = node->properties;
+          while (attr != NULL)
+            {
+              count++;
+              attr = attr->next;
+            }
+          return count;
+        default:
+          return -1;
         }
-      return count;
-    default:
-      return -1;
+    }
+  else
+    {
+      xmlDtdPtr dtd;
+      xmlHashTablePtr hash;
+      xmljHashScanData *data;
+      jint ret;
+
+      dtd = (xmlDtdPtr) xmljGetNodeID (env, self);
+      hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
+      if (hash == NULL)
+        {
+          return NULL;
+        }
+      data = (xmljHashScanData *) malloc (sizeof (xmljHashScanData));
+      if (data == NULL)
+        {
+          return NULL;
+        }
+      data->index = -1;
+      data->count = 0;
+      data->node = NULL;
+      xmlHashScan (hash, xmljHashScanner, data);
+      ret = data->count;
+      free (data);
+      return ret;
     }
 }
 
@@ -1239,10 +1407,25 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getNamedItemNS (JNIEnv * env,
                                                            jstring uri,
                                                            jstring localName)
 {
-  xmlAttrPtr attr;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  attr = xmljGetNamedItemNS (env, self, uri, localName);
-  return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
+    {
+      xmlAttrPtr attr;
+
+      attr = xmljGetNamedItemNS (env, self, uri, localName);
+      return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+    }
+  else
+    {
+      return NULL;
+    }
 }
 
 JNIEXPORT jobject JNICALL
@@ -1261,18 +1444,33 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_removeNamedItemNS (JNIEnv * env,
                                                               jstring
                                                               localName)
 {
-  xmlAttrPtr attr;
+  jclass cls;
+  jfieldID field;
+  jint type;
 
-  attr = xmljGetNamedItemNS (env, self, uri, localName);
-  if (attr == NULL)
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "type", "I");
+  type = (*env)->GetIntField (env, self, field);
+
+  if (type == 0)
     {
-      xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
-      return NULL;
+      xmlAttrPtr attr;
+      
+      attr = xmljGetNamedItemNS (env, self, uri, localName);
+      if (attr == NULL)
+        {
+          xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+          return NULL;
+        }
+      else
+        {
+          xmlUnlinkNode ((xmlNodePtr) attr);
+          return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+        }
     }
   else
     {
-      xmlUnlinkNode ((xmlNodePtr) attr);
-      return xmljGetNodeInstance (env, (xmlNodePtr) attr);
+      return NULL;
     }
 }
 

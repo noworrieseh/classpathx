@@ -1,3 +1,7 @@
+2004-07-12  Chris Burdess <dog@gnu.org>
+
+	* dom: Entities and notations NamedNodeMaps.
+
 2004-07-06  Chris Burdess <dog@gnu.org>
 
 	* xpath: Permit wildcards in getElementsByTagName[NS].
