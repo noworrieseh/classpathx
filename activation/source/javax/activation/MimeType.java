@@ -31,7 +31,7 @@ import java.io.IOException;
  * Represents a MIME type as per RFC2046.
  *
  * @author Andrew Selkirk
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class MimeType
 implements Externalizable
@@ -153,6 +153,8 @@ implements Externalizable
     // Get Type Index
     type = mimetype.substring(0, endIndex);
     typeIndex = type.indexOf("/");
+    if (typeIndex==-1)
+      throw new MimeTypeParseException(mimetype);
 
     // Get the Primary and Sub parts of the MIME type
     primary = type.substring(0, typeIndex);

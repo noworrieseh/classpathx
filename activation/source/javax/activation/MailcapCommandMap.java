@@ -30,9 +30,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Properties;
 
 /** a comand map that represents the mailcap file.
@@ -71,18 +74,19 @@ import java.util.Properties;
  * printed on the console.
  * </p>
  *
- * @author Andrew Selkirk: aselkirk@mailandnews.com
- * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
- * @version $Revision: 1.9 $
+ * @author <a href='mailto:aselkirk@mailandnews.com'>Andrew Selkirk</a>
+ * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version $Revision: 1.10 $
  */
 public class MailcapCommandMap
-extends CommandMap 
+  extends CommandMap 
 {
 
   /** the database of mailcap registrys.
    * Each entry is a hash of <code>CommandInfo[]</code>s.
    */
-  private Hashtable[] DB = null;
+  private Map[] DB = null;
 
   /**
    * Programmic Entries
@@ -114,53 +118,58 @@ extends CommandMap
    */
   public MailcapCommandMap()
   {
-    DB = new Hashtable[5];
+    DB = new Map[5];
     Properties properties = System.getProperties();
-    //init programmatic entries
-    DB[PROG] = new Hashtable();
-    //the user's mime types
+    // init programmatic entries
+    DB[PROG] = new HashMap();
+    // user-defined mime types
+    File userHome = new File(properties.getProperty("user.home"));
+    File userMailcap = new File(userHome, ".mailcap");
     try
     {
-      File userHome = new File(properties.getProperty("user.home") +
-        File.separator + ".mailcap");
-      DB[HOME] = loadMailcapRegistry(new FileReader(userHome));
+      DB[HOME] = loadMailcapRegistry(new FileReader(userMailcap));
     }
-    catch(Exception e)
+    catch (Exception e)
     {
-      DB[HOME] = new Hashtable();
+      DB[HOME] = new HashMap();
     }
-    //the system mime types
+    // the system mime types
+    File javaHome = new File(properties.getProperty("java.home"));
+    File javaHomeLib = new File(javaHome, "lib");
+    File javaMailcap = new File(javaHomeLib,  "mailcap");
     try
     {
-      File javaHome = new File(properties.getProperty("java.home") +
-        File.separator + "lib" + File.separator + "mailcap");
-      DB[SYS] = loadMailcapRegistry(new FileReader(javaHome));
+      DB[SYS] = loadMailcapRegistry(new FileReader(javaMailcap));
     }
-    catch(Exception e)
+    catch (Exception e)
     {
-      DB[SYS] = new Hashtable();
+      DB[SYS] = new HashMap();
     }
-    //a possible jar-file local copy of the mime types
+    // jar-defined mime types
     try
     {
       String resource = "/META-INF/mailcap";
-      InputStream str = getClass().getResourceAsStream(resource);
-      DB[JAR] = loadMailcapRegistry(new InputStreamReader(str));
+      URL url = getClass().getResource(resource);
+      if (url==null)
+        System.err.println("unable to load "+resource);
+      DB[JAR] = loadMailcapRegistry(new InputStreamReader(url.openStream()));
     }
-    catch(Exception e)
+    catch (Exception e)
     {
-      DB[JAR] = new Hashtable();
+      DB[JAR] = new HashMap();
     }
-    //the default providers... obtained from a possible META-INF/ location
+    // default mime types supplied by this implementation
     try
     {
       String resource = "/META-INF/mailcap.default";
-      InputStream str = getClass().getResourceAsStream(resource);
-      DB[DEF] = loadMailcapRegistry(new InputStreamReader(str));
+      URL url = getClass().getResource(resource);
+      if (url==null)
+        System.err.println("unable to load "+resource);
+      DB[DEF] = loadMailcapRegistry(new InputStreamReader(url.openStream()));
     }
     catch(Exception e)
     {
-      DB[DEF] = new Hashtable();
+      DB[DEF] = new HashMap();
     }
   } // MailcapCommandMap()
 
@@ -170,16 +179,14 @@ extends CommandMap
    * @throws IOException IO exception occurred
    */
   public MailcapCommandMap(String fileName)
-  throws IOException 
+    throws IOException 
   {
-    this();
     try
     {
       DB[PROG] = loadMailcapRegistry(new FileReader(fileName));
     }
-    catch(Exception e)
+    catch (Exception e)
     {
-      //
     }
   } // MailcapCommandMap()
 
@@ -189,14 +196,12 @@ extends CommandMap
    */
   public MailcapCommandMap(InputStream stream) 
   {
-    this();
     try 
     {
       DB[PROG] = loadMailcapRegistry(new InputStreamReader(stream));
     }
     catch (Exception e) 
     {
-      //
     }
   } // MailcapCommandMap()
 
@@ -209,16 +214,10 @@ extends CommandMap
   public void addMailcap(String mailCapEntry) 
   {
     StringReader rd = new StringReader(mailCapEntry);
-    Hashtable entries = loadMailcapRegistry(rd);
-    /* This method:
-    DB[PROG].putAll(entries);
-    would work as well as the following, but is not present in JDK 1.1.
-    */
-    for (Enumeration k = entries.keys(); k.hasMoreElements(); )
+    Map entries = loadMailcapRegistry(rd);
+    synchronized (DB)
     {
-      Object key = k.nextElement();
-      Object value = entries.get(key);
-      DB[PROG].put(key, value);
+      DB[PROG].putAll(entries);
     }
   } // addMailcap()
 
@@ -232,11 +231,9 @@ extends CommandMap
    */
   public DataContentHandler createDataContentHandler(String mimeType) 
   {
-    CommandInfo ch = getCommand(mimeType,"x-java-content-handler");
+    CommandInfo ch = getCommand(mimeType, "x-java-content-handler");
     if (ch == null)
-    {
       return null;
-    }
 
     //we do have the content handler so return it
     try 
@@ -244,10 +241,11 @@ extends CommandMap
       Class classObject = Class.forName(ch.getCommandClass());
       return (DataContentHandler) classObject.newInstance();
     }
-    catch(Exception e) 
+    catch (Exception e) 
     {
       //perhaps the ch was not a DataContentHandler...
       //doesn't matter what the problem is: just return null
+      System.err.println(e.getClass().getName()+": "+e.getMessage());
       return null;
     }
   }
@@ -277,7 +275,7 @@ extends CommandMap
     //particular mime type - using addMailcap() would invalidate
     //the cache but otherwise it would work well.
     CommandInfo[] allCommands = null;
-    synchronized(DB)
+    synchronized (DB)
     {
       //first establish the number of commands across all registrys
       int size = 0;
@@ -364,26 +362,11 @@ extends CommandMap
   public CommandInfo[] getPreferredCommands(String mimeType) 
   {
     CommandInfo[] all = getAllCommands(mimeType);
-    Vector uniqueCommands = new Vector();
-    for (int i = 0; i < all.length; i++)
-    {
-      CommandInfo cmd = all[i];
-      //search the unique list looking for the cmd
-      boolean found = false;
-      for (int k = 0; k < uniqueCommands.size() && !found; i++)
-      {
-        CommandInfo uniqueCmd = (CommandInfo) uniqueCommands.elementAt(i);
-        found = uniqueCmd.equals(cmd);
-      }
-      //if we haven't found it then add it to the list
-      if (!found)
-      {
-        uniqueCommands.addElement(cmd);
-      }
-    }
+    Set uniqueCommands = new HashSet();
+    uniqueCommands.addAll(Arrays.asList(all));
     //make the array to hold the preferred commands
     CommandInfo[] pref = new CommandInfo[uniqueCommands.size()];
-    uniqueCommands.copyInto(pref);
+    uniqueCommands.toArray(pref);
     //NOTE:
     //again, caching could be usefull here... it depends what
     //people use... I guess the other thing we could do is have
@@ -396,11 +379,11 @@ extends CommandMap
    * @param in the stream to load from
    * @return map of <code>mailcaps</code> keyed by content type
    */
-  private Hashtable loadMailcapRegistry(Reader in) 
+  private Map loadMailcapRegistry(Reader in) 
   {
     try 
     {
-      Hashtable registry = new Hashtable();
+      Map registry = new HashMap();
       //some states that we use in this mini-FSM
       final int READMIMETYPE = 0;
       final int READUNIXCOMMAND = 1;
@@ -521,7 +504,7 @@ extends CommandMap
               case StreamTokenizer.TT_EOL:
                 value = valueBuf.toString();
                 valueBuf.setLength(0);
-                addCommand(registry,mimetype,name,value);
+                addCommand(registry, mimetype, name, value);
                 state = READMIMETYPE;
                 break;
               case ';':
@@ -565,7 +548,7 @@ extends CommandMap
    * @param name the name of the command
    * @param value the text of the command
    */
-  private void addCommand(Hashtable reg, String mimetype, String name,
+  private void addCommand(Map reg, String mimetype, String name,
     String value)
   {
     if (name.startsWith("x-java-"))
@@ -584,7 +567,7 @@ extends CommandMap
       CommandInfo[] bigger = new CommandInfo[list.length + 1];
       System.arraycopy(list, 0, bigger, 0, list.length);
       bigger[list.length] = ci;
-      reg.put(mimetype,bigger);
+      reg.put(mimetype, bigger);
     }
   }
 
