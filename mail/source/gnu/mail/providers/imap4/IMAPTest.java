@@ -2,12 +2,12 @@ package gnu.mail.providers.imap4;
 
 import java.io.IOException;
 import java.util.Properties;
-import javax.mail.BodyPart;
 import javax.mail.FetchProfile;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
@@ -17,7 +17,6 @@ import javax.mail.event.FolderEvent;
 import javax.mail.event.FolderListener;
 import javax.mail.event.StoreEvent;
 import javax.mail.event.StoreListener;
-import javax.mail.internet.MimeBodyPart;
 
 /**
  * Simple test for IMAP.
@@ -91,30 +90,8 @@ public class IMAPTest
         int msgnum = messages[i].getMessageNumber();
         String subject = messages[i].getSubject();
         System.out.println("Message "+msgnum+": Subject: "+subject);
-        Object content = messages[i].getContent();
-        if (content instanceof Multipart)
-        {
-          Multipart multipart = (Multipart)content;
-          int count = multipart.getCount();
-          System.out.println("Message "+msgnum+" has "+count+" body parts");
-          for (int j=0; j<count; j++)
-          {
-            System.out.println("--");
-            BodyPart part = multipart.getBodyPart(j);
-            if (part instanceof MimeBodyPart)
-              ((MimeBodyPart)part).writeTo(System.out);
-          }
-        }
-        else if (content instanceof String)
-        {
-          System.out.println("--");
-          System.out.println((String)content);
-        }
-        else
-        {
-          System.out.println("content="+content);
-        }
-        System.out.println("----");
+        if (messages[i] instanceof Part)
+          printPart((Part)messages[i], 0);
       }
       inbox.close(false);
       store.close();
@@ -127,6 +104,35 @@ public class IMAPTest
     {
       e.printStackTrace(System.err);
     }
+  }
+
+  static void printPart(Part part, int depth)
+    throws MessagingException, IOException
+  {
+    System.out.println("* content-type="+part.getContentType());
+    Object content = part.getContent();
+    if (content instanceof Multipart)
+    {
+      Multipart multipart = (Multipart)content;
+      int count = multipart.getCount();
+      for (int j=0; j<count; j++)
+      {
+        System.out.println("-- Part "+(j+1)+" --");
+        printPart(multipart.getBodyPart(j), depth+1);
+        System.out.println("----");
+      }
+    }
+    else if (content instanceof String)
+    {
+      System.out.println("--");
+      System.out.println((String)content);
+    }
+    else
+    {
+      System.out.println("--");
+      System.out.println("* content="+content);
+    }
+    System.out.println("------");
   }
 
 }

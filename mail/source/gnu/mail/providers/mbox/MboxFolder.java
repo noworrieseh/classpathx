@@ -31,15 +31,38 @@
 
 package gnu.mail.providers.mbox;
 
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
-import java.util.zip.*;
-import javax.mail.*;
-import javax.mail.event.*;
-import javax.mail.internet.*;
-import gnu.mail.util.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import javax.mail.Address;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Store;
+import javax.mail.URLName;
+import javax.mail.event.ConnectionEvent;
+import javax.mail.event.FolderEvent;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import gnu.mail.util.LineInputStream;
+
 import gnu.mail.treeutil.StatusEvent;
 
 /**
@@ -182,7 +205,7 @@ public class MboxFolder
       MboxStore store = (MboxStore)this.store;
       store.log("reading "+filename);
       
-      Vector vm = new Vector(256);
+      List acc = new ArrayList(256);
       in = new LineInputStream(getInputStream());
       int count = 1;
       String line, fromLine = null;
@@ -202,7 +225,7 @@ public class MboxFolder
             byte[] bytes = buf.toByteArray();
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
-            vm.addElement(m);
+            acc.add(m);
 
             store.processStatusEvent(new StatusEvent(store,
                   StatusEvent.OPERATION_UPDATE,
@@ -226,7 +249,7 @@ public class MboxFolder
         byte[] bytes = buf.toByteArray();
         ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
         MboxMessage m = new MboxMessage(this, fromLine, bin, count++);
-        vm.addElement(m);
+        acc.add(m);
 
         store.processStatusEvent(new StatusEvent(store,
               StatusEvent.OPERATION_UPDATE,
@@ -235,10 +258,10 @@ public class MboxFolder
               StatusEvent.UNKNOWN,
               count-1));
       }
-      messages = new MboxMessage[vm.size()];
-      vm.copyInto(messages);
+      messages = new MboxMessage[acc.size()];
+      acc.toArray(messages);
       buf = null;
-      vm = null;
+      acc = null;
 
       store.processStatusEvent(new StatusEvent(store,
             StatusEvent.OPERATION_END,
@@ -421,30 +444,34 @@ public class MboxFolder
    * This deletes all the messages marked as deleted.
    * @exception MessagingException if a messaging error occurred
    */
-  public synchronized Message[] expunge() 
+  public Message[] expunge() 
     throws MessagingException 
   {
-    Vector ve = new Vector();
-    if (open) 
+    Message[] expunged;
+    synchronized (this)
     {
-      Vector vm = new Vector();
-      for (int i=0; i<messages.length; i++) 
+      List elist = new ArrayList();
+      if (open) 
       {
-        Flags flags = messages[i].getFlags();
-        if (flags.contains(Flags.Flag.DELETED))
+        List mlist = new ArrayList();
+        for (int i=0; i<messages.length; i++) 
         {
-          ve.addElement(messages[i]);
-          if (messages[i] instanceof MboxMessage)
-            ((MboxMessage)messages[i]).setExpunged(true);
+          Flags flags = messages[i].getFlags();
+          if (flags.contains(Flags.Flag.DELETED))
+          {
+            elist.add(messages[i]);
+            if (messages[i] instanceof MboxMessage)
+              ((MboxMessage)messages[i]).setExpunged(true);
+          }
+          else
+            mlist.add(messages[i]);
         }
-        else
-          vm.addElement(messages[i]);
+        messages = new MboxMessage[mlist.size()];
+        mlist.toArray(messages);
       }
-      messages = new MboxMessage[vm.size()];
-      vm.copyInto(messages);
+      expunged = new Message[elist.size()];
+      elist.toArray(expunged);
     }
-    Message[] expunged = new Message[ve.size()];
-    ve.copyInto(expunged);
     if (expunged.length>0)
       notifyMessageRemovedListeners(true, expunged);
     return expunged;
@@ -519,46 +546,38 @@ public class MboxFolder
   public synchronized void appendMessages(Message[] m) 
     throws MessagingException 
   {
-    Vector appended = new Vector(m.length);
-    int count = messages.length;
-    for (int i=0; i<m.length; i++) 
+    MboxMessage[] n;
+    synchronized (this)
     {
-      if (m[i] instanceof MimeMessage) 
+      List appended = new ArrayList(m.length);
+      int count = messages.length;
+      for (int i=0; i<m.length; i++) 
       {
-        MimeMessage mimem = (MimeMessage)m[i];
-        MboxMessage mboxm = new MboxMessage(this, mimem, count++);
-        if (mimem instanceof MboxMessage)
-          mboxm.fromLine = ((MboxMessage)mimem).fromLine;
-        appended.addElement(mboxm);
+        if (m[i] instanceof MimeMessage) 
+        {
+          MimeMessage mimem = (MimeMessage)m[i];
+          MboxMessage mboxm = new MboxMessage(this, mimem, count++);
+          if (mimem instanceof MboxMessage)
+            mboxm.fromLine = ((MboxMessage)mimem).fromLine;
+          appended.add(mboxm);
+        }
+      }
+      n = new MboxMessage[appended.size()];
+      if (n.length>0) 
+      {
+        appended.toArray(n);
+        // copy into the messages array
+        List acc = new ArrayList(messages.length+n.length);
+        acc.addAll(Arrays.asList(messages));
+        acc.addAll(Arrays.asList(n));
+        messages = new MboxMessage[acc.size()];
+        acc.toArray(messages);
+        acc = null;
       }
     }
-    int appendedLength = appended.size();
-    if (appendedLength>0) 
-    {
-      MboxMessage[] n = new MboxMessage[appendedLength];
-      appended.copyInto(n);
-
-      // copy into the messages array
-      Vector accumulator = new Vector(messages.length+n.length);
-      for (int i=0; i<messages.length; i++)
-        accumulator.addElement(messages[i]);
-      for (int i=0; i<n.length; i++)
-        accumulator.addElement(n[i]);
-      messages = new MboxMessage[accumulator.size()];
-      accumulator.copyInto(messages);
-      
-      // propagate event
+    // propagate event
+    if (n.length>0)
       notifyMessageAddedListeners(n);
-    }
-  }
-
-  /**
-   * Does nothing.
-   * @exception MessagingException ignore
-   */
-  public void fetch(Message[] messages, FetchProfile fetchprofile) 
-    throws MessagingException 
-  {
   }
 
   /**
@@ -782,9 +801,7 @@ public class MboxFolder
   private InputStream getInputStream() 
     throws IOException 
   {
-    InputStream in;
-
-    in = new FileInputStream(file);
+    InputStream in = new FileInputStream(file);
     if (isGzip())
       in = new GZIPInputStream(in);
     return in;
@@ -797,9 +814,7 @@ public class MboxFolder
   private OutputStream getOutputStream() 
     throws IOException 
   {
-    OutputStream out;
-
-    out = new FileOutputStream(file);
+    OutputStream out = new FileOutputStream(file);
     if (isGzip())
       out = new GZIPOutputStream(out);
     return out;

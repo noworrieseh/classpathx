@@ -27,11 +27,12 @@
 
 package gnu.mail.providers.mbox;
 
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
 import javax.activation.DataHandler;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Flags;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import gnu.mail.providers.ReadOnlyMessage;
 
 /**
  * The message class implementing the Mbox mail protocol.
@@ -40,7 +41,7 @@ import javax.mail.internet.*;
  * @version 2.0
  */
 public class MboxMessage 
-  extends MimeMessage 
+  extends ReadOnlyMessage 
 {
 
   /**
@@ -94,118 +95,8 @@ public class MboxMessage
     super.setExpunged(expunged);
   }
 	
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setFrom(Address address) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void addFrom(Address[] address) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setRecipients(Message.RecipientType recipienttype,
-      Address[] addresses) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void addRecipients(Message.RecipientType recipienttype,
-      Address[] addresses) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setReplyTo(Address[] addresses) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setSubject(String subject, String charset) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setSentDate(Date date) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setDisposition(String disposition) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setContentID(String cid) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setContentMD5(String md5) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setDescription(String description, String charset) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
-  /**
-   * Mbox messages are read-only.
-   */
-  public void setDataHandler(DataHandler datahandler) 
-    throws MessagingException 
-  {
-    throw new IllegalWriteException("MboxMessage is read-only");
-  }
-
   /** 
-   * Ok, Mbox messages aren't entirely read-only.
+   * Set the specified flags (reflected in the <code>Status</code> header).
    */
   public synchronized void setFlags(Flags flag, boolean set)
     throws MessagingException 

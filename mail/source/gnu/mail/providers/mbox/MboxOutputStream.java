@@ -27,11 +27,14 @@
 
 package gnu.mail.providers.mbox;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A filter stream that can escape mbox From_ lines in message content.
- * This will only work reliably for messages with <1024 bytes in each line.
+ * This will only work reliably for messages with &lt;4096 bytes in any one
+ * line.
  *
  * @author dog@dog.net.uk
  * @version 2.0
@@ -58,7 +61,7 @@ class MboxOutputStream
    */
   public MboxOutputStream(OutputStream out) 
   {
-    this(out, 1024);
+    this(out, 4096);
   }
 
   /**

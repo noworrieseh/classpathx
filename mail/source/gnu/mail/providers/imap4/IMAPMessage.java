@@ -453,7 +453,6 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
     throws MessagingException
   {
     // Hook into BODYSTRUCTURE method
-    /*
     ContentType ct = new ContentType(getContentType());
     // TODO message/* content-types
     if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
@@ -464,12 +463,24 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
     }
     else
     {
-    */
       if (content==null)
         fetchContent();
       return super.getDataHandler();
-      /*
-    }*/
+    }
+  }
+
+  public Object getContent()
+    throws MessagingException, IOException
+  {
+    ContentType ct = new ContentType(getContentType());
+    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
+    {
+      if (multipart==null)
+        fetchMultipart();
+      return multipart;
+    }
+    else
+      return super.getContent();
   }
 
   /**

@@ -27,13 +27,15 @@
 
 package gnu.mail.providers.mbox;
 
-import java.io.*;
-import java.net.*;
-import java.util.Vector;
-import javax.mail.*;
-import javax.mail.event.*;
-import java.util.Hashtable;
-import gnu.mail.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import javax.mail.Folder;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+
 import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
@@ -44,7 +46,7 @@ import gnu.mail.treeutil.StatusSource;
  * @author dog@dog.net.uk
  * @version 2.0
  */
-public class MboxStore 
+public final class MboxStore 
   extends Store 
   implements StatusSource
 {
@@ -54,7 +56,7 @@ public class MboxStore
   static int fetchsize = 1024;
   static boolean attemptFallback = true;
 
-  Vector statusListeners = new Vector();
+  private List statusListeners = new ArrayList();
 	
   /**
    * Constructor.
@@ -147,14 +149,14 @@ public class MboxStore
         try 
         {
           String username = System.getProperty("user.name");
-          inboxname = "/var/mail/"+username;
+          inboxname = "/var/mail/"+username; // GNU
           if (!exists(inboxname))
-            inboxname = "/var/spool/mail/"+username;
+            inboxname = "/var/spool/mail/"+username; // common alternative
           if (!exists(inboxname))
           {
             inboxname = null;
             String userhome = System.getProperty("user.home");
-            inboxname = userhome+"/mbox";
+            inboxname = userhome+"/Mailbox"; // qmail etc
           }
           if (!exists(inboxname))
             inboxname = null;
@@ -237,7 +239,7 @@ public class MboxStore
   {
     synchronized (statusListeners) 
     {
-      statusListeners.addElement(l);
+      statusListeners.add(l);
     }
   }
 			
@@ -250,7 +252,7 @@ public class MboxStore
   {
     synchronized (statusListeners) 
     {
-      statusListeners.removeElement(l);
+      statusListeners.remove(l);
     }
   }
 
@@ -265,7 +267,7 @@ public class MboxStore
     synchronized (statusListeners) 
     {
       listeners = new StatusListener[statusListeners.size()];
-      statusListeners.copyInto(listeners);
+      statusListeners.toArray(listeners);
     }
     switch (event.getType()) 
     {

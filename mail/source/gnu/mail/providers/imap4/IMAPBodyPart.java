@@ -105,6 +105,9 @@ public class IMAPBodyPart
     fetch(commands);
   }
 
+  /*
+   * Perform the IMAP fetch.
+   */
   void fetch(String[] commands)
     throws MessagingException
   {
@@ -130,13 +133,18 @@ public class IMAPBodyPart
     }
   }
 
+  /*
+   * Update this body part's content from the specified message status
+   * object.
+   */
   void update(MessageStatus status)
     throws MessagingException
   {
     for (Iterator i = status.keySet().iterator(); i.hasNext(); )
     {
       String key = (String)i.next();
-      if (key==BODY)
+      String target = BODY + section;
+      if (key.equals(target))
       {
         content = status.getContent();
       }
@@ -147,12 +155,18 @@ public class IMAPBodyPart
 
   // -- Simple accessors --
 
+  /**
+   * Returns the content size of this body part in bytes.
+   */
   public int getSize()
     throws MessagingException
   {
     return size;
   }
 
+  /**
+   * Returns the number of text lines in the content of this body part.
+   */
   public int getLineCount()
     throws MessagingException
   {
@@ -170,6 +184,7 @@ public class IMAPBodyPart
     ContentType ct = new ContentType(getContentType());
     if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
     {
+      // Our multipart object should already have been configured
       return new DataHandler(new IMAPMultipartDataSource(multipart));
     }
     else
@@ -178,6 +193,18 @@ public class IMAPBodyPart
         fetchContent();
       return super.getDataHandler();
     }
+  }
+
+  public Object getContent()
+    throws MessagingException, IOException
+  {
+    ContentType ct = new ContentType(getContentType());
+    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
+    {
+      return multipart;
+    }
+    else
+      return super.getContent();
   }
   
   /**

@@ -67,6 +67,12 @@ public abstract class ReadOnlyMessage extends MimeMessage
     super(folder, msgnum);
   }
 
+  protected ReadOnlyMessage(MimeMessage message)
+    throws MessagingException
+  {
+    super(message);
+  }
+
   // -- content --
 
   public void setContent(Object o, String type)
