@@ -1,7 +1,7 @@
 package gnu.crypto.sig;
 
 // ----------------------------------------------------------------------------
-// $Id: ISignature.java,v 1.1 2002-01-11 21:38:55 raif Exp $
+// $Id: ISignature.java,v 1.2 2002-01-18 02:28:35 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -48,9 +48,9 @@ import java.security.PublicKey;
  * Cryptography</a>, Alfred J. Menezes, Paul C. van Oorschot and Scott A.
  * Vanstone. Section 11.2.2 Digital signature schemes with appendix.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public interface ISignature {
+public interface ISignature extends Cloneable {
 
    // Constants
    // -------------------------------------------------------------------------
@@ -131,4 +131,11 @@ public interface ISignature {
     * signature verification.
     */
    boolean verify(Object signature) throws IllegalStateException;
+
+   /**
+    * Returns a clone copy of this instance.
+    *
+    * @return a clone copy of this instance.
+    */
+   Object clone() throws CloneNotSupportedException;
 }
