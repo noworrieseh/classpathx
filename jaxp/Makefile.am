@@ -1,5 +1,5 @@
 # 
-# $Id: Makefile.am,v 1.1.2.3 2004-04-07 22:32:12 avdyk Exp $
+# $Id: Makefile.am,v 1.1.2.4 2004-04-08 12:28:12 avdyk Exp $
 # Copyright (C) 2003 Julian Scheid
 # 
 # This file is part of GNU LibxmlJ, a JAXP-compliant Java wrapper for
@@ -298,10 +298,10 @@ BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES} ${JARFILE}
 # Generate header files for classes containing native code.
 # I did remove the -force argument (not available in gcjh nor in kaffe)
 gnu_xml_libxmlj_transform_%.h: 
-	@JAVAH@ -classpath . gnu.xml.libxmlj.transform.$*
+	@JAVAH@ -jni -classpath . gnu.xml.libxmlj.transform.$*
 
 javax_xml_transform_%.h:
-	@JAVAH@ javax.xml.transform.$*
+	@JAVAH@ -jni javax.xml.transform.$*
 
 ## Rule for compiling Java source files
 ##gnu/xml/aelfred2/%.class: @srcdir@/src/gnu/xml/aelfred2/%.java
