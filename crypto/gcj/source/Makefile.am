@@ -1,8 +1,8 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.5 2002-07-06 07:56:16 olf Exp $
+## $Id: Makefile.am,v 1.6 2002-07-27 02:10:51 raif Exp $
 ##
-## Copyright (C) 2002 Free Software Foundation, Inc.
+## Copyright (C) 2002, Free Software Foundation, Inc.
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by the Free
@@ -124,6 +124,7 @@ junitTest_LDFLAGS = --main=test.AllTests
 #
 crypto_sources = \
  gnu/crypto/Registry.java \
+ \
  gnu/crypto/cipher/Anubis.java \
  gnu/crypto/cipher/BaseCipher.java \
  gnu/crypto/cipher/CipherFactory.java \
@@ -135,6 +136,9 @@ crypto_sources = \
  gnu/crypto/cipher/Serpent.java \
  gnu/crypto/cipher/Square.java \
  gnu/crypto/cipher/Twofish.java \
+ \
+ gnu/crypto/exp/ust/UST.java \
+ \
  gnu/crypto/hash/BaseHash.java \
  gnu/crypto/hash/HashFactory.java \
  gnu/crypto/hash/IMessageDigest.java \
@@ -144,31 +148,39 @@ crypto_sources = \
  gnu/crypto/hash/RipeMD160.java \
  gnu/crypto/hash/Sha160.java \
  gnu/crypto/hash/Whirlpool.java \
+ \
  gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
  gnu/crypto/jce/DSSRawSignatureSpi.java \
  gnu/crypto/jce/GnuCrypto.java \
  gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+ gnu/crypto/jce/MD4RandomSpi.java \
  gnu/crypto/jce/MD4Spi.java \
+ gnu/crypto/jce/MD5RandomSpi.java \
  gnu/crypto/jce/MD5Spi.java \
  gnu/crypto/jce/MessageDigestAdapter.java \
- gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
- gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
+ gnu/crypto/jce/RipeMD128RandomSpi.java \
  gnu/crypto/jce/RipeMD128Spi.java \
  gnu/crypto/jce/RipeMD160RandomSpi.java \
  gnu/crypto/jce/RipeMD160Spi.java \
+ gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
+ gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
  gnu/crypto/jce/SecureRandomAdapter.java \
  gnu/crypto/jce/Sha160RandomSpi.java \
  gnu/crypto/jce/Sha160Spi.java \
  gnu/crypto/jce/SignatureAdapter.java \
+ gnu/crypto/jce/UMacRandomSpi.java \
  gnu/crypto/jce/WhirlpoolRandomSpi.java \
  gnu/crypto/jce/WhirlpoolSpi.java \
+ \
  gnu/crypto/mac/BaseMac.java \
  gnu/crypto/mac/HMac.java \
  gnu/crypto/mac/HMacFactory.java \
  gnu/crypto/mac/IMac.java \
  gnu/crypto/mac/MacFactory.java \
+ gnu/crypto/mac/TMMH16.java \
  gnu/crypto/mac/UHash32.java \
  gnu/crypto/mac/UMac32.java \
+ \
  gnu/crypto/mode/BaseMode.java \
  gnu/crypto/mode/CTR.java \
  gnu/crypto/mode/ECB.java \
@@ -176,12 +188,14 @@ crypto_sources = \
  gnu/crypto/mode/IMode.java \
  gnu/crypto/mode/ModeFactory.java \
  gnu/crypto/mode/OFB.java \
+ \
  gnu/crypto/pad/BasePad.java \
  gnu/crypto/pad/IPad.java \
- gnu/crypto/pad/PKCS7.java \
  gnu/crypto/pad/PadFactory.java \
+ gnu/crypto/pad/PKCS7.java \
  gnu/crypto/pad/TBC.java \
  gnu/crypto/pad/WrongPaddingException.java \
+ \
  gnu/crypto/prng/BasePRNG.java \
  gnu/crypto/prng/ICMGenerator.java \
  gnu/crypto/prng/IRandom.java \
@@ -189,6 +203,7 @@ crypto_sources = \
  gnu/crypto/prng/MDGenerator.java \
  gnu/crypto/prng/PRNGFactory.java \
  gnu/crypto/prng/UMacGenerator.java \
+ \
  gnu/crypto/sig/BaseSignature.java \
  gnu/crypto/sig/IKeyPairCodec.java \
  gnu/crypto/sig/IKeyPairGenerator.java \
@@ -196,6 +211,7 @@ crypto_sources = \
  gnu/crypto/sig/ISignatureCodec.java \
  gnu/crypto/sig/KeyPairGeneratorFactory.java \
  gnu/crypto/sig/SignatureFactory.java \
+ \
  gnu/crypto/sig/dss/DSSKey.java \
  gnu/crypto/sig/dss/DSSKeyPairGenerator.java \
  gnu/crypto/sig/dss/DSSKeyPairRawCodec.java \
@@ -203,6 +219,7 @@ crypto_sources = \
  gnu/crypto/sig/dss/DSSPublicKey.java \
  gnu/crypto/sig/dss/DSSSignature.java \
  gnu/crypto/sig/dss/DSSSignatureRawCodec.java \
+ \
  gnu/crypto/sig/rsa/EMSA_PSS.java \
  gnu/crypto/sig/rsa/GnuRSAKey.java \
  gnu/crypto/sig/rsa/GnuRSAPrivateKey.java \
@@ -212,12 +229,14 @@ crypto_sources = \
  gnu/crypto/sig/rsa/RSAKeyPairRawCodec.java \
  gnu/crypto/sig/rsa/RSAPSSSignature.java \
  gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java \
- gnu/crypto/util/PRNG.java \
+ \
  gnu/crypto/util/Prime.java \
+ gnu/crypto/util/PRNG.java \
  gnu/crypto/util/Util.java
 
 junit_test_sources = \
  test/AllTests.java \
+ \
  test/cipher/AllTests.java \
  test/cipher/BaseCipherTestCase.java \
  test/cipher/TestOfAnubis.java \
@@ -229,6 +248,10 @@ junit_test_sources = \
  test/cipher/TestOfSerpent.java \
  test/cipher/TestOfSquare.java \
  test/cipher/TestOfTwofish.java \
+ \
+ test/exp/AllTests.java \
+ test/exp/TestOfUST.java \
+ \
  test/hash/AllTests.java \
  test/hash/TestOfHashFactory.java \
  test/hash/TestOfMD4.java \
@@ -237,32 +260,41 @@ junit_test_sources = \
  test/hash/TestOfRipeMD160.java \
  test/hash/TestOfSha160.java \
  test/hash/TestOfWhirlpool.java \
+ \
  test/jce/AllTests.java \
  test/jce/TestOfKeyPairGenerator.java \
  test/jce/TestOfMessageDigest.java \
  test/jce/TestOfProvider.java \
  test/jce/TestOfSignature.java \
+ \
  test/mac/AllTests.java \
  test/mac/TestOfHMacFactory.java \
  test/mac/TestOfMacFactory.java \
+ test/mac/TestOfTMMH16.java \
+ \
  test/mode/AllTests.java \
  test/mode/TestOfECB.java \
  test/mode/TestOfModeFactory.java \
  test/mode/TestOfOFB.java \
+ \
  test/pad/AllTests.java \
- test/pad/TestOfPKCS7.java \
  test/pad/TestOfPadFactory.java \
+ test/pad/TestOfPKCS7.java \
  test/pad/TestOfTBC.java \
+ \
  test/prng/AllTests.java \
  test/prng/TestOfICMGenerator.java \
  test/prng/TestOfPRNGFactory.java \
+ \
  test/sig/AllTests.java \
  test/sig/TestOfKeyPairGeneratorFactory.java \
  test/sig/TestOfSignatureFactory.java \
+ \
  test/sig/dss/AllTests.java \
  test/sig/dss/TestOfDSSCodec.java \
  test/sig/dss/TestOfDSSKeyGeneration.java \
  test/sig/dss/TestOfDSSSignature.java \
+ \
  test/sig/rsa/AllTests.java \
  test/sig/rsa/TestOfRSACodec.java \
  test/sig/rsa/TestOfRSAKeyGeneration.java \
