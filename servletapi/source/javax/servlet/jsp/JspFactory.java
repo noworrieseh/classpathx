@@ -48,24 +48,6 @@ public abstract class JspFactory
   //  Methods
 
   /**
-   * XXX
-   *
-   * @param s XXX
-   * @param req XXX
-   * @param res XXX
-   * @param needsSession XXX
-   * @param bufferSize XXX
-   * @param autoflush XXX
-   * @return XXX
-   */
-  public abstract PageContext creatPageContext(Servlet s,
-					       ServletRequest req,
-					       ServletResponse res,
-					       boolean needsSession,
-					       int bufferSize,
-					       boolean autoflush);
-
-  /**
    * Get a PageContext object associated with a request/response.
    */
   public abstract PageContext getPageContext(Servlet servlet,
