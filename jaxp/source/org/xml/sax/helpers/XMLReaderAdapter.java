@@ -2,6 +2,7 @@
 // http://www.saxproject.org
 // Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
+// $Id: XMLReaderAdapter.java,v 1.11 2004-12-11 15:41:10 dog Exp $
 
 package org.xml.sax.helpers;
 
@@ -106,7 +107,7 @@ public class XMLReaderAdapter implements Parser, ContentHandler
     }
 
 
-
+
     ////////////////////////////////////////////////////////////////////
     // Implementation of org.xml.sax.Parser.
     ////////////////////////////////////////////////////////////////////
@@ -118,7 +119,7 @@ public class XMLReaderAdapter implements Parser, ContentHandler
      * <p>This is not supported in SAX2, and will always throw
      * an exception.</p>
      *
-     * @param The locale for error reporting.
+     * @param locale the locale for error reporting.
      * @see org.xml.sax.Parser#setLocale
      * @exception org.xml.sax.SAXException Thrown unless overridden.
      */

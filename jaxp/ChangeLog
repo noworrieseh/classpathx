@@ -1,3 +1,7 @@
+2004-12-10  Chris Burdess	<dog@gnu.org>
+
+	* org/xml/sax: Updated version of SAX API to sax2r3 final.
+
 2004-12-04  Chris Burdess	<dog@gnu.org>
 
 	* README,INSTALL,AUTHORS: Updated documentation.

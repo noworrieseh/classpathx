@@ -1,6 +1,7 @@
 // SAX Attribute List Interface.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
+// $Id: AttributeList.java,v 1.10 2004-12-11 15:41:09 dog Exp $
 
 package org.xml.sax;
 
@@ -180,7 +181,7 @@ public interface AttributeList {
      * <p>If the attribute name has a namespace prefix in the document,
      * the application must include the prefix here.</p>
      *
-     * @param i The index of the attribute in the list.
+     * @param name the name of the attribute to return
      * @return The attribute value as a string, or null if
      *         no such attribute exists.
      * @see #getValue(int)

@@ -1,6 +1,7 @@
 // SAX entity resolver.
 // http://www.saxproject.org
 // No warranty; no copyright -- use this as you will.
+// $Id: EntityResolver.java,v 1.10 2004-12-11 15:41:09 dog Exp $
 
 package org.xml.sax;
 
