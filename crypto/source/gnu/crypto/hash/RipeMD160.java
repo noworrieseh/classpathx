@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD160.java,v 1.4 2002-01-11 21:55:08 raif Exp $
+// $Id: RipeMD160.java,v 1.5 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -33,41 +33,27 @@ package gnu.crypto.hash;
 import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
-
 /**
- * RIPEMD-160 is a 160-bit message digest.<p>
+ * <p>RIPEMD-160 is a 160-bit message digest.</p>
  *
- * References:<br>
- * <a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html">RIPEMD160</a>
- * : A Strengthened Version of RIPEMD.<br>
- * Hans Dobbertin, Antoon Bosselaers and Bart Preneel.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.4 $
+ * <ol>
+ *    <li><a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html">
+ *    RIPEMD160</a>: A Strengthened Version of RIPEMD.<br>
+ *    Hans Dobbertin, Antoon Bosselaers and Bart Preneel.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.5 $
  */
 public class RipeMD160 extends BaseHash {
-
-   // Debugging methods and variables
-   // -------------------------------------------------------------------------
-
-   private static final String NAME = "ripemd160";
-   private static final boolean DEBUG = false;
-   private static final int debuglevel = 9;
-   private static final PrintWriter err = new PrintWriter(System.out, true);
-   private static void debug(String s) {
-      err.println(">>> "+NAME+": "+s);
-   }
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   private static final int BLOCK_SIZE = 64; // default block size in bytes
+   private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
-   /** 160-bit h0, h1, h2, h3, h4 (interim result) */
-   private int h0, h1, h2, h3, h4;
-
-   /** 512 bits work buffer = 16 x 32-bit words */
-   private int[] X = new int[16];
+   private static final String DIGEST0 = "9C1185A5C5E9FC54612808977EE8F548B2258D31";
 
    // selection of message word
    private static final int[] R  = {
@@ -103,7 +89,11 @@ public class RipeMD160 extends BaseHash {
        8,  5, 12,  9, 12,  5, 14,  6,  8, 13,  6,  5, 15, 13, 11, 11
    };
 
-   private static final String DIGEST0 = "9C1185A5C5E9FC54612808977EE8F548B2258D31";
+   /** 160-bit h0, h1, h2, h3, h4 (interim result) */
+   private int h0, h1, h2, h3, h4;
+
+   /** 512 bits work buffer = 16 x 32-bit words */
+   private int[] X = new int[16];
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -111,12 +101,10 @@ public class RipeMD160 extends BaseHash {
    /** Trivial 0-arguments constructor. */
    public RipeMD160() {
       super(Registry.RIPEMD160_HASH, 20, BLOCK_SIZE);
-
-      resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.<p>
+    * <p>Private constructor for cloning purposes.</p>
     *
     * @param md the instance to clone.
     */
@@ -132,27 +120,29 @@ public class RipeMD160 extends BaseHash {
       this.buffer = (byte[]) md.buffer.clone();
    }
 
-   // Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
 
-   /** @return a cloned copy of this instance. */
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
    public Object clone() {
       return (new RipeMD160(this));
    }
 
-   // Implementation of concrete methods in BaseHash
-   // -------------------------------------------------------------------------
+   // Implementation of concrete methods in BaseHash --------------------------
 
    protected void transform (byte[] in, int offset) {
       int A, B, C, D, E, Ap, Bp, Cp, Dp, Ep, T, s, i;
 
-      // encode 64 bytes from input block into an array of 16 unsigned
-      // integers.
+      // encode 64 bytes from input block into an array of 16 unsigned integers
       for (i = 0; i < 16; i++) {
          X[i] = (in[offset++] & 0xFF)       |
                 (in[offset++] & 0xFF) <<  8 |
                 (in[offset++] & 0xFF) << 16 |
-                (in[offset++] & 0xFF) << 24;
+                 in[offset++]         << 24;
       }
 
       A = Ap = h0;

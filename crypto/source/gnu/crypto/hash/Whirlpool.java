@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Whirlpool.java,v 1.4 2002-01-11 21:55:08 raif Exp $
+// $Id: Whirlpool.java,v 1.5 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -33,61 +33,63 @@ package gnu.crypto.hash;
 import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
-
 /**
- * Whirlpool, a new 512-bit hashing function operating on messages less than
+ * <p>Whirlpool, a new 512-bit hashing function operating on messages less than
  * 2 ** 256 bits in length. The function structure is designed according to the
- * Wide Trail strategy and permits a wide variety of implementation trade-offs.<p>
+ * Wide Trail strategy and permits a wide variety of implementation trade-offs.
+ * </p>
  *
- * IMPORTANT: This implementation is not thread-safe.<p>
+ * <p><b>IMPORTANT</b>: This implementation is not thread-safe.</p>
  *
- * References:<br>
- * <a href="http://planeta.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html">
- * The WHIRLPOOL Hashing Function</a>.<br>
- * <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
- * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.4 $
+ * <ol>
+ *    <li><a href="http://planeta.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html">
+ *    The WHIRLPOOL Hashing Function</a>.<br>
+ *    <a href="mailto:pbarreto@scopus.com.br">Paulo S.L.M. Barreto</a> and
+ *    <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.5 $
  */
 public final class Whirlpool extends BaseHash {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
 
-   private static final String NAME = "whirlpool";
    private static final boolean DEBUG = false;
-   private static final int debuglevel = 9;
-   private static final PrintWriter err = new PrintWriter(System.out, true);
-   private static void debug(String s) {
-      err.println(">>> "+NAME+": "+s);
-   }
+   private static final int debuglevel = 3;
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   private static final int BLOCK_SIZE = 64; // block size in bytes
+   private static final int BLOCK_SIZE = 64; // inner block size in bytes
+
+   /** The digest of the 0-bit long message. */
+   private static final String DIGEST0 =
+         "470F0409ABAA446E49667D4EBE12A14387CEDBD10DD17B8243CAD550A089DC0F"+
+         "EEA7AA40F6C2AAAB71C6EBD076E43C7CFCA0AD32567897DCB5969861049A0F5A";
+
    private static final int R = 10; // default number of rounds
 
    private static final String Sd = // p. 19 [WHIRLPOOL]
-      "\u1823\uc6E8\u87B8\u014F\u36A6\ud2F5\u796F\u9152"+
-      "\u60Bc\u9B8E\uA30c\u7B35\u1dE0\ud7c2\u2E4B\uFE57"+
-      "\u1577\u37E5\u9FF0\u4AdA\u58c9\u290A\uB1A0\u6B85"+
-      "\uBd5d\u10F4\ucB3E\u0567\uE427\u418B\uA77d\u95d8"+
-      "\uFBEE\u7c66\udd17\u479E\ucA2d\uBF07\uAd5A\u8333"+
-      "\u6302\uAA71\uc819\u49d9\uF2E3\u5B88\u9A26\u32B0"+
-      "\uE90F\ud580\uBEcd\u3448\uFF7A\u905F\u2068\u1AAE"+
-      "\uB454\u9322\u64F1\u7312\u4008\uc3Ec\udBA1\u8d3d"+
-      "\u9700\ucF2B\u7682\ud61B\uB5AF\u6A50\u45F3\u30EF"+
-      "\u3F55\uA2EA\u65BA\u2Fc0\udE1c\uFd4d\u9275\u068A"+
-      "\uB2E6\u0E1F\u62d4\uA896\uF9c5\u2559\u8472\u394c"+
-      "\u5E78\u388c\ud1A5\uE261\uB321\u9c1E\u43c7\uFc04"+
-      "\u5199\u6d0d\uFAdF\u7E24\u3BAB\ucE11\u8F4E\uB7EB"+
-      "\u3c81\u94F7\uB913\u2cd3\uE76E\uc403\u5644\u7FA9"+
-      "\u2ABB\uc153\udc0B\u9d6c\u3174\uF646\uAc89\u14E1"+
-      "\u163A\u6909\u70B6\ud0Ed\ucc42\u98A4\u285c\uF886";
+         "\u1823\uc6E8\u87B8\u014F\u36A6\ud2F5\u796F\u9152"+
+         "\u60Bc\u9B8E\uA30c\u7B35\u1dE0\ud7c2\u2E4B\uFE57"+
+         "\u1577\u37E5\u9FF0\u4AdA\u58c9\u290A\uB1A0\u6B85"+
+         "\uBd5d\u10F4\ucB3E\u0567\uE427\u418B\uA77d\u95d8"+
+         "\uFBEE\u7c66\udd17\u479E\ucA2d\uBF07\uAd5A\u8333"+
+         "\u6302\uAA71\uc819\u49d9\uF2E3\u5B88\u9A26\u32B0"+
+         "\uE90F\ud580\uBEcd\u3448\uFF7A\u905F\u2068\u1AAE"+
+         "\uB454\u9322\u64F1\u7312\u4008\uc3Ec\udBA1\u8d3d"+
+         "\u9700\ucF2B\u7682\ud61B\uB5AF\u6A50\u45F3\u30EF"+
+         "\u3F55\uA2EA\u65BA\u2Fc0\udE1c\uFd4d\u9275\u068A"+
+         "\uB2E6\u0E1F\u62d4\uA896\uF9c5\u2559\u8472\u394c"+
+         "\u5E78\u388c\ud1A5\uE261\uB321\u9c1E\u43c7\uFc04"+
+         "\u5199\u6d0d\uFAdF\u7E24\u3BAB\ucE11\u8F4E\uB7EB"+
+         "\u3c81\u94F7\uB913\u2cd3\uE76E\uc403\u5644\u7FA9"+
+         "\u2ABB\uc153\udc0B\u9d6c\u3174\uF646\uAc89\u14E1"+
+         "\u163A\u6909\u70B6\ud0Ed\ucc42\u98A4\u285c\uF886";
 
-   private static final byte[] S =  new byte[256];
    private static final long[] T0 = new long[256];
    private static final long[] T1 = new long[256];
    private static final long[] T2 = new long[256];
@@ -112,13 +114,7 @@ public final class Whirlpool extends BaseHash {
    /** work area for holding block cipher's intermediate values. */
    private long w0, w1, w2, w3, w4, w5, w6, w7;
 
-   /** The digest of the 0-bit long message. */
-   private static final String DIGEST0 =
-      "470F0409ABAA446E49667D4EBE12A14387CEDBD10DD17B8243CAD550A089DC0F"
-     +"EEA7AA40F6C2AAAB71C6EBD076E43C7CFCA0AD32567897DCB5969861049A0F5A";
-
-   // Static code - to intialise lookup tables
-   // -------------------------------------------------------------------------
+   // Static code - to intialise lookup tables --------------------------------
 
    static {
       long time = System.currentTimeMillis();
@@ -127,6 +123,7 @@ public final class Whirlpool extends BaseHash {
       int i, r, j;
       long s, s2, s3, s4, s5, s8, s9, t;
       char c;
+      final byte[] S =  new byte[256];
       for (i = 0; i < 256; i++) {
          c = Sd.charAt(i >>> 1);
 
@@ -260,7 +257,7 @@ public final class Whirlpool extends BaseHash {
    }
 
    /**
-    * private constructor for cloning purposes.
+    * <p>Private constructor for cloning purposes.</p>
     *
     * @param md the instance to clone.
     */
@@ -279,16 +276,19 @@ public final class Whirlpool extends BaseHash {
       this.buffer = (byte[]) md.buffer.clone();
    }
 
-   // Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
 
-   /** @return a cloned copy of this instance. */
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
    public Object clone() {
       return (new Whirlpool(this));
    }
 
-   // Implementation of concrete methods in BaseHash
-   // -------------------------------------------------------------------------
+   // Implementation of concrete methods in BaseHash --------------------------
 
    protected void transform(byte[] in, int offset) {
       // apply mu to the input
@@ -347,50 +347,49 @@ public final class Whirlpool extends BaseHash {
       // intermediate cipher output
       w0 = w1 = w2 = w3 = w4 = w5 = w6 = w7 = 0L;
 
-      for (int r = 0, i = 0; r < R; r++) {
+      for (int r = 0; r < R; r++) {
          // 1. compute intermediate round key schedule by applying ro[rc]
          // to the previous round key schedule --rc being the round constant
-
          Kr0 = T0[(int)((k00 >> 56) & 0xFFL)] ^ T1[(int)((k07 >> 48) & 0xFFL)] ^
                T2[(int)((k06 >> 40) & 0xFFL)] ^ T3[(int)((k05 >> 32) & 0xFFL)] ^
                T4[(int)((k04 >> 24) & 0xFFL)] ^ T5[(int)((k03 >> 16) & 0xFFL)] ^
-               T6[(int)((k02 >>  8) & 0xFFL)] ^ T7[(int)((k01      ) & 0xFFL)] ^
+               T6[(int)((k02 >>  8) & 0xFFL)] ^ T7[(int)( k01        & 0xFFL)] ^
                rc[r];
 
          Kr1 = T0[(int)((k01 >> 56) & 0xFFL)] ^ T1[(int)((k00 >> 48) & 0xFFL)] ^
                T2[(int)((k07 >> 40) & 0xFFL)] ^ T3[(int)((k06 >> 32) & 0xFFL)] ^
                T4[(int)((k05 >> 24) & 0xFFL)] ^ T5[(int)((k04 >> 16) & 0xFFL)] ^
-               T6[(int)((k03 >>  8) & 0xFFL)] ^ T7[(int)((k02      ) & 0xFFL)];
+               T6[(int)((k03 >>  8) & 0xFFL)] ^ T7[(int)( k02        & 0xFFL)];
 
          Kr2 = T0[(int)((k02 >> 56) & 0xFFL)] ^ T1[(int)((k01 >> 48) & 0xFFL)] ^
                T2[(int)((k00 >> 40) & 0xFFL)] ^ T3[(int)((k07 >> 32) & 0xFFL)] ^
                T4[(int)((k06 >> 24) & 0xFFL)] ^ T5[(int)((k05 >> 16) & 0xFFL)] ^
-               T6[(int)((k04 >>  8) & 0xFFL)] ^ T7[(int)((k03      ) & 0xFFL)];
+               T6[(int)((k04 >>  8) & 0xFFL)] ^ T7[(int)( k03        & 0xFFL)];
 
          Kr3 = T0[(int)((k03 >> 56) & 0xFFL)] ^ T1[(int)((k02 >> 48) & 0xFFL)] ^
                T2[(int)((k01 >> 40) & 0xFFL)] ^ T3[(int)((k00 >> 32) & 0xFFL)] ^
                T4[(int)((k07 >> 24) & 0xFFL)] ^ T5[(int)((k06 >> 16) & 0xFFL)] ^
-               T6[(int)((k05 >>  8) & 0xFFL)] ^ T7[(int)((k04      ) & 0xFFL)];
+               T6[(int)((k05 >>  8) & 0xFFL)] ^ T7[(int)( k04        & 0xFFL)];
 
          Kr4 = T0[(int)((k04 >> 56) & 0xFFL)] ^ T1[(int)((k03 >> 48) & 0xFFL)] ^
                T2[(int)((k02 >> 40) & 0xFFL)] ^ T3[(int)((k01 >> 32) & 0xFFL)] ^
                T4[(int)((k00 >> 24) & 0xFFL)] ^ T5[(int)((k07 >> 16) & 0xFFL)] ^
-               T6[(int)((k06 >>  8) & 0xFFL)] ^ T7[(int)((k05      ) & 0xFFL)];
+               T6[(int)((k06 >>  8) & 0xFFL)] ^ T7[(int)( k05        & 0xFFL)];
 
          Kr5 = T0[(int)((k05 >> 56) & 0xFFL)] ^ T1[(int)((k04 >> 48) & 0xFFL)] ^
                T2[(int)((k03 >> 40) & 0xFFL)] ^ T3[(int)((k02 >> 32) & 0xFFL)] ^
                T4[(int)((k01 >> 24) & 0xFFL)] ^ T5[(int)((k00 >> 16) & 0xFFL)] ^
-               T6[(int)((k07 >>  8) & 0xFFL)] ^ T7[(int)((k06      ) & 0xFFL)];
+               T6[(int)((k07 >>  8) & 0xFFL)] ^ T7[(int)( k06        & 0xFFL)];
 
          Kr6 = T0[(int)((k06 >> 56) & 0xFFL)] ^ T1[(int)((k05 >> 48) & 0xFFL)] ^
                T2[(int)((k04 >> 40) & 0xFFL)] ^ T3[(int)((k03 >> 32) & 0xFFL)] ^
                T4[(int)((k02 >> 24) & 0xFFL)] ^ T5[(int)((k01 >> 16) & 0xFFL)] ^
-               T6[(int)((k00 >>  8) & 0xFFL)] ^ T7[(int)((k07      ) & 0xFFL)];
+               T6[(int)((k00 >>  8) & 0xFFL)] ^ T7[(int)( k07        & 0xFFL)];
 
          Kr7 = T0[(int)((k07 >> 56) & 0xFFL)] ^ T1[(int)((k06 >> 48) & 0xFFL)] ^
                T2[(int)((k05 >> 40) & 0xFFL)] ^ T3[(int)((k04 >> 32) & 0xFFL)] ^
                T4[(int)((k03 >> 24) & 0xFFL)] ^ T5[(int)((k02 >> 16) & 0xFFL)] ^
-               T6[(int)((k01 >>  8) & 0xFFL)] ^ T7[(int)((k00      ) & 0xFFL)];
+               T6[(int)((k01 >>  8) & 0xFFL)] ^ T7[(int)( k00        & 0xFFL)];
 
          k00 = Kr0;
          k01 = Kr1;
@@ -405,42 +404,42 @@ public final class Whirlpool extends BaseHash {
          w0 = T0[(int)((nn0 >> 56) & 0xFFL)] ^ T1[(int)((nn7 >> 48) & 0xFFL)] ^
               T2[(int)((nn6 >> 40) & 0xFFL)] ^ T3[(int)((nn5 >> 32) & 0xFFL)] ^
               T4[(int)((nn4 >> 24) & 0xFFL)] ^ T5[(int)((nn3 >> 16) & 0xFFL)] ^
-              T6[(int)((nn2 >>  8) & 0xFFL)] ^ T7[(int)((nn1      ) & 0xFFL)] ^
+              T6[(int)((nn2 >>  8) & 0xFFL)] ^ T7[(int)( nn1        & 0xFFL)] ^
               Kr0;
          w1 = T0[(int)((nn1 >> 56) & 0xFFL)] ^ T1[(int)((nn0 >> 48) & 0xFFL)] ^
               T2[(int)((nn7 >> 40) & 0xFFL)] ^ T3[(int)((nn6 >> 32) & 0xFFL)] ^
               T4[(int)((nn5 >> 24) & 0xFFL)] ^ T5[(int)((nn4 >> 16) & 0xFFL)] ^
-              T6[(int)((nn3 >>  8) & 0xFFL)] ^ T7[(int)((nn2      ) & 0xFFL)] ^
+              T6[(int)((nn3 >>  8) & 0xFFL)] ^ T7[(int)( nn2        & 0xFFL)] ^
               Kr1;
          w2 = T0[(int)((nn2 >> 56) & 0xFFL)] ^ T1[(int)((nn1 >> 48) & 0xFFL)] ^
               T2[(int)((nn0 >> 40) & 0xFFL)] ^ T3[(int)((nn7 >> 32) & 0xFFL)] ^
               T4[(int)((nn6 >> 24) & 0xFFL)] ^ T5[(int)((nn5 >> 16) & 0xFFL)] ^
-              T6[(int)((nn4 >>  8) & 0xFFL)] ^ T7[(int)((nn3      ) & 0xFFL)] ^
+              T6[(int)((nn4 >>  8) & 0xFFL)] ^ T7[(int)( nn3        & 0xFFL)] ^
               Kr2;
          w3 = T0[(int)((nn3 >> 56) & 0xFFL)] ^ T1[(int)((nn2 >> 48) & 0xFFL)] ^
               T2[(int)((nn1 >> 40) & 0xFFL)] ^ T3[(int)((nn0 >> 32) & 0xFFL)] ^
               T4[(int)((nn7 >> 24) & 0xFFL)] ^ T5[(int)((nn6 >> 16) & 0xFFL)] ^
-              T6[(int)((nn5 >>  8) & 0xFFL)] ^ T7[(int)((nn4      ) & 0xFFL)] ^
+              T6[(int)((nn5 >>  8) & 0xFFL)] ^ T7[(int)( nn4        & 0xFFL)] ^
               Kr3;
          w4 = T0[(int)((nn4 >> 56) & 0xFFL)] ^ T1[(int)((nn3 >> 48) & 0xFFL)] ^
               T2[(int)((nn2 >> 40) & 0xFFL)] ^ T3[(int)((nn1 >> 32) & 0xFFL)] ^
               T4[(int)((nn0 >> 24) & 0xFFL)] ^ T5[(int)((nn7 >> 16) & 0xFFL)] ^
-              T6[(int)((nn6 >>  8) & 0xFFL)] ^ T7[(int)((nn5      ) & 0xFFL)] ^
+              T6[(int)((nn6 >>  8) & 0xFFL)] ^ T7[(int)( nn5        & 0xFFL)] ^
               Kr4;
          w5 = T0[(int)((nn5 >> 56) & 0xFFL)] ^ T1[(int)((nn4 >> 48) & 0xFFL)] ^
               T2[(int)((nn3 >> 40) & 0xFFL)] ^ T3[(int)((nn2 >> 32) & 0xFFL)] ^
               T4[(int)((nn1 >> 24) & 0xFFL)] ^ T5[(int)((nn0 >> 16) & 0xFFL)] ^
-              T6[(int)((nn7 >>  8) & 0xFFL)] ^ T7[(int)((nn6      ) & 0xFFL)] ^
+              T6[(int)((nn7 >>  8) & 0xFFL)] ^ T7[(int)( nn6        & 0xFFL)] ^
               Kr5;
          w6 = T0[(int)((nn6 >> 56) & 0xFFL)] ^ T1[(int)((nn5 >> 48) & 0xFFL)] ^
               T2[(int)((nn4 >> 40) & 0xFFL)] ^ T3[(int)((nn3 >> 32) & 0xFFL)] ^
               T4[(int)((nn2 >> 24) & 0xFFL)] ^ T5[(int)((nn1 >> 16) & 0xFFL)] ^
-              T6[(int)((nn0 >>  8) & 0xFFL)] ^ T7[(int)((nn7      ) & 0xFFL)] ^
+              T6[(int)((nn0 >>  8) & 0xFFL)] ^ T7[(int)( nn7        & 0xFFL)] ^
               Kr6;
          w7 = T0[(int)((nn7 >> 56) & 0xFFL)] ^ T1[(int)((nn6 >> 48) & 0xFFL)] ^
               T2[(int)((nn5 >> 40) & 0xFFL)] ^ T3[(int)((nn4 >> 32) & 0xFFL)] ^
               T4[(int)((nn3 >> 24) & 0xFFL)] ^ T5[(int)((nn2 >> 16) & 0xFFL)] ^
-              T6[(int)((nn1 >>  8) & 0xFFL)] ^ T7[(int)((nn0      ) & 0xFFL)] ^
+              T6[(int)((nn1 >>  8) & 0xFFL)] ^ T7[(int)( nn0        & 0xFFL)] ^
               Kr7;
 
          nn0 = w0;

@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseHash.java,v 1.6 2002-01-21 10:06:25 raif Exp $
+// $Id: BaseHash.java,v 1.7 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,9 +31,9 @@ package gnu.crypto.hash;
 // ----------------------------------------------------------------------------
 
 /**
- * A base abstract class to facilitate hash implementations.
+ * <p>A base abstract class to facilitate hash implementations.</p>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public abstract class BaseHash implements IMessageDigest {
 
@@ -46,7 +46,7 @@ public abstract class BaseHash implements IMessageDigest {
    /** The hash (output) size in bytes. */
    protected int hashSize;
 
-   /** The hash block size in bytes. */
+   /** The hash (inner) block size in bytes. */
    protected int blockSize;
 
    /** Number of bytes processed so far. */
@@ -59,7 +59,7 @@ public abstract class BaseHash implements IMessageDigest {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial constructor for use by concrete subclasses.<p>
+    * <p>Trivial constructor for use by concrete subclasses.</p>
     *
     * @param name the canonical name prefix of this instance.
     * @param hashSize the block size of the output in bytes.
@@ -72,10 +72,17 @@ public abstract class BaseHash implements IMessageDigest {
       this.hashSize = hashSize;
       this.blockSize = blockSize;
       this.buffer = new byte[blockSize];
+
+      resetContext();
    }
 
-   // IMessageDigest interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
+
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // IMessageDigest interface implementation ---------------------------------
 
    public String name() {
       return name;
@@ -83,6 +90,10 @@ public abstract class BaseHash implements IMessageDigest {
 
    public int hashSize() {
       return hashSize;
+   }
+
+   public int blockSize() {
+      return blockSize;
    }
 
    public void update(byte b) {
@@ -134,16 +145,15 @@ public abstract class BaseHash implements IMessageDigest {
       resetContext();
    }
 
-   // methods to be implemented by concrete subclasses
-   // -------------------------------------------------------------------------
+   // methods to be implemented by concrete subclasses ------------------------
 
    public abstract Object clone();
 
    public abstract boolean selfTest();
 
    /**
-    * Returns the byte array to use as padding before completing a hash
-    * operation.<p>
+    * <p>Returns the byte array to use as padding before completing a hash
+    * operation.</p>
     *
     * @return the bytes to pad the remaining bytes in the buffer before
     * completing a hash operation.
@@ -151,7 +161,7 @@ public abstract class BaseHash implements IMessageDigest {
    protected abstract byte[] padBuffer();
 
    /**
-    * Constructs the result from the contents of the current context.<p>
+    * <p>Constructs the result from the contents of the current context.</p>
     *
     * @return the output of the completed hash operation.
     */
@@ -161,7 +171,7 @@ public abstract class BaseHash implements IMessageDigest {
    protected abstract void resetContext();
 
    /**
-    * The block digest transformation per se.<p>
+    * <p>The block digest transformation per se.</p>
     *
     * @param in the <i>blockSize</i> long block, as an array of bytes to digest.
     * @param offset the index where the data to digest is located within the

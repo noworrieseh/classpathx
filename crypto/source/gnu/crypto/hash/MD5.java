@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: MD5.java,v 1.2 2002-01-11 21:55:08 raif Exp $
+// $Id: MD5.java,v 1.3 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -33,46 +33,36 @@ package gnu.crypto.hash;
 import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
-
 /**
- * The MD5 message-digest algorithm takes as input a message of arbitrary
+ * <p>The MD5 message-digest algorithm takes as input a message of arbitrary
  * length and produces as output a 128-bit "fingerprint" or "message digest" of
  * the input. It is conjectured that it is computationally infeasible to
  * produce two messages having the same message digest, or to produce any
- * message having a given prespecified target message digest.<p>
+ * message having a given prespecified target message digest.</p>
  *
- * References:<br>
- * The <a href="http://www.ietf.org/rfc/rfc1321.txt">MD5</a> Message-Digest
- * Algorithm.<br>
- * R. Rivest.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.2 $
+ * <ol>
+ *    <li>The <a href="http://www.ietf.org/rfc/rfc1321.txt">MD5</a> Message-
+ *    Digest Algorithm.<br>
+ *    R. Rivest.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.3 $
  */
 public class MD5 extends BaseHash {
-
-   // Debugging methods and variables
-   // -------------------------------------------------------------------------
-
-   private static final String NAME = "md5";
-   private static final boolean DEBUG = false;
-   private static final int debuglevel = 9;
-   private static final PrintWriter err = new PrintWriter(System.out, true);
-   private static void debug(String s) {
-      err.println(">>> "+NAME+": "+s);
-   }
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   private static final int BLOCK_SIZE = 64; // default block size in bytes
+   private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
-   /** 128-bit interim result. */
-   private int h0, h1, h2, h3;
+   private static final String DIGEST0 = "D41D8CD98F00B204E9800998ECF8427E";
 
    private final int[] X = new int[16];
 
-   private static final String DIGEST0 = "D41D8CD98F00B204E9800998ECF8427E";
+   /** 128-bit interim result. */
+   private int h0, h1, h2, h3;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -80,12 +70,10 @@ public class MD5 extends BaseHash {
    /** Trivial 0-arguments constructor. */
    public MD5() {
       super(Registry.MD5_HASH, 16, BLOCK_SIZE);
-
-      resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.<p>
+    * <p>Private constructor for cloning purposes.</p>
     *
     * @param md the instance to clone.
     */
@@ -100,23 +88,26 @@ public class MD5 extends BaseHash {
       this.buffer = (byte[]) md.buffer.clone();
    }
 
-   // Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
 
-   /** @return a cloned copy of this instance. */
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
    public Object clone() {
       return new MD5(this);
    }
 
-   // Implementation of concrete methods in BaseHash
-   // -------------------------------------------------------------------------
+   // Implementation of concrete methods in BaseHash --------------------------
 
    protected void transform(byte[] in, int offset) {
       for (int i = 0; i < 16; i++) {
          X[i] = (in[offset++] & 0xFF)       |
                 (in[offset++] & 0xFF) <<  8 |
                 (in[offset++] & 0xFF) << 16 |
-                (in[offset++] & 0xFF) << 24;
+                 in[offset++]         << 24;
       }
 
       int A = h0;
@@ -260,8 +251,7 @@ public class MD5 extends BaseHash {
       return DIGEST0.equals(Util.toString(new MD5().digest()));
    }
 
-   // helper methods
-   // -------------------------------------------------------------------------
+   // helper methods ----------------------------------------------------------
 
    private static final int FF(int a, int b, int c, int d, int k, int s, int i) {
       a += ((b & c) | (~b & d)) + k + i;

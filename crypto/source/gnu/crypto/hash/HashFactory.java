@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: HashFactory.java,v 1.5 2002-01-11 21:55:08 raif Exp $
+// $Id: HashFactory.java,v 1.6 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -34,13 +34,12 @@ import gnu.crypto.Registry;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A Factory to instantiate message digest algorithm instances.<p>
+ * <p>A <i>Factory</i> to instantiate message digest algorithm instances.</p>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class HashFactory implements Registry {
 
@@ -50,7 +49,7 @@ public class HashFactory implements Registry {
    // Constructor(s)
    // -------------------------------------------------------------------------
 
-   /** Trivial constructor to enforce Singleton pattern. */
+   /** Trivial constructor to enforce <i>Singleton</i> pattern. */
    private HashFactory() {
       super();
    }
@@ -59,9 +58,9 @@ public class HashFactory implements Registry {
    // -------------------------------------------------------------------------
 
    /**
-    * Return an instance of a hash algorithm given its name.<p>
+    * <p>Return an instance of a hash algorithm given its name.</p>
     *
-    * @param algorithm the name of the hash algorithm.
+    * @param name the name of the hash algorithm.
     * @return an instance of the hash algorithm, or null if none found.
     * @exception InternalError if the implementation does not pass its self-
     * test.
@@ -98,10 +97,10 @@ public class HashFactory implements Registry {
    }
 
    /**
-    * Returns a {@link java.util.Set} of names of hash algorithms supported by
-    * this <i>Factory</i>.<p>
+    * <p>Returns a {@link Set} of names of hash algorithms supported by this
+    * <i>Factory</i>.</p>
     *
-    * @return a {@link java.util.Set} of hash names (Strings).
+    * @return a {@link Set} of hash names (Strings).
     */
    public static final Set getNames() {
       HashSet hs = new HashSet();

@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: RipeMD128.java,v 1.4 2002-01-11 21:55:08 raif Exp $
+// $Id: RipeMD128.java,v 1.5 2002-05-14 08:50:38 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -33,41 +33,27 @@ package gnu.crypto.hash;
 import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
-
 /**
- * RIPEMD-128 is a 128-bit message digest.<p>
+ * <p>RIPEMD-128 is a 128-bit message digest.</p>
  *
- * References:<br>
- * <a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html">RIPEMD160</a>
- * : A Strengthened Version of RIPEMD.<br>
- * Hans Dobbertin, Antoon Bosselaers and Bart Preneel.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.4 $
+ * <ol>
+ *    <li><a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html">
+ *    RIPEMD160</a>: A Strengthened Version of RIPEMD.<br>
+ *    Hans Dobbertin, Antoon Bosselaers and Bart Preneel.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.5 $
  */
 public class RipeMD128 extends BaseHash {
-
-   // Debugging methods and variables
-   // -------------------------------------------------------------------------
-
-   private static final String NAME = "ripemd128";
-   private static final boolean DEBUG = false;
-   private static final int debuglevel = 9;
-   private static final PrintWriter err = new PrintWriter(System.out, true);
-   private static void debug(String s) {
-      err.println(">>> "+NAME+": "+s);
-   }
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   private static final int BLOCK_SIZE = 64; // block size in bytes
+   private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
-   /** 128-bit h0, h1, h2, h3 (interim result) */
-   private int h0, h1, h2, h3;
-
-   /** 512 bits work buffer = 16 x 32-bit words */
-   private int[] X = new int[16];
+   private static final String DIGEST0 = "CDF26213A150DC3ECB610F18F6B38B46";
 
    /** Constants for the transform method. */
    // selection of message word
@@ -100,7 +86,11 @@ public class RipeMD128 extends BaseHash {
       15,  5,  8, 11, 14, 14,  6, 14,  6,  9, 12,  9, 12,  5, 15,  8
    };
 
-   private static final String DIGEST0 = "CDF26213A150DC3ECB610F18F6B38B46";
+   /** 128-bit h0, h1, h2, h3 (interim result) */
+   private int h0, h1, h2, h3;
+
+   /** 512 bits work buffer = 16 x 32-bit words */
+   private int[] X = new int[16];
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -108,12 +98,10 @@ public class RipeMD128 extends BaseHash {
    /** Trivial 0-arguments constructor. */
    public RipeMD128() {
       super(Registry.RIPEMD128_HASH, 16, BLOCK_SIZE);
-
-      resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.<p>
+    * <p>Private constructor for cloning purposes.</p>
     *
     * @param md the instance to clone.
     */
@@ -128,16 +116,19 @@ public class RipeMD128 extends BaseHash {
       this.buffer = (byte[]) md.buffer.clone();
    }
 
-   // Cloneable interface implementation
+   // Class methods
    // -------------------------------------------------------------------------
 
-   /** @return a cloned copy of this instance. */
+   // Instance methods
+   // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
    public Object clone() {
       return new RipeMD128(this);
    }
 
-   // Implementation of concrete methods in BaseHash
-   // -------------------------------------------------------------------------
+   // Implementation of concrete methods in BaseHash --------------------------
 
    protected void transform (byte[] in, int offset) {
       int A, B, C, D, Ap, Bp, Cp, Dp, T, s, i;
@@ -148,7 +139,7 @@ public class RipeMD128 extends BaseHash {
          X[i] = (in[offset++] & 0xFF)       |
                 (in[offset++] & 0xFF) <<  8 |
                 (in[offset++] & 0xFF) << 16 |
-                (in[offset++] & 0xFF) << 24;
+                 in[offset++]         << 24;
       }
 
       A = Ap = h0;

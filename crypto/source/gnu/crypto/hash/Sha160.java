@@ -1,9 +1,9 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: Sha160.java,v 1.4 2002-01-11 21:55:08 raif Exp $
+// $Id: Sha160.java,v 1.5 2002-05-14 08:50:38 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -33,10 +33,8 @@ package gnu.crypto.hash;
 import gnu.crypto.Registry;
 import gnu.crypto.util.Util;
 
-import java.io.PrintWriter;
-
 /**
- * The Secure Hash Algorithm (SHA-1) is required for use with the Digital
+ * <p>The Secure Hash Algorithm (SHA-1) is required for use with the Digital
  * Signature Algorithm (DSA) as specified in the Digital Signature Standard
  * (DSS) and whenever a secure hash algorithm is required for federal
  * applications. For a message of length less than 2^64 bits, the SHA-1
@@ -45,44 +43,37 @@ import java.io.PrintWriter;
  * message. The SHA-1 is also used to compute a message digest for the received
  * version of the message during the process of verifying the signature. Any
  * change to the message in transit will, with very high probability, result in
- * a different message digest, and the signature will fail to verify.<p>
+ * a different message digest, and the signature will fail to verify.</p>
  *
- * The SHA-1 is designed to have the following properties: it is
+ * <p>The SHA-1 is designed to have the following properties: it is
  * computationally infeasible to find a message which corresponds to a given
  * message digest, or to find two different messages which produce the same
- * message digest.<p>
+ * message digest.</p>
  *
- * References:<br>
- * <a href="http://www.itl.nist.gov/fipspubs/fip180-1.htm">SECURE HASH
- * STANDARD</a><br>
- * Federal Information, Processing Standards Publication 180-1, 1995 April 17.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.4 $
+ * <ol>
+ *    <li><a href="http://www.itl.nist.gov/fipspubs/fip180-1.htm">SECURE HASH
+ *    STANDARD</a><br>
+ *    Federal Information, Processing Standards Publication 180-1, 1995 April 17.
+ *    </li>
+ * </ol>
+ *
+ * @version $Revision: 1.5 $
  */
 public class Sha160 extends BaseHash {
-
-   // Debugging methods and variables
-   // -------------------------------------------------------------------------
-
-   private static final String NAME = "sha-160";
-   private static final boolean DEBUG = false;
-   private static final int debuglevel = 9;
-   private static final PrintWriter err = new PrintWriter(System.out, true);
-   private static void debug(String s) {
-      err.println(">>> "+NAME+": "+s);
-   }
 
    // Constants and variables
    // -------------------------------------------------------------------------
 
-   private static final int BLOCK_SIZE = 64; // default block size in bytes
+   private static final int BLOCK_SIZE = 64; // inner block size in bytes
 
-   /** 160-bit interim result. */
-   private int h0, h1, h2, h3, h4;
+   private static final String DIGEST0 = "A9993E364706816ABA3E25717850C26C9CD0D89D";
 
    private final int[] W = new int[80];
 
-   private static final String DIGEST0 = "A9993E364706816ABA3E25717850C26C9CD0D89D";
+   /** 160-bit interim result. */
+   private int h0, h1, h2, h3, h4;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -90,12 +81,10 @@ public class Sha160 extends BaseHash {
    /** Trivial 0-arguments constructor. */
    public Sha160() {
       super(Registry.SHA160_HASH, 20, BLOCK_SIZE);
-
-      resetContext();
    }
 
    /**
-    * private constructor for cloning purposes.<p>
+    * <p>Private constructor for cloning purposes.</p>
     *
     * @param md the instance to clone.
     */
@@ -132,16 +121,16 @@ public class Sha160 extends BaseHash {
       return sha(h0, h1, h2, h3, h4, w);
    }
 
-   // Cloneable interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
 
-   /** @return a cloned copy of this instance. */
+   // java.lang.Cloneable interface implementation ----------------------------
+
    public Object clone() {
       return new Sha160(this);
    }
 
-   // Implementation of concrete methods in BaseHash
-   // -------------------------------------------------------------------------
+   // Implementation of concrete methods in BaseHash --------------------------
 
    protected void transform(byte[] in, int offset) {
       int i, T;
@@ -218,8 +207,7 @@ public class Sha160 extends BaseHash {
       return DIGEST0.equals(result);
    }
 
-   // SHA specific methods
-   // -------------------------------------------------------------------------
+   // SHA specific methods ----------------------------------------------------
 
    private static final int[]
    sha(int h0, int h1, int h2, int h3, int h4, int[] w) {
