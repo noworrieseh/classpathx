@@ -16,8 +16,7 @@ protocol=pop3; type=store; class=gnu.mail.providers.pop3.POP3Store; vendor=dog@g
 
 
 #if the user selected the imap provider
-protocol=imap; type=store; class=gnu.mail.providers.imap4.IMAPStore; vendor=dog@gnu.org;
-#protocol=imap4; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=nferrier@tapsellferrier.co.uk;
+protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
 
 
 #the user almost always needs SMTP

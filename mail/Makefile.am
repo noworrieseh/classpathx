@@ -126,26 +126,26 @@ source/gnu/mail/util/UUDecoderStream.java \
 source/gnu/mail/util/UUEncoderStream.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
-# The IMAP4 provider
-IMAP_JAVASRC = source/gnu/mail/providers/imap4/BASE64.java \
-source/gnu/mail/providers/imap4/IMAPBodyPart.java \
-source/gnu/mail/providers/imap4/IMAPCommand.java \
-source/gnu/mail/providers/imap4/IMAPConnection.java \
-source/gnu/mail/providers/imap4/IMAPConstants.java \
-source/gnu/mail/providers/imap4/IMAPException.java \
-source/gnu/mail/providers/imap4/IMAPFolder.java \
-source/gnu/mail/providers/imap4/IMAPMessage.java \
-source/gnu/mail/providers/imap4/IMAPMultipart.java \
-source/gnu/mail/providers/imap4/IMAPMultipartDataSource.java \
-source/gnu/mail/providers/imap4/IMAPResponse.java \
-source/gnu/mail/providers/imap4/IMAPResponseTokenizer.java \
-source/gnu/mail/providers/imap4/IMAPStore.java \
-source/gnu/mail/providers/imap4/IMAPTest.java \
-source/gnu/mail/providers/imap4/ListEntry.java \
-source/gnu/mail/providers/imap4/MailboxStatus.java \
-source/gnu/mail/providers/imap4/MessageStatus.java \
-source/gnu/mail/providers/imap4/Pair.java \
-source/gnu/mail/providers/imap4/UTF7imap.java
+# The IMAP provider
+IMAP_JAVASRC = source/gnu/mail/providers/imap/BASE64.java \
+source/gnu/mail/providers/imap/IMAPBodyPart.java \
+source/gnu/mail/providers/imap/IMAPCommand.java \
+source/gnu/mail/providers/imap/IMAPConnection.java \
+source/gnu/mail/providers/imap/IMAPConstants.java \
+source/gnu/mail/providers/imap/IMAPException.java \
+source/gnu/mail/providers/imap/IMAPFolder.java \
+source/gnu/mail/providers/imap/IMAPMessage.java \
+source/gnu/mail/providers/imap/IMAPMultipart.java \
+source/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
+source/gnu/mail/providers/imap/IMAPResponse.java \
+source/gnu/mail/providers/imap/IMAPResponseTokenizer.java \
+source/gnu/mail/providers/imap/IMAPStore.java \
+source/gnu/mail/providers/imap/IMAPTest.java \
+source/gnu/mail/providers/imap/ListEntry.java \
+source/gnu/mail/providers/imap/MailboxStatus.java \
+source/gnu/mail/providers/imap/MessageStatus.java \
+source/gnu/mail/providers/imap/Pair.java \
+source/gnu/mail/providers/imap/UTF7imap.java
 
 # The SMTP provider
 SMTP_JAVASRC = source/gnu/mail/providers/smtp/BASE64.java \
