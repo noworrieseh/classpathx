@@ -1,3 +1,8 @@
+2004-10-27  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: Added JAXP XPath implementation. Variable references and
+   	function calls now use JAXP resolver callback interfaces.
+   	
 2004-10-20  Chris Burdess  <dog@gnu.org>
 
    	* all: Updates to bring API in line with JAXP 1.3: introduction of

@@ -355,6 +355,9 @@ $(src)/gnu/xml/xpath/Selector.java \
 $(src)/gnu/xml/xpath/Step.java \
 $(src)/gnu/xml/xpath/Test.java \
 $(src)/gnu/xml/xpath/UnionExpr.java \
+$(src)/gnu/xml/xpath/VariableReference.java \
+$(src)/gnu/xml/xpath/XPathImpl.java \
+$(src)/gnu/xml/xpath/XPathFactoryImpl.java \
 $(src)/gnu/xml/xpath/XPathTokenizer.java \
 $(src)/gnu/xml/xpath/XPathParser.java \
 $(src)/gnu/xml/util/DoParse.java \
