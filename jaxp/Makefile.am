@@ -285,7 +285,7 @@ libxmlj_la_DEPENDENCIES = \
 	gnu_xml_libxmlj_transform_JavaContext.h \
 	gnu_xml_libxmlj_transform_LibxmlDocument.h
 
-libxmlj_la_SOURCES = src/libxsltj.c src/xmlj_io.c src/xmlj_error.c
+libxmlj_la_SOURCES = source/libxsltj.c source/xmlj_io.c source/xmlj_error.c
 libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 
@@ -303,46 +303,46 @@ javax_xml_transform_%.h:
 	@JAVAH@ -jni javax.xml.transform.$*
 
 ## Rule for compiling Java source files
-##gnu/xml/aelfred2/%.class: @srcdir@/src/gnu/xml/aelfred2/%.java
+##gnu/xml/aelfred2/%.class: @srcdir@/source/gnu/xml/aelfred2/%.java
 ##	echo "Compiling $*.java..."
 ##	@JAVAC@ @JAVACFLAGS@ \
 ##		-d . \
-##		-classpath "${CLASSPATH}:@srcdir@/src:." $<
+##		-classpath "${CLASSPATH}:@srcdir@/source:." $<
 ##
-##gnu/xml/dom/%.class: @srcdir@/src/gnu/xml/dom/%.java
+##gnu/xml/dom/%.class: @srcdir@/source/gnu/xml/dom/%.java
 ##	echo "Compiling $*.java..."
 ##	@JAVAC@ @JAVACFLAGS@ \
 ##		-d . \
-##		-classpath "${CLASSPATH}:@srcdir@/src:." $<
+##		-classpath "${CLASSPATH}:@srcdir@/source:." $<
 ##
-##	@srcdir@/src/gnu/xml/util/%.java \
-##		@srcdir@/src/gnu/xml/pipeline/%.java \
-##		@srcdir@/src/gnu/xml/libxmlj/transform/%.java \
-##		@srcdir@/src/org/w3c/dom/css/%.java \
-##		@srcdir@/src/org/w3c/dom/events/%.java \
-##		@srcdir@/src/org/w3c/dom/html/%.java \
-##		@srcdir@/src/org/w3c/dom/ranges/%.java \
-##		@srcdir@/src/org/w3c/dom/stylesheets/%.java \
-##		@srcdir@/src/org/w3c/dom/traversal/%.java \
-##		@srcdir@/src/org/w3c/dom/views/%.java \
-##		@srcdir@/src/org/xml/sax/ext/%.java \
-##		@srcdir@/src/org/xml/sax/helpers/%.java \
-##		@srcdir@/src/javax/xml/transform/dom/%.java \
-##		@srcdir@/src/javax/xml/transform/sax/%.java \
-##		@srcdir@/src/javax/xml/transform/stream/%.java
+##	@srcdir@/source/gnu/xml/util/%.java \
+##		@srcdir@/source/gnu/xml/pipeline/%.java \
+##		@srcdir@/source/gnu/xml/libxmlj/transform/%.java \
+##		@srcdir@/source/org/w3c/dom/css/%.java \
+##		@srcdir@/source/org/w3c/dom/events/%.java \
+##		@srcdir@/source/org/w3c/dom/html/%.java \
+##		@srcdir@/source/org/w3c/dom/ranges/%.java \
+##		@srcdir@/source/org/w3c/dom/stylesheets/%.java \
+##		@srcdir@/source/org/w3c/dom/traversal/%.java \
+##		@srcdir@/source/org/w3c/dom/views/%.java \
+##		@srcdir@/source/org/xml/sax/ext/%.java \
+##		@srcdir@/source/org/xml/sax/helpers/%.java \
+##		@srcdir@/source/javax/xml/transform/dom/%.java \
+##		@srcdir@/source/javax/xml/transform/sax/%.java \
+##		@srcdir@/source/javax/xml/transform/stream/%.java
 ##
 ##
-##		@srcdir@/src/javax/xml/parsers/%.java \
-##		@srcdir@/src/javax/xml/transform/%.java \
+##		@srcdir@/source/javax/xml/parsers/%.java \
+##		@srcdir@/source/javax/xml/transform/%.java \
 # Rule for compiling Java source files
-org/%.class: @srcdir@/src/org/%.java
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
+org/%.class: @srcdir@/source/org/%.java
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/source:." $<
 
-javax/%.class: @srcdir@/src/javax/%.java
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
+javax/%.class: @srcdir@/source/javax/%.java
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/source:." $<
 
-gnu/%.class: @srcdir@/src/gnu/%.java
-	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/src:." $<
+gnu/%.class: @srcdir@/source/gnu/%.java
+	@JAVAC@ @JAVACFLAGS@ -d . -classpath "${CLASSPATH}:@srcdir@/source:." $<
 
 # Jar file
 
@@ -363,8 +363,8 @@ check-local: gnu/xml/libxmlj/transform/TransformTest.class
 	diff @srcdir@/testdocs/transformed.xml transformed.xml
 
 dist-hook:
-	mkdir $(distdir)/src/gnu
-	cp -r $(srcdir)/src/gnu/* $(distdir)/src/gnu
+	mkdir $(distdir)/source/gnu
+	cp -r $(srcdir)/source/gnu/* $(distdir)/source/gnu
 	mkdir $(distdir)/testdocs
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
 
