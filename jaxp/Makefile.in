@@ -230,6 +230,7 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/XmlParser.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/XmlReader.java \
 	$(SOURCEDIR)/gnu/xml/aelfred2/JAXPFactory.java \
+	$(SOURCEDIR)/gnu/xml/pipeline/CallFilter.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/DomConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/EventConsumer.java \
 	$(SOURCEDIR)/gnu/xml/pipeline/EventFilter.java \
