@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.24 2001-11-19 18:27:20 db Exp $
+ * $Id: SAXDriver.java,v 1.25 2001-12-05 20:33:45 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -29,6 +29,10 @@
 // Copyright (c) 1998 by Microstar Software Ltd.
 // From Microstar's README (the entire original license):
 //
+//	Separate statements also said it's in the public domain.
+//	All modifications are distributed under the license
+//	above (GPL with library exception).
+//
 // AElfred is free for both commercial and non-commercial use and
 // redistribution, provided that Microstar's copyright and disclaimer are
 // retained intact.  You are free to modify AElfred for your own use and
@@ -52,7 +56,7 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Stack;
 
-// maintaining 1.1 compatibility for now ...
+// maintaining 1.1 compatibility for now ... more portable, PJava, etc
 // Iterator, Hashmap and ArrayList ought to be faster
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -63,7 +67,7 @@ import org.xml.sax.ext.*;
 import org.xml.sax.helpers.NamespaceSupport;
 
 
-// $Id: SAXDriver.java,v 1.24 2001-11-19 18:27:20 db Exp $
+// $Id: SAXDriver.java,v 1.25 2001-12-05 20:33:45 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -120,7 +124,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-19 18:27:20 $
+ * @version $Date: 2001-12-05 20:33:45 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
