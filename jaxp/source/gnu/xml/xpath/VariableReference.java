@@ -40,6 +40,7 @@ package gnu.xml.xpath;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathVariableResolver;
+import org.w3c.dom.Node;
 
 class VariableReference
   extends Expr

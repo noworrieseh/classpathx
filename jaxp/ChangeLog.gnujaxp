@@ -1,3 +1,8 @@
+2004-10-28  Chris Burdess  <dog@gnu.org>
+
+   	* xpath: Implemented XPathFactory.newInstance(); added missing
+   	imports in GNU implementation.
+   	
 2004-10-27  Chris Burdess  <dog@gnu.org>
 
    	* xpath: Added JAXP XPath implementation. Variable references and

@@ -40,9 +40,13 @@ package gnu.xml.xpath;
 
 import java.io.IOException;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
+import org.xml.sax.InputSource;
 
 /**
  * JAXP XPath implementation.
