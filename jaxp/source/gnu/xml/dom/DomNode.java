@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.7 2001-11-04 03:43:20 db Exp $
+ * $Id: DomNode.java,v 1.8 2001-11-16 22:46:54 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.7 2001-11-04 03:43:20 db Exp $
+// $Id: DomNode.java,v 1.8 2001-11-16 22:46:54 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-11-04 03:43:20 $
+ * @version $Date: 2001-11-16 22:46:54 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -883,7 +883,7 @@ public abstract class DomNode
      * attribute nodes.
      */
     public String getLocalName ()
-	{ return getNodeName (); }
+	{ return null; }
 
     
     /**
