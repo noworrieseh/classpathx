@@ -414,7 +414,7 @@ public class MimeMessage
   // -- To --
   
   /**
-   * Returns the recepients specified by the type.
+   * Returns the recipients specified by the type.
    * The mapping between the type and the corresponding RFC 822 header 
    * is as follows:
    * <dl>

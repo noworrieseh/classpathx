@@ -1,0 +1,8 @@
+The IMAP4 provider is a separate IMAP provider, written from scratch for
+performance and to remove the Scheme-interpreter dependency.
+
+It uses a generic IMAPConnection object to manage the IMAP protocol level.
+
+This provider is still under active development: use at your own risk!
+
+If you want to help get it stable, please contact dog@gnu.org

@@ -1,11 +1,14 @@
 /*
- * MultipartRelated.java
- * Copyright (C) 2003 dog <dog@dog.net.uk>
+ * MailboxStatus.java
+ * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
+ * 
+ * You also have permission to link it with the Sun Microsystems, Inc. 
+ * JavaMail(tm) extension and run that combination.
  * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,22 +20,33 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package gnu.mail.handler;
+package gnu.mail.providers.imap4;
+
+import java.util.List;
 
 /**
- * A JAF data content handler for the multipart/related MIME content
- * type.
+ * Represents the state of a mailbox.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 0.1
  */
-public final class MultipartRelated
-  extends Multipart
+public class MailboxStatus
 {
 
-  /**
-   * Constructor for multipart/related.
-   */
-  public MultipartRelated()
-  {
-    super("multipart/related", "multipart");
-  }
+  public int messageCount = -1;
+
+  public int newMessageCount = -1;
+
+  public int firstUnreadMessage = -1;
+
+  public int uidNext = -1;
+  
+  public int uidValidity = -1;
+
+  public List flags;
+
+  public List permanentFlags;
+
+  public boolean readWrite;
   
 }

@@ -3,7 +3,8 @@ AC_INIT(source/javax/mail/Session.java)
 
 dnl Tool discovery
 
-AC_PATH_PROG(JAR_TOOL, jar,)
+AC_PATH_PROG(JAR, jar,)
+dnl AC_PATH_PROG(JAVAC, gcj, javac,)
 
 AC_PROG_JAVA_CC(javac gcj)
 

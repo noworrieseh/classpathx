@@ -5,11 +5,15 @@
 empty:=
 space:=$(empty) $(empty)
 
-# Set by configure.
-PROJECTROOT = @srcdir@
-JAVAC = @JAVA_CC@
-JAVAC_OPTS = @JAVA_CC_OPTS@
-JAR = @JAR_TOOL@
+# Set by configure. TODO
+#PROJECTROOT = @srcdir@
+#JAVAC = @JAVA_CC@
+#JAVAC_OPTS = @JAVA_CC_OPTS@
+#JAR = @JAR_TOOL@
+PROJECTROOT = .
+JAVAC = /usr/bin/javac
+JAVAC_OPTS = 
+JAR = /usr/bin/jar
 
 # The default is to just build the jar file.
 all: mail.jar
@@ -26,7 +30,7 @@ META-INF:
 	mkdir $@
 
 # TODO generate these correctly from the .in files using configure options
-META-INF/javamail.default.address.map: META-INF $(PROJECTROOT)/javamail.address.amp.in
+META-INF/javamail.default.address.map: META-INF $(PROJECTROOT)/javamail.address.map.in
 	cp $(PROJECTROOT)/javamail.address.map.in $@
 
 META-INF/javamail.default.providers: META-INF $(PROJECTROOT)/javamail.providers.in

@@ -1,11 +1,14 @@
 /*
- * MultipartRelated.java
- * Copyright (C) 2003 dog <dog@dog.net.uk>
+ * IMAPException.java
+ * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2 of the License, or (at your option) any later version.
+ * 
+ * You also have permission to link it with the Sun Microsystems, Inc. 
+ * JavaMail(tm) extension and run that combination.
  * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,22 +20,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package gnu.mail.handler;
+package gnu.mail.providers.imap4;
+
+import java.io.IOException;
 
 /**
- * A JAF data content handler for the multipart/related MIME content
- * type.
+ * Exception corresponding to an IMAP4 BAD or NO server response.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 0.1
  */
-public final class MultipartRelated
-  extends Multipart
+public class IMAPException
+  extends IOException
 {
 
   /**
-   * Constructor for multipart/related.
+   * ID of the exception (BAD or NO).
    */
-  public MultipartRelated()
+  protected String id;
+  
+  public IMAPException(String id, String message)
   {
-    super("multipart/related", "multipart");
+    super(message);
+    this.id = id;
+  }
+
+  public String getId()
+  {
+    return id;
   }
   
 }

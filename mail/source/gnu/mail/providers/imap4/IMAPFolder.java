@@ -1,0 +1,422 @@
+/*
+ * IMAPFolder.java
+ * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ * 
+ * You also have permission to link it with the Sun Microsystems, Inc. 
+ * JavaMail(tm) extension and run that combination.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+package gnu.mail.providers.imap4;
+
+import java.io.IOException;
+import javax.mail.FetchProfile;
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.FolderNotFoundException;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Store;
+import javax.mail.event.ConnectionEvent;
+
+/**
+ * The folder class implementing the IMAP4rev1 mail protocol.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 0.1
+ */
+public class IMAPFolder 
+  extends Folder 
+{
+
+  /**
+   * The folder path.
+   */
+  protected String path;
+
+  /**
+   * The type of this folder (HOLDS_MESSAGES or HOLDS_FOLDERS).
+   */
+  protected int type;
+
+  /**
+   * The open state of this folder (READ_ONLY, READ_WRITE, or -1).
+   */
+  protected int mode;
+
+  protected Flags permanentFlags = new Flags();
+
+  protected char delimiter = '\u0000';
+
+  /**
+   * Constructor.
+   */
+  protected IMAPFolder(Store store, String path) 
+  {
+    super(store);
+    this.path = path;
+  }
+
+  /**
+   * Returns the name of this folder.
+   */
+  public String getName() 
+  {
+    int di = path.lastIndexOf(delimiter);
+    return (di==-1) ? path : path.substring(di+1);
+  }
+
+  /**
+   * Returns the full path of this folder.
+   */
+  public String getFullName()
+  {
+    return path;
+  }
+
+  /**
+   * Returns the type of this folder.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public int getType() 
+    throws MessagingException 
+  {
+    // TODO
+    return type;
+  }
+
+  /**
+   * Indicates whether this folder exists.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public boolean exists() 
+    throws MessagingException 
+  {
+    return false; // TODO
+  }
+
+  /**
+   * Indicates whether this folder contains new messages.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public boolean hasNewMessages() 
+    throws MessagingException 
+  {
+    return getNewMessageCount()>0; // TODO
+  }
+
+  /**
+   * Opens this folder.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public void open(int mode) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      MailboxStatus ms = null;
+      switch (mode)
+      {
+        case READ_WRITE:
+          ms = connection.select(getFullName());
+          this.mode = mode;
+          break;
+        case READ_ONLY:
+          ms = connection.examine(getFullName());
+          this.mode = mode;
+          break;
+        default:
+          throw new MessagingException("No such mode: "+mode);
+      }
+      if (ms==null)
+        throw new FolderNotFoundException(this);
+      // TODO update this from ms ?
+      notifyConnectionListeners(ConnectionEvent.OPENED);
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Create this folder.
+   */
+  public boolean create(int type) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      String path = this.path;
+      if (type==HOLDS_FOLDERS)
+        path = new StringBuffer(path)
+          .append(getSeparator())
+          .toString();
+      return connection.create(path); 
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Delete this folder.
+   */
+  public boolean delete(boolean flag) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      return connection.delete(path);
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Rename this folder.
+   */
+  public boolean renameTo(Folder folder) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      return connection.rename(path, folder.getFullName());
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Closes this folder.
+   * @param expunge if the folder is to be expunged before it is closed
+   * @exception MessagingException if a messaging error occurred
+   */
+  public void close(boolean expunge) 
+    throws MessagingException 
+  {
+    if (!isOpen())
+      throw new MessagingException("Folder is not open");
+    if (expunge)
+      expunge();
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      connection.close();
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+    mode = -1;
+    notifyConnectionListeners(ConnectionEvent.CLOSED);
+  }
+
+  /**
+   * Expunges this folder.
+   * This deletes all the messages marked as deleted.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public Message[] expunge() 
+    throws MessagingException 
+  {
+    if (!isOpen())
+      throw new MessagingException("Folder is not open");
+    if (mode==READ_ONLY)
+      throw new MessagingException("Folder was opened read-only");
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      int[] messageNumbers = connection.expunge();
+      // construct empty IMAPMessages for the messageNumbers
+      IMAPMessage[] messages = new IMAPMessage[messageNumbers.length];
+      for (int i=0; i<messages.length; i++)
+        messages[i] = new IMAPMessage(this, messageNumbers[i]);
+      return messages;
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Indicates whether this folder is open.
+   */
+  public boolean isOpen() 
+  {
+    return (mode!=-1);
+  }
+
+  /**
+   * Returns the permanent flags for this folder.
+   */
+  public Flags getPermanentFlags() 
+  {
+    return permanentFlags;
+  }
+
+  /**
+   * Returns the number of messages in this folder.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public int getMessageCount() 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      String[] items = new String[1];
+      items[0] = IMAPConnection.MESSAGES;
+      MailboxStatus ms = connection.status(path, items);
+      return ms.messageCount;
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Returns the specified message number from this folder.
+   * The message is only retrieved once from the server.
+   * Subsequent getMessage() calls to the same message are cached.
+   * Since POP3 does not provide a mechanism for retrieving only part of
+   * the message (headers, etc), the entire message is retrieved.
+   * @exception MessagingException if a messaging error occurred
+   */
+  public Message getMessage(int msgnum) 
+    throws MessagingException 
+  {
+    if (!isOpen())
+      throw new MessagingException("Folder is not open");
+    return new IMAPMessage(this, msgnum);
+  }
+
+  public void appendMessages(Message[] messages) 
+    throws MessagingException 
+  {
+    // TODO
+  }
+
+  public void fetch(Message[] messages, FetchProfile fetchprofile) 
+    throws MessagingException 
+  {
+    // TODO
+  }
+
+  /**
+   * Returns the subfolders for this folder.
+   */
+  public Folder[] list(String pattern) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      ListEntry[] entries = connection.list(path, pattern);
+      Folder[] folders = new Folder[entries.length];
+      for (int i=0; i<folders.length; i++)
+        folders[i] = getFolder(entries[i].mailbox);
+      return folders;
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+  
+  /**
+   * Returns the subscribed subfolders for this folder.
+   */
+  public Folder[] listSubscribed(String pattern) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    try
+    {
+      ListEntry[] entries = connection.lsub(path, pattern);
+      Folder[] folders = new Folder[entries.length];
+      for (int i=0; i<folders.length; i++)
+        folders[i] = getFolder(entries[i].mailbox);
+      return folders;
+    }
+    catch (IOException e)
+    {
+      throw new MessagingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Returns the parent folder of this folder.
+   */
+  public Folder getParent() 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    int di = path.lastIndexOf(getSeparator());
+    if (di==-1)
+      return null;
+    return store.getFolder(path.substring(0, di));
+  }
+
+  /**
+   * Returns a subfolder with the specified name.
+   */
+  public Folder getFolder(String name) 
+    throws MessagingException 
+  {
+    IMAPConnection connection = ((IMAPStore)store).connection;
+    return store.getFolder(new StringBuffer(path)
+        .append(getSeparator())
+        .append(name)
+        .toString());
+  }
+
+  /**
+   * Returns the path separator charcter.
+   */
+  public char getSeparator() 
+    throws MessagingException 
+  {
+    if (delimiter=='\u0000')
+    {
+      try
+      {
+        IMAPConnection connection = ((IMAPStore)store).connection;
+        ListEntry[] entries = connection.list(path, null);
+        if (entries.length>0)
+          delimiter = entries[0].delimiter;
+      }
+      catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    }
+    return delimiter;
+  }
+
+
+}
