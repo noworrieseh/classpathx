@@ -1,3 +1,8 @@
+2004-11-01  Chris Burdess  <dog@bluezoo.org>
+
+	* ParameterList.java: Report original value which caused a parse to
+	fail.
+
 2004-09-30  Chris Burdess  <dog@bluezoo.org>
 
 	* MANIFEST.MF: Added Implementation-* entries.
