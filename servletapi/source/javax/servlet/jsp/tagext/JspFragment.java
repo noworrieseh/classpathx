@@ -31,7 +31,7 @@ import javax.servlet.jsp.JspException;
  * @since JSP2.0
  * @author Arnaud Vandyck - arnaud.vandyck@ulg.ac.be
  */
-public interface JspFragment
+public abstract class JspFragment
 {
   
   /**
@@ -42,8 +42,14 @@ public interface JspFragment
    * @throws JspException
    * @throws IOException
    */
-  public void invoke(Writer out,
+  public abstract void invoke(Writer out,
                      Map params)
     throws JspException, IOException;
+
+  /**
+   * Retrieve the context
+   * @return the Jspcontext
+   */
+  public abstract JspContext getJspContext();
 
 }
