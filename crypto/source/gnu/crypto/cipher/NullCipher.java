@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: NullCipher.java,v 1.6 2002-06-28 13:14:28 raif Exp $
+// $Id: NullCipher.java,v 1.7 2002-07-06 23:31:55 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -44,7 +44,7 @@ import java.util.Iterator;
  * 128-, 192- and 256-bit long, and key sizes from 64- to 512-bit in 8-bit
  * increments.</p>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class NullCipher extends BaseCipher {
 
@@ -78,6 +78,7 @@ public final class NullCipher extends BaseCipher {
 
    public Iterator blockSizes() {
       ArrayList al = new ArrayList();
+      al.add(new Integer( 64 / 8));
       al.add(new Integer(128 / 8));
       al.add(new Integer(192 / 8));
       al.add(new Integer(256 / 8));
