@@ -222,13 +222,13 @@ class Template
     Node children = source.getFirstChild();
     Node next = source.getNextSibling();
     
-    String namespaceUri = source.getNamespaceURI();
-    if (Stylesheet.XSL_NS.equals(namespaceUri) &&
-        Node.ELEMENT_NODE == source.getNodeType())
+    try
       {
-        Element element = (Element) source;
-        try
+        String namespaceUri = source.getNamespaceURI();
+        if (Stylesheet.XSL_NS.equals(namespaceUri) &&
+            Node.ELEMENT_NODE == source.getNodeType())
           {
+            Element element = (Element) source;
             String name = element.getLocalName();
             if ("apply-templates".equals(name))
               {
@@ -445,20 +445,107 @@ class Template
                 return new CopyOfNode(parse(children), parse(next), select);
               }
           }
-        catch (XPathExpressionException e)
+        switch (source.getNodeType())
           {
-            DOMSourceLocator l = new DOMSourceLocator(source);
-            throw new TransformerConfigurationException(e.getMessage(), l, e);
+          case Node.TEXT_NODE:
+            // Determine whether to strip whitespace
+            Text text = (Text) source;
+            if (!stylesheet.isPreserved(text))
+              {
+                return parse(next);
+              }
+            break;
+          case Node.ELEMENT_NODE:
+            // Check for attribute value templates
+            NamedNodeMap attrs = source.getAttributes();
+            boolean convert = false;
+            int len = attrs.getLength();
+            for (int i = 0; i < len; i++)
+              {
+                Node attr = attrs.item(i);
+                String value = attr.getNodeValue();
+                int start = value.indexOf('{');
+                int end = value.indexOf('}');
+                if (start != -1 && end > start)
+                  {
+                    convert = true;
+                    break;
+                  }
+              }
+            if (convert)
+              {
+                // Create an element-producing template node instead
+                // with appropriate attribute-producing child template nodes
+                TemplateNode child = parse(children);
+                for (int i = 0; i < len; i++)
+                  {
+                    Node attr = attrs.item(i);
+                    String value = attr.getNodeValue();
+                    int start = value.lastIndexOf('{');
+                    int end = value.lastIndexOf('}');
+                    TemplateNode grandchild = null;
+                    if (start != -1 && end > start)
+                      {
+                        Document doc = source.getOwnerDocument();
+                        while (value.length() > 0 &&
+                               start != -1 && end > start)
+                          {
+                            // Verbatim text at end
+                            String sub = value.substring(end + 1);
+                            if (sub.length() > 0)
+                              {
+                                grandchild =
+                                  new LiteralNode(null, grandchild,
+                                                  doc.createTextNode(sub));
+                              }
+                            // Expression text
+                            String expr = value.substring(start + 1, end);
+                            if (expr.length() == 0)
+                              {
+                                String msg = "attribute value template " +
+                                  "must contain expression";
+                                DOMSourceLocator l =
+                                  new DOMSourceLocator(source);
+                                throw new TransformerConfigurationException(msg,
+                                                                            l);
+                              }
+                            Expr select = (Expr) stylesheet.xpath.compile(expr);
+                            grandchild = new ValueOfNode(null, grandchild,
+                                                         select, false);
+                            // work backwards through the text
+                            value = value.substring(0, start);
+                            start = value.lastIndexOf('{');
+                            end = value.lastIndexOf('}');
+                          }
+                        if (value.length() > 0)
+                          {
+                            // Verbatim text at beginning
+                            grandchild =
+                              new LiteralNode(null, grandchild,
+                                              doc.createTextNode(value));
+                          }
+                      }
+                    else
+                      {
+                        // Verbatim
+                        grandchild = parse(attr.getFirstChild());
+                  }
+                    child = new AttributeNode(grandchild, child,
+                                              attr.getNodeName(),
+                                              attr.getNamespaceURI());
+                  }
+                return new ElementNode(child, parse(next),
+                                       source.getNodeName(),
+                                       namespaceUri);
+              }
+            // Otherwise fall through
+            break;
           }
       }
-    if (source.getNodeType() == Node.TEXT_NODE)
+    catch (XPathExpressionException e)
       {
-        // Determine whether to strip whitespace
-        Text text = (Text) source;
-        if (!stylesheet.isPreserved(text))
-          {
-            return parse(next);
-          }
+        DOMSourceLocator l = new DOMSourceLocator(source);
+        throw new TransformerConfigurationException(e.getMessage(), l, e);
       }
     return new LiteralNode(parse(children), parse(next), source);
   }

@@ -290,7 +290,7 @@ class TransformerImpl
   {
     if (stylesheet != null)
       {
-        return stylesheet.bindings.get(name);
+        return stylesheet.bindings.get(name, null);
       }
     return null;
   }
