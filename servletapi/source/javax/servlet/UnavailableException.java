@@ -73,7 +73,7 @@ extends ServletException
   /**
    * Constructor for a permanent unavailable exception
    *
-   * @deprecated
+   * @deprecated use {@link UnavailableException(String)}.
    * @since Servlet API 1.0
    */
   public UnavailableException(Servlet servlet, String message) 
@@ -86,7 +86,7 @@ extends ServletException
 
   /**
    * Constructor for a temporary unavailable exception
-   * @deprecated
+   * @deprecated use {@link UnavailableException(String)}.
    *
    * @since Servlet API 1.0
    */
@@ -114,7 +114,7 @@ extends ServletException
   /**
    * Gets the servlet that is unavailable
    *
-   * @deprecated
+   * @deprecated no replacement
    * @since Servlet API 1.0
    */
   public Servlet getServlet() 
