@@ -117,55 +117,113 @@ public class MailDateFormat
   extends SimpleDateFormat
 {
 
-  public MailDateFormat()
+  private static final String[] DAYS_OF_WEEK = {
+    null, "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+  };
+
+  private static final String[] MONTHS = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  };
+
+  public MailDateFormat ()
   {
-    super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ'", Locale.US);
-    //super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ' (z)", Locale.US);
-    calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+    //super("EEE, d MMM yyyy HH:mm:ss 'ZZZZZ'", Locale.US);
+    calendar = new GregorianCalendar (TimeZone.getTimeZone ("GMT"));
+    numberFormat = new DecimalFormat ();
   }
 
   /**
-   * Formats the given date in the format specified by
-   * draft-ietf-drums-msg-fmt-08 in the current TimeZone.
+   * Appends the textual value for the specified field to the given string
+   * buffer. This method should be avoided, use <code>format(Date)</code>
+   * instead.
    * @param date the Date object
-   * @param dateStrBuf the formatted string
-   * @param fieldPosition the current field position
+   * @param buf the buffer to append to
+   * @param field the current field position
+   * @return the modified buffer
    */
-  public StringBuffer format(Date date, StringBuffer dateStrBuf,
-      FieldPosition fieldPosition)
+  public StringBuffer format (Date date, StringBuffer buf,
+      FieldPosition field)
   {
-    // Use super.format to do all but the pseudo time zone.
-    int offset = dateStrBuf.length();
-    super.format(date, dateStrBuf, fieldPosition);
-    // Advance pos to the beginning of the pseudo time zone field ZZZZZ
-    int pos = offset+25;
-    while (dateStrBuf.charAt(pos)!='Z')
-      pos++;
-    
-    // get the time zone offset (in minutes)
-    calendar.clear();
-    calendar.setTime(date);
-    int zoneOffset = (calendar.get(Calendar.ZONE_OFFSET)+
-      calendar.get(Calendar.DST_OFFSET))/60000;
+    calendar.clear ();
+    calendar.setTime (date);
+    buf.setLength (0);
 
-    // apply + or - appropriately
-    if (zoneOffset<0)
-    {
-      zoneOffset = -zoneOffset;
-      dateStrBuf.setCharAt(pos++, '-');
-    }
+    // Day of week
+    buf.append (DAYS_OF_WEEK[calendar.get (Calendar.DAY_OF_WEEK)]);
+    buf.append (',');
+    buf.append (' ');
+
+    // Day of month
+    buf.append (Integer.toString (calendar.get (Calendar.DAY_OF_MONTH)));
+    buf.append (' ');
+
+    // Month
+    buf.append (MONTHS[calendar.get (Calendar.MONTH)]);
+    buf.append (' ');
+
+    // Year
+    int year = calendar.get (Calendar.YEAR);
+    if (year < 1000)
+      {
+        buf.append ('0');
+        if (year < 100)
+          {
+            buf.append ('0');
+            if (year < 10)
+              {
+                buf.append ('0');
+              }
+          }
+      }
+    buf.append (Integer.toString (year));
+    buf.append (' ');
+
+    // Hour
+    int hour = calendar.get (Calendar.HOUR_OF_DAY);
+    buf.append (Character.forDigit (hour / 10, 10));
+    buf.append (Character.forDigit (hour % 10, 10));
+    buf.append (':');
+
+    // Minute
+    int minute = calendar.get (Calendar.MINUTE);
+    buf.append (Character.forDigit (minute / 10, 10));
+    buf.append (Character.forDigit (minute % 10, 10));
+    buf.append (':');
+
+    // Second
+    int second = calendar.get (Calendar.SECOND);
+    buf.append (Character.forDigit (second / 10, 10));
+    buf.append (Character.forDigit (second % 10, 10));
+    buf.append (' ');
+
+    // Timezone
+    // Get time offset in minutes
+    int zoneOffset = (calendar.get (Calendar.ZONE_OFFSET) +
+                      calendar.get (Calendar.DST_OFFSET)) / 60000;
+    
+    // Apply + or - appropriately
+    if (zoneOffset < 0)
+      {
+        zoneOffset = -zoneOffset;
+        buf.append ('-');
+      }
     else
-      dateStrBuf.setCharAt(pos++, '+');
-
-    // set the 2 2-char fields as specified above
-    int hours = zoneOffset/60;
-    dateStrBuf.setCharAt(pos++, Character.forDigit(hours/10, 10));
-    dateStrBuf.setCharAt(pos++, Character.forDigit(hours%10, 10));
-    int minutes = zoneOffset%60;
-    dateStrBuf.setCharAt(pos++, Character.forDigit(minutes/10, 10));
-    dateStrBuf.setCharAt(pos++, Character.forDigit(minutes%10, 10));
+      {
+        buf.append ('+');
+      }
     
-    return dateStrBuf;
+    // Set the 2 2-char fields as specified above
+    int tzhours = zoneOffset / 60;
+    buf.append (Character.forDigit (tzhours / 10, 10));
+    buf.append (Character.forDigit (tzhours % 10, 10));
+    int tzminutes = zoneOffset % 60;
+    buf.append (Character.forDigit (tzminutes / 10, 10));
+    buf.append (Character.forDigit (tzminutes % 10, 10));
+
+    field.setBeginIndex (0);
+    field.setEndIndex (buf.length ());
+    return buf;
   }
 
   /**
@@ -174,60 +232,160 @@ public class MailDateFormat
    * @param text the formatted date to be parsed
    * @param pos the current parse position
    */
-  public Date parse(String text, ParsePosition pos)
+  public Date parse (String text, ParsePosition pos)
   {
-    // strip out the timezone (ZZZZZ) field if it exists
-    // there can't be a + or - until that field
-    int zoneOffset = 0;
-    int start = text.indexOf('+');
-    if (start<0)
-      start = text.indexOf('-');
-    if (start>-1)
-    {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append(text.substring(0, start));
-      int end = text.indexOf(' ', start+1);
-      if (end==(start+5))
+    int start = 0, end = -1;
+    int len = text.length ();
+    calendar.clear ();
+    pos.setIndex (start);
+    try
       {
-        buffer.append(text.substring(end));
-        char pm = text.charAt(start++);
-        zoneOffset += 600*Character.digit(text.charAt(start++), 10);
-        zoneOffset += 60*Character.digit(text.charAt(start++), 10);
-        zoneOffset += 10*Character.digit(text.charAt(start++), 10);
-        zoneOffset += Character.digit(text.charAt(start++), 10);
-        zoneOffset *= 60000;
-        if ('-'==pm)
-          zoneOffset = -zoneOffset;
+        // Advance to date
+        if (Character.isLetter (text.charAt (start)))
+          {
+            start = skipNonWhitespace (text, start);
+          }
+        start = skipWhitespace (text, start);
+        pos.setIndex (start);
+        end = skipNonWhitespace (text, start + 1);
+        int date = Integer.parseInt (text.substring (start, end));
+        // Advance to month
+        start = skipWhitespace (text, end + 1);
+        pos.setIndex (start);
+        end = skipNonWhitespace (text, start + 1);
+        String monthText = text.substring (start, end);
+        int month = -1;
+        for (int i = 0; i < 12; i++)
+          {
+            if (MONTHS[i].equals (monthText))
+              {
+                month = i;
+                break;
+              }
+          }
+        if (month == -1)
+          {
+            pos.setErrorIndex (end);
+            return null;
+          }
+        // Advance to year
+        start = skipWhitespace (text, end + 1);
+        pos.setIndex (start);
+        end = skipNonWhitespace (text, start + 1);
+        int year = Integer.parseInt (text.substring (start, end));
+        calendar.set (Calendar.YEAR, year);
+        calendar.set (Calendar.MONTH, month);
+        calendar.set (Calendar.DAY_OF_MONTH, date);
+        // Advance to hour
+        start = skipWhitespace (text, end + 1);
+        pos.setIndex (start);
+        end = skipToColon (text, start + 1);
+        int hour = Integer.parseInt (text.substring (start, end));
+        calendar.set (Calendar.HOUR, hour);
+        // Advance to minute
+        start = end + 1;
+        pos.setIndex (start);
+        end = skipToColon (text, start + 1);
+        int minute = Integer.parseInt (text.substring (start, end));
+        calendar.set (Calendar.MINUTE, minute);
+        // Advance to second
+        start = end + 1;
+        pos.setIndex (start);
+        end = start + 1;
+        while (end < len && !Character.isWhitespace (text.charAt (end)))
+          {
+            end++;
+          }
+        int second = Integer.parseInt (text.substring (start, end));
+        calendar.set (Calendar.SECOND, second);
+        
+        if (end != len)
+          {
+            // Timezone
+            start = skipWhitespace (text, end + 1);
+            end = start + 1;
+            while (end < len && !Character.isWhitespace (text.charAt (end)))
+              {
+                end++;
+              }
+            char pm = text.charAt (start);
+            if (Character.isLetter (pm))
+              {
+                TimeZone tz =
+                  TimeZone.getTimeZone (text.substring (start, end));
+                calendar.set (Calendar.ZONE_OFFSET, tz.getRawOffset ());
+              }
+            else
+              {
+                int zoneOffset = 0;
+                zoneOffset += 600 * Character.digit (text.charAt (++start), 10);
+                zoneOffset += 60 * Character.digit (text.charAt (++start), 10);
+                zoneOffset += 10 * Character.digit (text.charAt (++start), 10);
+                zoneOffset += Character.digit (text.charAt (++start), 10);
+                zoneOffset *= 60000; // minutes -> ms
+                if ('-' == pm)
+                  {
+                    zoneOffset = -zoneOffset;
+                  }
+                calendar.set (Calendar.ZONE_OFFSET, zoneOffset);
+              }
+          }
+        pos.setIndex (end);
+        
+        return calendar.getTime();
       }
-      text = buffer.toString();
-    }
-    Date date = super.parse(text, pos);
-    // Use the zoneOffset to compensate as raw offset
-    // as there is no way to determine the DST part
-    if (date!=null)
-    {
-      calendar.clear();
-      calendar.setTime(date);
-      calendar.set(Calendar.ZONE_OFFSET, zoneOffset);
-      date = calendar.getTime();
-    }
-    return date;
+    catch (NumberFormatException e)
+      {
+        pos.setErrorIndex (Math.max (start, end));
+      }
+    catch (StringIndexOutOfBoundsException e)
+      {
+        pos.setErrorIndex (Math.max (start, end));
+      }
+    return null;
+  }
+
+  private int skipWhitespace (String text, int pos)
+  {
+    while (Character.isWhitespace (text.charAt (pos)))
+      {
+        pos++;
+      }
+    return pos;    
+  }
+
+  private int skipNonWhitespace (String text, int pos)
+  {
+    while (!Character.isWhitespace (text.charAt (pos)))
+      {
+        pos++;
+      }
+    return pos;    
+  }
+
+  private int skipToColon (String text, int pos)
+  {
+    while (text.charAt (pos) != ':')
+      {
+        pos++;
+      }
+    return pos;    
   }
 
   /**
    * Don't allow setting the calendar.
    */
-  public void setCalendar(Calendar newCalendar)
+  public void setCalendar (Calendar newCalendar)
   {
-    throw new RuntimeException("Method not available");
+    throw new UnsupportedOperationException ();
   }
 
   /**
    * Don't allow setting the NumberFormat.
    */
-  public void setNumberFormat(NumberFormat newNumberFormat)
+  public void setNumberFormat (NumberFormat newNumberFormat)
   {
-    throw new RuntimeException("Method not available");
+    throw new UnsupportedOperationException ();
   }
 
 }

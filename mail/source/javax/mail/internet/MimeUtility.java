@@ -800,6 +800,12 @@ public class MimeUtility
   private static HashMap javaCharsets;
 
   /*
+   * Indicates if we are using Java 1.2 - if so, we return "Java" charsets
+   * instead of MIME charsets.
+   */
+  private static boolean java12;
+
+  /*
    * Load the charset conversion tables.
    */
   static 
@@ -814,6 +820,16 @@ public class MimeUtility
       parse(mimeCharsets, lin);
       parse(javaCharsets, lin);
     }
+    try
+      {
+        String version = System.getProperty("java.version");
+        java12 = (version.startsWith("1.2") ||
+                  version.startsWith("1.1"));
+      }
+    catch (SecurityException e)
+      {
+        // TODO
+      }
   }
 
   /*
@@ -862,7 +878,19 @@ public class MimeUtility
     if (mimeCharsets==null || charset==null)
       return charset;
     String jc = (String)mimeCharsets.get(charset.toLowerCase());
-    return (jc!=null) ? jc : charset;
+    if (jc != null)
+      {
+        if (java12)
+          {
+            return jc;
+          }
+        else
+          {
+            String mc = (String)javaCharsets.get(jc.toLowerCase());
+            return (mc != null) ? mc : charset;
+          }
+      }
+    return charset;
   }
 
   /**
@@ -894,7 +922,7 @@ public class MimeUtility
    * Get the default charset corresponding to the system's current default
    * locale.
    * @return the default charset of the system's default locale,
-   * as a Java charset. (NOT a MIME charset)
+   * as a Java charset.
    */
   public static String getDefaultJavaCharset()
   {
@@ -905,7 +933,7 @@ public class MimeUtility
         // Use mail.mime.charset as of JavaMail 1.3
         defaultJavaCharset = System.getProperty("mail.mime.charset");
         if (defaultJavaCharset == null)
-          defaultJavaCharset = System.getProperty("file.encoding", "8859_1");
+          defaultJavaCharset = System.getProperty("file.encoding", "UTF-8");
       }
       catch (SecurityException e)
       {
@@ -923,12 +951,12 @@ public class MimeUtility
           );
         defaultJavaCharset = isr.getEncoding();
         
-        // If all else fails use 8859_1
+        // If all else fails use UTF-8
         if (defaultJavaCharset==null)
-          defaultJavaCharset = "8859_1";
+          defaultJavaCharset = "UTF-8";
       }
     }
-    return defaultJavaCharset;
+    return javaCharset(defaultJavaCharset);
   }
 
   // -- Calculating multipart boundaries --
