@@ -1647,7 +1647,7 @@ public class MimeMessage
     /*
      * Implement the no-CR-without-LF and len(line)<=998 RFC2822 rules
      * (section 2.3).
-     * We do this by wrapping in an RFC28222OutputStream.
+     * We do this by wrapping in an RFC2822OutputStream.
      */
     RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
     if (modified || content==null && contentStream==null)

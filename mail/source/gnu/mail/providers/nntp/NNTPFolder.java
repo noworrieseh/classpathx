@@ -291,7 +291,7 @@ public final class NNTPFolder
         last = gr.last;
         count = gr.count;
         // Get article
-        m = getMessageImpl(msgnum);
+        m = getMessageImpl(msgnum - 1 + first);
         // Cache store
         articleCache.put(key, m);
         return m;
