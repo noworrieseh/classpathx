@@ -18,7 +18,7 @@ WHAT IS THIS
 JAVA PACKAGES
     
     javax.xml.*		... JAXP 1.1 interfaces
-    org.xml.sax.*	... SAX2 (r2pre2+, extensions 1.1alpha) interfaces
+    org.xml.sax.*	... SAX2 (r2pre3, extensions 1.1beta) interfaces
     org.w3c.dom.*	... DOM Level 2 interfaces
 
     gnu.xml.aelfred2.*	... SAX2 parsers (+ optional validator, and JAXP glue)
