@@ -1,5 +1,5 @@
 /*
- * $Id: TransformerException.java,v 1.4 2001-11-02 22:07:45 db Exp $
+ * $Id: TransformerException.java,v 1.5 2003-08-19 09:52:17 avdyk Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -160,7 +160,7 @@ public class TransformerException extends Exception {
 
 
 	public void printStackTrace() {
-		printStackTrace(System.out);
+		printStackTrace(System.out);// shouldn't it be System.err?
 	}
 
 	public void printStackTrace(PrintStream stream) {
