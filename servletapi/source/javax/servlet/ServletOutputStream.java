@@ -37,8 +37,7 @@ import java.io.OutputStream;
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
-public abstract class ServletOutputStream
-extends OutputStream 
+public abstract class ServletOutputStream extends OutputStream 
 {
   private static String STRING_TRUE = "true";
   private static String STRING_FALSE = "false";
@@ -56,7 +55,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(String value)
-  throws IOException 
+    throws IOException 
   {
     byte[] byteArray = value.getBytes();
     write(byteArray, 0, byteArray.length);
@@ -72,16 +71,16 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(boolean value)
-  throws IOException 
+    throws IOException 
   {
     if(value) 
-    {
-      print(STRING_TRUE);
-    }
+      {
+	print(STRING_TRUE);
+      }
     else 
-    {
-      print(STRING_FALSE);
-    }
+      {
+	print(STRING_FALSE);
+      }
   }
 
 
@@ -94,7 +93,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(char value)
-  throws IOException 
+    throws IOException 
   {
     print(String.valueOf(value));
   }
@@ -109,7 +108,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(int value)
-  throws IOException 
+    throws IOException 
   {
     print(String.valueOf(value));
   }
@@ -124,7 +123,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(long value)
-  throws IOException 
+    throws IOException 
   {
     print(String.valueOf(value));
   }
@@ -139,7 +138,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(float value)
-  throws IOException 
+    throws IOException 
   {
     print(String.valueOf(value));
   }
@@ -154,7 +153,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void print(double value)
-  throws IOException 
+    throws IOException 
   {
     print(String.valueOf(value));
   }
@@ -168,7 +167,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println()
-  throws IOException 
+    throws IOException 
   {
     print("\r\n");
   }
@@ -182,7 +181,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(String value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -198,7 +197,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(boolean value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -214,7 +213,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(char value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -230,7 +229,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(int value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -246,7 +245,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(long value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -262,7 +261,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(float value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();
@@ -278,7 +277,7 @@ extends OutputStream
    * @exception IOException if an I/O exception occurs
    */
   public void println(double value)
-  throws IOException 
+    throws IOException 
   {
     print(value);
     println();

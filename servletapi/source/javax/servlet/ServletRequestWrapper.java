@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.BufferedReader;
 
 /**
@@ -112,6 +113,7 @@ public class ServletRequestWrapper
    * Calls the wrapped request object's method
    */
   public void setCharacterEncoding (String enc)
+    throws UnsupportedEncodingException
   {
     _impl.setCharacterEncoding (enc);
   }

@@ -26,19 +26,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 /**
- * XXX
+ * An HTTP contextual enironment for a JSP.
+ *
+ * @author Mark Wielaard <mark@klomp.org>
  */
 public interface HttpJspPage extends JspPage {
 
-	/**
-	 * XXX
-	 *
-	 * @param req XXX
-	 * @param res XXX
-	 * @exception ServletException XXX
-	 * @exception IOException XXX
-	 */
-	void _jspService(HttpServletRequest req, HttpServletResponse res) throws
-		                                                    ServletException,
-                                                                 IOException;
+  /**
+   * Provide a service for a page.
+   *
+   * @param req the request.
+   * @param res the response.
+   * @exception ServletException thrown if there's some error.
+   * @exception IOException thrown if there's an io problem.
+   */
+  void _jspService(HttpServletRequest req, HttpServletResponse res)
+    throws ServletException, IOException;
 }

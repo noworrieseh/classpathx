@@ -45,11 +45,16 @@ extends InputStream
   {
   }
 
+
+  // Implementation of read line.
+  
+  private final static int CR_FOUND = 1;
+
   /**
    * This method read bytes from a stream and stores them into a caller
    * supplied buffer.  It starts storing the data at index
    * <code>offset</code> into the buffer and attempts to read until a 
-   * end of line ('\n') is encountered or <code>length</code> bytes are
+   * end of line ("\r\n") is encountered or <code>length</code> bytes are
    * read.
    * This method can return before reading the number of bytes requested.
    * The actual number of bytes read is returned as an int.
@@ -90,7 +95,6 @@ extends InputStream
     {
       return(0);
     }
-
     // Read the first byte here in order to allow IOException's to 
     // propagate up
     int readChar = read();
@@ -99,24 +103,21 @@ extends InputStream
       return(-1);
     }
     buffer[offset] = (byte)readChar;
-
     int totalRead = 1;
-
+    int readState = 0;
     // Read the rest of the bytes
     try 
     {
       for (int i = 1; i < length; i++) 
       {
-	if(readChar == '\n') 
-	{
-
+	if (readChar == '\r')
+	  readState = CR_FOUND;
+	else if (readChar == '\n' && readState == CR_FOUND)
 	  return(totalRead);
-	}
+	// Read again and cycle round.
 	readChar = read();
 	if (readChar == -1) 
-	{
 	  return(totalRead);
-	}
 	buffer[offset + i] = (byte)readChar;
 	totalRead++;
       }

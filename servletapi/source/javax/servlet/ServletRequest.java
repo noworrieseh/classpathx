@@ -22,6 +22,7 @@ package javax.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -304,7 +305,8 @@ public interface ServletRequest
    * @throws java.io.UnsupportedEncodingException if the provided name is not 
    * a valid encoding scheme
    */
-  void setCharacterEncoding (String enc);
+  void setCharacterEncoding (String enc)
+    throws UnsupportedEncodingException;
 
 
   /**
