@@ -19,6 +19,19 @@ LICENSING
     General Public License, with the exception of DOM interface
     sources which are subject instead to the W3C license.
 
+    In addition, the files distributed under GPL include the
+    following special exception.
+
+	As a special exception, if you link this library with
+	other files to produce an executable, this library does
+	not by itself cause the resulting executable to be covered
+	by the GNU General Public License. This exception does
+	not however invalidate any other reasons why the executable
+	file might be covered by the GNU General Public License. 
+
+    As such, it can be used to run free as well as proprietary
+    applications and applets. 
+
 	COPYING		... contains the GPL text.
 	COPYRIGHT.html	... contains the W3C license.
     
