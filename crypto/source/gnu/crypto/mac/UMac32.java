@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: UMac32.java,v 1.1 2002-06-08 05:06:33 raif Exp $
+// $Id: UMac32.java,v 1.2 2002-07-06 23:50:57 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -120,7 +120,7 @@ import java.util.Map;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class UMac32 extends BaseMac {
 
@@ -133,6 +133,9 @@ public class UMac32 extends BaseMac {
     */
    public static final String NONCE_MATERIAL = "gnu.crypto.umac.nonce.material";
 
+   /** Known test vector. */
+   private static final String TV1 = "5FD764A6D3A9FD9D";
+
    private static final BigInteger MAX_NONCE_ITERATIONS =
          BigInteger.ONE.shiftLeft(16*8);
 
@@ -141,9 +144,15 @@ public class UMac32 extends BaseMac {
    static final int L1_KEY_LEN = 1024;
    static final int KEY_LEN =      16;
 
+   /** caches the result of the correctness test, once executed. */
+   private static Boolean valid;
+
    private byte[] nonce;
    private UHash32 uhash32;
    private BigInteger nonceReuseCount;
+
+   /** The authentication key for this instance. */
+   private transient byte[] K;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -296,7 +305,9 @@ public class UMac32 extends BaseMac {
          uhash32 = new UHash32();
       }
 
-      uhash32.init(attributes);
+      Map map = new HashMap();
+      map.put(MAC_KEY_MATERIAL, K);
+      uhash32.init(map);
    }
 
    public void update(byte b) {
@@ -322,32 +333,34 @@ public class UMac32 extends BaseMac {
    }
 
    public boolean selfTest() {
-      byte[] key;
-      try {
-         key = "abcdefghijklmnop".getBytes("ASCII");
-      } catch (UnsupportedEncodingException x) {
-         throw new RuntimeException("ASCII not supported");
+      if (valid == null) {
+         byte[] key;
+         try {
+            key = "abcdefghijklmnop".getBytes("ASCII");
+         } catch (UnsupportedEncodingException x) {
+            throw new RuntimeException("ASCII not supported");
+         }
+         byte[] nonce = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+         UMac32 mac = new UMac32();
+         Map attributes = new HashMap();
+         attributes.put(MAC_KEY_MATERIAL, key);
+         attributes.put(NONCE_MATERIAL, nonce);
+         try {
+            mac.init(attributes);
+         } catch (InvalidKeyException x) {
+            x.printStackTrace(System.err);
+            return false;
+         }
+
+         byte[] data = new byte[128];
+         data[0] = (byte) 0x80;
+
+         mac.update(data, 0, 128);
+         byte[] result = mac.digest();
+//         System.out.println("UMAC test vector: "+Util.toString(result));
+         valid = new Boolean(TV1.equals(Util.toString(result)));
       }
-      byte[] nonce = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
-      UMac32 mac = new UMac32();
-      Map attributes = new HashMap();
-      attributes.put(MAC_KEY_MATERIAL, key);
-      attributes.put(NONCE_MATERIAL, nonce);
-      try {
-         mac.init(attributes);
-      } catch (InvalidKeyException x) {
-         x.printStackTrace(System.err);
-         return false;
-      }
-
-      byte[] data = new byte[128];
-      data[0] = (byte) 0x80;
-
-      mac.update(data, 0, 128);
-      byte[] result = mac.digest();
-      System.out.println("UMAC test vector: "+Util.toString(result));
-
-      return true;
+      return valid.booleanValue();
    }
 
    // helper methods ----------------------------------------------------------
