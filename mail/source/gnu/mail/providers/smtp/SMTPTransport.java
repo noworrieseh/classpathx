@@ -200,9 +200,11 @@ public class SMTPTransport
           }
         
         // User authentication
+        String auth = getProperty ("auth");
+        boolean authRequired = "required".equals (auth);
         if (authenticationMechanisms != null &&
             !authenticationMechanisms.isEmpty () &&
-            propertyIsTrue ("auth"))
+            (authRequired || propertyIsTrue ("auth")))
           {
             if (username != null && password != null)
               {
@@ -220,8 +222,8 @@ public class SMTPTransport
               }
             return false;
           }
-        return true;
-      } 
+        return !authRequired;
+      }
     catch (IOException e)
       {
         throw new MessagingException (e.getMessage (), e);
