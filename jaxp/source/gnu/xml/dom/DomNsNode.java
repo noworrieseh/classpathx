@@ -38,7 +38,7 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
+import javax.xml.XMLConstants;
 
 /**
  * <p> Abstract implemention of namespace support.  This facilitates
@@ -66,7 +66,7 @@ public abstract class DomNsNode
    * @param name Name of this node, which may include a prefix
    */
   // package private
-  DomNsNode(short nodeType, Document owner, String namespaceURI, String name)
+  DomNsNode(short nodeType, DomDocument owner, String namespaceURI, String name)
   {
     super(nodeType, owner);
     this.name = name;
@@ -150,15 +150,15 @@ public abstract class DomNsNode
                         "illegal prefix " + prefix, this, 0);
       }
 
-    if ("xml".equals(prefix)
-        && !DomDocument.xmlNamespace.equals(namespace))
+    if (XMLConstants.XML_NS_PREFIX.equals(prefix)
+        && !XMLConstants.XML_NS_URI.equals(namespace))
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,
                         "xml namespace is always " +
-                        DomDocument.xmlNamespace, this, 0);
+                        XMLConstants.XML_NS_URI, this, 0);
       }
 
-    if ("xmlns".equals(prefix))
+    if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix))
       {
         if (namespace != null || getNodeType() != ATTRIBUTE_NODE)
           {
@@ -167,7 +167,8 @@ public abstract class DomNsNode
           }
       }
     else if (getNodeType () == ATTRIBUTE_NODE
-             && ("xmlns".equals(name) || name.startsWith("xmlns:")))
+             && (XMLConstants.XMLNS_ATTRIBUTE.equals(name) ||
+                 name.startsWith("xmlns:")))
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,
                         "namespace declarations can't change names", this, 0);

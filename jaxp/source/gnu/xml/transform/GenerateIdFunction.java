@@ -58,7 +58,7 @@ final class GenerateIdFunction
   implements XPathFunction, Function
 {
 
-  List values;
+  List args;
 
   public Object evaluate(List args)
     throws XPathFunctionException
@@ -67,13 +67,20 @@ final class GenerateIdFunction
     return Collections.EMPTY_SET;
   }
 
-  public void setValues(List values)
+  public void setArguments(List args)
   {
-    this.values = values;
+    this.args = args;
   }
 
   public Object evaluate(Node context, int pos, int len)
   {
+    int arity = args.size();
+    List values = new ArrayList(arity);
+    for (int i = 0; i < arity; i++)
+      {
+        Expr arg = (Expr) args.get(i);
+        values.add(arg.evaluate(context, pos, len));
+      }
     Node node;
     Collection ns = (Collection) values.get(0);
     if (ns.isEmpty())

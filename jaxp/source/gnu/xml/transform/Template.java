@@ -380,11 +380,19 @@ class Template
                       "any".equals(l) ? NodeNumberNode.ANY :
                       NodeNumberNode.SINGLE;
         String c = getAttribute(attrs, "count");
-        if (c == null)
+        Pattern count = null;
+        if (c != null)
           {
-            c = "countable()";
+            try
+              {
+                count = (Pattern) stylesheet.xpath.compile(c);
+              }
+            catch (ClassCastException e)
+              {
+                throw new TransformerConfigurationException("invalid pattern: " +
+                                                            c);
+              }
           }
-        Pattern count = (Pattern) stylesheet.xpath.compile(c);
         String f = getAttribute(attrs, "from");
         if (f == null)
           {

@@ -41,6 +41,7 @@ package gnu.xml.transform;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -71,6 +72,7 @@ final class DocumentFunction
 
   final Stylesheet stylesheet;
   final Node base;
+  List args;
   List values;
 
   DocumentFunction(Stylesheet stylesheet, Node base)
@@ -86,14 +88,25 @@ final class DocumentFunction
     return evaluate(null, 1, 1);
   }
 
-  public void setValues(List values)
+  public void setArguments(List args)
   {
-    this.values = values;
+    this.args = args;
   }
   
   public Object evaluate(Node context, int pos, int len)
   {
-    switch (values.size())
+    int arity = args.size();
+    if (values == null)
+      {
+        values = new ArrayList(arity);
+        for (int i = 0; i < arity; i++)
+          {
+            Expr arg = (Expr) args.get(i);
+            values.add(arg.evaluate(context, pos, len));
+          }
+      }
+    Object ret;
+    switch (arity)
       {
       case 1:
         Object arg = values.get(0);
@@ -105,15 +118,16 @@ final class DocumentFunction
               {
                 Node node = (Node) i.next();
                 String s = Expr.stringValue(node);
-                acc.addAll(document(s, baseURI(node)));
+                acc.addAll(document(s, node.getBaseURI()));
               }
-            return acc;
+            ret = acc;
           }
         else
           {
             String s = Expr._string(context, arg);
-            return document(s, baseURI(base));
+            ret = document(s, base.getBaseURI());
           }
+        break;
       case 2:
         Object arg1 = values.get(0);
         Object arg2 = values.get(1);
@@ -123,7 +137,7 @@ final class DocumentFunction
           }
         Collection arg2ns = (Collection) arg2;
         String base2 = arg2ns.isEmpty() ? null :
-          baseURI((Node) arg2ns.iterator().next());
+          ((Node) arg2ns.iterator().next()).getBaseURI();
         if (arg1 instanceof Collection)
           {
             Collection arg1ns = (Collection) arg1;
@@ -134,36 +148,19 @@ final class DocumentFunction
                 String s = Expr.stringValue(node);
                 acc.addAll(document(s, base2));
               }
-            return acc;
+            ret = acc;
           }
         else
           {
-            String s = Expr._string(null, arg1);
-            return document(s, base2);
+            String s = Expr._string(context, arg1);
+            ret = document(s, base2);
           }
+        break;
       default:
         throw new RuntimeException("invalid arity");
       }
-  }
-
-  /**
-   * Returns the XSL base URI of the specified node.
-   * @see XSLT 3.2
-   */
-  String baseURI(Node node)
-  {
-    if (node == null)
-      {
-        return null;
-      }
-    else if (node.getNodeType() == Node.DOCUMENT_NODE)
-      {
-        return ((Document) node).getDocumentURI();
-      }
-    else
-      {
-        return baseURI(node.getOwnerDocument());
-      }
+    values = null;
+    return ret;
   }
 
   /**
@@ -176,7 +173,7 @@ final class DocumentFunction
   {
     if ("".equals(uri) || uri == null)
       {
-        uri = baseURI(this.base);
+        uri = this.base.getBaseURI();
       }
     
     // Get fragment

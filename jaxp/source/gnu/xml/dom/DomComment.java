@@ -39,7 +39,6 @@
 package gnu.xml.dom;
 
 import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
 
 /**
  * <p> "Comment" implementation.
@@ -65,7 +64,7 @@ public class DomComment
    * its createComment functionality, or through a subclass which is
    * similarly used in a "Sub-DOM" style layer.
    */
-  protected DomComment(Document owner, String value)
+  protected DomComment(DomDocument owner, String value)
   {
     super(COMMENT_NODE, owner, value);
   }

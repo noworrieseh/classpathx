@@ -38,7 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Notation;
 
 /**
@@ -81,7 +80,7 @@ public class DomNotation
    * @param publicId If non-null, provides the notation's PUBLIC identifier
    * @param systemId If non-null, rovides the notation's SYSTEM identifier
    */
-  protected DomNotation(Document owner,
+  protected DomNotation(DomDocument owner,
                         String name,
                         String publicId,
                         String systemId)

@@ -93,6 +93,8 @@ class SAXEventSink
     throws SAXException
   {
     doc = new DomDocument();
+    doc.setStrictErrorChecking(false);
+    doc.setBuilding(true);
     ctx = doc;
   }
 
@@ -113,6 +115,8 @@ class SAXEventSink
   public void endDocument()
     throws SAXException
   {
+    doc.setStrictErrorChecking(true);
+    doc.setBuilding(false);
     DomDoctype doctype = (DomDoctype) doc.getDoctype();
     if (doctype != null)
       {

@@ -39,7 +39,6 @@
 package gnu.xml.dom;
 
 import java.util.HashMap;
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Entity;
@@ -299,7 +298,7 @@ public class DomDoctype
       }
   }
 
-  void setOwner(Document doc)
+  void setOwner(DomDocument doc)
   {
     if (entities != null)
       {

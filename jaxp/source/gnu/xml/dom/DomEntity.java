@@ -38,7 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Entity;
 
 /**
@@ -91,7 +90,7 @@ public class DomEntity
    * @param systemId Provides the entity's SYSTEM identifier (URI)
    * @param notation If non-null, provides the unparsed entity's notation.
    */
-  protected DomEntity(Document owner,
+  protected DomEntity(DomDocument owner,
                       String name,
                       String publicId,
                       String systemId,

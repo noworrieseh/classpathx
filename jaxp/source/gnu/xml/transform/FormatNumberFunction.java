@@ -40,6 +40,7 @@ package gnu.xml.transform;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.xpath.XPathFunction;
@@ -58,25 +59,8 @@ final class FormatNumberFunction
   implements XPathFunction, Function
 {
 
-  static final DecimalFormat defaultDecimalFormat = new DecimalFormat();
-  static
-  {
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-    symbols.setDecimalSeparator('.');
-    symbols.setGroupingSeparator(',');
-    symbols.setPercent('%');
-    symbols.setPerMill('\u2030');
-    symbols.setZeroDigit('0');
-    symbols.setDigit('#');
-    symbols.setPatternSeparator(';');
-    symbols.setInfinity("Infinity");
-    symbols.setNaN("NaN");
-    symbols.setMinusSign('-');
-    defaultDecimalFormat.setDecimalFormatSymbols(symbols);
-  }
-  
   final Stylesheet stylesheet;
-  List values;
+  List args;
 
   FormatNumberFunction(Stylesheet stylesheet)
   {
@@ -90,29 +74,39 @@ final class FormatNumberFunction
     return Collections.EMPTY_SET;
   }
 
-  public void setValues(List values)
+  public void setArguments(List args)
   {
-    this.values = values;
+    this.args = args;
   }
 
   public Object evaluate(Node context, int pos, int len)
   {
+    int arity = args.size();
+    List values = new ArrayList(arity);
+    for (int i = 0; i < arity; i++)
+      {
+        Expr arg = (Expr) args.get(i);
+        values.add(arg.evaluate(context, pos, len));
+      }
     double number = _number(context, values.get(0));
     String pattern = _string(context, values.get(1));
-    DecimalFormat df;
-    if (values.size() > 2)
+    // Currency symbol &#x00a4; is not supposed to be present
+    if (pattern.indexOf('\u00a4') != -1)
       {
-        String dfName = _string(context, values.get(2));
-        df = (DecimalFormat) stylesheet.decimalFormats.get(dfName);
-        if (df == null)
-          {
-            throw new IllegalArgumentException("No such decimal-format: " +
-                                               dfName);
-          }
+        // Replace with $ (Xalan does this)
+        pattern = pattern.replace('\u00a4', '$');
       }
-    else
+    String dfName = null;
+    if (arity > 2)
       {
-        df = defaultDecimalFormat;
+        dfName = _string(context, values.get(2));
+        // otherwise the default decimal-format will be used
+      }
+    DecimalFormat df = (DecimalFormat) stylesheet.decimalFormats.get(dfName);
+    if (df == null)
+      {
+        throw new IllegalArgumentException("No such decimal-format: " +
+                                           dfName);
       }
     df.applyPattern(pattern);
     return df.format(number);

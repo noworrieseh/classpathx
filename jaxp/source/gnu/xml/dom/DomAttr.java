@@ -39,7 +39,6 @@
 package gnu.xml.dom;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.TypeInfo;
@@ -96,7 +95,7 @@ public class DomAttr
    *	this is used to uniquely identify a type of attribute
    * @param name Name of this attribute, which may include a prefix
    */
-  protected DomAttr(Document owner, String namespaceURI, String name)
+  protected DomAttr(DomDocument owner, String namespaceURI, String name)
   {
     super(ATTRIBUTE_NODE, owner, namespaceURI, name);
     specified = true;

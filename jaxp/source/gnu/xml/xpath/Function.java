@@ -49,7 +49,10 @@ import java.util.List;
 public interface Function
 {
 
-  void setValues(List values);
+  /**
+   * Sets the list of expressions to evaluate as parameter values.
+   */
+  void setArguments(List args);
 
 }
 

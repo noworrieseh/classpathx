@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -57,7 +58,7 @@ final class SystemPropertyFunction
   implements XPathFunction, Function
 {
 
-  List values;
+  List args;
 
   public Object evaluate(List args)
     throws XPathFunctionException
@@ -66,13 +67,20 @@ final class SystemPropertyFunction
     return systemProperty(QName.valueOf(name));
   }
 
-  public void setValues(List values)
+  public void setArguments(List args)
   {
-    this.values = values;
+    this.args = args;
   }
 
   public Object evaluate(Node context, int pos, int len)
   {
+    int arity = args.size();
+    List values = new ArrayList(arity);
+    for (int i = 0; i < arity; i++)
+      {
+        Expr arg = (Expr) args.get(i);
+        values.add(arg.evaluate(context, pos, len));
+      }
     String name = _string(context, values.get(0));
     return systemProperty(QName.valueOf(name));
   }

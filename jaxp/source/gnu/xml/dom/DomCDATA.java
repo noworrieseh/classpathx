@@ -39,7 +39,6 @@
 package gnu.xml.dom;
 
 import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
 
 /**
  * <p> "CDATASection" implementation.
@@ -70,12 +69,12 @@ public class DomCDATA
    * similarly used in a "Sub-DOM" style layer.
    *
    */
-  protected DomCDATA(Document owner, String value)
+  protected DomCDATA(DomDocument owner, String value)
   {
     super(CDATA_SECTION_NODE, owner, value);
   }
 
-  protected DomCDATA (Document owner, char buf [], int off, int len)
+  protected DomCDATA(DomDocument owner, char buf [], int off, int len)
   {
     super(CDATA_SECTION_NODE, owner, buf, off, len);
   }

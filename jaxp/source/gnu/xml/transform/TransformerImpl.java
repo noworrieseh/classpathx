@@ -41,6 +41,7 @@ package gnu.xml.transform;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.UnknownServiceException;
 import java.net.URL;
@@ -234,43 +235,35 @@ class TransformerImpl
     else if (outputTarget instanceof StreamResult)
       {
         StreamResult sr = (StreamResult) outputTarget;
+        IOException ex = null;
         try
           {
-            OutputStream out = sr.getOutputStream();
-            if (out == null)
+            writeStreamResult(parent, sr, outputMethod, encoding);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            try
               {
-                String systemId = sr.getSystemId();
-                try
-                  {
-                    URL url = new URL(systemId);
-                    URLConnection connection = url.openConnection();
-                    connection.setDoOutput(true);
-                    out = connection.getOutputStream();
-                  }
-                catch (MalformedURLException e)
-                  {
-                    out = new FileOutputStream(systemId);
-                  }
-                catch (UnknownServiceException e)
-                  {
-                    URL url = new URL(systemId);
-                    out = new FileOutputStream(url.getPath());
-                  }
+                writeStreamResult(parent, sr, outputMethod, "UTF-8");
               }
-            StreamSerializer serializer =
-              new StreamSerializer(outputMethod, encoding, null);
-            serializer.serialize(parent, out);
-            out.close();
+            catch (IOException e2)
+              {
+                ex = e2;
+              }
           }
         catch (IOException e)
           {
+            ex = e;
+          }
+        if (ex != null)
+          {
             if (errorListener != null)
               {
-                errorListener.error(new TransformerException(e));
+                errorListener.error(new TransformerException(ex));
               }
             else
               {
-                e.printStackTrace(System.err);
+                ex.printStackTrace(System.err);
               }
           }
       }
@@ -298,6 +291,54 @@ class TransformerImpl
               {
                 e.printStackTrace(System.err);
               }
+          }
+      }
+  }
+
+  void writeStreamResult(Node node, StreamResult sr, int outputMethod,
+                         String encoding)
+    throws IOException
+  {
+    OutputStream out = null;
+    try
+      {
+        out = sr.getOutputStream();
+        if (out == null)
+          {
+            String systemId = sr.getSystemId();
+            try
+              {
+                URL url = new URL(systemId);
+                URLConnection connection = url.openConnection();
+                connection.setDoOutput(true);
+                out = connection.getOutputStream();
+              }
+            catch (MalformedURLException e)
+              {
+                out = new FileOutputStream(systemId);
+              }
+            catch (UnknownServiceException e)
+              {
+                URL url = new URL(systemId);
+                out = new FileOutputStream(url.getPath());
+              }
+          }
+        StreamSerializer serializer =
+          new StreamSerializer(outputMethod, encoding, null);
+        serializer.setCdataSectionElements(stylesheet.outputCdataSectionElements);
+        serializer.serialize(node, out);
+      }
+    finally
+      {
+        try
+          {
+            if (out != null)
+              {
+                out.close();
+              }
+          }
+        catch (IOException e)
+          {
           }
       }
   }

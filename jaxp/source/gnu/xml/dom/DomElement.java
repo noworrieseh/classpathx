@@ -40,9 +40,9 @@ package gnu.xml.dom;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.xml.XMLConstants;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -81,7 +81,7 @@ public class DomElement
    *	this is used to uniquely identify a type of element
    * @param name Name of this element, which may include a prefix
    */
-  protected DomElement(Document owner, String namespaceURI, String name)
+  protected DomElement(DomDocument owner, String namespaceURI, String name)
   {
     super(ELEMENT_NODE, owner, namespaceURI, name);
   }
@@ -127,7 +127,7 @@ public class DomElement
     return node;
   }
 
-  void setOwner(Document doc)
+  void setOwner(DomDocument doc)
   {
     if (attributes != null)
       {
@@ -253,7 +253,7 @@ public class DomElement
   public void setAttributeNS(String uri, String aname, String value)
   {
     if (("xmlns".equals (aname) || aname.startsWith ("xmlns:"))
-        && !DomDocument.xmlnsURI.equals (uri))
+        && !XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals (uri))
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,
                         "setting xmlns attribute to illegal value", this, 0);
@@ -369,7 +369,7 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
                 if ("xmlns".equals(qName))
@@ -397,7 +397,7 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
                 return ("xmlns".equals(qName));
@@ -418,7 +418,7 @@ public class DomElement
       {
         for (DomNode ctx = attributes.first; ctx != null; ctx = ctx.next)
           {
-            if (xmlnsURI.equals(ctx.getNamespaceURI()))
+            if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ctx.getNamespaceURI()))
               {
                 String qName = ctx.getNodeName();
                 if ("xmlns".equals(qName))
@@ -446,7 +446,7 @@ public class DomElement
     if (attributes != null)
       {
         Node xmlBase =
-          attributes.getNamedItemNS(DomDocument.xmlNamespace, "base");
+          attributes.getNamedItemNS(XMLConstants.XML_NS_URI, "base");
         if (xmlBase != null)
           {
             return xmlBase.getNodeValue();

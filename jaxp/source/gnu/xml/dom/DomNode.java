@@ -41,6 +41,7 @@ package gnu.xml.dom;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.XMLConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMException;
@@ -97,8 +98,8 @@ public abstract class DomNode
 {
 
   // package private
-  final static String xmlNamespace = "http://www.w3.org/XML/1998/namespace";
-  final static String xmlnsURI = "http://www.w3.org/2000/xmlns/";
+  //final static String xmlNamespace = "http://www.w3.org/XML/1998/namespace";
+  //final static String xmlnsURI = "http://www.w3.org/2000/xmlns/";
 
   // tunable
   //	NKIDS_* affects arrays of children (which grow)
@@ -135,7 +136,7 @@ public abstract class DomNode
   // PER-INSTANCE DATA
   //
 
-  Document owner;
+  DomDocument owner;
   DomNode parent; // parent node;
   DomNode previous; // previous sibling node
   DomNode next; // next sibling node
@@ -190,7 +191,7 @@ public abstract class DomNode
    * and DocumentType nodes get an owner as soon as they are
    * associated with a document.
    */
-  protected DomNode(short nodeType, Document owner)
+  protected DomNode(short nodeType, DomDocument owner)
   {
     this.nodeType = nodeType;
 
@@ -295,7 +296,7 @@ public abstract class DomNode
   /**
    * Used to adopt a node to a new document.
    */
-  void setOwner(Document doc)
+  void setOwner(DomDocument doc)
   {
     this.owner = doc;
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
@@ -389,6 +390,10 @@ public abstract class DomNode
   private void insertionEvent(DomEvent.DomMutationEvent event,
                               DomNode target)
   {
+    if (owner == null || owner.building)
+      {
+        return;
+      }
     boolean doFree = false;
     
     if (event == null)
@@ -424,6 +429,10 @@ public abstract class DomNode
   private void removalEvent(DomEvent.DomMutationEvent event,
                             DomNode target)
   {
+    if (owner == null || owner.building)
+      {
+        return;
+      }
     boolean doFree = false;
 
     if (event == null)
@@ -1106,8 +1115,8 @@ public abstract class DomNode
     
     if (deep)
       {
-        Document doc = (nodeType == DOCUMENT_NODE) ?
-          (Document) node : node.owner;
+        DomDocument doc = (nodeType == DOCUMENT_NODE) ?
+          (DomDocument) node : node.owner;
         for (DomNode ctx = first; ctx != null; ctx = ctx.next)
           {
             DomNode newChild = (DomNode) ctx.cloneNode(deep);

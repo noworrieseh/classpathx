@@ -39,7 +39,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Text;
 
@@ -65,23 +64,23 @@ public class DomText
    * as part of its createTextNode functionality, or through a subclass
    * which is similarly used in a "Sub-DOM" style layer. 
    */
-  protected DomText(Document owner, String value)
+  protected DomText(DomDocument owner, String value)
   {
     super(TEXT_NODE, owner, value);
   }
 
-  protected DomText(Document owner, char[] buf, int off, int len)
+  protected DomText(DomDocument owner, char[] buf, int off, int len)
   {
     super(TEXT_NODE, owner, buf, off, len);
   }
 
   // Used by DomCDATA
-  DomText(short nodeType, Document owner, String value)
+  DomText(short nodeType, DomDocument owner, String value)
   {
     super(nodeType, owner, value);
   }
 
-  DomText(short nodeType, Document owner, char[] buf, int off, int len)
+  DomText(short nodeType, DomDocument owner, char[] buf, int off, int len)
   {
     super(nodeType, owner, buf, off, len);
   }

@@ -38,7 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.EntityReference;
 
 /**
@@ -92,7 +91,7 @@ public class DomEntityReference
    *
    * @see DomNode#makeReadonly
    */
-  protected DomEntityReference(Document owner, String name)
+  protected DomEntityReference(DomDocument owner, String name)
   {
     super(ENTITY_REFERENCE_NODE, owner);
     this.name = name;

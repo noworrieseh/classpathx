@@ -39,7 +39,6 @@
 package gnu.xml.dom;
 
 import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.MutationEvent;
@@ -61,14 +60,14 @@ public abstract class DomCharacterData
   private String text;
   
   // package private
-  DomCharacterData(short nodeType, Document doc, String value)
+  DomCharacterData(short nodeType, DomDocument doc, String value)
   {
     super(nodeType, doc);
     text = (value == null) ? "" : value;
   }
 
   // package private
-  DomCharacterData(short nodeType, Document doc,
+  DomCharacterData(short nodeType, DomDocument doc,
                    char[] buf, int offset, int length)
   {
     super(nodeType, doc);

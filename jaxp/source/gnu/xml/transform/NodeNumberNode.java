@@ -109,10 +109,11 @@ final class NodeNumberNode
             return new int[0];
           }
       }
+    Node current = context;
     switch (level)
       {
       case SINGLE:
-        while (context != null && !countMatches(context))
+        while (context != null && !countMatches(current, context))
           {
             context = context.getParentNode();
           }
@@ -122,7 +123,7 @@ final class NodeNumberNode
         List ancestors = new ArrayList();
         while (context != null)
           {
-            if (countMatches(context))
+            if (countMatches(current, context))
               {
                 ancestors.add(context);
               }
@@ -148,7 +149,7 @@ final class NodeNumberNode
             for (Iterator i = ns.iterator(); i.hasNext(); )
               {
                 Node candidate = (Node) i.next();
-                if (countMatches(candidate))
+                if (countMatches(current, candidate))
                   {
                     candidates.add(candidate);
                   }
@@ -166,10 +167,36 @@ final class NodeNumberNode
       }
   }
 
-  boolean countMatches(Node node)
+  boolean countMatches(Node current, Node node)
   {
-    Object ret = count.evaluate(node, 1, 1);
-    return (ret instanceof Collection) && ((Collection) ret).contains(node);
+    if (count == null)
+      {
+        short nt = node.getNodeType();
+        if (nt != current.getNodeType())
+          {
+            return false;
+          }
+        switch (nt)
+          {
+          case Node.ATTRIBUTE_NODE:
+          case Node.ELEMENT_NODE:
+            String nns = node.getNamespaceURI();
+            String cns = current.getNamespaceURI();
+            if ((nns == null && cns == null) ||
+                (nns != null && nns.equals(cns)))
+              {
+                return node.getLocalName().equals(current.getLocalName());
+              }
+            return false;
+          }
+        return true;
+      }
+    else
+      {
+        Object ret = count.evaluate(node, 1, 1);
+        return (ret instanceof Collection) &&
+          ((Collection) ret).contains(node);
+      }
   }
 
   int getIndex(Node node)

@@ -39,6 +39,7 @@
 package gnu.xml.dom;
 
 import java.util.Iterator;
+import javax.xml.XMLConstants;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
@@ -89,6 +90,8 @@ public class DomDocument
 
   private final DOMImplementation implementation;
   private boolean checkingCharacters = true;
+
+  boolean building; // if true, skip mutation events in the tree
   
   DomDocumentConfiguration config;
 
@@ -128,6 +131,15 @@ public class DomDocument
   {
     super(DOCUMENT_NODE, null);
     implementation = impl;
+  }
+
+  /**
+   * Sets the <code>building</code> flag.
+   * Mutation events in the document are not reported.
+   */
+  public void setBuilding(boolean flag)
+  {
+    building = flag;
   }
 
   /**
@@ -571,15 +583,16 @@ public class DomDocument
     if (name.startsWith("xml:"))
       {
         if (namespaceURI != null
-            && !xmlNamespace.equals(namespaceURI))
+            && !XMLConstants.XML_NS_URI.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
-                            "xml namespace is always " + xmlNamespace,
-                            this, 0);
+                            "xml namespace is always " +
+                            XMLConstants.XML_NS_URI, this, 0);
           }
-        namespaceURI = xmlNamespace;
+        namespaceURI = XMLConstants.XML_NS_URI;
       }
-    else if (name.startsWith("xmlns:"))
+    else if (XMLConstants.XMLNS_ATTRIBUTE.equals(name) ||
+             name.startsWith("xmlns:"))
       {
         throw new DomEx(DomEx.NAMESPACE_ERR,
                         "xmlns is reserved", this, 0);
@@ -729,11 +742,12 @@ public class DomDocument
       }
     if (name.startsWith("xml:"))
       {
-        return createAttributeNS(xmlNamespace, name);
+        return createAttributeNS(XMLConstants.XML_NS_URI, name);
       }
-    else if (name.startsWith("xmlns:"))
+    else if (XMLConstants.XMLNS_ATTRIBUTE.equals(name) ||
+             name.startsWith("xmlns:"))
       {
-        return createAttributeNS(xmlnsURI, name);
+        return createAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, name);
       }
     else
       {
@@ -761,24 +775,28 @@ public class DomDocument
       {
         if (namespaceURI == null)
           {
-            namespaceURI = xmlNamespace;
+            namespaceURI = XMLConstants.XML_NS_URI;
           }
-        else if (!xmlNamespace.equals(namespaceURI))
+        else if (!XMLConstants.XML_NS_URI.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
-                            "xml namespace is always " + xmlNamespace,
-                            this, 0);
+                            "xml namespace is always " +
+                            XMLConstants.XML_NS_URI, this, 0);
           }
-        namespaceURI = xmlNamespace;
       }
-    else if (name.startsWith("xmlns:") || name.equals("xmlns"))
+    else if (XMLConstants.XMLNS_ATTRIBUTE.equals(name) ||
+             name.startsWith("xmlns:"))
       {
-        if (namespaceURI != null && !xmlnsURI.equals(namespaceURI))
+        if (namespaceURI == null)
+          {
+            namespaceURI = XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+          }
+        else if (!XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceURI))
           {
             throw new DomEx(DomEx.NAMESPACE_ERR,
-                            "xmlns namespace must be " + xmlnsURI, this, 0);
+                            "xmlns namespace must be " +
+                            XMLConstants.XMLNS_ATTRIBUTE_NS_URI, this, 0);
           }
-        namespaceURI = xmlnsURI;
       }
     else if (namespaceURI == null && name.indexOf(':') != -1)
       {
@@ -1087,7 +1105,7 @@ public class DomDocument
     if (root != null)
       {
         NamedNodeMap attrs = root.getAttributes();
-        Node xmlBase = attrs.getNamedItemNS(xmlNamespace, "base");
+        Node xmlBase = attrs.getNamedItemNS(XMLConstants.XML_NS_URI, "base");
         if (xmlBase != null)
           {
             return xmlBase.getNodeValue();
@@ -1212,7 +1230,7 @@ public class DomDocument
                   {
                     Node attr = attrs.item(i);
                     String namespace = attr.getNamespaceURI();
-                    if (xmlnsURI.equals(namespace))
+                    if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespace))
                       {
                         attrs.removeNamedItemNS(namespace,
                                                 attr.getNodeName());
@@ -1258,37 +1276,37 @@ public class DomDocument
             checkNCName(qualifiedName, xml11);
             String prefix = (ci == -1) ? "" :
               qualifiedName.substring(0, ci);
-            if ("xml".equals(prefix) &&
-                !xmlNamespace.equals(namespaceURI))
+            if (XMLConstants.XML_NS_PREFIX.equals(prefix) &&
+                !XMLConstants.XML_NS_URI.equals(namespaceURI))
               {
                 throw new DomEx(DomEx.NAMESPACE_ERR,
-                                "xml namespace must be " + xmlNamespace,
-                                src, 0);
+                                "xml namespace must be " +
+                                XMLConstants.XML_NS_URI, src, 0);
               }
             else if (src.nodeType == ATTRIBUTE_NODE &&
-                     ("xmlns".equals(prefix) ||
-                      "xmlns".equals(qualifiedName)) &&
-                     !xmlnsURI.equals(namespaceURI))
+                     (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix) ||
+                      XMLConstants.XMLNS_ATTRIBUTE.equals(qualifiedName)) &&
+                     !XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceURI))
               {
                 throw new DomEx(DomEx.NAMESPACE_ERR,
-                                "xmlns namespace must be " + xmlnsURI,
-                                src, 0);
+                                "xmlns namespace must be " +
+                                XMLConstants.XMLNS_ATTRIBUTE_NS_URI, src, 0);
               }
-            if (xmlNamespace.equals(namespaceURI) &&
-                !"xml".equals(prefix))
+            if (XMLConstants.XML_NS_URI.equals(namespaceURI) &&
+                !XMLConstants.XML_NS_PREFIX.equals(prefix))
               {
                 throw new DomEx(DomEx.NAMESPACE_ERR,
-                                "xml namespace must be " + xmlNamespace,
-                                src, 0);
+                                "xml namespace must be " +
+                                XMLConstants.XML_NS_URI, src, 0);
               }
             else if (src.nodeType == ATTRIBUTE_NODE &&
-                     xmlnsURI.equals(namespaceURI) &&
-                     !("xmlns".equals(prefix) ||
-                       "xmlns".equals(qualifiedName)))
+                     XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceURI) &&
+                     !(XMLConstants.XMLNS_ATTRIBUTE.equals(prefix) ||
+                       XMLConstants.XMLNS_ATTRIBUTE.equals(qualifiedName)))
               {
                 throw new DomEx(DomEx.NAMESPACE_ERR,
-                                "xmlns namespace must be " + xmlnsURI,
-                                src, 0);
+                                "xmlns namespace must be " +
+                                XMLConstants.XMLNS_ATTRIBUTE_NS_URI, src, 0);
               }
                 
           }

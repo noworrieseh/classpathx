@@ -44,6 +44,7 @@ import javax.xml.xpath.XPathFunction;
 import javax.xml.xpath.XPathFunctionException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
+import gnu.xml.xpath.Function;
 
 /**
  * The XSLT <code>current()</code>function.
@@ -52,7 +53,7 @@ import gnu.xml.xpath.Expr;
  */
 final class CurrentFunction
   extends Expr
-  implements XPathFunction
+  implements Function, XPathFunction
 {
 
   public Object evaluate(List args)
@@ -61,6 +62,10 @@ final class CurrentFunction
     // We can't do anything useful here.
     // So much for the JAXP API...
     return Collections.EMPTY_SET;
+  }
+
+  public void setArguments(List args)
+  {
   }
 
   public Object evaluate(Node context, int pos, int len)

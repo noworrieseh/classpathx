@@ -175,18 +175,20 @@ class Stylesheet
     preserveSpace = new LinkedHashSet();
     attributeSets = new LinkedHashMap();
     usedAttributeSets = new LinkedHashMap();
-    decimalFormats = new LinkedHashMap();
     namespaceAliases = new LinkedHashMap();
     outputCdataSectionElements = new LinkedHashSet();
     if (parent == null)
       {
         bindings = new Bindings();
         templates = new LinkedList();
+        decimalFormats = new LinkedHashMap();
+        initDefaultDecimalFormat();
       }
     else
       {
         bindings = parent.bindings;
         templates = parent.templates;
+        decimalFormats = parent.decimalFormats;
       }
 
     factory.xpathFactory.setXPathVariableResolver(bindings);
@@ -213,6 +215,25 @@ class Stylesheet
       }
       */
   }
+  
+  void initDefaultDecimalFormat()
+  {
+    DecimalFormat defaultDecimalFormat = new DecimalFormat();
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+    symbols.setDecimalSeparator('.');
+    symbols.setGroupingSeparator(',');
+    symbols.setPercent('%');
+    symbols.setPerMill('\u2030');
+    symbols.setZeroDigit('0');
+    symbols.setDigit('#');
+    symbols.setPatternSeparator(';');
+    symbols.setInfinity("Infinity");
+    symbols.setNaN("NaN");
+    symbols.setMinusSign('-');
+    defaultDecimalFormat.setDecimalFormatSymbols(symbols);
+    decimalFormats.put(null, defaultDecimalFormat);
+  }
+  
 
   public Object clone()
   {
@@ -319,11 +340,11 @@ class Stylesheet
   final void parseDecimalFormat(Node node, NamedNodeMap attrs)
     throws TransformerConfigurationException
   {
-    String dfName = getRequiredAttribute(attrs, "name", node);
+    String dfName = getAttribute(attrs, "name");
     DecimalFormat df = new DecimalFormat();
     DecimalFormatSymbols symbols = new DecimalFormatSymbols();
     symbols.setDecimalSeparator(parseDFChar(attrs, "decimal-separator", '.'));
-    symbols.setGroupingSeparator(parseDFChar(attrs, "grouping-spearator", ','));
+    symbols.setGroupingSeparator(parseDFChar(attrs, "grouping-separator", ','));
     symbols.setInfinity(parseDFString(attrs, "infinity", "Infinity"));
     symbols.setMinusSign(parseDFChar(attrs, "minus-sign", '-'));
     symbols.setNaN(parseDFString(attrs, "NaN", "NaN"));

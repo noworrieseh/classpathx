@@ -220,8 +220,7 @@ abstract class AbstractNumberNode
   static final String roman(boolean upper, int number)
   {
     StringBuffer buf = new StringBuffer();
-    int pos = roman_numbers.length - 1;
-    while (pos >= 0)
+    for (int pos = roman_numbers.length - 1; pos >= 0; pos -= 2)
       {
         int f = number / roman_numbers[pos];
         if (f != 0)

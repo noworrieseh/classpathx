@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Node;
@@ -168,6 +169,19 @@ public class XPathParser
     else if ("round".equals(name) && arity == 1)
       {
         return new RoundFunction(args);
+      }
+    else if (functionResolver != null)
+      {
+        QName qName = QName.valueOf(name);
+        Object function = functionResolver.resolveFunction(qName, arity);
+        if (function != null &&
+            function instanceof Function &&
+            function instanceof Expr)
+          {
+            Function f = (Function) function;
+            f.setArguments(args);
+            return (Expr) function;
+          }
       }
     return new FunctionCall(functionResolver, name, args);
   }

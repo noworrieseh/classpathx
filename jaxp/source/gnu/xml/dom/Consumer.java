@@ -300,10 +300,11 @@ public class Consumer extends DomConsumer
 	// using parser output (don't duplicate the work)
 	public void startDocument () throws SAXException
 	{
-	    DomDocument		doc;
-
 	    super.startDocument ();
-	    ((DomDocument) getDocument ()).setStrictErrorChecking(false);
+	    
+            DomDocument doc = (DomDocument) getDocument ();
+            doc.setStrictErrorChecking(false);
+            doc.setBuilding(true);
 	}
 
         /**
@@ -325,8 +326,9 @@ public class Consumer extends DomConsumer
 	public void endDocument ()
 	throws SAXException
 	{
-	    DomDocument		doc = (DomDocument) getDocument ();
+	    DomDocument doc = (DomDocument) getDocument ();
 	    doc.setStrictErrorChecking(true);
+            doc.setBuilding(false);
 	    doc.compact ();
             DomDoctype doctype = (DomDoctype) doc.getDoctype();
             if (doctype != null)

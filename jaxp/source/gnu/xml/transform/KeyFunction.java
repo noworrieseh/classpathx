@@ -38,6 +38,7 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.xpath.XPathFunction;
@@ -57,7 +58,7 @@ final class KeyFunction
 {
 
   final Stylesheet stylesheet;
-  List values;
+  List args;
 
   KeyFunction(Stylesheet stylesheet)
   {
@@ -71,13 +72,20 @@ final class KeyFunction
     return Collections.EMPTY_SET;
   }
 
-  public void setValues(List values)
+  public void setArguments(List args)
   {
-    this.values = values;
+    this.args = args;
   }
 
   public Object evaluate(Node context, int pos, int len)
   {
+    int arity = args.size();
+    List values = new ArrayList(arity);
+    for (int i = 0; i < arity; i++)
+      {
+        Expr arg = (Expr) args.get(i);
+        values.add(arg.evaluate(context, pos, len));
+      }
     String keyName = _string(context, values.get(0));
     Object arg = values.get(1);
     // TODO

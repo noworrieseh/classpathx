@@ -1,3 +1,13 @@
+2004-11-21  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Use XMLConstants constants instead of literals.
+   	* transform: Fixed infinite loop in roman numeral generation.
+   	* xpath: Resolve functions at parse time.
+   	
+2004-11-20  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Do not report events during DOM construction.
+   	
 2004-11-19  Chris Burdess  <dog@gnu.org>
 
    	* transform: OASIS XSLT conformance improvements.

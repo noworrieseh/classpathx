@@ -38,8 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
-
 /**
  * <p> Abstract implemention of nodes describing external DTD-related
  * objects.  This facilitates reusing code for Entity, Notation, and
@@ -73,7 +71,7 @@ public abstract class DomExtern
    */
   // package private
   DomExtern(short nodeType,
-            Document owner,
+            DomDocument owner,
             String name,
             String publicId,
             String systemId)

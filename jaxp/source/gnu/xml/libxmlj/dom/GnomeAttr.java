@@ -70,9 +70,14 @@ class GnomeAttr
   public native void setValue(String value)
     throws DOMException;
   
+  public Node getParentNode()
+  {
+    return null;
+  }
+  
   public Element getOwnerElement()
   {
-    return null; // FIXME
+    return (Element) super.getParentNode();
   }
   
   // DOM Level 3 methods
@@ -108,3 +113,4 @@ class GnomeAttr
   }
   
 }
+

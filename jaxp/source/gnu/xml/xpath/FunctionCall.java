@@ -82,23 +82,23 @@ public final class FunctionCall
         XPathFunction function = resolver.resolveFunction(qname, arity);
         if (function != null)
           {
-            List values = new ArrayList(arity);
-            for (int i = 0; i < arity; i++)
-              {
-                Expr arg = (Expr) args.get(i);
-                values.add(arg.evaluate(context, pos, len));
-              }
             //System.err.println("Calling "+toString()+" with "+values);
             if (function instanceof Expr)
               {
                 if (function instanceof Function)
                   {
-                    ((Function) function).setValues(values);
+                    ((Function) function).setArguments(args);
                   }
                 return ((Expr) function).evaluate(context, pos, len);
               }
             else
               {
+                List values = new ArrayList(arity);
+                for (int i = 0; i < arity; i++)
+                  {
+                    Expr arg = (Expr) args.get(i);
+                    values.add(arg.evaluate(context, pos, len));
+                  }
                 try
                   {
                     return function.evaluate(values);

@@ -38,7 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.ProcessingInstruction;
 
 /**
@@ -75,7 +74,7 @@ public class DomPI
    * part of its createProcessingInstruction functionality, or through
    * a subclass which is similarly used in a "Sub-DOM" style layer. 
    */
-  protected DomPI(Document owner, String target, String data)
+  protected DomPI(DomDocument owner, String target, String data)
   {
     super(PROCESSING_INSTRUCTION_NODE, owner);
     this.target = target;

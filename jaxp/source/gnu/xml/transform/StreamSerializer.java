@@ -42,8 +42,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.XMLConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -70,6 +73,7 @@ public class StreamSerializer
   final int mode;
   final Map namespaces;
   protected String eol;
+  Collection cdataSectionElements = Collections.EMPTY_SET;
 
   protected boolean discardDefaultContent;
   protected boolean xmlDeclaration = true;
@@ -92,7 +96,19 @@ public class StreamSerializer
     namespaces = new HashMap();
   }
 
+  void setCdataSectionElements(Collection c)
+  {
+    cdataSectionElements = c;
+  }
+
   public void serialize(final Node node, final OutputStream out)
+    throws IOException
+  {
+    serialize(node, out, false);
+  }
+  
+  void serialize(final Node node, final OutputStream out,
+                 boolean convertToCdata)
     throws IOException
   {
     if (out == null)
@@ -104,7 +120,12 @@ public class StreamSerializer
     Node next = node.getNextSibling();
     String uri = node.getNamespaceURI();
     boolean defined = false;
-    switch (node.getNodeType())
+    short nt = node.getNodeType();
+    if (convertToCdata && nt == Node.TEXT_NODE)
+      {
+        nt = Node.CDATA_SECTION_NODE;
+      }
+    switch (nt)
       {
       case Node.ATTRIBUTE_NODE:
         if (uri != null && !isDefined(uri))
@@ -152,10 +173,11 @@ public class StreamSerializer
                   }
                 else
                   {
-                    serialize(attr, out);
+                    serialize(attr, out, false);
                   }
               }
           }
+        convertToCdata = cdataSectionElements.contains(value);
         children = node.getFirstChild();
         if (children == null)
           {
@@ -165,7 +187,7 @@ public class StreamSerializer
         else
           {
             out.write(KET);
-            serialize(children, out);
+            serialize(children, out, convertToCdata);
             out.write(BRA);
             out.write(SLASH);
             out.write(value.getBytes(encoding));
@@ -237,7 +259,7 @@ public class StreamSerializer
         children = node.getFirstChild();
         if (children != null)
           {
-            serialize(children, out);
+            serialize(children, out, convertToCdata);
           }
         break;
       case Node.DOCUMENT_TYPE_NODE:
@@ -290,13 +312,15 @@ public class StreamSerializer
       }
     if (next != null)
       {
-        serialize(next, out);
+        serialize(next, out, convertToCdata);
       }
   }
 
   boolean isDefined(String uri)
   {
-    return namespaces.containsKey(uri);
+    return XMLConstants.XML_NS_URI.equals(uri) ||
+      XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(uri) ||
+      namespaces.containsKey(uri);
   }
 
   String define(String uri, String prefix)

@@ -38,7 +38,6 @@
 
 package gnu.xml.dom;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 
 /**
@@ -60,7 +59,7 @@ public class DomFragment
    * its createDocumentFragment functionality, or through a subclass which
    * is similarly used in a "Sub-DOM" style layer.
    */
-  protected DomFragment(Document owner)
+  protected DomFragment(DomDocument owner)
   {
     super(DOCUMENT_FRAGMENT_NODE, owner);
   }

@@ -58,7 +58,6 @@ abstract class TemplateNode
   final TemplateNode children;
   final TemplateNode next;
 
-
   TemplateNode(TemplateNode children, TemplateNode next)
   {
     this.children = children;
@@ -70,6 +69,11 @@ abstract class TemplateNode
                    Node parent, Node nextSibling)
     throws TransformerException
   {
+    if (Thread.currentThread().isInterrupted())
+      {
+        // Head off any infinite loops at the pass
+        return;
+      }
     doApply(stylesheet, mode, context, pos, len, parent, nextSibling);
   }
 
