@@ -9,7 +9,7 @@
  * Copyright (c) 1999-2001 by David Brownell.
  * This file is distributed under the GPL.
  *
- * $Id: package.html,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: package.html,v 1.6 2001-10-29 21:46:54 db Exp $
  */
 -->
 </head><body>
@@ -154,7 +154,8 @@ all XML parsers are required to support:</p> <ul>
     widely interoperable than those in any other encoding. </li>
 
     <li> ISO-8859-1 ... includes accented characters used in
-    much of western Europe. </li>
+    much of western Europe (but excluding the Euro currency
+    symbol).</li>
 
     <li> UTF-16 ... with several variants, this encodes each
     sixteen bit Unicode character in sixteen bits of output.
@@ -180,7 +181,7 @@ all XML parsers are required to support:</p> <ul>
 make sure to label your data appropriately: </p>
 
 <blockquote>
-&lt;?xml version="1.0" encoding="<b>ISO-8859-1</b>"?&gt;
+&lt;?xml version="1.0" encoding="<b>ISO-8859-15</b>"?&gt;
 </blockquote>
 
 <p> Encodings accessed through <code>java.io.InputStreamReader</code>
@@ -196,6 +197,12 @@ may even <em>require</em> use of nonstandard encoding names.
 Please report
 such problems; some of them can be worked around in this parser,
 and many can be worked around by using external labels.
+</p>
+
+<p>Note that if you are using the Euro symbol with an fixed length
+eight bit encoding, you should probably be using the encoding label
+<em>iso-8859-15</em> or, with a Microsoft OS, <em>cp-1252</em>.
+Of course, UTF-8 and UTF-16 handle the Euro symbol directly.
 </p>
 
 
