@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,9 +22,15 @@
 package javax.activation;
 
 // Imports
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.io.OutputStream;
+import java.io.IOException;
 
+/**
+ * DataSourceDataContentHandler
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
+ */
 class DataSourceDataContentHandler
 implements DataContentHandler 
 {
@@ -57,7 +64,8 @@ implements DataContentHandler
    * @param handler Data content handler
    * @param source Data source
    */
-  public DataSourceDataContentHandler(DataContentHandler handler,DataSource source) 
+  public DataSourceDataContentHandler(DataContentHandler handler,
+      DataSource source)
   {
     dhc = handler;
     ds = source;
@@ -70,9 +78,9 @@ implements DataContentHandler
 
   /**
    * Get transfer data flavors.
-   * @returns List of data flavors
+   * @return List of data flavors
    */
-  public DataFlavor[] getTransferDataFlavors() 
+  public DataFlavor[] getTransferDataFlavors()
   {
     return transferFlavors;
   } // getTransferDataFlavors()
@@ -81,7 +89,7 @@ implements DataContentHandler
    * Get transfer data based on data flavor and data source
    * @param flavor Data flavor
    * @param source Data source
-   * @returns Transfer data
+   * @return Transfer data
    * @throws IOException IO exception occurred
    */
   public Object getTransferData(DataFlavor flavor, DataSource source) 
@@ -93,10 +101,10 @@ implements DataContentHandler
   /**
    * Get content.
    * @param source Data source
-   * @returns Content object
+   * @return Content object
    * @throws IOException IO exception occurred
    */
-  public Object getContent(DataSource source) throws IOException 
+  public Object getContent(DataSource source) throws IOException
   {
     return null; // TODO
   } // getContent()
@@ -106,9 +114,10 @@ implements DataContentHandler
    * @param object Object to write
    * @param mimeType MIME type
    * @param stream Output stream
+   * @throws IOException IO exception occurred
    */
   public void writeTo(Object object, String mimeType, OutputStream stream)
-  throws IOException 
+  throws IOException
   {
   } // writeTo()
 

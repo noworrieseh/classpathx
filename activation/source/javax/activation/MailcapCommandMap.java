@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -20,19 +21,28 @@
 */
 package javax.activation;
 
-
-import java.io.*;
-import java.util.*;
-
+// Imports
+import java.io.File;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StreamTokenizer;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.Properties;
 
 /** a comand map that represents the mailcap file.
  * The <i>mailcap</i> file format is specified in RFC1524.
  * Within the JAF it is used as an easy way to specify beans that
- * perform certain operations on data of a particular MIME content type.
+ * perform certain operations on data of a particular MIME content
+ * type.
  *
  * <p>For example, the following mailcap file specifies 2 beans that
- * perform different operations on the <code>text/html</code> MIME type and
- * a bean that displays JPEG images:
+ * perform different operations on the <code>text/html</code>
+ * MIME type and a bean that displays JPEG images:
  * <pre>
  *   text/html; ; x-java-edit=gnu.inet.mime.html.HTMLBrowser
  *   text/&asterisk; ;  \
@@ -42,24 +52,27 @@ import java.util.*;
  * </pre>
  * </p>
  *
- * <p>This class provides a way to access the registry of information that
- * is declared in such a mailcap file.</p>
+ * <p>This class provides a way to access the registry of information
+ * that is declared in such a mailcap file.</p>
  *
- * <p>mailcap commands that do not begin with <code>x-java-</code> are ignored.
- * The special command: <code>x-java-content-handler</code> causes this class
- * to intepret the command as a <code>DataContentHandler</code>. There is a
- * special method for obtaining the content handler for a particular MIME type.
- * Other methods provide various ways of accessing the command registry for
- * a particular MIME type.
+ * <p>mailcap commands that do not begin with <code>x-java-</code>
+ * are ignored. The special command: <code>x-java-content-handler
+ * </code> causes this class to intepret the command as a
+ * <code>DataContentHandler</code>. There is a special method for
+ * obtaining the content handler for a particular MIME type. Other
+ * methods provide various ways of accessing the command registry
+ * for a particular MIME type.
  * </p>
  *
  * <p><h4>Command line testing</h4>
- * Running this class from the command line and supplying a content type will cause
- * the preferred commands for the content type to be printed on the console.
+ * Running this class from the command line and supplying a content
+ * type will cause the preferred commands for the content type to be
+ * printed on the console.
  * </p>
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
+ * @version $Revision: 1.7 $
  */
 public class MailcapCommandMap
 extends CommandMap 
@@ -68,68 +81,90 @@ extends CommandMap
   /** the database of mailcap registrys.
    * Each entry is a hash of <code>CommandInfo[]</code>s.
    */
-  private Hashtable[] DB=null;
+  private Hashtable[] DB = null;
 
+  /**
+   * Programmic Entries
+   */
   private static final int PROG = 0;
+
+  /**
+   * Home Entries
+   */
   private static final int HOME = 1;
+
+  /**
+   * System Entries
+   */
   private static final int SYS = 2;
+
+  /**
+   * Jar Entries
+   */
   private static final int JAR = 3;
+
+  /**
+   * Default Entries
+   */
   private static final int DEF = 4;
-  private static boolean debug = false;
 
 
   /** create default MIME Types registry.
    */
-  public MailcapCommandMap() 
+  public MailcapCommandMap()
   {
     DB = new Hashtable[5];
-    Properties properties=System.getProperties();
-    String sep=properties.getProperty("file.separator");
+    Properties properties = System.getProperties();
+    String sep = properties.getProperty("file.separator");
     //init programmatic entries
     DB[PROG] = new Hashtable();
     //the user's mime types
     try
     {
-      File userHome=new File(properties.getProperty("user.home")+sep+".mailcap");
+      File userHome = new File(properties.getProperty("user.home") +
+        sep + ".mailcap");
       DB[HOME] = loadMailcapRegistry(new FileReader(userHome));
     }
     catch(Exception e)
     {
-      DB[HOME]=new Hashtable();
+      DB[HOME] = new Hashtable();
     }
     //the system mime types
     try
     {
-      File javaHome=new File(properties.getProperty("java.home")+sep+"lib"+sep+"mailcap");
+      File javaHome = new File(properties.getProperty("java.home") +
+        sep + "lib" + sep + "mailcap");
       DB[SYS] = loadMailcapRegistry(new FileReader(javaHome));
     }
     catch(Exception e)
     {
-      DB[SYS]=new Hashtable();
+      DB[SYS] = new Hashtable();
     }
     //a possible jar-file local copy of the mime types
     try
     {
-      String resource="META-INF"+sep+"mailcap";
-      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[JAR]=loadMailcapRegistry(new InputStreamReader(str));
+      String resource = "META-INF" + sep + "mailcap";
+      InputStream str =
+        getClass().getClassLoader().getResourceAsStream(resource);
+      DB[JAR] = loadMailcapRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
-      DB[JAR]=new Hashtable();
+      DB[JAR] = new Hashtable();
     }
     //the default providers... obtained from a possible META-INF/ location
     try
     {
-      String resource="META-INF"+sep+"mailcap.default";
-      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[DEF]=loadMailcapRegistry(new InputStreamReader(str));
+      String resource = "META-INF" + sep + "mailcap.default";
+      InputStream str =
+        getClass().getClassLoader().getResourceAsStream(resource);
+      DB[DEF] = loadMailcapRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
-      DB[DEF]=new Hashtable();
+      DB[DEF] = new Hashtable();
     }
-  }
+  } // MailcapCommandMap()
 
   /** create mailcap command map with entries from file.
    *
@@ -148,7 +183,7 @@ extends CommandMap
     {
       //
     }
-  }
+  } // MailcapCommandMap()
 
   /** create mailcap command map with entries from stream.
    *
@@ -159,13 +194,13 @@ extends CommandMap
     this();
     try 
     {
-      DB[PROG]=loadMailcapRegistry(new InputStreamReader(stream));
+      DB[PROG] = loadMailcapRegistry(new InputStreamReader(stream));
     }
     catch (Exception e) 
     {
       //
     }
-  }
+  } // MailcapCommandMap()
 
   /** programmically add a mailcap entry.
    * Mailcap entries added in this way achieve the highest preference
@@ -175,10 +210,10 @@ extends CommandMap
    */
   public void addMailcap(String mailCapEntry) 
   {
-    StringReader rd=new StringReader(mailCapEntry);
-    Hashtable entries=loadMailcapRegistry(rd);
+    StringReader rd = new StringReader(mailCapEntry);
+    Hashtable entries = loadMailcapRegistry(rd);
     DB[PROG].putAll(entries);
-  }
+  } // addMailcap()
 
   /** create a content handler for the specified MIME type.
    * The database of registrys is searched and the most preferential
@@ -190,14 +225,17 @@ extends CommandMap
    */
   public DataContentHandler createDataContentHandler(String mimeType) 
   {
-    CommandInfo ch=getCommand(mimeType,"x-java-content-handler");
-    if(ch==null)
-    return null;
+    CommandInfo ch = getCommand(mimeType,"x-java-content-handler");
+    if (ch == null)
+    {
+      return null;
+    }
+
     //we do have the content handler so return it
     try 
     {
       Class classObject = Class.forName(ch.getCommandClass());
-      return (DataContentHandler)classObject.newInstance();
+      return (DataContentHandler) classObject.newInstance();
     }
     catch(Exception e) 
     {
@@ -224,52 +262,58 @@ extends CommandMap
    * @param mimeType MIME type to search for
    * @return command information associated with the mime type
    */
-  public CommandInfo[] getAllCommands(String mimeType) 
+  public CommandInfo[] getAllCommands(String mimeType)
   {
     //NOTE:
     //It should be easy to add a cache for this command
     //a single hash could store the results of searches on
     //particular mime type - using addMailcap() would invalidate
     //the cache but otherwise it would work well.
-    CommandInfo[] allCommands=null;
+    CommandInfo[] allCommands = null;
     synchronized(DB)
     {
       //first establish the number of commands across all registrys
-      int size=0;
-      for(int i=0; i<DB.length; i++)
+      int size = 0;
+      for (int i = 0; i < DB.length; i++)
       {
-	//count the mimetype that matches directly
-	CommandInfo[] entry=(CommandInfo[])DB[i].get(mimeType);
-	if(entry!=null)
-	size+=entry.length;
-	//if the specified mimetype is not a generic type test that specifically
-	if(!mimeType.endsWith("/*"));
-	{
-	  entry=(CommandInfo[])DB[i].get(mimeType.substring(0,mimeType.indexOf("/"))+"*");
-	  if(entry!=null)
-	  size+=entry.length;
-	}
+        //count the mimetype that matches directly
+        CommandInfo[] entry = (CommandInfo[]) DB[i].get(mimeType);
+        if (entry != null)
+        {
+          size += entry.length;
+        }
+        //if the specified mimetype is not a generic type test that specifically
+        if (!mimeType.endsWith("/*"))
+        {
+          entry = (CommandInfo[]) DB[i].get(mimeType.substring(0,
+            mimeType.indexOf("/")) + "*");
+          if (entry != null)
+          {
+            size += entry.length;
+          }
+        }
       }
       //create an array big enough
-      allCommands=new CommandInfo[size];
+      allCommands = new CommandInfo[size];
       //copy the contents of each array into the destination array
-      int pos=0;
-      for(int i=0; i<DB.length; i++)
+      int pos = 0;
+      for (int i = 0; i < DB.length; i++)
       {
-	CommandInfo[] entry=(CommandInfo[])DB[i].get(mimeType);
-	if(entry!=null)
+	CommandInfo[] entry = (CommandInfo[]) DB[i].get(mimeType);
+	if (entry != null)
 	{
-	  System.arraycopy(entry,0,allCommands,pos,entry.length);
-	  pos+=entry.length;
+	  System.arraycopy(entry, 0, allCommands, pos, entry.length);
+	  pos += entry.length;
 	}
 	//if the specified mimetype is not a generic type test that specifically
-	if(!mimeType.endsWith("/*"));
+	if (!mimeType.endsWith("/*"))
 	{
-	  entry=(CommandInfo[])DB[i].get(mimeType.substring(0,mimeType.indexOf("/"))+"*");
-	  if(entry!=null)
+	  entry = (CommandInfo[]) DB[i].get(mimeType.substring(0,
+      mimeType.indexOf("/")) + "*");
+	  if (entry != null)
 	  {
-	    System.arraycopy(entry,0,allCommands,pos,entry.length);
-	    pos+=entry.length;
+	    System.arraycopy(entry, 0, allCommands, pos, entry.length);
+	    pos += entry.length;
 	  }
 	}
       }
@@ -286,11 +330,13 @@ extends CommandMap
    */
   public CommandInfo getCommand(String mimeType, String cmdName)
   {
-    CommandInfo[] infoList=getAllCommands(mimeType);
-    for(int i=0; i<infoList.length; i++) 
+    CommandInfo[] infoList = getAllCommands(mimeType);
+    for (int i = 0; i < infoList.length; i++)
     {
-      if(infoList[i].getCommandName().equals(cmdName))
-      return infoList[i];
+      if (infoList[i].getCommandName().equals(cmdName))
+      {
+        return infoList[i];
+      }
     }
     return null;
   }
@@ -310,24 +356,26 @@ extends CommandMap
    */
   public CommandInfo[] getPreferredCommands(String mimeType) 
   {
-    CommandInfo[] all=getAllCommands(mimeType);
-    Vector uniqueCommands=new Vector();
-    for(int i=0; i<all.length; i++)
+    CommandInfo[] all = getAllCommands(mimeType);
+    Vector uniqueCommands = new Vector();
+    for (int i = 0; i < all.length; i++)
     {
-      CommandInfo cmd=all[i];
+      CommandInfo cmd = all[i];
       //search the unique list looking for the cmd
-      boolean found=false;
-      for(int k=0; k<uniqueCommands.size() && !found; i++)
+      boolean found = false;
+      for (int k = 0; k < uniqueCommands.size() && !found; i++)
       {
-	CommandInfo uniqueCmd=(CommandInfo)uniqueCommands.elementAt(i);
-	found=uniqueCmd.equals(cmd);
+        CommandInfo uniqueCmd = (CommandInfo) uniqueCommands.elementAt(i);
+        found = uniqueCmd.equals(cmd);
       }
       //if we haven't found it then add it to the list
-      if(!found)
-      uniqueCommands.addElement(cmd);
+      if (!found)
+      {
+        uniqueCommands.addElement(cmd);
+      }
     }
     //make the array to hold the preferred commands
-    CommandInfo[] pref=new CommandInfo[uniqueCommands.size()];
+    CommandInfo[] pref = new CommandInfo[uniqueCommands.size()];
     uniqueCommands.copyInto(pref);
     //NOTE:
     //again, caching could be usefull here... it depends what
@@ -345,48 +393,48 @@ extends CommandMap
   {
     try 
     {
-      Hashtable registry=new Hashtable();
+      Hashtable registry = new Hashtable();
       //some states that we use in this mini-FSM
-      final int READMIMETYPE=0;
-      final int READUNIXCOMMAND=1;
-      final int READCOMMANDNAME=2;
-      final int READCOMMANDVALUE=3;
-      final int SWALLOW=4;
+      final int READMIMETYPE = 0;
+      final int READUNIXCOMMAND = 1;
+      final int READCOMMANDNAME = 2;
+      final int READCOMMANDVALUE = 3;
+      final int SWALLOW = 4;
       //handles line continuations
-      boolean continueLine=false;
+      boolean continueLine = false;
       //the state register
-      int state=READMIMETYPE;
+      int state = READMIMETYPE;
       //various buffers for storing temp values
-      String mimetype=null;
-      String name=null;
-      String value=null;
-      StringBuffer mtBuf=new StringBuffer();
-      StringBuffer nameBuf=new StringBuffer();
-      StringBuffer valueBuf=new StringBuffer();
+      String mimetype = null;
+      String name = null;
+      String value = null;
+      StringBuffer mtBuf = new StringBuffer();
+      StringBuffer nameBuf = new StringBuffer();
+      StringBuffer valueBuf = new StringBuffer();
       //setup the tokenizer to parse a standard mailcap file
-      StreamTokenizer toker=new StreamTokenizer(in);
+      StreamTokenizer toker = new StreamTokenizer(in);
       toker.commentChar('#');
       toker.eolIsSignificant(true);
-      toker.wordChars('/','/');
-      while(true)
+      toker.wordChars('/', '/');
+      while (true)
       {
-	int token=toker.nextToken();
+	int token = toker.nextToken();
 	//first handle line continuations and END condition
 	switch(token)
 	{
 	  case StreamTokenizer.TT_EOF:
 	    return registry;
 	  case StreamTokenizer.TT_EOL:
-	    if(continueLine)
+	    if (continueLine)
 	    {
-	      do
-	      token=toker.nextToken();
-	      while(token==StreamTokenizer.TT_EOL);
-	      continueLine=false;
+	      do {
+	        token = toker.nextToken();
+	      } while (token == StreamTokenizer.TT_EOL);
+	      continueLine = false;
 	    }
 	    break;
 	  case '\\':
-	    continueLine=true;
+	    continueLine = true;
 	    continue;
 	}
 	//now the main state machine
@@ -401,9 +449,9 @@ extends CommandMap
 		break;
 	      case ';':
 		//the mime type has been specified
-		mimetype=mtBuf.toString();
+		mimetype = mtBuf.toString();
 		mtBuf.setLength(0);
-		state=READUNIXCOMMAND;
+		state = READUNIXCOMMAND;
 		break;
 	      case StreamTokenizer.TT_WORD:
 		mtBuf.append(toker.sval);
@@ -417,11 +465,11 @@ extends CommandMap
 	    {
 	      case ';':
 		//the command has been read - start reading the beans
-		state=READCOMMANDNAME;
+		state = READCOMMANDNAME;
 		break;
 	      case StreamTokenizer.TT_EOL:
 		//the mailcap entry has finished without specifying beans
-		state=READMIMETYPE;
+		state = READMIMETYPE;
 		break;
 	      default:
 		break;
@@ -432,7 +480,7 @@ extends CommandMap
 	    {
 	      case StreamTokenizer.TT_EOL:
 		//the entry has finished without specifying a bean
-		state=READMIMETYPE;
+		state = READMIMETYPE;
 		break;
 	      case ';':
 		//the field has finished without specifying a bean...
@@ -441,13 +489,17 @@ extends CommandMap
 		break;
 	      case '=':
 		//the field name has finished correctly
-		name=nameBuf.toString();
+		name = nameBuf.toString();
 		nameBuf.setLength(0);
 		//if we read a bean specifying field name then move on
-		if(name.startsWith("x-java-"))
-		state=READCOMMANDVALUE;
+		if (name.startsWith("x-java-"))
+    {
+		  state = READCOMMANDVALUE;
+    }
 		else
-		state=READUNIXCOMMAND;
+    {
+		  state = READUNIXCOMMAND;
+    }
 		break;
 	      case StreamTokenizer.TT_WORD:
 		nameBuf.append(toker.sval);
@@ -460,16 +512,16 @@ extends CommandMap
 	    switch(token)
 	    {
 	      case StreamTokenizer.TT_EOL:
-		value=valueBuf.toString();
+		value = valueBuf.toString();
 		valueBuf.setLength(0);
 		addCommand(registry,mimetype,name,value);
-		state=READMIMETYPE;
+		state = READMIMETYPE;
 		break;
 	      case ';':
-		value=valueBuf.toString();
+		value = valueBuf.toString();
 		valueBuf.setLength(0);
-		addCommand(registry,mimetype,name,value);
-		state=SWALLOW;
+		addCommand(registry, mimetype, name, value);
+		state = SWALLOW;
 		break;
 	      case StreamTokenizer.TT_WORD:
 		valueBuf.append(toker.sval);
@@ -482,7 +534,7 @@ extends CommandMap
 	    switch(token)
 	    {
 	      case StreamTokenizer.TT_EOL:
-		state=READMIMETYPE;
+		state = READMIMETYPE;
 		break;
 	      default:
 		break;
@@ -506,42 +558,48 @@ extends CommandMap
    * @param name the name of the command
    * @param value the text of the command
    */
-  private void addCommand(Hashtable reg,String mimetype,String name,String value)
+  private void addCommand(Hashtable reg, String mimetype, String name,
+    String value)
   {
-    if(name.startsWith("x-java-"))
+    if (name.startsWith("x-java-"))
     {
-      CommandInfo ci=new CommandInfo(name,value);
+      CommandInfo ci = new CommandInfo(name, value);
       //get the existing array
-      CommandInfo[] list=(CommandInfo[])reg.get(mimetype);
-      if(list==null)
+      CommandInfo[] list = (CommandInfo[]) reg.get(mimetype);
+      if (list == null)
       {
-	list=new CommandInfo[1];
-	list[0]=ci;
-	reg.put(mimetype,list);
-	return;
+        list = new CommandInfo[1];
+        list[0] = ci;
+        reg.put(mimetype,list);
+        return;
       }
       //the list exists - we have to add our action at the end
-      CommandInfo[] bigger=new CommandInfo[list.length+1];
-      System.arraycopy(list,0,bigger,0,list.length);
-      bigger[list.length]=ci;
+      CommandInfo[] bigger = new CommandInfo[list.length + 1];
+      System.arraycopy(list, 0, bigger, 0, list.length);
+      bigger[list.length] = ci;
       reg.put(mimetype,bigger);
     }
   }
 
-  /** with an argument of a content-type lists the preferred commands.
+  /**
+   * With an argument of a content-type lists the preferred commands.
+   * @param argv Command-lline arguments
    */
   public static void main(String[] argv)
   {
-    if(argv.length<1)
-    System.exit(0);
+    if (argv.length < 1)
+    {
+      System.exit(0);
+    }
+
     try
     {
-      MailcapCommandMap map=new MailcapCommandMap();
-      String contentType=argv[0];
-      CommandInfo[] pref=map.getPreferredCommands(contentType);
-      for(int i=0; i<pref.length; i++)
+      MailcapCommandMap map = new MailcapCommandMap();
+      String contentType = argv[0];
+      CommandInfo[] pref = map.getPreferredCommands(contentType);
+      for (int i = 0; i < pref.length; i++)
       {
-	System.out.println(contentType+" "+pref[i]);
+        System.out.println(contentType + " " + pref[i]);
       }
     }
     catch(Exception e)

@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -20,12 +21,15 @@
 */
 package javax.activation;
 
-import java.io.*;
-import java.util.*;
-
+// Imports
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
 
 /**
  * MIME Type Parameter List.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class MimeTypeParameterList 
 {
@@ -73,7 +77,7 @@ public class MimeTypeParameterList
 
   /**
    * Return string representation of parameter list.
-   * @returns String value
+   * @return String value
    */
   public String toString() 
   {
@@ -104,7 +108,7 @@ public class MimeTypeParameterList
       // Check for Seperator
       if (enum.hasMoreElements() == true) 
       {
-	buffer.append("; ");
+        buffer.append("; ");
       }
  
     } // while
@@ -117,7 +121,7 @@ public class MimeTypeParameterList
   /**
    * Get value of name.
    * @param name Parameter name
-   * @returns Parameter value, or null
+   * @return Parameter value, or null
    */
   public String get(String name) 
   {
@@ -136,7 +140,7 @@ public class MimeTypeParameterList
 
   /**
    * Get size of parameter list.
-   * @returns Number of parameters
+   * @return Number of parameters
    */
   public int size() 
   {
@@ -154,7 +158,7 @@ public class MimeTypeParameterList
 
   /**
    * Check if parameter list is empty.
-   * @returns true if empty, false otherwise
+   * @return true if empty, false otherwise
    */
   public boolean isEmpty() 
   {
@@ -191,27 +195,27 @@ public class MimeTypeParameterList
       index = parameter.indexOf("=");
       if (index != parameter.lastIndexOf("=")) 
       {
-	throw new MimeTypeParseException("multiple =");
+        throw new MimeTypeParseException("multiple =");
       }
       name = parameter.substring(0, index).trim();
-      value = unquote(parameter.substring(index + 1).trim());
+      value = (parameter.substring(index + 1).trim());
  
       // Check name characters
       for (index = 0; index < name.length(); index++) 
       {
-	if (isTokenChar(name.charAt(index)) == false) 
-	{
-	  throw new MimeTypeParseException("invalid character");
-	}
+        if (isTokenChar(name.charAt(index)) == false)
+        {
+          throw new MimeTypeParseException("invalid character");
+        }
       } // for: index
  
       // Check value characters
       for (index = 0; index < value.length(); index++) 
       {
-	if (isTokenChar(value.charAt(index)) == false) 
-	{
-	  throw new MimeTypeParseException("invalid character");
-	}
+        if (isTokenChar(value.charAt(index)) == false)
+        {
+          throw new MimeTypeParseException("invalid character");
+        }
       } // for: index
  
       // Add to Parameter List
@@ -223,7 +227,7 @@ public class MimeTypeParameterList
 
   /**
    * Get enumeration of parameter names.
-   * @returns Name enumeration
+   * @return Name enumeration
    */
   public Enumeration getNames() 
   {
@@ -233,19 +237,19 @@ public class MimeTypeParameterList
   /**
    * Check if token is character.
    * @param token Token to check
-   * @returns true if character, false otherwise
+   * @return true if character, false otherwise
    */
   private static boolean isTokenChar(char token) 
   {
     if (token > 32 && token < 127) 
     {
       if (token == '(' || token == ')' || token == '<' ||
-	  token == '<' || token == '@' || token == ',' ||
-	  token == ';' || token == ':' || token == '\\' ||
-	  token == '"' || token == '/' || token == '[' ||
-	  token == ']' || token == '?' || token == '=') 
+          token == '<' || token == '@' || token == ',' ||
+          token == ';' || token == ':' || token == '\\' ||
+          token == '"' || token == '/' || token == '[' ||
+          token == ']' || token == '?' || token == '=')
       {
-	return false;
+        return false;
       }
       return true;
     }
@@ -253,41 +257,41 @@ public class MimeTypeParameterList
   } // isTokenChar()
 
   /**
-   * Quote value.
+   * Quote a string.
    * @param value String to quote
-   * @returns Quoted string
+   * @return Quoted string
    */
   private static String quote(String value) 
   {
-    return "\"" + value + "\"";
-  } // quote()
 
-  /**
-   * Skip whitespace
-   * @param value String value
-   * @param num ???
-   */
-  private static int skipWhiteSpace(String value, int num) 
-  {
-    return 0; // TODO
-  } // skipWhiteSpace()
+    // Add quotes around the value
+    return "\"" + value + "\"";
+
+  } // quote()
 
   /**
    * Remove quotes from string.
    * @param value Quoted string
-   * @returns Unquoted string
+   * @return Unquoted string
    */
   private static String unquote(String value) 
   {
-    if (value.startsWith("\"") == true) 
+
+    // Check for starting quote
+    if (value.startsWith("\"") == true)
     {
       value = value.substring(1);
     }
-    if (value.endsWith("\"") == true) 
+
+    // Check for ending quote
+    if (value.endsWith("\"") == true)
     {
       value = value.substring(0, value.length() - 1);
     }
+
+    // Return Unquoted string
     return value;
+
   } // unquote()
 
 

@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,10 +22,17 @@
 package javax.activation;
 
 // Imports
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * File Data Source.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class FileDataSource
 implements DataSource
@@ -37,7 +45,7 @@ implements DataSource
   /**
    * File source.
    */
-  private File _file = null;
+  private File file = null;
 
   /**
    * Content type map.
@@ -64,7 +72,7 @@ implements DataSource
    */
   public FileDataSource(File file) 
   {
-    _file = file;
+    this.file = file;
   } // FileDataSource()
 
 
@@ -74,59 +82,59 @@ implements DataSource
 
   /**
    * Get name.
-   * @returns Name
+   * @return Name
    */
   public String getName() 
   {
-    return _file.getName(); // TODO
+    return file.getName(); // TODO
   } // getName()
 
   /**
    * Get file.
-   * @returns File
+   * @return File
    */
   public File getFile() 
   {
-    return _file;
+    return file;
   } // getFile()
 
   /**
    * Get input stream.
-   * @returns Input stream
+   * @return Input stream
    * @throws IOException IO exception occurred
    */
   public InputStream getInputStream() throws IOException 
   {
-    return new FileInputStream(_file); // TODO
+    return new FileInputStream(file); // TODO
   } // getInputStream()
 
   /**
    * Get content type.
-   * @returns Content type
+   * @return Content type
    */
   public String getContentType() 
   {
     if (typeMap == null) 
     {
-      return FileTypeMap.getDefaultFileTypeMap().getContentType(_file);
+      return FileTypeMap.getDefaultFileTypeMap().getContentType(file);
     } else 
     {
-      return typeMap.getContentType(_file);
+      return typeMap.getContentType(file);
     }
   } // getContentType()
 
   /**
    * Get output stream.
-   * @returns Output stream
+   * @return Output stream
    * @throws IOException IO exception occurred
    */
   public OutputStream getOutputStream() throws IOException 
   {
-    if (_file.canWrite() == false) 
+    if (file.canWrite() == false)
     {
       throw new IOException("Cannot write");
     }
-    return new FileOutputStream(_file);
+    return new FileOutputStream(file);
   } // getOutputStream()
 
   /**

@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,50 +22,77 @@
 package javax.activation;
 
 // Imports
-import java.io.*;
-import java.net.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 
-/** a data source based on a URL.
+/**
+ * A data source based on a URL.
  *
- * @author Andrew Selkirk: aselkirk@mailandnews.com
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class URLDataSource
 implements DataSource
 {
 
+  //-------------------------------------------------------------
+  // Constants --------------------------------------------------
+  //-------------------------------------------------------------
+
   /**
-   * URL.
+   * Encoding of the default content type for url data sources
+   */
+  private static final String DEFAULT_CONTENT = "application/octet-stream";
+
+
+  //-------------------------------------------------------------
+  // Variables --------------------------------------------------
+  //-------------------------------------------------------------
+
+  /**
+   * URL to the datasource.
    */
   private URL url = null;
 
   /**
-   * URL connection.
+   * Cached URL connection
    */
-  private URLConnection url_conn = null;
+  private URLConnection connection = null;
 
+
+  //-------------------------------------------------------------
+  // Initialization ---------------------------------------------
+  //-------------------------------------------------------------
 
   /**
-   * Create new URL data source from URL. 
+   * Create new URL data source from URL.
    * @param url URL
    */
-  public URLDataSource(URL url) 
+  public URLDataSource(URL url)
   {
     this.url = url;
   } // URLDataSource()
 
 
+  //-------------------------------------------------------------
+  // Methods ----------------------------------------------------
+  //-------------------------------------------------------------
+
   /**
-   * Get name.
-   * @returns Name of data source
+   * Get name of the URL.
+   * @return Name of the data source
    */
-  public String getName() 
+  public String getName()
   {
     return url.getFile();
   } // getName()
 
   /**
-   * Get URL.
-   * @returns URL of data source
+   * Get the URL.
+   * @return URL of the data source
    */
   public URL getURL() 
   {
@@ -72,22 +100,22 @@ implements DataSource
   } // getURL()
 
   /**
-   * Get input stream.
-   * @returns Input stream of data source
+   * Get input stream of the URL
+   * @return Input stream of data source
    * @throws IOException IO exception occurred
    */
   public InputStream getInputStream() throws IOException 
   {
-    if (url_conn == null) 
+    if (connection == null)
     {
-      url_conn = url.openConnection();
+      connection = url.openConnection();
     }
-    return url_conn.getInputStream();
+    return connection.getInputStream();
   } // getInputStream()
 
   /**
-   * Get content type of URL data source.
-   * @returns Content type
+   * Get the content type of the URL data source.
+   * @return Content type
    */
   public String getContentType() 
   {
@@ -97,33 +125,46 @@ implements DataSource
 
     try 
     {
-      if (url_conn == null) 
+
+      // Check if a connection has been established
+      if (connection == null)
       {
-	url_conn = url.openConnection();
+        connection = url.openConnection();
       }
-      type = url_conn.getContentType();
-      if (type != null) 
+
+      // Determine the Content type
+      type = connection.getContentType();
+      if (type != null)
       {
-	return type;
+        return type;
       }
-    } catch (Exception e) 
+
+    } catch (Exception e)
     {
-    }
-    return "application/octet-stream";
+    } // try
+
+    // Return the default content type
+    return DEFAULT_CONTENT;
+
   } // getContentType()
 
   /**
    * Get output stream.
-   * @returns Output stream of data source
+   * @return Output stream of data source
    * @throws IOException IO exception occurred
    */
-  public OutputStream getOutputStream() throws IOException 
+  public OutputStream getOutputStream() throws IOException
   {
-    if (url_conn == null) 
+
+    // Check if a connection has been established
+    if (connection == null)
     {
-      url_conn = url.openConnection();
+      connection = url.openConnection();
     }
-    return url_conn.getOutputStream();
+
+    // Return an output stream of the connection
+    return connection.getOutputStream();
+
   } // getOutputStream()
 
 

@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,12 +22,20 @@
 package javax.activation;
 
 // Imports
-import java.io.*;
-import java.awt.datatransfer.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.IOException;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.net.URL;
 
 /**
  * Data Handler.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.4 $
  */
 public class DataHandler implements Transferable 
 {
@@ -35,17 +44,64 @@ public class DataHandler implements Transferable
   // Variables --------------------------------------------------
   //-------------------------------------------------------------
 
+  /**
+   * TODO
+   */
   private DataSource dataSource = null;
+
+  /**
+   * TODO
+   */
   private DataSource objDataSource = null;
+
+  /**
+   * TODO
+   */
   private Object object = null;
+
+  /**
+   * TODO
+   */
   private String objectMimeType = null;
+
+  /**
+   * TODO
+   */
   private CommandMap currentCommandMap = null;
+
+  /**
+   * TODO
+   */
   private static final DataFlavor[] emptyFlavors = null;
+
+  /**
+   * TODO
+   */
   private DataFlavor[] transferFlavors = null;
+
+  /**
+   * TODO
+   */
   private DataContentHandler dataContentHandler = null;
+
+  /**
+   * TODO
+   */
   private DataContentHandler factoryDCH = null;
+
+  /**
+   * TODO
+   */
   private static DataContentHandlerFactory factory = null;
+
+  /**
+   * TODO
+   */
   private DataContentHandlerFactory oldFactory = null;
+
+  /**
+   * TODO
+   */
   private String shortType = null;
 
 
@@ -93,7 +149,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get name.
-   * @returns Data handler name
+   * @return Data handler name
    */
   public String getName() 
   {
@@ -106,7 +162,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get content.
-   * @returns Content object
+   * @return Content object
    * @throws IOException IO exception occurred
    */
   public Object getContent() throws IOException 
@@ -124,17 +180,17 @@ public class DataHandler implements Transferable
       handler = getDataContentHandler();
       if (handler != null) 
       {
-	return handler.getContent(dataSource);
-      } else 
+        return handler.getContent(dataSource);
+      } else
       {
-	return dataSource.getInputStream();
+        return dataSource.getInputStream();
       }
     }
   } // getContent()
 
   /**
    * Get input stream.
-   * @returns Input stream
+   * @return Input stream
    * @throws IOException IO exception occurred
    */
   public InputStream getInputStream() throws IOException 
@@ -150,31 +206,32 @@ public class DataHandler implements Transferable
     {
       return dataSource.getInputStream();
     }
-    else 
+    else
     {
       // Get Data Content Handler
       handler = getCommandMap().createDataContentHandler(objectMimeType);
       // Check Handler
-      if (handler != null) 
+      if (handler != null)
       {
-	input = new PipedInputStream();
-	output = new PipedOutputStream(input);
-	input.connect(output);
-	try 
-	{
-	  handler.writeTo(object, objectMimeType, output);
-	}
-	catch (Exception e) 
-	{
-	}
-	return input;
+        input = new PipedInputStream();
+        output = new PipedOutputStream(input);
+        input.connect(output);
+        try
+        {
+          handler.writeTo(object, objectMimeType, output);
+        }
+        catch (Exception e)
+        {
+        }
+        return input;
       }
-      else 
+      else
       {
-	throw new UnsupportedDataTypeException();
-      }
-    }
-  }
+        throw new UnsupportedDataTypeException();
+      } // if: handler
+    } // if: dataSource
+
+  } // getInputStream()
 
   /**
    * Write to output stream.
@@ -197,7 +254,7 @@ public class DataHandler implements Transferable
 
       while ((data = input.read()) != -1) 
       {
-	stream.write(data);
+        stream.write(data);
       }
 
     } // if: dataSource
@@ -208,7 +265,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get content type of data handler.
-   * @returns Content type
+   * @return Content type
    */
   public String getContentType() 
   {
@@ -221,7 +278,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get output stream.
-   * @returns Output stream
+   * @return Output stream
    * @throws IOException IO exception occurred
    */
   public OutputStream getOutputStream() throws IOException 
@@ -236,7 +293,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get all commands.
-   * @returns Command list
+   * @return Command list
    */
   public CommandInfo[] getAllCommands() 
   {
@@ -245,7 +302,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get base type.
-   * @returns Base type
+   * @return Base type
    */
   private synchronized String getBaseType() 
   {
@@ -254,14 +311,15 @@ public class DataHandler implements Transferable
 
   /**
    * Get beans of command.
-   * @returns Instantiated command bean, or null
+   * @param commandInfo TODO
+   * @return Instantiated command bean, or null
    */
   public Object getBean(CommandInfo commandInfo) 
   {
     try 
     {
       return commandInfo.getCommandObject(this, 
-					  getClass().getClassLoader());
+                getClass().getClassLoader());
     } catch (Exception e) 
     {
       return null;
@@ -271,7 +329,7 @@ public class DataHandler implements Transferable
   /**
    * Get command information based on command verb.
    * @param command Command verb
-   * @returns Command information
+   * @return Command information
    */
   public CommandInfo getCommand(String command) 
   {
@@ -280,7 +338,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get command map.
-   * @returns Command map
+   * @return Command map
    */
   private synchronized CommandMap getCommandMap() 
   {
@@ -289,20 +347,21 @@ public class DataHandler implements Transferable
 
   /**
    * Get data content handler.
-   * @returns Data content handler
+   * @return Data content handler
    */
   private synchronized DataContentHandler getDataContentHandler() 
   {
     if (factory != null) 
     {
-      dataContentHandler = factory.createDataContentHandler(getContentType());
+      dataContentHandler =
+        factory.createDataContentHandler(getContentType());
     }
     return dataContentHandler; 
   } // getDataContentHandler()
 
   /**
    * Get data source.
-   * @returns Data source, or null
+   * @return Data source, or null
    */
   public DataSource getDataSource() 
   {
@@ -311,7 +370,7 @@ public class DataHandler implements Transferable
 
   /**
    * Get list of preferred commands.
-   * @returns List of preferred commands
+   * @return List of preferred commands
    */
   public CommandInfo[] getPreferredCommands() 
   {
@@ -321,7 +380,7 @@ public class DataHandler implements Transferable
   /**
    * Get transfer data based on data flavor.
    * @param dataFlavor Data flavor
-   * @returns Transfer data
+   * @return Transfer data
    * @throws UnsupportedFlavorException Unsupported data flavor
    * @throws IOException IO exception occurred
    */
@@ -331,35 +390,36 @@ public class DataHandler implements Transferable
     // Needs testing...
     // Variables
     DataContentHandler handler;
-    try 
+    try
     {
 
-      if (dataSource != null) 
+      if (dataSource != null)
       {
-	handler = getCommandMap().createDataContentHandler(getContentType());
-	if (handler != null) 
-	{
-	  return handler.getTransferData(dataFlavor, dataSource);
-	} else if (dataFlavor.getMimeType().equals(getContentType()) == true &&
-		   dataFlavor.getRepresentationClass().equals(Class.forName("java.io.InputStream")) == true) 
-	{
-	  return dataSource.getInputStream();
-	} else 
-	{
-	  throw new UnsupportedDataTypeException();
-	}
-      } else 
+        handler = getCommandMap().createDataContentHandler(getContentType());
+        if (handler != null)
+        {
+          return handler.getTransferData(dataFlavor, dataSource);
+        } else if (dataFlavor.getMimeType().equals(getContentType()) == true &&
+          dataFlavor.getRepresentationClass().equals(
+            Class.forName("java.io.InputStream")) == true)
+        {
+          return dataSource.getInputStream();
+        } else
+        {
+          throw new UnsupportedDataTypeException();
+        }
+      } else
       {
-	if (dataFlavor.getMimeType().equals(getContentType()) == true &&
-	    dataFlavor.getRepresentationClass().equals(object.getClass()) == true) 
-	{
-	  return object;
-	} else 
-	{
-	  throw new UnsupportedDataTypeException();
-	}
+        if (dataFlavor.getMimeType().equals(getContentType()) == true &&
+          dataFlavor.getRepresentationClass().equals(object.getClass()) == true)
+        {
+          return object;
+        } else
+        {
+          throw new UnsupportedDataTypeException();
+        }
       }
-    } catch (Exception e) 
+    } catch (Exception e)
     {
       return null;
     }
@@ -367,9 +427,9 @@ public class DataHandler implements Transferable
 
   /**
    * Get transfer data flavors.
-   * @returns List of data flavors
+   * @return List of data flavors
    */
-  public synchronized DataFlavor[] getTransferDataFlavors() 
+  public synchronized DataFlavor[] getTransferDataFlavors()
   {
 
     // Variables
@@ -379,7 +439,7 @@ public class DataHandler implements Transferable
     handler = getDataContentHandler();
 
     // Get Transfer Data Flavors
-    if (handler != null) 
+    if (handler != null)
     {
       return handler.getTransferDataFlavors();
     }
@@ -389,9 +449,9 @@ public class DataHandler implements Transferable
   /**
    * Determine if data flavor is supported.
    * @param dataFlavor Data flavor
-   * @returns true if supported, false otherwise
+   * @return true if supported, false otherwise
    */
-  public boolean isDataFlavorSupported(DataFlavor dataFlavor) 
+  public boolean isDataFlavorSupported(DataFlavor dataFlavor)
   {
 
     // Variables
@@ -403,12 +463,12 @@ public class DataHandler implements Transferable
     list = getTransferDataFlavors();
 
     // Loop through List
-    for (index = 0; index < list.length; index++) 
+    for (index = 0; index < list.length; index++)
     {
       element = list[index];
-      if (element.equals(dataFlavor) == true) 
+      if (element.equals(dataFlavor) == true)
       {
-	return true;
+        return true;
       }
     }
 
@@ -421,7 +481,7 @@ public class DataHandler implements Transferable
    * Set command map.  If null, command map is reset to default.
    * @param map Command map
    */
-  public synchronized void setCommandMap(CommandMap map) 
+  public synchronized void setCommandMap(CommandMap map)
   {
     if (map == null) 
     {
@@ -437,7 +497,8 @@ public class DataHandler implements Transferable
    * is a one time call.  Further calls result in an Error.
    * @param newFactory New factory
    */
-  public static synchronized void setDataContentHandlerFactory(DataContentHandlerFactory newFactory) 
+  public static synchronized void setDataContentHandlerFactory(
+      DataContentHandlerFactory newFactory)
   {
 
     // Check For existing Factory
@@ -458,31 +519,54 @@ public class DataHandler implements Transferable
  * Experiment data writer.  I'm going to do away with this.  Data Handler
  * actually uses this in writeTo as an anonymous inner class.  To stay
  * consistent with Sun's implementation, so will this be.
+ * @author Andrew Selkirk
  */
 class DataHandlerWriter implements Runnable 
 {
 
+  /**
+   * TODO
+   */
   private final PipedOutputStream pos;
+
+  /**
+   * TODO
+   */
   private final DataHandler dh;
+
+  /**
+   * TODO
+   */
   private final DataContentHandler fdch;
 
-  DataHandlerWriter(DataContentHandler contentHandler, PipedOutputStream stream, DataHandler handler) 
+  /**
+   * DatahandlerWriter
+   * @param contentHandler TODO
+   * @param stream TODO
+   * @param handler TODO
+   */
+  DataHandlerWriter(DataContentHandler contentHandler,
+    PipedOutputStream stream, DataHandler handler)
   {
     fdch = contentHandler;
     pos = stream;
     dh = handler;
-  } // DataHandler$1()
+  } // DataHandler()
 
-  public void run() 
+  /**
+   * Run
+   */
+  public void run()
   {
-    try 
+/*
+    try
     {
       // handler.writeTo(object, objectMimeType, pos);
-    } catch (Exception e) 
+    } catch (Exception e)
     {
     }
-
+*/
   } // run()
 
 
-} // DataHandler$1
+} // DataHandlerWriter

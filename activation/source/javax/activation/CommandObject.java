@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -25,16 +26,19 @@ import java.io.IOException;
 
 /**
  * Command Object.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
-public abstract interface CommandObject
+public interface CommandObject
 {
 
   /**
    * Set command context of object.
    * @param verb Command name
    * @param handler Data handler
+   * @throws IOException IOException occurred
    */
-  public abstract void setCommandContext(String verb, DataHandler handler)
+  public void setCommandContext(String verb, DataHandler handler)
   throws IOException;
 
 

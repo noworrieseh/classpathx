@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,10 +22,12 @@
 package javax.activation;
 
 // Imports
-import java.io.IOException;
+//import java.io.IOException;
 
 /**
  * Command Map.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public abstract class CommandMap
 {
@@ -58,14 +61,14 @@ public abstract class CommandMap
   /**
    * Create data content handler for MIME type.
    * @param mimeType MIME Type
-   * @returns Data content handler
+   * @return Data content handler
    */
   public abstract DataContentHandler createDataContentHandler(String mimeType);
 
   /**
    * Get all commands for a particular MIME type.
    * @param mimeType MIME Type
-   * @returns Array of commands
+   * @return Array of commands
    */
   public abstract CommandInfo[] getAllCommands(String mimeType);
 
@@ -73,13 +76,13 @@ public abstract class CommandMap
    * Get command of a particular MIME type and command name.
    * @param mimeType MIME Type
    * @param cmdName Command name
-   * @returns Command info
+   * @return Command info
    */
   public abstract CommandInfo getCommand(String mimeType, String cmdName);
 
   /**
    * Get reference to default command map.
-   * @returns Default command map
+   * @return Default command map
    */
   public static CommandMap getDefaultCommandMap() 
   {
@@ -89,7 +92,7 @@ public abstract class CommandMap
   /**
    * Get list of preferred commands.  One entry per command name.
    * @param mimeType MIME Type
-   * @returns List of commands
+   * @return List of commands
    */
   public abstract CommandInfo[] getPreferredCommands(String mimeType);
 

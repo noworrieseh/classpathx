@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -25,6 +26,8 @@ import java.io.IOException;
 
 /**
  * Unsupported Data Type Exception.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class UnsupportedDataTypeException extends IOException 
 {

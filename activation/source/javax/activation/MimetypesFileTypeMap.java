@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -20,7 +21,7 @@
 */
 package javax.activation;
 
-
+// Imports
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -28,11 +29,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
-
 
 /** maps MIME types to "filename" extensions.
  * The entire MIME type registry for an application can either be made
@@ -61,10 +61,15 @@ import java.util.Properties;
  *
  * @author Andrew Selkirk: aselkirk@mailandnews.com
  * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
+ * @version $Revision: 1.7 $
  */
 public class MimetypesFileTypeMap
 extends FileTypeMap 
 {
+
+  //-------------------------------------------------------------
+  // Variables --------------------------------------------------
+  //-------------------------------------------------------------
 
   /** the standard mime type registry.
    */
@@ -81,73 +86,98 @@ extends FileTypeMap
    */
   private Hashtable[] DB = null;
 
-  /** index into the registry.
+  /**
+   * TODO
    */
   private static final int PROG = 0;
+
+  /**
+   * TODO
+   */
   private static final int HOME = 1;
+
+  /**
+   * TODO
+   */
   private static final int SYS = 2;
+
+  /**
+   * TODO
+   */
   private static final int JAR = 3;
+
+  /**
+   * TODO
+   */
   private static final int DEF = 4;
 
+
+  //-------------------------------------------------------------
+  // Initialization ---------------------------------------------
+  //-------------------------------------------------------------
 
   /** create default MIME Types registry.
    */
   public MimetypesFileTypeMap() 
   {
     DB = new Hashtable[5];
-    Properties properties=System.getProperties();
-    String sep=properties.getProperty("file.separator");
+    Properties properties = System.getProperties();
+    String sep = properties.getProperty("file.separator");
     //init programmatic entries
     DB[PROG] = new Hashtable();
     //the user's mime types
     try
     {
-      File userHome=new File(properties.getProperty("user.home")+sep+".mime.types");
+      File userHome = new File(properties.getProperty("user.home") +
+        sep + ".mime.types");
       DB[HOME] = loadMimeRegistry(new FileReader(userHome));
     }
     catch(Exception e)
     {
-      DB[HOME]=new Hashtable();
+      DB[HOME] = new Hashtable();
     }
     //the system mime types
     try
     {
-      File javaHome=new File(properties.getProperty("java.home")+sep+"lib"+sep+"mime.types");
+      File javaHome = new File(properties.getProperty("java.home") +
+        sep + "lib" + sep + "mime.types");
       DB[SYS] = loadMimeRegistry(new FileReader(javaHome));
     }
     catch(Exception e)
     {
-      DB[SYS]=new Hashtable();
+      DB[SYS] = new Hashtable();
     }
     //a possible jar-file local copy of the mime types
     try
     {
-      String resource="META-INF" +sep+ "mime.types";
-      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[JAR]=loadMimeRegistry(new InputStreamReader(str));
+      String resource = "META-INF" + sep + "mime.types";
+      InputStream str =
+        getClass().getClassLoader().getResourceAsStream(resource);
+      DB[JAR] = loadMimeRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
-      DB[JAR]=new Hashtable();
+      DB[JAR] = new Hashtable();
     }
     //the default providers... obtained from a possible META-INF/ location
     try
     {
-      String resource="META-INF" + sep + "mimetypes.default";
-      InputStream str=getClass().getClassLoader().getResourceAsStream(resource);
-      DB[DEF]=loadMimeRegistry(new InputStreamReader(str));
+      String resource = "META-INF" + sep + "mimetypes.default";
+      InputStream str =
+        getClass().getClassLoader().getResourceAsStream(resource);
+      DB[DEF] = loadMimeRegistry(new InputStreamReader(str));
     }
     catch(Exception e)
     {
-      DB[DEF]=new Hashtable();
+      DB[DEF] = new Hashtable();
     }
-  }
+  } // MimetypesFileTypeMap()
 
   /** create MIME Types registry from the stream.
    *
    * @param stream MIME Types file map formatted stream
    */
-  public MimetypesFileTypeMap(InputStream stream) 
+  public MimetypesFileTypeMap(InputStream stream)
   {
     this();
     try 
@@ -157,13 +187,13 @@ extends FileTypeMap
     catch (Exception e) 
     {
     }
-  }
+  } // MimetypesFileTypeMap()
 
   /** create MIME Types registry with entries from file
    *
    * @param mimeTypeFileName MIME Types file map formatted file name
    */
-  public MimetypesFileTypeMap(String mimeTypeFileName) 
+  public MimetypesFileTypeMap(String mimeTypeFileName)
   {
     this();
     try 
@@ -173,8 +203,12 @@ extends FileTypeMap
     catch (Exception e) 
     {
     }
-  }
+  } // MimetypesFileTypeMap()
 
+
+  //-------------------------------------------------------------
+  // Methods ----------------------------------------------------
+  //-------------------------------------------------------------
 
   /** get content type of file.
    *
@@ -185,7 +219,7 @@ extends FileTypeMap
   public String getContentType(File file) 
   {
     return getContentType(file.getName());
-  }
+  } // getContentType()
 
   /** get content type of file.
    * Looks up the extension of the file (returns default content type if
@@ -200,135 +234,149 @@ extends FileTypeMap
     //get the extension
     index = filename.lastIndexOf(".");
     //if the filename has no extension then just return the def type
-    if (index == -1) 
-    return defaultType;
+    if (index == -1)
+    {
+      return defaultType;
+    }
+
     //we must know the file extension
     String ext = filename.substring(index + 1);
     //search each mime.type file
-    for(index=0; index<DB.length; index++) 
+    for (index = 0; index < DB.length; index++)
     {
       //if there is no list of types at this index skip it
-      if (DB[index] == null) 
-      continue;
+      if (DB[index] == null)
+      {
+        continue;
+      }
+
       //get the mime type from the list of types
-      MimeType mimeType = (MimeType)(DB[index].get(ext));
-      if (mimeType != null) 
-      return mimeType.getBaseType();
+      MimeType mimeType = (MimeType) (DB[index].get(ext));
+      if (mimeType != null) {
+        return mimeType.getBaseType();
+      }
     }
     return defaultType;
-  }
+  } // getContentType()
 
   /** programmically add MIME Types entries.
    * In fact the MIME types specified here are put into the existing
    * programmatic registry. These supplement that registry.
    *
-   * @param mime_types MIME Types formatted entry
+   * @param mimeTypes MIME Types formatted entry
    */
-  public void addMimeTypes(String mime_types) 
+  public void addMimeTypes(String mimeTypes)
   {
     try
     {
-      StringReader sr=new StringReader(mime_types);
+      StringReader sr = new StringReader(mimeTypes);
       DB[PROG].putAll(loadMimeRegistry(sr));
     }
     catch(Exception e)
     {
       //don't bother with errors
     }
-  }
+  } // addMimeTypes()
 
   /** load a MIME registry from the specified stream.
    *
    * @param in the stream to load from
    * @return map of <code>MimeType</code> keyed by extension
    */
-  private Hashtable loadMimeRegistry(Reader in) 
+  private Hashtable loadMimeRegistry(Reader in)
   {
     try 
     {
-      Hashtable registry=new Hashtable();
+      Hashtable registry = new Hashtable();
       //some states that we use in this mini-FSM
-      final int STARTLINE=0;
-      final int READTYPE=1;
-      final int READEXT=2;
+      final int STARTLINE = 0;
+      final int READTYPE = 1;
+      final int READEXT = 2;
       //the state register
-      int state=READTYPE;
+      int state = READTYPE;
       //the mimetype register
-      MimeType mt=null;
-      StringBuffer mimeTypeBuffer=new StringBuffer();
-      StringBuffer extBuffer=new StringBuffer();
+      MimeType mt = null;
+      StringBuffer mimeTypeBuffer = new StringBuffer();
+      StringBuffer extBuffer = new StringBuffer();
       //setup the tokenizer to parse a standard mime.types file
-      StreamTokenizer toker=new StreamTokenizer(in);
+      StreamTokenizer toker = new StreamTokenizer(in);
       toker.commentChar('#');
       toker.eolIsSignificant(true);
-      toker.wordChars('/','/');
-      toker.wordChars('-','-');
-      while(true)
+      toker.wordChars('/', '/');
+      toker.wordChars('-', '-');
+      while (true)
       {
-	switch(toker.nextToken())
-	{
-	  case StreamTokenizer.TT_EOF:
-	    return registry;
-	  case StreamTokenizer.TT_EOL:
-	    switch(state)
-	    {
-	      case READEXT:
-		//set the state
-		state=READTYPE;
-		continue;
-	      default:
-		continue;
-	    }
-	  case StreamTokenizer.TT_WORD:
-	    switch(state)
-	    {
-	      case READTYPE:
-		//type has been read - create the object
-		mt=new MimeType(toker.sval);
-		state=READEXT;
-		continue;
-	      case READEXT:
-		//the extension has been read - store the mimetype against it
-		registry.put(toker.sval,mt);
-		continue;
-	      default:
-		continue;
-	    }
-	}
+        switch (toker.nextToken())
+        {
+        case StreamTokenizer.TT_EOF:
+          return registry;
+        case StreamTokenizer.TT_EOL:
+          switch (state)
+          {
+          case READEXT:
+            //set the state
+            state = READTYPE;
+            continue;
+          default:
+            continue;
+          }
+        case StreamTokenizer.TT_WORD:
+          switch(state)
+          {
+            case READTYPE:
+              //type has been read - create the object
+              mt = new MimeType(toker.sval);
+              state = READEXT;
+              continue;
+            case READEXT:
+              //the extension has been read - store the
+              // mimetype against it
+              registry.put(toker.sval,mt);
+              continue;
+            default:
+              continue;
+          }
+        }
       }
     }
-    catch (Exception e) 
+    catch (Exception e)
     {
       //this is only here for debugging
       e.printStackTrace();
     }
     return null;
-  }
+  } // loadMimeRegistry()
 
-  /** takes a content type and finds all the extensions associated with it.
-   * All the extensions are printed out, one per line.
+  /**
+   * Takes a content type and finds all the extensions associated
+   * with it. All the extensions are printed out, one per line.
+   * @param argv Command-line arguments
    */
   public static void main(String[] argv)
   {
-    MimetypesFileTypeMap fm=new MimetypesFileTypeMap();
-    if(argv.length<1)
+    MimetypesFileTypeMap fm = new MimetypesFileTypeMap();
+    if (argv.length < 1)
     {
       //if no arguments then just die
       System.exit(0);
     }
-    String contentType=argv[0];
-    for(int i=0; i<fm.DB.length; i++)
+    String contentType = argv[0];
+    for (int i = 0; i < fm.DB.length; i++)
     {
-      Enumeration exts=fm.DB[i].keys();
-      Enumeration mimeTypes=fm.DB[i].elements();
-      while(exts.hasMoreElements())
+      Enumeration exts = fm.DB[i].keys();
+      Enumeration mimeTypes = fm.DB[i].elements();
+      while (exts.hasMoreElements())
       {
-	String extension=(String)exts.nextElement();
-	MimeType mt=(MimeType)mimeTypes.nextElement();
-	String baseType=mt.getBaseType();
-	if(baseType.equals(contentType))
-	System.out.println(contentType+" "+extension);
+        String extension = (String) exts.nextElement();
+        MimeType mt = (MimeType) mimeTypes.nextElement();
+        String baseType = mt.getBaseType();
+        if (baseType.equals(contentType))
+        {
+          System.out.println(contentType + " " + extension);
+        }
       }
     }
-  }
-}
+  } // main()
+
+
+} // MimetypesFileTypeMap

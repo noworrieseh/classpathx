@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,10 +22,12 @@
 package javax.activation;
 
 // Imports
-import java.io.*;
+import java.io.File;
 
 /**
  * File Type Map.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public abstract class FileTypeMap 
 {
@@ -58,20 +61,22 @@ public abstract class FileTypeMap
   /**
    * Get content type.
    * @param filename Filename
+   * @return TODO
    */
   public abstract String getContentType(String filename);
 
   /**
    * Get content type.
    * @param file File source
+   * @return TODO
    */
   public abstract String getContentType(File file);
 
   /**
    * Get default file type map.
-   * @returns Default file type map
+   * @return Default file type map
    */
-  public static FileTypeMap getDefaultFileTypeMap() 
+  public static FileTypeMap getDefaultFileTypeMap()
   {
     return defaultMap;
   } // getDefaultFileTypeMap()
@@ -80,7 +85,7 @@ public abstract class FileTypeMap
    * Set default file type map.
    * @param map New default file type map
    */
-  public static void setDefaultFileTypeMap(FileTypeMap map) 
+  public static void setDefaultFileTypeMap(FileTypeMap map)
   {
     defaultMap = map;
   } // setDefaultFileTypeMap()

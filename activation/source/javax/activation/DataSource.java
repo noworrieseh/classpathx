@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -27,8 +28,10 @@ import java.io.OutputStream;
 
 /**
  * Data Source.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
-public abstract interface DataSource
+public interface DataSource
 {
 
   //-------------------------------------------------------------
@@ -37,29 +40,29 @@ public abstract interface DataSource
 
   /**
    * Get name.
-   * @returns Name
+   * @return Name
    */
-  public abstract String getName();
+  public String getName();
 
   /**
    * Get input stream.
-   * @returns Input stream
+   * @return Input stream
    * @throws IOException IO exception occurred
    */
-  public abstract InputStream getInputStream() throws IOException;
+  public InputStream getInputStream() throws IOException;
 
   /**
    * Get content type.
-   * @returns Content type
+   * @return Content type
    */
-  public abstract String getContentType();
+  public String getContentType();
 
   /**
    * Get output stream.
-   * @returns Output stream
+   * @return Output stream
    * @throws IOException IO exception occurred
    */
-  public abstract OutputStream getOutputStream() throws IOException;
+  public OutputStream getOutputStream() throws IOException;
 
 
 } // DataSource

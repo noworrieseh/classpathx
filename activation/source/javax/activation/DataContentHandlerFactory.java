@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -25,8 +26,10 @@ import java.io.IOException;
 
 /**
  * Data Content Handler Factory.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
-public abstract interface DataContentHandlerFactory
+public interface DataContentHandlerFactory
 {
 
   //-------------------------------------------------------------
@@ -34,11 +37,11 @@ public abstract interface DataContentHandlerFactory
   //-------------------------------------------------------------
 
   /**
-   * Create data content handler based on MIME type.
+   * Create a data content handler based on a MIME type.
    * @param mimeType MIME Type
-   * @returns Data content handler
+   * @return Data content handler
    */
-  public abstract DataContentHandler createDataContentHandler(String mimeType);
+  public DataContentHandler createDataContentHandler(String mimeType);
 
 
 } // DataContentHandlerFactory

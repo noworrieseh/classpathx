@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,7 +22,11 @@
 package javax.activation;
 
 /**
- * MIME Type Parse Exception.
+ * MIME Type Parse Exception.  The exception is thrown when a
+ * problem has occurred while parsing the mime types.
+ *
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class MimeTypeParseException
 extends Exception
@@ -32,16 +37,16 @@ extends Exception
   //-------------------------------------------------------------
 
   /**
-   * Create MIME Type parse exception with description.
-   * @param value Description
+   * Create a MIME Type parse exception with description.
+   * @param message Description
    */
-  public MimeTypeParseException(String value)
+  public MimeTypeParseException(String message)
   {
-    super(value);
+    super(message);
   } // MimeTypeParseException()
 
   /**
-   * Create MIME Type parse exception.
+   * Create a MIME Type parse exception.
    */
   public MimeTypeParseException()
   {

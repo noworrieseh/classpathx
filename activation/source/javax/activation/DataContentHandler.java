@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -27,8 +28,10 @@ import java.awt.datatransfer.DataFlavor;
 
 /**
  * Data Content Handler.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
-public abstract interface DataContentHandler
+public interface DataContentHandler
 {
 
   //-------------------------------------------------------------
@@ -36,12 +39,12 @@ public abstract interface DataContentHandler
   //-------------------------------------------------------------
 
   /**
-   * Get content object from data source.
+   * Get content object from the data source.
    * @param source Data source
-   * @returns Object
+   * @return Object
    * @throws IOException IO exception occurred
    */
-  public abstract Object getContent(DataSource source)
+  public Object getContent(DataSource source)
   throws IOException;
 
   /**
@@ -51,23 +54,24 @@ public abstract interface DataContentHandler
    * @param stream Output stream
    * @throws IOException IO exception occurred
    */
-  public abstract void writeTo(Object object, String mimeType,OutputStream stream)
+  public void writeTo(Object object, String mimeType,OutputStream stream)
   throws IOException;
 
   /**
    * Get transfer data.
    * @param flavor Data flavor
    * @param source Data source
+   * @return TODO
    * @throws IOException IO exception occurred
    */
-  public abstract Object getTransferData(DataFlavor flavor,DataSource source)
+  public Object getTransferData(DataFlavor flavor,DataSource source)
   throws IOException;
 
   /**
-   * Get list of transfer data flavors.
-   * @returns Array listing of data transfer flavors
+   * Get a list of transfer data flavors.
+   * @return Array listing of data transfer flavors
    */
-  public abstract DataFlavor[] getTransferDataFlavors();
+  public DataFlavor[] getTransferDataFlavors();
 
 
 } // DataContentHandler

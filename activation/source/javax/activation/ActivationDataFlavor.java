@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -25,6 +26,8 @@ import java.awt.datatransfer.DataFlavor;
 
 /**
  * Activation Data Flavor.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 public class ActivationDataFlavor
 extends DataFlavor
@@ -104,7 +107,7 @@ extends DataFlavor
   /**
    * Test data flavor for equivalence.
    * @param dataFlavor Data flavor to test
-   * @returns true if equals, otherwise false
+   * @return true if equals, otherwise false
    */
   public boolean equals(DataFlavor dataFlavor) 
   {
@@ -123,7 +126,7 @@ extends DataFlavor
 
   /**
    * Get human presentable name
-   * @returns Name
+   * @return Name
    */
   public String getHumanPresentableName() 
   {
@@ -131,8 +134,17 @@ extends DataFlavor
   } // getHumanPresentableName()
 
   /**
+   * Set the human presentable name.
+   * @param humanPresentableName Name
+   */
+  public void setHumanPresentableName(String humanPresentableName)
+  {
+    this.humanPresentableName = humanPresentableName;
+  } // setHumanPresentationName()
+
+  /**
    * Get MIME Type.
-   * @returns MIME Type
+   * @return MIME Type
    */
   public String getMimeType() 
   {
@@ -141,7 +153,7 @@ extends DataFlavor
 
   /**
    * Get representation class.
-   * @returns Representation class
+   * @return Representation class
    */
   public Class getRepresentationClass() 
   {
@@ -151,7 +163,7 @@ extends DataFlavor
   /**
    * Determine if MIME Type is equals to data flavor.
    * @param mimeType MIME Type to test
-   * @returns true if equal, false otherwise
+   * @return true if equal, false otherwise
    */
   public boolean isMimeTypeEqual(String mimeType) 
   {
@@ -167,7 +179,7 @@ extends DataFlavor
   /**
    * Normalize MIME Type.
    * @param mimeType MIME Type to normalize
-   * @returns Normalized MIME Type
+   * @return Normalized MIME Type
    */
   protected String normalizeMimeType(String mimeType) 
   {
@@ -178,7 +190,7 @@ extends DataFlavor
    * Normalize MIME type parameter.
    * @param parameterName Parameter name to normalize
    * @param parameterValue Parameter value to normalize
-   * @returns Normalized parameter
+   * @return Normalized parameter
    */
   protected String normalizeMimeTypeParameter(String parameterName, 
 					      String parameterValue) 
@@ -186,15 +198,5 @@ extends DataFlavor
     return null; // TODO
   } // normalizeMimeTypeParameter()
 
-  /**
-   * Set the human presentable name.
-   * @param humanPresentableName Name
-   */
-  public void setHumanPresentableName(String humanPresentableName) 
-  {
-    this.humanPresentableName = humanPresentableName;
-  } // setHumanPresentationName()
-
 
 } // ActivationDataFlavor
-

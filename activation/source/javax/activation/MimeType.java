@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -20,39 +21,60 @@
 */
 package javax.activation;
 
+// Imports
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Externalizable;
+import java.io.IOException;
 
-import java.io.*;
-
-
-/** represents a MIME type as per RFC2046.
+/**
+ * Represents a MIME type as per RFC2046.
  *
- * @author Andrew Selkirk: aselkirk@mailandnews.com
+ * @author Andrew Selkirk
+ * @version $Revision: 1.4 $
  */
 public class MimeType
 implements Externalizable
 {
 
-  /** primary type.
+  //-------------------------------------------------------------
+  // Constants --------------------------------------------------
+  //-------------------------------------------------------------
+
+  //private static final String TSPECIALS = "()<>@,;:\\\"/[]?=";
+
+
+  //-------------------------------------------------------------
+  // Variables --------------------------------------------------
+  //-------------------------------------------------------------
+
+  /**
+   * Primary type.
    */
   String primaryType = null;
 
-  /** sub type
+  /**
+   * Sub type
    */
   String subType = null;
 
-  /** MIME Type parameters.
+  /**
+   * MIME Type parameters.
    */
   MimeTypeParameterList parameters = new MimeTypeParameterList();
 
-  private static final String TSPECIALS = "()<>@,;:\\\"/[]?=";
 
+  //-------------------------------------------------------------
+  // Initialization ---------------------------------------------
+  //-------------------------------------------------------------
 
-  /** create MIME Type object from MIME Type entry.
-   *
+  /**
+   * Create a MIME Type object from a raw MIME Type entry.
    * @param rawdata MIME Type entry
    */
   public MimeType(String rawdata) 
   {
+    // TODO: should we be silently failing here?
     try 
     {
       parse(rawdata);
@@ -60,7 +82,7 @@ implements Externalizable
     catch (Exception e) 
     {
     }
-  }
+  } // MimeType
 
   /**
    * Create MIME Type object from primary/sub
@@ -71,191 +93,238 @@ implements Externalizable
   {
     primaryType = primary;
     subType = sub;
-  }
+  } // MimeType()
 
   /**
    * Create empty MIME Type
    */
   public MimeType() 
   {
-  }
+  } // MimeType()
 
-  /** @return canonical representation of the MIME type
-   *   this is usually: <i>primary type</i>/<i>subtype</i>; <i>parameters</i>
+
+  //-------------------------------------------------------------
+  // Methods ----------------------------------------------------
+  //-------------------------------------------------------------
+
+  /**
+   * Get a MIME type string encoding.  The format is
+   * <i>primary type</i>/<i>subtype</i>; <i>parameters</i>
+   * @return canonical representation of the MIME type
    */
-  public String toString() 
+  public String toString()
   {
+
+    // Variables
     StringBuffer buffer;
+
     // Construct Type
     buffer = new StringBuffer();
     buffer.append(getBaseType());
-    if (parameters.size() > 0) 
+    if (parameters.size() > 0)
     {
       buffer.append("; ");
       buffer.append(parameters.toString());
-    }
-    return buffer.toString();
-  }
+    } // if
 
-  /** parse MIME Type entry.
-   *
+    // Return MIME type encoding
+    return buffer.toString();
+
+  } // toString()
+
+  /**
+   * Parse a MIME Type entry.
    * @param mimetype MIME Type entry
    * @throws MimeTypeParseException MIME type parsing exception
    */
   private void parse(String mimetype)
   throws MimeTypeParseException 
   {
+
+    // Variables
     int endIndex;
     int typeIndex;
     String type;
     String parameterList;
     String primary;
     String sub;
-    //check for type and parameter separator
+
+    // Check for type and parameter separator
     endIndex = mimetype.indexOf(";");
-    if (endIndex == -1) 
-    endIndex = mimetype.length();
-    //get Type Index
+    if (endIndex == -1)
+    {
+      endIndex = mimetype.length();
+    } // if
+
+    // Get Type Index
     type = mimetype.substring(0, endIndex);
     typeIndex = type.indexOf("/");
-    //get Primary and Sub
+
+    // Get the Primary and Sub parts of the MIME type
     primary = type.substring(0, typeIndex);
     sub = type.substring(typeIndex + 1, endIndex);
-    //set Primary and Sub Types
+
+    // Set the Primary and Sub Types of the object
     setPrimaryType(primary);
     setSubType(sub);
+
     // Set Parameter List
     parameterList = mimetype.substring(endIndex);
     parameters = new MimeTypeParameterList(parameterList);
-  }
 
-  /** @return Base type
+  } // parse()
+
+  /**
+   * Get the Base of the MIME type.  Consists of the format:
+   * <i>primary type</i>/<i>subtype</i>
+   * @return Base type
    */
   public String getBaseType() 
   {
     return getPrimaryType() + "/" + getSubType();
-  }
+  } // getBaseType()
 
-  /** get value of MIME type parameter.
-   *
+  /**
+   * Get the value of a MIME type parameter.
    * @param name Parameter name
    * @return Parameter value, or null
    */
   public String getParameter(String name) 
   {
     return parameters.get(name);
-  }
+  } // getParameter()
 
-  /** @return Parameter object
+  /**
+   * Get the parameter collection
+   * @return Parameter object
    */
   public MimeTypeParameterList getParameters() 
   {
     return parameters;
-  }
+  } // getParameters()
 
-  /** remove the specified parameter.
-   *
+  /**
+   * Remove the specified parameter from the MIME type
    * @param name Parameter name
    */
-  public void removeParameter(String name) 
+  public void removeParameter(String name)
   {
     parameters.remove(name);
-  }
+  } // removeParameter()
 
-  /** set the MIME type parameter.
-   *
+  /**
+   * Set a MIME type parameter.
    * @param name Parameter name
    * @param value Parameter value
    */
-  public void setParameter(String name, String value) 
+  public void setParameter(String name, String value)
   {
     parameters.set(name, value);
-  }
+  } // setParameter()
 
-  /** @return Primary type
+  /**
+   * Get the primary type of the MIME type
+   * @return Primary type
    */
-  public String getPrimaryType() 
+  public String getPrimaryType()
   {
     return primaryType;
-  }
+  } // getPrimaryType()
 
-  /** @return Sub type
+  /**
+   * Get the sub type of the MIME type
+   * @return Sub type
    */
-  public String getSubType() 
+  public String getSubType()
   {
     return subType;
-  }
+  } // getSubType()
 
-  /** set the primary type of MIME type.
-   *
+  /**
+   * Set the primary type of the MIME type.
    * @param primary Primary type
    * @throws MimeTypeParseException Parsing exception occurred
    */
   public void setPrimaryType(String primary)
-  throws MimeTypeParseException 
+  throws MimeTypeParseException
   {
+    // TODO: Why does this method declare an exception?
     primaryType = primary;
-  }
+  } // setPrimaryType()
 
-  /** set the sub type of MIME type.
-   *
+  /**
+   * Set the sub type of the MIME type.
    * @param sub Sub type
    * @throws MimeTypeParseException Parsing exception occurred
    */
   public void setSubType(String sub)
-  throws MimeTypeParseException 
+  throws MimeTypeParseException
   {
+    // TODO: Why does this method declare an exception?
     subType = sub;
-  }
+  } // setSubType()
 
-  /** determine if raw MIME Type entry matches this MIME Type.
-   *
-   * @param rawdata MIME type entry
-   * @return true if matches, false otherwise
+  /**
+   * Determine if the raw MIME Type entry matches this MIME Type.
+   * @param rawdata MIME type entry to check
+   * @return true if it matches, false otherwise
    * @throws MimeTypeParseException Parsing exception occurred
    */
   public boolean match(String rawdata)
-  throws MimeTypeParseException 
+  throws MimeTypeParseException
   {
-    MimeType mimeType;
-    // Construct Mime Type
-    mimeType = new MimeType(rawdata);
-    // Match Mime Type
-    return match(mimeType);
-  }
 
-  /** determine if MIME Type matches this MIME Type.
-   *
-   * @param type MIME type
+    // Variables
+    MimeType mimeType;
+
+    // Construct a Mime Type from the raw data
+    mimeType = new MimeType(rawdata);
+
+    // Match the Mime Type to check equality
+    return match(mimeType);
+
+  } // match()
+
+  /**
+   * Determine if the MIME Type matches this MIME Type.
+   * @param type MIME type to check
    * @return true if matches, false otherwise
    */
-  public boolean match(MimeType type) 
+  public boolean match(MimeType type)
   {
+    // TODO: should the parameters be checked as well?
+
+    // Check the Primary and Sub types
     return (getPrimaryType().equals(type.getPrimaryType())
-	    && getSubType().equals(type.getSubType()));
-  }
+             && getSubType().equals(type.getSubType()));
+
+  } // match()
 
 
-  //externalizable implementation
+  //-------------------------------------------------------------
+  // Interface: Externalizable ----------------------------------
+  //-------------------------------------------------------------
 
-  /** Read external.  Part of serialization.
-   *
+  /**
+   * Read external.  Part of serialization.
    * @param input Object input
+   * @throws IOException IOException occurred
+   * @throws ClassNotFoundException ClassNotFoundException occurred
    */
   public void readExternal(ObjectInput input)
-  throws IOException, ClassNotFoundException 
+  throws IOException, ClassNotFoundException
   {
-    try 
+    try
     {
-      parse((String)input.readObject());
+      parse((String) input.readObject());
     }
-    catch (MimeTypeParseException e) 
+    catch (MimeTypeParseException e)
     {
     }
-  }
+  } // readExternal()
 
-  /** write external.  Part of serialization.
-   *
+  /**
+   * Write external.  Part of serialization.
    * @param output Object output
    * @throws IOException IO exception occurred
    */
@@ -263,6 +332,7 @@ implements Externalizable
   throws IOException 
   {
     output.writeObject(toString());
-  }
+  } // writeExternal()
 
-}
+
+} // MimeType

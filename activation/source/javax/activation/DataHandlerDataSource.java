@@ -2,7 +2,8 @@
   GNU-Classpath Extensions: java bean activation framework
   Copyright (C) 2000 2001  Andrew Selkirk
 
-  For more information on the classpathx please mail: nferrier@tapsellferrier.co.uk
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public License
@@ -21,10 +22,14 @@
 package javax.activation;
 
 // Imports
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  * Data handler data source.  Use of this class is currently unknown.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.3 $
  */
 class DataHandlerDataSource
 implements DataSource 
@@ -60,7 +65,7 @@ implements DataSource
 
   /**
    * Get input stream.
-   * @returns Input stream
+   * @return Input stream
    * @throws IOException IO exception occurred
    */
   public InputStream getInputStream() throws IOException 
@@ -70,7 +75,7 @@ implements DataSource
 
   /**
    * Get output stream.
-   * @returns Output stream
+   * @return Output stream
    * @throws IOException IO exception occurred
    */
   public OutputStream getOutputStream() throws IOException 
@@ -80,7 +85,7 @@ implements DataSource
 
   /**
    * Get content type.
-   * @returns Content type
+   * @return Content type
    */
   public String getContentType() 
   {
@@ -89,7 +94,7 @@ implements DataSource
 
   /**
    * Get name.
-   * @returns Name
+   * @return Name
    */
   public String getName() 
   {

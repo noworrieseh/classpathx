@@ -1,15 +1,35 @@
-/********************************************************************
- * Copyright (c) Open Java Extensions, Andrew Selkirk  LGPL License *
- ********************************************************************/
+/*
+  GNU-Classpath Extensions: java bean activation framework
+  Copyright (C) 2000 2001  Andrew Selkirk
 
+  For more information on the classpathx please mail:
+  nferrier@tapsellferrier.co.uk
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
 package javax.activation;
 
 // Imports
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  * Object Data Content Handler.
+ * @author Andrew Selkirk
+ * @version $Revision: 1.2 $
  */
 public class ObjectDataContentHandler
 implements DataContentHandler 
@@ -37,7 +57,7 @@ implements DataContentHandler
   /**
    * Data content handler.
    */
-  private DataContentHandler dhc;
+  private DataContentHandler handler;
 
 
   //-------------------------------------------------------------
@@ -50,9 +70,10 @@ implements DataContentHandler
    * @param object Object
    * @param mimetype MIME Type
    */
-  public ObjectDataContentHandler(DataContentHandler handler,Object object, String mimetype) 
+  public ObjectDataContentHandler(DataContentHandler handler,
+    Object object, String mimetype)
   {
-    dhc = handler;
+    this.handler = handler;
     obj = object;
     mimeType = mimetype;
   } // ObjectDataContentHandler()
@@ -64,16 +85,16 @@ implements DataContentHandler
 
   /**
    * Get data content handler.
-   * @returns Data content handler
+   * @return Data content handler
    */
   public DataContentHandler getDCH() 
   {
-    return dhc;
+    return handler;
   } // getDCH()
 
   /**
    * Get transfer data flavors.
-   * @returns List of transfer data flavors
+   * @return List of transfer data flavors
    */
   public DataFlavor[] getTransferDataFlavors() 
   {
@@ -84,6 +105,7 @@ implements DataContentHandler
    * Get transfer data flavor.
    * @param flavor Data flavor
    * @param source Data source
+   * @return TODO
    * @throws IOException IO exception occurred
    */
   public Object getTransferData(DataFlavor flavor, DataSource source) 
@@ -95,7 +117,7 @@ implements DataContentHandler
   /**
    * Get content.
    * @param source Data source
-   * @returns Object content
+   * @return Object content
    */
   public Object getContent(DataSource source) 
   {
