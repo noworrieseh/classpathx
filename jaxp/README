@@ -1,3 +1,9 @@
+WARNING: GNUJAXP is pure GPL at the moment!!!
+
+I (avdyk) am working to change license to GPL + linking exception for
+the whole project, but be aware that if you build the project with the
+libxmlj package, these classes are pure GPL!
+
 WHAT IS THIS
     GNUJAXP includes interfaces and implementations for basic XML
     processing in Java, and some general purpose SAX2 utilities.
