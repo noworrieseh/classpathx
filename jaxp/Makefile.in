@@ -240,6 +240,7 @@ SOURCEFILES = 	$(SOURCEDIR)/javax/xml/parsers/DocumentBuilderFactory.java \
 	$(SOURCEDIR)/gnu/xml/util/DefaultHandler.java \
 	$(SOURCEDIR)/gnu/xml/util/XMLWriter.java \
 	$(SOURCEDIR)/gnu/xml/util/XHTMLWriter.java \
+	$(SOURCEDIR)/gnu/xml/dom/Consumer.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomAttr.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomCDATA.java \
 	$(SOURCEDIR)/gnu/xml/dom/DomCharacterData.java \
