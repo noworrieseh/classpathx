@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -219,6 +220,14 @@ public class SMTPTransport
       {
         throw new MessagingException (e.getMessage (), e);
       }
+  }
+
+  /**
+   * Returns a list of the ESMTP extensions supported by the server.
+   */
+  public List getExtensions ()
+  {
+    return Collections.unmodifiableList (extensions);
   }
   
   /**

@@ -1,3 +1,7 @@
+2004-09-07  Chris Burdess  <dog@bluezoo.org>
+
+	* SMTPTransport.java: Expose ESMTP extension list.
+
 2004-08-06  Chris Burdess  <dog@bluezoo.org>
 
 	* IMAPFolder.java: Correct folder pathnames in list() commands.
