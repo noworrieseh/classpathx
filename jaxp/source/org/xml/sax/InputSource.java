@@ -1,6 +1,6 @@
 // SAX input source.
 // No warranty; no copyright -- use this as you will.
-// $Id: InputSource.java,v 1.4 2001-08-03 19:08:39 db Exp $
+// $Id: InputSource.java,v 1.5 2001-08-07 18:16:37 db Exp $
 
 package org.xml.sax;
 
@@ -20,15 +20,21 @@ import java.io.InputStream;
  * a public identifier, a system identifier, a byte stream (possibly
  * with a specified encoding), and/or a character stream.</p>
  *
- * <p>There are two places that the application will deliver this
+ * <p>There are two places that the application can deliver an
  * input source to the parser: as the argument to the Parser.parse
  * method, or as the return value of the EntityResolver.resolveEntity
  * method.</p>
  *
  * <p>The SAX parser will use the InputSource object to determine how
  * to read XML input.  If there is a character stream available, the
- * parser will read that stream directly; if not, the parser will use
- * a byte stream, if available; if neither a character stream nor a
+ * parser will read that stream directly, ignoring any text encoding
+ * declaration found in that stream as well as any encoding specified
+ * in the InputSource.  If there is no character stream, but there is
+ * a byte stream, the parser will use that byte stream, using the
+ * encoding specified in the InputSource or else (if no encoding is
+ * specified) autodetecting the character encoding using an algorithm
+ * such as the one in the XML specification.  If neither a character
+ * stream nor a
  * byte stream is available, the parser will attempt to open a URI
  * connection to the resource identified by the system
  * identifier.</p>
@@ -69,7 +75,8 @@ public class InputSource {
      * public identifier as well, or setEncoding to specify
      * the character encoding, if known.</p>
      *
-     * <p>If the system identifier is a URL, it must be full resolved.</p>
+     * <p>If the system identifier is a URL, it must be fully
+     * resolved (it may not be a relative URL).</p>
      *
      * @param systemId The system identifier (URI).
      * @see #setPublicId
@@ -87,9 +94,9 @@ public class InputSource {
     /**
      * Create a new input source with a byte stream.
      *
-     * <p>Application writers may use setSystemId to provide a base 
-     * for resolving relative URIs, setPublicId to include a 
-     * public identifier, and/or setEncoding to specify the object's
+     * <p>Application writers should use setSystemId() to provide a base 
+     * for resolving relative URIs, may use setPublicId to include a 
+     * public identifier, and may use setEncoding to specify the object's
      * character encoding.</p>
      *
      * @param byteStream The raw byte stream containing the document.
@@ -108,8 +115,8 @@ public class InputSource {
     /**
      * Create a new input source with a character stream.
      *
-     * <p>Application writers may use setSystemId() to provide a base 
-     * for resolving relative URIs, and setPublicId to include a 
+     * <p>Application writers should use setSystemId() to provide a base 
+     * for resolving relative URIs, and may use setPublicId to include a 
      * public identifier.</p>
      *
      * <p>The character stream shall not include a byte order mark.</p>
@@ -169,7 +176,8 @@ public class InputSource {
      * object pointed to by the system identifier, it can register
      * the encoding using the setEncoding method.</p>
      *
-     * <p>If the system ID is a URL, it must be fully resolved.</p>
+     * <p>If the system identifier is a URL, it must be fully
+     * resolved (it may not be a relative URL).</p>
      *
      * @param systemId The system identifier as a string.
      * @see #setEncoding
@@ -263,6 +271,8 @@ public class InputSource {
     
     /**
      * Get the character encoding for a byte stream or URI.
+     * This value will be ignored when the application provides a
+     * character stream.
      *
      * @return The encoding, or null if none was supplied.
      * @see #setByteStream
