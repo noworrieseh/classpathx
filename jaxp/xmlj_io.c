@@ -354,7 +354,7 @@ xmljNewParserContext (JNIEnv * env,
 {
   InputStreamContext *inputContext;
   xmlCharEncoding encoding;
-  xmlParserCtxtPtr parserContext;
+  xmlParserCtxtPtr ctx;
   int options;
 
   encoding = xmljDetectCharEncoding (env, detectBuffer);
@@ -363,14 +363,14 @@ xmljNewParserContext (JNIEnv * env,
       inputContext = xmljNewInputStreamContext (env, inputStream);
       if (NULL != inputContext)
         {
-          parserContext = xmlCreateIOParserCtxt (NULL, NULL,
-                                                 /* NOTE: userdata must be NULL for DOM to work */
-                                                 xmljInputReadCallback,
-                                                 xmljInputCloseCallback,
-                                                 inputContext, encoding);
-          if (NULL != parserContext)
+          ctx = xmlCreateIOParserCtxt (NULL, NULL,
+                                       /* NOTE: userdata must be NULL for DOM to work */
+                                       xmljInputReadCallback,
+                                       xmljInputCloseCallback,
+                                       inputContext, encoding);
+          if (NULL != ctx)
             {
-              parserContext->userData = parserContext;
+              ctx->userData = ctx;
               
               /* Set parsing options */
               options = 0;
@@ -387,9 +387,13 @@ xmljNewParserContext (JNIEnv * env,
                 {
                   options |= XML_PARSE_NOENT;
                 }
-              xmlCtxtUseOptions (parserContext, options);
-
-              return parserContext;
+              if (xmlCtxtUseOptions (ctx, options))
+                {
+                  xmljThrowException (env,
+                                      "java/lang/RuntimeException",
+                                      "Unable to set xmlParserCtxtPtr options");
+                }
+              return ctx;
             }
           xmljFreeInputStreamContext (inputContext);
         }
@@ -398,17 +402,17 @@ xmljNewParserContext (JNIEnv * env,
 }
 
 void
-xmljFreeParserContext (xmlParserCtxtPtr parserContext)
+xmljFreeParserContext (xmlParserCtxtPtr ctx)
 {
   InputStreamContext *inputStreamContext;
 
   inputStreamContext
-    = (InputStreamContext *) parserContext->input->buf->context;
+    = (InputStreamContext *) ctx->input->buf->context;
 
   if (inputStreamContext != NULL)
     xmljFreeInputStreamContext (inputStreamContext);
 
-  /* TODO xmlFreeParserCtxt (parserContext); */
+  /* TODO xmlFreeParserCtxt (ctx); */
 }
 
 xmlDocPtr
@@ -466,7 +470,7 @@ xmljParseDocument (JNIEnv * env,
     }
   return NULL;
 }
-                              
+
 xmlDocPtr
 xmljParseDocument2 (JNIEnv * env,
                     xmlParserCtxtPtr ctx,
@@ -484,7 +488,8 @@ xmljParseDocument2 (JNIEnv * env,
   ctx->sax = sax;
               
   xmljSetThreadContext (saxCtx);
-  
+
+  printf ("ctx=%d loadsubset=%d\n", ctx, ctx->loadsubset);
   ret = xmlParseDocument (ctx);
   doc = ctx->myDoc;
   if (ret)

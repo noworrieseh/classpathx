@@ -221,11 +221,7 @@ implements Node
 
   // DOM Level 3 methods
 
-  public String getBaseURI ()
-    {
-      // TODO
-      return null;
-    }
+  public native String getBaseURI ();
 
   public short compareDocumentPosition (Node other) throws DOMException
     {
@@ -301,23 +297,11 @@ implements Node
         return equals (other);
       }
 
-    public String lookupPrefix (String namespaceURI)
-      {
-        // TODO
-        return null;
-      }
+    public native String lookupPrefix (String namespaceURI);
 
-    public boolean isDefaultNamespace (String namespaceURI)
-      {
-        // TODO
-        return false;
-      }
+    public native boolean isDefaultNamespace (String namespaceURI);
 
-    public String lookupNamespaceURI (String prefix)
-      {
-        // TODO
-        return null;
-      }
+    public native String lookupNamespaceURI (String prefix);
 
     public boolean isEqualNode (Node arg)
       {

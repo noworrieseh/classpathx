@@ -128,7 +128,7 @@ implements Element
 
   public void setIdAttribute (String name, boolean isId)
     {
-      // TODO
+      setIdAttributeNS (null, name, isId);
     }
 
   public void setIdAttributeNode (Attr isAddr, boolean isId)

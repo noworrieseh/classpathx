@@ -53,10 +53,16 @@ implements Document
 {
 
   DOMImplementation dom;
+
+  /**
+   * Not currently used.
+   */
+  boolean strictErrorChecking;
   
   GnomeDocument(int id)
   {
     super(id);
+    strictErrorChecking = true;
   }
 
   protected void finalize()
@@ -129,11 +135,7 @@ implements Document
 
   // DOM Level 3 methods
 
-  public String getInputEncoding ()
-    {
-      // TODO
-      return null;
-    }
+  public native String getInputEncoding ();
 
   public String getXmlEncoding ()
     {
@@ -141,54 +143,32 @@ implements Document
       return null;
     }
 
-  public boolean getXmlStandalone ()
-    {
-      // TODO
-      return false;
-    }
+  public native boolean getXmlStandalone ();
 
-  public void setXmlStandalone (boolean xmlStandalone)
-    {
-      // TODO
-    }
+  public native void setXmlStandalone (boolean xmlStandalone);
 
-  public String getXmlVersion ()
-    {
-      // TODO
-      return null;
-    }
+  public native String getXmlVersion ();
 
-  public void setXmlVersion (String xmlVersion)
-    {
-      // TODO
-    }
+  public native void setXmlVersion (String xmlVersion);
 
   public boolean getStrictErrorChecking ()
     {
-      // TODO
-      return false;
+      return strictErrorChecking;
     }
 
   public void setStrictErrorChecking (boolean strictErrorChecking)
     {
-      // TODO
+      this.strictErrorChecking = strictErrorChecking;
     }
 
-  public String getDocumentURI ()
-    {
-      // TODO
-      return null;
-    }
+  public native String getDocumentURI ();
 
-  public void setDocumentURI (String documentURI)
-    {
-      // TODO
-    }
+  public native void setDocumentURI (String documentURI);
 
   public Node adoptNode (Node source)
+    throws DOMException
     {
-      // TODO
-      return null;
+      throw new DOMException (DOMException.NOT_SUPPORTED_ERR, null);
     }
 
   public DOMConfiguration getDomConfig ()
@@ -202,10 +182,7 @@ implements Document
       // TODO
     }
 
-  public Node renameNode (Node n, String namespaceURI, String qualifiedName)
-    {
-      // TODO
-      return null;
-    }
+  public native Node renameNode (Node n, String namespaceURI,
+                                 String qualifiedName);
 
 }

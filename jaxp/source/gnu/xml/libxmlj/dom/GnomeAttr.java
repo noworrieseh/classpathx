@@ -72,10 +72,6 @@ implements Attr
       return null;
     }
   
-  public boolean isId ()
-    {
-      // TODO
-      return false;
-    }
+  public native boolean isId ();
   
 }

@@ -1,3 +1,8 @@
+2004-06-02  Chris Burdess <dog@gnu.org>
+
+	* GnomeNode.java et al, xmlj_dom.c: Implementation of some DOM Level 3
+	    methods.
+
 2004-06-01  Chris Burdess <dog@gnu.org>
 
 	* GnomeNode.java et al: Applied Dalibor's #3080 patch for missing

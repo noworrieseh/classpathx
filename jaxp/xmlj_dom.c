@@ -82,6 +82,15 @@ Java_gnu_xml_libxmlj_dom_GnomeAttr_setValue (JNIEnv * env,
   xmlNodeSetContent (node, s_value);
 }
 
+JNIEXPORT jboolean JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeAttr_isId (JNIEnv * env, jobject self)
+{
+  xmlAttrPtr attr;
+
+  attr = (xmlAttrPtr) xmljGetNodeID (env, self);
+  return (attr->atype == XML_ATTRIBUTE_ID);
+}
+
 /* -- GnomeDocument -- */
 
 JNIEXPORT void JNICALL
@@ -216,8 +225,22 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_importNode (JNIEnv * env,
                                                    jobject importedNode,
                                                    jboolean deep)
 {
-  /* TODO */
-  return NULL;
+  xmlDocPtr doc;
+  xmlNodePtr node;
+  xmlNodePtr ret;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  node = xmljGetNodeID (env, importedNode);
+  ret = xmlDocCopyNode (node, doc, deep);
+  if (ret == NULL)
+    {
+      xmljThrowDOMException (env, 9, NULL); /* NOT_SUPPORTED_ERR */
+      return NULL;
+    }
+  else
+    {
+      return xmljGetNodeInstance (env, ret);
+    }
 }
 
 JNIEXPORT jobject JNICALL
@@ -286,6 +309,110 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementById (JNIEnv * env,
 {
   /* TODO */
   return NULL;
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getInputEncoding (JNIEnv * env,
+                                                         jobject self)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  return (doc->encoding == NULL) ? NULL : xmljNewString (env, doc->encoding);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getXmlStandalone (JNIEnv * env,
+                                                         jobject self)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  return doc->standalone;
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_setXmlStandalone (JNIEnv * env,
+                                                         jobject self,
+                                                         jboolean xmlStandalone)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  doc->standalone = xmlStandalone;
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getXmlVersion (JNIEnv * env,
+                                                      jobject self)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  return (doc->version == NULL) ? NULL : xmljNewString (env, doc->version);
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_setXmlVersion (JNIEnv * env,
+                                                      jobject self,
+                                                      jstring xmlVersion)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  if (xmlVersion == NULL)
+    {
+      doc->version = NULL;
+    }
+  else
+    {
+      doc->version = xmljGetStringChars (env, xmlVersion);
+    }
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_getDocumentURI (JNIEnv * env,
+                                                       jobject self)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  return (doc->name == NULL) ? NULL :
+    xmljNewString (env, (const xmlChar *) doc->name);
+}
+
+JNIEXPORT void JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_setDocumentURI (JNIEnv * env,
+                                                       jobject self,
+                                                       jstring documentURI)
+{
+  xmlDocPtr doc;
+
+  doc = (xmlDocPtr) xmljGetNodeID (env, self);
+  if (documentURI == NULL)
+    {
+      doc->name = NULL;
+    }
+  else
+    {
+      doc->name = (char *) xmljGetStringChars (env, documentURI);
+    }
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeDocument_renameNode (JNIEnv * env,
+                                                   jobject self,
+                                                   jobject n,
+                                                   jstring namespaceURI,
+                                                   jstring qualifiedName)
+{
+  xmlNodePtr node;
+
+  node = xmljGetNodeID (env, n);
+  xmlNodeSetName (node, xmljGetStringChars (env, qualifiedName));
+  node->ns->href = xmljGetStringChars (env, namespaceURI);
+  /* TODO node->ns->prefix */
+  return n;
 }
 
 /* -- GnomeDocumentBuilder -- */
@@ -1004,6 +1131,81 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_hasAttributes (JNIEnv * env, jobject self)
 
   node = xmljGetNodeID (env, self);
   return (node->properties != NULL);
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeNode_getBaseURI (JNIEnv * env, jobject self)
+{
+  xmlNodePtr node;
+  xmlChar *baseURI;
+  jstring ret;
+  
+  node = xmljGetNodeID (env, self);
+  baseURI = xmlNodeGetBase (node->doc, node);
+  ret = xmljNewString (env, (const xmlChar *) baseURI);
+  xmlFree (baseURI);
+  return ret;
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeNode_lookupPrefix (JNIEnv * env, jobject self,
+                                                 jstring namespaceURI)
+{
+  xmlNodePtr node;
+  xmlNsPtr ns;
+  
+  node = xmljGetNodeID (env, self);
+  ns = xmlSearchNsByHref (node->doc, node, xmljGetStringChars (env,
+                                                               namespaceURI));
+  if (ns == NULL)
+    {
+      return NULL;
+    }
+  else
+    {
+      return xmljNewString (env, ns->prefix);
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeNode_isDefaultNamespace (JNIEnv * env,
+                                                       jobject self,
+                                                       jstring namespaceURI)
+{
+  xmlNodePtr node;
+  xmlNsPtr ns;
+  
+  node = xmljGetNodeID (env, self);
+  ns = xmlSearchNsByHref (node->doc, node, xmljGetStringChars (env,
+                                                               namespaceURI));
+  if (ns == NULL)
+    {
+      return 0;
+    }
+  else
+    {
+      return (ns->prefix == NULL || xmlStrlen (ns->prefix) == 0);
+    }
+}
+
+JNIEXPORT jstring JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeNode_lookupNamespaceURI (JNIEnv * env,
+                                                       jobject self,
+                                                       jstring prefix)
+{
+  xmlNodePtr node;
+  xmlNsPtr ns;
+  
+  node = xmljGetNodeID (env, self);
+  ns = xmlSearchNs (node->doc, node, xmljGetStringChars (env, prefix));
+  if (ns == NULL)
+    {
+      return NULL;
+    }
+  else
+    {
+      return xmljNewString (env, ns->href);
+    }
 }
 
 /* -- GnomeNodeList -- */
