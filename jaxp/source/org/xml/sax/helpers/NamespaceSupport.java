@@ -3,7 +3,7 @@
 // Written by David Megginson
 // This class is in the Public Domain.  NO WARRANTY!
 
-// $Id: NamespaceSupport.java,v 1.5 2001-10-18 00:36:10 db Exp $
+// $Id: NamespaceSupport.java,v 1.6 2001-10-23 19:41:13 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -170,6 +170,8 @@ public class NamespaceSupport
     public void pushContext ()
     {
 	int max = contexts.length;
+
+	contexts [contextPos].declsOK = false;
 	contextPos++;
 
 				// Extend the array if necessary
@@ -239,7 +241,9 @@ public class NamespaceSupport
      * the prefix.</p>
      *
      * <p>Note that you must <em>not</em> declare a prefix after
-     * you've pushed and popped another Namespace context.</p>
+     * you've pushed and popped another Namespace context, or
+     * treated the declarations phase as complete by processing
+     * a prefixed name.</p>
      *
      * <p>Note that there is an asymmetry in this library: {@link
      * #getPrefix getPrefix} will not return the "" prefix,
@@ -254,6 +258,10 @@ public class NamespaceSupport
      *	the value "xml" or "xmlns".
      * @param uri The Namespace URI to associate with the prefix.
      * @return true if the prefix was legal, false otherwise
+     * @exception IllegalStateException when a prefix is declared
+     *	after looking up a name in the context, or after pushing
+     *	another context on top of it.
+     *
      * @see #processName
      * @see #getURI
      * @see #getPrefix
@@ -494,7 +502,8 @@ public class NamespaceSupport
 	    elementNameTable = parent.elementNameTable;
 	    attributeNameTable = parent.attributeNameTable;
 	    defaultNS = parent.defaultNS;
-	    tablesDirty = false;
+	    declSeen = false;
+	    declsOK = true;
 	}
 
 	/**
@@ -524,7 +533,10 @@ public class NamespaceSupport
 	void declarePrefix (String prefix, String uri)
 	{
 				// Lazy processing...
-	    if (!tablesDirty) {
+	    if (!declsOK)
+		throw new IllegalStateException (
+		    "can't declare any more prefixes in this context");
+	    if (!declSeen) {
 		copyTables();
 	    }
 	    if (declarations == null) {
@@ -563,11 +575,14 @@ public class NamespaceSupport
 	    String name[];
 	    Hashtable table;
 	    
+	    			// detect errors in call sequence
+	    declsOK = false;
+
 				// Select the appropriate table.
 	    if (isAttribute) {
-		table = elementNameTable;
-	    } else {
 		table = attributeNameTable;
+	    } else {
+		table = elementNameTable;
 	    }
 	    
 				// Start by looking in the cache, and
@@ -617,7 +632,6 @@ public class NamespaceSupport
 				// Save in the cache for future use.
 				// (Could be shared with parent context...)
 	    table.put(name[2], name);
-	    tablesDirty = true;
 	    return name;
 	}
 	
@@ -723,7 +737,7 @@ public class NamespaceSupport
 	    }
 	    elementNameTable = new Hashtable();
 	    attributeNameTable = new Hashtable();
-	    tablesDirty = true;
+	    declSeen = true;
 	}
 
 
@@ -737,6 +751,7 @@ public class NamespaceSupport
 	Hashtable elementNameTable;
 	Hashtable attributeNameTable;
 	String defaultNS = null;
+	boolean declsOK = true;
 	
 
 
@@ -745,7 +760,7 @@ public class NamespaceSupport
 	////////////////////////////////////////////////////////////////
 	
 	private Vector declarations = null;
-	private boolean tablesDirty = false;
+	private boolean declSeen = false;
 	private Context parent = null;
     }
 }
