@@ -159,6 +159,12 @@ public final class MaildirMessage
   String getInfo() 
     throws MessagingException 
   {
+    return getInfo(flags);
+  }
+
+  static String getInfo(Flags flags)
+    throws MessagingException
+  {
     StringBuffer buffer = new StringBuffer();
     buffer.append('2');
     buffer.append(',');

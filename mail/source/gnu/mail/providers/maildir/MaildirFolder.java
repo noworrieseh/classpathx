@@ -27,9 +27,15 @@
 
 package gnu.mail.providers.maildir;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,8 +51,6 @@ import javax.mail.event.ConnectionEvent;
 import javax.mail.event.FolderEvent;
 import javax.mail.internet.MimeMessage;
 import gnu.mail.util.LineInputStream;
-
-import gnu.mail.treeutil.StatusEvent;
 
 /**
  * The folder class implementing a Maildir-format mailbox.
@@ -88,6 +92,8 @@ public final class MaildirFolder
   boolean inbox;
   
   static Flags permanentFlags = new Flags();
+
+  static long deliveryCount = 0;
 		
   /**
    * Constructor.
@@ -186,7 +192,7 @@ public final class MaildirFolder
   public void open(int mode) 
     throws MessagingException 
   {
-    if (mode!=-1)
+    if (this.mode!=-1)
       throw new IllegalStateException("Folder is open");
     if (!maildir.exists() || !maildir.canRead())
       throw new FolderNotFoundException(this);
@@ -447,11 +453,58 @@ public final class MaildirFolder
         {
           MimeMessage src = (MimeMessage)m[i];
           Flags flags = src.getFlags();
-          int count = flags.contains(Flags.Flag.SEEN) ? ++clen : ++nlen;
-          MaildirMessage dst = new MaildirMessage(this, src, count);
-          // TODO deliver to new
-          throw new javax.mail.MethodNotSupportedException("Not yet implemented");
-          //appended.add(dst);
+          boolean seen = flags.contains(Flags.Flag.SEEN);
+          int count = seen ? ++clen : ++nlen;
+          try
+          {
+            String uniq = createUniq();
+            String tmpname = uniq;
+            String info = null;
+            if (seen)
+            {
+              info = MaildirMessage.getInfo(flags);
+              tmpname = new StringBuffer(uniq)
+                .append(':')
+                .append(info)
+                .toString();
+            }
+            File tmpfile = new File(tmpdir, tmpname);
+            long time = System.currentTimeMillis();
+            long timeout = time + 86400000L; // 24h
+            while (time<timeout)
+            {
+              if (!tmpfile.exists())
+                break;
+               try
+               {
+                 wait(2000); // sleep for 2s
+               } 
+               catch (InterruptedException e)
+               {
+               }
+              time = System.currentTimeMillis();
+            }
+            if (!tmpfile.createNewFile()) // create tmp/tmpname
+              throw new MessagingException("Temporary file already exists");
+            OutputStream out =
+              new BufferedOutputStream(new FileOutputStream(tmpfile));
+            src.writeTo(out); // write message to tmp/tmpname
+            out.close(); // flush and close
+            File file = new File(seen ? curdir.dir : newdir.dir, tmpname);
+            tmpfile.renameTo(file); // link to final location
+            tmpfile.delete(); // delete temporary file
+            MaildirMessage dst =
+              new MaildirMessage(this, file, uniq, info, count);
+            appended.add(dst);
+          }
+          catch (IOException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+          catch (SecurityException e)
+          {
+            throw new IllegalWriteException(e.getMessage());
+          }
         }
       }
       n = new MaildirMessage[appended.size()];
@@ -461,6 +514,39 @@ public final class MaildirFolder
     // propagate event
     if (n.length>0)
       notifyMessageAddedListeners(n);
+  }
+
+  /**
+   * Create a unique filename.
+   */
+  static String createUniq()
+    throws MessagingException, IOException
+  {
+    long time = System.currentTimeMillis() / 1000L;
+    long pid = 0;
+    File urandom = new File("/dev/urandom");
+    if (urandom.exists() && urandom.canRead())
+    {
+      // Read 8 bytes from /dev/urandom
+      byte[] bytes = new byte[8];
+      InputStream in = new FileInputStream(urandom);
+      int offset = 0;
+      while (offset<bytes.length)
+        offset += in.read(bytes, offset, bytes.length-offset);
+      in.close();
+      for (int i=0; i<bytes.length; i++)
+        pid |= (((long)bytes[i]) * ((long)Math.pow(i, 2)));
+    }
+    else
+      pid += ++deliveryCount;
+    String host = InetAddress.getLocalHost().getHostName();
+    return new StringBuffer()
+      .append(time)
+      .append('.')
+      .append(pid)
+      .append('.')
+      .append(host)
+      .toString();
   }
 
   /**

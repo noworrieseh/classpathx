@@ -1,5 +1,5 @@
 /*
- * MultipartRelated.java
+ * MultipartSigned.java
  * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU JavaMail, a library.
@@ -28,19 +28,19 @@
 package gnu.mail.handler;
 
 /**
- * A JAF data content handler for the multipart/related MIME content
+ * A JAF data content handler for the multipart/signed MIME content
  * type.
  */
-public final class MultipartRelated
+public final class MultipartSigned
   extends Multipart
 {
 
   /**
-   * Constructor for multipart/related.
+   * Constructor for multipart/signed.
    */
-  public MultipartRelated()
+  public MultipartSigned()
   {
-    super("multipart/related", "multipart");
+    super("multipart/signed", "multipart");
   }
   
 }
