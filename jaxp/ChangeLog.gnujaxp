@@ -1,3 +1,7 @@
+2004-08-10  Musachy Barroso  <musachy@gmail.com>
+
+   	* XmlParser.java: Convert 0x2028 to '\r' when document is 1.1
+   	
 2004-08-08  Musachy Barroso  <musachy@gmail.com>
 
    	* XmlParser.java: Report start name characters that are not

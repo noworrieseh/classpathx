@@ -4627,10 +4627,10 @@ loop:
 		    if ((c == 0x0085 || c == 0x000a) && sawCR)
 		       	continue;
 		    
-		    // Sec 2.1
+		    // Sec 2.11
 		    // [3] the single character #x85
-		    // [4] the single character #x2028
-		    if((c == 0x0085 || c == 0x2028) && xmlVersion == XML_11)
+		    
+		    if(c == 0x0085  && xmlVersion == XML_11)
 		    	readBuffer[j++] = '\r';
 		} else if ((b1 & 0xf0) == 0xe0) {
 		    // 3-byte sequence:
@@ -4639,6 +4639,12 @@ loop:
 		    c = (char) (((b1 & 0x0f) << 12) |
 				   (getNextUtf8Byte (i++, count) << 6) |
 				   getNextUtf8Byte (i++, count));
+                    //sec 2.11
+		    //[4] the single character #x2028
+		    if(c == 0x2028 && xmlVersion == XML_11){
+		       	readBuffer[j++] = '\r';
+		       	continue;
+		    }
 		    if (c < 0x0800 || (c >= 0xd800 && c <= 0xdfff))
 			encodingError ("Illegal three byte UTF-8 sequence",
 				c, 0);
