@@ -136,16 +136,16 @@ final public class SAXDriver
     private DeclHandler			declHandler = base;
     private LexicalHandler		lexicalHandler = base;
 
-    private String			elementName = null;
-    private Stack			entityStack = new Stack ();
+    private String			elementName;
+    private Stack			entityStack;
 
     // could use just one vector (of object/struct): faster, smaller
-    private Vector			attributeNames = new Vector ();
-    private Vector			attributeNamespaces = new Vector ();
-    private Vector			attributeLocalNames = new Vector ();
-    private Vector			attributeValues = new Vector ();
-    private boolean			attributeSpecified [] = new boolean[10];
-    private boolean			attributeDeclared [] = new boolean[10];
+    private Vector			attributeNames;
+    private Vector			attributeNamespaces;
+    private Vector			attributeLocalNames;
+    private Vector			attributeValues;
+    private boolean			attributeSpecified [];
+    private boolean			attributeDeclared [];
 
     private boolean			namespaces = true;
     private boolean			xmlNames = false;
@@ -155,9 +155,9 @@ final public class SAXDriver
     private boolean			useResolver2 = true;
     private boolean     stringInterning = true;
 
-    private int				attributeCount = 0;
+    private int				attributeCount;
     private boolean			attributes;
-    private String			nsTemp [] = new String [3];
+    private String			nsTemp [];
     private NamespaceSupport		prefixStack;
 
     //
@@ -165,7 +165,26 @@ final public class SAXDriver
     //
 
     /** Constructs a SAX Parser.  */
-    public SAXDriver () {}
+    public SAXDriver ()
+    {
+      reset ();
+    }
+
+    private void reset ()
+    {
+      elementName = null;
+      entityStack = new Stack ();
+      attributeNames = new Vector ();
+      attributeNamespaces = new Vector ();
+      attributeLocalNames = new Vector ();
+      attributeValues = new Vector ();
+      attributeSpecified = new boolean[10];
+      attributeDeclared = new boolean[10];
+      attributeCount = 0;
+      attributes = false;
+      nsTemp = new String[3];
+      prefixStack = null;
+    }
 
 
     //
@@ -340,9 +359,7 @@ final public class SAXDriver
 		throw new SAXParseException (e.getMessage (), this, e);
 	    } finally {
 		contentHandler.endDocument ();
-		entityStack.removeAllElements ();
-		parser = null;
-		prefixStack = null;
+                reset();
 	    }
 	}
     }

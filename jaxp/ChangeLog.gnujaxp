@@ -1,3 +1,8 @@
+2004-06-24  Chris Burdess <dog@bluezoo.org>
+
+	* SAXDriver.java: Introduced reset method to reset state before
+	    new parse. Thanks to Musachy Barroso.
+
 2003-12-01 00:32  Arnaud Vandyck <avdyk@users.sourceforge.net>
 
 	* source/: *.java : Removed al the cvs
