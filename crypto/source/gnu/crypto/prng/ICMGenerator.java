@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.6 2002-06-08 05:24:34 raif Exp $
+// $Id: ICMGenerator.java,v 1.7 2002-07-07 00:00:11 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -57,7 +57,7 @@ import java.util.Map;
  *    Integer Counter Mode</a>, David A. McGrew.</li>
  * </ol>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ICMGenerator extends BasePRNG {
 
@@ -75,10 +75,10 @@ public class ICMGenerator extends BasePRNG {
    public static final String SEGMENT_INDEX_LENGTH =
          "gnu.crypto.prng.icm.segment.index.length";
 
-   /** Property name of ICM's segment index length. */
+   /** Property name of ICM's offset. */
    public static final String OFFSET = "gnu.crypto.prng.icm.offset";
 
-   /** Property name of ICM's segment index length. */
+   /** Property name of ICM's segment index. */
    public static final String SEGMENT_INDEX = "gnu.crypto.prng.icm.segment.index";
 
    /** The integer value 256 as a BigInteger. */
@@ -87,20 +87,20 @@ public class ICMGenerator extends BasePRNG {
    /** The underlying cipher implementation. */
    private IBlockCipher cipher;
 
-   /** The underlying cipher block size to use, in octets. */
-   private int cipherBlockSize;
+   /** This keystream block index length in bytes. */
+   private int blockNdxLength = -1;
 
-   /** Maximum number of blocks per segment. */
-   private BigInteger maxBlocksPerSegment;
+   /** This keystream segment index length in bytes. */
+   private int segmentNdxLength = -1;
 
-   /** A work constant. */
-   private BigInteger counterRange;
+   /** The index of the next block for a given keystream segment. */
+   private BigInteger blockNdx = BigInteger.ZERO;
+
+   /** The segment index for this keystream. */
+   private BigInteger segmentNdx;
 
    /** The initial counter for a given keystream segment. */
    private BigInteger C0;
-
-   /** The index of the next block for a given keystream segment. */
-   private BigInteger blockNdx;
 
    // Constructor(s)
    // -------------------------------------------------------------------------
@@ -110,11 +110,32 @@ public class ICMGenerator extends BasePRNG {
       super(Registry.ICM_PRNG);
    }
 
+   /**
+    * <p>Private constructor for cloning purposes.</p>
+    *
+    * @param that the instance to clone.
+    */
+   private ICMGenerator(ICMGenerator that) {
+      this();
+
+      this.cipher = (that.cipher == null ? null : (IBlockCipher) that.cipher.clone());
+      this.blockNdxLength = that.blockNdxLength;
+      this.segmentNdxLength = that.segmentNdxLength;
+      this.blockNdx = that.blockNdx;
+      this.segmentNdx = that.segmentNdx;
+   }
+
    // Class methods
    // -------------------------------------------------------------------------
 
    // Instance methods
    // -------------------------------------------------------------------------
+
+   // java.lang.Cloneable interface implementation ----------------------------
+
+   public Object clone() {
+      return new ICMGenerator(this);
+   }
 
    // Implementation of abstract methods in BasePRNG --------------------------
 
@@ -128,34 +149,29 @@ public class ICMGenerator extends BasePRNG {
    //
    public void setup(Map attributes) {
       // find out which cipher algorithm to use
+      boolean newCipher = true;
       String underlyingCipher = (String) attributes.get(CIPHER);
-      if (underlyingCipher == null)
-         underlyingCipher = "rijndael";
-
-      // ensure that we have a reliable implementation of this cipher algorithm
-      cipher = CipherFactory.getInstance(underlyingCipher);
-
-      // assume we'll use its default block size
-      cipherBlockSize = cipher.defaultBlockSize();
-
-      // find out what block size we should use for it. if null stick with
-      // default;
-      Integer i = (Integer) attributes.get(IBlockCipher.CIPHER_BLOCK_SIZE);
-      if (i != null) {
-         cipherBlockSize = i.intValue();
-      }
-
-      Iterator it;
-      // ensure that value is valid for the chosen underlying cipher
-      boolean ok = false;
-      for (it = cipher.blockSizes(); it.hasNext(); ) {
-         ok = (cipherBlockSize == ((Integer) it.next()).intValue());
-         if (ok) {
-            break;
+      if (underlyingCipher == null) {
+         if (cipher == null) { // happy birthday
+            // ensure we have a reliable implementation of this cipher
+            cipher = CipherFactory.getInstance(Registry.RIJNDAEL_CIPHER);
+         } else { // we already have one. use it as is
+            newCipher = false;
          }
+      } else { // ensure we have a reliable implementation of this cipher
+         cipher = CipherFactory.getInstance(underlyingCipher);
       }
-      if (!ok)
-         throw new IllegalArgumentException(IBlockCipher.CIPHER_BLOCK_SIZE);
+
+      // find out what block size we should use it in
+      int cipherBlockSize = 0;
+      Integer bs = (Integer) attributes.get(IBlockCipher.CIPHER_BLOCK_SIZE);
+      if (bs != null) {
+         cipherBlockSize = bs.intValue();
+      } else {
+         if (newCipher) { // assume we'll use its default block size
+            cipherBlockSize = cipher.defaultBlockSize();
+         } // else use as is
+      }
 
       // get the key material
       byte[] key = (byte[]) attributes.get(IBlockCipher.KEY_MATERIAL);
@@ -163,58 +179,26 @@ public class ICMGenerator extends BasePRNG {
          throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
       }
 
-      int keyLength = key.length;
-
-      // ensure that keyLength is valid for the chosen underlying cipher
-      ok = false;
-      for (it = cipher.keySizes(); it.hasNext(); ) {
-         ok = (keyLength == ((Integer) it.next()).intValue());
-         if (ok) {
-            break;
-         }
+      // now initialise the cipher
+      HashMap map = new HashMap();
+      if (cipherBlockSize != 0) { // only needed if new or changed
+         map.put(IBlockCipher.CIPHER_BLOCK_SIZE, new Integer(cipherBlockSize));
       }
-      if (!ok) {
-         throw new IllegalArgumentException("keyLength");
+      map.put(IBlockCipher.KEY_MATERIAL, key);
+      try {
+         cipher.init(map);
+      } catch (InvalidKeyException x) {
+         throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
       }
 
+      // at this point we have an initialised (new or otherwise) cipher
       // ensure that remaining params make sense
-      int blockIndexLength = -1; // number of octets in the block index
-      i = (Integer) attributes.get(BLOCK_INDEX_LENGTH);
-      if (i != null) {
-         blockIndexLength = i.intValue();
-         if (blockIndexLength < 1) {
-            throw new IllegalArgumentException(BLOCK_INDEX_LENGTH);
-         }
-      }
 
-      int segmentIndexLength = -1; // number of octets in the segment index
-      i = (Integer) attributes.get(SEGMENT_INDEX_LENGTH);
-      if (i != null) {
-         segmentIndexLength = i.intValue();
-         if (segmentIndexLength < 1) {
-            throw new IllegalArgumentException(SEGMENT_INDEX_LENGTH);
-         }
-      }
+      cipherBlockSize = cipher.currentBlockSize();
+      BigInteger counterRange = TWO_FIFTY_SIX.pow(cipherBlockSize);
 
-      // if both are undefined spit the dummy
-      if ((blockIndexLength == -1) && (segmentIndexLength == -1)) {
-         throw new IllegalArgumentException(BLOCK_INDEX_LENGTH+", "+SEGMENT_INDEX_LENGTH);
-      } else { // if one is undefined, set it to BLOCK_LENGTH / 2 minus the other
-         int limit = cipherBlockSize / 2;
-         if (blockIndexLength == -1) {
-            blockIndexLength = limit - segmentIndexLength;
-         } else if (segmentIndexLength == -1) {
-            segmentIndexLength = limit - blockIndexLength;
-         } else if ((segmentIndexLength + blockIndexLength) > limit) {
-            throw new IllegalArgumentException(BLOCK_INDEX_LENGTH+", "+SEGMENT_INDEX_LENGTH);
-         }
-      }
-
-      maxBlocksPerSegment = TWO_FIFTY_SIX.pow(blockIndexLength);
-      // Maximum number segments possible
-      BigInteger maxSegmentCount = TWO_FIFTY_SIX.pow(segmentIndexLength);
-      counterRange = TWO_FIFTY_SIX.pow(cipherBlockSize);
-
+      // offset, like the underlying cipher key is not cloneable
+      // always look for it and throw an exception if it's not there
       Object obj = attributes.get(OFFSET);
       // allow either a byte[] or a BigInteger
       BigInteger r;
@@ -229,10 +213,58 @@ public class ICMGenerator extends BasePRNG {
          r = new BigInteger(1, offset);
       }
 
+      int wantBlockNdxLength = -1; // number of octets in the block index
+      Integer i = (Integer) attributes.get(BLOCK_INDEX_LENGTH);
+      if (i != null) {
+         wantBlockNdxLength = i.intValue();
+         if (wantBlockNdxLength < 1) {
+            throw new IllegalArgumentException(BLOCK_INDEX_LENGTH);
+         }
+      }
+
+      int wantSegmentNdxLength = -1; // number of octets in the segment index
+      i = (Integer) attributes.get(SEGMENT_INDEX_LENGTH);
+      if (i != null) {
+         wantSegmentNdxLength = i.intValue();
+         if (wantSegmentNdxLength < 1) {
+            throw new IllegalArgumentException(SEGMENT_INDEX_LENGTH);
+         }
+      }
+
+      // if both are undefined check if it's a reuse
+      if ((wantBlockNdxLength == -1) && (wantSegmentNdxLength == -1)) {
+         if (blockNdxLength == -1) { // new instance
+            throw new IllegalArgumentException(BLOCK_INDEX_LENGTH+", "+SEGMENT_INDEX_LENGTH);
+         } // else reuse old values
+      } else { // only one is undefined, set it to BLOCK_LENGTH/2 minus the other
+         int limit = cipherBlockSize / 2;
+         if (wantBlockNdxLength == -1) {
+            wantBlockNdxLength = limit - wantSegmentNdxLength;
+         } else if (wantSegmentNdxLength == -1) {
+            wantSegmentNdxLength = limit - wantBlockNdxLength;
+         } else if ((wantSegmentNdxLength + wantBlockNdxLength) > limit) {
+            throw new IllegalArgumentException(BLOCK_INDEX_LENGTH+", "+SEGMENT_INDEX_LENGTH);
+         }
+         // save new values
+         blockNdxLength = wantBlockNdxLength;
+         segmentNdxLength = wantSegmentNdxLength;
+      }
+
       // get the segment index as a BigInteger
       BigInteger s = (BigInteger) attributes.get(SEGMENT_INDEX);
-      if (s.compareTo(maxSegmentCount) > 0) {
-         throw new IllegalArgumentException(SEGMENT_INDEX);
+      if (s == null) {
+         if (segmentNdx == null) { // segment index was never set
+            throw new IllegalArgumentException(SEGMENT_INDEX);
+         }
+         // reuse; check if still valid
+         if (segmentNdx.compareTo(TWO_FIFTY_SIX.pow(segmentNdxLength)) > 0) {
+            throw new IllegalArgumentException(SEGMENT_INDEX);
+         }
+      } else {
+         if (s.compareTo(TWO_FIFTY_SIX.pow(segmentNdxLength)) > 0) {
+            throw new IllegalArgumentException(SEGMENT_INDEX);
+         }
+         segmentNdx = s;
       }
 
       // The initial counter of the keystream segment with segment index s is
@@ -240,23 +272,22 @@ public class ICMGenerator extends BasePRNG {
       //
       // C[0] = (s * (256^BLOCK_INDEX_LENGTH) + r) modulo (256^BLOCK_LENGTH)
       //
-      C0 = s.multiply(maxBlocksPerSegment).add(r).modPow(BigInteger.ONE, counterRange);
-      blockNdx = BigInteger.ZERO;
-
-      // finally initialise the underlying cipher
-      HashMap map = new HashMap();
-      map.put(IBlockCipher.CIPHER_BLOCK_SIZE, new Integer(cipherBlockSize));
-      map.put(IBlockCipher.KEY_MATERIAL, key);
-      try {
-         cipher.init(map);
-      } catch (InvalidKeyException x) {
-         throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
-      }
+      C0 = segmentNdx
+            .multiply(TWO_FIFTY_SIX.pow(blockNdxLength))
+            .add(r)
+            .modPow(BigInteger.ONE, counterRange);
    }
 
    public void fillBlock() throws LimitReachedException {
-      if (!(blockNdx.compareTo(maxBlocksPerSegment) < 0))
+      if (C0 == null) {
+         throw new IllegalStateException();
+      }
+      if (blockNdx.compareTo(TWO_FIFTY_SIX.pow(blockNdxLength)) >= 0) {
          throw new LimitReachedException();
+      }
+
+      int cipherBlockSize = cipher.currentBlockSize();
+      BigInteger counterRange = TWO_FIFTY_SIX.pow(cipherBlockSize);
 
       // encrypt the counter for the current blockNdx
       // C[i] = (C[0] + i) modulo (256^BLOCK_LENGTH).
