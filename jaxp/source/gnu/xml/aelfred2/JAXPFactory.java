@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.2 2001-06-23 05:14:33 db Exp $
+ * $Id: JAXPFactory.java,v 1.3 2001-07-05 02:42:56 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.helpers.XMLReaderAdapter;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -128,11 +129,7 @@ public final class JAXPFactory extends SAXParserFactory
 
     private static class JaxpParser extends SAXParser
     {
-
-// FIXME:  Want a new AElfred2 XMLReader class,
-// with settable validation flag
-
-	private SAXDriver	ae2 = new SAXDriver ();
+	private XmlReader	ae2 = new XmlReader ();
 
 	JaxpParser () { }
 
@@ -146,7 +143,7 @@ public final class JAXPFactory extends SAXParserFactory
 
 	public Parser getParser ()
 	throws SAXException
-	    { return ae2; }
+	    { return new XMLReaderAdapter (ae2); }
 
 	public XMLReader getXMLReader ()
 	throws SAXException
