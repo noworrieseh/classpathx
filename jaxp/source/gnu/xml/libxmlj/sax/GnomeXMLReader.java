@@ -71,7 +71,7 @@ implements XMLReader
 
   static
   {
-    System.loadLibrary("xmlj");
+    XMLJ.init ();
   }
 
   private static final String FEATURES_PREFIX =
@@ -277,11 +277,11 @@ implements XMLReader
     String key = name.substring (PROPERTIES_PREFIX.length ());
     if ("declaration-handler".equals (key))
       {
-        return declarationHandler;
+        return getDeclarationHandler ();
       }
     else if ("lexical-handler".equals (key))
       {
-        return lexicalHandler;
+        return getLexicalHandler ();
       }
     else
       {
@@ -296,12 +296,32 @@ implements XMLReader
     String key = name.substring (PROPERTIES_PREFIX.length ());
     if ("declaration-handler".equals (key))
       {
-        declarationHandler = (DeclHandler) value;
+        setDeclarationHandler ((DeclHandler) value);
       }
     else if ("lexical-handler".equals (key))
       {
-        lexicalHandler = (LexicalHandler) value;
+        setLexicalHandler ((LexicalHandler) value);
       }
+  }
+
+  public DeclHandler getDeclarationHandler ()
+  {
+    return declarationHandler;
+  }
+
+  public void setDeclarationHandler (DeclHandler declarationHandler)
+  {
+    this.declarationHandler = declarationHandler;
+  }
+
+  public LexicalHandler getLexicalHandler ()
+  {
+    return lexicalHandler;
+  }
+
+  public void setLexicalHandler (LexicalHandler lexicalHandler)
+  {
+    this.lexicalHandler = lexicalHandler;
   }
 
   /**

@@ -738,7 +738,7 @@ ifelse([$4], , , [  rm -fr Test*
 fi
 rm -fr Test*])
 
-# $Id: aclocal.m4,v 1.14 2004-07-30 07:47:03 dog Exp $
+# $Id: aclocal.m4,v 1.15 2004-07-30 14:55:35 dog Exp $
 # Determine shared object suffixes.
 #
 # Our method is to use the libtool variable $library_names_spec,

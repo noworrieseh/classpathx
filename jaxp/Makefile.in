@@ -459,12 +459,11 @@ $(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
-$(src)/gnu/xml/libxmlj/transform/GnomeTemplates.java \
+$(src)/gnu/xml/libxmlj/transform/ErrorListenerErrorHandler.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformer.java \
-$(src)/gnu/xml/libxmlj/transform/JavaContext.java \
-$(src)/gnu/xml/libxmlj/transform/LibxsltStylesheet.java \
 $(src)/gnu/xml/libxmlj/transform/TransformTest.java \
+$(src)/gnu/xml/libxmlj/transform/URIResolverEntityResolver.java \
 $(src)/gnu/xml/libxmlj/util/EmptyNodeList.java \
 $(src)/gnu/xml/libxmlj/util/NamedInputStream.java \
 $(src)/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
@@ -493,10 +492,8 @@ gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
 gnu_xml_libxmlj_dom_GnomeXPathNodeList.h \
 gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
 gnu_xml_libxmlj_dom_GnomeXPathResult.h \
-javax_xml_transform_OutputKeys.h \
 gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
-gnu_xml_libxmlj_transform_JavaContext.h \
-gnu_xml_libxmlj_transform_LibxsltStylesheet.h
+gnu_xml_libxmlj_transform_GnomeTransformer.h
 
 
 jni_sources = \
@@ -786,9 +783,6 @@ uninstall-am: uninstall-info-am
 #
 #gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class
 #	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
-#
-#javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
-#	CLASSPATH=$(dst) @JAVAH@ -jni javax.xml.transform.$*
 
 gnu_xml_libxmlj_dom_%.h: $(libj_jarfile)
 	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
@@ -798,9 +792,6 @@ gnu_xml_libxmlj_sax_%.h: $(libj_jarfile)
 
 gnu_xml_libxmlj_transform_%.h: $(libj_jarfile)
 	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
-
-javax_xml_transform_%.h: $(libj_jarfile)
-	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)

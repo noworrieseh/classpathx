@@ -1,3 +1,8 @@
+2004-07-30  Chris Burdess <dog@gnu.org>
+
+	* transform: Added support for DOMSource and DOMResult transforms
+	    to/from GnomeDocument nodes.
+
 2004-07-27  Chris Burdess <dog@gnu.org>
 
 	* GnomeElement: getAttribute(NS) returns empty strings instead of
