@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentBuilder.java,v 1.7 2001-12-05 22:48:40 db Exp $
+ * $Id: DocumentBuilder.java,v 1.8 2002-02-08 18:51:10 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
 /**
  * Uses an XML parser to construct a DOM document.
  * @author	Andrew Selkirk, David Brownell
- * @version	$Id: DocumentBuilder.java,v 1.7 2001-12-05 22:48:40 db Exp $
+ * @version	$Id: DocumentBuilder.java,v 1.8 2002-02-08 18:51:10 db Exp $
  */
 public abstract class DocumentBuilder
 {
@@ -73,9 +73,6 @@ public abstract class DocumentBuilder
 	throws IOException
 	{
 	    String	temp;
-
-	    if (!f.exists ())
-		throw new IOException ("no such file: " + f.getName ());
 
 	    // FIXME: getAbsolutePath() seems buggy; I'm seeing components
 	    // like "/foo/../" which are clearly not "absolute"

@@ -1,5 +1,5 @@
 /*
- * $Id: StreamSource.java,v 1.5 2001-11-02 22:07:45 db Exp $
+ * $Id: StreamSource.java,v 1.6 2002-02-08 18:51:10 db Exp $
  * Copyright (C) 2001 Andrew Selkirk
  * Copyright (C) 2001 David Brownell
  * 
@@ -141,9 +141,6 @@ public class StreamSource implements Source {
 	throws IOException
 	{
 	    String	temp;
-
-	    if (!f.exists ())
-		throw new IOException ("no such file: " + f.getName ());
 
 	    // FIXME: getAbsolutePath() seems buggy; I'm seeing components
 	    // like "/foo/../" which are clearly not "absolute"
