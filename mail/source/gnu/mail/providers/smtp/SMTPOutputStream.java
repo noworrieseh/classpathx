@@ -25,6 +25,8 @@ public class SMTPOutputStream
 extends CRLFOutputStream
 {
 
+  private int lastb;
+
   /** make the SMTP stream, pointing to another stream.
    * @param stream the stream connected to the SMTP layer
    */
