@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.3 2001-06-24 04:12:23 db Exp $
+ * $Id: DomNode.java,v 1.4 2001-08-21 17:14:58 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.3 2001-06-24 04:12:23 db Exp $
+// $Id: DomNode.java,v 1.4 2001-08-21 17:14:58 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -56,7 +56,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-06-24 04:12:23 $
+ * @version $Date: 2001-08-21 17:14:58 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -1111,39 +1111,6 @@ public abstract class DomNode
 	}
     }
 
-    // MutationEvent names ... sending some of these is built-in
-    private static final String mutationEventNames [] = {
-	"DOMNodeInserted", "DOMNodeRemoved",
-	"DOMCharacterDataModified", "DOMAttrModified",
-
-	    // underspecified; sent after the basic four above,
-	    // under ill-defined circumstances.  For purposes of
-	    // this implementation, consider sending this event
-	    // as getting sent around finalization time.
-	"DOMSubtreeModified",
-
-	    // XXX very pricey; sent to subtree members after insertion
-	    // and removal events.  Unclear how expensive it'd be to
-	    // track registrations here ...
-	"DOMNodeRemovedFromDocument", "DOMNodeInsertedIntoDocument"
-    };
-
-    // HtmlEvent names ... we create and pass them; a GUI fires them
-    private static final String htmlEventNames [] = {
-	"load", "unload", "abort", "error", "select",
-	"change", "submit", "reset", "focus", "blur",
-	"resize", "scroll"
-    };
-
-    // UIEvent names
-    private static final String uiEventNames [] = {
-	"DOMFocusIn", "DOMFocusOut", "DOMFocusActivate"
-    };
-
-    // MouseEvent names
-    // click, mousedown, mouseup, mouseover, mousemove, mouseout
-
-
     /**
      * <b>DOM L2 (Events)</b>
      * Returns an instance of the specified type of event object.
@@ -1156,28 +1123,30 @@ public abstract class DomNode
      * classes and initialize it using use such a "USER-" event type name;
      * or defin, instantiate, and initialize an application-specific subclass
      * of DomEvent and pass that to dispatchEvent().
+     *
+     * @param eventType Identifies the particular DOM feature module
+     *	defining the type of event, such as "MutationEvents".
+     *	<em>The event "name" is a different kind of "type".</em>
      */
-    public Event createEvent (String type)
+    public Event createEvent (String eventType)
     {
-	for (int i = 0; i < mutationEventNames.length; i++)
-	    if (mutationEventNames [i].equals (type))
-		return new DomEvent.DomMutationEvent (null);
+	eventType = eventType.toLowerCase ();
 
-	for (int i = 0; i < htmlEventNames.length; i++)
-	    if (htmlEventNames [i].equals (type))
-		return new DomEvent (null);
+	if ("mutationevents".equals (eventType))
+	    return new DomEvent.DomMutationEvent (null);
 
-	for (int i = 0; i < uiEventNames.length; i++)
-	    if (uiEventNames [i].equals (type))
-		return new DomEvent.DomUIEvent (null);
-	
-	// mouse events go here
-
-	if (type.startsWith ("USER-"))
+	if ("htmlevents".equals (eventType)
+		|| "events".equals (eventType)
+		|| "user-events".equals (eventType))
 	    return new DomEvent (null);
 
+	if ("uievents".equals (eventType))
+	    return new DomEvent.DomUIEvent (null);
+	
+	// mouse events 
+
 	throw new DomEx (DomEx.NOT_SUPPORTED_ERR,
-		type, null, 0);
+		eventType, null, 0);
     }
 
 
@@ -1372,6 +1341,13 @@ public abstract class DomNode
 	// Notify just those listeners
 	e.currentNode = current; 
 	for (int i = 0; i < count; i++) {
+
+	    // FIXME:  late in the DOM CR process (3rd or 4th CR?) the
+	    // removeEventListener spec changed.  Now removals take effect
+	    // immediatly, unlike addEventListener.
+	    // Either make sure the listener is still registered before
+	    // each notification, or check when a global remove count changed.
+
 	    try {
 		notificationSet [i].listener.handleEvent (e);
 	    } catch (Exception x) {
@@ -1379,13 +1355,6 @@ public abstract class DomNode
 	    }
 	    notificationSet [i] = null;		// free for GC
 	}
-
-	// it'd be nice to have only one of those loops, but
-	// the DOM L2 WD seems to need both ... changes to a
-	// node's notification set from any of its listeners
-	// have deterministic behavior (disregarded each node
-	// pass), event delivery is unordered w.r.t. different
-	// listeners
     }
 
     /**
