@@ -220,8 +220,13 @@ public final class WellFormednessFilter extends EventFilter
     {
 	if (!startedDoc)
 	    fatalError ("callback outside of document?");
-	if ("before" != dtdState)
+  if (hander.getFeature (FEATURE + "string-interning")) {
+    if ("before" != dtdState)
 	    fatalError ("two DTDs?");
+  } else {
+    if (!"before".equals(dtdState))
+	    fatalError ("two DTDs?");
+  }
 	if (!elementStack.empty ())
 	    fatalError ("DTD must precede root element");
 	dtdState = "inside";
@@ -233,8 +238,13 @@ public final class WellFormednessFilter extends EventFilter
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
-	if ("after" == dtdState)
+  if (hander.getFeature (FEATURE + "string-interning")) {
+    if ("after" == dtdState)
 	    fatalError ("not inside DTD");
+  } else {
+    if ("after".equals(dtdState))
+	    fatalError ("not inside DTD");
+  }
 	super.notationDecl (name, publicId, systemId);
     }
 
@@ -244,8 +254,13 @@ public final class WellFormednessFilter extends EventFilter
     {
 // FIXME: not all parsers will report startDTD() ...
 // we'd rather insist we're "inside".
-	if ("after" == dtdState)
+  if (hander.getFeature (FEATURE + "string-interning")) {
+    if ("after" == dtdState)
 	    fatalError ("not inside DTD");
+  } else {
+    if ("after".equals(dtdState))
+	    fatalError ("not inside DTD");
+  }
 	super.unparsedEntityDecl (name, publicId, systemId, notationName);
     }
 
