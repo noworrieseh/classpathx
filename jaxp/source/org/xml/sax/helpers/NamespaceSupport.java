@@ -3,7 +3,7 @@
 // Written by David Megginson
 // This class is in the Public Domain.  NO WARRANTY!
 
-// $Id: NamespaceSupport.java,v 1.4 2001-09-29 05:34:42 db Exp $
+// $Id: NamespaceSupport.java,v 1.5 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -14,7 +14,8 @@ import java.util.Vector;
 
 
 /**
- * Encapsulate Namespace logic for use by SAX drivers.
+ * Encapsulate Namespace logic for use by applications using SAX,
+ * or internally by SAX drivers.
  *
  * <blockquote>
  * <em>This module, both source code and documentation, is in the
@@ -58,9 +59,14 @@ import java.util.Vector;
  * prefix/URI mapping is repeated for each context (for example), this
  * class will be somewhat less efficient.</p>
  *
+ * <p>Although SAX drivers (parsers) may choose to use this class to
+ * implement namespace handling, they are not required to do so.
+ * Applications must track namespace information themselves if they
+ * want to use namespace information.
+ *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0r2pre
+ * @version 2.0r2pre2
  */
 public class NamespaceSupport
 {
@@ -72,7 +78,9 @@ public class NamespaceSupport
 
 
     /**
-     * The XML Namespace as a constant.
+     * The XML Namespace URI as a constant.
+     * The value is <code>http://www.w3.org/XML/1998/namespace</code>
+     * as defined in the XML Namespaces specification.
      *
      * <p>This is the Namespace URI that is automatically mapped
      * to the "xml" prefix.</p>
@@ -125,16 +133,38 @@ public class NamespaceSupport
 
     /**
      * Start a new Namespace context.
-     *
-     * <p>Normally, you should push a new context at the beginning
-     * of each XML element: the new context will automatically inherit
+     * The new context will automatically inherit
      * the declarations of its parent context, but it will also keep
-     * track of which declarations were made within this context.</p>
+     * track of which declarations were made within this context.
+     *
+     * <p>Event callback code should start a new context once per element.
+     * This means being ready to call this in either of two places.
+     * For elements that don't include namespace declarations, the
+     * <em>ContentHandler.startElement()</em> callback is the right place.
+     * For elements with such a declaration, it'd done in the first
+     * <em>ContentHandler.startPrefixMapping()</em> callback.
+     * A boolean flag can be used to
+     * track whether a context has been started yet.  When either of
+     * those methods is called, it checks the flag to see if a new context
+     * needs to be started.  If so, it starts the context and sets the
+     * flag.  After <em>ContentHandler.startElement()</em>
+     * does that, it always clears the flag.
+     *
+     * <p>Normally, SAX drivers would push a new context at the beginning
+     * of each XML element.  Then they perform a first pass over the
+     * attributes to process all namespace declarations, making
+     * <em>ContentHandler.startPrefixMapping()</em> callbacks.
+     * Then a second pass is made, to determine the namespace-qualified
+     * names for all attributes and for the element name.
+     * Finally all the information for the
+     * <em>ContentHandler.startElement()</em> callback is available,
+     * so it can then be made.
      *
      * <p>The Namespace support object always starts with a base context
      * already in force: in this context, only the "xml" prefix is
      * declared.</p>
      *
+     * @see org.xml.sax.ContentHandler
      * @see #popContext
      */
     public void pushContext ()
@@ -195,8 +225,9 @@ public class NamespaceSupport
 
     /**
      * Declare a Namespace prefix.  All prefixes must be declared
-     * before they are referenced.  For example, an element's attributes
-     * should be scanned in two passes:  first for namespace declarations,
+     * before they are referenced.  For example, a SAX driver (parser)
+     * would scan an element's attributes
+     * in two passes:  first for namespace declarations,
      * then a second pass using {@link #processName processName()} to
      * interpret prefixes against (potentially redefined) prefixes.
      *
@@ -204,21 +235,23 @@ public class NamespaceSupport
      * context; the prefix will remain in force until this context
      * is popped, unless it is shadowed in a descendant context.</p>
      *
-     * <p>To declare a default Namespace, use the empty string as
-     * the prefix.  The prefix must not be "xml" or "xmlns".</p>
+     * <p>To declare the default element Namespace, use the empty string as
+     * the prefix.</p>
      *
      * <p>Note that you must <em>not</em> declare a prefix after
-     * you've pushed and popped another Namespace.</p>
+     * you've pushed and popped another Namespace context.</p>
      *
      * <p>Note that there is an asymmetry in this library: {@link
-     * #getPrefix getPrefix} will not return the default "" prefix,
-     * even if you have declared one.  To check for a default prefix,
+     * #getPrefix getPrefix} will not return the "" prefix,
+     * even if you have declared a default element namespace.
+     * To check for a default namespace,
      * you have to look it up explicitly using {@link #getURI getURI}.
      * This asymmetry exists to make it easier to look up prefixes
      * for attribute names, where the default prefix is not allowed.</p>
      *
-     * @param prefix The prefix to declare, or null for the empty
-     *        string.
+     * @param prefix The prefix to declare, or the empty string to
+     *	indicate the default element namespace.  This may never have
+     *	the value "xml" or "xmlns".
      * @param uri The Namespace URI to associate with the prefix.
      * @return true if the prefix was legal, false otherwise
      * @see #processName

@@ -1,6 +1,7 @@
 // SAX Attribute List Interface.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: AttributeList.java,v 1.3 2001-08-03 19:08:39 db Exp $
+// $Id: AttributeList.java,v 1.4 2001-10-18 00:36:09 db Exp $
 
 package org.xml.sax;
 
@@ -61,9 +62,8 @@ package org.xml.sax;
  *             {@link org.xml.sax.Attributes Attributes}
  *             interface, which includes Namespace support.
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.DocumentHandler#startElement startElement
  * @see org.xml.sax.helpers.AttributeListImpl AttributeListImpl
  */

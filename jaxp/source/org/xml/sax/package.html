@@ -1,15 +1,17 @@
 <html><head>
 
-<!-- $Id: package.html,v 1.5 2001-08-03 18:49:47 db Exp $ -->
+<!-- $Id: package.html,v 1.6 2001-10-18 00:36:10 db Exp $ -->
 
 </head><body>
 
 <p> This package provides the core SAX APIs.
 Some SAX1 APIs are deprecated to encourage integration of
 namespace-awareness into designs of new applications
-and into maintainance of existing infrastructure.
-For more information on SAX, see
-<a href="http://sax.sourceforge.net">the SAX page</a>.
+and into maintainance of existing infrastructure. </p>
+
+<p>See <a href='http://sax.sourceforge.net'>http://sax.sourceforge.net</a>
+for more information about SAX.</p>
+
 
 <h2> SAX2 Standard Feature Flags </h2>
 
@@ -46,6 +48,16 @@ Currently defined standard feature URIs have the prefix
 	</tr>
 
     <tr>
+	<td>is-standalone</td>
+	<td><em>none</em></td>
+	<td> May be examined only during a parse, after the
+	    <em>startDocument()</em> callback has been made; read-only.
+	    The value is true if the document specified the
+	    "standalone" flag in its XML declaration,
+	    and otherwise is false. </td>
+	</tr>
+
+    <tr>
 	<td>lexical-handler/parameter-entities</td>
 	<td><em>unspecified</em></td>
 	<td> true indicates that the LexicalHandler will report the
@@ -78,6 +90,31 @@ Currently defined standard feature URIs have the prefix
 	</tr>
 
     <tr>
+	<td>use-attributes2</td>
+	<td><em>unspecified</em></td>
+	<td> Returns true if the <em>Attributes</em> objects passed by
+	    this parser in <em>ContentHandler.startElement()</em>
+	    implement the <a href="ext/Attributes2.html"
+	    ><em>org.xml.sax.ext.Attributes2</em></a> interface.
+	    That interface exposes additional information,
+	    such as whether the attribute was specified in the
+	    source text rather than defaulted.
+	    </td>
+	</tr>
+
+    <tr>
+	<td>use-locator2</td>
+	<td><em>unspecified</em></td>
+	<td> Returns true if the <em>Locator</em> objects passed by
+	    this parser in <em>ContentHandler.setDocumentLocator()</em>
+	    implement the <a href="ext/Locator2.html"
+	    ><em>org.xml.sax.ext.Locator2</em></a> interface.
+	    That interface exposes additional entity information,
+	    such as the character encoding and XML version used.
+	    </td>
+	</tr>
+
+    <tr>
 	<td>validation</td>
 	<td><em>unspecified</em></td>
 	<td> controls whether the parser is reporting all validity
@@ -94,7 +131,8 @@ properties is required.
 <p> For default values not specified by SAX2,
 each XMLReader implementation specifies its default,
 or may choose not to expose the feature flag.
-Implementations may support changing current values
+Unless otherwise specified here,
+implementations may support changing current values
 of these standard feature flags, but not while parsing.
 </p>
 
@@ -120,7 +158,9 @@ the standard property URIs have the prefix
 	<td> Used to see most DTD declarations except those treated
 	    as lexical ("document element name is ...") or which are
 	    mandatory for all SAX parsers (<em>DTDHandler</em>).
-	    The Object must implement <em>DeclHandler</em>.  </td>
+	    The Object must implement <a href="ext/DeclHandler.html"
+	    ><em>org.xml.sax.ext.DeclHandler</em></a>.
+	    </td>
 	</tr>
 
     <tr>
@@ -137,7 +177,9 @@ the standard property URIs have the prefix
 	    applications:  comments, CDATA delimeters, selected general
 	    entity inclusions, and the start and end of the DTD
 	    (and declaration of document element name).
-	    The Object must implement <em>LexicalHandler</em>.  </td>
+	    The Object must implement <a href="ext/LexicalHandler.html"
+	    ><em>org.xml.sax.ext.LexicalHandler</em></a>.
+	    </td>
 	</tr>
 
     <tr>

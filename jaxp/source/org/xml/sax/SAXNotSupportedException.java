@@ -1,8 +1,9 @@
 // SAXNotSupportedException.java - unsupported feature or value.
-// Written by David Megginson, sax@megginson.com
+// http://sax.sourceforge.net
+// Written by David Megginson
 // NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: SAXNotSupportedException.java,v 1.3 2001-08-03 19:08:39 db Exp $
+// $Id: SAXNotSupportedException.java,v 1.4 2001-10-18 00:36:10 db Exp $
 
 
 package org.xml.sax;
@@ -21,9 +22,8 @@ package org.xml.sax;
  * extensions may use this class for similar purposes.</p>
  *
  * @since SAX 2.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.SAXNotRecognizedException 
  */
 public class SAXNotSupportedException extends SAXException

@@ -1,6 +1,7 @@
 // SAX entity resolver.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: EntityResolver.java,v 1.3 2001-08-03 18:47:00 db Exp $
+// $Id: EntityResolver.java,v 1.4 2001-10-18 00:36:09 db Exp $
 
 package org.xml.sax;
 
@@ -58,9 +59,8 @@ import java.io.IOException;
  * (possibly by using the public identifier).</p>
  *
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.XMLReader#setEntityResolver
  * @see org.xml.sax.InputSource
  */
@@ -85,7 +85,11 @@ public interface EntityResolver {
      * system identifiers to secure and/or local URIs, to look up
      * public identifiers in a catalogue, or to read an entity from a
      * database or other input source (including, for example, a dialog
-     * box).</p>
+     * box).  Neither XML nor SAX specifies a preferred policy for using
+     * public or system IDs to resolve resources.  However, SAX specifies
+     * how to interpret any InputSource returned by this method, and that
+     * if none is returned, then the system ID will be dereferenced as
+     * a URL.  </p>
      *
      * <p>If the system identifier is a URL, the SAX parser must
      * resolve it fully before reporting it to the application.</p>

@@ -1,6 +1,7 @@
 // SAX input source.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: InputSource.java,v 1.5 2001-08-07 18:16:37 db Exp $
+// $Id: InputSource.java,v 1.6 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax;
 
@@ -41,13 +42,15 @@ import java.io.InputStream;
  *
  * <p>An InputSource object belongs to the application: the SAX parser
  * shall never modify it in any way (it may modify a copy if 
- * necessary).</p>
+ * necessary).  However, standard processing of both byte and
+ * character streams is to close them on as part of end-of-parse cleanup,
+ * so applications should not attempt to re-use such streams after they
+ * have been handed to a parser.  </p>
  *
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
- * @see org.xml.sax.Parser#parse
+ * @author David Megginson
+ * @version 2.0r2pre2
+ * @see org.xml.sax.XMLReader#parse(org.xml.sax.InputSource)
  * @see org.xml.sax.EntityResolver#resolveEntity
  * @see java.io.InputStream
  * @see java.io.Reader

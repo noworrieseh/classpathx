@@ -1,6 +1,7 @@
 // SAX DTD handler.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: DTDHandler.java,v 1.3 2001-08-03 18:47:00 db Exp $
+// $Id: DTDHandler.java,v 1.4 2001-10-18 00:36:09 db Exp $
 
 package org.xml.sax;
 
@@ -40,9 +41,8 @@ package org.xml.sax;
  * notation corresponding with the attribute value.</p>
  *
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.XMLReader#setDTDHandler
  */
 public interface DTDHandler {

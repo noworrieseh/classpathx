@@ -1,6 +1,7 @@
 // DeclHandler.java - Optional handler for DTD declaration events.
+// http://sax.sourceforge.net
 // Public Domain: no warranty.
-// $Id: DeclHandler.java,v 1.3 2001-08-03 18:51:54 db Exp $
+// $Id: DeclHandler.java,v 1.4 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax.ext;
 
@@ -39,9 +40,8 @@ import org.xml.sax.SAXException;
  * when you attempt to register the handler.</p>
  *
  * @since SAX 2.0 (extensions 1.0)
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 1.0
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.XMLReader
  */
 public interface DeclHandler
@@ -78,14 +78,14 @@ public interface DeclHandler
      * "NOTATION" followed by a space followed by a parenthesized
      * token group with all whitespace removed.</p>
      *
-     * <p>Any parameter entities in the attribute value will be
-     * expanded, but general entities (and character references)
-     * will not.</p>
+     * <p>The value will be the value as reported to applications,
+     * appropriately normalized and with entity and character
+     * references expanded.  </p>
      *
      * @param eName The name of the associated element.
      * @param aName The name of the attribute.
      * @param type A string representing the attribute type.
-     * @param valueDefault A string representing the attribute default
+     * @param mode A string representing the attribute defaulting mode
      *        ("#IMPLIED", "#REQUIRED", or "#FIXED") or null if
      *        none of these applies.
      * @param value A string representing the attribute's default value,
@@ -95,7 +95,7 @@ public interface DeclHandler
     public abstract void attributeDecl (String eName,
 					String aName,
 					String type,
-					String valueDefault,
+					String mode,
 					String value)
 	throws SAXException;
 

@@ -3,7 +3,7 @@
 // and by David Brownell, dbrownell@users.sourceforge.net
 // NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: NewInstance.java,v 1.1 2001-09-29 07:25:29 db Exp $
+// $Id: NewInstance.java,v 1.2 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -30,7 +30,7 @@ package org.xml.sax.helpers;
  * JDK.</p>
  *
  * @author Edwin Goei, David Brownell
- * @version $Id: NewInstance.java,v 1.1 2001-09-29 07:25:29 db Exp $
+ * @version 2.0r2pre2
  */
 class NewInstance {
 

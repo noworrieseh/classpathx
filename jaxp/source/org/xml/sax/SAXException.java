@@ -1,6 +1,7 @@
 // SAX exception class.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: SAXException.java,v 1.3 2001-08-03 19:08:39 db Exp $
+// $Id: SAXException.java,v 1.4 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax;
 
@@ -27,9 +28,8 @@ package org.xml.sax;
  * {@link org.xml.sax.SAXParseException SAXParseException} subclass.</p>
  *
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.SAXParseException
  */
 public class SAXException extends Exception {
@@ -49,7 +49,6 @@ public class SAXException extends Exception {
      * Create a new SAXException.
      *
      * @param message The error or warning message.
-     * @see org.xml.sax.Parser#setLocale
      */
     public SAXException (String message) {
 	super(message);
@@ -81,7 +80,6 @@ public class SAXException extends Exception {
      *
      * @param message The detail message.
      * @param e The exception to be wrapped in a SAXException.
-     * @see org.xml.sax.Parser#setLocale
      */
     public SAXException (String message, Exception e)
     {
@@ -98,7 +96,6 @@ public class SAXException extends Exception {
      * the detail message from the embedded exception.</p>
      *
      * @return The error or warning message.
-     * @see org.xml.sax.Parser#setLocale
      */
     public String getMessage ()
     {

@@ -1,8 +1,9 @@
 // ContentHandler.java - handle main document content.
-// Written by David Megginson, sax@megginson.com
+// http://sax.sourceforge.net
+// Written by David Megginson
 // NO WARRANTY!  This class is in the public domain.
 
-// $Id: ContentHandler.java,v 1.3 2001-08-03 19:08:39 db Exp $
+// $Id: ContentHandler.java,v 1.4 2001-10-18 00:36:09 db Exp $
 
 package org.xml.sax;
 
@@ -48,9 +49,8 @@ package org.xml.sax;
  * bug.</p>
  *
  * @since SAX 2.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.DTDHandler
  * @see org.xml.sax.ErrorHandler
@@ -136,12 +136,13 @@ public interface ContentHandler
      * itself, if necessary.</p>
      *
      * <p>Note that start/endPrefixMapping events are not
-     * guaranteed to be properly nested relative to each-other:
-     * all startPrefixMapping events will occur before the
+     * guaranteed to be properly nested relative to each other:
+     * all startPrefixMapping events will occur immediately before the
      * corresponding {@link #startElement startElement} event, 
      * and all {@link #endPrefixMapping endPrefixMapping}
-     * events will occur after the corresponding {@link #endElement
-     * endElement} event, but their order is not otherwise 
+     * events will occur immediately after the corresponding
+     * {@link #endElement endElement} event,
+     * but their order is not otherwise 
      * guaranteed.</p>
      *
      * <p>There should never be start/endPrefixMapping events for the
@@ -162,8 +163,8 @@ public interface ContentHandler
      * End the scope of a prefix-URI mapping.
      *
      * <p>See {@link #startPrefixMapping startPrefixMapping} for 
-     * details.  This event will always occur after the corresponding 
-     * {@link #endElement endElement} event, but the order of 
+     * details.  These events will always occur immediately after the
+     * corresponding {@link #endElement endElement} event, but the order of 
      * {@link #endPrefixMapping endPrefixMapping} events is not otherwise
      * guaranteed.</p>
      *

@@ -1,6 +1,7 @@
 // SAX exception class.
+// http://sax.sourceforge.net
 // No warranty; no copyright -- use this as you will.
-// $Id: SAXParseException.java,v 1.3 2001-08-03 19:08:39 db Exp $
+// $Id: SAXParseException.java,v 1.4 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax;
 
@@ -24,9 +25,8 @@ package org.xml.sax;
  * SAXException}, it inherits the ability to wrap another exception.</p>
  *
  * @since SAX 1.0
- * @author David Megginson, 
- *         <a href="mailto:sax@megginson.com">sax@megginson.com</a>
- * @version 2.0r2pre
+ * @author David Megginson
+ * @version 2.0r2pre2
  * @see org.xml.sax.SAXException
  * @see org.xml.sax.Locator
  * @see org.xml.sax.ErrorHandler
@@ -50,7 +50,6 @@ public class SAXParseException extends SAXException {
      * @param locator The locator object for the error or warning (may be
      *        null).
      * @see org.xml.sax.Locator
-     * @see org.xml.sax.Parser#setLocale 
      */
     public SAXParseException (String message, Locator locator) {
 	super(message);
@@ -77,7 +76,6 @@ public class SAXParseException extends SAXException {
      *        null).
      * @param e Any exception.
      * @see org.xml.sax.Locator
-     * @see org.xml.sax.Parser#setLocale
      */
     public SAXParseException (String message, Locator locator,
 			      Exception e) {
@@ -108,7 +106,6 @@ public class SAXParseException extends SAXException {
      *                   caused the error or warning.
      * @param columnNumber The column number of the end of the text that
      *                     cause the error or warning.
-     * @see org.xml.sax.Parser#setLocale
      */
     public SAXParseException (String message, String publicId, String systemId,
 			      int lineNumber, int columnNumber)
@@ -139,7 +136,6 @@ public class SAXParseException extends SAXException {
      * @param columnNumber The column number of the end of the text that
      *                     cause the error or warning.
      * @param e Another exception to embed in this one.
-     * @see org.xml.sax.Parser#setLocale
      */
     public SAXParseException (String message, String publicId, String systemId,
 			      int lineNumber, int columnNumber, Exception e)

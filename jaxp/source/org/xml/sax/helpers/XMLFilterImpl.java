@@ -3,7 +3,7 @@
 // Written by David Megginson
 // NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: XMLFilterImpl.java,v 1.4 2001-09-29 05:34:42 db Exp $
+// $Id: XMLFilterImpl.java,v 1.5 2001-10-18 00:36:10 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -41,7 +41,7 @@ import org.xml.sax.SAXNotRecognizedException;
  *
  * @since SAX 2.0
  * @author David Megginson
- * @version 2.0r2pre
+ * @version 2.0r2pre2
  * @see org.xml.sax.XMLFilter
  * @see org.xml.sax.XMLReader
  * @see org.xml.sax.EntityResolver
