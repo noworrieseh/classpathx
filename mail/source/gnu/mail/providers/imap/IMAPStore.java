@@ -1,6 +1,6 @@
 /*
  * IMAPStore.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003,2004 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -48,6 +48,7 @@ import javax.net.ssl.TrustManager;
 
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
+import gnu.inet.imap.Namespaces;
 
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
@@ -373,6 +374,120 @@ public class IMAPStore
     for (int i = 0; i < alerts.length; i++)
       {
         notifyStoreListeners (StoreEvent.ALERT, alerts[i]);
+      }
+  }
+
+  /**
+   * Returns a list of folders representing personal namespaces.
+   * See RFC 2342 for details.
+   */
+  public Folder[] getPersonalNamespaces ()
+    throws MessagingException
+  {
+    if (!isConnected ())
+      {
+        throw new StoreClosedException (this);
+      }
+    synchronized (this)
+      {
+        try
+          {
+            Namespaces ns = connection.namespace ();
+            if (ns == null)
+              {
+                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                                                       "command not supported");
+              }
+            Namespaces.Namespace[] n = ns.getPersonal ();
+            Folder[] f = new Folder[n.length];
+            for (int i = 0; i < n.length; i++)
+              {
+                String prefix = n[i].getPrefix ();
+                char delimiter = n[i].getDelimiter ();
+                f[i] = new IMAPFolder (this, prefix, delimiter);
+              }
+            return f;
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
+      }
+  }
+
+  /**
+   * Returns a list of folders representing other users' namespaces.
+   * See RFC 2342 for details.
+   */
+  public Folder[] getUserNamespaces ()
+    throws MessagingException
+  {
+    if (!isConnected ())
+      {
+        throw new StoreClosedException (this);
+      }
+    synchronized (this)
+      {
+        try
+          {
+            Namespaces ns = connection.namespace ();
+            if (ns == null)
+              {
+                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                                                       "command not supported");
+              }
+            Namespaces.Namespace[] n = ns.getOther ();
+            Folder[] f = new Folder[n.length];
+            for (int i = 0; i < n.length; i++)
+              {
+                String prefix = n[i].getPrefix ();
+                char delimiter = n[i].getDelimiter ();
+                f[i] = new IMAPFolder (this, prefix, delimiter);
+              }
+            return f;
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
+      }
+  }
+
+  /**
+   * Returns a list of folders representing shared namespaces.
+   * See RFC 2342 for details.
+   */
+  public Folder[] getSharedNamespaces ()
+    throws MessagingException
+  {
+    if (!isConnected ())
+      {
+        throw new StoreClosedException (this);
+      }
+    synchronized (this)
+      {
+        try
+          {
+            Namespaces ns = connection.namespace ();
+            if (ns == null)
+              {
+                throw new MethodNotSupportedException ("IMAP NAMESPACE " +
+                                                       "command not supported");
+              }
+            Namespaces.Namespace[] n = ns.getShared ();
+            Folder[] f = new Folder[n.length];
+            for (int i = 0; i < n.length; i++)
+              {
+                String prefix = n[i].getPrefix ();
+                char delimiter = n[i].getDelimiter ();
+                f[i] = new IMAPFolder (this, prefix, delimiter);
+              }
+            return f;
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException (e.getMessage (), e);
+          }
       }
   }
 

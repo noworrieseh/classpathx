@@ -1,3 +1,7 @@
+2004-09-29  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPStore.java: Implement IMAP namespaces.
+
 2004-09-28  Chris Burdess  <dog@bluezoo.org>
 
 	* URLName.java: Permit '@' in userInfo component of URL.
