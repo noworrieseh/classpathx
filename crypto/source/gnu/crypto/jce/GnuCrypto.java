@@ -1,7 +1,7 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuCrypto.java,v 1.1 2002-01-17 11:49:41 raif Exp $
+// $Id: GnuCrypto.java,v 1.2 2002-01-18 02:27:53 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -37,7 +37,7 @@ import java.util.Set;
  * The GNU Crypto implementation of the Java Cryptographic Extension (JCE)
  * provider.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class GnuCrypto extends Provider {
 
@@ -79,9 +79,12 @@ public final class GnuCrypto extends Provider {
       put("KeyPairGenerator.RSA ImplementedIn", "Software");
 
       // Signature
-      put("Signature.DSS", "gnu.crypto.jce.DSSSignatureSpi");
-      put("Signature.DSS KeySize", "1024");
-      put("Signature.DSS ImplementedIn", "Software");
+      put("Signature.DSS/RAW", "gnu.crypto.jce.DSSRawSignatureSpi");
+      put("Signature.DSS/RAW KeySize", "1024");
+      put("Signature.DSS/RAW ImplementedIn", "Software");
+      put("Signature.RSA-PSS/RAW", "gnu.crypto.jce.RSAPSSRawSignatureSpi");
+      put("Signature.RSA-PSS/RAW KeySize", "1024");
+      put("Signature.RSA-PSS/RAW ImplementedIn", "Software");
 
       // Cipher
       put("Cipher.ANUBIS",   "gnu.crypto.jce.AnubisSpi");
@@ -101,21 +104,23 @@ public final class GnuCrypto extends Provider {
       put("Alg.Alias.MessageDigest.RIPEMD-128",        "RIPEMD128");
       put("Alg.Alias.SecureRandom.SHA1PRNG",           "SHAPRNG");
       put("Alg.Alias.KeyPairGenerator.DSA",            "DSS");
-      put("Alg.Alias.Signature.DSA",                   "DSS");
-      put("Alg.Alias.Signature.SHAwithDSA",            "DSS");
-      put("Alg.Alias.Signature.SHA1withDSA",           "DSS");
-      put("Alg.Alias.Signature.SHA160withDSA",         "DSS");
-      put("Alg.Alias.Signature.OID.1.2.840.10040.4.3", "DSS");
-      put("Alg.Alias.Signature.1.2.840.10040.4.3",     "DSS");
-      put("Alg.Alias.Signature.1.3.14.3.2.13",         "DSS");
-      put("Alg.Alias.Signature.1.3.14.3.2.27",         "DSS");
-      put("Alg.Alias.Signature.SHA/DSA",               "DSS");
-      put("Alg.Alias.Signature.SHA1/DSA",              "DSS");
-      put("Alg.Alias.Signature.SHA-1/DSA",             "DSS");
-      put("Alg.Alias.Signature.SHA-160/DSA",           "DSS");
-      put("Alg.Alias.Signature.DSAwithSHA",            "DSS");
-      put("Alg.Alias.Signature.DSAwithSHA1",           "DSS");
-      put("Alg.Alias.Signature.DSAwithSHA160",         "DSS");
+      put("Alg.Alias.Signature.DSA",                   "DSS/RAW");
+      put("Alg.Alias.Signature.SHAwithDSA",            "DSS/RAW");
+      put("Alg.Alias.Signature.SHA1withDSA",           "DSS/RAW");
+      put("Alg.Alias.Signature.SHA160withDSA",         "DSS/RAW");
+//      put("Alg.Alias.Signature.OID.1.2.840.10040.4.3", "DSS");
+//      put("Alg.Alias.Signature.1.2.840.10040.4.3",     "DSS");
+//      put("Alg.Alias.Signature.1.3.14.3.2.13",         "DSS");
+//      put("Alg.Alias.Signature.1.3.14.3.2.27",         "DSS");
+      put("Alg.Alias.Signature.SHA/DSA",               "DSS/RAW");
+      put("Alg.Alias.Signature.SHA1/DSA",              "DSS/RAW");
+      put("Alg.Alias.Signature.SHA-1/DSA",             "DSS/RAW");
+      put("Alg.Alias.Signature.SHA-160/DSA",           "DSS/RAW");
+      put("Alg.Alias.Signature.DSAwithSHA",            "DSS/RAW");
+      put("Alg.Alias.Signature.DSAwithSHA1",           "DSS/RAW");
+      put("Alg.Alias.Signature.DSAwithSHA160",         "DSS/RAW");
+      put("Alg.Alias.Signature.RSA-PSS",               "RSA-PSS/RAW");
+      put("Alg.Alias.Signature.RSAPSS",                "RSA-PSS/RAW");
    }
 
    // Class methods
@@ -139,6 +144,26 @@ public final class GnuCrypto extends Provider {
     */
    public static final Set getSecureRandomNames() {
       return gnu.crypto.prng.PRNGFactory.getNames();
+   }
+
+   /**
+    * Returns a {@link java.util.Set} of names of keypair generator
+    * implementations available from this <i>Provider</i>.<p>
+    *
+    * @return a {@link java.util.Set} of hash names (Strings).
+    */
+   public static final Set getKeyPairGeneratorNames() {
+      return gnu.crypto.sig.KeyPairGeneratorFactory.getNames();
+   }
+
+   /**
+    * Returns a {@link java.util.Set} of names of signature scheme
+    * implementations available from this <i>Provider</i>.<p>
+    *
+    * @return a {@link java.util.Set} of hash names (Strings).
+    */
+   public static final Set getSignatureNames() {
+      return gnu.crypto.sig.SignatureFactory.getNames();
    }
 
    /**
