@@ -1,5 +1,5 @@
 /*
- * $Id: XmlReader.java,v 1.3 2001-08-09 18:31:06 db Exp $
+ * $Id: XmlReader.java,v 1.4 2001-08-24 21:36:40 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.pipeline.*;
 
 
-// $Id: XmlReader.java,v 1.3 2001-08-09 18:31:06 db Exp $
+// $Id: XmlReader.java,v 1.4 2001-08-24 21:36:40 db Exp $
 
 /**
  * This SAX2 parser optionally layers a validator over the &AElig;lfred2
@@ -53,7 +53,7 @@ import gnu.xml.pipeline.*;
  * @see gnu.xml.pipeline.ValidationConsumer
  *
  * @author David Brownell
- * @version $Date: 2001-08-09 18:31:06 $
+ * @version $Date: 2001-08-24 21:36:40 $
  */
 public final class XmlReader implements XMLReader
 {
@@ -190,11 +190,17 @@ public final class XmlReader implements XMLReader
 	if ((SAXDriver.FEATURE + "validation").equals (featureId)) {
 	    if (active)
 		throw new SAXNotSupportedException ("already parsing");
-	    if (state && !aelfred2.getFeature (
-			SAXDriver.FEATURE + "namespace-prefixes"))
-		throw new SAXNotSupportedException (
-		    "validating requires namespace-prefixes");
+	    if (state)
+		aelfred2.setFeature (
+		    SAXDriver.FEATURE + "namespace-prefixes",
+		    true);
 	    isValidating = state;
+	} else if (isValidating
+		&& state == false
+		&& (SAXDriver.FEATURE + "namespace-prefixes")
+		    .equals (featureId)) {
+	    throw new SAXNotSupportedException (
+		    "validating requires namespace-prefixes");
 	} else
 	    aelfred2.setFeature (featureId, state);
     }
