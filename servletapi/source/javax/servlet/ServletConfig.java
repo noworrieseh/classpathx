@@ -1,0 +1,76 @@
+/*
+  GNU-Classpath Extensions: Servlet API
+  Copyright (C) 1998, 1999, 2001   Free Software Foundation, Inc.
+
+  For more information on the classpathx please mail: classpathx-discuss@gnu.org
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+package javax.servlet;
+
+import java.util.Enumeration;
+
+
+/**
+ * Whenever a server wants to pass initialization data to a servlet, it
+ * creates a class which implements this interface.<BR>
+ * The server then adds {String,String} pairs to the class, and the servlet
+ * can read these using this interface.
+ *
+ * @version Servlet API 2.2
+ * @since Servlet API 1.0
+ * @author Paul Siegmann (pauls@euronet.nl)
+ */
+public interface ServletConfig
+{
+
+  /**
+   * Get the value of this name's initparameter 
+   *
+   * @since Servlet API 1.0
+   *
+   * @param name the name of the Parameter whose value we want
+   * @return The value of this name's initparameter or null if it doesn't
+   * exist
+   */
+  String getInitParameter (String name);
+
+
+  /**
+   * Get all InitParameterNames
+   *
+   * @since Servlet API 1.0
+   *
+   * @return An enumeration consisting of all the init parameter names
+   * or an empty empty enumeration when there are no init parameters
+   */
+  Enumeration getInitParameterNames ();
+
+
+  /**
+   * Get the context of this ServletConfig
+   *
+   * @since Servlet API 1.0
+   *
+   * @return The context of the servlet whose Config this is
+   */
+  ServletContext getServletContext ();
+
+
+  /**
+   * XXX
+   */
+  String getServletName();
+}
