@@ -20,14 +20,14 @@ import gnu.mail.util.*;
  * @version	1.0
  */
 public class SMTPTransport
-extends Transport
+  extends Transport
 {
 
   //-------------------------------------------------------------
   // Variables --------------------------------------------------
   //-------------------------------------------------------------
 
-  private static final String[] ignoreList = null;
+  //private static final String[] ignoreList = null;
   private static final byte[] CRLF = {13, 10};
 
   private MimeMessage message;
@@ -38,11 +38,11 @@ extends Transport
   private Hashtable extMap;
   private boolean noAuth;
   private String  name;
-  private BufferedInputStream serverInput;
-  private LineInputStream lineInputStream;
-  private OutputStream serverOutput;
+  private BufferedReader serverInput;
+  //private BufferedReader lineInputStream;
+  private SMTPOutputStream serverOutput;
   private String lastServerResponse;
-  private Socket serverSocket;
+  private Socket socket;
   private static String  localHostName = null;
 
 
@@ -54,29 +54,29 @@ extends Transport
   {
     super(session, urlName);
     // TODO
-  } // SMTPTransport()
+  }
 
 
   //-------------------------------------------------------------
   // Methods ----------------------------------------------------
   //-------------------------------------------------------------
 
-  protected void finalize() throws Throwable 
-  {
-    close();
-  } // finalize()
+  //    protected void finalize() throws Throwable 
+  //    {
+  //      close();
+  //    }
 
   public synchronized void close() throws MessagingException 
   {
     // TODO
 
     // Check if connection is Open
-    if (isConnected() == true) 
-    {
-      closeConnection();
-    } // if
+    if (isConnected()) 
+      {
+	closeConnection();
+      } 
 
-  } // close()
+  }
 
   public synchronized void connect() throws MessagingException 
   {
@@ -91,20 +91,20 @@ extends Transport
 
     // Check if Host Set
     if (host == null) 
-    {
-      throw new MessagingException("No SMTP host has been " +
-				   "set (mail.smtp.host)");
-    } // if
+      {
+	throw new MessagingException("No SMTP host has been " +
+				     "set (mail.smtp.host)");
+      } 
 
     // Connect
     connect(host, user, null);
 
-  } // connect()
+  }
 
   private void checkConnected() 
   {
     // TODO
-  } // checkConnected()
+  }
 
   private void closeConnection() throws MessagingException 
   {
@@ -113,19 +113,19 @@ extends Transport
     simpleCommand("QUIT");
 
     try 
-    {
+      {
 
-      // Close Streams
-      serverOutput.close();
-      lineInputStream.close();
-      serverInput.close();
-      serverSocket.close();
+	// Close Streams
+	serverOutput.close();
+	//lineInputStream.close();
+	serverInput.close();
+	socket.close();
 
-    } catch (IOException e) 
-    {
-    } // try
+      } catch (IOException e) 
+	{
+	}
 
-  } // closeConnection()
+  }
 
   private OutputStream data() throws MessagingException 
   {
@@ -137,9 +137,9 @@ extends Transport
     response = simpleCommand("DATA");
 
     // Return Output Stream
-    return new CRLFOutputStream(serverOutput);
+    return new SMTPOutputStream(serverOutput);
 
-  } // data()
+  }
 
   /**
    * Send a ELHO command to the SMTP server.  Since it is possible
@@ -165,14 +165,14 @@ extends Transport
 
     // Check For Invalid Response
     if (response != 250) 
-    {
-      return false;
-    }
+      {
+	return false;
+      }
 
     // Valid Response
     return true;
 
-  } // ehlo()
+  }
 
   /**
    * Send end-of-data tag to SMTP server.
@@ -183,7 +183,8 @@ extends Transport
 
     // Variables
     int response;
-    byte[] dataEnd = {13, 10, 46, 13, 10};
+    //byte[] dataEnd = {13, 10, 46, 13, 10};
+    String dataEnd = "\r\n.\r\n";
 
     // Command
     response = simpleCommand(dataEnd);
@@ -206,25 +207,25 @@ extends Transport
 
     // Check for Local Host String
     if (localHostName != null) 
-    {
-      return localHostName;
-    } // if
+      {
+	return localHostName;
+      } 
 
     // Check For mail.smtp.localhost property
     localHostName = session.getProperty("mail.smtp.localhost");
     if (localHostName != null) 
-    {
-      return localHostName;
-    } // if
+      {
+	return localHostName;
+      } 
 
     // Determine Localhost
     try 
-    {
-      localHostName = InetAddress.getLocalHost().getHostName();
-      return localHostName;
-    } catch (UnknownHostException e) 
-    {
-    } // try
+      {
+	localHostName = InetAddress.getLocalHost().getHostName();
+	return localHostName;
+      } catch (UnknownHostException e) 
+	{
+	}
 
     // Return Unknown
     return "";
@@ -250,29 +251,29 @@ extends Transport
     // Command
     response = simpleCommand(command);
 
-  } // helo()
+  }
 
   public synchronized boolean isConnected() 
   {
     return super.isConnected();
-  } // isConnected()
+  }
 
   private boolean isNotLastLine(String value) 
   {
 
     // Check for space after code
-    if (value.chatAt(3) == ' ') 
-    {
-      return false;
-    } // if
+    if (value.charAt(3) == ' ') 
+      {
+	return false;
+      } 
 
     return true;
-  } // isNotLastLine()
+  }
 
   private void issueCommand(String value1, int value2) throws MessagingException 
   {
     // TODO
-  } // issueCommand()
+  }
 
   private void mailFrom() throws MessagingException 
   {
@@ -286,34 +287,40 @@ extends Transport
     // Get Mail From
     fromAddress = session.getProperty("mail.smtp.from");
     if (fromAddress == null) 
-    {
-      from = message.getFrom();
-      if (from == null || from.length == 0) 
       {
-	fromAddress = InetAddress.getLocalAddress();
-      } else 
-      {
-	fromAddress = from[0];
+	from = message.getFrom();
+	if (from == null || from.length == 0) 
+	  {
+	    try 
+	      {
+		fromAddress = InetAddress.getLocalHost().getHostAddress();
+	      } catch (UnknownHostException uhe)
+		{
+		  uhe.printStackTrace();
+		}
+	  } else 
+	    {
+	      fromAddress = from[0].toString();
+	    }
       }
-    } // if
-    mailFrom = "MAIL FROM:<" + fromAddress + ">";
+    mailFrom = "MAIL FROM: <" + fromAddress + ">";
 
     // Command
     response = simpleCommand(mailFrom);
 
     // Check Response
     if (response != 250) 
-    {
-      throw new MessagingException("Invalid MAIL FROM");
-    }
+      {
+	throw new MessagingException("Invalid MAIL FROM");
+      }
 
-  } // mailFrom()
+  }
 
 
   private String normalizeAddress(String address) 
   {
     return null; // TODO
-  } // normalizeAddress()
+  }
 
   private void openServer(String host, int port) throws MessagingException 
   {
@@ -322,60 +329,79 @@ extends Transport
     String timeout;
 
     // Create Server Socket
-    serverSocket = new Socket(host, port);
+    try
+      {
+	socket = new Socket(host, port);
+      } catch (IOException ioe)
+	{
+	  ioe.printStackTrace();
+	}
 
     // Check for "mail.smtp.timeout" option
     timeout = session.getProperty("mail.smtp.timeout");
     if (timeout != null) 
-    {
-      serverSocket.setSoTimeout(Integer.parseInt(timeout));
-    } // if
+      {
+	try
+	  {
+	    socket.setSoTimeout(Integer.parseInt(timeout));
+	  } catch (SocketException se)
+	    {
+	      se.printStackTrace();
+	    }
+      }
 
-    serverInput = serverSocket.getInputStream();
-    serverOutput = new SMTPOutputStream(serverSocker.getOutputStream());
-    lineOutputStream = new LineOutputStream(serverOutput);
+    try 
+      {
+	serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	serverOutput = new SMTPOutputStream(socket.getOutputStream());
+	//lineInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      } catch (IOException ioe)
+	{
+	  ioe.printStackTrace();
+	}
 
-  } // openServer()
+  }
 
 
   protected boolean protocolConnect(String host, int port, String user,
 				    String password)
-  throws MessagingException 
+    throws MessagingException 
   {
     // Variables
     String mailPort;
     int connectPort;
     
     try 
-    {
-      
-      // Check Port
-      mailPort = session.getProperty("mail.smtp.port");
-      if (mailPort != null) 
       {
-	connectPort = Integer.parseInt(mailPort);
-      } else if (port == -1) 
-      {
-	connectPort = 25;
-      } else 
-      {
-	connectPort = port;
-      }
       
-      // Open Server
-      openServer(host, port);
+	// Check Port
+	mailPort = session.getProperty("mail.smtp.port");
+	if (mailPort != null) 
+	  {
+	    connectPort = Integer.parseInt(mailPort);
+	  } else if (port == -1) 
+	    {
+	      connectPort = 25;
+	    } else 
+	      {
+		connectPort = port;
+	      }
       
-      // Currently doesn't support user authentication
+	// Open Server
+	openServer(host, connectPort);
       
-    } catch (Exception e) 
-    {
-      return false;
-    } // try
+	// Currently doesn't support user authentication
+      
+      } catch (Exception e) 
+	{
+	  e.printStackTrace();
+	  return false;
+	} 
     
     // Return Valid Connection
     return true;
     
-  } // protocolConnect()
+  }
 
   /**
    * Send list of mail recipients to SMTP server.  Keeps track
@@ -392,27 +418,27 @@ extends Transport
     
     // Process each Address
     for (index = 0; index < addresses.length; index++) 
-    {
-      
-      // Construct RCPT TO
-      rcptTo = "RCPT TO:<" + addresses[index] + ">";
-      
-      // Command
-      response = simpleCommand(rcptTo);
-      
-      // TODO: Depending on response, update addresses lists
-      // whether the address if valid/invalid
-      
-      // Check Response
-      // if (response != 250) 
       {
-	// throw new MessagingException("Invalid MAIL FROM");
-	//
-      }
-
-    } // for
       
-  }// rcptTo()
+	// Construct RCPT TO
+	rcptTo = "RCPT TO:<" + addresses[index] + ">";
+      
+	// Command
+	response = simpleCommand(rcptTo);
+      
+	// TODO: Depending on response, update addresses lists
+	// whether the address if valid/invalid
+      
+	// Check Response
+	// if (response != 250) 
+	{
+	  // throw new MessagingException("Invalid MAIL FROM");
+	  //
+	}
+
+      }
+      
+  }
     
   private int readServerResponse() 
   {
@@ -427,17 +453,29 @@ extends Transport
     boolean end;
 
     // Read Each Line of Input From Server
-    lastServerResponse = lineInputStream.readLine();
-    while (isNotLastLine(lastServerResponse) == true) 
-    {
-      lastServerResponse = lineInputStream.readLine();
-    } // while
+
+    try
+      {
+	lastServerResponse = serverInput.readLine();
+	while (isNotLastLine(lastServerResponse)) 
+	  {
+	    lastServerResponse = serverInput.readLine();
+	  }
+      } catch (IOException ioe)
+	{
+	  ioe.printStackTrace();
+	}
+
+    if (session.getDebug())
+      {
+	  System.out.println("DEBUG SMTP RECV: " + lastServerResponse);
+      }
     code = lastServerResponse.substring(0, 3);
 
     // Return Code
     return Integer.parseInt(code);
 
-  } // readServerResponse()
+  }
 
   /**
    * Send command to SMTP server.
@@ -446,41 +484,30 @@ extends Transport
    */
   private void sendCommand(String command) throws MessagingException 
   {
-    sendCommand(command.getBytes());
-  } // sendCommand()
-
-  /**
-   * Send command to SMTP server.
-   * @param command Command to send
-   * @exception MessagingException Problem has occurred
-   */
-  private void sendCommand(byte[] command) throws MessagingException 
-  {
-    
     try 
-    {
+      {
+	// Write Command
+	serverOutput.write(command.getBytes());
+	serverOutput.write(CRLF);
       
-      // Write Command
-      serverOutput.write(command);
-      
-    } catch (IOException e) 
-    {
-      throw new MessagingException("Problem writing to server");
-    } // try
+      } catch (IOException e) 
+	{
+	  throw new MessagingException("Problem writing to server");
+	}
     
     // Check Debug
-    if (session.getDebug() == true) 
-    {
-      System.out.println("DEBUG SMTP SENT: " + String.valueOf(command));
-    } // if
+    if (session.getDebug()) 
+      {
+	System.out.println("DEBUG SMTP SENT: " + command);
+      }
       
-  } // sendCommand()
+  }
 
 
   public synchronized void sendMessage(Message message,
 				       Address[] addresses)
-  throws MessagingException,
-  SendFailedException 
+    throws MessagingException,
+    SendFailedException 
   {
 
     // Variables
@@ -494,26 +521,32 @@ extends Transport
     readServerResponse();
 
     // EHLO/HELO
-    ehlo = session.getProperty("mail.smtp.elho");
-    if (ehlo != null && elho.toUpperCase().equals("FALSE") == true) 
-    {
-      helo(getLocalHost());
-    } else if (ehlo(getLocalHost()) == false) 
-    {
-      helo(getLocalHost());
-    }
+    ehlo = session.getProperty("mail.smtp.ehlo");
+    if (ehlo != null && ehlo.toUpperCase().equals("FALSE")) 
+      {
+	helo(getLocalHost());
+      } else if (ehlo(getLocalHost()) == false) 
+	{
+	  helo(getLocalHost());
+	}
 
     // Send Header
     mailFrom();
     rcptTo();
 
     // Send Data
-    message.writeTo(data());
+    try
+      {
+	message.writeTo(data());
+      } catch (IOException ioe)
+	{
+	  ioe.printStackTrace();
+	}
     finishData();
 
     // Close
 
-  } // sendMessage()
+  }
 
   /**
    * Write a command to the SMTP server and parse the response.
@@ -525,12 +558,12 @@ extends Transport
   {
 
     // Send Command
-    sendCommand(value);
+    sendCommand(command);
 
     // Return Response
     return readServerResponse();
 
-  } // simpleCommand()
+  }
 
   /**
    * Write a command to the SMTP server and parse the response.
@@ -538,26 +571,26 @@ extends Transport
    * @returns Return code from SMTP server
    * @exception MessagingException Problem has occurred
    */
-  private int simpleCommand(byte[] command) throws MessagingException 
-  {
+//    private int simpleCommand(byte[] command) throws MessagingException 
+//    {
 
-    // Send Command
-    sendCommand(command);
+//      // Send Command
+//      sendCommand(command);
 
-    // Return Response
-    return readServerResponse();
+//      // Return Response
+//      return readServerResponse();
 
-  } // simpleCommand()
+//    }
 
   private boolean supportsAuthentication(String value) 
   {
     return false; // TODO
-  } // supportsAuthentication()
+  }
 
   private boolean supportsExtension(String value) 
   {
     return false; // TODO
-  } // supportsExtension()
+  }
 
 
-} // SMTPTransport
+}
