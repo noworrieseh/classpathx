@@ -1,0 +1,347 @@
+# Makefile for GNU Crypto project
+#
+# You are free to redistribute this file. NO WARRANTY or fitness
+# for purpose is implied by this notice.
+#
+# !!!                                                  !!!
+# !!!   MAKE EDITS TO "Makefile.in", not "Makefile"    !!!
+# !!!                                                  !!!
+#
+# Use the "configure" command to generate the project Makefile
+# from its "Makefile.in" template.
+#
+
+LIBNAME = gnu-crypto
+
+##set by configure
+
+SRCDIR = @srcdir@
+SOURCEDIR=$(SRCDIR)/source
+
+GCJ = @GCJ@
+
+SOURCEFILES = \
+	$(SOURCEDIR)/gnu/crypto/cipher/Anubis.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/BaseCipher.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/CipherFactory.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/IBlockCipher.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/IBlockCipherSpi.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/Khazad.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/NullCipher.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/Rijndael.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/Square.java \
+	$(SOURCEDIR)/gnu/crypto/cipher/Twofish.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/hash/BaseHash.java \
+	$(SOURCEDIR)/gnu/crypto/hash/HashFactory.java \
+	$(SOURCEDIR)/gnu/crypto/hash/IMessageDigest.java \
+	$(SOURCEDIR)/gnu/crypto/hash/MD5.java \
+	$(SOURCEDIR)/gnu/crypto/hash/RipeMD128.java \
+	$(SOURCEDIR)/gnu/crypto/hash/RipeMD160.java \
+	$(SOURCEDIR)/gnu/crypto/hash/Sha160.java \
+	$(SOURCEDIR)/gnu/crypto/hash/Whirlpool.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/mode/BaseMode.java \
+	$(SOURCEDIR)/gnu/crypto/mode/CTR.java \
+	$(SOURCEDIR)/gnu/crypto/mode/ECB.java \
+	$(SOURCEDIR)/gnu/crypto/mode/ICM.java \
+	$(SOURCEDIR)/gnu/crypto/mode/IMode.java \
+	$(SOURCEDIR)/gnu/crypto/mode/ModeFactory.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/pad/BasePad.java \
+	$(SOURCEDIR)/gnu/crypto/pad/IPad.java \
+	$(SOURCEDIR)/gnu/crypto/pad/PadFactory.java \
+	$(SOURCEDIR)/gnu/crypto/pad/PKCS7.java \
+	$(SOURCEDIR)/gnu/crypto/pad/TBC.java \
+	$(SOURCEDIR)/gnu/crypto/pad/WrongPaddingException.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/prng/BasePRNG.java \
+	$(SOURCEDIR)/gnu/crypto/prng/ICMGenerator.java \
+	$(SOURCEDIR)/gnu/crypto/prng/IRandom.java \
+	$(SOURCEDIR)/gnu/crypto/prng/LimitReachedException.java \
+	$(SOURCEDIR)/gnu/crypto/prng/MDGenerator.java \
+	$(SOURCEDIR)/gnu/crypto/prng/PRNGFactory.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/tool/CipherSpeed.java \
+	$(SOURCEDIR)/gnu/crypto/tool/NessieCipherTVEmitter.java \
+	$(SOURCEDIR)/gnu/crypto/tool/NessieHashTVEmitter.java \
+	$(SOURCEDIR)/gnu/crypto/tool/NistKat.java \
+	$(SOURCEDIR)/gnu/crypto/tool/NistMCT.java \
+	\
+	$(SOURCEDIR)/gnu/crypto/util/Util.java
+
+TESTFILES = \
+	$(SOURCEDIR)/test/AllTests.java \
+	\
+	$(SOURCEDIR)/test/cipher/AllTests.java \
+	$(SOURCEDIR)/test/cipher/TestOfAnubis.java \
+	$(SOURCEDIR)/test/cipher/TestOfCipherFactory.java \
+	$(SOURCEDIR)/test/cipher/TestOfKhazad.java \
+	$(SOURCEDIR)/test/cipher/TestOfNullCipher.java \
+	$(SOURCEDIR)/test/cipher/TestOfRijndael.java \
+	$(SOURCEDIR)/test/cipher/TestOfSquare.java \
+	$(SOURCEDIR)/test/cipher/TestOfTwofish.java \
+	\
+	$(SOURCEDIR)/test/hash/AllTests.java \
+	$(SOURCEDIR)/test/hash/TestOfHashFactory.java \
+	$(SOURCEDIR)/test/hash/TestOfMD5.java \
+	$(SOURCEDIR)/test/hash/TestOfRipeMD128.java \
+	$(SOURCEDIR)/test/hash/TestOfRipeMD160.java \
+	$(SOURCEDIR)/test/hash/TestOfSha160.java \
+	$(SOURCEDIR)/test/hash/TestOfWhirlpool.java \
+	\
+	$(SOURCEDIR)/test/mode/AllTests.java \
+	$(SOURCEDIR)/test/mode/TestOfModeFactory.java \
+	\
+	$(SOURCEDIR)/test/pad/AllTests.java \
+	$(SOURCEDIR)/test/pad/TestOfPKCS7.java \
+	$(SOURCEDIR)/test/pad/TestOfPadFactory.java \
+	$(SOURCEDIR)/test/pad/TestOfTBC.java \
+	\
+	$(SOURCEDIR)/test/prng/AllTests.java \
+	$(SOURCEDIR)/test/prng/TestOfICMGenerator.java \
+	$(SOURCEDIR)/test/prng/TestOfPRNGFactory.java \
+
+PKGFILES =
+
+
+#a mangling of the SOURCEFILES list above
+#This is not quite perfect, we've had to hardcode the
+# $(SOURCEDIR)/ directory in the swap but if we can find a
+# way around that we'll be laughing!
+CLASSESLIST=$(subst .java,.class,$(subst $(SOURCEDIR)/,$(CC-DESTDIR)/,$(foreach dir,$(SOURCEFILES),$(dir))))
+TESTLIST=$(subst .java,.class,$(subst $(SOURCEDIR)/,$(CC-DESTDIR)/,$(foreach dir,$(TESTFILES),$(dir))))
+
+#the classpath for compilations
+CC-CLASSPATH=classes
+CC-TEST-CLASSPATH=classes lib/junit.jar $(LIBNAME).jar
+
+# a workaround to allow using the same Makefile under both Unix and NT
+ifeq (${OS},Windows_NT)
+	PS:=;
+else
+	PS:=:
+endif
+CPATH = $(subst $(space),$(PS),$(CC-CLASSPATH))
+CTESTPATH = $(subst $(space),$(PS),$(CC-TEST-CLASSPATH))
+
+#the desination directory for compilations
+CC-DESTDIR = classes
+
+#
+# Compiler is chosen through "configure" (autoconf)
+#
+GCJ_OPTS = --encoding=8859_1 -fsyntax-only -femit-class-files
+GCJ_COMPILE = $(GCJ) $(GCJ_OPTS) -Isource -foutput-class-dir=$(CC-DESTDIR)
+JAVAC_COMPILE = javac -sourcepath source -classpath "$(CPATH)" -d $(CC-DESTDIR)
+JAVAC_COMPILE_TEST = javac -sourcepath source -classpath "$(CTESTPATH)" -d $(CC-DESTDIR)
+
+##variables which define some useful constants
+
+newline:=\\n
+empty:=
+space:=$(empty) $(empty)
+
+
+#
+# REAL TARGETS
+#
+
+default:	jar
+
+all:	jar javadoc
+
+jar:	lib/$(LIBNAME).jar lib/$(LIBNAME)-test.jar
+
+test:	jar
+	java -cp "lib/$(LIBNAME).jar$(PS)lib/$(LIBNAME)-test.jar$(PS)lib/junit.jar" test.AllTests
+
+
+# for normal development
+# must rerun "make" after this
+clean:
+	-rm -rf lib/$(LIBNAME)* $(CC-DESTDIR) docs/api
+	-rm -rf $(LIBNAME)-*.zip
+
+# must rerun configure after this
+distclean:	clean
+	-rm -f Makefile config.cache config.log config.status
+	-rm -rf lib
+
+# must rerun autoconf (and configure) after this
+mrproper:	distclean
+	-rm -f configure
+
+javadoc: lib/$(LIBNAME)-doc.zip
+lib/$(LIBNAME)-doc.zip:
+	-rm -rf docs/api
+	mkdir -p docs/api
+	javadoc -d docs/api \
+		-windowtitle "GNU Crypto Library" \
+		-nodeprecatedlist \
+		-version -use \
+		-doctitle "<H1>GNU Crypto Library<BR>Programmer's Documentation</H1>" \
+		\
+		-header "For the latest news and information visit<BR> \
+		<A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>" \
+		\
+		-bottom "Copyright &copy;2001 <A HREF="mailto:classpathx-crypto@gnu.org"> \
+		Free Software Foundation, Inc.</A> All Rights Reserved." \
+		-classpath "$(SOURCEDIR)" \
+		\
+		-group "GNU Crypto Algorithms" \
+		"gnu.crypto.cipher:gnu.crypto.hash:gnu.crypto.mode:gnu.crypto.pad:gnu.crypto.prng" \
+		\
+		-group "GNU Crypto Tools" \
+		"gnu.crypto.tool" \
+		\
+		-group "GNU Crypto utilities" \
+		"gnu.crypto.util" \
+		\
+		gnu.crypto.cipher \
+		gnu.crypto.hash \
+		gnu.crypto.mode \
+		gnu.crypto.pad \
+		gnu.crypto.prng \
+		gnu.crypto.tool \
+		gnu.crypto.util
+	jar cMf lib/$(LIBNAME)-doc.zip -C docs api
+
+# build the main jar file
+lib/$(LIBNAME).jar: lib $(LIBNAME) $(CC-DESTDIR)
+	mkdir ./tmp
+	cp AUTHORS ChangeLog COPYING LICENSE README NEWS THANKS ./tmp
+	cp -R $(CC-DESTDIR)/gnu/ ./tmp
+	cd ./tmp; jar cmf ../etc/$(LIBNAME).mf ../lib/$(LIBNAME).jar *
+	rm -rf ./tmp
+
+# build the test jar file
+lib/$(LIBNAME)-test.jar: lib lib/$(LIBNAME).jar lib/junit.jar $(LIBNAME)-test $(CC-DESTDIR)
+	mkdir ./tmp
+	cp AUTHORS ChangeLog COPYING LICENSE README NEWS THANKS ./tmp
+	cp -R $(CC-DESTDIR)/test/ ./tmp
+	cd ./tmp; jar cf ../lib/$(LIBNAME)-test.jar *
+	rm -rf ./tmp
+
+
+$(LIBNAME): compile
+
+
+#the compilation target
+#This is intended for developers who are constantly compiling stuff
+#
+#NOTE: this has to use a shell if test because the GNU-Make $(wildcard)
+#doesn't work properly. If it did we could do this:
+#
+#  compile: $(CLASSLIST)
+#  ifeq "$(wildcard filelist.mak)" "filelist.mak"
+#	$(@COMPILER@_COMPILE) @filelist.mak
+#	@rm filelist.mak
+#  else
+#	@echo Nothing to be done for compile.
+#  endif
+#
+#I think that would be a lot better and have reported the fault with
+#the $(wildcard) function to bug-make@gnu.org.
+#The problem is that it does not recognise the existance of files created
+#within commands caused by pre-requisites.
+
+compile: $(CLASSESLIST)
+	mkdir -p $(CC-DESTDIR)
+	if [ -e filelist.mak ] ; then \
+	  $(@COMPILER@_COMPILE) @filelist.mak ; \
+	  rm filelist.mak ; \
+	fi
+
+$(LIBNAME)-test: $(TESTLIST)
+	mkdir -p $(CC-DESTDIR)
+	if [ -e filelist.mak ] ; then \
+	  $(@COMPILER@_COMPILE_TEST) @filelist.mak ; \
+	  rm filelist.mak ; \
+	fi
+
+#recompile all the source files
+.PHONY: recompile recompile-test
+
+recompile: clean-filelist all-source-files
+	$(@COMPILER@_COMPILE) @filelist.mak
+	rm filelist.mak
+
+recompile-test: clean-filelist all-test-files
+	$(@COMPILER@_COMPILE_TEST) @filelist.mak
+	rm filelist.mak
+
+
+#make the source file list be the list of all files
+.PHONY: all-source-files all-test-source-files
+
+all-source-files:
+	$(foreach f,$(SOURCEFILES),$(shell echo $(f) >> filelist.mak))
+
+all-test-files:
+	$(foreach f,$(TESTFILES),$(shell echo $(f) >> filelist.mak))
+
+
+#ensures that the filelist is fresh each time
+#This simply removes the file list (after ensuring that it exists)
+.PHONY: clean-filelist
+
+clean-filelist:
+	rm -f filelist.mak
+
+#target matching class files to source files
+$(CC-DESTDIR)/%.class: $(SOURCEDIR)/%.java
+	@echo $? >> filelist.mak
+
+
+#
+# RELEASE ENGINEERING:
+# "full" release has source, jarfile, javadoc, and extras
+#
+# override VERSION in environment, like:
+#  $ VERSION=1.0beta1 make -e release
+#
+VERSION =	dev
+
+release: $(LIBNAME)-$(VERSION).zip
+
+
+DIST_DIR =	$(LIBNAME)-$(VERSION)
+
+# XXX ChangeLog
+FILES		:= \
+	AUTHORS ChangeLog COPYING LICENSE NEWS README THANKS \
+	build.xml configure configure.in Makefile.in \
+	etc/$(LIBNAME).mf \
+	lib/$(LIBNAME).jar  \
+
+$(LIBNAME)-$(VERSION).zip: $(FILES) lib/$(LIBNAME)-doc.zip $(SOURCEFILES) $(TESTFILES) $(PKGFILES)
+	for F in $(FILES) $(SOURCEFILES) $(PKGFILES) ;\
+	do \
+		 mkdir -p `dirname $(DIST_DIR)/$$F` ;\
+		 cp $$F $(DIST_DIR)/$$F ;\
+	done
+	mkdir $(DIST_DIR)/docs
+	cd $(DIST_DIR)/docs; jar xf ../../lib/$(LIBNAME)-doc.zip
+	chmod +x $(DIST_DIR)/configure
+	cp lib/$(LIBNAME).jar $(DIST_DIR)/lib
+	# jar cMf $(LIBNAME)-$(VERSION).zip $(DIST_DIR)
+	zip -qr9 $(LIBNAME)-$(VERSION).zip $(DIST_DIR)
+	rm -rf $(DIST_DIR)
+
+# setup required jars
+JUNITVERSION:=3.7
+
+lib/junit.jar: lib junit$(JUNITVERSION).zip
+	if ! [ -e lib/junit.jar ] ; then \
+		unzip -o junit$(JUNITVERSION).zip ;\
+		mv junit$(JUNITVERSION)/junit.jar lib/ ;\
+		rm -rf ./junit$(JUNITVERSION) ;\
+	fi
+
+lib:
+	mkdir $@
+
+junit$(JUNITVERSION).zip:
+	wget -v -t 2 -O ./junit$(JUNITVERSION).zip http://download.sourceforge.net/junit/junit$(JUNITVERSION).zip
+
