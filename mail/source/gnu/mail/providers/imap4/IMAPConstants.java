@@ -37,6 +37,9 @@ public interface IMAPConstants
 {
 
   // Client commands
+  public static final String CAPABILITY = "CAPABILITY".intern();
+  public static final String NOOP = "NOOP".intern();
+  public static final String AUTHENTICATE = "AUTHENTICATE".intern();
   public static final String LOGIN = "LOGIN".intern();
   public static final String LOGOUT = "LOGOUT".intern();
   public static final String SELECT = "SELECT".intern();
@@ -117,5 +120,11 @@ public interface IMAPConstants
   
   // NIL
   public static final String NIL = "NIL".intern();
+
+  // Authentication mechanisms
+  public static final String KERBEROS_V4 = "KERBEROS_V4";
+  public static final String GSSAPI = "GSSAPI";
+  public static final String SKEY = "SKEY";
+  public static final String CRAM_MD5 = "CRAM-MD5";
 
 }

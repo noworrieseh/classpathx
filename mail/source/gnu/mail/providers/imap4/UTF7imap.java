@@ -187,7 +187,7 @@ public final class UTF7imap
             encoding = true;
           }
           encoderSink.write(((int)c)/0x100);
-          encoderSink.write(((int)c)^0x100);
+          encoderSink.write(((int)c)%0x100);
         }
         else if (encoding)
         {

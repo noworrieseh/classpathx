@@ -29,6 +29,7 @@ package gnu.mail.providers.imap4;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -45,6 +46,7 @@ import javax.mail.Flags;
  */
 public class IMAPStore
   extends Store
+  implements IMAPConstants
 {
 
   /**
@@ -95,7 +97,11 @@ public class IMAPStore
         connection = new IMAPConnection(host, port);
         if (session.getDebug())
           connection.setDebug(true);
-        return connection.login(username, password);
+        List capabilities = connection.capability();
+        if (capabilities.contains("AUTH="+CRAM_MD5))
+          return connection.authenticate_CRAM_MD5(username, password);
+        else
+          return connection.login(username, password);
       }
       catch (UnknownHostException e)
       {

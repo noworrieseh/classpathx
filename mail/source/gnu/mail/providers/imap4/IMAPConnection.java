@@ -32,6 +32,8 @@ import java.io.OutputStream;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -172,6 +174,43 @@ public class IMAPConnection implements IMAPConstants
   }
 
   /**
+   * Returns a list of the capabilities of the IMAP server.
+   */
+  public List capability()
+    throws IOException
+  {
+    String tag = newTag();
+    sendCommand(tag, CAPABILITY);
+    while (true)
+    {
+      IMAPResponse response = readResponse();
+      if (response.isTagged())
+      {
+        String id = response.getID();
+        if (id==OK)
+        {
+          // The capability "list" is actually contained in the response
+          // text.
+          String text = response.getText();
+          List capabilities = new ArrayList();
+          int si = text.indexOf(' ');
+          while (si!=-1)
+          {
+            capabilities.add(text.substring(0, si));
+            text = text.substring(si+1);
+            si = text.indexOf(' ');
+          }
+          if (text.length()>0)
+            capabilities.add(text);
+          return capabilities;
+        }
+        else
+          throw new IMAPException(id, response.getText());
+      }
+    }
+  }
+
+  /**
    * Login to the connection using the username and password method.
    * @param username the authentication principal
    * @param password the authentication credentials
@@ -186,6 +225,105 @@ public class IMAPConnection implements IMAPConstants
     cmd.append(' ');
     cmd.append(quote(password));
     return invokeSimpleCommand(cmd.toString());
+  }
+
+  /**
+   * Login to the connection using the CRAM-MD5 authorization extension.
+   * This method is fully documented in RFC 2195.
+   */
+  public boolean authenticate_CRAM_MD5(String username, String secret)
+    throws IOException
+  {
+    String tag = newTag();
+    sendCommand(tag, new StringBuffer(AUTHENTICATE)
+        .append(' ')
+        .append(CRAM_MD5)
+        .toString());
+    while (true)
+    {
+      IMAPResponse response = readResponse();
+      if (response.isTagged())
+      {
+        String id = response.getID();
+        if (id==OK)
+          return true;
+        else if (id==NO)
+          return false;
+        else if (id==BAD)
+          throw new IMAPException(id, response.getText());
+      }
+      else if (response.isContinuation())
+      {
+        try
+        {
+          byte[] s = secret.getBytes(DEFAULT_ENCODING); // TODO encoding?
+          byte[] c0 = response.getText().getBytes(DEFAULT_ENCODING);
+          byte[] c1 = BASE64.decode(c0); // challenge
+          byte[] digest = hmac_md5(s, c1);
+          byte[] r0 = username.getBytes(DEFAULT_ENCODING); // username
+          byte[] r1 = new byte[r0.length+digest.length+1]; // response
+          System.arraycopy(r0, 0, r1, 0, r0.length); // add username
+          r1[r0.length] = 0x20; // SPACE
+          System.arraycopy(digest, 0, r1, r0.length+1, digest.length);
+          byte[] r2 = BASE64.encode(r1);
+          out.write(r2);
+          out.write(0x0d);
+          out.write(0x0d);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+          // No MD5 algorithm provider - cancel exchange
+          out.write(0x2a);
+          out.write(0x0d);
+          out.write(0x0d);
+        }
+      }
+    }
+  }
+
+  /**
+   * Computes a CRAM digest using the HMAC algorithm:
+   * <pre>
+   * MD5(key XOR opad, MD5(key XOR ipad, text))
+   * </pre>.
+   * <code>secret</code> is null-padded to a length of 64 bytes.
+   * If the shared secret is longer than 64 bytes, the MD5 digest of the
+   * shared secret is used as a 16 byte input to the keyed MD5 calculation.
+   * See RFC 2104 for details.
+   */
+  private static byte[] hmac_md5(byte[] key, byte[] text)
+    throws NoSuchAlgorithmException
+  {
+    byte[] k_ipad = new byte[64];
+    byte[] k_opad = new byte[64];
+    byte[] digest;
+    MessageDigest md5 = MessageDigest.getInstance("MD5");
+    // if key is longer than 64 bytes reset it to key=MD5(key)
+    if (key.length>64)
+    {
+      md5.update(key);
+      key = md5.digest();
+    }
+    // start out by storing key in pads
+    System.arraycopy(key, 0, k_ipad, 0, key.length);
+    System.arraycopy(key, 0, k_opad, 0, key.length);
+    // XOR key with ipad and opad values
+    for (int i=0; i<64; i++)
+    {
+      k_ipad[i] ^= 0x36;
+      k_opad[i] ^= 0x5c;
+    }
+    // perform inner MD5
+    md5.reset();
+    md5.update(k_ipad);
+    md5.update(text);
+    digest = md5.digest();
+    // perform outer MD5
+    md5.reset();
+    md5.update(k_opad);
+    md5.update(digest);
+    digest = md5.digest();
+    return digest;
   }
 
   /**

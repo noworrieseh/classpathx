@@ -196,7 +196,7 @@ public class IMAPFolder
       IMAPConnection connection = ((IMAPStore)store).connection;
       try
       {
-        ListEntry[] entries;
+        ListEntry[] entries = null;
         synchronized (connection)
         {
           entries = connection.list(parent, name);
@@ -299,7 +299,7 @@ public class IMAPFolder
         path = new StringBuffer(path)
           .append(delimiter)
           .toString();
-      boolean ret;
+      boolean ret = false;
       synchronized (connection)
       {
         ret = connection.create(path);
@@ -323,7 +323,7 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      boolean ret;
+      boolean ret = false;
       synchronized (connection)
       {
         ret = connection.delete(path);
@@ -347,7 +347,7 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      boolean ret;
+      boolean ret = false;
       synchronized (connection)
       {
         ret = connection.rename(path, folder.getFullName());
@@ -385,7 +385,7 @@ public class IMAPFolder
       IMAPConnection connection = s.connection;
       try
       {
-        boolean success;
+        boolean success = false;
         synchronized (connection)
         {
           success = connection.close();
@@ -415,7 +415,7 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      int[] messageNumbers;
+      int[] messageNumbers = null;
       synchronized (connection)
       {
         messageNumbers = connection.expunge();
@@ -677,7 +677,7 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
-      ListEntry[] entries;
+      ListEntry[] entries = null;
       synchronized (connection)
       {
         entries = connection.lsub(path, pattern);
@@ -763,7 +763,7 @@ public class IMAPFolder
       try
       {
         IMAPConnection connection = ((IMAPStore)store).connection;
-        ListEntry[] entries;
+        ListEntry[] entries = null;
         synchronized (connection)
         {
           entries = connection.list(path, null);
