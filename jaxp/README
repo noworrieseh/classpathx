@@ -35,9 +35,7 @@ LICENSING
     See the LICENSE file for more information.
 
 BUILDING
-    The default build tools use autoconf and GNU make.  At this writing
-    you have two configuration options.  Most developers will use a JDK
-    environment to build:
+    The default build tools use autoconf and GNU make.
 
     	$ ./configure
 	...
@@ -45,18 +43,13 @@ BUILDING
 	...
 	$
     
-    Some versions of GCJ (after 3.0) can compile this to class files:
+    You will need a java compiler on the PATH to build GNUJAXP. You
+    can specify one at configuration time like this:
 
-    	$ ./configure --with-gcj
-	...
+        $ JAVA_CC=javac ./configure
 	$ make all
-	...
-	$
 
-    In the future, using GCJ (some versions after 3.0) to native code
-    will be supported.
-
-    Also see the autoconf files (you may need CVS access).
+    See the file HACKING for how to build from CVS.
 
 INSTALLATION AND CONFIGURATION
     The simplest way to use this software is to put the "gnujaxp.jar"

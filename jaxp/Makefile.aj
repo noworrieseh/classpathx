@@ -337,46 +337,15 @@ SUPPORTFILES = \
 # This is an automakejar target.
 # You must run the automakejar script on this Make file to
 # cause the target to be legal Make syntax.
-gnujaxp_jar_sourcedir=$(SOURCEDIR)
-gnujaxp_jar_sourcefiles=$(SOURCEFILES)
-gnujaxp_jar_classpath=$(wildcard lib/*.jar)
-gnujaxp_jar_classesdest=classes
-gnujaxp_jar_otherfiles=$(SUPPORTFILES)
-gnujaxp_jar_manifest=$(PROJECTROOT)/manifest.mf
-# End of automakejar target.
-gnujaxp_jar_debugclasses=$(gnujaxp_jar_sourcefiles:.java=.class)
-gnujaxp_jar_classfiles=$(gnujaxp_jar_debugclasses:$(gnujaxp_jar_sourcedir)%=$(gnujaxp_jar_classesdest)%)
-
 gnujaxp.jar:
-gnujaxp.jar: gnujaxp-init $(gnujaxp_jar_classfiles) gnujaxp-compilation $(gnujaxp_jar_otherfiles) $(gnujaxp_jar_manifest)
-	$(JAR) cf$(if $(gnujaxp_jar_manifest),m) gnujaxp.jar $(gnujaxp_jar_manifest) $(gnujaxp_jar_otherfiles) -C $(gnujaxp_jar_classesdest) .
+	sourcedir=$(SOURCEDIR)
+	sourcefiles=$(SOURCEFILES)
+	classpath=$(wildcard lib/*.jar)
+	classesdest=classes
+	otherfiles=$(SUPPORTFILES)
+	manifest=$(PROJECTROOT)/manifest.mf
+# End of automakejar target.
 
-.PHONY: gnujaxp-init gnujaxp-compilation
-
-gnujaxp-init:
-	echo > filelist
-
-gnujaxp-compilation: $(gnujaxp_jar_classesdest)
-	$(if $(shell cat filelist),$(JAVAC) $(JAVAC_OPTS) -d $(gnujaxp_jar_classesdest) -classpath $(call PATHMK,$(gnujaxp_jar_classesdest) $(call PATHMK,$(gnujaxp_jar_classpath))) @filelist)
-
-$(gnujaxp_jar_classesdest):
-	mkdir $@
-
-$(gnujaxp_jar_classesdest)/%.class: $(gnujaxp_jar_sourcedir)/%.java
-	@echo $? >> filelist
-
-echo_gnujaxp_jar:
-	@echo sourcedir = $(gnujaxp_jar_sourcedir)
-	@echo sourcefiles = $(gnujaxp_jar_sourcefiles)
-	@echo classpath = $(call PATHMK,$(gnujaxp_jar_classpath))
-	@echo classesdest = $(gnujaxp_jar_classesdest)
-	@echo classfiles = $(gnujaxp_jar_classfiles)
-
-ifeq (${OS},Windows_NT)
-PATHMK = $(subst $(space),;,$(1))
-else
-PATHMK = $(subst $(space),:,$(1))
-endif
 
 
 # for normal development
