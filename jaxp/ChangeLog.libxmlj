@@ -1,3 +1,7 @@
+2004-11-17  Chris Burdess <dog@gnu.org>
+
+	* dom: DOM Level 3 Core conformance testing.
+
 2004-11-12  Chris Burdess <dog@gnu.org>
 
 	* GnomeTransformerFactory.java: Implemented getAssociatedStylesheet.

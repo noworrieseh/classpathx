@@ -1863,14 +1863,16 @@ public abstract class DomNode
           }
         int d1 = n1.depth, d2 = n2.depth;
         int delta = d1 - d2;
-        while (d1 > d2) {
-          n1 = n1.parent;
-          d1--;
-        }
-        while (d2 > d1) {
-          n2 = n2.parent;
-          d2--;
-        }
+        while (d1 > d2)
+          {
+            n1 = n1.parent;
+            d1--;
+          }
+        while (d2 > d1)
+          {
+            n2 = n2.parent;
+            d2--;
+          }
         int c = compareTo2(n1, n2);
         return (c != 0) ? c : delta;
       }
