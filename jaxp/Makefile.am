@@ -330,6 +330,7 @@ $(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeTypeInfo.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
@@ -362,6 +363,7 @@ gnu_xml_libxmlj_dom_GnomeNode.h \
 gnu_xml_libxmlj_dom_GnomeNodeList.h \
 gnu_xml_libxmlj_dom_GnomeNotation.h \
 gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+gnu_xml_libxmlj_dom_GnomeTypeInfo.h \
 gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
 gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
 gnu_xml_libxmlj_dom_GnomeXPathResult.h \
@@ -371,7 +373,7 @@ gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
 gnu_xml_libxmlj_transform_JavaContext.h \
 gnu_xml_libxmlj_transform_LibxsltStylesheet.h
 
-libxmlj_la_DEPENDENCIES = $(JARFILE) $(headers)
+libxmlj_la_DEPENDENCIES = $(headers)
 
 libxmlj_la_SOURCES = \
 xmlj_dom.c \
@@ -415,12 +417,25 @@ gnu.xml.pipeline \
 gnu.xml.util
 
 #BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
+BUILT_SOURCES = $(JARFILE) $(headers)
 
 # Generate header files for classes containing native code.
 #$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
 #	@JAVAH@ -jni -d $(jni) -classpath $(dst) $($<:/=.)
 
 # I did remove the -force argument (not available in gcjh nor in kaffe)
+
+#gnu_xml_libxmlj_dom_%.h: $(dst)/gnu/xml/libxmlj/dom/%.class
+#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
+#
+#gnu_xml_libxmlj_sax_%.h: $(dst)/gnu/xml/libxmlj/sax/%.class
+#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
+#
+#gnu_xml_libxmlj_transform_%.h: $(dst)/gnu/xml/libxmlj/transform/%.class
+#	CLASSPATH=$(dst) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
+#
+#javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
+#	CLASSPATH=$(dst) @JAVAH@ -jni javax.xml.transform.$*
 
 gnu_xml_libxmlj_dom_%.h: $(JARFILE)
 	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
@@ -431,7 +446,7 @@ gnu_xml_libxmlj_sax_%.h: $(JARFILE)
 gnu_xml_libxmlj_transform_%.h: $(JARFILE)
 	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
 
-javax_xml_transform_%.h: 
+javax_xml_transform_%.h: $(JARFILE)
 	CLASSPATH=$(JARFILE) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files

@@ -37,6 +37,7 @@
 #include "gnu_xml_libxmlj_dom_GnomeNode.h"
 #include "gnu_xml_libxmlj_dom_GnomeNodeList.h"
 #include "gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h"
+#include "gnu_xml_libxmlj_dom_GnomeTypeInfo.h"
 #include "gnu_xml_libxmlj_dom_MatchingNodeList.h"
 
 #include <libxml/parser.h>

@@ -44,9 +44,9 @@ implements NodeList
   private final Object id;
 
   GnomeNodeList (Object id)
-    {
-      this.id = id;
-    }
+  {
+    this.id = id;
+  }
 
   public native Node item (int index);
 

@@ -48,32 +48,28 @@ implements XPathExpression
 
   GnomeXPathExpression (GnomeDocument doc, String expression,
                         XPathNSResolver resolver)
-    {
-      expr = init (expression);
-      // TODO resolver
-    }
+  {
+    expr = init (expression);
+    // TODO resolver
+  }
 
   protected void finalize ()
-    {
-      free (expr);
-    }
+  {
+    free (expr);
+  }
 
   private native Object init (String expression);
 
   private native void free (Object expr);
 
-  public Object evaluate (Node contextNode,
-                          short type,
-                          Object result)
+  public Object evaluate (Node contextNode, short type, Object result)
     throws XPathException, DOMException
-    {
-      return evaluate (expr, contextNode, type, result);
-    }
+  {
+    return evaluate (expr, contextNode, type, result);
+  }
   
-  private native Object evaluate (Object expr,
-                                  Node contextNode,
-                                  short type,
-                                  Object result)
+  private native Object evaluate (Object expr, Node contextNode,
+                                  short type, Object result)
     throws XPathException, DOMException;
     
 }

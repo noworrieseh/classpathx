@@ -64,32 +64,32 @@ implements Document, XPathEvaluator
   boolean strictErrorChecking;
   
   GnomeDocument(Object id)
-    {
-      super(id);
-      strictErrorChecking = true;
-    }
+  {
+    super(id);
+    strictErrorChecking = true;
+  }
   
   protected void finalize()
-    {
-      free(id);
-    }
+  {
+    free(id);
+  }
   
   private native void free(Object id);
 
   public native DocumentType getDoctype();
 
   public DOMImplementation getImplementation()
-    {
-      return dom;
-    }
+  {
+    return dom;
+  }
 
   public native Element getDocumentElement();
 
   public Element createElement(String tagName)
     throws DOMException
-    {
-      return createElementNS(null, tagName);
-    }
+  {
+    return createElementNS(null, tagName);
+  }
 
   public native DocumentFragment createDocumentFragment();
 
@@ -100,40 +100,40 @@ implements Document, XPathEvaluator
   public native CDATASection createCDATASection(String data)
     throws DOMException;
 
-  public native ProcessingInstruction createProcessingInstruction(String
-      target, String data)
+  public native ProcessingInstruction createProcessingInstruction(String target,
+                                                                  String data)
     throws DOMException;
 
   public Attr createAttribute(String name)
     throws DOMException
-    {
-      return createAttributeNS(null, name);
-    }
+  {
+    return createAttributeNS(null, name);
+  }
 
   public native EntityReference createEntityReference(String name)
     throws DOMException;
 
   public NodeList getElementsByTagName(String tagName)
-    {
-      return new MatchingNodeList(id, null, tagName, false);
-    }
+  {
+    return new MatchingNodeList(id, null, tagName, false);
+  }
 
   public native Node importNode(Node importedNode, boolean deep)
     throws DOMException;
 
   public native Element createElementNS(String namespaceURI, String
-      qualifiedName)
+                                        qualifiedName)
     throws DOMException;
   
   public native Attr createAttributeNS(String namespaceURI, String
-      qualifiedName)
+                                       qualifiedName)
     throws DOMException;
 
   public NodeList getElementsByTagNameNS(String namespaceURI,
       String localName)
-    {
-      return new MatchingNodeList(id, namespaceURI, localName, true);
-    }
+  {
+    return new MatchingNodeList(id, namespaceURI, localName, true);
+  }
 
   public native Element getElementById(String elementId);
 
@@ -142,10 +142,10 @@ implements Document, XPathEvaluator
   public native String getInputEncoding ();
 
   public String getXmlEncoding ()
-    {
-      // TODO
-      return null;
-    }
+  {
+    // TODO
+    return null;
+  }
 
   public native boolean getXmlStandalone ();
 
@@ -156,35 +156,35 @@ implements Document, XPathEvaluator
   public native void setXmlVersion (String xmlVersion);
 
   public boolean getStrictErrorChecking ()
-    {
-      return strictErrorChecking;
-    }
+  {
+    return strictErrorChecking;
+  }
 
   public void setStrictErrorChecking (boolean strictErrorChecking)
-    {
-      this.strictErrorChecking = strictErrorChecking;
-    }
-
+  {
+    this.strictErrorChecking = strictErrorChecking;
+  }
+  
   public native String getDocumentURI ();
 
   public native void setDocumentURI (String documentURI);
 
   public Node adoptNode (Node source)
     throws DOMException
-    {
-      throw new DOMException (DOMException.NOT_SUPPORTED_ERR, null);
-    }
+  {
+    throw new DOMException (DOMException.NOT_SUPPORTED_ERR, null);
+  }
 
   public DOMConfiguration getDomConfig ()
-    {
-      // TODO
-      return null;
-    }
+  {
+    // TODO
+    return null;
+  }
 
   public void normalizeDocument ()
-    {
-      // TODO
-    }
+  {
+    // TODO
+  }
 
   public native Node renameNode (Node n, String namespaceURI,
                                  String qualifiedName);
@@ -194,14 +194,14 @@ implements Document, XPathEvaluator
   public XPathExpression createExpression (String expression,
                                            XPathNSResolver resolver)
     throws XPathException, DOMException
-    {
-      return new GnomeXPathExpression (this, expression, resolver);
-    }
+  {
+    return new GnomeXPathExpression (this, expression, resolver);
+  }
 
   public XPathNSResolver createNSResolver (Node nodeResolver)
-    {
-      return new GnomeXPathNSResolver (this);
-    }
+  {
+    return new GnomeXPathNSResolver (this);
+  }
 
   public native Object evaluate (String expression,
                                  Node contextNode,
@@ -209,5 +209,16 @@ implements Document, XPathEvaluator
                                  short type,
                                  Object result)
     throws XPathException, DOMException;
+
+  public String toString()
+  {
+    StringBuffer buffer = new StringBuffer (getClass ().getName ());
+    buffer.append ("[version=");
+    buffer.append (getXmlVersion ());
+    buffer.append (",standalone=");
+    buffer.append (getXmlStandalone ());
+    buffer.append ("]");
+    return buffer.toString ();
+  }
 
 }

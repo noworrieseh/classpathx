@@ -39,8 +39,8 @@ implements CDATASection
 {
 
   GnomeCDATASection (Object id)
-    {
-      super (id);
-    }
+  {
+    super (id);
+  }
 
 }

@@ -46,14 +46,14 @@ implements XPathResult
   final Object obj;
 
   GnomeXPathResult (Object obj)
-    {
-      this.obj = obj;
-    }
+  {
+    this.obj = obj;
+  }
 
   protected void finalize ()
-    {
-      free (obj);
-    }
+  {
+    free (obj);
+  }
 
   private native void free (Object obj);
   
@@ -83,26 +83,39 @@ implements XPathResult
     throws XPathException;
 
   public String toString ()
-    {
-      short type = getResultType ();
-      switch (type)
-        {
-        case STRING_TYPE:
-          return getStringValue ();
-        case NUMBER_TYPE:
-          return new Double (getNumberValue ()).toString ();
-        case BOOLEAN_TYPE:
-          return Boolean.valueOf (getBooleanValue ()).toString ();
-        case UNORDERED_NODE_SNAPSHOT_TYPE:
-          Node node = getSingleNodeValue ();
-          if (node != null)
-            {
-              return node.toString ();
-            }
+  {
+    short type = getResultType ();
+    switch (type)
+      {
+      case STRING_TYPE:
+        return getStringValue ();
+      case NUMBER_TYPE:
+        return new Double (getNumberValue ()).toString ();
+      case BOOLEAN_TYPE:
+        return Boolean.valueOf (getBooleanValue ()).toString ();
+      case UNORDERED_NODE_SNAPSHOT_TYPE:
+        int len = getSnapshotLength ();
+        switch (len) {
+        case 0:
+          return "[no matches]";
+        case 1:
+          return getSingleNodeValue ().toString ();
         default:
-          return getClass ().getName () + "[type=" + type + ",length=" +
-            getSnapshotLength () + ']';
+          StringBuffer buffer = new StringBuffer ();
+          for (int i = 0; i < len; i++)
+            {
+              if (i > 0)
+                {
+                  buffer.append (',');
+                }
+              buffer.append (snapshotItem (i));
+            }
+          return buffer.toString ();
         }
-    }
+      default:
+        return getClass ().getName () + "[type=" + type + ",length=" +
+          getSnapshotLength () + ']';
+      }
+  }
   
 }

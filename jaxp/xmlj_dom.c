@@ -1362,6 +1362,36 @@ Java_gnu_xml_libxmlj_dom_GnomeProcessingInstruction_setData (JNIEnv * env,
   xmlNodeSetContent (node, s_data);
 }
 
+/* -- GnomeTypeInfo -- */
+
+JNIEXPORT jstring JNICALL 
+Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_getTypeName (JNIEnv *env, jobject self)
+{
+  /* TODO when XML Schema support is available */
+  return NULL;
+}
+
+JNIEXPORT jstring JNICALL 
+Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_getTypeNamespace (JNIEnv *env,
+                                                         jobject self)
+{
+  /* TODO when XML Schema support is available */
+  return NULL;
+}
+
+JNIEXPORT jboolean JNICALL 
+Java_gnu_xml_libxmlj_dom_GnomeTypeInfo_isDerivedFrom (JNIEnv *env,
+                                                      jobject self,
+                                                      jstring typeNS,
+                                                      jstring typeName,
+                                                      jint method)
+{
+  /* TODO when XML Schema support is available */
+  return 0;
+}
+
+/* -- MatchingNodeList -- */
+
 JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_MatchingNodeList_item (JNIEnv * env,
                                                 jobject self,

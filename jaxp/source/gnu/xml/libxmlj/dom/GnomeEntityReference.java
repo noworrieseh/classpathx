@@ -39,8 +39,8 @@ implements EntityReference
 {
 
   GnomeEntityReference (Object id)
-    {
-      super (id);
-    }
+  {
+    super (id);
+  }
 
 }

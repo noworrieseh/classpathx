@@ -39,8 +39,8 @@ implements DocumentFragment
 {
 
   GnomeDocumentFragment (Object id)
-    {
-      super (id);
-    }
+  {
+    super (id);
+  }
 
 }

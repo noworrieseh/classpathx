@@ -45,9 +45,9 @@ implements NamedNodeMap
   private final Object id;
 
   GnomeNamedNodeMap (Object id)
-    {
-      this.id = id;
-    }
+  {
+    this.id = id;
+  }
 
   public native Node getNamedItem (String name);
 

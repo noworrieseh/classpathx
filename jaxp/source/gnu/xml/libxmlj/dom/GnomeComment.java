@@ -39,8 +39,8 @@ implements Comment
 {
 
   GnomeComment (Object id)
-    {
-      super (id);
-    }
+  {
+    super (id);
+  }
 
 }
