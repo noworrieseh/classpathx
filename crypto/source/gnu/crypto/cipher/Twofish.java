@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Twofish.java,v 1.2 2001-11-21 19:44:43 raif Exp $
+// $Id: Twofish.java,v 1.3 2001-11-22 10:31:06 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -48,9 +48,9 @@ import java.util.Iterator;
  * Reference:<br>
  * <a href="../twofish.pdf">Twofish: A 128-bit Block Cipher</a>.<br>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class Twofish extends BaseCipher implements IBlockCipherSpi {
+public final class Twofish extends BaseCipher {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
@@ -310,7 +310,7 @@ public final class Twofish extends BaseCipher implements IBlockCipherSpi {
       return result;
    }
 
-   // Implementation of abstract methods in BaseCipher
+   // IBlockCipherSpi interface implementation
    // -------------------------------------------------------------------------
 
    public Iterator blockSizes() {
@@ -711,7 +711,7 @@ public final class Twofish extends BaseCipher implements IBlockCipherSpi {
       return r;
    }
 
-   /*
+   /**
     * Reed-Solomon code parameters: (12, 8) reversible code:<p>
     * <pre>
     *   g(x) = x**4 + (a + 1/a) x**3 + a x**2 + (a + 1/a) x + 1

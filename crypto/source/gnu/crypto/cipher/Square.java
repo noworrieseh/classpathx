@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: Square.java,v 1.2 2001-11-21 19:44:43 raif Exp $
+// $Id: Square.java,v 1.3 2001-11-22 10:31:06 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -43,9 +43,9 @@ import java.util.Iterator;
  * <a href="mailto:lars.knudsen@esat.kuleuven.ac.be">Lars Knudsen</a> and
  * <a href="mailto:vincent.rijmen@esat.kuleuven.ac.be">Vincent Rijmen</a>.
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class Square extends BaseCipher implements IBlockCipherSpi {
+public final class Square extends BaseCipher {
 
    // Debugging methods and variables
    // -------------------------------------------------------------------------
@@ -210,7 +210,7 @@ public final class Square extends BaseCipher implements IBlockCipherSpi {
       return result;
    }
 
-   // Implementation of abstract methods in BaseCipher
+   // IBlockCipherSpi interface implementation
    // -------------------------------------------------------------------------
 
    public Iterator blockSizes() {
