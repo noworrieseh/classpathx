@@ -1,5 +1,5 @@
 /*
- * $Id: Consumer.java,v 1.2 2001-06-24 04:12:23 db Exp $
+ * $Id: Consumer.java,v 1.3 2001-10-18 00:48:36 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -25,9 +25,12 @@ import java.io.IOException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Node;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.Attributes2;
 
 import gnu.xml.pipeline.DomConsumer;
 
@@ -51,7 +54,7 @@ import gnu.xml.pipeline.DomConsumer;
  * using this API.
  *
  * @author David Brownell
- * @version $Date: 2001-06-24 04:12:23 $
+ * @version $Date: 2001-10-18 00:48:36 $
  */
 public class Consumer extends DomConsumer
 {
@@ -67,6 +70,9 @@ public class Consumer extends DomConsumer
 
     /**
      * Implements the backdoors needed by DOM.
+     * All methods in this class use implementation-specific APIs that are
+     * implied by the DOM specification (needed to implement testable
+     * behavior) but which are excluded from the DOM specification.
      */
     static final class Backdoor extends DomConsumer.Handler
     {
@@ -93,6 +99,7 @@ public class Consumer extends DomConsumer
 	    DomDocument		doc = (DomDocument) getDocument ();
 
 	    super.startDTD (name, pubid, sysid);
+	    // DOM L2 doctype creation model is bizarre
 	    doc.appendChild (new DomDoctype (doc, name, pubid, sysid));
 	}
 
@@ -101,6 +108,7 @@ public class Consumer extends DomConsumer
 	throws SAXException
 	{
 	    super.endDTD ();
+	    // DOM L2 has no way to make things readonly
 	    getDoctype ().makeReadonly ();
 	}
 
@@ -110,6 +118,7 @@ public class Consumer extends DomConsumer
 	    String pubid, String sysid
 	) throws SAXException
 	{
+	    // DOM L2 can't create/save notation nodes
 	    getDoctype ().declareNotation (name, pubid, sysid);
 	}
 
@@ -120,6 +129,7 @@ public class Consumer extends DomConsumer
 	    String notation
 	) throws SAXException
 	{
+	    // DOM L2 can't create/save entity nodes
 	    getDoctype ().declareEntity (name, pubid, sysid, notation);
 	}
 
@@ -127,6 +137,7 @@ public class Consumer extends DomConsumer
 	public void internalEntityDecl (String name, String value)
 	throws SAXException
 	{
+	    // DOM L2 can't create/save entity nodes
 	    // NOTE:  this doesn't save the value as a child of this
 	    // node, though it could realistically do so.
 	    getDoctype ().declareEntity (name, null, null, null);
@@ -136,9 +147,66 @@ public class Consumer extends DomConsumer
 	public void externalEntityDecl (String name, String pubid, String sysid)
 	throws SAXException
 	{
+	    // DOM L2 can't create/save entity nodes
 	    // NOTE:  DOM allows for these to have children, if
 	    // they don't have unbound namespace references.
 	    getDoctype ().declareEntity (name, pubid, sysid, null);
 	}
+
+	// SAX2 element
+	public void startElement (
+	    String uri,
+	    String local,
+	    String name,
+	    Attributes attrs
+	) throws SAXException
+	{
+	    Node		top;
+
+	    super.startElement (uri, local, name, attrs);
+
+	    // might there be more work?
+	    top = getTop ();
+	    if (!top.hasAttributes () || !(attrs instanceof Attributes2))
+		return;
+
+	    // remember any attributes that got defaulted
+	    DomNamedNodeMap	map = (DomNamedNodeMap) top.getAttributes ();
+	    Attributes2		atts = (Attributes2) attrs;
+	    int			length = atts.getLength ();
+
+	    for (int i = 0; i < length; i++) {
+		if (atts.isSpecified (i))
+		    continue;
+		
+		// value was defaulted.
+		String		temp = atts.getQName (i);
+		DomAttr		attr;
+
+		if ("".equals (temp))
+		    attr = (DomAttr) map.getNamedItemNS (atts.getURI (i),
+			    atts.getLocalName (i));
+		else
+		    attr = (DomAttr) map.getNamedItem (temp);
+
+		// DOM L2 can't write this flag, only read it
+		attr.setSpecified (false);
+	    }
+
+	    // FIXME: associate with the list of attributes that
+	    // DOM may have to default later (by hand)
+	}
+
+	// FIXME:  remember attributes declared with default values,
+	// and arrange to recreate them if they're ever deleted 
+	// from a NamedNodeMap of attributes.
+	// DOM L2 has no way to create or access such declarations,
+	// except implicitly.
+
+// FIXME:
+
+// override clearDocument(), delegate then:
+// doc.setCheckingCharacters (true);
+
     }
 }
