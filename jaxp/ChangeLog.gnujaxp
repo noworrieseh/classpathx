@@ -1,5 +1,10 @@
 2004-07-31  Musachy Barroso  <musachy@gmail.com>
 
+	* XmlParser.java: Improved check for partial character references
+	and partial entity references in internal entities. 
+	
+2004-07-31  Musachy Barroso  <musachy@gmail.com>
+
 	* XmlParser.java: Added check for partial character references
 	in internal entities. 
 	

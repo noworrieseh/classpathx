@@ -2511,14 +2511,29 @@ loop:
                         
                         int bufferPosMark = readBufferPos;
                         if (dataBuffer [dataBufferPos - 1] == '&'){
-                            char t = 0;
-                            if ((t = readCh()) == '#'){ 
+                            char t = readCh();
+                            boolean singleAmp = true;
+                            if (t  == '#'){ 
                                //try to match a character ref
                                tryReadCharRef ();
                                readBufferPos = bufferPosMark;
+                               singleAmp = false;
                             }
-                            else
+                            else if (Character.isLetter(t)){
+                            	//looks like an entity ref
                             	unread (t);
+                            	readNmtoken (true);
+                        	require (';');
+                        	readBufferPos = bufferPosMark;
+                        	singleAmp = false;
+                            }
+                            else if (t == '&'){
+                            	unread (t);
+                            	singleAmp = false;
+                            }
+                            if (singleAmp)	
+                            	error ("& must be encoded either as &amp; or" +
+                            			" as &#38;#38");
                         }
 		    // It looks like an entity ref ...
 		    } else {
