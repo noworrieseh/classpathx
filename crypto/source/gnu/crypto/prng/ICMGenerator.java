@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.7 2002-07-07 00:00:11 raif Exp $
+// $Id: ICMGenerator.java,v 1.8 2002-07-14 01:45:41 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -37,7 +37,6 @@ import gnu.crypto.cipher.CipherFactory;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -50,6 +49,21 @@ import java.util.Map;
  * segmentation makes ICM especially appropriate for securing packet-based
  * protocols.</p>
  *
+ * <p>This implementation adheres to the definition of the ICM keystream
+ * generation function that allows for any symetric key block cipher algorithm
+ * (initialisation parameter <code>gnu.crypto.prng.icm.cipher.name</code> taken
+ * to be an instance of {@link java.lang.String}) to be used. If such a
+ * parameter is not defined/included in the initialisation <code>Map</code>,
+ * then the "Rijndael" algorithm is used. Furthermore, if the initialisation
+ * parameter <code>gnu.crypto.cipher.block.size</code> (taken to be a instance
+ * of {@link java.lang.Integer}) is missing or undefined in the initialisation
+ * <code>Map</code>, then the cipher's <em>default</em> block size is used.</p>
+ *
+ * <p><b>NOTE</b>: Rijndael is used as the default symmetric key block cipher
+ * algorithm because, with its default block and key sizes, it is the AES. Yet
+ * being Rijndael, the algorithm offers more versatile block and key sizes which
+ * may prove to be useful for generating "longer" key streams.</p>
+ *
  * <p>References:</p>
  *
  * <ol>
@@ -57,7 +71,7 @@ import java.util.Map;
  *    Integer Counter Mode</a>, David A. McGrew.</li>
  * </ol>
  *
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ICMGenerator extends BasePRNG {
 
