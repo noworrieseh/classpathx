@@ -26,7 +26,9 @@ package javax.servlet.http;
  * the attributes of the sessions in a web application change
  * either through addittion, deletion, or replacement
  *
+ * @version Servlet API 2.3
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public interface HttpSessionAttributeListener

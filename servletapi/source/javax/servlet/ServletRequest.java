@@ -33,6 +33,7 @@ import java.util.Map;
  * @version Servlet API 2.2
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 public interface ServletRequest
 {

@@ -32,8 +32,8 @@ import java.util.Locale;
  * through to the underlying wrapped object.
  *
  * @version Servlet API 2.3
- *
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public class ServletResponseWrapper 

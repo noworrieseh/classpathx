@@ -28,7 +28,9 @@ package javax.servlet.http;
  * container to notify all such objects implementing this interface
  * upon activation and passivation
  *
+ * @version Servlet API 2.3
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public interface HttpSessionActivationListener

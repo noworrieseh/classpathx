@@ -28,10 +28,12 @@ import java.security.Principal;
 
 /**
  * Serves a convenience class for developers to adapt to HttpServletRequests
- * by default, passes all method calls which are parte of the {@link HttpServletRequest}
+ * by default, passes all method calls which are part of the {@link HttpServletRequest}
  * interface through to the wrapped object
  *
+ * @version Servlet API 2.3
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 public class HttpServletRequestWrapper extends ServletRequestWrapper 
   implements HttpServletRequest

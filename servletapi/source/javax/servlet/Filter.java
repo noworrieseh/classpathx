@@ -55,6 +55,7 @@ import java.io.IOException;
  * @version Servlet API 2.3
  * @since Servlet API 2.3
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
+ * @author Charles Lowell - cowboyd@pobox.com
 */
 public interface Filter
 {

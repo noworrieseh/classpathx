@@ -27,8 +27,9 @@ import javax.servlet.ServletRequest;
  * Contains all the client's request information.
  * <B>Implementation note:</B> all the headername matching in this class should be case<B>in</B>sensitive.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.3
  * @since Servlet API 1.0
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 public interface HttpServletRequest
 extends ServletRequest

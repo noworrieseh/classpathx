@@ -30,7 +30,9 @@ import java.io.IOException;
  * are part of the HttpServletResponse interface to the underlying 
  * implementation
  *
+ * @version Servlet API 2.3
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 public class HttpServletResponseWrapper extends ServletResponseWrapper 
   implements HttpServletResponse

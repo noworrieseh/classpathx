@@ -34,6 +34,7 @@ import java.io.BufferedReader;
  * object
  *
  * @since Servlet API 2.3
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public class ServletRequestWrapper

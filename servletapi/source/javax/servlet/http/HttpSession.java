@@ -47,6 +47,7 @@ import javax.servlet.ServletContext;
  * @version Servlet API 2.3
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
+ * @author Charles Lowell (cowboyd@pobox.com)
  */
 public interface HttpSession
 {
