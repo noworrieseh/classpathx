@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.7 2001-10-23 17:42:25 db Exp $
+ * $Id: DomConsumer.java,v 1.8 2001-10-24 22:39:38 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -77,7 +77,7 @@ import gnu.xml.util.DomParser;
  * @see DomParser
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-24 22:39:38 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -409,17 +409,19 @@ public class DomConsumer implements EventConsumer
 	    { return document; }
 	
 	/**
-	 * Returns the current node being populated, which is always
-	 * an Element or Document.
+	 * Returns the current node being populated.  This is usually
+	 * an Element or Document, but it might be an EntityReference
+	 * node if some implementation-specific code knows how to put
+	 * those into the result tree and later mark them as readonly.
 	 */
 	protected Node getTop ()
 	    { return top; }
 
 
 	// SAX1
-	public void setDocumentLocator (Locator l)
+	public void setDocumentLocator (Locator locator)
 	{
-	    locator = l;
+	    this.locator = locator;
 	}
 
 	// SAX1
@@ -481,7 +483,7 @@ public class DomConsumer implements EventConsumer
 	}
 
 	// SAX1
-	public void characters (char buf [], int off, int len)
+	public void characters (char ch [], int start, int length)
 	throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
@@ -490,7 +492,7 @@ public class DomConsumer implements EventConsumer
 	    if (currentEntity != null)
 		return;
 
-	    String	value = new String (buf, off, len);
+	    String	value = new String (ch, start, length);
 	    Node	lastChild = top.getLastChild ();
 
 	    // merge consecutive text or CDATA nodes if appropriate.
@@ -551,9 +553,9 @@ public class DomConsumer implements EventConsumer
 	// SAX2
 	public void startElement (
 	    String uri,
-	    String local,
-	    String name,
-	    Attributes attrs
+	    String localName,
+	    String qName,
+	    Attributes atts
 	) throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
@@ -564,21 +566,21 @@ public class DomConsumer implements EventConsumer
 	    // parser discarded basic information; DOM tree isn't writable
 	    // without massaging to assign prefixes to all nodes.
 	    // the "NSFilter" class does that massaging.
-	    if (name.length () == 0)
-		name = local;
+	    if (qName.length () == 0)
+		qName = localName;
 
 
 	    Element	element;
-	    int		length = attrs.getLength ();
+	    int		length = atts.getLength ();
 
 	    if (!isL2 || !consumer.isUsingNamespaces ()) {
-		element = document.createElement (name);
+		element = document.createElement (qName);
 
 		// first the explicit attributes ...
-		length = attrs.getLength ();
+		length = atts.getLength ();
 		for (int i = 0; i < length; i++)
-		    element.setAttribute (attrs.getQName (i),
-					    attrs.getValue (i));
+		    element.setAttribute (atts.getQName (i),
+					    atts.getValue (i));
 		// ... then any recreated ones (DOM deletes duplicates)
 		if (recreatedAttrs) {
 		    recreatedAttrs = false;
@@ -600,17 +602,17 @@ public class DomConsumer implements EventConsumer
 	    // (b) it's an attribute with no prefix
 	    String	namespace;
 	    
-	    if (local.length () != 0)
+	    if (localName.length () != 0)
 		namespace = (uri.length () == 0) ? null : uri;
 	    else
-		namespace = getNamespace (getPrefix (name), attrs);
+		namespace = getNamespace (getPrefix (qName), atts);
 
 	    if (namespace == null)
-		element = document.createElement (name);
+		element = document.createElement (qName);
 	    else
-		element = document.createElementNS (namespace, name);
+		element = document.createElementNS (namespace, qName);
 
-	    populateAttributes (element, attrs);
+	    populateAttributes (element, atts);
 	    if (recreatedAttrs) {
 		recreatedAttrs = false;
 		// ... DOM deletes any duplicates
@@ -735,7 +737,7 @@ public class DomConsumer implements EventConsumer
 	}
 
 	// SAX2
-	public void endElement (String uri, String local, String name)
+	public void endElement (String uri, String localName, String qName)
 	throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
@@ -747,12 +749,12 @@ public class DomConsumer implements EventConsumer
 	}
 
 	// SAX1 (mandatory reporting if validating)
-	public void ignorableWhitespace (char buf [], int off, int len)
+	public void ignorableWhitespace (char ch [], int start, int length)
 	throws SAXException
 	{
 	    if (consumer.isHidingWhitespace ())
 		return;
-	    characters (buf, off, len);
+	    characters (ch, start, length);
 	}
 
 	// SAX2 lexical event
@@ -782,7 +784,7 @@ public class DomConsumer implements EventConsumer
 	// ...and it doesn't include the internal DTD subset, desired
 	// both to support DOM L2 and to enable "pass through" processing
 	//
-	public void startDTD (String name, String pubid, String sysid)
+	public void startDTD (String name, String publicId, String SystemId)
 	throws SAXException
 	{
 	    // need to filter out comments and PIs within the DTD
@@ -805,7 +807,8 @@ public class DomConsumer implements EventConsumer
 		// subset string in a usable form; else we'd really like
 		// to store it away here!
 
-		doctype = impl.createDocumentType (name, pubid, sysid, null);
+		doctype = impl.createDocumentType (name,
+				publicId, SystemId, null);
 		document.appendChild (doctype);
 
 		// NOTE:  there's no way to attach notation and entity
@@ -826,7 +829,7 @@ public class DomConsumer implements EventConsumer
 	}
 	
 	// SAX2 lexical event
-	public void comment (char buf [], int off, int len)
+	public void comment (char ch [], int start, int length)
 	throws SAXException
 	{
 	    Node	comment;
@@ -837,7 +840,7 @@ public class DomConsumer implements EventConsumer
 		    || inDTD
 		    || currentEntity != null)
 		return;
-	    comment = document.createComment (new String (buf, off, len));
+	    comment = document.createComment (new String (ch, start, length));
 	    top.appendChild (comment);
 	}
 
@@ -885,7 +888,7 @@ public class DomConsumer implements EventConsumer
 	// SAX1 DTD event
 	public void notationDecl (
 	    String name,
-	    String pubid, String sysid
+	    String publicId, String SystemId
 	) throws SAXException
 	{
 	    /* IGNORE -- no public DOM API lets us store these
@@ -896,8 +899,8 @@ public class DomConsumer implements EventConsumer
 	// SAX1 DTD event
 	public void unparsedEntityDecl (
 	    String name,
-	    String pubid, String sysid,
-	    String notation
+	    String publicId, String SystemId,
+	    String notationName
 	) throws SAXException
 	{
 	    /* IGNORE -- no public DOM API lets us store these
@@ -914,11 +917,11 @@ public class DomConsumer implements EventConsumer
 
 	// SAX2 declaration event
 	public void attributeDecl (
-	    String element,
-	    String attr,
-	    String x,
-	    String y,
-	    String z
+	    String eName,
+	    String aName,
+	    String type,
+	    String mode,
+	    String value
 	) throws SAXException
 	{
 	    /* IGNORE -- no attribute model support in DOM L2 */
@@ -934,8 +937,11 @@ public class DomConsumer implements EventConsumer
 	}
 
 	// SAX2 declaration event
-	public void externalEntityDecl (String name, String pubid, String sysid)
-	throws SAXException
+	public void externalEntityDecl (
+	    String name,
+	    String publicId,
+	    String SystemId
+	) throws SAXException
 	{
 	    /* IGNORE -- no public DOM API lets us store these
 	     * into the doctype node
