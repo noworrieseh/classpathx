@@ -1,3 +1,10 @@
+2004-11-16  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Implemented Document.renameNode, Document.normalizeDocument,
+   	Element.setIdAttribute*. DomDocument.verifyXmlName accuracy was
+        improved. XML 1.1 Name, NCName, and Char checking was implemented,
+        and XML 1.0 rules applied.
+   	
 2004-11-15  Chris Burdess  <dog@gnu.org>
 
    	* dom: Improved DOM Level 3 conformance.

@@ -1,6 +1,6 @@
 /*
  * DomImpl.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -56,13 +56,16 @@ import gnu.xml.dom.ls.DomLSSerializer;
 /**
  * <p> "DOMImplementation" implementation. </p>
  *
- * <p> At this writing, the following features are supported: "XML" (L1, L2),
+ * <p> At this writing, the following features are supported:
+ * "XML" (L1, L2, L3),
  * "Events" (L2), "MutationEvents" (L2), "USER-Events" (a conformant extension),
- * "HTMLEvents" (L2), "UIEvents" (L2), "Traversal" (L2), "XPath" (L3).
+ * "HTMLEvents" (L2), "UIEvents" (L2), "Traversal" (L2), "XPath" (L3),
+ * "LS" (L3) "LS-Async" (L3).
  * It is possible to compile the package so it doesn't support some of these
  * features (notably, Traversal).
  *
  * @author David Brownell 
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class DomImpl
   implements DOMImplementation, DOMImplementationLS
@@ -182,7 +185,7 @@ public class DomImpl
     // CR2 deleted internal subset, ensuring DocumentType
     // is 100% useless instead of just 90% so.
   {
-    DomDocument.verifyNamespaceName(rootName);
+    DomDocument.checkNCName(rootName, false);
     return new DomDoctype(this, rootName, publicId, systemId, null);
   }
 
@@ -196,19 +199,25 @@ public class DomImpl
                                  DocumentType doctype)
   {
     Document doc = new DomDocument(this);
-    Element root;
+    Element root = null;
     
-    root = doc.createElementNS(namespaceURI, rootName);
-    if (rootName.startsWith("xmlns:"))
+    if (rootName != null)
       {
-        throw new DomEx(DomEx.NAMESPACE_ERR, "xmlns is reserved", null, 0);
+        root = doc.createElementNS(namespaceURI, rootName);
+        if (rootName.startsWith("xmlns:"))
+          {
+            throw new DomEx(DomEx.NAMESPACE_ERR, "xmlns is reserved", null, 0);
+          }
       }
     // Bleech -- L2 seemingly _requires_ omission of xmlns attributes.
     if (doctype != null)
       {
         doc.appendChild(doctype);		// handles WRONG_DOCUMENT error
       }
-    doc.appendChild(root);
+    if (root != null)
+      {
+        doc.appendChild(root);
+      }
     return doc;
   }
 

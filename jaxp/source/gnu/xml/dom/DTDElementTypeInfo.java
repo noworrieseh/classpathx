@@ -1,6 +1,6 @@
 /*
  * DTDElementTypeInfo.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *

@@ -39,6 +39,7 @@
 package gnu.xml.dom;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -155,6 +156,7 @@ public abstract class DomNode
 
   // DOM Level 3 userData dictionary.
   private Map userData;
+  private Map userDataHandlers;
 
   //
   // Some of the methods here are declared 'final' because
@@ -162,13 +164,6 @@ public abstract class DomNode
   // class -- for both integrity and performance.
   //
 
-  // package private
-  void nyi()
-  {
-    throw new DomEx(DomEx.NOT_SUPPORTED_ERR,
-                    "feature not yet implemented", this, 0);
-  }
-  
   /**
    * Reduces space utilization for this node.
    */
@@ -818,7 +813,7 @@ public abstract class DomNode
         ref.previous = null;
         ref.next = null;
         
-        return child;
+        return ref;
       }
     catch (ClassCastException e)
       {
@@ -843,7 +838,7 @@ public abstract class DomNode
       {
         DomNode ref = (DomNode) refChild;
 
-        if (ref.parent != this)
+        if (ref == null || ref.parent != this)
           {
             throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
           }
@@ -1116,7 +1111,7 @@ public abstract class DomNode
         for (DomNode ctx = first; ctx != null; ctx = ctx.next)
           {
             DomNode newChild = (DomNode) ctx.cloneNode(deep);
-            newChild.owner = doc;
+            newChild.setOwner(doc);
             node.appendChild(newChild);
           }
       }
@@ -1125,7 +1120,23 @@ public abstract class DomNode
       {
         node.makeReadonly();
       }
+    notifyUserDataHandlers(UserDataHandler.NODE_CLONED, this, node);
     return node;
+  }
+
+  void notifyUserDataHandlers(short op, Node src, Node dst)
+  {
+    if (userDataHandlers != null)
+      {
+        for (Iterator i = userDataHandlers.entrySet().iterator(); i.hasNext(); )
+          {
+            Map.Entry entry = (Map.Entry) i.next();
+            String key = (String) entry.getKey();
+            UserDataHandler handler = (UserDataHandler) entry.getValue();
+            Object data = userData.get(key);
+            handler.handle(op, key, data, src, dst);
+          }
+      }
   }
 
   /**
@@ -1845,6 +1856,11 @@ public abstract class DomNode
           {
             return 0;
           }
+        if (n1.nodeType == ATTRIBUTE_NODE ||
+            n2.nodeType == ATTRIBUTE_NODE)
+          {
+            return 0;
+          }
         int d1 = n1.depth, d2 = n2.depth;
         int delta = d1 - d2;
         while (d1 > d2) {
@@ -1877,6 +1893,12 @@ public abstract class DomNode
   public final String getTextContent()
     throws DOMException
   {
+    return getTextContent(true);
+  }
+
+  final String getTextContent(boolean topLevel)
+    throws DOMException
+  {
     switch (nodeType)
       {
       case ELEMENT_NODE:
@@ -1884,10 +1906,10 @@ public abstract class DomNode
       case ENTITY_NODE:
       case ENTITY_REFERENCE_NODE:
       case DOCUMENT_FRAGMENT_NODE:
-        StringBuffer buffer = new StringBuffer ();
+        StringBuffer buffer = new StringBuffer();
         for (DomNode ctx = first; ctx != null; ctx = ctx.next)
           {
-            String textContent = ctx.getTextContent ();
+            String textContent = ctx.getTextContent(false);
             if (textContent != null)
               {
                 buffer.append(textContent);
@@ -1896,15 +1918,16 @@ public abstract class DomNode
         return buffer.toString();
       case TEXT_NODE:
       case CDATA_SECTION_NODE:
-        if (!((Text) this).isElementContentWhitespace())
+        if (((Text) this).isElementContentWhitespace())
           {
-            return getNodeValue();
+            return "";
           }
-        // fall through
+        return getNodeValue();
       case COMMENT_NODE:
       case PROCESSING_INSTRUCTION_NODE:
+        return topLevel ? getNodeValue() : "";
       default:
-        return "";
+        return null;
       }
   }
 
@@ -2030,10 +2053,17 @@ public abstract class DomNode
 
   public Object setUserData(String key, Object data, UserDataHandler handler)
   {
-    // TODO handler
     if (userData == null)
       {
         userData = new HashMap();
+      }
+    if (handler != null)
+      {
+        if (userDataHandlers == null)
+          {
+            userDataHandlers = new HashMap();
+          }
+        userDataHandlers.put(key, handler);
       }
     return userData.put(key, data);
   }

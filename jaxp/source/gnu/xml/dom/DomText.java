@@ -1,5 +1,7 @@
 /*
+ * DomText.java
  * Copyright (C) 1999-2001 David Brownell
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -45,6 +47,7 @@ import org.w3c.dom.Text;
  * <p> "Text" implementation.  </p>
  *
  * @author David Brownell 
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class DomText
   extends DomCharacterData
@@ -200,7 +203,7 @@ public class DomText
         ref = ctx;
       }
     ctx = ref.next;
-    if (isEmpty || ref != this)
+    if ((isEmpty || ref != this) && parent != null)
       {
         parent.removeChild(ref);
       }
@@ -209,7 +212,7 @@ public class DomText
          ctx = ref)
       {
         ref = ctx.next;
-        if (isEmpty || ctx != this)
+        if ((isEmpty || ctx != this) && parent != null)
           {
             parent.removeChild(ctx);
           }

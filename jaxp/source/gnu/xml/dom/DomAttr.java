@@ -1,6 +1,6 @@
 /*
  * DomAttr.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -72,6 +72,7 @@ import org.w3c.dom.events.MutationEvent;
  * nodes you work with.</em> </p>
  *
  * @author David Brownell
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class DomAttr
   extends DomNsNode
@@ -105,7 +106,6 @@ public class DomAttr
     // report self-mutation
   }
   
-
   /**
    * <b>DOM L1</b>
    * Returns the attribute name (same as getNodeName)
@@ -115,7 +115,6 @@ public class DomAttr
     return getNodeName();
   }
   
-
   /**
    * <b>DOM L1</b>
    * Returns true if a parser reported this was in the source text.
@@ -125,7 +124,6 @@ public class DomAttr
     return specified;
   }
   
-
   /**
    * Records whether this attribute was in the source text.
    */
@@ -133,7 +131,6 @@ public class DomAttr
   {
     specified = value;
   }
-
 
   /**
    * <b>DOM L1</b>
@@ -159,7 +156,6 @@ public class DomAttr
     return buf.toString();
   }
   
-
   /**
    * <b>DOM L1</b>
    * Assigns the value of the attribute; it will have one child,
@@ -171,7 +167,6 @@ public class DomAttr
     setNodeValue(value);
   }
   
-
   /**
    * <b>DOM L1</b>
    * Returns the value of the attribute as a non-null string; same
@@ -183,7 +178,6 @@ public class DomAttr
     return getNodeValue();
   }
   
-
   /**
    * <b>DOM L1</b>
    * Assigns the attribute value; using this API, no entity or
@@ -209,7 +203,6 @@ public class DomAttr
     mutating(oldValue, value, MutationEvent.MODIFICATION);
   }
 
-
   /**
    * <b>DOM L2</b>
    * Returns the element with which this attribute is associated.
@@ -218,7 +211,6 @@ public class DomAttr
   {
     return (Element) parent;
   }
-
 
   /**
    * Records the element with which this attribute is associated.
@@ -294,7 +286,16 @@ public class DomAttr
             DTDAttributeTypeInfo info =
               doctype.getAttributeTypeInfo(parent.getNodeName(),
                                            getNodeName());
-            return ("ID".equals(info.type));
+            if (info != null && "ID".equals(info.type))
+              {
+                return true;
+              }
+          }
+        DomElement element = (DomElement) parent;
+        if (element.userIdAttrs != null &&
+            element.userIdAttrs.contains(this))
+          {
+            return true;
           }
         // TODO XML Schema implementation
       }

@@ -1,6 +1,6 @@
 /*
  * DomDocumentConfiguration.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -57,6 +57,7 @@ class DomDocumentConfiguration
   private static final List SUPPORTED_PARAMETERS =
     Arrays.asList(new String[] { "cdata-sections",
                   "comments",
+                  "element-content-whitespace",
                   "entities",
                   "error-handler",
                   "namespace-declarations",
@@ -65,6 +66,7 @@ class DomDocumentConfiguration
 
   boolean cdataSections = true;
   boolean comments = true;
+  boolean elementContentWhitespace = true;
   boolean entities = true;
   DOMErrorHandler errorHandler;
   boolean namespaceDeclarations = true;
@@ -82,13 +84,25 @@ class DomDocumentConfiguration
       {
         comments = "true".equals(value.toString());
       }
+    else if ("element-content-whitespace".equals(name))
+      {
+        elementContentWhitespace = "true".equals(value.toString());
+      }
     else if ("entities".equals(name))
       {
         entities = "true".equals(value.toString());
       }
     else if ("error-handler".equals(name))
       {
-        errorHandler = (DOMErrorHandler) value;
+        try
+          {
+            errorHandler = (DOMErrorHandler) value;
+          }
+        catch (ClassCastException e)
+          {
+            throw new DomEx(DomEx.TYPE_MISMATCH_ERR,
+                            value.getClass().getName(), null, 0);
+          }
       }
     else if ("namespace-declarations".equals(name))
       {
@@ -105,8 +119,25 @@ class DomDocumentConfiguration
             entities = false;
             cdataSections = false;
             namespaceDeclarations = true;
+            elementContentWhitespace = true;
             comments = true;
           }
+      }
+    else if (("canonical-form".equals(name) ||
+              "check-character-normalization".equals(name) ||
+              "datatype-normalization".equals(name) ||
+              "normalize-characters".equals(name) ||
+              "validate".equals(name) ||
+              "validate-if-schema".equals(name)) &&
+             "false".equals(value.toString()))
+      {
+        // NOOP
+      }
+    else if (("namespaces".equals(name) ||
+              "well-formed".equals(name)) &&
+             "true".equals(value.toString()))
+      {
+        // NOOP
       }
     else
       {
@@ -126,6 +157,10 @@ class DomDocumentConfiguration
       {
         return comments ? Boolean.TRUE : Boolean.FALSE;
       }
+    else if ("element-content-whitespace".equals(name))
+      {
+        return elementContentWhitespace ? Boolean.TRUE : Boolean.FALSE;
+      }
     else if ("entities".equals(name))
       {
         return entities ? Boolean.TRUE : Boolean.FALSE;
@@ -143,16 +178,15 @@ class DomDocumentConfiguration
         return comments ? Boolean.TRUE : Boolean.FALSE;
       }
     else if ("canonical-form".equals(name) ||
-        "check-character-normalization".equals(name) ||
-        "datatype-normalization".equals(name) ||
-        "normalize-characters".equals(name) ||
-        "validate".equals(name) ||
-        "validate-if-schema".equals(name))
+             "check-character-normalization".equals(name) ||
+             "datatype-normalization".equals(name) ||
+             "normalize-characters".equals(name) ||
+             "validate".equals(name) ||
+             "validate-if-schema".equals(name))
       {
         return Boolean.FALSE;
       }
-    else if ("element-content-whitespace".equals(name) ||
-             "namespaces".equals(name) ||
+    else if ("namespaces".equals(name) ||
              "well-formed".equals(name))
       {
         return Boolean.TRUE;
@@ -170,7 +204,29 @@ class DomDocumentConfiguration
   public boolean canSetParameter(String name, Object value)
   {
     name = name.toLowerCase();
-    return contains(name);
+    if ("error-handler".equals(name))
+      {
+        return (value == null || value instanceof DOMErrorHandler);
+      }
+    else if (contains(name))
+      {
+        return true;
+      }
+    else if ("canonical-form".equals(name) ||
+             "check-character-normalization".equals(name) ||
+             "datatype-normalization".equals(name) ||
+             "normalize-characters".equals(name) ||
+             "validate".equals(name) ||
+             "validate-if-schema".equals(name))
+      {
+        return "false".equals(value.toString());
+      }
+    else if ("namespaces".equals(name) ||
+             "well-formed".equals(name))
+      {
+        return "true".equals(value.toString());
+      }
+    return false;
   }
 
   public DOMStringList getParameterNames()

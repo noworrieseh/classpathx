@@ -1,6 +1,6 @@
 /*
  * DomCharacterData.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -51,6 +51,7 @@ import org.w3c.dom.events.MutationEvent;
  * interface (Text, Comment, CDATASection).  </p>
  *
  * @author David Brownell
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public abstract class DomCharacterData
   extends DomNode
@@ -81,13 +82,13 @@ public abstract class DomCharacterData
    */
   public void appendData(String arg)
   {
-	if (isReadonly())
+    if (isReadonly())
       {
 	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     String value = text + arg;
-	mutating(value);
-	text = value;
+    mutating(value);
+    text = value;
   }
   
   /**
@@ -97,22 +98,22 @@ public abstract class DomCharacterData
    */
   public void deleteData(int offset, int count)
   {
-	if (isReadonly())
+    if (isReadonly())
       {
-	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     char[] raw = text.toCharArray();
-	if (offset < 0 || count < 0 || offset > raw.length)
+    if (offset < 0 || count < 0 || offset > raw.length)
       {
-	    throw new DomEx(DomEx.INDEX_SIZE_ERR);
+        throw new DomEx(DomEx.INDEX_SIZE_ERR);
       }
-	if ((offset + count) > raw.length)
+    if ((offset + count) > raw.length)
       {
-	    count = raw.length - offset;
+        count = raw.length - offset;
       }
-	if (count == 0)
+    if (count == 0)
       {
-	    return;
+        return;
       }
     try
       {
@@ -154,7 +155,7 @@ public abstract class DomCharacterData
    */
   public int getLength()
   {
-	return text.length();
+    return text.length();
   }
   
   static final class EmptyNodeList
@@ -181,7 +182,7 @@ public abstract class DomCharacterData
    */
   final public NodeList getChildNodes()
   {
-	return theEmptyNodeList;
+    return theEmptyNodeList;
   }
 
   /**
@@ -190,19 +191,19 @@ public abstract class DomCharacterData
    */
   public void insertData(int offset, String arg)
   {
-	if (isReadonly())
+    if (isReadonly())
       {
 	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
       }
     char[] raw = text.toCharArray();
-	char[] tmp = arg.toCharArray ();
-	char[] buf = new char[raw.length + tmp.length];
-
-	try
+    char[] tmp = arg.toCharArray ();
+    char[] buf = new char[raw.length + tmp.length];
+    
+    try
       {
-	    System.arraycopy(raw, 0, buf, 0, offset);
-	    System.arraycopy(tmp, 0, buf, offset, tmp.length);
-	    System.arraycopy(raw, offset, buf, offset + tmp.length,
+        System.arraycopy(raw, 0, buf, 0, offset);
+        System.arraycopy(tmp, 0, buf, offset, tmp.length);
+        System.arraycopy(raw, offset, buf, offset + tmp.length,
                          raw.length - offset);
         String value = new String(buf);
 	    mutating(value);
@@ -246,9 +247,9 @@ public abstract class DomCharacterData
         // insertData
         char[] tmp = arg.toCharArray ();
         char[] buf2 = new char[buf.length + tmp.length];
-	    System.arraycopy(raw, 0, buf, 0, offset);
-	    System.arraycopy(tmp, 0, buf, offset, tmp.length);
-	    System.arraycopy(raw, offset, buf, offset + tmp.length,
+        System.arraycopy(raw, 0, buf, 0, offset);
+        System.arraycopy(tmp, 0, buf, offset, tmp.length);
+        System.arraycopy(raw, offset, buf, offset + tmp.length,
                          raw.length - offset);
         String value = new String(buf);
 	    mutating(value);
@@ -294,7 +295,7 @@ public abstract class DomCharacterData
    */
   public String substringData(int offset, int count)
   {
-	try
+    try
       {
         return text.substring(offset, count);
       }
@@ -310,17 +311,17 @@ public abstract class DomCharacterData
 
   private void mutating(String newValue)
   {
-	if (!reportMutations)
+    if (!reportMutations)
       {
 	    return;
       }
-
-	// EVENT:  DOMCharacterDataModified, target = this,
-	//	prev/new values provided
-	MutationEvent	event;
-
-	event = (MutationEvent) createEvent("MutationEvents");
-	event.initMutationEvent("DOMCharacterDataModified",
+    
+    // EVENT:  DOMCharacterDataModified, target = this,
+    //	prev/new values provided
+    MutationEvent	event;
+    
+    event = (MutationEvent) createEvent("MutationEvents");
+    event.initMutationEvent("DOMCharacterDataModified",
                             true /* bubbles */, false /* nocancel */,
                             null, text, newValue, null, (short) 0);
     dispatchEvent(event);

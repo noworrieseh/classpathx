@@ -1,6 +1,6 @@
 /*
  * DomElement.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -38,6 +38,9 @@
 
 package gnu.xml.dom;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,11 +52,18 @@ import org.w3c.dom.TypeInfo;
  * <p> "Element" implementation.
  *
  * @author David Brownell 
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class DomElement
   extends DomNsNode
   implements Element
 {
+
+  /**
+   * User-defined ID attributes.
+   * Used by DomAttr.isId and DomDocument.getElementById
+   */
+  Set userIdAttrs;
 
   // Attributes are VERY expensive in DOM, and not just for
   // this implementation.  Avoid creating them.
@@ -420,7 +430,7 @@ public class DomElement
                   }
                 else
                   {
-                    if (prefix.equals(qName.substring(6)))
+                    if (equal(prefix, qName.substring(6)))
                       {
                         return ctx.getNodeValue();
                       }
@@ -459,21 +469,45 @@ public class DomElement
 
   public void setIdAttribute(String name, boolean isId)
   {
-    // TODO XML Schema implementation
-    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
+    NamedNodeMap attrs = getAttributes();
+    Attr attr = (Attr) attrs.getNamedItem(name);
+    setIdAttributeNode(attr, isId);
   }
   
-  public void setIdAttributeNode(Attr isAddr, boolean isId)
+  public void setIdAttributeNode(Attr attr, boolean isId)
   {
-    // TODO XML Schema implementation
-    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
+    if (readonly)
+      {
+        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+      }
+    if (attr == null || attr.getOwnerElement() != this)
+      {
+        throw new DomEx(DomEx.NOT_FOUND_ERR);
+      }
+    if (isId)
+      {
+        if (userIdAttrs == null)
+          {
+            userIdAttrs = new HashSet();
+          }
+        userIdAttrs.add(attr);
+      }
+    else if (userIdAttrs != null)
+      {
+        userIdAttrs.remove(attr);
+        if (userIdAttrs.isEmpty())
+          {
+            userIdAttrs = null;
+          }
+      }
   }
 
   public void setIdAttributeNS(String namespaceURI, String localName,
                                boolean isId)
   {
-    // TODO XML Schema implementation
-    throw new DomEx(DomEx.INVALID_MODIFICATION_ERR);
+    NamedNodeMap attrs = getAttributes();
+    Attr attr = (Attr) attrs.getNamedItemNS(namespaceURI, localName);
+    setIdAttributeNode(attr, isId);
   }
   
 }

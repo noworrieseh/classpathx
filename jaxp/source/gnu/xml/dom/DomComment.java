@@ -1,6 +1,6 @@
 /*
  * DomComment.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -50,6 +50,7 @@ import org.w3c.dom.Document;
  * those comments at some point in the processing pipeline. </p>
  *
  * @author David Brownell
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class DomComment
   extends DomCharacterData

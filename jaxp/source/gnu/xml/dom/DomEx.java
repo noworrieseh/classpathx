@@ -1,6 +1,6 @@
 /*
  * DomEx.java
- * Copyright (C) 1999,2000,2001 The Free Software Foundation
+ * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -166,6 +166,8 @@ public class DomEx
         return "The operation violates XML Namespaces.";
       case INVALID_ACCESS_ERR:
         return "Parameter or operation isn't supported by this node.";
+      case TYPE_MISMATCH_ERR:
+        return "The type of the argument is incompatible with the expected type.";
       }
     return "Reserved exception number: " + code;
   }

@@ -187,6 +187,10 @@ public class DomNamedNodeMap
     String nodeName = ns ? null : node.getNodeName();
     String localName = ns ? node.getLocalName() : null;
     String namespaceURI = ns ? node.getNamespaceURI() : null;
+    if ("".equals(namespaceURI))
+      {
+        namespaceURI = null;
+      }
     
     // maybe attribute ADDITION events (?)
     
