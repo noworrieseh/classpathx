@@ -1,27 +1,33 @@
 package gnu.crypto.pad;
 
 // ----------------------------------------------------------------------------
-// $Id: PKCS7.java,v 1.1.1.1 2001-11-20 13:40:40 raif Exp $
+// $Id: PKCS7.java,v 1.2 2001-12-04 12:56:08 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
-// This program is free software; you can redistribute it and/or modify it under
-// the terms of the GNU Library General Public License as published by the Free
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free
 // Software Foundation; either version 2 of the License or (at your option) any
 // later version.
 //
 // This program is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more
-// details.
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+// more details.
 //
-// You should have received a copy of the GNU Library General Public License
-// along with this program; see the file COPYING. If not, write to the
+// You should have received a copy of the GNU General Public License along with
+// this program; see the file COPYING.  If not, write to the
 //
 //    Free Software Foundation Inc.,
 //    59 Temple Place - Suite 330,
 //    Boston, MA 02111-1307
 //    USA
+//
+// As a special exception, if you link this library with other files to produce
+// an executable, this library does not by itself cause the resulting
+// executable to be covered by the GNU General Public License.  This exception
+// does not however invalidate any other reasons why the executable file might
+// be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.util.Util;
@@ -34,14 +40,15 @@ import java.io.PrintWriter;
  * block sizes of up to 256 bytes in [PKCS-7].
  *
  * References:<br>
- * <a href="../rfc1423.txt">[RFC-1423]</a>Privacy Enhancement for Internet
- * Electronic Mail: Part III: Algorithms, Modes, and Identifiers.<br>
+ * <a href="http://www.ietf.org/rfc/rfc1423.txt">RFC-1423</a>: Privacy
+ * Enhancement for Internet Electronic Mail: Part III: Algorithms, Modes, and
+ * Identifiers.<br>
  * <a href="http://www.ietf.org/">IETF</a>.
- * <a href="../pkcs-7.txt">[PKCS-7]</a>PKCS #7: Cryptographic Message Syntax
- * Standard - An RSA Laboratories Technical Note.<br>
- * <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-7/">RSA Security</a>.
+ * <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-7/">[PKCS-7]</a>PKCS #7:
+ * Cryptographic Message Syntax Standard - An RSA Laboratories Technical Note.<br>
+ * <a href="http://www.rsasecurity.com/">RSA Security</a>.
  *
- * @version $Revision: 1.1.1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class PKCS7 extends BasePad {
 
