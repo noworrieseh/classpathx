@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: IRandom.java,v 1.4 2002-01-17 11:51:15 raif Exp $
+// $Id: IRandom.java,v 1.5 2002-06-08 05:22:18 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,13 +30,12 @@ package gnu.crypto.prng;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
-import java.security.GeneralSecurityException;
 import java.util.Map;
 
 /**
- * The basic visible methods of any pseudo-random number generator.
+ * <p>The basic visible methods of any pseudo-random number generator.</p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public interface IRandom {
 
@@ -46,12 +45,15 @@ public interface IRandom {
    // Methods
    // -------------------------------------------------------------------------
 
-   /** @return the canonical name of this instance. */
+   /**
+    * <p>Returns the canonical name of this instance.</p>
+    *
+    * @return the canonical name of this instance. */
    String name();
 
    /**
-    * Initialises the padding scheme with a designated block size, eventually
-    * seeding it in preparation for operations.
+    * <p>Initialises the padding scheme with a designated block size, eventually
+    * seeding it in preparation for operations.</p>
     *
     * @param attributes a set of name-value pairs that describe the desired
     * future instance behaviour.
@@ -61,7 +63,7 @@ public interface IRandom {
    void init(Map attributes);
 
    /**
-    * Returns the next 8 bits of random data generated from this instance.
+    * <p>Returns the next 8 bits of random data generated from this instance.</p>
     *
     * @return the next 8 bits of random data generated from this instance.
     * @exception IllegalStateException if the instance is not yet initialised.
@@ -71,9 +73,9 @@ public interface IRandom {
    byte nextByte() throws IllegalStateException, LimitReachedException;
 
    /**
-    * Fills the designated byte array, starting from byte at index <i>offset</i>,
-    * for a maximum of <code>length</code> bytes with the output of this
-    * generator instance.
+    * <p>Fills the designated byte array, starting from byte at index
+    * <code>offset</code>, for a maximum of <code>length</code> bytes with the
+    * output of this generator instance.
     *
     * @param out the placeholder to contain the generated random bytes.
     * @param offset the starting index in <i>out</i> to consider. This method
