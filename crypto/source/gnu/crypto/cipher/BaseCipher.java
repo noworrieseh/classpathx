@@ -1,9 +1,9 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseCipher.java,v 1.4 2001-12-04 12:56:08 raif Exp $
+// $Id: BaseCipher.java,v 1.5 2002-06-08 04:56:54 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -37,9 +37,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * A basic abstract class to facilitate implementing symmetric block ciphers.
+ * <p>A basic abstract class to facilitate implementing symmetric block ciphers.
+ * </p>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
 
@@ -68,7 +69,7 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
    // -------------------------------------------------------------------------
 
    /**
-    * Trivial constructor for use by concrete subclasses.<p>
+    * <p>Trivial constructor for use by concrete subclasses.</p>
     *
     * @param name the canonical name prefix of this instance.
     * @param defaultBlockSize the default block size in bytes.
@@ -85,8 +86,12 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // IBlockCipher interface implementation
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // IBlockCipher interface implementation -----------------------------------
+
+   public abstract Object clone();
 
    public String name() {
       StringBuffer sb = new StringBuffer(name).append('-');
@@ -171,8 +176,7 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
       return true;
    }
 
-   // own methods
-   // -------------------------------------------------------------------------
+   // own methods -------------------------------------------------------------
 
    private boolean testSymmetry(int ks, int bs) {
       try {

@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: IBlockCipher.java,v 1.3 2001-12-04 12:56:08 raif Exp $
+// $Id: IBlockCipher.java,v 1.4 2002-06-08 05:00:29 raif Exp $
 //
 // Copyright (C) 2001 Free Software Foundation, Inc.
 //
@@ -35,18 +35,20 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * The basic visible methods of any symmetric key block cipher.<p>
+ * <p>The basic visible methods of any symmetric key block cipher.</p>
  *
- * A symmetric key block cipher is a function that maps n-bit plaintext blocks
- * to n-bit ciphertext blocks; n being the cipher's <i>block size</i>. This
- * encryption function is parameterised by a k-bit key, and is invertible. Its
- * inverse is the decryption function.<p>
+ * <p>A symmetric key block cipher is a function that maps n-bit plaintext
+ * blocks to n-bit ciphertext blocks; n being the cipher's <i>block size</i>.
+ * This encryption function is parameterised by a k-bit key, and is invertible.
+ * Its inverse is the decryption function.</p>
  *
- * Possible initialisation values for an instance of this type are:
+ * <p>Possible initialisation values for an instance of this type are:</p>
+ *
  * <ul>
  *    <li>The block size in which to operate this block cipher instance. This
  *    value is <b>optional</b>, if unspecified, the block cipher's default
- *    block size shall be used.
+ *    block size shall be used.</li>
+ *
  *    <li>The byte array containing the user supplied key material to use for
  *    generating the cipher's session key(s). This value is <b>mandatory</b>
  *    and should be included in the initialisation parameters. If it isn't,
@@ -54,69 +56,76 @@ import java.util.Map;
  *    other than <tt>reset()</tt> is invoked on the instance.</li>
  * </ul>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public interface IBlockCipher {
+public interface IBlockCipher extends Cloneable {
 
    // Constants
    // -------------------------------------------------------------------------
 
    /**
-    * Property name of the user-supplied key material. The value associated to
-    * this property name is taken to be a byte array.
-    */
-   String KEY_MATERIAL = "gnu.crypto.key.material";
-
-   /**
-    * Property name of the block size in which to operate a block cipher. The
-    * value associated with this property name is taken to be a
-    * {@link java.lang.Integer}.
+    * <p>Property name of the block size in which to operate a block cipher.
+    * The value associated with this property name is taken to be an
+    * {@link Integer}.</p>
     */
    String CIPHER_BLOCK_SIZE = "gnu.crypto.cipher.block.size";
+
+   /**
+    * <p>Property name of the user-supplied key material. The value associated
+    * to this property name is taken to be a byte array.</p>
+    */
+   String KEY_MATERIAL = "gnu.crypto.cipher.key.material";
 
    // Methods
    // -------------------------------------------------------------------------
 
    /**
-    * Returns the canonical name of this instance.<p>
+    * <p>Returns the canonical name of this instance.</p>
     *
     * @return the canonical name of this instance.
     */
    String name();
 
    /**
-    * Returns the default value, in bytes, of the algorithm's block size.<p>
+    * <p>Returns the default value, in bytes, of the algorithm's block size.</p>
     *
     * @return the default value, in bytes, of the algorithm's block size.
     */
    int defaultBlockSize();
 
    /**
-    * Returns the default value, in bytes, of the algorithm's key size.<p>
+    * <p>Returns the default value, in bytes, of the algorithm's key size.</p>
     *
     * @return the default value, in bytes, of the algorithm's key size.
     */
    int defaultKeySize();
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported block sizes.
-    * Each element returned by this object is a {@link java.lang.Integer}.<p>
+    * <p>Returns an {@link Iterator} over the supported block sizes. Each
+    * element returned by this object is an {@link Integer}.</p>
     *
-    * @return an <tt>Iterator</tt> over the supported block sizes.
+    * @return an {@link Iterator} over the supported block sizes.
     */
    Iterator blockSizes();
 
    /**
-    * Returns an {@link java.util.Iterator} over the supported key sizes. Each
-    * element returned by this object is a {@link java.lang.Integer}.<p>
+    * <p>Returns an {@link Iterator} over the supported key sizes. Each element
+    * returned by this object is an {@link Integer}.</p>
     *
-    * @return an <tt>Iterator</tt> over the supported key sizes.
+    * @return an {@link Iterator} over the supported key sizes.
     */
    Iterator keySizes();
 
    /**
-    * Initialises the algorithm with designated attributes. Permissible names
-    * and values are described in the class documentation above.<p>
+    * <p>Returns a clone of this instance.</p>
+    *
+    * @return a clone copy of this instance.
+    */
+   Object clone();
+
+   /**
+    * <p>Initialises the algorithm with designated attributes. Permissible names
+    * and values are described in the class documentation above.</p>
     *
     * @param attributes a set of name-value pairs that describe the desired
     * future instance behaviour.
@@ -129,7 +138,7 @@ public interface IBlockCipher {
    throws InvalidKeyException, IllegalStateException;
 
    /**
-    * Returns the currently set block size for this instance.<p>
+    * <p>Returns the currently set block size for this instance.</p>
     *
     * @return the current block size for this instance.
     * @exception IllegalStateException if the instance is not initialised.
@@ -137,41 +146,43 @@ public interface IBlockCipher {
    int currentBlockSize() throws IllegalStateException;
 
    /**
-    * Resets the algorithm instance for re-initialisation and use with other
-    * characteristics. This method always succeeds.
+    * <p>Resets the algorithm instance for re-initialisation and use with other
+    * characteristics. This method always succeeds.</p>
     */
    void reset();
 
    /**
-    * Encrypts exactly one block of plaintext.<p>
+    * <p>Encrypts exactly one block of plaintext.</p>
     *
     * @param in the plaintext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
+    * @param inOffset index of <code>in</code> from which to start considering
+    * data.
     * @param out the ciphertext.
-    * @param outOffset index of <i>out</i> from which to store result.
+    * @param outOffset index of <code>out</code> from which to store result.
     * @exception IllegalStateException if the instance is not initialised.
     */
    void encryptBlock(byte[] in, int inOffset, byte[] out, int outOffset)
    throws IllegalStateException;
 
    /**
-    * Decrypts exactly one block of ciphertext.<p>
+    * <p>Decrypts exactly one block of ciphertext.</p>
     *
     * @param in the plaintext.
-    * @param inOffset index of <i>in</i> from which to start considering data.
+    * @param inOffset index of <code>in</code> from which to start considering
+    * data.
     * @param out the ciphertext.
-    * @param outOffset index of <i>out</i> from which to store result.
+    * @param outOffset index of <code>out</code> from which to store result.
     * @exception IllegalStateException if the instance is not initialised.
     */
    void decryptBlock(byte[] in, int inOffset, byte[] out, int outOffset)
    throws IllegalStateException;
 
    /**
-    * A basic symmetric encryption/decryption test for all supported block and
-    * key sizes.<p>
+    * <p>A basic symmetric encryption/decryption test for all supported block
+    * and key sizes.</p>
     *
-    * @return <tt>true</tt> if the implementation passes a basic symmetric
-    * self-test. Returns <tt>false</tt> otherwise.
+    * @return <code>true</code> if the implementation passes a basic symmetric
+    * self-test. Returns <code>false</code> otherwise.
     */
    boolean selfTest();
 }
