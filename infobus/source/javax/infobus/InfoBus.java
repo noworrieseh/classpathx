@@ -27,10 +27,179 @@ import java.util.Vector;
 /**
  * InfoBus.
  * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final	class		InfoBus
 				implements	PropertyChangeListener {
+
+	//-------------------------------------------------------------
+	// Inner Classes ----------------------------------------------
+	//-------------------------------------------------------------
+
+	/**
+	 * Prioritized Controller List.  Organizes Data Controllers
+	 * based on priority.
+	 * @author Andrew Selkirk
+	 * @version $Revision: 1.4 $
+	 */
+	class PrioritizedControllerList implements Cloneable {
+
+		//-------------------------------------------------------------
+		// Variables --------------------------------------------------
+		//-------------------------------------------------------------
+
+		/**
+		 * Data Controller list.  List is prioritized.
+		 */
+		private	Vector				controllerList	= null;
+
+		/**
+		 * Priority List.  There is a 1-1 matching of
+		 * priority vales and controller list.  List is
+		 * in prioritized ordering.
+		 */
+		private	Vector				priorityList	= null;
+
+		/**
+		 * Parent Infobus
+		 */
+		private	InfoBus				parent			= null;
+
+		/**
+		 * Synchonization locking object
+		 */
+		private transient Object	syncLock		= null;
+
+
+		//-------------------------------------------------------------
+		// Initialization ---------------------------------------------
+		//-------------------------------------------------------------
+
+		/**
+		 * Create PrioritizedControllerList
+		 */
+		protected PrioritizedControllerList() {
+			controllerList = new Vector();
+			priorityList = new Vector();
+		} // PrioritizedControllerList()
+
+		/**
+		 * Create PrioritizedControllerList
+		 * @param value1 What is this for?
+		 * @param value2 What is this for?
+		 * @param infoBus Parent Infobus
+		 */
+		protected PrioritizedControllerList(int capacity, int increment, InfoBus infoBus) {
+			parent = infoBus;
+			controllerList = new Vector(capacity, increment);
+			priorityList = new Vector(capacity, increment);
+		} // PrioritizedControllerList()
+
+
+		//-------------------------------------------------------------
+		// Public Accessor Methods ------------------------------------
+		//-------------------------------------------------------------
+
+		/**
+		 * Add data controller.
+		 * @param controller Data controller to add
+		 * @param priority Priority of controller
+		 */
+		protected void addDataController(InfoBusDataController controller,
+										 int priority) {
+
+			// Variables
+			int		index;
+			Integer	value;
+
+			for (index = 0; index < size(); index++) {
+				value = (Integer) priorityList.elementAt(index);
+				if (value.intValue() < priority) {
+					controllerList.insertElementAt(controller, index);
+					priorityList.insertElementAt(new Integer(priority),
+													index);
+					return;
+				}
+			} // for
+
+			controllerList.addElement(controller);
+			priorityList.addElement(new Integer(priority));
+
+		} // addDataController()
+
+		/**
+		 * Remove data controller.
+		 * @param controller Data controller to remove
+		 */
+		protected void removeDataController(InfoBusDataController controller) {
+
+			// Variables
+			int	index;
+
+			// Get Index of Controller
+			index = controllerList.indexOf(controller);
+
+			// Remove Controller
+			if (index != -1) {
+				controllerList.removeElementAt(index);
+				priorityList.removeElementAt(index);
+			} // if
+
+		} // removeDataController()
+
+		/**
+		 * Get clone of Data Controller list
+		 * @return Vector of controllers (in prioritized order)
+		 */
+		protected Vector getDCclone() {
+			return (Vector) controllerList.clone();
+		} // getDCclone()
+
+		/**
+		 * Clone.
+		 * @return Cloned PrioritizedDCList
+		 */
+		public Object clone() {
+			return this; // TODO
+		} // clone()
+
+		/**
+		 * Get size of Data Controller list.
+		 * @return Size of Data Controller list
+		 */
+		protected int size() {
+			return controllerList.size();
+		} // size()
+
+		/**
+		 * Get Data Controller at a specified position.
+		 * @param index Index of controller
+		 * @return Data Controller at specified position
+		 */
+		protected InfoBusDataController controllerAt(int index) {
+			return (InfoBusDataController) controllerList.get(index);
+		} // controllerAt()
+
+		/**
+		 * Get priority at a specified position.
+		 * @param index Index of controller
+		 * @return Priority at specified position
+		 */
+		protected int priorityAt(int index) {
+			return ((Integer) priorityList.get(index)).intValue();
+		} // priorityAt()
+
+		/**
+		 * Get enumeration of Data Controllers.
+		 * @return Enumeration of Data Controllers
+		 */
+		protected Enumeration elements() {
+			return controllerList.elements();
+		} // elements()
+
+
+	} // PrioritizedControllerList
+
 
 	//-------------------------------------------------------------
 	// Variables --------------------------------------------------
@@ -190,7 +359,7 @@ public final	class		InfoBus
 	/**
 	 * Prioritized list of data controllers
 	 */
-	private		PrioritizedDCList		controllerList		= null;
+	private		PrioritizedControllerList	controllerList		= null;
 
 	/**
 	 * Flag added controllers // TODO
@@ -216,7 +385,7 @@ public final	class		InfoBus
 		memberList		= new Vector();
 		producerList	= new Vector();
 		consumerList	= new Vector();
-		controllerList	= new PrioritizedDCList();
+		controllerList	= new PrioritizedControllerList();
 		defaultControl	= new DefaultController(this);
 		controllerList.addDataController(defaultControl,
 							DEFAULT_CONTROLLER_PRIORITY);
