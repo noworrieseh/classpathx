@@ -31,46 +31,45 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 /**
- * TransformerFactory
- * @author	Andrew Selkirk
+ * Abstract class extended by implementations.
+ *
+ * @author	Andrew Selkirk, David Brownell
  * @version	1.0
  */
 public abstract class TransformerFactory {
 
-	//-------------------------------------------------------------
-	// Variables --------------------------------------------------
-	//-------------------------------------------------------------
-
-	private static final String	defaultPropName =
-		"javax.xml.transform.TransformerFactory";
-
-	private static final boolean	debug		= false;
-	private static String		foundFactory	= null;
-
-
-	//-------------------------------------------------------------
-	// Initialization ---------------------------------------------
-	//-------------------------------------------------------------
-
+	/** Constructor, for use by subclasses. */
 	protected TransformerFactory() {
-	} // TransformerFactory()
+	}
 
 
 	//-------------------------------------------------------------
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
+	/**
+	 * Returns an object encapsulating the &lt;?xml-stylesheet&nbsp;?&gt;
+	 * processing instruction from the document that matches the
+	 * specified criteria.
+	 */
 	public abstract Source getAssociatedStylesheet(Source source, 
 		String media, String title, String charset) 
 		throws TransformerConfigurationException;
 
+	/** Returns an implementation-specific attribute */
 	public abstract Object getAttribute(String name) 
 		throws IllegalArgumentException;
 
+	/** Returns the ErrorListener used when parsing stylesheets. */
 	public abstract ErrorListener getErrorListener();
 
+	/**
+	 * Exposes capabilities of the underlying implementation.
+	 * Examples include SAXSource.FEATURE and DOMResult.FEATURE.
+	 */
 	public abstract boolean getFeature(String name);
 
+	/** Returns the URIResolver used when parsing stylesheets. */
 	public abstract URIResolver getURIResolver();
 
 
@@ -81,128 +80,55 @@ public abstract class TransformerFactory {
 	 *	system property,
 	 * <em>$JAVA_HOME/lib/jaxp.properties</em> for the key with
 	 *	that same name,
-	 * <em>JAR files in the class path with a <em>META-INF/services</em>
+	 * JAR files in the class path with a <em>META-INF/services</em>
 	 *	file with that same name,
 	 * else the compiled-in platform default.
 	 */
 	public static TransformerFactory newInstance() 
-			throws TransformerFactoryConfigurationError {
-
-		// Variables
-		Class			classObject;
-		TransformerFactory	factory;
-
-		// Locate Factory
-		foundFactory = findFactory(defaultPropName, 
+	throws TransformerFactoryConfigurationError
+	{
+	    try {
+		return (TransformerFactory) ClassStuff.createFactory (
+			"javax.xml.transform.TransformerFactory",
 			"com.icl.saxon.TransformerFactoryImpl"
+			// "gnu.xml.util.SAXNullTransformerFactory"
 			// "org.apache.xalan.processor.TransformerFactoryImpl"
 			);
-
-		try {
-
-			// Get Class
-			classObject = Class.forName(foundFactory);
-
-			// Instantiate Class
-			factory = (TransformerFactory)
-				    classObject.newInstance();
-
-			// Return Instance
-			return factory;
-
-		} catch (Exception e) {
-			throw new TransformerFactoryConfigurationError(e);
-		} // try		
-
+	    } catch (ClassCastException e) {
+		throw new TransformerFactoryConfigurationError(e);
+	    }
 	}
 
 
-	public abstract Templates newTemplates(Source source) 
+	/**
+	 * Returns a pre-compiled stylesheet.
+	 * @param stylesheet XSLT stylesheet specifying transform
+	 */
+	public abstract Templates newTemplates (Source stylesheet) 
 		throws TransformerConfigurationException;
 
+	/**
+	 * Returns a transformer that performs the null transform.
+	 */
 	public abstract Transformer newTransformer() 
 		throws TransformerConfigurationException;
 
-	public abstract Transformer newTransformer(Source source) 
+	/**
+	 * Returns a transformer making a specified transform.
+	 * @param stylesheet XSLT stylesheet specifying transform
+	 */
+	public abstract Transformer newTransformer (Source stylesheet) 
 		throws TransformerConfigurationException;
 
 
+	/** Assigns an implementation-specific attribute */
 	public abstract void setAttribute(String name, Object value)
 		throws IllegalArgumentException;
 
+	/** Assigns the ErrorListener used when parsing stylesheets. */
 	public abstract void setErrorListener(ErrorListener listener) 
 		throws IllegalArgumentException;
 
+	/** Assigns the URIResolver used when parsing stylesheets. */
 	public abstract void setURIResolver(URIResolver resolver);
-
-
-	// internals
-
-	private static String
-	findFactory (String property, String defaultValue)
-	{
-		String		factory;
-		String		javaHome;
-		File		file;
-		Properties	props;
-		ClassLoader	loader;
-		BufferedReader	br;
-		InputStream	stream;
-
-		// Check System Property
-		factory = System.getProperty(property);
-
-		// Check JAVA_HOME
-		try {
-			if (factory == null) {
-				javaHome = System.getProperty("java.home");
-				file = new File (new File (javaHome, "lib"),
-						"jaxp.properties");
-				if (file.exists() == true) {
-					props = new Properties();
-					props.load(new FileInputStream(file));
-					factory = props.getProperty(property);
-				}
-			}
-		} catch (Exception e1) {
-		}
-
-		// Check Services API
-		try {
-			if (factory == null) {
-
-				// Get Class Loader for Accessing resources
-				loader = TransformerFactory.class
-						.getClassLoader();
-				if (loader == null) {
-					loader = ClassLoader
-						.getSystemClassLoader();
-				}
-			
-				// Get Resource Stream
-				stream = loader.getResourceAsStream(
-					"META-INF/services/" + property);
-
-				// Stream Found, Read Entry
-				if (stream != null) {
-					br = new BufferedReader (
-						new InputStreamReader(stream));
-					factory = br.readLine();
-				}
-
-			}
-		} catch (Exception e2) {
-		}
-
-		// Otherwise, Use default
-		if (factory == null) {
-			factory = defaultValue;
-		}
-
-		// Return Factory
-		return factory;
-
-	}
 }
-
-
