@@ -1,0 +1,6 @@
+Andrew Selkirk did the initial work on the API classes and on the SMTP
+provider.
+
+Nic Ferrier wrote the IMAP provider.
+
+Chris Burdess wrote the POP3, Mbox and NNTP providers.
