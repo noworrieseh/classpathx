@@ -1,7 +1,7 @@
 package gnu.crypto.util;
 
 // ----------------------------------------------------------------------------
-// $Id: Util.java,v 1.3 2002-06-08 05:29:22 raif Exp $
+// $Id: Util.java,v 1.4 2002-06-24 11:56:33 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto.util;
 /**
  * <p>A collection of utility methods used throughout this project.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Util {
 
@@ -119,6 +119,43 @@ public class Util {
          buf[j++] = HEX_DIGITS[ k        & 0x0F];
       }
       return new String(buf);
+   }
+
+   /**
+    * <p>Returns a byte array from a string of hexadecimal digits.</p>
+    *
+    * @param s a string of hexadecimal ASCII characters
+    * @return the decoded byte array from the input hexadecimal string.
+    */
+   public static byte[] toBytesFromString(String s) {
+      int limit = s.length();
+      byte[] result = new byte[((limit + 1) / 2)];
+      int i = 0, j = 0;
+      if ((limit % 2) == 1) {
+         result[j++] = (byte) fromDigit(s.charAt(i++));
+      }
+      while (i < limit) {
+         result[j++] = (byte)(
+               (fromDigit(s.charAt(i++)) << 4) | fromDigit(s.charAt(i++)));
+      }
+      return result;
+   }
+
+   /**
+    * <p>Returns a number from <code>0</code> to <code>15</code> corresponding
+    * to the designated hexadecimal digit.</p>
+    *
+    * @param c a hexadecimal ASCII symbol.
+    */
+   public static int fromDigit(char c) {
+      if (c >= '0' && c <= '9') {
+         return c - '0';
+      } else if (c >= 'A' && c <= 'F') {
+         return c - 'A' + 10;
+      } else if (c >= 'a' && c <= 'f') {
+         return c - 'a' + 10;
+      } else
+         throw new IllegalArgumentException("Invalid hexadecimal digit: " + c);
    }
 
    /**
