@@ -313,9 +313,9 @@ FILES		:= \
 	AUTHORS ChangeLog COPYING LICENSE NEWS README THANKS \
 	build.xml configure configure.in Makefile.in \
 	etc/$(LIBNAME).mf \
-	lib/$(LIBNAME).jar  \
+	lib/$(LIBNAME).jar lib/$(LIBNAME)-test.jar  \
 
-$(LIBNAME)-$(VERSION).zip: $(FILES) lib/$(LIBNAME)-doc.zip $(SOURCEFILES) $(TESTFILES) $(PKGFILES)
+$(LIBNAME)-$(VERSION).zip: test javadoc $(FILES) $(SOURCEFILES) $(TESTFILES) $(PKGFILES)
 	for F in $(FILES) $(SOURCEFILES) $(PKGFILES) ;\
 	do \
 		 mkdir -p `dirname $(DIST_DIR)/$$F` ;\
@@ -324,9 +324,10 @@ $(LIBNAME)-$(VERSION).zip: $(FILES) lib/$(LIBNAME)-doc.zip $(SOURCEFILES) $(TEST
 	mkdir $(DIST_DIR)/docs
 	cd $(DIST_DIR)/docs; jar xf ../../lib/$(LIBNAME)-doc.zip
 	chmod +x $(DIST_DIR)/configure
-	cp lib/$(LIBNAME).jar $(DIST_DIR)/lib
 	# jar cMf $(LIBNAME)-$(VERSION).zip $(DIST_DIR)
 	zip -qr9 $(LIBNAME)-$(VERSION).zip $(DIST_DIR)
+	tar -cf $(LIBNAME)-$(VERSION).tar $(DIST_DIR)
+	gzip $(LIBNAME)-$(VERSION).tar
 	rm -rf $(DIST_DIR)
 
 # setup required jars
