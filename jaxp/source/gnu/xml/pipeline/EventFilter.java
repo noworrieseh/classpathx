@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.4 2001-07-10 21:22:02 db Exp $
+ * $Id: EventFilter.java,v 1.5 2001-07-10 22:55:41 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -92,8 +92,18 @@ import gnu.xml.util.DefaultHandler;
  *
  *	</ul>
  *
+ * <hr />
+ *
+ * <p> The {@link #bind} routine may be used associate event pipelines
+ * with any kind of {@link XMLReader} that will produce the events.
+ * Such pipelines don't necessarily need to have any members which are
+ * implemented using this class.  That routine has some intelligence
+ * which supports automatic changes to parser feature flags, letting
+ * event piplines become largely independent of the particular feature
+ * sets of parsers.
+ *
  * @author David Brownell
- * @version $Date: 2001-07-10 21:22:02 $
+ * @version $Date: 2001-07-10 22:55:41 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -113,6 +123,9 @@ public class EventFilter
     private ErrorHandler		errHandler;
 
     
+    /** SAX2 URI prefix for standard feature flags. */
+    public static final String		FEATURE_URI
+	= "http://xml.org/sax/features/";
     /** SAX2 URI prefix for standard properties (mostly for handlers). */
     public static final String		PROPERTY_URI
 	= "http://xml.org/sax/properties/";
@@ -120,37 +133,114 @@ public class EventFilter
     /** SAX2 property identifier for {@link DeclHandler} events */
     public static final String		DECL_HANDLER
 	= PROPERTY_URI + "declaration-handler";
-    /** SAX2 property identifier for {@link LexicallHandler} events */
+    /** SAX2 property identifier for {@link LexicalHandler} events */
     public static final String		LEXICAL_HANDLER
 	= PROPERTY_URI + "lexical-handler";
 
 
     /**
      * Binds the standard SAX2 handlers from the specified consumer
-     * to the specified producer.  These handlers include the core
+     * pipeline to the specified producer.  These handlers include the core
      * {@link ContentHandler} and {@link DTDHandler}, plus the extension
      * {@link DeclHandler} and {@link LexicalHandler}.  Any additional
      * application-specific handlers need to be bound separately.
+     * The {@link ErrorHandler} is handled differently:  the producer's
+     * error handler is passed through to the consumer pipeline.
      *
-     * <p> Note that this method works with any kind of event consumer,
-     * not just event filters.
+     * <p> At the head of the pipeline, certain standard event filters are
+     * recognized and handled specially.  This facilitates construction
+     * of processing pipelines that work regardless of the capabilities
+     * of the XMLReader implementation in use; for example, it permits
+     * validating output of a {@link gnu.xml.util.DomParser}. <ul>
      *
-     * @param producer will deliver events to the specifid consumer 
-     * @param consumer supplies event handlers to be associated
+     *	<li> {@link NSFilter} will be removed if the producer can be
+     *	told not to discard namespace data, using the "namespace-prefixes"
+     *	feature flag.
+     *
+     *	<li> {@link ValidationConsumer} will be removed if the producer
+     *	can be told to validate, using the "validation" feature flag.
+     *
+     *	<li> {@link WellFormednessFilter} is always removed, on the
+     *	grounds that no XMLReader is permitted to producee malformed
+     *	event streams and this would just be processing overhead.
+     *
+     *	<li> The first consumer which is not one of those classes stops
+     *	such special handling.  This means that if you want to force
+     *	one of those filters to be used, you could just precede it with
+     *	an instance of {@link EventFilter} configured as a pass-through.
+     *	You might need to do that if you are using an {@link NSFilter}
+     *	subclass to fix names found in attributes or character data.
+     *
+     *	</ul>
+     *
+     * <p> Other than that, this method works with any kind of event consumer,
+     * not just event filters.  Note that in all cases, the standard handlers
+     * are assigned; any previous handler assignments for the handler will
+     * be overridden.
+     *
+     * @param producer will deliver events to the specified consumer 
+     * @param consumer pipeline supplying event handlers to be associated
      *	with the producer
      */
     public static void bind (XMLReader producer, EventConsumer consumer)
     {
-	producer.setContentHandler (consumer.getContentHandler ());
-	producer.setDTDHandler (consumer.getDTDHandler ());
+	for (;;) {
+
+	    // change problematic SAX2 default
+	    if (consumer instanceof NSFilter) {
+		try {
+		    producer.setFeature (FEATURE_URI + "namespace-prefixes",
+			true);
+		    consumer = ((NSFilter)consumer).getNext ();
+		} catch (SAXException e) {
+		    break;
+		}
+
+	    // the parser _might_ do DTD validation by default ...
+	    } else if (consumer instanceof ValidationConsumer) {
+		try {
+		    producer.setFeature (FEATURE_URI + "validation",
+			true);
+		    consumer = ((ValidationConsumer)consumer).getNext ();
+		} catch (SAXException e) {
+		    break;
+		}
+
+	    // parsers are required not to have such bugs
+	    } else if (consumer instanceof WellFormednessFilter) {
+		consumer = ((WellFormednessFilter)consumer).getNext ();
+	    }
+	}
+
+	// Some SAX parsers can't handle null handlers -- bleech
+	DefaultHandler	h = new DefaultHandler ();
+
+	if (consumer.getContentHandler () != null)
+	    producer.setContentHandler (consumer.getContentHandler ());
+	else
+	    producer.setContentHandler (h);
+	if (consumer.getDTDHandler () != null)
+	    producer.setDTDHandler (consumer.getDTDHandler ());
+	else
+	    producer.setDTDHandler (h);
+
 	try {
-	    producer.setProperty (DECL_HANDLER,
-	    	consumer.getProperty (DECL_HANDLER));
+	    Object	dh = consumer.getProperty (DECL_HANDLER);
+	    if (dh == null)
+		dh = h;
+	    producer.setProperty (DECL_HANDLER, dh);
 	} catch (Exception e) { /* ignore */ }
 	try {
-	    producer.setProperty (LEXICAL_HANDLER,
-	    	consumer.getProperty (LEXICAL_HANDLER));
+	    Object	lh = consumer.getProperty (LEXICAL_HANDLER);
+	    if (lh == null)
+		lh = h;
+	    producer.setProperty (LEXICAL_HANDLER, lh);
 	} catch (Exception e) { /* ignore */ }
+
+	// this binding goes the other way around
+	if (producer.getErrorHandler () == null)
+	    producer.setErrorHandler (h);
+	consumer.setErrorHandler (producer.getErrorHandler ());
     }
     
     /**
