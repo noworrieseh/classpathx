@@ -573,7 +573,7 @@ fi
 
     # Need very new versions of GCJ for this:  GCJ 3.0.x won't work ...
     gcj_compile_tester='source/gnu/xml/dom/DomNode.java'
-    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&$5'
+    ac_gcj_test='gcj -C -Isource $gcj_compile_tester 1>&5'
     if { (eval echo configure:578: \"$ac_gcj_test\") 1>&5; (eval $ac_gcj_test) 2>&5; }; then
 	COMPILER='GCJ'
     else
