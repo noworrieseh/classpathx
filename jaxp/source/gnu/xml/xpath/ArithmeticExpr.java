@@ -93,7 +93,7 @@ final class ArithmeticExpr
       case MULTIPLY:
         return new Double(ln * rn);
       case DIVIDE:
-        if (rn == 0.0d)
+        if (rn == 0.0d || rn == -0.0d)
           {
             return new Double(ln < 0.0d ?
                               Double.NEGATIVE_INFINITY :
@@ -101,7 +101,7 @@ final class ArithmeticExpr
           }
         return new Double(ln / rn);
       case MODULO:
-        if (rn == 0.0d)
+        if (rn == 0.0d || rn == -0.0d)
           {
             return new Double(ln < 0.0d ?
                               Double.NEGATIVE_INFINITY :

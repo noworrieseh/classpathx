@@ -38,6 +38,8 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
@@ -104,11 +106,15 @@ abstract class AbstractNumberNode
 
   String format(int[] number)
   {
+    if (number.length == 0)
+      {
+        return "";
+      }
     int start = 0, end = 0, len = format.length(); // region of format
-    int pos = 0; // number index
-    StringBuffer buf = new StringBuffer();
-  
-    while (pos < number.length)
+    // Tokenize
+    List tokens = new ArrayList((number.length * 2) + 1);
+    List types = new ArrayList(tokens.size());
+    while (end < len)
       {
         while (end < len && !isAlphanumeric(format.charAt(end)))
           {
@@ -116,11 +122,8 @@ abstract class AbstractNumberNode
           }
         if (end > start)
           {
-            buf.append(format.substring(start, end));
-          }
-        else if (end > 0)
-          {
-            buf.append('.');
+            tokens.add(format.substring(start, end));
+            types.add(Boolean.FALSE);
           }
         start = end;
         while (end < len && isAlphanumeric(format.charAt(end)))
@@ -129,16 +132,59 @@ abstract class AbstractNumberNode
           }
         if (end > start)
           {
-            format(buf, number[pos], format.substring(start, end));
+            tokens.add(format.substring(start, end));
+            types.add(Boolean.TRUE);
+          }
+        start = end;
+      }
+    // Process tokens
+    StringBuffer buf = new StringBuffer();
+    len = tokens.size();
+    int pos = 0;
+    for (int i = 0; i < len; i++)
+      {
+        String token = (i < 0) ? "." : (String) tokens.get(i);
+        boolean alpha = (i < 0) ? true : 
+          ((Boolean) types.get(i)).booleanValue();
+        if (!alpha)
+          {
+            buf.append(token);
           }
         else
           {
-            format(buf, number[pos], "1");
+            if (pos < number.length)
+              {
+                format(buf, number[pos++], token);
+                if (((i + 1 == len) || (i + 2 == len)) &&
+                    (pos < number.length))
+                  {
+                    // More numbers than tokens, reuse last token
+                    i -= 2;
+                  }
+              }
+            if (pos == number.length && i < (len - 2))
+              {
+                // No more numbers. Skip to the end...
+                i = len - 2;
+                if (((Boolean) types.get(i + 1)).booleanValue())
+                  {
+                    // number formatting token, ignore
+                    i++;
+                  }
+              }
           }
-        pos++;
       }
+    //System.err.println("format: '"+format+"' "+asList(number)+" = '"+buf.toString()+"'");
     return buf.toString();
   }
+
+  /*List asList(int[] number)
+    {
+      List l = new ArrayList();
+      for (int i = 0; i < number.length; i++)
+        l.add(new Integer(number[i]));
+      return l;
+    }*/
 
   void format(StringBuffer buf, int number, String formatToken)
   {
@@ -211,7 +257,7 @@ abstract class AbstractNumberNode
       {
         int r = number % 26;
         number = number / 26;
-        buf.insert(0, (char) offset + r);
+        buf.insert(0, (char) (offset + r));
       }
     return buf.toString();
   }

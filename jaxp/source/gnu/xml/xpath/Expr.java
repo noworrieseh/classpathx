@@ -39,6 +39,8 @@
 package gnu.xml.xpath;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +48,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
@@ -74,6 +77,10 @@ public abstract class Expr
 
   protected static final Comparator documentOrderComparator =
     new DocumentOrderComparator();
+
+  protected static final DecimalFormat decimalFormat =
+    new DecimalFormat("################################.################################",
+                      new DecimalFormatSymbols(Locale.US));
 
   public Object evaluate(Object item, QName returnType)
     throws XPathExpressionException
@@ -306,13 +313,35 @@ public abstract class Expr
       }
     if (object instanceof Double)
       {
-        Double d = (Double) object;
-        String ret = d.toString();
-        if (ret.endsWith (".0"))
-          { 
-            ret = ret.substring(0, ret.length() - 2);
+        double d = ((Double) object).doubleValue();
+        if (Double.isNaN(d))
+          {
+            return "NaN";
           }
-        return ret;
+        else if (d == 0.0d)
+          {
+            return "0";
+          }
+        else if (Double.isInfinite(d))
+          {
+            if (d < 0)
+              {
+                return "-Infinity";
+              }
+            else
+              {
+                return "Infinity";
+              }
+          }
+        else
+          {
+            String ret = decimalFormat.format(d);
+            if (ret.endsWith (".0"))
+              { 
+                ret = ret.substring(0, ret.length() - 2);
+              }
+            return ret;
+          }
       }
     if (object instanceof Collection)
       {
@@ -389,7 +418,7 @@ public abstract class Expr
             return Double.NaN;
           }
       }
-    return 0.0; // TODO user-defined types
+    return Double.NaN; // TODO user-defined types
   }
 
   /**

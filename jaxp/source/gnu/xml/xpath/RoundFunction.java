@@ -74,7 +74,8 @@ final class RoundFunction
   {
     Object val = arg.evaluate(context, pos, len);
     double n = _number(context, val);
-    return (n == Double.NaN) ? new Double(n) : new Double(Math.round(n));
+    return (Double.isNaN(n) || Double.isInfinite(n)) ?
+      new Double(n) : new Double(Math.round(n));
   }
 
   public String toString()

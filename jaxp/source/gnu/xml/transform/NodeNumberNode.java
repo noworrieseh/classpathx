@@ -70,10 +70,10 @@ final class NodeNumberNode
 
   final int level;
   final Pattern count;
-  final Expr from;
+  final Pattern from;
 
   NodeNumberNode(TemplateNode children, TemplateNode next,
-                 int level, Pattern count, Expr from,
+                 int level, Pattern count, Pattern from,
                  String format, String lang,
                  int letterValue, String groupingSeparator, int groupingSize)
   {
@@ -87,7 +87,7 @@ final class NodeNumberNode
   int[] compute(Stylesheet stylesheet, Node context, int pos, int len)
     throws TransformerException
   {
-    if (from != null)
+    /*if (from != null)
       {
         Object ret = from.evaluate(context, pos, len);
         if (ret instanceof Collection)
@@ -108,14 +108,25 @@ final class NodeNumberNode
           {
             return new int[0];
           }
-      }
+      }*/
     Node current = context;
     switch (level)
       {
       case SINGLE:
-        while (context != null && !countMatches(current, context))
+        if (from == null)
           {
-            context = context.getParentNode();
+            while (context != null && !countMatches(current, context))
+              {
+                context = context.getParentNode();
+              }
+          }
+        else
+          {
+            while (context != null && !countMatches(current, context) &&
+                   !fromMatches(context))
+              {
+                context = context.getParentNode();
+              }
           }
         return (context == null) ? new int[0] :
           new int[] { (context == current) ? pos : getIndex(current, context) };
@@ -125,10 +136,14 @@ final class NodeNumberNode
           {
             if (countMatches(current, context))
               {
-                ancestors.add(context);
+                if (from == null || fromMatches(context))
+                  {
+                    ancestors.add(context);
+                  }
               }
             context = context.getParentNode();
           }
+        Collections.sort(ancestors, documentOrderComparator);
         int[] ret = new int[ancestors.size()];
         for (int i = 0; i < ret.length; i++)
           {
@@ -152,14 +167,13 @@ final class NodeNumberNode
                 if (countMatches(current, candidate))
                   {
                     candidates.add(candidate);
+                    if (from != null && from.matches(candidate))
+                      {
+                        break;
+                      }
                   }
               }
-            int[] ret2 = new int[candidates.size()];
-            for (int i = 0; i < ret2.length; i++)
-              {
-                ret2[i] = getIndex(current, (Node) candidates.get(i));
-              }
-            return ret2;
+            return new int[] { candidates.size() };
           }
         return new int[0];
       default:
@@ -199,6 +213,19 @@ final class NodeNumberNode
       {
         return count.matches(node);
       }
+  }
+
+  boolean fromMatches(Node node)
+  {
+    for (Node ctx = node.getParentNode(); ctx != null;
+         ctx = ctx.getParentNode())
+      {
+        if (from.matches(ctx))
+          {
+            return true;
+          }
+      }
+    return false;
   }
 
   int getIndex(Node current, Node node)

@@ -346,10 +346,11 @@ class Stylesheet
           case Node.COMMENT_NODE:
             return builtInNodeTemplate;
           case Node.TEXT_NODE:
-            if (!isPreserved((Text) context))
+            // Whitespace stripping doen initially by transformer
+            /*if (!isPreserved((Text) context))
               {
                 return null;
-              }
+              }*/
             // fall through
           case Node.ATTRIBUTE_NODE:
             return builtInTextTemplate;
@@ -395,7 +396,19 @@ class Stylesheet
     String n = getAttribute(attrs, "name");
     QName name = (n == null) ? null : getQName(n);
     String m = getAttribute(attrs, "match");
-    Pattern match = (m != null) ? (Pattern) xpath.compile(m) : null;
+    Pattern match = null;
+    if (m != null)
+      {
+        try
+          {
+            match = (Pattern) xpath.compile(m);
+          }
+        catch (ClassCastException e)
+          {
+            String msg = "illegal pattern: " + m;
+            throw new TransformerConfigurationException(msg);
+          }
+      }
     String p = getAttribute(attrs, "priority");
     String mm = getAttribute(attrs, "mode");
     QName mode = (mm == null) ? null : getQName(mm);
@@ -1167,7 +1180,9 @@ class Stylesheet
                       "any".equals(l) ? NodeNumberNode.ANY :
                       NodeNumberNode.SINGLE;
         String c = getAttribute(attrs, "count");
+        String f = getAttribute(attrs, "from");
         Pattern count = null;
+        Pattern from = null;
         if (c != null)
           {
             try
@@ -1176,16 +1191,22 @@ class Stylesheet
               }
             catch (ClassCastException e)
               {
-                throw new TransformerConfigurationException("invalid pattern: " +
-                                                            c);
+                String msg = "invalid pattern: " + c;
+                throw new TransformerConfigurationException(msg);
               }
           }
-        String f = getAttribute(attrs, "from");
-        if (f == null)
+        if (f != null)
           {
-            f = ".";
+            try
+              {
+                from = (Pattern) xpath.compile(f);
+              }
+            catch (ClassCastException e)
+              {
+                String msg = "invalid pattern: " + f;
+                throw new TransformerConfigurationException(msg);
+              }
           }
-        Expr from = (Expr) xpath.compile(f);
         return new NodeNumberNode(parse(children), parse(next),
                                   level, count, from,
                                   format, lang,
@@ -1352,6 +1373,8 @@ class Stylesheet
             Text text = (Text) node;
             if (!isPreserved(text))
               {
+                // Strip
+                text.getParentNode().removeChild(text);
                 return parse(next);
               }
             break;

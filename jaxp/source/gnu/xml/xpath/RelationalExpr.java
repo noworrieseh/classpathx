@@ -75,14 +75,14 @@ final class RelationalExpr
       }
     if (lt)
       {
-        if (ln < rn)
+        if (ln < rn || Double.isInfinite(rn))
           {
             return Boolean.TRUE;
           }
       }
     else
       {
-        if (ln > rn)
+        if (ln > rn || Double.isInfinite(ln))
           {
             return Boolean.TRUE;
           }

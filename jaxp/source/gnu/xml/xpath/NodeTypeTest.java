@@ -84,6 +84,8 @@ public final class NodeTypeTest
       case Node.CDATA_SECTION_NODE:
       case Node.COMMENT_NODE:
       case Node.PROCESSING_INSTRUCTION_NODE:
+      case Node.DOCUMENT_NODE:
+      case Node.DOCUMENT_FRAGMENT_NODE:
         if (type > 0)
           {
             if (nodeType != type)

@@ -70,9 +70,15 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
+import gnu.xml.dom.DomDocument;
 import gnu.xml.xpath.Expr;
 import gnu.xml.xpath.Root;
 
+/**
+ * The transformation process for a given stylesheet.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ */
 class TransformerImpl
   extends Transformer
 {
@@ -101,6 +107,7 @@ class TransformerImpl
   public void transform(Source xmlSource, Result outputTarget)
     throws TransformerException
   {
+    // Get the source tree
     DOMSource source;
     synchronized (factory.resolver)
       {
@@ -109,111 +116,146 @@ class TransformerImpl
         source = factory.resolver.resolveDOM(xmlSource, null, null);
       }
     Node context = source.getNode();
+    Document doc = (context instanceof Document) ? (Document) context :
+      context.getOwnerDocument();
+    if (doc instanceof DomDocument)
+      {
+        // Suppress mutation events
+        ((DomDocument) doc).setBuilding(true);
+        // TODO find a better/more generic way of doing this than
+        // casting
+      }
+    // Get the result tree
     Node parent = null, nextSibling = null;
     if (outputTarget instanceof DOMResult)
       {
         DOMResult dr = (DOMResult) outputTarget;
         parent = dr.getNode();
         nextSibling = dr.getNextSibling();
+
+        Document rdoc = (parent instanceof Document) ? (Document) parent :
+          parent.getOwnerDocument();
+        if (rdoc instanceof DomDocument)
+          {
+            // Suppress mutation events and allow multiple root elements
+            DomDocument drdoc = (DomDocument) rdoc;
+            drdoc.setBuilding(true);
+            drdoc.setCheckWellformedness(false);
+            // TODO find a better/more generic way of doing this than
+            // casting
+          }
       }
     boolean created = false;
     if (parent == null)
       {
-        Document doc = (context instanceof Document) ? (Document) context :
-          context.getOwnerDocument();
+        // Create a document fragment to hold the result
         parent = doc.createDocumentFragment();
         created = true;
       }
+    // Transformation
     int outputMethod = Stylesheet.OUTPUT_XML;
     String encoding = null;
     if (stylesheet != null)
       {
+        // Make a copy of the source node, and strip it
+        context = context.cloneNode(true);
+        strip(context);
         // XSLT transformation
-        TemplateNode t = stylesheet.getTemplate(null, context);
-        if (t != null)
+        try
           {
-            t.apply(stylesheet, null, context, 1, 1, parent, nextSibling);
-          }
-        outputMethod = stylesheet.outputMethod;
-        encoding = stylesheet.outputEncoding;
-        String publicId = stylesheet.outputPublicId;
-        String systemId = stylesheet.outputSystemId;
-        if (created)
-          {
-            Node root = parent.getFirstChild();
-            while (root != null && root.getNodeType() != Node.ELEMENT_NODE)
+            TemplateNode t = stylesheet.getTemplate(null, context);
+            if (t != null)
               {
-                root = root.getNextSibling();
+                t.apply(stylesheet, null, context, 1, 1, parent, nextSibling);
               }
-            if (root != null)
+            outputMethod = stylesheet.outputMethod;
+            encoding = stylesheet.outputEncoding;
+            String publicId = stylesheet.outputPublicId;
+            String systemId = stylesheet.outputSystemId;
+            if (created)
               {
-                // Now that we know the name of the root element we can create
-                // the document
-                Document doc = (context instanceof Document) ?
-                  (Document) context :
-                  context.getOwnerDocument();
-                DOMImplementation impl = doc.getImplementation();
-                DocumentType doctype = (publicId != null || systemId != null) ?
-                  impl.createDocumentType(root.getNodeName(),
-                                          publicId,
-                                          systemId) :
-                  null;
-                Document newDoc = impl.createDocument(root.getNamespaceURI(),
-                                                      root.getNodeName(),
-                                                      doctype);
-                Node newRoot = newDoc.getDocumentElement();
-                copyAttributes(newDoc, root, newRoot);
-                copyChildren(newDoc, root, newRoot);
-                parent = newDoc;
+                Node root = parent.getFirstChild();
+                while (root != null && root.getNodeType() != Node.ELEMENT_NODE)
+                  {
+                    root = root.getNextSibling();
+                  }
+                if (root != null)
+                  {
+                    // Now that we know the name of the root element,
+                    // we can create the document
+                    DOMImplementation impl = doc.getImplementation();
+                    DocumentType doctype =
+                      (publicId != null || systemId != null) ?
+                      impl.createDocumentType(root.getNodeName(),
+                                              publicId,
+                                              systemId) :
+                      null;
+                    Document newDoc = impl.createDocument(root.getNamespaceURI(),
+                                                          root.getNodeName(),
+                                                          doctype);
+                    Node newRoot = newDoc.getDocumentElement();
+                    copyAttributes(newDoc, root, newRoot);
+                    copyChildren(newDoc, root, newRoot);
+                    parent = newDoc;
+                  }
               }
-          }
-        /*
-        else if (publicId != null || systemId != null)
-          {
-            switch (parent.getNodeType())
-              {
+            /*
+               else if (publicId != null || systemId != null)
+               {
+               switch (parent.getNodeType())
+               {
               case Node.DOCUMENT_NODE:
               case Node.DOCUMENT_FRAGMENT_NODE:
-                Document doc = (parent instanceof Document) ?
-                  (Document) parent :
-                  parent.getOwnerDocument();
-                DOMImplementation impl = doc.getImplementation();
-                DocumentType doctype =
-                  impl.createDocumentType(doc.getNodeName(),
-                                          publicId,
-                                          systemId);
+              Document doc = (parent instanceof Document) ?
+              (Document) parent :
+              parent.getOwnerDocument();
+              DOMImplementation impl = doc.getImplementation();
+              DocumentType doctype =
+              impl.createDocumentType(doc.getNodeName(),
+              publicId,
+              systemId);
                 // Try to insert doctype before first element
                 Node ctx = parent.getFirstChild();
                 for (; ctx != null && ctx.getNodeType() != Node.ELEMENT_NODE;
-                     ctx = ctx.getNextSibling())
-                  {
-                  }
+                ctx = ctx.getNextSibling())
+                {
+                }
                 if (ctx != null)
-                  {
-                    parent.insertBefore(doctype, ctx);
-                  }
+                {
+                parent.insertBefore(doctype, ctx);
+                }
                 else
-                  {
-                    parent.appendChild(doctype);
-                  }
+                {
+                parent.appendChild(doctype);
+                }
+                }
+                }
+             */
+            if (stylesheet.outputVersion != null)
+              {
+                parent.setUserData("version", stylesheet.outputVersion, null);
               }
+            if (stylesheet.outputOmitXmlDeclaration)
+              {
+                parent.setUserData("omit-xml-declaration", "yes", null);
+              }
+            if (stylesheet.outputStandalone)
+              {
+                parent.setUserData("standalone", "yes", null);
+              }
+            // TODO cdata-section-elements
+            // TODO indent
+            // TODO media-type
           }
-          */
-        if (stylesheet.outputVersion != null)
+        catch (TransformerException e)
           {
-            parent.setUserData("version", stylesheet.outputVersion, null);
+            // Done transforming, reset document
+            if (doc instanceof DomDocument)
+              {
+                ((DomDocument) doc).setBuilding(false);
+              }
+            throw e;
           }
-        if (stylesheet.outputOmitXmlDeclaration)
-          {
-            parent.setUserData("omit-xml-declaration", "yes", null);
-          }
-        if (stylesheet.outputStandalone)
-          {
-            parent.setUserData("standalone", "yes", null);
-          }
-        // TODO cdata-section-elements
-        // TODO indent
-        // TODO media-type
       }
     else
       {
@@ -228,6 +270,7 @@ class TransformerImpl
             parent.appendChild(clone);
           }
       }
+    // Render result to the target device
     if (outputTarget instanceof DOMResult)
       {
         if (created)
@@ -298,6 +341,33 @@ class TransformerImpl
       }
   }
 
+  /**
+   * Strip whitespace from the source tree.
+   */
+  void strip(Node node)
+  {
+    short nt = node.getNodeType();
+    if (nt == Node.TEXT_NODE) // CDATA sections ?
+      {
+        if (!stylesheet.isPreserved((Text) node))
+          {
+            node.getParentNode().removeChild(node);
+          }
+      }
+    else
+      {
+        for (Node child = node.getFirstChild(); child != null;
+             child = child.getNextSibling())
+          {
+            strip(child);
+          }
+      }
+  }
+
+  /**
+   * Obtain a suitable output stream for writing the result to,
+   * and use the StreamSerializer to write the result tree to the stream.
+   */
   void writeStreamResult(Node node, StreamResult sr, int outputMethod,
                          String encoding)
     throws IOException

@@ -1,3 +1,10 @@
+2004-11-24  Chris Burdess  <dog@gnu.org>
+
+   	* dom: Don't create attribute text node unless required.
+   	* transform: Better whitespace stripping, xsl:number algorithm
+   	improvements
+	* xpath: Iprovements to math conformance.
+   	
 2004-11-23  Chris Burdess  <dog@gnu.org>
 
    	* dom: Use LS implementation for JAXP DocumentBuilder.
