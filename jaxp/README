@@ -1,0 +1,27 @@
+WHAT IS THIS
+    ... a work in progress!
+    
+    At this writing, components are being incrementally integrated.
+
+JAVA PACKAGES
+    
+    javax.xml.*		... JAXP 1.1 interfaces
+    org.xml.sax.*	... SAX2 interfaces
+    org.w3c.dom.*	... DOM Level 2 interfaces
+
+    gnu.xml.aelfred2.*	... SAX2 parsers (and JAXP glue)
+    gnu.xml.dom.*	... DOM level 2 (XML) implementation
+    gnu.xml.pipeline.*	... SAX2 event stream utilities
+    gnu.xml.util.*	... various XML utility classes
+
+LICENSING
+    The software in this package is distributed under the GNU
+    General Public License, with the exception of DOM interface
+    sources which are subject instead to the W3C license.
+
+	COPYING		... contains the GPL text.
+	COPYRIGHT.html	... contains the W3C license.
+    
+    The SAX/SAX2 files, originally in the public domain, have
+    been updated; those updates are under the GPL.  SAX2 APIs
+    remain unchanged.
