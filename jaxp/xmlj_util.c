@@ -32,14 +32,11 @@
 jstring
 xmljNewString (JNIEnv * env, const xmlChar * text)
 {
-  char *s_text;
   jstring ret;
 
   if (text == NULL)
     return NULL;
-  s_text = (char *) text;	/* TODO signedness? */
-  ret = (*env)->NewStringUTF (env, s_text);
-  /*free(s_text); */
+  ret = (*env)->NewStringUTF (env, (char *) text);
   return ret;
 }
 

@@ -22,13 +22,10 @@
 # 02111-1307 USA. 
 #
 
-#AC_INIT(libxmlj, 0.1.1)
-
 AC_INIT(source/javax/xml/parsers/SAXParserFactory.java)
 AC_CONFIG_SRCDIR(xmlj_util.c)
 AC_CONFIG_AUX_DIR(config)
 
-#AM_INIT_AUTOMAKE(libxmlj, 0.1.1)
 AM_INIT_AUTOMAKE(jaxp, 1.1)
 
 AC_JAVA_OPTIONS
@@ -37,9 +34,27 @@ AC_SUBST(LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(JAVACFLAGS)
+AC_SUBST(SOFLAGS)
 
 AC_CANONICAL_HOST
 AC_CHECK_CLASSPATH
+
+AC_SUBST(XMLJ_VERSION_MAJOR)
+XMLJ_VERSION_MAJOR="0"
+AC_SUBST(XMLJ_VERSION_MINOR)
+XMLJ_VERSION_MINOR="99"
+
+# Checks for header files.
+
+AM_PATH_XML([2.5.1],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
+	    AC_MSG_ERROR([unable to locate libxml.]))
+AM_PATH_XSLT([1.0.24],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
+	    AC_MSG_ERROR([unable to locate libxslt.]))
+
+# Libtool configuration
+
+SOFLAGS="-rpath \$(libdir)"
+LIBTOOL_PROG="${SHELL} ./libtool"
 
 # Checks for programs.
 
@@ -50,12 +65,11 @@ AC_PROG_JAVAC
 AC_PROG_JAVAH
 AC_PROG_JAR
 
-# Checks for header files.
+# Set SOSUFFIX and friends
 
-AM_PATH_XML([2.5.1],[CFLAGS="${CFLAGS}"] [CPPFLAGS="${CPPFLAGS}"] [LIBS="${XML_LIBS} ${LIBS}"] , 
-	    AC_MSG_ERROR([unable to locate libxml.]))
-AM_PATH_XSLT([1.0.24],[CFLAGS="${XSLT_CFLAGS} ${CFLAGS}"] [CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}"] [LIBS="${XSLT_LIBS} ${LIBS}"] , 
-	    AC_MSG_ERROR([unable to locate libxslt.]))
+SOSUFFIX_CONFIG
+MODSUFFIX_CONFIG
+JMODSUFFIX_CONFIG
 
 AC_CONFIG_FILES(Makefile)
 

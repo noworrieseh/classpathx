@@ -463,7 +463,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE JAVAPREFIX JAVACFLAGS JAVAFLAGS JAVA JAVAC CFLAGS CPPFLAGS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC LDFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL JAVAH JAR XML2_CONFIG XML_CFLAGS XML_LIBS XSLT_CONFIG XSLT_CFLAGS XSLT_LIBS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE JAVAPREFIX JAVACFLAGS JAVAFLAGS JAVA JAVAC CFLAGS CPPFLAGS SOFLAGS build build_cpu build_vendor build_os host host_cpu host_vendor host_os XMLJ_VERSION_MAJOR XMLJ_VERSION_MINOR XML2_CONFIG CC LDFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE XML_CFLAGS XML_LIBS XSLT_CONFIG XSLT_CFLAGS XSLT_LIBS EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL JAVAH JAR SOSUFFIX MODSUFFIX JMODSUFFIX LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1023,8 +1023,10 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-xmltest       Do not try to compile and run a test LIBXML program
   --disable-dependency-tracking Speeds up one-time builds
   --enable-dependency-tracking  Do not reject slow dependency extractors
+  --disable-xslttest       Do not try to compile and run a test LIBXSLT program
   --enable-shared[=PKGS]
                           build shared libraries [default=yes]
   --enable-static[=PKGS]
@@ -1032,25 +1034,22 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --disable-xmltest       Do not try to compile and run a test LIBXML program
-  --disable-xslttest       Do not try to compile and run a test LIBXSLT program
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-java-prefix=PREFIX  prefix where Java runtime is installed (optional)
+  --with-java-prefix=PFX  prefix where Java runtime is installed (optional)
   --with-javac-flags=FLAGS flags to pass to the Java compiler (optional)
   --with-java-flags=FLAGS flags to pass to the Java VM (optional)
-  --with-javac=Java compiler to use (optional)
+  --with-xml-prefix=PFX   Prefix where libxml is installed (optional)
+  --with-xml-exec-prefix=PFX Exec prefix where libxml is installed (optional)
+  --with-xslt-prefix=PFX   Prefix where libxslt is installed (optional)
+  --with-xslt-exec-prefix=PFX Exec prefix where libxslt is installed (optional)
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-tags[=TAGS]
                           include additional configurations [automatic]
-  --with-xml-prefix=PFX   Prefix where libxml is installed (optional)
-  --with-xml-exec-prefix=PFX Exec prefix where libxml is installed (optional)
-  --with-xslt-prefix=PFX   Prefix where libxslt is installed (optional)
-  --with-xslt-exec-prefix=PFX Exec prefix where libxslt is installed (optional)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1499,7 +1498,6 @@ ac_config_sub="$SHELL $ac_aux_dir/config.sub"
 ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 
 
-#AM_INIT_AUTOMAKE(libxmlj, 0.1.1)
 am__api_version="1.6"
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -1861,26 +1859,24 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 # Check whether --with-java-prefix or --without-java-prefix was given.
 if test "${with_java_prefix+set}" = set; then
   withval="$with_java_prefix"
-  JAVAPREFIX="$withval"
+
 fi;
 
 # Check whether --with-javac-flags or --without-javac-flags was given.
 if test "${with_javac_flags+set}" = set; then
   withval="$with_javac_flags"
-  JAVACFLAGS="$withval"
+
 fi;
 
 # Check whether --with-java-flags or --without-java-flags was given.
 if test "${with_java_flags+set}" = set; then
   withval="$with_java_flags"
-  JAVAFLAGS="$withval"
-fi;
 
-# Check whether --with-javac or --without-javac was given.
-if test "${with_javac+set}" = set; then
-  withval="$with_javac"
-  JAVAC="$withval"
 fi;
+JAVAPREFIX=$with_java_prefix
+JAVACFLAGS=$with_javac_flags
+JAVAFLAGS=$with_java_flags
+
 
 
 
@@ -1950,7 +1946,85 @@ else
 fi
 
 
-# Checks for programs.
+
+XMLJ_VERSION_MAJOR="0"
+
+XMLJ_VERSION_MINOR="99"
+
+# Checks for header files.
+
+rm -f .deps 2>/dev/null
+mkdir .deps 2>/dev/null
+if test -d .deps; then
+  DEPDIR=.deps
+else
+  # MS-DOS does not allow filenames that begin with a dot.
+  DEPDIR=_deps
+fi
+rmdir .deps 2>/dev/null
+
+
+          ac_config_commands="$ac_config_commands depfiles"
+
+
+am_make=${MAKE-make}
+cat > confinc << 'END'
+doit:
+	@echo done
+END
+# If we don't find an include directive, just comment out the code.
+echo "$as_me:$LINENO: checking for style of include used by $am_make" >&5
+echo $ECHO_N "checking for style of include used by $am_make... $ECHO_C" >&6
+am__include="#"
+am__quote=
+_am_result=none
+# First try GNU make style include.
+echo "include confinc" > confmf
+# We grep out `Entering directory' and `Leaving directory'
+# messages which can occur if `w' ends up in MAKEFLAGS.
+# In particular we don't look at `^make:' because GNU make might
+# be invoked under some other name (usually "gmake"), in which
+# case it prints its new name instead of `make'.
+if test "`$am_make -s -f confmf 2> /dev/null | fgrep -v 'ing directory'`" = "done"; then
+   am__include=include
+   am__quote=
+   _am_result=GNU
+fi
+# Now try BSD make style include.
+if test "$am__include" = "#"; then
+   echo '.include "confinc"' > confmf
+   if test "`$am_make -s -f confmf 2> /dev/null`" = "done"; then
+      am__include=.include
+      am__quote="\""
+      _am_result=BSD
+   fi
+fi
+
+
+echo "$as_me:$LINENO: result: $_am_result" >&5
+echo "${ECHO_T}$_am_result" >&6
+rm -f confinc confmf
+
+# Check whether --enable-dependency-tracking or --disable-dependency-tracking was given.
+if test "${enable_dependency_tracking+set}" = set; then
+  enableval="$enable_dependency_tracking"
+
+fi;
+if test "x$enable_dependency_tracking" != xno; then
+  am_depcomp="$ac_aux_dir/depcomp"
+  AMDEPBACKSLASH='\'
+fi
+
+
+if test "x$enable_dependency_tracking" != xno; then
+  AMDEP_TRUE=
+  AMDEP_FALSE='#'
+else
+  AMDEP_TRUE='#'
+  AMDEP_FALSE=
+fi
+
+
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -2819,79 +2893,1351 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-rm -f .deps 2>/dev/null
-mkdir .deps 2>/dev/null
-if test -d .deps; then
-  DEPDIR=.deps
+
+depcc="$CC"   am_compiler_list=
+
+echo "$as_me:$LINENO: checking dependency style of $depcc" >&5
+echo $ECHO_N "checking dependency style of $depcc... $ECHO_C" >&6
+if test "${am_cv_CC_dependencies_compiler_type+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  # MS-DOS does not allow filenames that begin with a dot.
-  DEPDIR=_deps
+  if test -z "$AMDEP_TRUE" && test -f "$am_depcomp"; then
+  # We make a subdir and do the tests there.  Otherwise we can end up
+  # making bogus files that we don't know about and never remove.  For
+  # instance it was reported that on HP-UX the gcc test will end up
+  # making a dummy file named `D' -- because `-MD' means `put the output
+  # in D'.
+  mkdir conftest.dir
+  # Copy depcomp to subdir because otherwise we won't find it if we're
+  # using a relative directory.
+  cp "$am_depcomp" conftest.dir
+  cd conftest.dir
+
+  am_cv_CC_dependencies_compiler_type=none
+  if test "$am_compiler_list" = ""; then
+     am_compiler_list=`sed -n 's/^#*\([a-zA-Z0-9]*\))$/\1/p' < ./depcomp`
+  fi
+  for depmode in $am_compiler_list; do
+    # We need to recreate these files for each test, as the compiler may
+    # overwrite some of them when testing with obscure command lines.
+    # This happens at least with the AIX C compiler.
+    echo '#include "conftest.h"' > conftest.c
+    echo 'int i;' > conftest.h
+    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+
+    case $depmode in
+    nosideeffect)
+      # after this tag, mechanisms are not by side-effect, so they'll
+      # only be used when explicitly requested
+      if test "x$enable_dependency_tracking" = xyes; then
+	continue
+      else
+	break
+      fi
+      ;;
+    none) break ;;
+    esac
+    # We check with `-c' and `-o' for the sake of the "dashmstdout"
+    # mode.  It turns out that the SunPro C++ compiler does not properly
+    # handle `-M -o', and we need to detect this.
+    if depmode=$depmode \
+       source=conftest.c object=conftest.o \
+       depfile=conftest.Po tmpdepfile=conftest.TPo \
+       $SHELL ./depcomp $depcc -c conftest.c -o conftest.o >/dev/null 2>&1 &&
+       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
+      am_cv_CC_dependencies_compiler_type=$depmode
+      break
+    fi
+  done
+
+  cd ..
+  rm -rf conftest.dir
+else
+  am_cv_CC_dependencies_compiler_type=none
 fi
-rmdir .deps 2>/dev/null
 
-
-          ac_config_commands="$ac_config_commands depfiles"
-
-
-am_make=${MAKE-make}
-cat > confinc << 'END'
-doit:
-	@echo done
-END
-# If we don't find an include directive, just comment out the code.
-echo "$as_me:$LINENO: checking for style of include used by $am_make" >&5
-echo $ECHO_N "checking for style of include used by $am_make... $ECHO_C" >&6
-am__include="#"
-am__quote=
-_am_result=none
-# First try GNU make style include.
-echo "include confinc" > confmf
-# We grep out `Entering directory' and `Leaving directory'
-# messages which can occur if `w' ends up in MAKEFLAGS.
-# In particular we don't look at `^make:' because GNU make might
-# be invoked under some other name (usually "gmake"), in which
-# case it prints its new name instead of `make'.
-if test "`$am_make -s -f confmf 2> /dev/null | fgrep -v 'ing directory'`" = "done"; then
-   am__include=include
-   am__quote=
-   _am_result=GNU
 fi
-# Now try BSD make style include.
-if test "$am__include" = "#"; then
-   echo '.include "confinc"' > confmf
-   if test "`$am_make -s -f confmf 2> /dev/null`" = "done"; then
-      am__include=.include
-      am__quote="\""
-      _am_result=BSD
-   fi
-fi
+echo "$as_me:$LINENO: result: $am_cv_CC_dependencies_compiler_type" >&5
+echo "${ECHO_T}$am_cv_CC_dependencies_compiler_type" >&6
+CCDEPMODE=depmode=$am_cv_CC_dependencies_compiler_type
 
 
-echo "$as_me:$LINENO: result: $_am_result" >&5
-echo "${ECHO_T}$_am_result" >&6
-rm -f confinc confmf
 
-# Check whether --enable-dependency-tracking or --disable-dependency-tracking was given.
-if test "${enable_dependency_tracking+set}" = set; then
-  enableval="$enable_dependency_tracking"
 
+
+# Check whether --with-xml-prefix or --without-xml-prefix was given.
+if test "${with_xml_prefix+set}" = set; then
+  withval="$with_xml_prefix"
+  xml_config_prefix="$withval"
+else
+  xml_config_prefix=""
 fi;
-if test "x$enable_dependency_tracking" != xno; then
-  am_depcomp="$ac_aux_dir/depcomp"
-  AMDEPBACKSLASH='\'
-fi
 
-
-if test "x$enable_dependency_tracking" != xno; then
-  AMDEP_TRUE=
-  AMDEP_FALSE='#'
+# Check whether --with-xml-exec-prefix or --without-xml-exec-prefix was given.
+if test "${with_xml_exec_prefix+set}" = set; then
+  withval="$with_xml_exec_prefix"
+  xml_config_exec_prefix="$withval"
 else
-  AMDEP_TRUE='#'
-  AMDEP_FALSE=
+  xml_config_exec_prefix=""
+fi;
+# Check whether --enable-xmltest or --disable-xmltest was given.
+if test "${enable_xmltest+set}" = set; then
+  enableval="$enable_xmltest"
+
+else
+  enable_xmltest=yes
+fi;
+
+  if test x$xml_config_exec_prefix != x ; then
+     xml_config_args="$xml_config_args --exec-prefix=$xml_config_exec_prefix"
+     if test x${XML2_CONFIG+set} != xset ; then
+        XML2_CONFIG=$xml_config_exec_prefix/bin/xml2-config
+     fi
+  fi
+  if test x$xml_config_prefix != x ; then
+     xml_config_args="$xml_config_args --prefix=$xml_config_prefix"
+     if test x${XML2_CONFIG+set} != xset ; then
+        XML2_CONFIG=$xml_config_prefix/bin/xml2-config
+     fi
+  fi
+
+  # Extract the first word of "xml2-config", so it can be a program name with args.
+set dummy xml2-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_XML2_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $XML2_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_XML2_CONFIG="$XML2_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_XML2_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_XML2_CONFIG" && ac_cv_path_XML2_CONFIG="no"
+  ;;
+esac
+fi
+XML2_CONFIG=$ac_cv_path_XML2_CONFIG
+
+if test -n "$XML2_CONFIG"; then
+  echo "$as_me:$LINENO: result: $XML2_CONFIG" >&5
+echo "${ECHO_T}$XML2_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  min_xml_version=2.5.1
+  echo "$as_me:$LINENO: checking for libxml - version >= $min_xml_version" >&5
+echo $ECHO_N "checking for libxml - version >= $min_xml_version... $ECHO_C" >&6
+  no_xml=""
+  if test "$XML2_CONFIG" = "no" ; then
+    no_xml=yes
+  else
+    XML_CFLAGS=`$XML2_CONFIG $xml_config_args --cflags`
+    XML_LIBS=`$XML2_CONFIG $xml_config_args --libs`
+    xml_config_major_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+    xml_config_minor_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
+    xml_config_micro_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
+    if test "x$enable_xmltest" = "xyes" ; then
+      ac_save_CFLAGS="$CFLAGS"
+      ac_save_LIBS="$LIBS"
+      CFLAGS="$CFLAGS $XML_CFLAGS"
+      LIBS="$XML_LIBS $LIBS"
+      rm -f conf.xmltest
+      if test "$cross_compiling" = yes; then
+  echo $ac_n "cross compiling; assumed OK... $ac_c"
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <libxml/tree.h>
+
+int
+main()
+{
+  int xml_major_version, xml_minor_version, xml_micro_version;
+  int major, minor, micro;
+  char *tmp_version;
+  int tmp_int_version;
+
+  system("touch conf.xmltest");
+
+  /* Capture xml2-config output via autoconf/configure variables */
+  /* HP/UX 9 (%@#!) writes to sscanf strings */
+  tmp_version = (char *)strdup("$min_xml_version");
+  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
+     printf("%s, bad version string from xml2-config\n", "$min_xml_version");
+     exit(1);
+   }
+   free(tmp_version);
+
+   /* Capture the version information from the header files */
+   tmp_int_version = LIBXML_VERSION;
+   xml_major_version=tmp_int_version / 10000;
+   xml_minor_version=(tmp_int_version - xml_major_version * 10000) / 100;
+   xml_micro_version=(tmp_int_version - xml_minor_version * 100 - xml_major_version * 10000);
+
+ /* Compare xml2-config output to the libxml headers */
+  if ((xml_major_version != $xml_config_major_version) ||
+      (xml_minor_version > $xml_config_minor_version)
+#if 0
+      ||
+/* The last released version of libxml-1.x has an incorrect micro version in
+ * the header file so neither the includes nor the library will match the
+ * micro_version to the output of xml2-config
+ */
+      (xml_micro_version != $xml_config_micro_version)
+#endif
+	  )
+
+    {
+      printf("*** libxml header files (version %d.%d.%d) do not match\n",
+         xml_major_version, xml_minor_version, xml_micro_version);
+      printf("*** xml2-config (version %d.%d.%d)\n",
+         $xml_config_major_version, $xml_config_minor_version, $xml_config_micro_version);
+      return 1;
+    }
+/* Compare the headers to the library to make sure we match */
+  /* Less than ideal -- doesn't provide us with return value feedback,
+   * only exits if there's a serious mismatch between header and library.
+   */
+    LIBXML_TEST_VERSION;
+
+    /* Test that the library is greater than our minimum version */
+    if (($xml_config_major_version > major) ||
+        (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
+        (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
+        ($xml_config_micro_version >= micro)))
+      {
+        return 0;
+       }
+     else
+      {
+        printf("\n*** An old version of libxml (%d.%d.%d) was found.\n",
+               xml_major_version, xml_minor_version, xml_micro_version);
+        printf("*** You need a version of libxml newer than %d.%d.%d. The latest version of\n",
+           major, minor, micro);
+        printf("*** libxml is always available from ftp://ftp.xmlsoft.org.\n");
+        printf("***\n");
+        printf("*** If you have already installed a sufficiently new version, this error\n");
+        printf("*** probably means that the wrong copy of the xml2-config shell script is\n");
+        printf("*** being found. The easiest way to fix this is to remove the old version\n");
+        printf("*** of LIBXML, but you can also set the XML2_CONFIG environment to point to the\n");
+        printf("*** correct copy of xml2-config. (In this case, you will have to\n");
+        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
+        printf("*** so that the correct libraries are found at run-time))\n");
+    }
+  return 1;
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+no_xml=yes
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+       CFLAGS="$ac_save_CFLAGS"
+       LIBS="$ac_save_LIBS"
+     fi
+  fi
+
+  if test "x$no_xml" = x ; then
+     echo "$as_me:$LINENO: result: yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&5
+echo "${ECHO_T}yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&6
+     CFLAGS="${CFLAGS}" CPPFLAGS="${CPPFLAGS}" LIBS="${XML_LIBS} ${LIBS}"
+  else
+     echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+     if test "$XML2_CONFIG" = "no" ; then
+       echo "*** The xml2-config script installed by LIBXML could not be found"
+       echo "*** If libxml was installed in PREFIX, make sure PREFIX/bin is in"
+       echo "*** your path, or set the XML2_CONFIG environment variable to the"
+       echo "*** full path to xml2-config."
+     else
+       if test -f conf.xmltest ; then
+        :
+       else
+          echo "*** Could not run libxml test program, checking why..."
+          CFLAGS="$CFLAGS $XML_CFLAGS"
+          LIBS="$LIBS $XML_LIBS"
+          cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <libxml/tree.h>
+#include <stdio.h>
+
+int
+main ()
+{
+ LIBXML_TEST_VERSION; return 0;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+   echo "*** The test program compiled, but did not run. This usually means"
+          echo "*** that the run-time linker is not finding LIBXML or finding the wrong"
+          echo "*** version of LIBXML. If it is not finding LIBXML, you'll need to set your"
+          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
+          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
+          echo "*** is required on your system"
+          echo "***"
+          echo "*** If you have an old version installed, it is best to remove it, although"
+          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ echo "*** The test program failed to compile or link. See the file config.log for the"
+          echo "*** exact error that occured. This usually means LIBXML was incorrectly installed"
+          echo "*** or that you have moved LIBXML since it was installed. In the latter case, you"
+          echo "*** may want to edit the xml2-config script: $XML2_CONFIG"
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+          CFLAGS="$ac_save_CFLAGS"
+          LIBS="$ac_save_LIBS"
+       fi
+     fi
+
+     XML_CFLAGS=""
+     XML_LIBS=""
+     { { echo "$as_me:$LINENO: error: unable to locate libxml." >&5
+echo "$as_me: error: unable to locate libxml." >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+
+
+  rm -f conf.xmltest
+
+
+
+# Check whether --with-xslt-prefix or --without-xslt-prefix was given.
+if test "${with_xslt_prefix+set}" = set; then
+  withval="$with_xslt_prefix"
+  xslt_config_prefix="$withval"
+else
+  xslt_config_prefix=""
+fi;
+
+# Check whether --with-xslt-exec-prefix or --without-xslt-exec-prefix was given.
+if test "${with_xslt_exec_prefix+set}" = set; then
+  withval="$with_xslt_exec_prefix"
+  xslt_config_exec_prefix="$withval"
+else
+  xslt_config_exec_prefix=""
+fi;
+# Check whether --enable-xslttest or --disable-xslttest was given.
+if test "${enable_xslttest+set}" = set; then
+  enableval="$enable_xslttest"
+
+else
+  enable_xslttest=no
+fi;
+
+  if test x$xslt_config_exec_prefix != x ; then
+     xslt_config_args="$xslt_config_args --exec-prefix=$xslt_config_exec_prefix"
+     if test x${XSLT_CONFIG+set} != xset ; then
+        XSLT_CONFIG=$xslt_config_exec_prefix/bin/xslt-config
+     fi
+  fi
+  if test x$xslt_config_prefix != x ; then
+     xslt_config_args="$xslt_config_args --prefix=$xslt_config_prefix"
+     if test x${XSLT_CONFIG+set} != xset ; then
+        XSLT_CONFIG=$xslt_config_prefix/bin/xslt-config
+     fi
+  fi
+
+  # Extract the first word of "xslt-config", so it can be a program name with args.
+set dummy xslt-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_XSLT_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $XSLT_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_XSLT_CONFIG="$XSLT_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_XSLT_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_XSLT_CONFIG" && ac_cv_path_XSLT_CONFIG="no"
+  ;;
+esac
+fi
+XSLT_CONFIG=$ac_cv_path_XSLT_CONFIG
+
+if test -n "$XSLT_CONFIG"; then
+  echo "$as_me:$LINENO: result: $XSLT_CONFIG" >&5
+echo "${ECHO_T}$XSLT_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  min_xslt_version=1.0.24
+  echo "$as_me:$LINENO: checking for libxslt - version >= $min_xslt_version" >&5
+echo $ECHO_N "checking for libxslt - version >= $min_xslt_version... $ECHO_C" >&6
+  no_xslt=""
+  if test "$XSLT_CONFIG" = "no" ; then
+    no_xslt=yes
+  else
+    XSLT_CFLAGS=`$XSLT_CONFIG $xslt_config_args --cflags`
+    XSLT_LIBS=`$XSLT_CONFIG $xslt_config_args --libs`
+    xslt_config_major_version=`$XSLT_CONFIG $xslt_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+    xslt_config_minor_version=`$XSLT_CONFIG $xslt_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
+    xslt_config_micro_version=`$XSLT_CONFIG $xslt_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
+    if test "x$enable_xslttest" = "xyes" ; then
+      ac_save_CFLAGS="$CFLAGS"
+      ac_save_LIBS="$LIBS"
+      CFLAGS="$CFLAGS $XSLT_CFLAGS"
+      LIBS="$XSLT_LIBS $LIBS"
+      rm -f conf.xslttest
+      if test "$cross_compiling" = yes; then
+  echo $ac_n "cross compiling; assumed OK... $ac_c"
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <libxslt/xslt.h>
+int
+main()
+{
+  int xslt_major_version, xslt_minor_version, xslt_micro_version;
+  int major, minor, micro;
+  char *tmp_version;
+
+  system("touch conf.xslttest");
+
+  /* Capture xslt-config output via autoconf/configure variables */
+  /* HP/UX 9 (%@#!) writes to sscanf strings */
+  tmp_version = (char *)strdup("$min_xslt_version");
+  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
+     printf("%s, bad version string from xslt-config\n", "$min_xslt_version");
+     exit(1);
+   }
+   free(tmp_version);
+
+   /* Capture the version information from the header files */
+   tmp_version = (char *)strdup(LIBXSLT_DOTTED_VERSION);
+   if (sscanf(tmp_version, "%d.%d.%d", &xslt_major_version, &xslt_minor_version, &xslt_micro_version) != 3) {
+     printf("%s, bad version string from libxslt includes\n", "LIBXSLT_DOTTED_VERSION");
+     exit(1);
+   }
+   free(tmp_version);
+
+ /* Compare xslt-config output to the libxslt headers */
+  if ((xslt_major_version != $xslt_config_major_version) ||
+      (xslt_minor_version != $xslt_config_minor_version) ||
+      (xslt_micro_version != $xslt_config_micro_version))
+    {
+      printf("*** libxslt header files (version %d.%d.%d) do not match\n",
+         xslt_major_version, xslt_minor_version, xslt_micro_version);
+      printf("*** xslt-config (version %d.%d.%d)\n",
+         $xslt_config_major_version, $xslt_config_minor_version, $xslt_config_micro_version);
+      return 1;
+    }
+/* Compare the headers to the library to make sure we match */
+  /* Less than ideal -- doesn't provide us with return value feedback,
+   * only exits if there's a serious mismatch between header and library.
+   */
+    /* copied from LIBXXML_TEST_VERSION; */
+    xmlCheckVersion(LIBXSLT_VERSION_STRING);
+
+    /* Test that the library is greater than our minimum version */
+    if ((xslt_major_version > major) ||
+        ((xslt_major_version == major) && (xslt_minor_version > minor)) ||
+        ((xslt_major_version == major) && (xslt_minor_version == minor) &&
+        (xslt_micro_version >= micro)))
+      {
+        return 0;
+       }
+     else
+      {
+        printf("\n*** An old version of libxslt (%d.%d.%d) was found.\n",
+               xslt_major_version, xslt_minor_version, xslt_micro_version);
+        printf("*** You need a version of libxslt newer than %d.%d.%d. The latest version of\n",
+           major, minor, micro);
+        printf("*** libxslt is always available from ftp://ftp.xmlsoft.org.\n");
+        printf("***\n");
+        printf("*** If you have already installed a sufficiently new version, this error\n");
+        printf("*** probably means that the wrong copy of the xslt-config shell script is\n");
+        printf("*** being found. The easiest way to fix this is to remove the old version\n");
+        printf("*** of LIBXSLT, but you can also set the XSLT_CONFIG environment to point to the\n");
+        printf("*** correct copy of xslt-config. (In this case, you will have to\n");
+        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
+        printf("*** so that the correct libraries are found at run-time))\n");
+    }
+  return 1;
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+no_xslt=yes
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+       CFLAGS="$ac_save_CFLAGS"
+       LIBS="$ac_save_LIBS"
+     fi
+  fi
+
+  if test "x$no_xslt" = x ; then
+     echo "$as_me:$LINENO: result: yes (version $xslt_config_major_version.$xslt_config_minor_version.$xslt_config_micro_version)" >&5
+echo "${ECHO_T}yes (version $xslt_config_major_version.$xslt_config_minor_version.$xslt_config_micro_version)" >&6
+     CFLAGS="${XSLT_CFLAGS} ${CFLAGS}" CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}" LIBS="${XSLT_LIBS} ${LIBS}"
+  else
+     echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+     if test "$XSLT_CONFIG" = "no" ; then
+       echo "*** The xslt-config script installed by LIBXSLT could not be found"
+       echo "*** If libxslt was installed in PREFIX, make sure PREFIX/bin is in"
+       echo "*** your path, or set the XSLT_CONFIG environment variable to the"
+       echo "*** full path to xslt-config."
+     else
+       if test -f conf.xslttest ; then
+        :
+       else
+          echo "*** Could not run libxslt test program, checking why..."
+          CFLAGS="$CFLAGS $XSLT_CFLAGS"
+          LIBS="$LIBS $XSLT_LIBS"
+          cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <libxslt/xslt.h>
+#include <stdio.h>
+
+int
+main ()
+{
+ LIBXSLT_TEST_VERSION; return 0;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+   echo "*** The test program compiled, but did not run. This usually means"
+          echo "*** that the run-time linker is not finding LIBXSLT or finding the wrong"
+          echo "*** version of LIBXSLT. If it is not finding LIBXSLT, you'll need to set your"
+          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
+          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
+          echo "*** is required on your system"
+          echo "***"
+          echo "*** If you have an old version installed, it is best to remove it, although"
+          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ echo "*** The test program failed to compile or link. See the file config.log for the"
+          echo "*** exact error that occured. This usually means LIBXSLT was incorrectly installed"
+          echo "*** or that you have moved LIBXSLT since it was installed. In the latter case, you"
+          echo "*** may want to edit the xslt-config script: $XSLT_CONFIG"
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+          CFLAGS="$ac_save_CFLAGS"
+          LIBS="$ac_save_LIBS"
+       fi
+     fi
+
+     XSLT_CFLAGS=""
+     XSLT_LIBS=""
+     { { echo "$as_me:$LINENO: error: unable to locate libxslt." >&5
+echo "$as_me: error: unable to locate libxslt." >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+
+
+  rm -f conf.xslttest
+
+
+# Libtool configuration
+
+SOFLAGS="-rpath \$(libdir)"
+LIBTOOL_PROG="${SHELL} ./libtool"
+
+# Checks for programs.
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}gcc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="${ac_tool_prefix}gcc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_CC"; then
+  ac_ct_CC=$CC
+  # Extract the first word of "gcc", so it can be a program name with args.
+set dummy gcc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="gcc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  CC=$ac_ct_CC
+else
+  CC="$ac_cv_prog_CC"
+fi
+
+if test -z "$CC"; then
+  if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}cc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="${ac_tool_prefix}cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_CC"; then
+  ac_ct_CC=$CC
+  # Extract the first word of "cc", so it can be a program name with args.
+set dummy cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  CC=$ac_ct_CC
+else
+  CC="$ac_cv_prog_CC"
+fi
+
+fi
+if test -z "$CC"; then
+  # Extract the first word of "cc", so it can be a program name with args.
+set dummy cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+  ac_prog_rejected=no
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    if test "$as_dir/$ac_word$ac_exec_ext" = "/usr/ucb/cc"; then
+       ac_prog_rejected=yes
+       continue
+     fi
+    ac_cv_prog_CC="cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+if test $ac_prog_rejected = yes; then
+  # We found a bogon in the path, so make sure we never use it.
+  set dummy $ac_cv_prog_CC
+  shift
+  if test $# != 0; then
+    # We chose a different compiler from the bogus one.
+    # However, it has the same basename, so the bogon will be chosen
+    # first if we set CC to just the basename; use the full file name.
+    shift
+    ac_cv_prog_CC="$as_dir/$ac_word${1+' '}$@"
+  fi
+fi
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$CC"; then
+  if test -n "$ac_tool_prefix"; then
+  for ac_prog in cl
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    test -n "$CC" && break
+  done
+fi
+if test -z "$CC"; then
+  ac_ct_CC=$CC
+  for ac_prog in cl
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_CC" && break
+done
+
+  CC=$ac_ct_CC
+fi
+
 fi
 
 
+test -z "$CC" && { { echo "$as_me:$LINENO: error: no acceptable C compiler found in \$PATH
+See \`config.log' for more details." >&5
+echo "$as_me: error: no acceptable C compiler found in \$PATH
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
 
+# Provide some information about the compiler.
+echo "$as_me:$LINENO:" \
+     "checking for C compiler version" >&5
+ac_compiler=`set X $ac_compile; echo $2`
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
+  (eval $ac_compiler --version </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler -v </dev/null >&5\"") >&5
+  (eval $ac_compiler -v </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler -V </dev/null >&5\"") >&5
+  (eval $ac_compiler -V </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+
+echo "$as_me:$LINENO: checking whether we are using the GNU C compiler" >&5
+echo $ECHO_N "checking whether we are using the GNU C compiler... $ECHO_C" >&6
+if test "${ac_cv_c_compiler_gnu+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+#ifndef __GNUC__
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_compiler_gnu=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_compiler_gnu=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+ac_cv_c_compiler_gnu=$ac_compiler_gnu
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_c_compiler_gnu" >&5
+echo "${ECHO_T}$ac_cv_c_compiler_gnu" >&6
+GCC=`test $ac_compiler_gnu = yes && echo yes`
+ac_test_CFLAGS=${CFLAGS+set}
+ac_save_CFLAGS=$CFLAGS
+CFLAGS="-g"
+echo "$as_me:$LINENO: checking whether $CC accepts -g" >&5
+echo $ECHO_N "checking whether $CC accepts -g... $ECHO_C" >&6
+if test "${ac_cv_prog_cc_g+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_prog_cc_g=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_prog_cc_g=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_cc_g" >&5
+echo "${ECHO_T}$ac_cv_prog_cc_g" >&6
+if test "$ac_test_CFLAGS" = set; then
+  CFLAGS=$ac_save_CFLAGS
+elif test $ac_cv_prog_cc_g = yes; then
+  if test "$GCC" = yes; then
+    CFLAGS="-g -O2"
+  else
+    CFLAGS="-g"
+  fi
+else
+  if test "$GCC" = yes; then
+    CFLAGS="-O2"
+  else
+    CFLAGS=
+  fi
+fi
+echo "$as_me:$LINENO: checking for $CC option to accept ANSI C" >&5
+echo $ECHO_N "checking for $CC option to accept ANSI C... $ECHO_C" >&6
+if test "${ac_cv_prog_cc_stdc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_prog_cc_stdc=no
+ac_save_CC=$CC
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdarg.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+/* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
+struct buf { int x; };
+FILE * (*rcsopen) (struct buf *, struct stat *, int);
+static char *e (p, i)
+     char **p;
+     int i;
+{
+  return p[i];
+}
+static char *f (char * (*g) (char **, int), char **p, ...)
+{
+  char *s;
+  va_list v;
+  va_start (v,p);
+  s = g (p, va_arg (v,int));
+  va_end (v);
+  return s;
+}
+int test (int i, double x);
+struct s1 {int (*f) (int a);};
+struct s2 {int (*f) (double a);};
+int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
+int argc;
+char **argv;
+int
+main ()
+{
+return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
+  ;
+  return 0;
+}
+_ACEOF
+# Don't try gcc -ansi; that turns off useful extensions and
+# breaks some systems' header files.
+# AIX			-qlanglvl=ansi
+# Ultrix and OSF/1	-std1
+# HP-UX 10.20 and later	-Ae
+# HP-UX older versions	-Aa -D_HPUX_SOURCE
+# SVR4			-Xc -D__EXTENSIONS__
+for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+do
+  CC="$ac_save_CC $ac_arg"
+  rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_prog_cc_stdc=$ac_arg
+break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext
+done
+rm -f conftest.$ac_ext conftest.$ac_objext
+CC=$ac_save_CC
+
+fi
+
+case "x$ac_cv_prog_cc_stdc" in
+  x|xno)
+    echo "$as_me:$LINENO: result: none needed" >&5
+echo "${ECHO_T}none needed" >&6 ;;
+  *)
+    echo "$as_me:$LINENO: result: $ac_cv_prog_cc_stdc" >&5
+echo "${ECHO_T}$ac_cv_prog_cc_stdc" >&6
+    CC="$CC $ac_cv_prog_cc_stdc" ;;
+esac
+
+# Some people use a C++ compiler to compile C.  Since we use `exit',
+# in C++ we need to declare it.  In case someone uses the same compiler
+# for both compiling C and C++ we need to have the C++ compiler decide
+# the declaration of exit, since it's the most demanding environment.
+cat >conftest.$ac_ext <<_ACEOF
+#ifndef __cplusplus
+  choke me
+#endif
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  for ac_declaration in \
+   ''\
+   '#include <stdlib.h>' \
+   'extern "C" void std::exit (int) throw (); using std::exit;' \
+   'extern "C" void std::exit (int); using std::exit;' \
+   'extern "C" void exit (int) throw ();' \
+   'extern "C" void exit (int);' \
+   'void exit (int);'
+do
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdlib.h>
+$ac_declaration
+int
+main ()
+{
+exit (42);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+continue
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_declaration
+int
+main ()
+{
+exit (42);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+done
+rm -f conftest*
+if test -n "$ac_declaration"; then
+  echo '#ifdef __cplusplus' >>confdefs.h
+  echo $ac_declaration      >>confdefs.h
+  echo '#endif'             >>confdefs.h
+fi
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 depcc="$CC"   am_compiler_list=
 
@@ -3501,7 +4847,6 @@ LTCC=${LTCC-"$CC"}
 # Allow CC to be a program name with arguments.
 compiler=$CC
 
-
 # Check whether --enable-libtool-lock or --disable-libtool-lock was given.
 if test "${enable_libtool_lock+set}" = set; then
   enableval="$enable_libtool_lock"
@@ -3533,7 +4878,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3536 "configure"' > conftest.$ac_ext
+  echo '#line 4881 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4997,7 +6342,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5000:" \
+echo "$as_me:6345:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6005,11 +7350,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6008: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7353: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6012: \$? = $ac_status" >&5
+   echo "$as_me:7357: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6237,11 +7582,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6240: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7585: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6244: \$? = $ac_status" >&5
+   echo "$as_me:7589: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6304,11 +7649,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6307: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7652: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6311: \$? = $ac_status" >&5
+   echo "$as_me:7656: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8330,7 +9675,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8333 "configure"
+#line 9678 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8428,7 +9773,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8431 "configure"
+#line 9776 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10591,11 +11936,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10594: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11939: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10598: \$? = $ac_status" >&5
+   echo "$as_me:11943: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10658,11 +12003,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10661: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12006: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10665: \$? = $ac_status" >&5
+   echo "$as_me:12010: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11901,7 +13246,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11904 "configure"
+#line 13249 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11999,7 +13344,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12002 "configure"
+#line 13347 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12824,11 +14169,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12827: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14172: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12831: \$? = $ac_status" >&5
+   echo "$as_me:14176: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12891,11 +14236,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12894: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14239: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12898: \$? = $ac_status" >&5
+   echo "$as_me:14243: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14848,11 +16193,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14851: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16196: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14855: \$? = $ac_status" >&5
+   echo "$as_me:16200: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15080,11 +16425,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15083: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16428: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15087: \$? = $ac_status" >&5
+   echo "$as_me:16432: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15147,11 +16492,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15150: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16495: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15154: \$? = $ac_status" >&5
+   echo "$as_me:16499: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17173,7 +18518,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17176 "configure"
+#line 18521 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17271,7 +18616,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17274 "configure"
+#line 18619 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18391,7 +19736,7 @@ fi
 
 
 if test "x$JAVAPREFIX" = x; then
-	test "x$JAVAC" = x && for ac_prog in "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT
+        test "x$JAVAC" = x && for ac_prog in "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18432,7 +19777,7 @@ fi
 done
 
 else
-	test "x$JAVAC" = x && for ac_prog in "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT
+        test "x$JAVAC" = x && for ac_prog in "gcj$EXEEXT -C" guavac$EXEEXT jikes$EXEEXT javac$EXEEXT
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18487,7 +19832,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 18490 "configure" */
+/* #line 19835 "configure" */
 public class Test {
 }
 EOF
@@ -18514,7 +19859,7 @@ echo "${ECHO_T}$ac_cv_prog_javac_works" >&6
 
 
 if test "x$JAVAPREFIX" = x; then
-	test "x$JAVAH" = x && for ac_prog in gcjh$EXEEXT
+        test "x$JAVAH" = x && for ac_prog in gcjh$EXEEXT
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18555,7 +19900,7 @@ fi
 done
 
 else
-	test "x$JAVAH" = x && for ac_prog in gcjh
+        test "x$JAVAH" = x && for ac_prog in gcjh
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18598,7 +19943,7 @@ test -n "$JAVAH" || JAVAH="$JAVAPREFIX"
 
 fi
 if test "x$JAVAPREFIX" = x; then
-	test "x$JAVAH" = x && for ac_prog in javah$EXEEXT
+        test "x$JAVAH" = x && for ac_prog in javah$EXEEXT
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18639,7 +19984,7 @@ fi
 done
 
 else
-	test "x$JAVAH" = x && for ac_prog in javah
+        test "x$JAVAH" = x && for ac_prog in javah
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -18684,6 +20029,11 @@ fi
 test "x$JAVAH" = x && { { echo "$as_me:$LINENO: error: no JNI header file generator found in \$PATH" >&5
 echo "$as_me: error: no JNI header file generator found in \$PATH" >&2;}
    { (exit 1); exit 1; }; }
+if test "x$JAVA_HOME" != x; then
+  CFLAGS="-I$JAVA_HOME/include $CFLAGS"
+else
+  echo "JAVA_HOME is not defined, I hope you have a working jni.h"
+fi
 
 if test x"`eval 'echo $ac_cv_path_JAVAH'`" != x ; then
   cat >conftest.$ac_ext <<_ACEOF
@@ -18720,7 +20070,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
     ac_save_CPPFLAGS="$CPPFLAGS"
     ac_dir=`echo $ac_cv_path_JAVAH | sed 's,\(.*\)/[^/]*/[^/]*$,\1/include,'`
-    ac_machdep=`echo $build_os | sed 's,[-0-9].*,,'`
+    ac_machdep=`echo $build_os | sed 's,[-0-9].*,,' | sed 's,cygwin,win32,'`
     CPPFLAGS="$ac_save_CPPFLAGS -I$ac_dir -I$ac_dir/$ac_machdep"
     cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
@@ -18852,609 +20202,92 @@ echo "$as_me: error: no acceptable jar program found in \$PATH" >&2;}
    { (exit 1); exit 1; }; }
 
 
-# Checks for header files.
+# Set SOSUFFIX and friends
+
+
+	echo "$as_me:$LINENO: checking SOSUFFIX from libtool" >&5
+echo $ECHO_N "checking SOSUFFIX from libtool... $ECHO_C" >&6
+	module=no
+
+	versuffix=""
+	release=""
+	libname=libfoo
+	eval _SOSUFFIX=\"$shrext\"
+	if test "X$_SOSUFFIX" = "X" ; then
+		_SOSUFFIX=".so"
+		if test `$LIBTOOL_PROG --config | grep build_libtool_libs | grep no` 2>/dev/null; then
+			if test "X$_SOSUFFIX_MESSAGE" = "X"; then
+				_SOSUFFIX_MESSAGE=yes
+        			{ echo "$as_me:$LINENO: WARNING: libtool may not know about this architecture." >&5
+echo "$as_me: WARNING: libtool may not know about this architecture." >&2;}
+               			{ echo "$as_me:$LINENO: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&5
+echo "$as_me: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&2;}
+			fi
+        	fi
+        fi
+
+        SOSUFFIX=$_SOSUFFIX
+	echo "$as_me:$LINENO: result: $SOSUFFIX" >&5
+echo "${ECHO_T}$SOSUFFIX" >&6
 
 
 
-# Check whether --with-xml-prefix or --without-xml-prefix was given.
-if test "${with_xml_prefix+set}" = set; then
-  withval="$with_xml_prefix"
-  xml_config_prefix="$withval"
-else
-  xml_config_prefix=""
-fi;
+	echo "$as_me:$LINENO: checking MODSUFFIX from libtool" >&5
+echo $ECHO_N "checking MODSUFFIX from libtool... $ECHO_C" >&6
+	module=yes
 
-# Check whether --with-xml-exec-prefix or --without-xml-exec-prefix was given.
-if test "${with_xml_exec_prefix+set}" = set; then
-  withval="$with_xml_exec_prefix"
-  xml_config_exec_prefix="$withval"
-else
-  xml_config_exec_prefix=""
-fi;
-# Check whether --enable-xmltest or --disable-xmltest was given.
-if test "${enable_xmltest+set}" = set; then
-  enableval="$enable_xmltest"
+	versuffix=""
+	release=""
+	libname=libfoo
+	eval _SOSUFFIX=\"$shrext\"
+	if test "X$_SOSUFFIX" = "X" ; then
+		_SOSUFFIX=".so"
+		if test `$LIBTOOL_PROG --config | grep build_libtool_libs | grep no` 2>/dev/null; then
+			if test "X$_SOSUFFIX_MESSAGE" = "X"; then
+				_SOSUFFIX_MESSAGE=yes
+        			{ echo "$as_me:$LINENO: WARNING: libtool may not know about this architecture." >&5
+echo "$as_me: WARNING: libtool may not know about this architecture." >&2;}
+               			{ echo "$as_me:$LINENO: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&5
+echo "$as_me: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&2;}
+			fi
+        	fi
+        fi
 
-else
-  enable_xmltest=yes
-fi;
-
-  if test x$xml_config_exec_prefix != x ; then
-     xml_config_args="$xml_config_args --exec-prefix=$xml_config_exec_prefix"
-     if test x${XML2_CONFIG+set} != xset ; then
-        XML2_CONFIG=$xml_config_exec_prefix/bin/xml2-config
-     fi
-  fi
-  if test x$xml_config_prefix != x ; then
-     xml_config_args="$xml_config_args --prefix=$xml_config_prefix"
-     if test x${XML2_CONFIG+set} != xset ; then
-        XML2_CONFIG=$xml_config_prefix/bin/xml2-config
-     fi
-  fi
-
-  # Extract the first word of "xml2-config", so it can be a program name with args.
-set dummy xml2-config; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_XML2_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $XML2_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_XML2_CONFIG="$XML2_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_XML2_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_XML2_CONFIG" && ac_cv_path_XML2_CONFIG="no"
-  ;;
-esac
-fi
-XML2_CONFIG=$ac_cv_path_XML2_CONFIG
-
-if test -n "$XML2_CONFIG"; then
-  echo "$as_me:$LINENO: result: $XML2_CONFIG" >&5
-echo "${ECHO_T}$XML2_CONFIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  min_xml_version=2.5.1
-  echo "$as_me:$LINENO: checking for libxml - version >= $min_xml_version" >&5
-echo $ECHO_N "checking for libxml - version >= $min_xml_version... $ECHO_C" >&6
-  no_xml=""
-  if test "$XML2_CONFIG" = "no" ; then
-    no_xml=yes
-  else
-    XML_CFLAGS=`$XML2_CONFIG $xml_config_args --cflags`
-    XML_LIBS=`$XML2_CONFIG $xml_config_args --libs`
-    xml_config_major_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    xml_config_minor_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    xml_config_micro_version=`$XML2_CONFIG $xml_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    if test "x$enable_xmltest" = "xyes" ; then
-      ac_save_CFLAGS="$CFLAGS"
-      ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $XML_CFLAGS"
-      LIBS="$XML_LIBS $LIBS"
-      rm -f conf.xmltest
-      if test "$cross_compiling" = yes; then
-  echo $ac_n "cross compiling; assumed OK... $ac_c"
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <libxml/tree.h>
-
-int
-main()
-{
-  int xml_major_version, xml_minor_version, xml_micro_version;
-  int major, minor, micro;
-  char *tmp_version;
-  int tmp_int_version;
-
-  system("touch conf.xmltest");
-
-  /* Capture xml2-config output via autoconf/configure variables */
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = (char *)strdup("$min_xml_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string from xml2-config\n", "$min_xml_version");
-     exit(1);
-   }
-   free(tmp_version);
-
-   /* Capture the version information from the header files */
-   tmp_int_version = LIBXML_VERSION;
-   xml_major_version=tmp_int_version / 10000;
-   xml_minor_version=(tmp_int_version - xml_major_version * 10000) / 100;
-   xml_micro_version=(tmp_int_version - xml_minor_version * 100 - xml_major_version * 10000);
-
- /* Compare xml2-config output to the libxml headers */
-  if ((xml_major_version != $xml_config_major_version) ||
-      (xml_minor_version > $xml_config_minor_version)
-#if 0
-      ||
-/* The last released version of libxml-1.x has an incorrect micro version in
- * the header file so neither the includes nor the library will match the
- * micro_version to the output of xml2-config
- */
-      (xml_micro_version != $xml_config_micro_version)
-#endif
-	  )
-
-    {
-      printf("*** libxml header files (version %d.%d.%d) do not match\n",
-         xml_major_version, xml_minor_version, xml_micro_version);
-      printf("*** xml2-config (version %d.%d.%d)\n",
-         $xml_config_major_version, $xml_config_minor_version, $xml_config_micro_version);
-      return 1;
-    }
-/* Compare the headers to the library to make sure we match */
-  /* Less than ideal -- doesn't provide us with return value feedback,
-   * only exits if there's a serious mismatch between header and library.
-   */
-    LIBXML_TEST_VERSION;
-
-    /* Test that the library is greater than our minimum version */
-    if (($xml_config_major_version > major) ||
-        (($xml_config_major_version == major) && ($xml_config_minor_version > minor)) ||
-        (($xml_config_major_version == major) && ($xml_config_minor_version == minor) &&
-        ($xml_config_micro_version >= micro)))
-      {
-        return 0;
-       }
-     else
-      {
-        printf("\n*** An old version of libxml (%d.%d.%d) was found.\n",
-               xml_major_version, xml_minor_version, xml_micro_version);
-        printf("*** You need a version of libxml newer than %d.%d.%d. The latest version of\n",
-           major, minor, micro);
-        printf("*** libxml is always available from ftp://ftp.xmlsoft.org.\n");
-        printf("***\n");
-        printf("*** If you have already installed a sufficiently new version, this error\n");
-        printf("*** probably means that the wrong copy of the xml2-config shell script is\n");
-        printf("*** being found. The easiest way to fix this is to remove the old version\n");
-        printf("*** of LIBXML, but you can also set the XML2_CONFIG environment to point to the\n");
-        printf("*** correct copy of xml2-config. (In this case, you will have to\n");
-        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
-        printf("*** so that the correct libraries are found at run-time))\n");
-    }
-  return 1;
-}
-
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  :
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-no_xml=yes
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-     fi
-  fi
-
-  if test "x$no_xml" = x ; then
-     echo "$as_me:$LINENO: result: yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&5
-echo "${ECHO_T}yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&6
-     CFLAGS="${CFLAGS}" CPPFLAGS="${CPPFLAGS}" LIBS="${XML_LIBS} ${LIBS}"
-  else
-     echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-     if test "$XML2_CONFIG" = "no" ; then
-       echo "*** The xml2-config script installed by LIBXML could not be found"
-       echo "*** If libxml was installed in PREFIX, make sure PREFIX/bin is in"
-       echo "*** your path, or set the XML2_CONFIG environment variable to the"
-       echo "*** full path to xml2-config."
-     else
-       if test -f conf.xmltest ; then
-        :
-       else
-          echo "*** Could not run libxml test program, checking why..."
-          CFLAGS="$CFLAGS $XML_CFLAGS"
-          LIBS="$LIBS $XML_LIBS"
-          cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <libxml/tree.h>
-#include <stdio.h>
-
-int
-main ()
-{
- LIBXML_TEST_VERSION; return 0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-   echo "*** The test program compiled, but did not run. This usually means"
-          echo "*** that the run-time linker is not finding LIBXML or finding the wrong"
-          echo "*** version of LIBXML. If it is not finding LIBXML, you'll need to set your"
-          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-          echo "*** is required on your system"
-          echo "***"
-          echo "*** If you have an old version installed, it is best to remove it, although"
-          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
- echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means LIBXML was incorrectly installed"
-          echo "*** or that you have moved LIBXML since it was installed. In the latter case, you"
-          echo "*** may want to edit the xml2-config script: $XML2_CONFIG"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-          CFLAGS="$ac_save_CFLAGS"
-          LIBS="$ac_save_LIBS"
-       fi
-     fi
-
-     XML_CFLAGS=""
-     XML_LIBS=""
-     { { echo "$as_me:$LINENO: error: unable to locate libxml." >&5
-echo "$as_me: error: unable to locate libxml." >&2;}
-   { (exit 1); exit 1; }; }
-  fi
-
-
-  rm -f conf.xmltest
+        MODSUFFIX=$_SOSUFFIX
+	echo "$as_me:$LINENO: result: $MODSUFFIX" >&5
+echo "${ECHO_T}$MODSUFFIX" >&6
 
 
 
-# Check whether --with-xslt-prefix or --without-xslt-prefix was given.
-if test "${with_xslt_prefix+set}" = set; then
-  withval="$with_xslt_prefix"
-  xslt_config_prefix="$withval"
-else
-  xslt_config_prefix=""
-fi;
+	echo "$as_me:$LINENO: checking JMODSUFFIX from libtool" >&5
+echo $ECHO_N "checking JMODSUFFIX from libtool... $ECHO_C" >&6
+	module=yes
 
-# Check whether --with-xslt-exec-prefix or --without-xslt-exec-prefix was given.
-if test "${with_xslt_exec_prefix+set}" = set; then
-  withval="$with_xslt_exec_prefix"
-  xslt_config_exec_prefix="$withval"
-else
-  xslt_config_exec_prefix=""
-fi;
-# Check whether --enable-xslttest or --disable-xslttest was given.
-if test "${enable_xslttest+set}" = set; then
-  enableval="$enable_xslttest"
+	versuffix=""
+	release=""
+	libname=libfoo
+	eval _SOSUFFIX=\"$shrext\"
+	if test "X$_SOSUFFIX" = "X" ; then
+		_SOSUFFIX=".so"
+		if test `$LIBTOOL_PROG --config | grep build_libtool_libs | grep no` 2>/dev/null; then
+			if test "X$_SOSUFFIX_MESSAGE" = "X"; then
+				_SOSUFFIX_MESSAGE=yes
+        			{ echo "$as_me:$LINENO: WARNING: libtool may not know about this architecture." >&5
+echo "$as_me: WARNING: libtool may not know about this architecture." >&2;}
+               			{ echo "$as_me:$LINENO: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&5
+echo "$as_me: WARNING: assuming $_SUFFIX suffix for dynamic libraries." >&2;}
+			fi
+        	fi
+        fi
 
-else
-  enable_xslttest=no
-fi;
+	if test `uname` = "Darwin"; then
+	    JMODSUFFIX=".jnilib"
+	else
+            JMODSUFFIX=$_SOSUFFIX
+	fi
+	echo "$as_me:$LINENO: result: $JMODSUFFIX" >&5
+echo "${ECHO_T}$JMODSUFFIX" >&6
 
-  if test x$xslt_config_exec_prefix != x ; then
-     xslt_config_args="$xslt_config_args --exec-prefix=$xslt_config_exec_prefix"
-     if test x${XSLT_CONFIG+set} != xset ; then
-        XSLT_CONFIG=$xslt_config_exec_prefix/bin/xslt-config
-     fi
-  fi
-  if test x$xslt_config_prefix != x ; then
-     xslt_config_args="$xslt_config_args --prefix=$xslt_config_prefix"
-     if test x${XSLT_CONFIG+set} != xset ; then
-        XSLT_CONFIG=$xslt_config_prefix/bin/xslt-config
-     fi
-  fi
-
-  # Extract the first word of "xslt-config", so it can be a program name with args.
-set dummy xslt-config; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_XSLT_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $XSLT_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_XSLT_CONFIG="$XSLT_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_XSLT_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_XSLT_CONFIG" && ac_cv_path_XSLT_CONFIG="no"
-  ;;
-esac
-fi
-XSLT_CONFIG=$ac_cv_path_XSLT_CONFIG
-
-if test -n "$XSLT_CONFIG"; then
-  echo "$as_me:$LINENO: result: $XSLT_CONFIG" >&5
-echo "${ECHO_T}$XSLT_CONFIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  min_xslt_version=1.0.24
-  echo "$as_me:$LINENO: checking for libxslt - version >= $min_xslt_version" >&5
-echo $ECHO_N "checking for libxslt - version >= $min_xslt_version... $ECHO_C" >&6
-  no_xslt=""
-  if test "$XSLT_CONFIG" = "no" ; then
-    no_xslt=yes
-  else
-    XSLT_CFLAGS=`$XSLT_CONFIG $xslt_config_args --cflags`
-    XSLT_LIBS=`$XSLT_CONFIG $xslt_config_args --libs`
-    xslt_config_major_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    xslt_config_minor_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    xslt_config_micro_version=`$XSLT_CONFIG $xslt_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    if test "x$enable_xslttest" = "xyes" ; then
-      ac_save_CFLAGS="$CFLAGS"
-      ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $XSLT_CFLAGS"
-      LIBS="$XSLT_LIBS $LIBS"
-      rm -f conf.xslttest
-      if test "$cross_compiling" = yes; then
-  echo $ac_n "cross compiling; assumed OK... $ac_c"
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <libxslt/xslt.h>
-int
-main()
-{
-  int xslt_major_version, xslt_minor_version, xslt_micro_version;
-  int major, minor, micro;
-  char *tmp_version;
-
-  system("touch conf.xslttest");
-
-  /* Capture xslt-config output via autoconf/configure variables */
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = (char *)strdup("$min_xslt_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string from xslt-config\n", "$min_xslt_version");
-     exit(1);
-   }
-   free(tmp_version);
-
-   /* Capture the version information from the header files */
-   tmp_version = (char *)strdup(LIBXSLT_DOTTED_VERSION);
-   if (sscanf(tmp_version, "%d.%d.%d", &xslt_major_version, &xslt_minor_version, &xslt_micro_version) != 3) {
-     printf("%s, bad version string from libxslt includes\n", "LIBXSLT_DOTTED_VERSION");
-     exit(1);
-   }
-   free(tmp_version);
-
- /* Compare xslt-config output to the libxslt headers */
-  if ((xslt_major_version != $xslt_config_major_version) ||
-      (xslt_minor_version != $xslt_config_minor_version) ||
-      (xslt_micro_version != $xslt_config_micro_version))
-    {
-      printf("*** libxslt header files (version %d.%d.%d) do not match\n",
-         xslt_major_version, xslt_minor_version, xslt_micro_version);
-      printf("*** xslt-config (version %d.%d.%d)\n",
-         $xslt_config_major_version, $xslt_config_minor_version, $xslt_config_micro_version);
-      return 1;
-    }
-/* Compare the headers to the library to make sure we match */
-  /* Less than ideal -- doesn't provide us with return value feedback,
-   * only exits if there's a serious mismatch between header and library.
-   */
-    /* copied from LIBXXML_TEST_VERSION; */
-    xmlCheckVersion(LIBXSLT_VERSION_STRING);
-
-    /* Test that the library is greater than our minimum version */
-    if ((xslt_major_version > major) ||
-        ((xslt_major_version == major) && (xslt_minor_version > minor)) ||
-        ((xslt_major_version == major) && (xslt_minor_version == minor) &&
-        (xslt_micro_version >= micro)))
-      {
-        return 0;
-       }
-     else
-      {
-        printf("\n*** An old version of libxslt (%d.%d.%d) was found.\n",
-               xslt_major_version, xslt_minor_version, xslt_micro_version);
-        printf("*** You need a version of libxslt newer than %d.%d.%d. The latest version of\n",
-           major, minor, micro);
-        printf("*** libxslt is always available from ftp://ftp.xmlsoft.org.\n");
-        printf("***\n");
-        printf("*** If you have already installed a sufficiently new version, this error\n");
-        printf("*** probably means that the wrong copy of the xslt-config shell script is\n");
-        printf("*** being found. The easiest way to fix this is to remove the old version\n");
-        printf("*** of LIBXSLT, but you can also set the XSLT_CONFIG environment to point to the\n");
-        printf("*** correct copy of xslt-config. (In this case, you will have to\n");
-        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
-        printf("*** so that the correct libraries are found at run-time))\n");
-    }
-  return 1;
-}
-
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  :
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-no_xslt=yes
-fi
-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-     fi
-  fi
-
-  if test "x$no_xslt" = x ; then
-     echo "$as_me:$LINENO: result: yes (version $xslt_config_major_version.$xslt_config_minor_version.$xslt_config_micro_version)" >&5
-echo "${ECHO_T}yes (version $xslt_config_major_version.$xslt_config_minor_version.$xslt_config_micro_version)" >&6
-     CFLAGS="${XSLT_CFLAGS} ${CFLAGS}" CPPFLAGS="${XSLT_CFLAGS} ${CPPFLAGS}" LIBS="${XSLT_LIBS} ${LIBS}"
-  else
-     echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-     if test "$XSLT_CONFIG" = "no" ; then
-       echo "*** The xslt-config script installed by LIBXSLT could not be found"
-       echo "*** If libxslt was installed in PREFIX, make sure PREFIX/bin is in"
-       echo "*** your path, or set the XSLT_CONFIG environment variable to the"
-       echo "*** full path to xslt-config."
-     else
-       if test -f conf.xslttest ; then
-        :
-       else
-          echo "*** Could not run libxslt test program, checking why..."
-          CFLAGS="$CFLAGS $XSLT_CFLAGS"
-          LIBS="$LIBS $XSLT_LIBS"
-          cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <libxslt/xslt.h>
-#include <stdio.h>
-
-int
-main ()
-{
- LIBXSLT_TEST_VERSION; return 0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-   echo "*** The test program compiled, but did not run. This usually means"
-          echo "*** that the run-time linker is not finding LIBXSLT or finding the wrong"
-          echo "*** version of LIBXSLT. If it is not finding LIBXSLT, you'll need to set your"
-          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-          echo "*** is required on your system"
-          echo "***"
-          echo "*** If you have an old version installed, it is best to remove it, although"
-          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
- echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means LIBXSLT was incorrectly installed"
-          echo "*** or that you have moved LIBXSLT since it was installed. In the latter case, you"
-          echo "*** may want to edit the xslt-config script: $XSLT_CONFIG"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-          CFLAGS="$ac_save_CFLAGS"
-          LIBS="$ac_save_LIBS"
-       fi
-     fi
-
-     XSLT_CFLAGS=""
-     XSLT_LIBS=""
-     { { echo "$as_me:$LINENO: error: unable to locate libxslt." >&5
-echo "$as_me: error: unable to locate libxslt." >&2;}
-   { (exit 1); exit 1; }; }
-  fi
-
-
-  rm -f conf.xslttest
 
 
           ac_config_files="$ac_config_files Makefile"
@@ -20137,6 +20970,7 @@ s,@JAVA@,$JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@CPPFLAGS@,$CPPFLAGS,;t t
+s,@SOFLAGS@,$SOFLAGS,;t t
 s,@build@,$build,;t t
 s,@build_cpu@,$build_cpu,;t t
 s,@build_vendor@,$build_vendor,;t t
@@ -20145,6 +20979,9 @@ s,@host@,$host,;t t
 s,@host_cpu@,$host_cpu,;t t
 s,@host_vendor@,$host_vendor,;t t
 s,@host_os@,$host_os,;t t
+s,@XMLJ_VERSION_MAJOR@,$XMLJ_VERSION_MAJOR,;t t
+s,@XMLJ_VERSION_MINOR@,$XMLJ_VERSION_MINOR,;t t
+s,@XML2_CONFIG@,$XML2_CONFIG,;t t
 s,@CC@,$CC,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
 s,@ac_ct_CC@,$ac_ct_CC,;t t
@@ -20157,6 +20994,11 @@ s,@AMDEP_TRUE@,$AMDEP_TRUE,;t t
 s,@AMDEP_FALSE@,$AMDEP_FALSE,;t t
 s,@AMDEPBACKSLASH@,$AMDEPBACKSLASH,;t t
 s,@CCDEPMODE@,$CCDEPMODE,;t t
+s,@XML_CFLAGS@,$XML_CFLAGS,;t t
+s,@XML_LIBS@,$XML_LIBS,;t t
+s,@XSLT_CONFIG@,$XSLT_CONFIG,;t t
+s,@XSLT_CFLAGS@,$XSLT_CFLAGS,;t t
+s,@XSLT_LIBS@,$XSLT_LIBS,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LN_S@,$LN_S,;t t
 s,@ECHO@,$ECHO,;t t
@@ -20176,12 +21018,9 @@ s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@JAVAH@,$JAVAH,;t t
 s,@JAR@,$JAR,;t t
-s,@XML2_CONFIG@,$XML2_CONFIG,;t t
-s,@XML_CFLAGS@,$XML_CFLAGS,;t t
-s,@XML_LIBS@,$XML_LIBS,;t t
-s,@XSLT_CONFIG@,$XSLT_CONFIG,;t t
-s,@XSLT_CFLAGS@,$XSLT_CFLAGS,;t t
-s,@XSLT_LIBS@,$XSLT_LIBS,;t t
+s,@SOSUFFIX@,$SOSUFFIX,;t t
+s,@MODSUFFIX@,$MODSUFFIX,;t t
+s,@JMODSUFFIX@,$JMODSUFFIX,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

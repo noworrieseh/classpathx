@@ -115,18 +115,25 @@ JAVAFLAGS = @JAVAFLAGS@
 JAVAH = @JAVAH@
 JAVAPREFIX = @JAVAPREFIX@
 JAVA_JUNIT = @JAVA_JUNIT@
+JMODSUFFIX = @JMODSUFFIX@
 JUNIT = @JUNIT@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+MODSUFFIX = @MODSUFFIX@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 RC = @RC@
+
+SOFLAGS = @SOFLAGS@
+SOSUFFIX = @SOSUFFIX@
 STRIP = @STRIP@
 TESTS_JUNIT = @TESTS_JUNIT@
 VERSION = @VERSION@
 XML2_CONFIG = @XML2_CONFIG@
+XMLJ_VERSION_MAJOR = @XMLJ_VERSION_MAJOR@
+XMLJ_VERSION_MINOR = @XMLJ_VERSION_MINOR@
 XML_CFLAGS = @XML_CFLAGS@
 XML_LIBS = @XML_LIBS@
 XSLT_CFLAGS = @XSLT_CFLAGS@
@@ -136,15 +143,12 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 uudecode = @uudecode@
+LIBMAJOR = @XMLJ_VERSION_MAJOR@
+LIBVERSION = @XMLJ_VERSION_MAJOR@.@XMLJ_VERSION_MINOR@
 
 src = @srcdir@/source
 dst = @srcdir@/classes
 doc = @srcdir@/apidoc
-
-JARFILE = gnujaxp.jar
-
-#data_DATA = ${JARFILE} - needs $(prefix)/share/java
-lib_LTLIBRARIES = libxmlj.la
 
 sources = \
 $(src)/org/w3c/dom/Attr.java \
@@ -495,9 +499,7 @@ gnu_xml_libxmlj_transform_JavaContext.h \
 gnu_xml_libxmlj_transform_LibxsltStylesheet.h
 
 
-libxmlj_la_DEPENDENCIES = $(headers)
-
-libxmlj_la_SOURCES = \
+jni_sources = \
 xmlj_dom.c \
 xmlj_error.c \
 xmlj_io.c \
@@ -508,8 +510,22 @@ xmlj_util.c \
 xmlj_xpath.c
 
 
-libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic -D_JNI_IMPLEMENTATION_
-libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
+jni_objects = $(patsubst %.c, %.o, $(jni_sources))
+jni_lobjects = $(patsubst %.c, %.lo, $(jni_sources))
+
+libj_jarfile = gnujaxp.jar
+
+#XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -export-dynamic -D_JNI_IMPLEMENTATION_
+XMLJ_LFLAGS = -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
+XMLJ_CFLAGS = $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -pedantic -Wall -fbounds-check
+LT_COMPILE = $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
+LT_LINK = $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
+LT_INSTALL = $(LIBTOOL) --mode=install $(INSTALL)
+
+libjso_base = libxmlj
+libjso = $(libjso_base)-$(LIBVERSION)@JMODSUFFIX@
+libjso_default = $(libjso_base)@JMODSUFFIX@
+libjso_target = $(libjso_base).la
 
 package_names = \
 javax.xml.parsers \
@@ -540,54 +556,21 @@ gnu.xml.pipeline \
 gnu.xml.util
 
 
-#BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
-BUILT_SOURCES = $(JARFILE) $(headers)
+BUILT_SOURCES = $(libj_jarfile) $(libjso_target)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LTLIBRARIES = $(lib_LTLIBRARIES)
-
-libxmlj_la_LIBADD =
-am_libxmlj_la_OBJECTS = libxmlj_la-xmlj_dom.lo libxmlj_la-xmlj_error.lo \
-	libxmlj_la-xmlj_io.lo libxmlj_la-xmlj_node.lo \
-	libxmlj_la-xmlj_sax.lo libxmlj_la-xmlj_transform.lo \
-	libxmlj_la-xmlj_util.lo libxmlj_la-xmlj_xpath.lo
-libxmlj_la_OBJECTS = $(am_libxmlj_la_OBJECTS)
-
-DEFS = @DEFS@
-DEFAULT_INCLUDES =  -I. -I$(srcdir)
-LDFLAGS = @LDFLAGS@
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
-am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/libxmlj_la-xmlj_dom.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_error.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_io.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_node.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_sax.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_transform.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_util.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
-	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libxmlj_la_SOURCES)
+DIST_SOURCES =
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
 	Makefile.in NEWS acinclude.m4 aclocal.m4 config/compile \
 	config/config.guess config/config.sub config/depcomp \
 	config/install-sh config/ltmain.sh config/missing \
 	config/mkinstalldirs configure configure.ac mkinstalldirs
-SOURCES = $(libxmlj_la_SOURCES)
-
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
 
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno
@@ -604,225 +587,6 @@ $(srcdir)/configure:  $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENC
 
 $(ACLOCAL_M4):  configure.ac acinclude.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-libLTLIBRARIES_INSTALL = $(INSTALL)
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    f="`echo $$p | sed -e 's|^.*/||'`"; \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(libdir)/$$f; \
-	  else :; fi; \
-	done
-
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	    p="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p"; \
-	  $(LIBTOOL) --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-	  test -z "$dir" && dir=.; \
-	  echo "rm -f \"$${dir}/so_locations\""; \
-	  rm -f "$${dir}/so_locations"; \
-	done
-libxmlj_la-xmlj_dom.lo: xmlj_dom.c
-libxmlj_la-xmlj_error.lo: xmlj_error.c
-libxmlj_la-xmlj_io.lo: xmlj_io.c
-libxmlj_la-xmlj_node.lo: xmlj_node.c
-libxmlj_la-xmlj_sax.lo: xmlj_sax.c
-libxmlj_la-xmlj_transform.lo: xmlj_transform.c
-libxmlj_la-xmlj_util.lo: xmlj_util.c
-libxmlj_la-xmlj_xpath.lo: xmlj_xpath.c
-libxmlj.la: $(libxmlj_la_OBJECTS) $(libxmlj_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libxmlj_la_LDFLAGS) $(libxmlj_la_OBJECTS) $(libxmlj_la_LIBADD) $(LIBS)
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT) core *.core
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_dom.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_error.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_io.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_node.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_sax.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_transform.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo@am__quote@
-
-distclean-depend:
-	-rm -rf ./$(DEPDIR)
-
-.c.o:
-@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(COMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
-
-.c.obj:
-@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(COMPILE) -c `cygpath -w $<`
-
-.c.lo:
-@AMDEP_TRUE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LTCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
-
-libxmlj_la-xmlj_dom.o: xmlj_dom.c
-@AMDEP_TRUE@	source='xmlj_dom.c' object='libxmlj_la-xmlj_dom.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_dom.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_dom.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_dom.o `test -f 'xmlj_dom.c' || echo '$(srcdir)/'`xmlj_dom.c
-
-libxmlj_la-xmlj_dom.obj: xmlj_dom.c
-@AMDEP_TRUE@	source='xmlj_dom.c' object='libxmlj_la-xmlj_dom.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_dom.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_dom.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_dom.obj `cygpath -w xmlj_dom.c`
-
-libxmlj_la-xmlj_dom.lo: xmlj_dom.c
-@AMDEP_TRUE@	source='xmlj_dom.c' object='libxmlj_la-xmlj_dom.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_dom.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_dom.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_dom.lo `test -f 'xmlj_dom.c' || echo '$(srcdir)/'`xmlj_dom.c
-
-libxmlj_la-xmlj_error.o: xmlj_error.c
-@AMDEP_TRUE@	source='xmlj_error.c' object='libxmlj_la-xmlj_error.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_error.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_error.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_error.o `test -f 'xmlj_error.c' || echo '$(srcdir)/'`xmlj_error.c
-
-libxmlj_la-xmlj_error.obj: xmlj_error.c
-@AMDEP_TRUE@	source='xmlj_error.c' object='libxmlj_la-xmlj_error.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_error.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_error.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_error.obj `cygpath -w xmlj_error.c`
-
-libxmlj_la-xmlj_error.lo: xmlj_error.c
-@AMDEP_TRUE@	source='xmlj_error.c' object='libxmlj_la-xmlj_error.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_error.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_error.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_error.lo `test -f 'xmlj_error.c' || echo '$(srcdir)/'`xmlj_error.c
-
-libxmlj_la-xmlj_io.o: xmlj_io.c
-@AMDEP_TRUE@	source='xmlj_io.c' object='libxmlj_la-xmlj_io.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_io.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_io.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_io.o `test -f 'xmlj_io.c' || echo '$(srcdir)/'`xmlj_io.c
-
-libxmlj_la-xmlj_io.obj: xmlj_io.c
-@AMDEP_TRUE@	source='xmlj_io.c' object='libxmlj_la-xmlj_io.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_io.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_io.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_io.obj `cygpath -w xmlj_io.c`
-
-libxmlj_la-xmlj_io.lo: xmlj_io.c
-@AMDEP_TRUE@	source='xmlj_io.c' object='libxmlj_la-xmlj_io.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_io.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_io.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_io.lo `test -f 'xmlj_io.c' || echo '$(srcdir)/'`xmlj_io.c
-
-libxmlj_la-xmlj_node.o: xmlj_node.c
-@AMDEP_TRUE@	source='xmlj_node.c' object='libxmlj_la-xmlj_node.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_node.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_node.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_node.o `test -f 'xmlj_node.c' || echo '$(srcdir)/'`xmlj_node.c
-
-libxmlj_la-xmlj_node.obj: xmlj_node.c
-@AMDEP_TRUE@	source='xmlj_node.c' object='libxmlj_la-xmlj_node.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_node.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_node.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_node.obj `cygpath -w xmlj_node.c`
-
-libxmlj_la-xmlj_node.lo: xmlj_node.c
-@AMDEP_TRUE@	source='xmlj_node.c' object='libxmlj_la-xmlj_node.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_node.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_node.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_node.lo `test -f 'xmlj_node.c' || echo '$(srcdir)/'`xmlj_node.c
-
-libxmlj_la-xmlj_sax.o: xmlj_sax.c
-@AMDEP_TRUE@	source='xmlj_sax.c' object='libxmlj_la-xmlj_sax.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_sax.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_sax.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_sax.o `test -f 'xmlj_sax.c' || echo '$(srcdir)/'`xmlj_sax.c
-
-libxmlj_la-xmlj_sax.obj: xmlj_sax.c
-@AMDEP_TRUE@	source='xmlj_sax.c' object='libxmlj_la-xmlj_sax.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_sax.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_sax.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_sax.obj `cygpath -w xmlj_sax.c`
-
-libxmlj_la-xmlj_sax.lo: xmlj_sax.c
-@AMDEP_TRUE@	source='xmlj_sax.c' object='libxmlj_la-xmlj_sax.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_sax.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_sax.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_sax.lo `test -f 'xmlj_sax.c' || echo '$(srcdir)/'`xmlj_sax.c
-
-libxmlj_la-xmlj_transform.o: xmlj_transform.c
-@AMDEP_TRUE@	source='xmlj_transform.c' object='libxmlj_la-xmlj_transform.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_transform.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_transform.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_transform.o `test -f 'xmlj_transform.c' || echo '$(srcdir)/'`xmlj_transform.c
-
-libxmlj_la-xmlj_transform.obj: xmlj_transform.c
-@AMDEP_TRUE@	source='xmlj_transform.c' object='libxmlj_la-xmlj_transform.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_transform.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_transform.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_transform.obj `cygpath -w xmlj_transform.c`
-
-libxmlj_la-xmlj_transform.lo: xmlj_transform.c
-@AMDEP_TRUE@	source='xmlj_transform.c' object='libxmlj_la-xmlj_transform.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_transform.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_transform.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_transform.lo `test -f 'xmlj_transform.c' || echo '$(srcdir)/'`xmlj_transform.c
-
-libxmlj_la-xmlj_util.o: xmlj_util.c
-@AMDEP_TRUE@	source='xmlj_util.c' object='libxmlj_la-xmlj_util.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_util.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_util.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_util.o `test -f 'xmlj_util.c' || echo '$(srcdir)/'`xmlj_util.c
-
-libxmlj_la-xmlj_util.obj: xmlj_util.c
-@AMDEP_TRUE@	source='xmlj_util.c' object='libxmlj_la-xmlj_util.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_util.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_util.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_util.obj `cygpath -w xmlj_util.c`
-
-libxmlj_la-xmlj_util.lo: xmlj_util.c
-@AMDEP_TRUE@	source='xmlj_util.c' object='libxmlj_la-xmlj_util.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_util.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_util.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_util.lo `test -f 'xmlj_util.c' || echo '$(srcdir)/'`xmlj_util.c
-
-libxmlj_la-xmlj_xpath.o: xmlj_xpath.c
-@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.o `test -f 'xmlj_xpath.c' || echo '$(srcdir)/'`xmlj_xpath.c
-
-libxmlj_la-xmlj_xpath.obj: xmlj_xpath.c
-@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.obj `cygpath -w xmlj_xpath.c`
-
-libxmlj_la-xmlj_xpath.lo: xmlj_xpath.c
-@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.lo `test -f 'xmlj_xpath.c' || echo '$(srcdir)/'`xmlj_xpath.c
-CCDEPMODE = @CCDEPMODE@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -833,42 +597,9 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-
-ETAGS = etags
-ETAGSFLAGS =
-
 tags: TAGS
+TAGS:
 
-ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '    { files[$$0] = 1; } \
-	       END { for (i in files) print i; }'`; \
-	mkid -fID $$unique
-
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	tags=; \
-	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '    { files[$$0] = 1; } \
-	       END { for (i in files) print i; }'`; \
-	test -z "$(ETAGS_ARGS)$$tags$$unique" \
-	  || $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	     $$tags $$unique
-
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && cd $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) $$here
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
 top_distdir = .
@@ -964,10 +695,9 @@ distcleancheck: distclean
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-local
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
 
 install: install-am
 install-exec: install-exec-am
@@ -996,13 +726,11 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool clean-local \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-distclean-am: clean-am distclean-compile distclean-depend \
-	distclean-generic distclean-libtool distclean-tags
+distclean-am: clean-am distclean-generic distclean-libtool
 
 dvi: dvi-am
 
@@ -1014,7 +742,7 @@ info-am:
 
 install-data-am: install-data-local
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am:
 
 install-info: install-info-am
 
@@ -1029,24 +757,19 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
-uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
+uninstall-am: uninstall-info-am
 
-.PHONY: GTAGS all all-am check check-am check-local clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool clean-local dist dist-all \
-	dist-gzip distcheck distclean distclean-compile \
-	distclean-depend distclean-generic distclean-libtool \
-	distclean-tags distcleancheck distdir dvi dvi-am info info-am \
-	install install-am install-data install-data-am \
-	install-data-local install-exec install-exec-am install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	tags uninstall uninstall-am uninstall-info-am \
-	uninstall-libLTLIBRARIES
+.PHONY: all all-am check check-am check-local clean clean-generic \
+	clean-libtool clean-local dist dist-all dist-gzip distcheck \
+	distclean distclean-generic distclean-libtool distcleancheck \
+	distdir dvi dvi-am info info-am install install-am install-data \
+	install-data-am install-data-local install-exec install-exec-am \
+	install-info install-info-am install-man install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool uninstall uninstall-am uninstall-info-am
 
 
 # Generate header files for classes containing native code.
@@ -1067,17 +790,17 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 #javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
 #	CLASSPATH=$(dst) @JAVAH@ -jni javax.xml.transform.$*
 
-gnu_xml_libxmlj_dom_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
+gnu_xml_libxmlj_dom_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
 
-gnu_xml_libxmlj_sax_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
+gnu_xml_libxmlj_sax_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
 
-gnu_xml_libxmlj_transform_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
+gnu_xml_libxmlj_transform_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
 
-javax_xml_transform_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni javax.xml.transform.$*
+javax_xml_transform_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)
@@ -1087,30 +810,33 @@ $(dst):
 	mkdir -p $(dst)
 
 # Jar file
-$(JARFILE): $(classes)
-	@JAR@ cfm $(JARFILE) $(top_srcdir)/manifest.mf \
+$(libj_jarfile): $(classes)
+	@JAR@ cfm $(libj_jarfile) $(top_srcdir)/manifest.mf \
 		-C $(dst) gnu \
 		-C $(dst) javax \
 		-C $(dst) org
 
-# API documentation
+# JNI objects
+$(jni_lobjects): %.lo: %.c $(headers)
+	$(LT_COMPILE) $< 
 
+# Shared JNI library
+$(libjso_target): $(jni_lobjects)
+	$(LT_LINK) -shrext @JMODSUFFIX@ -o $@ $(jni_lobjects) 
+
+# API documentation
 javadoc:
 	mkdir -p $(doc)
 	$(JAVADOC) -d $(doc) -windowtitle "GNU JAXP Library" \
 		-sourcepath @srcdir@/source $(package_names)
 
 # Remove classes and jar file
-
 clean-local:
-	rm -f $(JARFILE)
-	rm -rf $(dst) $(doc)
-	rm -f $(headers)
+	rm -rf $(libj_jarfile) $(dst) $(doc) $(headers) $(jni_objects)
 
 # Run a simple transformation to check that the package is working
-
 check-local: gnu/xml/libxmlj/transform/TransformTest.class
-	@JAVA@  -classpath "${CLASSPATH}:${JARFILE}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
+	@JAVA@  -classpath "${CLASSPATH}:${libj_jarfile}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
 	diff @srcdir@/testdocs/transformed.xml transformed.xml
 
 dist-hook:
@@ -1120,8 +846,10 @@ dist-hook:
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
 
 install-data-local:
-	@srcdir@/mkinstalldirs $(prefix)/share/java
-	$(INSTALL_DATA) ${JARFILE} $(prefix)/share/java
+	@srcdir@/mkinstalldirs $(libdir)
+	$(LT_INSTALL) ${libjso_target} $(libdir)
+	@srcdir@/mkinstalldirs $(datadir)/java/
+	$(INSTALL_DATA) ${libj_jarfile} $(datadir)/java/
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

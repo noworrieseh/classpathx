@@ -22,14 +22,13 @@
 
 JAVADOC = javadoc
 
+SOFLAGS=        @SOFLAGS@
+LIBMAJOR=       @XMLJ_VERSION_MAJOR@
+LIBVERSION=     @XMLJ_VERSION_MAJOR@.@XMLJ_VERSION_MINOR@
+
 src = @srcdir@/source
 dst = @srcdir@/classes
 doc = @srcdir@/apidoc
-
-JARFILE = gnujaxp.jar
-#data_DATA = ${JARFILE} - needs $(prefix)/share/java
-
-lib_LTLIBRARIES = libxmlj.la
 
 sources = \
 $(src)/org/w3c/dom/Attr.java \
@@ -378,9 +377,7 @@ gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
 gnu_xml_libxmlj_transform_JavaContext.h \
 gnu_xml_libxmlj_transform_LibxsltStylesheet.h
 
-libxmlj_la_DEPENDENCIES = $(headers)
-
-libxmlj_la_SOURCES = \
+jni_sources = \
 xmlj_dom.c \
 xmlj_error.c \
 xmlj_io.c \
@@ -390,8 +387,22 @@ xmlj_transform.c \
 xmlj_util.c \
 xmlj_xpath.c
 
-libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic -D_JNI_IMPLEMENTATION_
-libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
+jni_objects = $(patsubst %.c, %.o, $(jni_sources))
+jni_lobjects = $(patsubst %.c, %.lo, $(jni_sources))
+
+libj_jarfile=   gnujaxp.jar
+
+#XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -export-dynamic -D_JNI_IMPLEMENTATION_
+XMLJ_LFLAGS=    -shared $(SOFLAGS) $(LDFLAGS) $(XML_LDFLAGS) $(XSLT_LDFLAGS) -release $(LIBVERSION) -single_module
+XMLJ_CFLAGS=    $(CFLAGS) $(XML_CFLAGS) $(XSLT_CFLAGS) -pedantic -Wall -fbounds-check
+LT_COMPILE=     $(LIBTOOL) --mode=compile $(CC) -c $(XMLJ_CFLAGS)
+LT_LINK=        $(LIBTOOL) --mode=link $(CC) $(XMLJ_LFLAGS) $(XSLT_LIBS)
+LT_INSTALL=     $(LIBTOOL) --mode=install $(INSTALL)
+
+libjso_base=    libxmlj
+libjso=         $(libjso_base)-$(LIBVERSION)@JMODSUFFIX@
+libjso_default= $(libjso_base)@JMODSUFFIX@
+libjso_target=  $(libjso_base).la
 
 package_names = \
 javax.xml.parsers \
@@ -421,8 +432,7 @@ gnu.xml.libxmlj.transform \
 gnu.xml.pipeline \
 gnu.xml.util
 
-#BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES}
-BUILT_SOURCES = $(JARFILE) $(headers)
+BUILT_SOURCES = $(libj_jarfile) $(libjso_target)
 
 # Generate header files for classes containing native code.
 #$(headers): %.h: $(dst)/$(%:_=/).class) $(header_deps)
@@ -442,17 +452,17 @@ BUILT_SOURCES = $(JARFILE) $(headers)
 #javax_xml_transform_%.h: $(dst)/javax/xml/transform/%.class
 #	CLASSPATH=$(dst) @JAVAH@ -jni javax.xml.transform.$*
 
-gnu_xml_libxmlj_dom_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
+gnu_xml_libxmlj_dom_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.dom.$*
 
-gnu_xml_libxmlj_sax_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
+gnu_xml_libxmlj_sax_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.sax.$*
 
-gnu_xml_libxmlj_transform_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
+gnu_xml_libxmlj_transform_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni gnu.xml.libxmlj.transform.$*
 
-javax_xml_transform_%.h: $(JARFILE)
-	CLASSPATH=$(JARFILE) @JAVAH@ -jni javax.xml.transform.$*
+javax_xml_transform_%.h: $(libj_jarfile)
+	CLASSPATH=$(libj_jarfile) @JAVAH@ -jni javax.xml.transform.$*
 
 # Rule for compiling Java source files
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)
@@ -462,30 +472,33 @@ $(dst):
 	mkdir -p $(dst)
 
 # Jar file
-$(JARFILE): $(classes)
-	@JAR@ cfm $(JARFILE) $(top_srcdir)/manifest.mf \
+$(libj_jarfile): $(classes)
+	@JAR@ cfm $(libj_jarfile) $(top_srcdir)/manifest.mf \
 		-C $(dst) gnu \
 		-C $(dst) javax \
 		-C $(dst) org
 
-# API documentation
+# JNI objects
+$(jni_lobjects): %.lo: %.c $(headers)
+	$(LT_COMPILE) $< 
 
+# Shared JNI library
+$(libjso_target): $(jni_lobjects)
+	$(LT_LINK) -shrext @JMODSUFFIX@ -o $@ $(jni_lobjects) 
+
+# API documentation
 javadoc:
 	mkdir -p $(doc)
 	$(JAVADOC) -d $(doc) -windowtitle "GNU JAXP Library" \
 		-sourcepath @srcdir@/source $(package_names)
 
 # Remove classes and jar file
-
 clean-local:
-	rm -f $(JARFILE)
-	rm -rf $(dst) $(doc)
-	rm -f $(headers)
+	rm -rf $(libj_jarfile) $(dst) $(doc) $(headers) $(jni_objects)
 
 # Run a simple transformation to check that the package is working
-
 check-local: gnu/xml/libxmlj/transform/TransformTest.class
-	@JAVA@  -classpath "${CLASSPATH}:${JARFILE}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
+	@JAVA@  -classpath "${CLASSPATH}:${libj_jarfile}:." -Djava.library.path=.libs gnu.xml.libxmlj.transform.TransformTest @srcdir@/testdocs/test.xml @srcdir@/testdocs/testsheet.xsl transformed.xml
 	diff @srcdir@/testdocs/transformed.xml transformed.xml
 
 dist-hook:
@@ -495,6 +508,8 @@ dist-hook:
 	cp $(srcdir)/testdocs/* $(distdir)/testdocs
 
 install-data-local:
-	@srcdir@/mkinstalldirs $(prefix)/share/java
-	$(INSTALL_DATA) ${JARFILE} $(prefix)/share/java
+	@srcdir@/mkinstalldirs $(libdir)
+	$(LT_INSTALL) ${libjso_target} $(libdir)
+	@srcdir@/mkinstalldirs $(datadir)/java/
+	$(INSTALL_DATA) ${libj_jarfile} $(datadir)/java/
 
