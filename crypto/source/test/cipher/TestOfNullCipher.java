@@ -1,9 +1,9 @@
 package test.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: TestOfNullCipher.java,v 1.2 2001-12-04 12:56:08 raif Exp $
+// $Id: TestOfNullCipher.java,v 1.3 2002-06-29 01:27:18 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -30,21 +30,20 @@ package test.cipher;
 // be covered by the GNU General Public License.
 // ----------------------------------------------------------------------------
 
+import gnu.crypto.Registry;
+import gnu.crypto.cipher.NullCipher;
+
+import java.util.HashMap;
+
 import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import gnu.crypto.cipher.NullCipher;
-import gnu.crypto.cipher.IBlockCipher;
-import gnu.crypto.util.Util;
-
 /**
- * Conformance tests for the NullCipher implementation.
+ * <p>Conformance tests for the {@link NullCipher} implementation.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class TestOfNullCipher extends TestCase {
+public class TestOfNullCipher extends BaseCipherTestCase {
 
    // Constants and variables
    // -------------------------------------------------------------------------
@@ -64,18 +63,30 @@ public class TestOfNullCipher extends TestCase {
    }
 
    public static Test suite() {
-      return new TestSuite(TestOfNullCipher.class);
+      return new TestOfNullCipher(Registry.NULL_CIPHER);
    }
 
    // Instance methods
    // -------------------------------------------------------------------------
 
-   public void testSelfTest() {
+   public void setUp() throws Exception {
+      cipher = new NullCipher();
+      HashMap attrib = new HashMap();
+      attrib.put(cipher.CIPHER_BLOCK_SIZE, new Integer(8));
+      attrib.put(cipher.KEY_MATERIAL, new byte[16]);
+      cipher.init(attrib);
+   }
+
+   public void runTest() {
       try {
-         IBlockCipher algorithm = new NullCipher();
-         assertTrue("selfTest()", algorithm.selfTest());
+         String algorithm = cipher.name();
+
+         assertTrue("validityTest(" + algorithm + "): ", validityTest());
+         assertTrue("cloneabilityTest(" + algorithm + "): ", cloneabilityTest());
+
       } catch (Exception x) {
-         fail("selfTest(): "+String.valueOf(x));
+         x.printStackTrace(System.err);
+         fail(String.valueOf(x));
       }
    }
 }
