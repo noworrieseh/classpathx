@@ -2,6 +2,7 @@
 
 	* all: Use RawData for native pointers.
 	* xmlj_sax.c: Fixed entity resolution.
+	* xmlj_io.c: Fixed race condition closing input stream context.
 
 2004-06-03  Chris Burdess <dog@gnu.org>
 

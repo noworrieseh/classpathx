@@ -200,13 +200,13 @@ xmljNewInputStreamContext (JNIEnv * env, jobject inputStream)
   inputStreamClass = (*env)->FindClass (env, "java/io/InputStream");
   if (inputStreamClass == NULL)
     {
-      xmljThrowException (env, "java/lang/ClassNotFoundException",
-                          "java.io.InputStream");
       return NULL;
     }
   result = (InputStreamContext *) malloc (sizeof (InputStreamContext));
   if (result == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   result->env = env;
   result->inputStream = inputStream;
@@ -238,13 +238,13 @@ xmljNewOutputStreamContext (JNIEnv * env, jobject outputStream)
   outputStreamClass = (*env)->FindClass (env, "java/io/OutputStream");
   if (outputStreamClass == NULL)
     {
-      xmljThrowException (env, "java/lang/ClassNotFoundException",
-                          "java.io.OutputStream");
       return NULL;
     }
   result = (OutputStreamContext *) malloc (sizeof (OutputStreamContext));
   if (result == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   result->env = env;
   result->outputStream = outputStream;
@@ -409,18 +409,19 @@ xmljNewParserContext (JNIEnv * env,
 void
 xmljFreeParserContext (xmlParserCtxtPtr ctx)
 {
-  InputStreamContext *inputStreamContext;
+  InputStreamContext *inputStreamContext = NULL;
 
   if (ctx->input != NULL && ctx->input->buf != NULL)
     {
       inputStreamContext
         = (InputStreamContext *) ctx->input->buf->context;
       
-      if (inputStreamContext != NULL)
-        xmljFreeInputStreamContext (inputStreamContext);
     }
-
   xmlFreeParserCtxt (ctx);
+  if (inputStreamContext != NULL)
+    {
+      xmljFreeInputStreamContext (inputStreamContext);
+    }
 }
 
 xmlDocPtr

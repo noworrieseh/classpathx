@@ -29,6 +29,7 @@
 #include "xmlj_io.h"
 #include "xmlj_util.h"
 #include <unistd.h>
+#include <string.h>
 
 xmlExternalEntityLoader defaultLoader = NULL;
 
@@ -154,10 +155,10 @@ xmljExternalEntityLoader (const char *url, const char *id,
   systemId = xmlCharStrdup (url);
   publicId = xmlCharStrdup (id);
   ret = xmljSAXResolveEntity (context, publicId, systemId);
-  /*if (ret == NULL)
+  if (ret == NULL)
     {
       ret = defaultLoader (url, id, context);
-    }*/
+    }
   return ret;
 }
 
@@ -224,6 +225,9 @@ xmljNewSAXHandler (jboolean contentHandler,
       sax->processingInstruction = &xmljSAXProcessingInstruction;
     }
 
+  /* We always intercept getEntity */
+  /* TODO this should only be if lexicalHandler */
+  sax->getEntity = &xmljSAXGetEntity;
   if (lexicalHandler)
     {
       sax->getEntity = &xmljSAXGetEntity;
@@ -306,6 +310,11 @@ xmljSAXResolveEntity (void *vctx,
   /* xmlSAX2ResolveEntity (vctx, publicId, systemId); */
 
   ctx = (xmlParserCtxtPtr) vctx;
+  if (ctx->_private == NULL)
+    {
+      /* Not in Kansas */
+      return NULL;
+    }
   sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
@@ -359,7 +368,12 @@ xmljSAXResolveEntity (void *vctx,
 xmlEntityPtr
 xmljSAXGetEntity (void *vctx, const xmlChar * name)
 {
-  return xmlSAX2GetEntity (vctx, name);
+  xmlEntityPtr ret;
+  
+  /* TODO */
+  /* ret = xmlSAX2GetEntity (vctx, name); */
+  ret = NULL;
+  return ret;
 }
 
 void
