@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.16 2002-08-14 16:08:17 raif Exp $
+   $Id: build.xml,v 1.17 2002-08-15 12:19:29 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -81,7 +81,7 @@
    </patternset>
 
    <target name="jar" depends="configure,compile"
-           description="Create the project's main .jar file">
+           description="Build the project's main .jar file">
       <copy todir="${classes.dir}">
          <fileset dir="${basedir}">
             <patternset refid="toplevel_files"/>
@@ -115,9 +115,7 @@
    </target>
 
    <target name="jar-test" depends="compile-test">
-      <jar jarfile="${test.jar}" basedir="${classes.dir}" includes="test/**">
-         <fileset dir="${basedir}" includes="tv/**"/>
-      </jar>
+      <jar jarfile="${test.jar}" basedir="${classes.dir}" includes="test/**"/>
    </target>
 
    <target name="compile-test" depends="jar">
@@ -155,7 +153,7 @@
    Test vectors ...............................................................
    -->
    <target name="tv" depends="kat,mct,nessie"
-           description="Output NIST-compliant Known Answer and Monte-Carlo Test vectors"/>
+           description="Output NIST and NESSIE compliant test vectors"/>
    <!--
    Generating test vectors and exercising algorithms the NESSIE way ...........
 
@@ -167,7 +165,7 @@
    or any of its sub-tasks.
    -->
    <target name="nessie" depends="jar"
-           description="Generate test vectors according to the NESSIE specifications">
+           description="Output NESSIE-compliant test vectors">
       <parallel>
          <antcall target="ra"/>
          <antcall target="doum"/>
@@ -231,7 +229,7 @@
    Generating test vectors and exercising algorithms the NIST way .............
    -->
    <target name="kat" depends="jar"
-           description="Output test vectors in compliance with NIST's KAT">
+           description="Output NIST-compliant KAT vectors">
       <parallel>
          <antcall target="nist-kat">
             <param name="cipher" value="anubis"/>
@@ -282,7 +280,7 @@
    </target>
 
    <target name="mct" depends="jar"
-           description="Output test vectors in compliance with NIST's MCT">
+           description="Output NIST-compliant MCT vectors">
       <parallel>
          <antcall target="nist-mct">
             <param name="cipher" value="anubis"/>
@@ -374,11 +372,11 @@
    <!--
    Make distribution ..........................................................
    -->
-   <target name="dist" depends="test,dist-library,dist-tv,compute-checksum"
+   <target name="release" depends="test,dist-library,dist-tv,compute-checksum"
            description="Package the library's Software and generated Test Vectors">
    </target>
 
-   <target name="dist-library" depends="distclean,jar,docs">
+   <target name="dist-library" depends="jar,docs">
       <property name="build.dir" value="build/${package}-${version}"/>
       <copy todir="${build.dir}">
          <fileset dir="${basedir}">
