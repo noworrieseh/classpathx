@@ -89,7 +89,7 @@ public final class BASE64
         bt[ti++] = src[(b1<<4 & 0x30) + (b2>>>4 & 0xf)];
         bt[ti++] = src[(b2<<2 & 0x3c) + (i>>>6 & 0x3)];
       }
-      else if (buflen==3)
+      else
       {
         byte b1 = bs[si], b2 = bs[si+1], b3 = bs[si+2];
         bt[ti++] = src[b1>>>2 & 0x3f];
