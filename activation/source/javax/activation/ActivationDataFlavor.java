@@ -1,202 +1,143 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
+ * ActivationDataFlavor.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
 package javax.activation;
 
-// Imports
 import java.awt.datatransfer.DataFlavor;
+import java.io.InputStream;
 
 /**
- * Activation Data Flavor.
- * @author Andrew Selkirk
- * @version $Revision: 1.4 $
+ * Activation-specific DataFlavor with improved MIME parsing.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
-public class ActivationDataFlavor
-extends DataFlavor
+public class ActivationDataFlavor extends DataFlavor
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
+    private String mimeType;
+    private String humanPresentableName;
+    private Class representationClass;
 
-  /**
-   * Data flavor MIME Type.
-   */
-  private String mimeType = null;
-
-  /**
-   * Data flavor MIME type object.
-   */
-  private MimeType mimeObject = null;
-
-  /**
-   * Human presentable name of data flavor.
-   */
-  private String humanPresentableName = null;
-
-  /**
-   * Representation class of data flavor.
-   */
-  private Class representationClass = null;
-
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create Activation Data Flavor.
-   * @param representationClass Class representing flavor
-   * @param humanPresentableName Readable name
-   */
-  public ActivationDataFlavor(Class representationClass, 
-			      String humanPresentableName) 
-  {
-    this(representationClass, null, humanPresentableName);
-  } // ActivationDataFlavor()
-
-  /**
-   * Create Activation Data Flavor.
-   * @param mimeType MIME Type
-   * @param humanPresentableName Readable name
-   */
-  public ActivationDataFlavor(String mimeType, 
-			      String humanPresentableName) 
-  {
-    this(null, mimeType, humanPresentableName);
-  } // ActivationDataFlavor()
-
-  /**
-   * Create Activation Data Flavor.
-   * @param representationClass Class representing flavor
-   * @param mimeType MIME Type
-   * @param humanPresentableName Readable name
-   */
-  public ActivationDataFlavor(Class representationClass, 
-			      String mimeType, 
-			      String humanPresentableName) 
-  {
-    /* In JDK1.1 we must use the DataFlavor(Class, String) constructor */
-    super(representationClass, humanPresentableName);
-    this.mimeType = mimeType;
-  } // ActivationDataFlavor()
-
-
-  //-------------------------------------------------------------
-  // Public Accessor Methods ------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Test data flavor for equivalence.
-   * @param dataFlavor Data flavor to test
-   * @return true if equals, otherwise false
-   */
-  public boolean equals(DataFlavor dataFlavor) 
-  {
-
-    // Variables
-    ActivationDataFlavor flavor;
-
-    if (dataFlavor instanceof ActivationDataFlavor) 
+    /**
+     * Constructor.
+     * @param representationClass the representation class
+     * @param mimeType the MIME type of the data
+     * @param humanPresentableName the human-presentable name of the data
+     * flavor
+     */
+    public ActivationDataFlavor(Class representationClass, String mimeType,
+            String humanPresentableName)
     {
-      flavor = (ActivationDataFlavor) dataFlavor;
+        super(mimeType, humanPresentableName);
+        this.mimeType = mimeType;
+        this.humanPresentableName = humanPresentableName;
+        this.representationClass = representationClass;
     }
 
-    return false;
-
-  } // equals()
-
-  /**
-   * Get human presentable name
-   * @return Name
-   */
-  public String getHumanPresentableName() 
-  {
-    return humanPresentableName;
-  } // getHumanPresentableName()
-
-  /**
-   * Set the human presentable name.
-   * @param humanPresentableName Name
-   */
-  public void setHumanPresentableName(String humanPresentableName)
-  {
-    this.humanPresentableName = humanPresentableName;
-  } // setHumanPresentationName()
-
-  /**
-   * Get MIME Type.
-   * @return MIME Type
-   */
-  public String getMimeType() 
-  {
-    return mimeType;
-  } // getMimeType()
-
-  /**
-   * Get representation class.
-   * @return Representation class
-   */
-  public Class getRepresentationClass() 
-  {
-    return representationClass;
-  } // getRepresentationClass()
-
-  /**
-   * Determine if MIME Type is equals to data flavor.
-   * @param mimeType MIME Type to test
-   * @return true if equal, false otherwise
-   */
-  public boolean isMimeTypeEqual(String mimeType) 
-  {
-    if (this.mimeType.equals(mimeType) == true) 
+    /**
+     * Constructor.
+     * @param representationClass the representation class
+     * @param humanPresentableName the human-presentable name of the data
+     * flavor
+     */
+    public ActivationDataFlavor(Class representationClass,
+            String humanPresentableName)
     {
-      return true;
-    } else 
-    {
-      return false;
+        super(representationClass, humanPresentableName);
+        mimeType = super.getMimeType();
+        this.representationClass = representationClass;
+        this.humanPresentableName = humanPresentableName;
     }
-  } // isMimeTypeEqual()
 
-  /**
-   * Normalize MIME Type.
-   * @param mimeType MIME Type to normalize
-   * @return Normalized MIME Type
-   */
-  protected String normalizeMimeType(String mimeType) 
-  {
-    return null; // TODO
-  } // normalizeMimeType()
+    /**
+     * Constructor. The representation class is an InputStream.
+     * @param mimeType the MIME type of the data
+     * @param humanPresentableName the human-presentable name of the data
+     * flavor
+     */
+    public ActivationDataFlavor(String mimeType, String humanPresentableName)
+    {
+        super(mimeType, humanPresentableName);
+        this.mimeType = mimeType;
+        this.humanPresentableName = humanPresentableName;
+        representationClass = InputStream.class;
+    }
 
-  /**
-   * Normalize MIME type parameter.
-   * @param parameterName Parameter name to normalize
-   * @param parameterValue Parameter value to normalize
-   * @return Normalized parameter
-   */
-  protected String normalizeMimeTypeParameter(String parameterName, 
-					      String parameterValue) 
-  {
-    return null; // TODO
-  } // normalizeMimeTypeParameter()
+    public String getMimeType()
+    {
+        return mimeType;
+    }
 
+    public Class getRepresentationClass()
+    {
+        return representationClass;
+    }
 
-} // ActivationDataFlavor
+    public String getHumanPresentableName()
+    {
+        return humanPresentableName;
+    }
+
+    public void setHumanPresentableName(String humanPresentableName)
+    {
+        this.humanPresentableName = humanPresentableName;
+    }
+    
+    public boolean equals(DataFlavor dataFlavor)
+    {
+        return (isMimeTypeEqual(dataFlavor) &&
+                dataFlavor.getRepresentationClass() == representationClass);
+    }
+
+    public boolean isMimeTypeEqual(String mimeType)
+    {
+        try
+        {
+            return new MimeType(this.mimeType).match(new MimeType(mimeType));
+        }
+        catch (MimeTypeParseException e)
+        {
+            return false;
+        }
+    }
+
+    protected String normalizeMimeTypeParameter(String parameterName,
+            String parameterValue)
+    {
+        return new StringBuffer(parameterName)
+            .append('=')
+            .append(parameterValue)
+            .toString();
+    }
+
+    protected String normalizeMimeType(String mimeType)
+    {
+        return mimeType;
+    }
+
+}

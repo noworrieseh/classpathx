@@ -1,529 +1,429 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
-
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * DataHandler.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 package javax.activation;
 
-// Imports
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.IOException;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URL;
 
 /**
- * Data Handler.
- * @author Andrew Selkirk
- * @version $Revision: 1.6 $
+ * Handler for data available in multiple sources and formats.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
-public class DataHandler implements Transferable 
+public class DataHandler
+    implements Transferable
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
+    private static final DataFlavor[] NO_FLAVORS = new DataFlavor[0];
+    private static DataContentHandlerFactory factory = null;
+    
+    private DataSource dataSource;
+    private DataSource objDataSource;
+    private Object object;
+    private String objectMimeType;
+    private CommandMap currentCommandMap;
+    private DataFlavor[] transferFlavors = NO_FLAVORS;
+    private DataContentHandler dataContentHandler;
+    private DataContentHandler factoryDCH;
+    private DataContentHandlerFactory oldFactory;
+    private String shortType;
 
-  /**
-   * TODO
-   */
-  private DataSource dataSource;
-
-  /**
-   * TODO
-   */
-  private DataSource objDataSource;
-
-  /**
-   * TODO
-   */
-  private Object object;
-
-  /**
-   * TODO
-   */
-  private String objectMimeType;
-
-  /**
-   * TODO
-   */
-  private CommandMap currentCommandMap;
-
-  /**
-   * TODO
-   */
-  private static final DataFlavor[] emptyFlavors = new DataFlavor[0];
-
-  /**
-   * TODO
-   */
-  private DataFlavor[] transferFlavors = emptyFlavors;
-
-  /**
-   * TODO
-   */
-  private DataContentHandler dataContentHandler;
-
-  /**
-   * TODO
-   */
-  private DataContentHandler factoryDCH;
-
-  /**
-   * TODO
-   */
-  private static DataContentHandlerFactory factory;
-
-  /**
-   * TODO
-   */
-  private DataContentHandlerFactory oldFactory = factory;
-
-  /**
-   * TODO
-   */
-  private String shortType;
-
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create data handler based on data source.
-   * @param source Data source
-   */
-  public DataHandler(DataSource source) 
-  {
-    dataSource = source;
-  }
-
-  /**
-   * Create data handler based on object and MIME type.
-   * @param object Object
-   * @param mimeType MIME type
-   */
-  public DataHandler(Object object, String mimeType) 
-  {
-    this.object = object;
-    this.objectMimeType = mimeType;
-  }
-
-  /**
-   * Create data handler based on URL.
-   * @param url URL reference
-   */
-  public DataHandler(URL url) 
-  {
-    this(new URLDataSource(url));
-  }
-
-
-  //-------------------------------------------------------------
-  // Public Accessor Methods ------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Get name.
-   * @return Data handler name
-   */
-  public String getName() 
-  {
-    if (dataSource!=null) 
-      return dataSource.getName();
-    else
-      return null;
-  }
-
-  /**
-   * Get content.
-   * @return Content object
-   * @throws IOException IO exception occurred
-   */
-  public Object getContent()
-    throws IOException 
-  {
-
-    // Variables
-    DataContentHandler handler;
-
-    if (dataSource == null) 
+    /**
+     * Constructor in which the data is read from a data source.
+     * @param ds the data source
+     */
+    public DataHandler(DataSource ds)
     {
-      return object;
-    } else 
-    {
-      // handler = getCommandMap().createDataContentHandler(getContentType());
-      handler = getDataContentHandler();
-      if (handler != null) 
-      {
-        return handler.getContent(dataSource);
-      } else
-      {
-        return dataSource.getInputStream();
-      }
-    }
-  } // getContent()
-
-  /**
-   * Get input stream.
-   * @return Input stream
-   * @throws IOException IO exception occurred
-   */
-  public InputStream getInputStream()
-    throws IOException 
-  {
-    if (dataSource!=null)
-      return dataSource.getInputStream();
-    else
-    {
-      // Get Data Content Handler
-      DataContentHandler handler = getDataContentHandler();
-      // Check Handler
-      if (handler==null)
-        throw new UnsupportedDataTypeException("No data content handler for "+
-            "MIME content type: "+getBaseType());
-      if (handler instanceof ObjectDataContentHandler)
-      {
-        if (((ObjectDataContentHandler)handler).getDCH()==null)
-          throw new UnsupportedDataTypeException("No object data content "+
-              "handler for MIME content type: "+getBaseType());
-      }
-      PipedOutputStream out = new PipedOutputStream();
-      PipedInputStream in = new PipedInputStream(out);
-      InputStreamWriter writer = this.new InputStreamWriter(handler, in, out);
-      Thread writerThread = new Thread(writer);
-      writerThread.setName("DataHandler.getInputStream");
-      writerThread.start();
-      return in;
-    }
-  }
-
-  class InputStreamWriter
-    implements Runnable
-  {
-
-    DataContentHandler handler;
-    PipedInputStream in;
-    PipedOutputStream out;
-
-    InputStreamWriter(DataContentHandler handler, 
-        PipedInputStream in,
-        PipedOutputStream out)
-    {
-      this.handler = handler;
-      this.in = in;
-      this.out = out;
+        dataSource = ds;
+        oldFactory = factory;
     }
 
-    public void run()
+    /**
+     * Constructor using a reified object representation.
+     * @param obj the object representation of the data
+     * @param mimeType the MIME type of the object
+     */
+    public DataHandler(Object obj, String mimeType)
     {
-      try
-      {
-        handler.writeTo(object, objectMimeType, out);
-      }
-      catch (IOException e)
-      {
-        try
-        {
-          out.close();
-        }
-        catch (IOException e2)
-        {
-        }
-      }
+        object = obj;
+        objectMimeType = mimeType;
+        oldFactory = factory;
     }
-  }
 
-  /**
-   * Write to output stream.
-   * @param stream Output stream 
-   * @throws IOException IO exception occurred
-   */
-  public void writeTo(OutputStream stream)
-    throws IOException 
-  {
-    // Check For Data Source
-    if (dataSource!=null) 
+    /**
+     * Constructor in which the data is read from a URL.
+     * @param url the URL
+     */
+    public DataHandler(URL url)
     {
-      // Get Input Stream
-      InputStream in = dataSource.getInputStream();
-      int max = 16384; // TODO make configurable
-      byte[] bytes = new byte[max];
-      int len;
-      while ((len = in.read(bytes)) > 0)
-        stream.write(bytes, 0, len);
-      in.close();
+        dataSource = new URLDataSource(url);
+        oldFactory = factory;
     }
-    else
+
+    /**
+     * Returns the data source from which data is read.
+     */
+    public DataSource getDataSource()
     {
-      DataContentHandler handler = getDataContentHandler();
-      handler.writeTo(object, objectMimeType, stream);
-    }
-  }
-
-  /**
-   * Get content type of data handler.
-   * @return Content type
-   */
-  public String getContentType() 
-  {
-    if (dataSource!=null)
-      return dataSource.getContentType();
-    else
-      return objectMimeType;
-  }
-
-  /**
-   * Get output stream.
-   * @return Output stream
-   * @throws IOException IO exception occurred
-   */
-  public OutputStream getOutputStream()
-    throws IOException 
-  {
-    if (dataSource!=null) 
-      return dataSource.getOutputStream();
-    else
-      return null;
-  }
-
-  /**
-   * Get all commands.
-   * @return Command list
-   */
-  public CommandInfo[] getAllCommands() 
-  {
-    CommandMap map = getCommandMap();
-    return map.getAllCommands(getBaseType());
-  }
-
-  /**
-   * Get base type.
-   * @return Base type
-   */
-  private synchronized String getBaseType() 
-  {
-    if (shortType==null)
-    {
-      String contentType = getContentType();
-      try
-      {
-        shortType = new MimeType(contentType).getBaseType();
-      }
-      catch (MimeTypeParseException e)
-      {
-        shortType = contentType;
-      }
-    }
-    return shortType;
-  } // getBaseType()
-
-  /**
-   * Get beans of command.
-   * @param commandInfo TODO
-   * @return Instantiated command bean, or null
-   */
-  public Object getBean(CommandInfo commandInfo) 
-  {
-    try 
-    {
-      return commandInfo.getCommandObject(this, 
-                getClass().getClassLoader());
-    } catch (Exception e) 
-    {
-      return null;
-    }
-  } // getBean()
-
-  /**
-   * Get command information based on command verb.
-   * @param command Command verb
-   * @return Command information
-   */
-  public CommandInfo getCommand(String command) 
-  {
-    CommandMap map = getCommandMap();
-    return map.getCommand(getBaseType(), command);
-  }
-
-  /**
-   * Get command map.
-   * @return Command map
-   */
-  private synchronized CommandMap getCommandMap() 
-  {
-    if (currentCommandMap==null)
-      return CommandMap.getDefaultCommandMap();
-    return currentCommandMap;
-  }
-
-  /**
-   * Get data content handler.
-   * @return Data content handler
-   */
-  private synchronized DataContentHandler getDataContentHandler() 
-  {
-    if (factory!=oldFactory)
-    {
-      dataContentHandler = null;
-      factoryDCH = null;
-      oldFactory = factory;
-      transferFlavors = emptyFlavors;
-    }
-    if (dataContentHandler!=null)
-      return dataContentHandler;
-    String contentType = getBaseType();
-    if (factory!=null && factoryDCH==null)
-      factoryDCH = factory.createDataContentHandler(contentType);
-    if (factoryDCH!=null)
-      dataContentHandler = factoryDCH;
-    else
-    {
-      CommandMap map = getCommandMap();
-      dataContentHandler = map.createDataContentHandler(contentType);
-    }
-    if (dataSource!=null)
-      dataContentHandler = 
-          new DataSourceDataContentHandler(dataContentHandler, dataSource);
-    else
-      dataContentHandler = 
-          new ObjectDataContentHandler(dataContentHandler, object, objectMimeType);
-    return dataContentHandler; 
-  }
-
-  /**
-   * Get data source.
-   * @return Data source, or null
-   */
-  public DataSource getDataSource() 
-  {
-    if (dataSource==null)
-    {
-      if (objDataSource==null)
-        objDataSource = new DataHandlerDataSource(this);
-      else
+        if (dataSource != null)
+            return dataSource;
+        if (objDataSource == null)
+            objDataSource = new DataHandlerDataSource(this);
         return objDataSource;
     }
-    return dataSource;
-  }
 
-  /**
-   * Get list of preferred commands.
-   * @return List of preferred commands
-   */
-  public CommandInfo[] getPreferredCommands() 
-  {
-    CommandMap map = getCommandMap();
-    return map.getPreferredCommands(getBaseType());
-  }
-
-  /**
-   * Get transfer data based on data flavor.
-   * @param dataFlavor Data flavor
-   * @return Transfer data
-   * @throws UnsupportedFlavorException Unsupported data flavor
-   * @throws IOException IO exception occurred
-   */
-  public Object getTransferData(DataFlavor dataFlavor)
-    throws UnsupportedFlavorException, IOException 
-  {
-    DataContentHandler handler = getDataContentHandler();
-    return handler.getTransferData(dataFlavor, dataSource);
-  }
-
-  /**
-   * Get transfer data flavors.
-   * @return List of data flavors
-   */
-  public synchronized DataFlavor[] getTransferDataFlavors()
-  {
-    if (factory!=oldFactory)
-      transferFlavors = emptyFlavors;
-    if (transferFlavors==emptyFlavors)
-      transferFlavors = getDataContentHandler().getTransferDataFlavors();
-    return transferFlavors;
-  }
-
-  /**
-   * Determine if data flavor is supported.
-   * @param dataFlavor Data flavor
-   * @return true if supported, false otherwise
-   */
-  public boolean isDataFlavorSupported(DataFlavor dataFlavor)
-  {
-    DataFlavor[] flavors = getTransferDataFlavors();
-    for (int i=0; i<flavors.length; i++)
-      if (flavors[i].equals(dataFlavor))
-        return true;
-    return false;
-  }
-
-  /**
-   * Set command map.  If null, command map is reset to default.
-   * @param map Command map
-   */
-  public synchronized void setCommandMap(CommandMap map)
-  {
-    if (map==null || map!=currentCommandMap) 
+    /**
+     * Returns the name of the data object if created with a DataSource.
+     */
+    public String getName()
     {
-      // Assume nowt
-      currentCommandMap = map;
-      dataContentHandler = null;
-      transferFlavors = emptyFlavors;
-    }
-  }
-
-  /**
-   * Set the data content factory for data handler.  Note that this
-   * is a one time call.  Further calls result in an Error.
-   * @param newFactory New factory
-   */
-  public static synchronized void setDataContentHandlerFactory(
-      DataContentHandlerFactory newFactory)
-  {
-    // Check For existing Factory
-    if (factory != null) 
-    {
-      throw new Error();
+        if (dataSource != null)
+            return dataSource.getName();
+        return null;
     }
 
-    // Set Factory
-    SecurityManager sm = System.getSecurityManager();
-    if (sm!=null)
+    /**
+     * Returns the MIME type of the data (with parameters).
+     */
+    public String getContentType()
     {
-      try
-      {
-        sm.checkSetFactory();
-      }
-      catch (SecurityException e)
-      {
-        Class dataHandlerClazz = javax.activation.DataHandler.class;
-        Class factoryClazz = newFactory.getClass();
-        if (factoryClazz!=dataHandlerClazz)
-          throw e;
-      }
-      factory = newFactory;
+        if (dataSource != null)
+            return dataSource.getContentType();
+        return objectMimeType;
     }
-  }
+
+    /**
+     * Returns an input stream from which the data can be read.
+     */
+    public InputStream getInputStream()
+        throws IOException
+    {
+        if (dataSource != null)
+            return dataSource.getInputStream();
+        DataContentHandler dch = getDataContentHandler();
+        if (dch == null)
+            throw new UnsupportedDataTypeException(
+                    "no DCH for MIME type " + getShortType());
+        if ((dch instanceof ObjectDataContentHandler) &&
+                ((ObjectDataContentHandler)dch).getDCH() == null)
+            throw new UnsupportedDataTypeException(
+                    "no object DCH for MIME type " + getShortType());
+        PipedOutputStream pos = new PipedOutputStream();
+        DataContentHandlerWriter dchw = new DataContentHandlerWriter(dch,
+                object, objectMimeType, pos);
+        Thread thread = new Thread(dchw, "DataHandler.getInputStream");
+        thread.start();
+        return new PipedInputStream(pos);
+    }
+
+    static class DataContentHandlerWriter
+        implements Runnable
+    {
+
+        DataContentHandler dch;
+        Object object;
+        String mimeType;
+        OutputStream out;
+
+        DataContentHandlerWriter(DataContentHandler dch, Object object,
+                String mimeType, OutputStream out)
+        {
+            this.dch = dch;
+            this.object = object;
+            this.mimeType = mimeType;
+            this.out = out;
+        }
+        
+        public void run()
+        {
+            try
+            {
+                dch.writeTo(object, mimeType, out);
+            }
+            catch(IOException e)
+            {
+            }
+            finally
+            {
+                try
+                {
+                    out.close();
+                }
+                catch(IOException e)
+                {
+                }
+            }
+        }
+    }
+        
+    /**
+     * Writes the data as a byte stream.
+     * @param os the stream to write to
+     */
+    public void writeTo(OutputStream os)
+        throws IOException
+    {
+        if (dataSource != null)
+        {
+            InputStream in = dataSource.getInputStream();
+            byte[] buf = new byte[8192];
+            for (int len = in.read(buf); len != -1; len = in.read(buf))
+                os.write(buf, 0, len);
+            in.close();
+        }
+        else
+        {
+            DataContentHandler dch = getDataContentHandler();
+            dch.writeTo(object, objectMimeType, os);
+        }
+    }
+
+    /**
+     * Returns an output stream that can be used to overwrite the underlying
+     * data, if the DataSource constructor was used.
+     */
+    public OutputStream getOutputStream()
+        throws IOException
+    {
+        if (dataSource != null)
+            return dataSource.getOutputStream();
+        return null;
+    }
+
+    /**
+     * Returns the data flavors in which this data is available.
+     */
+    public synchronized DataFlavor[] getTransferDataFlavors()
+    {
+        if (factory != oldFactory || transferFlavors == NO_FLAVORS)
+        {
+            DataContentHandler dch = getDataContentHandler();
+            transferFlavors = dch.getTransferDataFlavors();
+        }
+        return transferFlavors;
+    }
+
+    /**
+     * Indicates whether the specified data flavor is supported for this
+     * data.
+     */
+    public boolean isDataFlavorSupported(DataFlavor flavor)
+    {
+        DataFlavor[] flavors = getTransferDataFlavors();
+        for (int i = 0; i < flavors.length; i++)
+        {
+            if (flavors[i].equals(flavor))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns an object representing the data to be transferred.
+     * @param flavor the requested data flavor
+     */
+    public Object getTransferData(DataFlavor flavor)
+        throws UnsupportedFlavorException, IOException
+    {
+        DataContentHandler dch = getDataContentHandler();
+        return dch.getTransferData(flavor, dataSource);
+    }
+
+    /**
+     * Sets the command map to be used by this data handler.
+     * Setting to null uses the default command map.
+     * @param commandMap the command map to use
+     */
+    public synchronized void setCommandMap(CommandMap commandMap)
+    {
+        if (commandMap != currentCommandMap || commandMap == null)
+        {
+            transferFlavors = NO_FLAVORS;
+            dataContentHandler = null;
+            currentCommandMap = commandMap;
+        }
+    }
+
+    /**
+     * Returns the preferred commands for this type of data.
+     */
+    public CommandInfo[] getPreferredCommands()
+    {
+        CommandMap commandMap = getCommandMap();
+        return commandMap.getPreferredCommands(getShortType());
+    }
+
+    /**
+     * Returns the complete list of commands for this type of data.
+     */
+    public CommandInfo[] getAllCommands()
+    {
+        CommandMap commandMap = getCommandMap();
+        return commandMap.getAllCommands(getShortType());
+    }
+
+    /**
+     * Returns the specified command.
+     * @param cmdName the command name
+     */
+    public CommandInfo getCommand(String cmdName)
+    {
+        CommandMap commandMap = getCommandMap();
+        return commandMap.getCommand(getShortType(), cmdName);
+    }
+
+    /**
+     * Returns the data as a reified object.
+     */
+    public Object getContent()
+        throws IOException
+    {
+        DataContentHandler dch = getDataContentHandler();
+        return dch.getContent(getDataSource());
+    }
+
+    /**
+     * Returns the instantiated bean using the specified command.
+     * @param cmdInfo the command to instantiate the bean with
+     */
+    public Object getBean(CommandInfo cmdInfo)
+    {
+        try
+        {
+            return cmdInfo.getCommandObject(this, getClass().getClassLoader());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace(System.err);
+            return null;
+        }
+        catch (ClassNotFoundException e)
+        {
+            e.printStackTrace(System.err);
+            return null;
+        }
+    }
+
+    /**
+     * Sets the data content handler factory.
+     * If the factory has already been set, throws an Error.
+     * @param newFactory the factory to set
+     */
+    public static synchronized void setDataContentHandlerFactory(
+            DataContentHandlerFactory newFactory)
+    {
+        if (factory != null)
+            throw new Error("DataContentHandlerFactory already defined");
+        SecurityManager security = System.getSecurityManager();
+        if (security != null)
+        {
+            try
+            {
+                security.checkSetFactory();
+            }
+            catch (SecurityException e)
+            {
+                if (newFactory != null && DataHandler.class.getClassLoader()
+                        != newFactory.getClass().getClassLoader())
+                    throw e;
+            }
+        }
+        factory = newFactory;
+    }
+
+    /*
+     * Returns just the base part of the data's content-type, with no
+     * parameters.
+     */
+    private synchronized String getShortType()
+    {
+        if (shortType == null)
+        {
+            String contentType = getContentType();
+            try
+            {
+                MimeType mimeType = new MimeType(contentType);
+                shortType = mimeType.getBaseType();
+            }
+            catch (MimeTypeParseException e)
+            {
+                shortType = contentType;
+            }
+        }
+        return shortType;
+    }
+
+    /*
+     * Returns the command map for this handler.
+     */
+    private synchronized CommandMap getCommandMap()
+    {
+        if (currentCommandMap != null)
+            return currentCommandMap;
+        return CommandMap.getDefaultCommandMap();
+    }
+
+    /*
+     * Returns the DCH for this handler.
+     */
+    private synchronized DataContentHandler getDataContentHandler()
+    {
+        if (factory != oldFactory)
+        {
+            oldFactory = factory;
+            factoryDCH = null;
+            dataContentHandler = null;
+            transferFlavors = NO_FLAVORS;
+        }
+        if (dataContentHandler != null)
+            return dataContentHandler;
+        String mimeType = getShortType();
+        if (factoryDCH == null && factory != null)
+            factoryDCH = factory.createDataContentHandler(mimeType);
+        if (factoryDCH != null)
+            dataContentHandler = factoryDCH;
+        if (dataContentHandler == null)
+        {
+            CommandMap commandMap = getCommandMap();
+            dataContentHandler = commandMap.createDataContentHandler(mimeType);
+        }
+        if (dataSource != null)
+            dataContentHandler = new DataSourceDataContentHandler(dataContentHandler, dataSource);
+        else
+            dataContentHandler = new ObjectDataContentHandler(dataContentHandler, object, objectMimeType);
+        return dataContentHandler;
+    }
 
 }

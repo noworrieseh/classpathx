@@ -1,153 +1,105 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk, Nic Ferrier
-
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * CommandInfo.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 package javax.activation;
 
-// Imports
-import java.io.Externalizable;
-import java.io.ObjectInputStream;
-import java.io.IOException;
 import java.beans.Beans;
+import java.io.Externalizable;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
- * Describes a command.
+ * Description of the result of a command request.
  *
- * @author Andrew Selkirk: aselkirk@mailandnews.com
- * @author Nic Ferrier: nferrier@tapsellferrier.co.uk
- * @version $Revision: 1.4 $
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
 public class CommandInfo
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
+    private String verb;
+    private String className;
 
-  /**
-   * Command verb.
-   */
-  private String verb = null;
-
-  /**
-   * Command class name.
-   */
-  private String className = null;
-
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create the command information
-   * @param verb Command verb
-   * @param className Command class name
-   */
-  public CommandInfo(String verb, String className) 
-  {
-    this.verb = verb;
-    this.className = className;
-  } // CommandInfo()
-
-
-  //-------------------------------------------------------------
-  // Methods ----------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Get string representation
-   * @return the command name
-   * @see #getCommandName which this method uses
-   */
-  public String toString()
-  {
-    return getCommandName();
-  } // toString()
-
-  /**
-   * Get the class of the command.
-   * @return Command class
-   */
-  public String getCommandClass() 
-  {
-    return className;
-  } // getCommandClass()
-
-  /**
-   * Get the command's name.
-   * @return Command name
-   */
-  public String getCommandName() 
-  {
-    return verb;
-  } // getCommandName()
-
-  /**
-   * Instantiate the command object.
-   * @param handler Data handler
-   * @param loader Class loader to use
-   * @return Command object
-   * @throws IOException IO exception occurred
-   * @throws ClassNotFoundException Class not found
-   */
-  public Object getCommandObject(DataHandler handler, ClassLoader loader)
-  throws IOException, ClassNotFoundException 
-  {
-
-    // Variables
-    Object object;
-    CommandObject command;
-    Externalizable external;
-    ObjectInputStream input;
-
-    // Create the object
-    object = Beans.instantiate(loader, className);
-
-    // Check for a Command Object
-    if (object instanceof CommandObject)
+    /**
+     * Constructor.
+     * @param verb the command verb
+     * @param className the command class name
+     */
+    public CommandInfo(String verb, String className)
     {
-      command = (CommandObject) object;
+        this.verb = verb;
+        this.className = className;
+    }
 
-      // Set the context of the command object
-      command.setCommandContext(verb, handler);
-
-    } // if
-
-    // Check for Externalizable object
-    else if ((object instanceof Externalizable) && handler != null)
+    /**
+     * Returns the command verb.
+     */
+    public String getCommandName()
     {
-      external = (Externalizable) object;
+        return verb;
+    }
 
-      // Get the stream to read the object from the handler
-      input = new ObjectInputStream(handler.getInputStream());
+    /**
+     * Returns the command class name.
+     */
+    public String getCommandClass()
+    {
+        return className;
+    }
 
-      // Cause the object to read itself from the stream
-      external.readExternal(input);
-
-    } // if
-
-    // Return the Command object
-    return object;
-
-  } // getCommandObject()
-
-
-} // CommandInfo
+    /**
+     * Returns the instantiated bean.
+     * If the bean implements <code>CommandObject</code>, its
+     * <code>setCommandContext</code> method will be called.
+     * @param dh the data handler describing the command data
+     * @param loader the class loader used to instantiate the bean
+     */
+    public Object getCommandObject(DataHandler dh, ClassLoader loader)
+        throws IOException, ClassNotFoundException
+    {
+        Object object = Beans.instantiate(loader, className);
+        if (object != null)
+        {
+            if (object instanceof CommandObject)
+            {
+                CommandObject command = (CommandObject)object;
+                command.setCommandContext(verb, dh);
+            }
+            else if (dh != null && (object instanceof Externalizable))
+            {
+                InputStream in = dh.getInputStream();
+                if (in != null)
+                {
+                    Externalizable externalizable = (Externalizable)object;
+                    externalizable.readExternal(new ObjectInputStream(in));
+                }
+            }
+        }
+        return object;
+    }
+    
+}

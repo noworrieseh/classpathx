@@ -1,5 +1,5 @@
 /*
- * MimeTypeParseException.java
+ * TextViewer.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU Java Activation Framework (JAF), a library.
@@ -24,46 +24,47 @@
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
  */
-package javax.activation;
+package gnu.activation.viewers;
+
+import java.awt.Dimension;
+import java.awt.TextArea;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import javax.activation.CommandObject;
+import javax.activation.DataHandler;
 
 /**
- * Exception thrown to indicate a malformed MIME content type.
+ * Simple text display component.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.0.2
  */
-public class MimeTypeParseException extends Exception
+public class TextViewer extends TextArea
+    implements CommandObject
 {
 
-    /**
-     * Constructs a MimeTypeParseException with no detail message.
-     */
-    public MimeTypeParseException()
+    public TextViewer()
     {
+        super("", 24, 80, 1);
+        setEditable(false);
     }
 
-    /**
-     * MimeTypeParseException with the specified detail message.
-     * @param message the exception message
-     */
-    public MimeTypeParseException(String message)
+    public Dimension getPreferredSize()
     {
-        super(message);
+        return getMinimumSize(24, 80);
     }
 
-    /**
-     * Constructs a MimeTypeParseException with the specified detail message
-     * and token in error.
-     * @param message the exception message
-     * @param token the token in error
-     */
-    MimeTypeParseException(String message, String token)
+    public void setCommandContext(String verb, DataHandler dh)
+        throws IOException
     {
-        this(new StringBuffer(message)
-                .append(':')
-                .append(' ')
-                .append(token)
-                .toString());
+        InputStream in = dh.getInputStream();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        byte[] buf = new byte[4096];
+        for (int len = in.read(buf); len != -1; len = in.read(buf))
+            bytes.write(buf, 0, len);
+        in.close();
+        setText(bytes.toString());
     }
     
 }

@@ -1,9 +1,8 @@
 #
-# This is a very simple 'mailcap' file
+# Default mailcap entries for GNU JAF
 #
-# It would be cool to have this created by configure depending
-# on --with-mimetype or something
-#
-image/gif;;		x-java-view=gnu.inet.mime.viewers.ImageViewer
-image/jpeg;;		x-java-view=gnu.inet.mime.viewers.ImageViewer
-text/*;;		x-java-view=gnu.inet.mime.viewers.TextViewer
+image/gif;;     x-java-view=gnu.activation.viewers.ImageViewer
+image/jpeg;;    x-java-view=gnu.activation.viewers.ImageViewer
+image/png;;     x-java-view=gnu.activation.viewers.ImageViewer
+text/*;;        x-java-view=gnu.activation.viewers.TextViewer
+text/*;;        x-java-edit=gnu.activation.viewers.TextEditor

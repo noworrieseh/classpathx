@@ -1,298 +1,301 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 Andrew Selkirk
-
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * MimeTypeParameterList.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 package javax.activation;
 
-// Imports
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.StringTokenizer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
- * MIME Type Parameter List.
- * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * A list of MIME type parameters, as specified in RFCs 2045 and 2046.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
-public class MimeTypeParameterList 
+public class MimeTypeParameterList
 {
 
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
+    private static final String TSPECIALS = "()<>@,;:/[]?=\\\"";
 
-  /**
-   * Parameter mapping.
-   */
-  private Hashtable parameters = new Hashtable();
-
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create MIME type parameters list from string.
-   * @param parameterList String to parse
-   */
-  public MimeTypeParameterList(String parameterList)
-  throws MimeTypeParseException 
-  {
-    try 
+    private List parameterNames;
+    private Map parameterValues;
+    
+    /**
+     * Constructor for an empty parameter list.
+     */
+    public MimeTypeParameterList()
     {
-      parse(parameterList);
-    } catch (Exception e) 
-    {
+        parameterNames = new ArrayList();
+        parameterValues = new HashMap();
     }
-  } // MimeTypeParameterList()
 
-  /**
-   * Create empty parameter list.
-   */
-  public MimeTypeParameterList() 
-  {
-  } // MimeTypeParameterList()
-
-
-  //-------------------------------------------------------------
-  // Public Accessor Methods ------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Return string representation of parameter list.
-   * @return String value
-   */
-  public String toString() 
-  {
-
-    // Variables
-    Enumeration enum;
-    StringBuffer buffer;
-    String name;
-    String value;
- 
-    // Get Names
-    enum = getNames();
- 
-    // Process Each Name
-    buffer = new StringBuffer();
-    while (enum.hasMoreElements() == true) 
+    /**
+     * Constructor that parses the specified MIME parameter data.
+     * @param parameterList a MIME parameter list string representation
+     */
+    public MimeTypeParameterList(String parameterList)
+        throws MimeTypeParseException
     {
- 
-      // Get Parameter
-      name = (String) enum.nextElement();
-      value = get(name);
- 
-      // Append to Result
-      buffer.append(name);
-      buffer.append("=");
-      buffer.append(quote(value));
- 
-      // Check for Seperator
-      if (enum.hasMoreElements() == true) 
-      {
-        buffer.append("; ");
-      }
- 
-    } // while
- 
-    // Return Result
-    return buffer.toString();
- 
-  } // toString()
-
-  /**
-   * Get value of name.
-   * @param name Parameter name
-   * @return Parameter value, or null
-   */
-  public String get(String name) 
-  {
-    return (String) parameters.get(name);
-  } // get()
-
-  /**
-   * Set value of name.
-   * @param name Parameter name
-   * @param value Parameter value
-   */
-  public void set(String name, String value) 
-  {
-    parameters.put(name, value);
-  } // set()
-
-  /**
-   * Get size of parameter list.
-   * @return Number of parameters
-   */
-  public int size() 
-  {
-    return parameters.size();
-  } // size()
-
-  /**
-   * Remove parameter.
-   * @param name Name of parameter
-   */
-  public void remove(String name) 
-  {
-    parameters.remove(name);
-  } // remove()
-
-  /**
-   * Check if parameter list is empty.
-   * @return true if empty, false otherwise
-   */
-  public boolean isEmpty() 
-  {
-    if (parameters.size() == 0) 
-    {
-      return true;
+        parameterNames = new ArrayList();
+        parameterValues = new HashMap();
+        parse(parameterList);
     }
-    return false;
-  } // isEmpty()
 
-  /**
-   * Parse parameter list.
-   * @param parameterList Parameter list to parse
-   * @throws MimeTypeParseException Parsing exception occurred
-   */
-  protected void parse(String parameterList)
-  throws MimeTypeParseException 
-  {
- 
-    // Variables
-    StringTokenizer tokens;
-    String parameter;
-    String name;
-    String value;
-    int index;
- 
-    // Create Tokenizer
-    tokens = new StringTokenizer(parameterList, ";");
- 
-    // Load Each Parameter
-    while (tokens.hasMoreTokens() == true) 
+    /**
+     * Parses the specified MIME parameter data, storing the results in this
+     * object.
+     * @param parameterList a MIME parameter list string representation
+     */
+    protected void parse(String parameterList)
+        throws MimeTypeParseException
     {
-      parameter = tokens.nextToken();
-      index = parameter.indexOf("=");
-      if (index != parameter.lastIndexOf("=")) 
-      {
-        throw new MimeTypeParseException("multiple =");
-      }
-      name = parameter.substring(0, index).trim();
-      value = (parameter.substring(index + 1).trim());
- 
-      // Check name characters
-      for (index = 0; index < name.length(); index++) 
-      {
-        if (isTokenChar(name.charAt(index)) == false)
-        {
-          throw new MimeTypeParseException("invalid character");
+        if (parameterList == null)
+            return;
+        // Tokenize list into parameters
+        char[] chars = parameterList.toCharArray();
+        int len = chars.length;
+        boolean inQuotedString = false;
+        StringBuffer buffer = new StringBuffer();
+        List params = new ArrayList();
+        for (int i = 0; i < len; i++) {
+            char c = chars[i];
+            if (c == ';' && !inQuotedString)
+            {
+                String param = buffer.toString().trim();
+                if (param.length() > 0)
+                    params.add(param);
+                buffer.setLength(0);
+            }
+            else
+            {
+                if (c == '"')
+                    inQuotedString = !inQuotedString;
+                buffer.append(c);
+            }
         }
-      } // for: index
- 
-      // Check value characters
-      for (index = 0; index < value.length(); index++) 
-      {
-        if (isTokenChar(value.charAt(index)) == false)
+        String param = buffer.toString().trim();
+        if (param.length() > 0)
+            params.add(param);
+        
+        // Tokenize each parameter into name + value
+        for (Iterator i = params.iterator(); i.hasNext(); )
         {
-          throw new MimeTypeParseException("invalid character");
+            param = (String)i.next();
+            int ei = param.indexOf('=');
+            if (ei == -1)
+                throw new MimeTypeParseException("Couldn't find the '=' that separates a parameter name from its value.");
+            String name = param.substring(0, ei).trim();
+            MimeType.checkValidity(name, "Parameter name is invalid");
+            String value = param.substring(ei + 1).trim();
+            len = value.length();
+            if (len > 1 && value.charAt(0) == '"' &&
+                    value.charAt(len - 1) == '"')
+                value = unquote(value);
+            else
+                MimeType.checkValidity(name, "Parameter value is invalid");
+
+            parameterNames.add(name);
+            parameterValues.put(name.toLowerCase(), value);
         }
-      } // for: index
- 
-      // Add to Parameter List
-      set(name, value);
- 
-    } // while())
- 
-  } // parse()
-
-  /**
-   * Get enumeration of parameter names.
-   * @return Name enumeration
-   */
-  public Enumeration getNames() 
-  {
-    return parameters.keys();
-  } // getNames()
-
-  /**
-   * Check if token is character.
-   * @param token Token to check
-   * @return true if character, false otherwise
-   */
-  private static boolean isTokenChar(char token) 
-  {
-    if (token > 32 && token < 127) 
-    {
-      if (token == '(' || token == ')' || token == '<' ||
-          token == '<' || token == '@' || token == ',' ||
-          token == ';' || token == ':' || token == '\\' ||
-          token == '"' || token == '/' || token == '[' ||
-          token == ']' || token == '?' || token == '=')
-      {
-        return false;
-      }
-      return true;
-    }
-    return false;
-  } // isTokenChar()
-
-  /**
-   * Quote a string.
-   * @param value String to quote
-   * @return Quoted string
-   */
-  private static String quote(String value) 
-  {
-
-    // Add quotes around the value
-    return "\"" + value + "\"";
-
-  } // quote()
-
-  /**
-   * Remove quotes from string.
-   * @param value Quoted string
-   * @return Unquoted string
-   */
-  private static String unquote(String value) 
-  {
-
-    // Check for starting quote
-    if (value.startsWith("\"") == true)
-    {
-      value = value.substring(1);
     }
 
-    // Check for ending quote
-    if (value.endsWith("\"") == true)
+    /**
+     * Returns the number of parameters.
+     */
+    public synchronized int size()
     {
-      value = value.substring(0, value.length() - 1);
+        return parameterNames.size();
     }
 
-    // Return Unquoted string
-    return value;
+    /**
+     * Indicates if there are no parameters.
+     */
+    public synchronized boolean isEmpty()
+    {
+        return parameterNames.isEmpty();
+    }
 
-  } // unquote()
+    /**
+     * Returns the value for the specified parameter name.
+     * @param name the parameter name
+     */
+    public synchronized String get(String name)
+    {
+        name = name.trim();
+        return (String)parameterValues.get(name.toLowerCase());
+    }
 
+    /**
+     * Sets the value for the specified parameter name.
+     * @param name the parameter name
+     * @param value the parameter value
+     */
+    public synchronized void set(String name, String value)
+    {
+        name = name.trim();
+        boolean exists = false;
+        for (Iterator i = parameterNames.iterator(); i.hasNext(); )
+        {
+            String pname = (String)i.next();
+            if (name.equalsIgnoreCase(pname))
+                exists = true;
+        }
+        if (!exists)
+            parameterNames.add(name);
+        parameterValues.put(name.toLowerCase(), value);
+    }
 
-} // MimeTypeParameterList
+    /**
+     * Removes the parameter identified by the specified name.
+     * @param name the parameter name
+     */
+    public synchronized void remove(String name)
+    {
+        name = name.trim();
+        for (Iterator i = parameterNames.iterator(); i.hasNext(); )
+        {
+            String pname = (String)i.next();
+            if (name.equalsIgnoreCase(pname))
+                i.remove();
+        }
+        parameterValues.remove(name.toLowerCase());
+    }
+
+    /**
+     * Returns an enumeration of all the parameter names.
+     */
+    public synchronized Enumeration getNames()
+    {
+        return new IteratorEnumeration(parameterNames.iterator());
+    }
+
+    /**
+     * Returns an RFC 2045-complient string representation of this parameter
+     * list.
+     */
+    public synchronized String toString()
+    {
+        StringBuffer buffer = new StringBuffer();
+        for (Iterator i = parameterNames.iterator(); i.hasNext(); )
+        {
+            String name = (String)i.next();
+            String value = (String)parameterValues.get(name.toLowerCase());
+
+            if (buffer.length() > 0)
+            {
+                buffer.append(';');
+                buffer.append(' ');
+            }
+            buffer.append(name);
+            buffer.append('=');
+            buffer.append(quote(value));
+        }
+        return buffer.toString();
+    }
+
+    private static String quote(String value)
+    {
+        boolean needsQuoting = false;
+        int len = value.length();
+        for (int i = 0; i < len; i++)
+        {
+            if (!MimeType.isValidChar(value.charAt(i)))
+            {
+                needsQuoting = true;
+                break;
+            }
+        }
+
+        if (needsQuoting)
+        {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append('"');
+            for (int i = 0; i < len; i++)
+            {
+                char c = value.charAt(i);
+                if (c == '\\' || c == '"')
+                    buffer.append('\\');
+                buffer.append(c);
+            }
+            buffer.append('"');
+            return buffer.toString();
+        }
+        return value;
+    }
+
+    private static String unquote(String value)
+    {
+        int len = value.length();
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 1; i < len - 1; i++)
+        {
+            char c = value.charAt(i);
+            if (c == '\\')
+            {
+                i++;
+                if (i < len - 1)
+                {
+                    c = value.charAt(i);
+                    if (c != '\\' && c != '"')
+                        buffer.append('\\');
+                }
+            }
+            buffer.append(c);
+        }
+        return buffer.toString();
+    }
+
+    /**
+     * Enumeration proxy for an Iterator.
+     */
+    static class IteratorEnumeration
+        implements Enumeration
+    {
+
+        final Iterator iterator;
+
+        IteratorEnumeration(Iterator iterator)
+        {
+            this.iterator = iterator;
+        }
+
+        public boolean hasMoreElements()
+        {
+            return iterator.hasNext();
+        }
+        
+        public Object nextElement()
+        {
+            return iterator.next();
+        }
+
+    }
+
+}

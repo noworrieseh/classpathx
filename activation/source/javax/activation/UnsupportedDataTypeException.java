@@ -1,57 +1,57 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
-
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * UnsupportedDataTypeException.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 package javax.activation;
 
-// Imports
 import java.io.IOException;
 
 /**
- * Unsupported Data Type Exception.
- * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * Exception indicating that the requested method doesn't support the
+ * specified data type.
+ *
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
-public class UnsupportedDataTypeException extends IOException 
+public class UnsupportedDataTypeException extends IOException
 {
 
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
+    /**
+     * Constructs an UnsupportedDataTypeException with no detail message.
+     */
+    public UnsupportedDataTypeException()
+    {
+    }
 
-  /**
-   * Create new unsupported data type exception with description.
-   * @param value Description
-   */
-  public UnsupportedDataTypeException(String value) 
-  {
-    super(value);
-  } // UnsupportedDataTypeException()
-
-  /**
-   * Create new unsupported data type exception.
-   */
-  public UnsupportedDataTypeException() 
-  {
-    super();
-  } // UnsupportedDataTypeException()
-
-
-} // UnsupportedDataTypeException
+    /**
+     * Constructs an UnsupportedDataTypeException with the specified detail
+     * message.
+     * @param message the message
+     */
+    public UnsupportedDataTypeException(String message)
+    {
+        super(message);
+    }
+}

@@ -13,8 +13,6 @@ doc = docs
 
 # Source files.
 sources = \
-$(src)/gnu/activation/MagicFileTypeMap.java \
-$(src)/gnu/activation/MIMETypeParser.java \
 $(src)/javax/activation/ActivationDataFlavor.java \
 $(src)/javax/activation/CommandInfo.java \
 $(src)/javax/activation/CommandMap.java \
@@ -34,7 +32,10 @@ $(src)/javax/activation/MimeTypeParseException.java \
 $(src)/javax/activation/MimetypesFileTypeMap.java \
 $(src)/javax/activation/ObjectDataContentHandler.java \
 $(src)/javax/activation/UnsupportedDataTypeException.java \
-$(src)/javax/activation/URLDataSource.java
+$(src)/javax/activation/URLDataSource.java \
+$(src)/gnu/activation/viewers/ImageViewer.java \
+$(src)/gnu/activation/viewers/TextEditor.java \
+$(src)/gnu/activation/viewers/TextViewer.java
 
 # Targets
 BUILT_SOURCES = activation.jar
@@ -60,7 +61,7 @@ activation.jar: meta-inf activation
 meta-inf: $(META_INF) $(META_INF_FILES)
 
 $(META_INF):
-	test ! -d META-INF && mkdir -p META-INF
+	test ! -d $(dst)/META-INF && mkdir -p $(dst)/META-INF
 
 $(META_INF)/COPYING: COPYING
 	cp COPYING $(META_INF)/

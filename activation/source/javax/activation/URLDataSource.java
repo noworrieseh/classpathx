@@ -1,171 +1,120 @@
 /*
-  GNU-Classpath Extensions: java bean activation framework
-  Copyright (C) 2000 2001  Andrew Selkirk
-
-  For more information on the classpathx please mail:
-  nferrier@tapsellferrier.co.uk
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * URLDataSource.java
+ * Copyright (C) 2004 The Free Software Foundation
+ * 
+ * This file is part of GNU Java Activation Framework (JAF), a library.
+ * 
+ * GNU JAF is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * GNU JAF is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * As a special exception, if you link this library with other files to
+ * produce an executable, this library does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * This exception does not however invalidate any other reasons why the
+ * executable file might be covered by the GNU General Public License.
+ */
 package javax.activation;
 
-// Imports
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * A data source based on a URL.
+ * DataSource implementation that retrieves its data from a URL.
  *
- * @author Andrew Selkirk
- * @version $Revision: 1.3 $
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.0.2
  */
 public class URLDataSource
-implements DataSource
+    implements DataSource
 {
 
-  //-------------------------------------------------------------
-  // Constants --------------------------------------------------
-  //-------------------------------------------------------------
+    private URL url;
+    private URLConnection connection;
 
-  /**
-   * Encoding of the default content type for url data sources
-   */
-  private static final String DEFAULT_CONTENT = "application/octet-stream";
-
-
-  //-------------------------------------------------------------
-  // Variables --------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * URL to the datasource.
-   */
-  private URL url = null;
-
-  /**
-   * Cached URL connection
-   */
-  private URLConnection connection = null;
-
-
-  //-------------------------------------------------------------
-  // Initialization ---------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Create new URL data source from URL.
-   * @param url URL
-   */
-  public URLDataSource(URL url)
-  {
-    this.url = url;
-  } // URLDataSource()
-
-
-  //-------------------------------------------------------------
-  // Methods ----------------------------------------------------
-  //-------------------------------------------------------------
-
-  /**
-   * Get name of the URL.
-   * @return Name of the data source
-   */
-  public String getName()
-  {
-    return url.getFile();
-  } // getName()
-
-  /**
-   * Get the URL.
-   * @return URL of the data source
-   */
-  public URL getURL() 
-  {
-    return url;
-  } // getURL()
-
-  /**
-   * Get input stream of the URL
-   * @return Input stream of data source
-   * @throws IOException IO exception occurred
-   */
-  public InputStream getInputStream() throws IOException 
-  {
-    if (connection == null)
+    /**
+     * Constructor.
+     * This will not open the connection to the URL.
+     */
+    public URLDataSource(URL url)
     {
-      connection = url.openConnection();
+        this.url = url;
     }
-    return connection.getInputStream();
-  } // getInputStream()
 
-  /**
-   * Get the content type of the URL data source.
-   * @return Content type
-   */
-  public String getContentType() 
-  {
-
-    // Variables
-    String type;
-
-    try 
+    /**
+     * Returns the Content-Type header for the URL.
+     * In the case of failure or lack of such a header,
+     * returns "application/octet-stream".
+     */
+    public String getContentType()
     {
+        try
+        {
+            if (connection == null)
+                connection = url.openConnection();
+        }
+        catch (IOException e)
+        {
+        }
+        String contentType = null;
+        if (connection != null)
+            contentType = connection.getContentType();
+        if (contentType == null)
+            contentType = "application/octet-stream";
+        return contentType;
+    }
 
-      // Check if a connection has been established
-      if (connection == null)
-      {
+    /**
+     * Returns the result of <code>getFile</code> of the underlying URL.
+     */
+    public String getName()
+    {
+        return url.getFile();
+    }
+
+    public InputStream getInputStream()
+        throws IOException
+    {
         connection = url.openConnection();
-      }
-
-      // Determine the Content type
-      type = connection.getContentType();
-      if (type != null)
-      {
-        return type;
-      }
-
-    } catch (Exception e)
-    {
-    } // try
-
-    // Return the default content type
-    return DEFAULT_CONTENT;
-
-  } // getContentType()
-
-  /**
-   * Get output stream.
-   * @return Output stream of data source
-   * @throws IOException IO exception occurred
-   */
-  public OutputStream getOutputStream() throws IOException
-  {
-
-    // Check if a connection has been established
-    if (connection == null)
-    {
-      connection = url.openConnection();
+        if (connection != null)
+        {
+            connection.setDoInput(true);
+            return connection.getInputStream();
+        }
+        return null;
     }
 
-    // Return an output stream of the connection
-    return connection.getOutputStream();
+    public OutputStream getOutputStream()
+        throws IOException
+    {
+        connection = url.openConnection();
+        if (connection != null)
+        {
+            connection.setDoOutput(true);
+            return connection.getOutputStream();
+        }
+        return null;
+    }
 
-  } // getOutputStream()
-
-
-} // URLDataSource
+    /**
+     * Returns the underlying URL.
+     */
+    public URL getURL()
+    {
+        return url;
+    }
+    
+}
