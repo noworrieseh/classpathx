@@ -1,7 +1,7 @@
 package gnu.crypto.sig.rsa;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuRSAKey.java,v 1.1 2002-01-11 21:21:57 raif Exp $
+// $Id: GnuRSAKey.java,v 1.2 2002-08-25 04:32:44 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -37,7 +37,7 @@ import java.security.interfaces.RSAKey;
 /**
  * A base asbtract class for both public and private RSA keys.<p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class GnuRSAKey implements Key, RSAKey {
 
@@ -88,7 +88,7 @@ public abstract class GnuRSAKey implements Key, RSAKey {
    /**
     * Returns the modulus <code>n</code>.
     *
-    * @returns the modulus <code>n</code>.
+    * @return the modulus <code>n</code>.
     */
    public BigInteger getN() {
       return n;

@@ -1,7 +1,7 @@
 package gnu.crypto.sig.dss;
 
 // ----------------------------------------------------------------------------
-// $Id: DSSSignature.java,v 1.4 2002-01-28 01:43:23 raif Exp $
+// $Id: DSSSignature.java,v 1.5 2002-08-25 04:32:25 raif Exp $
 //
 // Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 //
@@ -45,7 +45,7 @@ import java.util.HashMap;
 
 /**
  * The DSS (Digital Signature Standard) algorithm makes use of the following
- * parameters:
+ * parameters:<p>
  *
  * <ol>
  *    <li>p: A prime modulus, where <code>2<sup>L-1</sup> &lt; p &lt; 2<sup>L</sup>
@@ -64,42 +64,47 @@ import java.util.HashMap;
  *    &lt; q</code>.</li>
  * </ol>
  *
- * The integers <code>p</code>, <code>q</code>, and <code>g</code> can be
+ * <p>The integers <code>p</code>, <code>q</code>, and <code>g</code> can be
  * public and can be common to a group of users. A user's private and public
  * keys are <code>x</code> and <code>y</code>, respectively. They are normally
  * fixed for a period of time. Parameters <code>x</code> and <code>k</code> are
  * used for signature generation only, and must be kept secret. Parameter
- * <code>k</code> must be regenerated for each signature.<p>
+ * <code>k</code> must be regenerated for each signature.</p>
  *
  * The signature of a message <code>M</code> is the pair of numbers <code>r</code>
- * and <code>s</code> computed according to the equations below:
+ * and <code>s</code> computed according to the equations below:<p>
  *
  * <ul>
  *    <li><code>r = (g<sup>k</sup> mod p) mod q</code> and</li>
  *    <li><code>s = (k<sup>-1</sup>(SHA(M) + xr)) mod q</code>.</li>
  * </ul>
  *
- * In the above, <code>k<sup>-1</sup></code> is the multiplicative inverse of
+ * <p>In the above, <code>k<sup>-1</sup></code> is the multiplicative inverse of
  * <code>k</code>, <code>mod q</code>; i.e., <code>(k<sup>-1</sup> k) mod q = 1
  * </code> and <code>0 &lt; k-1 &lt; q</code>. The value of <code>SHA(M)</code>
  * is a 160-bit string output by the Secure Hash Algorithm specified in FIPS 180.
  * For use in computing <code>s</code>, this string must be converted to an
- * integer.<p>
+ * integer.</p>
  *
- * As an option, one may wish to check if <code>r == 0</code> or <code>s == 0
+ * <p>As an option, one may wish to check if <code>r == 0</code> or <code>s == 0
  * </code>. If either <code>r == 0</code> or <code>s == 0</code>, a new value
  * of <code>k</code> should be generated and the signature should be
  * recalculated (it is extremely unlikely that <code>r == 0</code> or <code>s ==
- * 0</code> if signatures are generated properly).<p>
+ * 0</code> if signatures are generated properly).</p>
  *
- * The signature is transmitted along with the message to the verifier.<p>
+ * <p>The signature is transmitted along with the message to the verifier.</p>
  *
- * References:<br>
- * <a href="http://www.itl.nist.gov/fipspubs/fip186.htm">Digital Signature
- * Standard (DSS)</a>, Federal Information Processing Standards Publication 186.
- * National Institute of Standards and Technology.<p>
+ * <p>
  *
- * @version $Revision: 1.4 $
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://www.itl.nist.gov/fipspubs/fip186.htm">Digital
+ *    Signature Standard (DSS)</a>, Federal Information Processing Standards
+ *    Publication 186. National Institute of Standards and Technology.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.5 $
  */
 public class DSSSignature extends BaseSignature {
 

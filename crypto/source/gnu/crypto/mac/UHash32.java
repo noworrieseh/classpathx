@@ -1,7 +1,7 @@
 package gnu.crypto.mac;
 
 // ----------------------------------------------------------------------------
-// $Id: UHash32.java,v 1.2 2002-07-06 23:51:58 raif Exp $
+// $Id: UHash32.java,v 1.3 2002-08-25 04:31:20 raif Exp $
 //
 // Copyright (C) 2002, Free Software Foundation, Inc.
 //
@@ -76,7 +76,7 @@ import java.util.Map;
  *    T. Krovetz, J. Black, S. Halevi, A. Hevia, H. Krawczyk, and P. Rogaway.</li>
  * </ol>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class UHash32 extends BaseMac {
 
@@ -497,15 +497,16 @@ public class UHash32 extends BaseMac {
    // =========================================================================
 
    /**
-    * Second hash stage of the UHash32 algorithm.
+    * <p>Second hash stage of the UHash32 algorithm.</p>
     *
-    * 5.4  L2-HASH-32: Second-layer hash.
-    *
-    * Input:
-    *    K string of length 24 bytes.
-    *    M string of length less than 2^64 bytes.
-    * Returns:
-    *    Y, string of length 16 bytes.
+    * 5.4  L2-HASH-32: Second-layer hash.<p>
+    * <ul>
+    *    <li>Input:<br>
+    *       K string of length 24 bytes.<br>
+    *       M string of length less than 2^64 bytes.</li>
+    *    <li>Returns:<br>
+    *       Y, string of length 16 bytes.</li>
+    * </ul>
     */
    class L2Hash32 implements Cloneable {
 
