@@ -71,7 +71,7 @@ public class TransformTest
 
     // Force use of Libxsltj
     System.setProperty ("javax.xml.transform.TransformerFactory",
-			"gnu.xml.libxmlj.transform.TransformerFactoryImpl");
+			"gnu.xml.libxmlj.transform.GnomeTransformerFactory");
 
     // Read arguments
     if (args.length != 3)

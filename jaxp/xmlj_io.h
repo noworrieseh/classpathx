@@ -51,6 +51,7 @@ typedef struct _SAXParseContext
   xmlParserCtxtPtr ctx; /* libxml2 parser context */
   xmlSAXLocatorPtr loc; /* libxml2 SAX locator */
   xmlSAXHandlerPtr sax; /* pristine SAX handler */
+  jstring systemId;
 
   jmethodID startDTD;
   jmethodID externalEntityDecl;
@@ -73,12 +74,15 @@ typedef struct _SAXParseContext
   jmethodID warning;
   jmethodID error;
   jmethodID fatalError;
+
+  jmethodID resolveURIAndOpen; /* JavaProxy */
   
 }
 SAXParseContext;
 
 SAXParseContext *
-xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx);
+xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx,
+                        jstring systemId);
 
 void
 xmljFreeSAXParseContext (SAXParseContext * saxCtx);
@@ -86,6 +90,7 @@ xmljFreeSAXParseContext (SAXParseContext * saxCtx);
 xmlParserCtxtPtr
 xmljNewParserContext (JNIEnv * env,
                       jobject inputStream,
+                      jbyteArray detectBuffer,
                       jstring inSystemId,
                       jstring inPublicId,
                       jboolean validate,
@@ -99,6 +104,7 @@ xmlDocPtr
 xmljParseDocument (JNIEnv * env,
                    jobject self,
                    jobject in,
+                   jbyteArray detectBuffer,
                    jstring publicId,
                    jstring systemId,
                    jboolean validate,
@@ -112,9 +118,17 @@ xmljParseDocument (JNIEnv * env,
                    jboolean lexicalHandler,
                    int saxMode);
 
+xmlDocPtr
+xmljParseDocument2 (JNIEnv * env,
+                    xmlParserCtxtPtr ctx,
+                    SAXParseContext *saxCtx,
+                    xmlSAXHandlerPtr sax,
+                    int saxMode);
+
 xmlParserInputPtr
 xmljNewParserInput (JNIEnv * env,
-		    jobject inputStream, xmlParserCtxtPtr parserContext);
+		    jobject inputStream,
+                    jbyteArray detectBuffer, xmlParserCtxtPtr parserContext);
 
 xmlParserInputBufferPtr
 xmljNewParserInputBuffer (JNIEnv * env,
@@ -135,7 +149,7 @@ xmljResolveURI (SaxErrorContext * saxErrorContext, const char *URL,
 			const char *ID);
 */
 xmlDocPtr
-xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
+xmljResolveURIAndOpen (SAXParseContext *saxContext,
 		       const char *URL, const char *ID);
 
 

@@ -38,8 +38,9 @@
 
 package gnu.xml.libxmlj.transform;
 
+import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PushbackInputStream;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -50,6 +51,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.stream.StreamSource;
+
+import gnu.xml.libxmlj.util.XMLJ;
 
 public class LibxsltStylesheet
 {
@@ -63,14 +66,23 @@ public class LibxsltStylesheet
     try
       {
         this.outputProperties = new Properties ();
+        NamedInputStream in = XMLJ.getInputStream (xsltSource);
+        String systemId = in.getName ();
+        byte[] detectBuffer = in.getDetectBuffer ();
         this.nativeStylesheetHandle
-          = newLibxsltStylesheet (IOToolkit.getSourceInputStream (xsltSource),
-                                  xsltSource.getSystemId (),
+          = newLibxsltStylesheet (in,
+                                  detectBuffer,
+                                  systemId,
                                   (xsltSource instanceof StreamSource) ?
                                   ((StreamSource) xsltSource).
                                   getPublicId () : null, javaContext,
                                   this.outputProperties);
-      } 
+      }
+    catch (IOException e)
+      {
+        System.out.println(xsltSource.getSystemId());
+        throw new TransformerConfigurationException (e);
+      }
     catch (TransformerException e)
       {
         if (null != e.getCause ())
@@ -109,7 +121,7 @@ public class LibxsltStylesheet
 
     // Make an array from the parameters so JNI interface's job is
     // easier
-    String[]parameterArray = new String[parameters.size () * 2];
+    String[] parameterArray = new String[parameters.size () * 2];
     int index = 0;
 
     for (Iterator it = parameters.keySet ().iterator (); it.hasNext ();
@@ -124,21 +136,33 @@ public class LibxsltStylesheet
 
     // Transform
 
-    libxsltTransform (nativeStylesheetHandle,
-		      IOToolkit.getSourceInputStream (source),
-		      source.getSystemId (),
-		      (source instanceof StreamSource) ? ((StreamSource)
-							  source).
-		      getPublicId () : null,
-		      IOToolkit.getResultOutputStream (result),
-		      parameterArray, javaContext);
+    try
+      {
+        NamedInputStream in = XMLJ.getInputStream (source);
+        String systemId = in.getName ();
+        byte[] detectBuffer = in.getDetectBuffer ();
+        libxsltTransform (nativeStylesheetHandle,
+                          in,
+                          detectBuffer,
+                          systemId,
+                          (source instanceof StreamSource) ? ((StreamSource)
+                                                              source).
+                          getPublicId () : null,
+                          XMLJ.getOutputStream (result),
+                          parameterArray, javaContext);
+      }
+    catch (IOException e)
+      {
+        throw new TransformerException (source.getSystemId (), e);
+      }
   }
 
   /*
    *  Native interface to libxslt.
    */
   private static synchronized native int 
-  newLibxsltStylesheet (PushbackInputStream in,
+  newLibxsltStylesheet (InputStream in,
+                        byte[] detectBuffer,
                         String inSystemId,
                         String inPublicId,
                         JavaContext javaContext,
@@ -150,7 +174,8 @@ public class LibxsltStylesheet
 
   private static synchronized native void 
   libxsltTransform (int nativeStylesheetHandle,
-                    PushbackInputStream in,
+                    InputStream in,
+                    byte[] detectBuffer,
                     String inSystemId,
                     String inPublicId,
                     OutputStream out,

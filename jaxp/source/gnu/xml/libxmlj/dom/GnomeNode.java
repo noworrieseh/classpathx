@@ -126,8 +126,8 @@ implements Node
       if (instances == null)
         return;
       Integer docKey = new Integer(doc);
-      //instances.remove(docKey);
-      System.out.println("Freed "+instances.remove(docKey));
+      instances.remove(docKey);
+      //System.out.println("Freed "+instances.remove(docKey));
     }
 
   final int id;

@@ -294,6 +294,8 @@ JNIEXPORT jobject JNICALL
 Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
                                                            jobject self,
                                                            jobject in,
+                                                           jbyteArray
+                                                           detectBuffer,
                                                            jstring publicId,
                                                            jstring systemId,
                                                            jboolean validate,
@@ -310,6 +312,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
   doc = xmljParseDocument(env,
                           self,
                           in,
+                          detectBuffer,
                           publicId,
                           systemId,
                           validate,
@@ -321,8 +324,8 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_parseStream (JNIEnv * env,
                           errorHandler,
                           0,
                           0,
-                          0);
-  return createDocument (env, self, doc);
+                          1);
+  return xmljCreateDocument (env, self, doc);
 }
 
 JNIEXPORT jobject JNICALL
@@ -342,7 +345,7 @@ Java_gnu_xml_libxmlj_dom_GnomeDocumentBuilder_createDocument (JNIEnv * env,
   /* TODO namespaceURI
    * TODO qualifiedName
    * TODO doctype */
-  return createDocument (env, self, doc);
+  return xmljCreateDocument (env, self, doc);
 }
 
 /* -- GnomeDocumentType -- */
@@ -1183,7 +1186,7 @@ Java_gnu_xml_libxmlj_dom_MatchingNodeList_getLength (JNIEnv * env,
  * Create GnomeDocument object from the given xmlDocPtr
  */
 jobject
-createDocument (JNIEnv * env, jobject self, xmlDocPtr doc)
+xmljCreateDocument (JNIEnv * env, jobject self, xmlDocPtr doc)
 {
   jclass cls;
   jfieldID field;

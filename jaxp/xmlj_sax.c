@@ -39,15 +39,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
-  const xmlChar *ret;
-  jstring j_ret;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-
-  ret = loc->getPublicId (ctx);
-  j_ret = xmljNewString (env, ret);
-  return j_ret;
+  return xmljNewString (env, loc->getPublicId (ctx));
 }
 
 JNIEXPORT jstring JNICALL
@@ -57,15 +52,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
-  const xmlChar *ret;
-  jstring j_ret;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-
-  ret = loc->getSystemId (ctx);
-  j_ret = xmljNewString (env, ret);
-  return j_ret;
+  return xmljNewString (env, loc->getSystemId (ctx));
 }
 
 JNIEXPORT jint JNICALL
@@ -75,13 +65,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
-  jint ret;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-
-  ret = loc->getLineNumber (ctx);
-  return ret;
+  return loc->getLineNumber (ctx);
 }
 
 JNIEXPORT jint JNICALL
@@ -91,13 +78,10 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv * env,
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
-  jint ret;
 
   ctx = (xmlParserCtxtPtr) j_ctx;
   loc = (xmlSAXLocatorPtr) j_loc;
-
-  ret = loc->getColumnNumber (ctx);
-  return ret;
+  return loc->getColumnNumber (ctx);
 }
 
 /* -- GnomeXMLReader -- */
@@ -109,6 +93,7 @@ JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                                                      jobject self,
                                                      jobject in,
+                                                     jbyteArray detectBuffer,
                                                      jstring publicId,
                                                      jstring systemId,
                                                      jboolean validate,
@@ -123,6 +108,7 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
   xmljParseDocument (env,
                      self,
                      in,
+                     detectBuffer,
                      publicId,
                      systemId,
                      validate,
@@ -134,7 +120,20 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                      errorHandler,
                      declarationHandler,
                      lexicalHandler,
-                     1);
+                     0);
+}
+
+xmlParserInputPtr
+xmljExternalEntityLoader (const char *url, const char *id,
+                          xmlParserCtxtPtr context)
+{
+  const xmlChar *systemId;
+  const xmlChar *publicId;
+
+  printf("xmljExternalEntityLoader %s %s\n", url, id);
+  systemId = xmlCharStrdup (url);
+  publicId = xmlCharStrdup (id);
+  return xmljSAXResolveEntity (context, publicId, systemId);
 }
 
 /*
@@ -171,7 +170,7 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
     {
       sax->resolveEntity = &xmljSAXResolveEntity;
       /* The above function is never called in libxml2 */
-      xmlSetExternalEntityLoader (&xmljExternalEntityLoader);
+      xmlSetExternalEntityLoader (xmljExternalEntityLoader);
     }
   else
     {
@@ -257,19 +256,6 @@ xmljNewSAXHandler (xmlSAXHandlerPtr orig,
   sax->serror = NULL;
 
   return sax;
-}
-
-xmlParserInputPtr
-xmljExternalEntityLoader (const char *url, const char *id,
-                          xmlParserCtxtPtr context)
-{
-  const xmlChar *systemId;
-  const xmlChar *publicId;
-
-  printf("xmljExternalEntityLoader %s %s\n", url, id);
-  systemId = xmlCharStrdup (url);
-  publicId = xmlCharStrdup (id);
-  return xmljSAXResolveEntity (context, publicId, systemId);
 }
 
 /* -- Callback functions -- */
@@ -389,9 +375,25 @@ xmljSAXResolveEntity (void *vctx,
 
   /* Return an xmlParserInputPtr corresponding to the input stream */
   if (inputStream != NULL)
-    return xmljNewParserInput (env, inputStream, ctx);
+    {
+      jbyteArray detectBuffer;
+      jmethodID getDetectBuffer;
+      jclass cls;
+
+      /* Get the detect buffer from the NamedInputStream */
+      cls = (*env)->GetObjectClass (env, inputStream);
+      getDetectBuffer = (*env)->GetMethodID (env, inputStream,
+                                             "getDetectBuffer",
+                                             "()[B");
+      detectBuffer = (*env)->CallObjectMethod (env, inputStream,
+                                               getDetectBuffer);
+      
+      return xmljNewParserInput (env, inputStream, detectBuffer, ctx);
+    }
   else
-    return NULL;
+    {
+      return NULL;
+    }
 }
 
 xmlEntityPtr

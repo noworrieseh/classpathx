@@ -322,23 +322,17 @@ $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
 $(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java \
-$(src)/gnu/xml/libxmlj/transform/DefaultErrorListenerImpl.java \
-$(src)/gnu/xml/libxmlj/transform/DefaultURIResolverImpl.java \
-$(src)/gnu/xml/libxmlj/transform/ErrorListenerProxy.java \
-$(src)/gnu/xml/libxmlj/transform/IOToolkit.java \
+$(src)/gnu/xml/libxmlj/transform/GnomeTemplates.java \
+$(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
+$(src)/gnu/xml/libxmlj/transform/GnomeTransformer.java \
 $(src)/gnu/xml/libxmlj/transform/JavaContext.java \
-$(src)/gnu/xml/libxmlj/transform/LibxmlDocument.java \
 $(src)/gnu/xml/libxmlj/transform/LibxsltStylesheet.java \
-$(src)/gnu/xml/libxmlj/transform/SourceLocatorImpl.java \
-$(src)/gnu/xml/libxmlj/transform/SourceWrapper.java \
-$(src)/gnu/xml/libxmlj/transform/TemplatesImpl.java \
 $(src)/gnu/xml/libxmlj/transform/TransformTest.java \
-$(src)/gnu/xml/libxmlj/transform/TransformerFactoryImpl.java \
-$(src)/gnu/xml/libxmlj/transform/TransformerImpl.java \
-$(src)/gnu/xml/libxmlj/transform/URIResolverProxy.java \
 $(src)/gnu/xml/libxmlj/util/EmptyNodeList.java \
+$(src)/gnu/xml/libxmlj/util/NamedInputStream.java \
 $(src)/gnu/xml/libxmlj/util/StandaloneDocumentType.java \
-$(src)/gnu/xml/libxmlj/util/StandaloneLocator.java
+$(src)/gnu/xml/libxmlj/util/StandaloneLocator.java \
+$(src)/gnu/xml/libxmlj/util/XMLJ.java
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 
@@ -358,10 +352,9 @@ gnu_xml_libxmlj_dom_GnomeNotation.h \
 gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
 gnu_xml_libxmlj_dom_MatchingNodeList.h \
 javax_xml_transform_OutputKeys.h \
+gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
 gnu_xml_libxmlj_transform_JavaContext.h \
-gnu_xml_libxmlj_transform_LibxmlDocument.h \
-gnu_xml_libxmlj_transform_LibxsltStylesheet.h \
-gnu_xml_libxmlj_transform_TransformerFactoryImpl.h
+gnu_xml_libxmlj_transform_LibxsltStylesheet.h
 
 libxmlj_la_DEPENDENCIES = $(JARFILE) $(headers)
 

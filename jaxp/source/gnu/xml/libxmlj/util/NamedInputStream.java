@@ -1,5 +1,5 @@
 /*
- * StandaloneLocator.java
+ * NamedInputStream.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -26,53 +26,47 @@
  */
 package gnu.xml.libxmlj.util;
 
-import javax.xml.transform.SourceLocator;
-import org.xml.sax.Locator;
+import java.io.FilterInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.PushbackInputStream;
 
-/**
- * SAX Locator implementation that uses the specified values.
- *
- * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- */
-public final class StandaloneLocator
-implements Locator, SourceLocator
+public class NamedInputStream
+extends FilterInputStream
 {
 
-  private final int lineNumber;
+  private static int DETECT_BUFFER_SIZE = 50;
+  
+  private String name;
 
-  private final int columnNumber;
-
-  private final String publicId;
-
-  private final String systemId;
-
-  public StandaloneLocator(int lineNumber, int columnNumber,
-                    String publicId, String systemId)
+  NamedInputStream (String name, InputStream in, int size)
     {
-      this.lineNumber = lineNumber;
-      this.columnNumber = columnNumber;
-      this.publicId = publicId;
-      this.systemId = systemId;
+      super (new PushbackInputStream (in, size));
+      this.name = name;
     }
 
-  public String getPublicId()
+  public String getName ()
     {
-      return publicId;
+      return name;
     }
 
-  public String getSystemId()
+  public byte[] getDetectBuffer ()
+    throws IOException
     {
-      return systemId;
+      PushbackInputStream p = (PushbackInputStream) in;
+      byte[] buffer = new byte[DETECT_BUFFER_SIZE];
+      int len = p.read (buffer);
+      if (len < 0)
+        {
+          return null;
+        }
+      else
+        {
+          p.unread (buffer, 0, len);
+          byte[] ret = new byte[len];
+          System.arraycopy (buffer, 0, ret, 0, len);
+          return ret;
+        }
     }
-
-  public int getLineNumber()
-    {
-      return lineNumber;
-    }
-
-  public int getColumnNumber()
-    {
-      return columnNumber;
-    }
-
+  
 }

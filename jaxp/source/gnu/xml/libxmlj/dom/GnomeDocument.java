@@ -46,7 +46,7 @@ import org.w3c.dom.Text;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class GnomeDocument
+public class GnomeDocument
 extends GnomeNode
 implements Document
 {

@@ -44,8 +44,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import gnu.xml.libxmlj.util.NamedInputStream;
 import gnu.xml.libxmlj.util.StandaloneDocumentType;
 import gnu.xml.libxmlj.util.StandaloneLocator;
+import gnu.xml.libxmlj.util.XMLJ;
 
 /**
  * A JAXP DOM implementation that uses Gnome libxml2 as the underlying
@@ -117,11 +119,13 @@ implements DOMImplementation
 
   public Document parse(InputSource input) throws SAXException, IOException
     {
-      InputStream in = getInputStream (input);
+      NamedInputStream in = XMLJ.getInputStream (input);
+      byte[] detectBuffer = in.getDetectBuffer ();
       String publicId = input.getPublicId();
       String systemId = input.getSystemId();
       seenFatalError = false;
       return parseStream(in,
+                         detectBuffer,
                          input.getPublicId(),
                          input.getSystemId(),
                          validate,
@@ -131,21 +135,8 @@ implements DOMImplementation
                          errorHandler != null);
     }
 
-  InputStream getInputStream(InputSource input) throws IOException
-    {
-      InputStream in = input.getByteStream();
-      if (in == null)
-        {
-          String systemId = input.getSystemId();
-          if (systemId != null)
-            in = new URL(systemId).openStream();
-          else
-            throw new IOException("Unable to locate input source");
-        }
-      return new PushbackInputStream(in, 50);
-    }
-  
   private native Document parseStream(InputStream in,
+                                      byte[] detectBuffer,
                                       String publicId,
                                       String systemId,
                                       boolean validate,
@@ -202,8 +193,8 @@ implements DOMImplementation
                                     String systemId) throws SAXException, IOException
     {
       if (entityResolver != null)
-        return getInputStream(entityResolver.resolveEntity(publicId,
-                                                           systemId));
+        return XMLJ.getInputStream(entityResolver.resolveEntity(publicId,
+                                                                systemId));
       else
         return null;
     }

@@ -50,7 +50,7 @@ void xmljDOMFatalError (void *ctx, const char *msg, ...);
 void dispatchLogCallback (const char *msg, const char *methodName);
 
 /* Utility */
-jobject createDocument (JNIEnv * env, jobject self, xmlDocPtr doc);
+jobject xmljCreateDocument (JNIEnv * env, jobject self, xmlDocPtr doc);
 xmlParserCtxtPtr getContext (JNIEnv * env, jobject self);
 xmlAttrPtr getNamedItem (JNIEnv * env, jobject self, jstring name);
 xmlAttrPtr getNamedItemNS (JNIEnv * env, jobject self, jstring uri,
