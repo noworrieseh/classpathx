@@ -211,9 +211,8 @@ public final class Steps
     Expr expr = (Expr) i.next();
     if (!(expr instanceof Root))
       {
-        buf.append('/');
+        buf.append(expr);
       }
-    buf.append(expr);
     while (i.hasNext())
       {
         expr = (Expr) i.next();

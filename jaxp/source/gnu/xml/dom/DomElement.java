@@ -69,6 +69,9 @@ public class DomElement
   // this implementation.  Avoid creating them.
   private DomNamedNodeMap attributes;
 
+  // xml:space cache
+  String xmlSpace = "";
+
   /**
    * Constructs an Element node associated with the specified document.
    *
@@ -168,6 +171,11 @@ public class DomElement
    */
   public String getAttribute(String name)
   {
+    if ("xml:space" == name) // NB only works on interned string
+      {
+        // Use cached value
+        return xmlSpace;
+      }
     Attr attr = getAttributeNode(name);
     return (attr == null) ? "" : attr.getValue();
   }

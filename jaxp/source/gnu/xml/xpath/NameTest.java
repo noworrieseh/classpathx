@@ -88,14 +88,7 @@ public final class NameTest
         // Fall through
       case Node.ELEMENT_NODE:
         break;
-      case Node.DOCUMENT_TYPE_NODE:
-      case Node.ENTITY_NODE:
-      case Node.ENTITY_REFERENCE_NODE:
-      case Node.NOTATION_NODE:
-        // XPath doesn't recognise these
-        return false;
       default:
-        // Only process elements and attributes
         return false;
       }
     if (any)

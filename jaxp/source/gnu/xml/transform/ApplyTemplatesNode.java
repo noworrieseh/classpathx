@@ -115,6 +115,10 @@ final class ApplyTemplatesNode
                                      node);
             if (t != null)
               {
+                if (s.debug)
+                  {
+                    System.err.println("Applying " + t);
+                  }
                 t.apply(stylesheet, mode, node, i + 1, l,
                         parent, nextSibling);
               }

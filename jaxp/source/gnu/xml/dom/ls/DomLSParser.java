@@ -64,6 +64,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+import gnu.xml.dom.DomDocument;
 import gnu.xml.dom.DomEx;
 
 /**
@@ -278,6 +279,12 @@ public class DomLSParser
         // parse
         reader.parse(source);
       }
+    catch (DOMException e)
+      {
+        reader = null;
+        eventSink = null;
+        throw e;
+      }
     catch (SAXException e)
       {
         reader = null;
@@ -292,6 +299,11 @@ public class DomLSParser
       }
     // return document
     Document ret = eventSink.doc;
+    String systemId = input.getSystemId();
+    if (systemId != null && ret instanceof DomDocument)
+      {
+        ((DomDocument) ret).setDocumentURI(systemId);
+      }
     eventSink = null;
     return ret;
   }

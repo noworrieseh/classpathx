@@ -178,7 +178,8 @@ public final class Selector
     addCandidates(context, acc);
     List candidates = new ArrayList(acc);
     //Collections.sort(candidates, documentOrderComparator);
-    return filterCandidates(candidates, false);
+    List ret = filterCandidates(candidates, false);
+    return ret;
   }
 
   Collection evaluate(Node context, Collection ns)
@@ -190,7 +191,8 @@ public final class Selector
       }
     List candidates = new ArrayList(acc);
     //Collections.sort(candidates, documentOrderComparator);
-    return filterCandidates(candidates, true);
+    List ret = filterCandidates(candidates, true);
+    return ret;
   }
 
   /**
@@ -212,6 +214,7 @@ public final class Selector
                 Node node = (Node) candidates.get(i);
                 if (cascade)
                   {
+                    /*
                     short nodeType = node.getNodeType();
                     if (nodeType == Node.DOCUMENT_NODE ||
                         nodeType == Node.DOCUMENT_FRAGMENT_NODE)
@@ -219,6 +222,7 @@ public final class Selector
                         successful.add(node);
                         continue;
                       }
+                      */
                   }
                 if (test.matches(node, i + 1, len))
                   {

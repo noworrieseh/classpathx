@@ -76,6 +76,7 @@ import gnu.xml.xpath.NameTest;
 import gnu.xml.xpath.Pattern;
 import gnu.xml.xpath.Selector;
 import gnu.xml.xpath.Root;
+import gnu.xml.xpath.Test;
 import gnu.xml.xpath.XPathImpl;
 
 /**
@@ -98,6 +99,8 @@ class Stylesheet
   final XPathImpl xpath;
   final String systemId;
   final int precedence;
+
+  final boolean debug;
 
   /**
    * Version of XSLT.
@@ -230,7 +233,9 @@ class Stylesheet
     parse(doc.getDocumentElement(), true);
     current = doc; // Alow namespace resolution during processing
     
-    if ("yes".equals(System.getProperty("xsl.debug")))
+    debug = ("yes".equals(System.getProperty("xsl.debug")));
+
+    if (debug)
       {
         System.err.println("Stylesheet: " + doc.getDocumentURI());
         for (Iterator i = templates.iterator(); i.hasNext(); )
@@ -574,11 +579,11 @@ class Stylesheet
   void parse(Node node, boolean root)
     throws TransformerConfigurationException
   {
-    current = node;
     if (node == null)
       {
         return;
       }
+    current = node;
     try
       {
         String namespaceUri = node.getNamespaceURI();
@@ -895,24 +900,30 @@ class Stylesheet
       }
     // Check parent node
     Node ctx = text.getParentNode();
-    for (Iterator i = preserveSpace.iterator(); i.hasNext(); )
+    if (!preserveSpace.isEmpty())
       {
-        NameTest preserveTest = (NameTest) i.next();
-        if (preserveTest.matches(ctx, 1, 1))
+        for (Iterator i = preserveSpace.iterator(); i.hasNext(); )
           {
-            boolean override = false;
-            for (Iterator j = stripSpace.iterator(); j.hasNext(); )
+            NameTest preserveTest = (NameTest) i.next();
+            if (preserveTest.matches(ctx, 1, 1))
               {
-                NameTest stripTest = (NameTest) j.next();
-                if (stripTest.matches(ctx, 1, 1))
+                boolean override = false;
+                if (!stripSpace.isEmpty())
                   {
-                    override = true;
-                    break;
+                    for (Iterator j = stripSpace.iterator(); j.hasNext(); )
+                      {
+                        NameTest stripTest = (NameTest) j.next();
+                        if (stripTest.matches(ctx, 1, 1))
+                          {
+                            override = true;
+                            break;
+                          }
+                      }
                   }
-              }
-            if (!override)
-              {
-                return true;
+                if (!override)
+                  {
+                    return true;
+                  }
               }
           }
       }
@@ -1244,12 +1255,12 @@ class Stylesheet
   final TemplateNode parse(Node node)
     throws TransformerConfigurationException
   {
-    // Hack to associate the document function with its declaring node
-    current = node;
     if (node == null)
       {
         return null;
       }
+    // Hack to associate the document function with its declaring node
+    current = node;
     Node children = node.getFirstChild();
     Node next = node.getNextSibling();
     try

@@ -246,6 +246,12 @@ public class DomNamedNodeMap
         first = node;
       }
     length++;
+    // cache xml:space
+    boolean xmlSpace = "xml:space".equals(nodeName);
+    if (xmlSpace && owner instanceof DomElement)
+      {
+        ((DomElement) owner).xmlSpace = node.getNodeValue();
+      }
     return null;
   }
 
@@ -281,6 +287,7 @@ public class DomNamedNodeMap
     for (DomNode ctx = first; ctx != null; ctx = ctx.next)
       {
         boolean test = false;
+        String nodeName = ctx.getNodeName();
         if (ns)
           {
             String tln = ctx.getLocalName();
@@ -296,10 +303,16 @@ public class DomNamedNodeMap
           }
         else
           {
-            test = ctx.getNodeName().equals(name);
+            test = nodeName.equals(name);
           }
         if (test)
           {
+            // uncache xml:space
+            boolean xmlSpace = "xml:space".equals(nodeName);
+            if (xmlSpace && owner instanceof DomElement)
+              {
+                ((DomElement) owner).xmlSpace = "";
+              }
             // is this a default attribute?
             if (ctx.nodeType == Node.ATTRIBUTE_NODE)
               {

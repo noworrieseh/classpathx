@@ -76,8 +76,12 @@ abstract class TemplateNode
       }
     if (Thread.currentThread().isInterrupted())
       {
-        // Head off any infinite loops at the pass
+        // Try to head off any infinite loops at the pass
         return;
+      }
+    if (stylesheet.debug)
+      {
+        System.err.println("Applying " + toString());
       }
     doApply(stylesheet, mode, context, pos, len, parent, nextSibling);
   }
