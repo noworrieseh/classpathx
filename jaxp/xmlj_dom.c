@@ -1384,12 +1384,12 @@ Java_gnu_xml_libxmlj_dom_GnomeNamedNodeMap_getLength (JNIEnv * env,
       hash = (xmlHashTablePtr) ((type == 1) ? dtd->entities : dtd->notations);
       if (hash == NULL)
         {
-          return NULL;
+          return 0;
         }
       data = (xmljHashScanData *) malloc (sizeof (xmljHashScanData));
       if (data == NULL)
         {
-          return NULL;
+          return 0;
         }
       data->index = -1;
       data->count = 0;
