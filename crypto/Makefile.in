@@ -1,3 +1,34 @@
+##
+## ----------------------------------------------------------------------------
+## $Id: Makefile.in,v 1.5 2002-06-22 10:09:10 raif Exp $
+##
+## Copyright (C) 2002, Free Software Foundation, Inc.
+##
+## This program is free software; you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the Free
+## Software Foundation; either version 2 of the License or (at your option) any
+## later version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; see the file COPYING.  If not, write to the
+##
+##    Free Software Foundation Inc.,
+##    59 Temple Place - Suite 330,
+##    Boston, MA 02111-1307
+##    USA
+##
+## As a special exception, if you link this library with other files to produce
+## an executable, this library does not by itself cause the resulting
+## executable to be covered by the GNU General Public License.  This exception
+## does not however invalidate any other reasons why the executable file might
+## be covered by the GNU General Public License.
+## ----------------------------------------------------------------------------
+##
 # Makefile for GNU Crypto project
 #
 # You are free to redistribute this file. NO WARRANTY or fitness
@@ -48,7 +79,7 @@ SOURCEFILES = \
 	$(SOURCEDIR)/gnu/crypto/mac/IMac.java \
 	$(SOURCEDIR)/gnu/crypto/mac/MacFactory.java \
 	$(SOURCEDIR)/gnu/crypto/mac/UHash32.java \
-	$(SOURCEDIR)/gnu/crypto/mac/UMash32.java \
+	$(SOURCEDIR)/gnu/crypto/mac/UMac32.java \
 	\
 	$(SOURCEDIR)/gnu/crypto/mode/BaseMode.java \
 	$(SOURCEDIR)/gnu/crypto/mode/CTR.java \
@@ -100,8 +131,10 @@ TESTFILES = \
 	$(SOURCEDIR)/test/cipher/TestOfKhazad.java \
 	$(SOURCEDIR)/test/cipher/TestOfNullCipher.java \
 	$(SOURCEDIR)/test/cipher/TestOfRijndael.java \
+	$(SOURCEDIR)/test/cipher/TestOfSerpent.java \
 	$(SOURCEDIR)/test/cipher/TestOfSquare.java \
 	$(SOURCEDIR)/test/cipher/TestOfTwofish.java \
+	$(SOURCEDIR)/test/cipher/TestOfNistVectors.java \
 	\
 	$(SOURCEDIR)/test/hash/AllTests.java \
 	$(SOURCEDIR)/test/hash/TestOfHashFactory.java \
@@ -142,9 +175,33 @@ TESTFILES = \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSACodec.java \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSAKeyGeneration.java \
 	$(SOURCEDIR)/test/sig/rsa/TestOfRSAPSSSignature.java \
+	\
+	tv/anubis/cbc_d_m.txt \
+	tv/anubis/cbc_e_m.txt \
+	tv/anubis/ecb_d_m.txt \
+	tv/anubis/ecb_e_m.txt \
+	tv/anubis/ecb_vk.txt \
+	tv/anubis/ecb_vt.txt \
+	tv/rijndael/cbc_d_m.txt \
+	tv/rijndael/cbc_e_m.txt \
+	tv/rijndael/ecb_d_m.txt \
+	tv/rijndael/ecb_e_m.txt \
+	tv/rijndael/ecb_vk.txt \
+	tv/rijndael/ecb_vt.txt \
+	tv/serpent/cbc_d_m.txt \
+	tv/serpent/cbc_e_m.txt \
+	tv/serpent/ecb_d_m.txt \
+	tv/serpent/ecb_e_m.txt \
+	tv/serpent/ecb_vk.txt \
+	tv/serpent/ecb_vt.txt \
+	tv/twofish/cbc_d_m.txt \
+	tv/twofish/cbc_e_m.txt \
+	tv/twofish/ecb_d_m.txt \
+	tv/twofish/ecb_e_m.txt \
+	tv/twofish/ecb_vk.txt \
+	tv/twofish/ecb_vt.txt
 
 PKGFILES =
-
 
 #a mangling of the SOURCEFILES list above
 #This is not quite perfect, we've had to hardcode the
@@ -226,7 +283,7 @@ lib/$(LIBNAME)-doc.zip:
 		-header "For the latest news and information visit<BR> \
 		<A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>" \
 		\
-		-bottom "Copyright &copy;2001-2002 <A HREF="mailto:classpathx-crypto@gnu.org"> \
+		-bottom "Copyright &copy;2001-2002, <A HREF="mailto:classpathx-crypto@gnu.org"> \
 		Free Software Foundation, Inc.</A> All Rights Reserved." \
 		-classpath "$(SOURCEDIR)" \
 		\
