@@ -1,5 +1,5 @@
 /*
- * $Id: Resolver.java,v 1.4 2001-10-23 17:42:25 db Exp $
+ * $Id: Resolver.java,v 1.5 2001-10-29 21:49:10 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -35,7 +35,7 @@ import java.util.Hashtable;
 import org.xml.sax.*;
 
 
-// $Id: Resolver.java,v 1.4 2001-10-23 17:42:25 db Exp $
+// $Id: Resolver.java,v 1.5 2001-10-29 21:49:10 db Exp $
 
 /**
  * Utility implementation of a SAX resolver, which can be used to improve
@@ -45,7 +45,7 @@ import org.xml.sax.*;
  *
  * <p><b>FIXME:</b> This needs to leverage a catalog facility.
  *
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-29 21:49:10 $
  */
 public class Resolver implements EntityResolver, Cloneable
 {
@@ -230,21 +230,23 @@ public class Resolver implements EntityResolver, Cloneable
      * Uses a local dictionary of public identifiers to resolve URIs,
      * normally with the goal of minimizing network traffic or latencies.
      */
-    public InputSource resolveEntity (String pubid, String sysid)
+    public InputSource resolveEntity (String publicId, String systemId)
     throws IOException, SAXException
     {
 	InputSource	retval = null;
 	String		uri;
 
-	if (pubid != null
-		&& ((uri = (String) pubidMapping.get (pubid)) != null)) {
+	if (publicId != null
+		&& ((uri = (String) pubidMapping.get (publicId)) != null)) {
 	    retval = new InputSource (uri);
-	    retval.setPublicId (pubid);
+	    retval.setPublicId (publicId);
 	}
 
-	// Should do URN resolution here
+	// Could do URN resolution here
 
-	// URL resolution always done by parser though
+	// URL resolution always done by parser
+
+	// FIXME: chain to "next" resolver
 
 	return retval;
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: DefaultHandler.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: DefaultHandler.java,v 1.3 2001-10-29 21:49:10 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -27,14 +27,12 @@
 
 package gnu.xml.util;
 
-import org.xml.sax.AttributeList;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.ext.DeclHandler;
 
 
-// $Id: DefaultHandler.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DefaultHandler.java,v 1.3 2001-10-29 21:49:10 db Exp $
 
 /**
  * This class extends the SAX base handler class to support the
@@ -43,7 +41,7 @@ import org.xml.sax.ext.DeclHandler;
  * throwing an exception.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-29 21:49:10 $
  */
 public class DefaultHandler extends org.xml.sax.helpers.DefaultHandler
     implements LexicalHandler, DeclHandler
@@ -76,7 +74,7 @@ public class DefaultHandler extends org.xml.sax.helpers.DefaultHandler
 	{}
 
     /** <b>SAX2</b>:  called when the doctype is partially parsed */
-    public void startDTD (String root, String pubid, String sysid)
+    public void startDTD (String root, String publicId, String systemId)
     throws SAXException
 	{}
 
@@ -100,15 +98,15 @@ public class DefaultHandler extends org.xml.sax.helpers.DefaultHandler
 	{}
 
     /** <b>SAX2</b>:  called when comments are parsed */
-    public void comment (char buf [], int off, int len)
+    public void comment (char ch [], int start, int length)
     throws SAXException
 	{ }
 
     // SAX2 DeclHandler
 
     /** <b>SAX2</b>:  called on attribute declarations */
-    public void attributeDecl (String element, String name,
-	    String type, String defaultType, String defaltValue)
+    public void attributeDecl (String eName, String aName,
+	    String type, String mode, String value)
     throws SAXException
 	{}
 
@@ -118,7 +116,8 @@ public class DefaultHandler extends org.xml.sax.helpers.DefaultHandler
 	{}
 
     /** <b>SAX2</b>:  called on external entity declarations */
-    public void externalEntityDecl (String name, String pubid, String sysid)
+    public void externalEntityDecl (String name,
+    	String publicId, String systemId)
     throws SAXException
 	{}
 

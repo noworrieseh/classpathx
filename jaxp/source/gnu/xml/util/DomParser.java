@@ -1,5 +1,5 @@
 /*
- * $Id: DomParser.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: DomParser.java,v 1.3 2001-10-29 21:49:10 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -99,7 +99,7 @@ import org.w3c.dom.*;
  * by this "parser" are unspecified; don't do it! </P>
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-10-29 21:49:10 $
  */
 final public class DomParser implements XMLReader
 {
@@ -311,7 +311,7 @@ final public class DomParser implements XMLReader
     /**
      * <b>SAX2</b>: Tells whether this parser supports the specified feature.
      */
-    public boolean getFeature (String featureId)
+    public boolean getFeature (String name)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	// basically, none are relevant -- they relate more to
@@ -319,21 +319,21 @@ final public class DomParser implements XMLReader
 
 		// FIXME: DOM feature to expose interning?
 
-	if ((FEATURES + "validation").equals (featureId)
+	if ((FEATURES + "validation").equals (name)
 		|| (FEATURES + "external-general-entities")
-		    .equals (featureId)
+		    .equals (name)
 		|| (FEATURES + "external-parameter-entities")
-		    .equals (featureId)
-		|| (FEATURES + "string-interning").equals (featureId)
+		    .equals (name)
+		|| (FEATURES + "string-interning").equals (name)
 		)
 	    return false;
     
-	if ((FEATURES + "namespaces").equals (featureId))
+	if ((FEATURES + "namespaces").equals (name))
 	    return showNamespaces;
-	if ((FEATURES + "namespace-prefixes").equals (featureId))
+	if ((FEATURES + "namespace-prefixes").equals (name))
 	    return showXML1_0;
 
-	throw new SAXNotRecognizedException (featureId);
+	throw new SAXNotRecognizedException (name);
     }
 
     /**
@@ -341,44 +341,44 @@ final public class DomParser implements XMLReader
      * the declaration and lexical handlers, and current the "DOM" node,
      * are supported.
      */
-    public Object getProperty (String propertyId)
+    public Object getProperty (String name)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
-	if ((HANDLERS + "declaration-handler").equals (propertyId))
+	if ((HANDLERS + "declaration-handler").equals (name))
 	    return declHandler;
-	if ((HANDLERS + "lexical-handler").equals (propertyId))
+	if ((HANDLERS + "lexical-handler").equals (name))
 	    return lexicalHandler;
 
-	if ((HANDLERS + "dom-node").equals (propertyId))
+	if ((HANDLERS + "dom-node").equals (name))
 	    return current;
 
 	// unknown properties
-	throw new SAXNotRecognizedException (propertyId);
+	throw new SAXNotRecognizedException (name);
     }
 
     /**
      * <b>SAX2</b>:  Sets the state of features supported in this parser.
      * Only the namespace support features are mutable.
      */
-    public void setFeature (String featureId, boolean state)
+    public void setFeature (String name, boolean state)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if (current != null)
 	    throw new IllegalStateException ("feature change midparse");
 
-	boolean value = getFeature (featureId);
+	boolean value = getFeature (name);
 
 	if (value == state)
 	    return;
 
-	if ((FEATURES + "namespaces").equals (featureId)) {
+	if ((FEATURES + "namespaces").equals (name)) {
 	    if (!showXML1_0 && state == false)
 		throw new SAXNotSupportedException ("Illegal namespace "
 			+ "processing configuration");
 	    showNamespaces = state;
 	    return;
 	}
-	if ((FEATURES + "namespace-prefixes").equals (featureId)) {
+	if ((FEATURES + "namespace-prefixes").equals (name)) {
 	    if (!showNamespaces && state == false)
 		throw new SAXNotSupportedException ("Illegal namespace "
 			+ "processing configuration");
@@ -386,7 +386,7 @@ final public class DomParser implements XMLReader
 	    return;
 	}
 
-	throw new SAXNotSupportedException (featureId);
+	throw new SAXNotSupportedException (name);
     }
 
     /**
@@ -397,39 +397,39 @@ final public class DomParser implements XMLReader
      * Like SAX1 input source or document URI, the initial DOM document
      * may not be changed during a parse.
      */
-    public void setProperty (String propertyId, Object property)
+    public void setProperty (String name, Object state)
     throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if (current != null)
 	    throw new IllegalStateException ("feature change midparse");
 
-	if ((HANDLERS + "declaration-handler").equals (propertyId)) {
-	    if (!(property instanceof DeclHandler))
-		throw new SAXNotSupportedException (propertyId);
-	    declHandler = (DeclHandler) property;
+	if ((HANDLERS + "declaration-handler").equals (name)) {
+	    if (!(state instanceof DeclHandler))
+		throw new SAXNotSupportedException (name);
+	    declHandler = (DeclHandler) state;
 	    return;
 	}
 
-	if ((HANDLERS + "lexical-handler").equals (propertyId)) {
-	    if (!(property instanceof LexicalHandler))
-		throw new SAXNotSupportedException (propertyId);
-	    lexicalHandler = (LexicalHandler) property;
+	if ((HANDLERS + "lexical-handler").equals (name)) {
+	    if (!(state instanceof LexicalHandler))
+		throw new SAXNotSupportedException (name);
+	    lexicalHandler = (LexicalHandler) state;
 	    return;
 	}
 
-	if ((HANDLERS + "dom-node").equals (propertyId)) {
-	    if (property instanceof Node) {
+	if ((HANDLERS + "dom-node").equals (name)) {
+	    if (state instanceof Node) {
 		if (current != null)
 		    throw new SAXNotSupportedException (
-			"property is readonly during parse:  " + propertyId);
-		setStart ((Node) property);
+			"property is readonly during parse:  " + name);
+		setStart ((Node) state);
 		return;
 	    }
 	    throw new SAXNotSupportedException ("not a DOM Node");
 	}
 
 	// unknown properties
-	throw new SAXNotRecognizedException (propertyId);
+	throw new SAXNotRecognizedException (name);
     }
 
     private void setStart (Node property)
