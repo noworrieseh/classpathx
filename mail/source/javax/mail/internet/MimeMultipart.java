@@ -325,6 +325,11 @@ public class MimeMultipart
         byte[] bbytes = boundary.getBytes();
         int blen = bbytes.length;
         
+        /*
+         * Using a CRLFInputStream simplifies things here, but it may buffer
+         * too much if the underlying stream does a read() beyond the end of
+         * the MIME content. Return to this problem.
+         */
         CRLFInputStream crlfis = new CRLFInputStream(is);
         String line;
         while ((line = crlfis.readLine())!=null)
@@ -336,7 +341,7 @@ public class MimeMultipart
           throw new MessagingException("No start boundary");
         
         long start = 0L, end = 0L;
-        for (boolean done = false; !done;)
+        for (boolean done = false; !done;) // A
         {
           InternetHeaders headers = null;
           if (sis!=null)
@@ -347,63 +352,56 @@ public class MimeMultipart
               throw new IOException("EOF before content body");
           }
           else
-          {
-            headers = createInternetHeaders(is);
-          }
+            headers = createInternetHeaders(crlfis);
           ByteArrayOutputStream bos = null;
           if (sis==null)
             bos = new ByteArrayOutputStream();
 
-          // NB this routine uses the InputStream.mark() method
-          // if it is not supported by the underlying stream we will run into
-          // problems
           boolean eol = true;
           int last = -1;
-          int afterLast = -1;
-          while (true)
+          while (true) // B
           {
-            int c;
+            int c = -1;
             if (eol)
             {
-              is.mark(blen+1024);
               int pos = 0;
-              while (pos<blen)
+              while (pos<blen) // C
               {
-                if (is.read()!=bbytes[pos])
-                  break;
+                c = crlfis.read();
+                if (c!=bbytes[pos])
+                {
+                  crlfis.unread(c);
+                  crlfis.unread(bbytes, 0, pos);
+                  break; // out of C loop
+                }
                 pos++;
               }
               
               if (pos==blen)
               {
-                c = is.read();
-                if (c=='-' && is.read()=='-')
+                c = crlfis.read();
+                if (c=='-')
                 {
-                  done = true;
-                  break;
+                  c = crlfis.read();
+                  if (c=='-')
+                  {
+                    done = true; // end of MIME multipart
+                    break; // out of B loop
+                  }
                 }
+                  
                 while (c==' ' || c=='\t')
-                  c = is.read();
-                if (c=='\r')
-                {
-                  is.mark(1);
-                  if (is.read()!='\n')
-                    is.reset();
-                  break;
-                }
+                  c = crlfis.read();
                 if (c=='\n')
                   break;
               }
               if (bos!=null && last!=-1)
               {
                 bos.write(last);
-                if (afterLast!=-1)
-                  bos.write(afterLast);
-                last = afterLast = -1;
+                last = -1;
               }
-              is.reset();
             }
-            c = is.read();
+            c = crlfis.read();
             if (c<0)
             {
               done = true;
@@ -415,14 +413,6 @@ public class MimeMultipart
               if (sis!=null)
                 end = sis.getPosition()-1L;
               last = c;
-              if (c=='\r')
-              {
-                is.mark(1);
-                if ((c = is.read())=='\n')
-                  afterLast = c;
-                else
-                  is.reset();
-              }
             }
             else
             {
@@ -431,7 +421,7 @@ public class MimeMultipart
                 bos.write(c);
             }
           }
-          
+        
           // Create a body part from the stream
           MimeBodyPart bp;
           if (sis!=null)
