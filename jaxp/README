@@ -60,5 +60,53 @@ BUILDING
     
     So far there's no way to package a source distribution; stick to CVS.
 
-TESTING
+CONFORMANCE TESTING
+    The primary test resources are at http://xmlconf.sourceforge.net
+    and include:
+
+    SAX1 and XML conformance tests
+	The AElfred2 parser is highly conformant, though it still takes
+	a few implementation shortcuts.  See the package documentation
+	for information about known XML conformance issues in AElfred2.
+
+	Note that the "xml.testing.Driver" only addresses the core
+	XML 1.0 specification requirements, which roughly correspond
+	to what SAX1 provides.
+	
+	SAX2 conformance, including namespace support and support for
+	LexicalHandler and Declhandler extensions, doesn't currently
+	have a good test suite/driver.  However:
+
+	    - Applying the DOM unit tests to this implementation gives
+	      the LexicalHandler (comments, and boundaries of DTDs,
+	      CDATA sections, and general entities) a workout, and
+	      does the same for at least internal general entity
+	      declarations;
+	    
+	    - The pipeline package's layered validator demands that
+	      element and attribute declarations work correctly.
+	
+	By those metrics, SAX2 conformance for AElfred2 is also strong. 
+    
+    DOM Unit Tests
+	The "domunit 0.0.4" tests use the JAXP API to hook up a DOM
+	implementation to a parser (out of scope for DOM L2).
+
+	At this writing, this passes the bulk of those tests except
+	for a few which require magic handling of attributes:
+
+	    - DOM wants to expose which attributes were specified
+	      in the literal text of an XML document.  SAX doesn't
+	      expose that information.
+	    
+	    - DOM expects that attributes that are defaulted in
+	      the DTD will magically reappear when they're deleted.
+	      This DOM could implement that behavior, but doesn't.
+	
+	Some JAXP DOM feature flags aren't fully supported, though
+	they could be.  That is, properties affecting which "noise nodes"
+	end up in the DOM tree aren't all supported.  (Stuff like
+	ignorable whitespace, CDATA section boundaries, entity references,
+	and so on.)  The JAXP defaults are supported, but otherwise you
+	may need to turn off almost all "noise" to get some peace.
 
