@@ -1,5 +1,5 @@
 /*
- * $Id: DomNode.java,v 1.5 2001-10-23 17:42:25 db Exp $
+ * $Id: DomNode.java,v 1.6 2001-11-04 00:51:52 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.traversal.*;
 
 
-// $Id: DomNode.java,v 1.5 2001-10-23 17:42:25 db Exp $
+// $Id: DomNode.java,v 1.6 2001-11-04 00:51:52 db Exp $
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -64,7 +64,7 @@ import org.w3c.dom.traversal.*;
  * do not have namespace URIs.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-04 00:51:52 $
  */
 public abstract class DomNode
     implements Node, NodeList, EventTarget, DocumentEvent, Cloneable
@@ -90,7 +90,10 @@ public abstract class DomNode
 
     private Document			owner;
     private DomNode			parent;
-    private boolean			readonly;
+
+    // Bleech ... "package private" so a DOM builder can entity refs
+    // writable during construction.  DOM spec is nasty.
+    boolean				readonly;
 
     // jdk 1.1 javac dislikes "final" here (bug)
     private /*final*/ short		nodeType;
@@ -1113,9 +1116,16 @@ public abstract class DomNode
 	    EventListener	listener,
 	    boolean		useCapture
 	) {
-	    this.type = type;
+	    this.type = type.intern ();
 	    this.listener = listener;
 	    this.useCapture = useCapture;
+	}
+
+	boolean equals (ListenerRecord rec)
+	{
+	    return listener == rec.listener
+		    && useCapture == rec.useCapture
+		    && type == rec.type;
 	}
     }
 
@@ -1177,8 +1187,16 @@ public abstract class DomNode
 		newListeners [i] = listeners [i];
 	    listeners = newListeners;
 	}
-	listeners [nListeners++] =
-	    new ListenerRecord (type, listener, useCapture);
+
+	// prune duplicates
+	ListenerRecord	record;
+
+	record = new ListenerRecord (type, listener, useCapture);
+	for (int i = 0; i < nListeners; i++) {
+	    if (record.equals (listeners [i]))
+		return;
+	}
+	listeners [nListeners++] = record;
     }
 
 
@@ -1200,6 +1218,7 @@ public abstract class DomNode
      *
      * @see #createEvent
      *
+     * @exception NullPointerException When a null event is passed.
      * @exception ClassCastException When the event wasn't provided by
      *	the createEvent method, or otherwise isn't a DomEvent.
      * @exception EventException If the event type wasn't specified
@@ -1349,15 +1368,17 @@ public abstract class DomNode
 	// Notify just those listeners
 	e.currentNode = current; 
 	for (int i = 0; i < count; i++) {
-
-	    // FIXME:  late in the DOM CR process (3rd or 4th CR?) the
-	    // removeEventListener spec changed.  Now removals take effect
-	    // immediatly, unlike addEventListener.
-	    // Either make sure the listener is still registered before
-	    // each notification, or check when a global remove count changed.
-
 	    try {
-		notificationSet [i].listener.handleEvent (e);
+		// Late in the DOM CR process (3rd or 4th CR?) the
+		// removeEventListener spec became asymmetric with respect
+		// to addEventListener ... effect is now immediate.
+		for (int j = 0; j < nListeners; j++) {
+		    if (listeners [i].equals (notificationSet [i])) {
+			notificationSet [i].listener.handleEvent (e);
+			break;
+		    }
+		}
+
 	    } catch (Exception x) {
 		// ignore all exceptions
 	    }
