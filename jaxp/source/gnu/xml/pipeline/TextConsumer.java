@@ -1,6 +1,6 @@
 /*
- * $Id: TextConsumer.java,v 1.1 2001-06-22 15:53:07 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: TextConsumer.java,v 1.2 2001-07-05 01:43:02 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import gnu.xml.util.XMLWriter;
  * @see WellFormednessFilter
  *
  * @author David Brownell
- * @version $Date: 2001-06-22 15:53:07 $
+ * @version $Date: 2001-07-05 01:43:02 $
  */
 public class TextConsumer extends XMLWriter implements EventConsumer
 {
@@ -91,10 +91,10 @@ public class TextConsumer extends XMLWriter implements EventConsumer
     public Object getProperty (String propertyId)
     throws SAXNotRecognizedException
     {
-	if ((EventFilter.HANDLER_URI + "lexical-handler")
+	if ((EventFilter.PROPERTY_URI + "lexical-handler")
 		.equals (propertyId))
 	    return this;
-	if ((EventFilter.HANDLER_URI + "declaration-handler")
+	if ((EventFilter.PROPERTY_URI + "declaration-handler")
 		.equals (propertyId))
 	    return this;
 	throw new SAXNotRecognizedException (propertyId);

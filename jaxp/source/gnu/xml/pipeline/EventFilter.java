@@ -1,5 +1,5 @@
 /*
- * $Id: EventFilter.java,v 1.1 2001-06-22 14:44:52 db Exp $
+ * $Id: EventFilter.java,v 1.2 2001-07-05 01:43:02 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ import gnu.xml.util.DefaultHandler;
  * event production part of a pipeline.
  *
  * @author David Brownell
- * @version $Date: 2001-06-22 14:44:52 $
+ * @version $Date: 2001-07-05 01:43:02 $
  */
 public class EventFilter
     implements EventConsumer, ContentHandler, DTDHandler,
@@ -93,8 +93,8 @@ public class EventFilter
     // XXX robustly support getDocumentLocator
 
     
-    /** SAX2 URI prefix for standard handlers */
-    public static final String		HANDLER_URI
+    /** SAX2 URI prefix for standard properties (mostly for handlers). */
+    public static final String		PROPERTY_URI
 	= "http://xml.org/sax/properties/";
 
 
@@ -122,11 +122,11 @@ public class EventFilter
 	dtdHandler = dtdNext = consumer.getDTDHandler ();
 	try {
 	    declHandler = declNext = (DeclHandler)
-		    consumer.getProperty (HANDLER_URI + "declaration-handler");
+		    consumer.getProperty (PROPERTY_URI + "declaration-handler");
 	} catch (SAXException e) { /* leave value null */ }
 	try {
 	    lexHandler = lexNext = (LexicalHandler)
-		    consumer.getProperty (HANDLER_URI + "lexical-handler");
+		    consumer.getProperty (PROPERTY_URI + "lexical-handler");
 	} catch (SAXException e) { /* leave value null */ }
     }
 
@@ -199,11 +199,11 @@ public class EventFilter
 
 	    if (id == o)
 		return;
-	    if ((HANDLER_URI + "declaration-handler").equals (id)) {
+	    if ((PROPERTY_URI + "declaration-handler").equals (id)) {
 		declHandler = (DeclHandler) o;
 		return;
 	    }
-	    if ((HANDLER_URI + "lexical-handler").equals (id)) {
+	    if ((PROPERTY_URI + "lexical-handler").equals (id)) {
 		lexHandler = (LexicalHandler) o;
 		return;
 	    }
@@ -223,9 +223,9 @@ public class EventFilter
     final public Object getProperty (String id)
     throws SAXNotRecognizedException
     {
-	if ((HANDLER_URI + "declaration-handler").equals (id)) 
+	if ((PROPERTY_URI + "declaration-handler").equals (id)) 
 	    return declHandler;
-	if ((HANDLER_URI + "lexical-handler").equals (id))
+	if ((PROPERTY_URI + "lexical-handler").equals (id))
 	    return lexHandler;
 
 	Object	property = null;
