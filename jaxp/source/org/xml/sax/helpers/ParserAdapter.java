@@ -1,8 +1,28 @@
+/*
+  GNU-Classpath Extensions:	jaxp
+  Copyright (C) 2001 David Brownell
+
+  For more information on the classpathx please mail: classpathx-discuss@gnu.org
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
 // ParserAdapter.java - adapt a SAX1 Parser to a SAX2 XMLReader.
 // Written by David Megginson, sax@megginson.com
-// NO WARRANTY!  This class is in the public domain.
 
-// $Id: ParserAdapter.java,v 1.1 2001-06-07 01:30:50 db Exp $
+// $Id: ParserAdapter.java,v 1.2 2001-06-08 20:42:17 db Exp $
 
 package org.xml.sax.helpers;
 
@@ -30,11 +50,6 @@ import org.xml.sax.SAXNotSupportedException;
 
 /**
  * Adapt a SAX1 Parser as a SAX2 XMLReader.
- *
- * <blockquote>
- * <em>This module, both source code and documentation, is in the
- * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
- * </blockquote>
  *
  * <p>This class wraps a SAX1 {@link org.xml.sax.Parser Parser}
  * and makes it act as a SAX2 {@link org.xml.sax.XMLReader XMLReader},
@@ -837,9 +852,6 @@ public class ParserAdapter implements XMLReader, DocumentHandler
 
     /**
      * Adapt a SAX1 AttributeList as a SAX2 Attributes object.
-     *
-     * <p>This class is in the Public Domain, and comes with NO
-     * WARRANTY of any kind.</p>
      *
      * <p>This wrapper class is used only when Namespace support
      * is disabled -- it provides pretty much a direct mapping

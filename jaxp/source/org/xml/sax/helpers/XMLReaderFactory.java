@@ -1,8 +1,28 @@
+/*
+  GNU-Classpath Extensions:	jaxp
+  Copyright (C) 2001 David Brownell
+
+  For more information on the classpathx please mail: classpathx-discuss@gnu.org
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
 // XMLReaderFactory.java - factory for creating a new reader.
 // Written by David Megginson, sax@megginson.com
-// NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: XMLReaderFactory.java,v 1.1 2001-06-07 01:30:50 db Exp $
+// $Id: XMLReaderFactory.java,v 1.2 2001-06-08 20:42:17 db Exp $
 
 package org.xml.sax.helpers;
 import org.xml.sax.Parser;
@@ -12,11 +32,6 @@ import org.xml.sax.SAXException;
 
 /**
  * Factory for creating an XML reader.
- *
- * <blockquote>
- * <em>This module, both source code and documentation, is in the
- * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
- * </blockquote>
  *
  * <p>This class contains static methods for creating an XML reader
  * from an explicit class name, or for creating an XML reader based
@@ -66,7 +81,7 @@ final public class XMLReaderFactory
      * and tries to instantiate that class as a SAX2 
      * XMLReader.</p>
      *
-     * <p> If there is no such value, the &AElig;lred Enhanced (&AE;2)
+     * <p> If there is no such value, the GNU &AElig;lred2
      * non-validating parser is used. </p>
      *
      * <p>Note that many Java interpreters allow system properties
@@ -82,7 +97,7 @@ final public class XMLReaderFactory
 	throws SAXException
     {
 	String className = System.getProperty("org.xml.sax.driver",
-	    "org.brownell.xml.aelfred2.SAXDriver"
+	    "gnu.xml.aelfred2.SAXDriver"
 	    );
 	if (className == null) {
 	    Parser parser;
