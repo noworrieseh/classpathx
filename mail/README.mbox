@@ -10,14 +10,14 @@ a local mailbox using the provider. The protocol to use is mbox.
   URLName url = new URLName("mbox:///home/user/mail");
   Store store = session.getStore(url);
   Folder root = store.getDefaultFolder();
-  Folder savedMessages = root.lookup("saved.messages");
+  Folder savedMessages = root.getFolder("saved.messages");
 
 Any host details specified in the connection (username, password, host, or
 port) are ignored. The file part of the URL is used to specify the default 
 root directory for mailboxes, however any valid filename can be used to
 refer to a mailbox anywhere in the filesystem. For instance,
 
-  Folder localSpool = root.lookup("/var/spool/mail/user");
+  Folder localSpool = root.getFolder("/var/spool/mail/user");
 
 would return a spool mailbox whatever the default root directory. If no
 directory is specified in the URL, the user's home directory becomes the de

@@ -9,7 +9,7 @@ a news server using the provider. The protocol to use is nntp.
   URLName url = new URLName("nntp://user:pass@host:port");
   Store store = session.getStore(url);
   Folder root = store.getDefaultFolder();
-  Folder altTest = root.lookup("alt.test");
+  Folder altTest = root.getFolder("alt.test");
 
 If a username and password are not supplied, no authentication will be
 attempted to the server (it assumes that the server is public). The port can

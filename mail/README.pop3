@@ -8,7 +8,7 @@ a POP server using the provider. The protocol to use is pop3.
   URLName url = new URLName("pop3://user:pass@host:port");
   Store store = session.getStore(url);
   Folder root = store.getDefaultFolder();
-  Folder inbox = root.lookup("INBOX");
+  Folder inbox = root.getFolder("INBOX");
 
 A username and password must be supplied. The port can be omitted, it
 defaults to 110.

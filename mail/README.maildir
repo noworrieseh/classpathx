@@ -11,15 +11,15 @@ will locate the default ("Maildir") directory:
   URLName url = new URLName("maildir:///home/user");
   Store store = session.getStore(url);
   Folder root = store.getDefaultFolder();
-  Folder inbox = root.lookup("INBOX");
+  Folder inbox = root.getFolder("INBOX");
 
-An alternate mailbox can be read. Specify the parent directory, then lookup
+An alternate mailbox can be read. Specify the parent directory, then look up
 the mailbox directory by name.
 
   URLName url = new URLName("maildir:///home/user/mail");
   Store store = session.getStore(url);
   Folder root = store.getDefaultFolder();
-  Folder savedMessages = root.lookup("MySavedMessages");
+  Folder savedMessages = root.getFolder("MySavedMessages");
 
 Any host details specified in the connection (username, password, host, or
 port) are ignored. The file part of the URL is used to specify the default 
