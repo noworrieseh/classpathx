@@ -1,7 +1,7 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: IRandom.java,v 1.5 2002-06-08 05:22:18 raif Exp $
+// $Id: IRandom.java,v 1.6 2002-07-06 23:53:22 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -35,9 +35,43 @@ import java.util.Map;
 /**
  * <p>The basic visible methods of any pseudo-random number generator.</p>
  *
- * @version $Revision: 1.5 $
+ * <p>The [HAC] defines a PRNG (as implemented in this library) as follows:</p>
+ *
+ * <ul>
+ *    <li>"5.6 Definition: A pseudorandom bit generator (PRBG) is said to pass
+ *    the <em>next-bit test</em> if there is no polynomial-time algorithm which,
+ *    on input of the first <code>L</code> bits of an output sequence <code>S</code>,
+ *    can predict the <code>(L+1)</code>st bit of <code>S</code> with a
+ *    probability significantly grater than <code>1/2</code>."</li>
+ *
+ *    <li>"5.8 Definition: A PRBG that passes the <em>next-bit test</em>
+ *    (possibly under some plausible but unproved mathematical assumption such
+ *    as the intractability of factoring integers) is called a
+ *    <em>cryptographically secure pseudorandom bit generator</em> (CSPRBG)."</li>
+ * </ul>
+ *
+ * <p><b>IMPLEMENTATION NOTE</b>: Although all the concrete classes in this
+ * package implement the {@link Cloneable} interface, it is important to note
+ * here that such an operation, for those algorithms that use an underlting
+ * symmetric key block cipher, <b>DOES NOT</b> clone any session key material
+ * that may have been used in initialising the source PRNG (the instance to be
+ * cloned). Instead a clone of an already initialised PRNG, that uses and
+ * underlying symmetric key block cipher, is another instance with a clone of
+ * the same cipher that operates with the <b>same block size</b> but without any
+ * knowledge of neither key material nor key size.</p>
+ *
+ * <p>References:</p>
+ *
+ * <ol>
+ *    <li><a href="http://www.cacr.math.uwaterloo.ca/hac">[HAC]</a>: Handbook of
+ *    Applied Cryptography.<br>
+ *    CRC Press, Inc. ISBN 0-8493-8523-7, 1997<br>
+ *    Menezes, A., van Oorschot, P. and S. Vanstone.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
-public interface IRandom {
+public interface IRandom extends Cloneable {
 
    // Constants
    // -------------------------------------------------------------------------
@@ -89,4 +123,11 @@ public interface IRandom {
     */
    void nextBytes(byte[] out, int offset, int length)
    throws IllegalStateException, LimitReachedException;
+
+   /**
+    * <p>Returns a clone copy of this instance.</p>
+    *
+    * @return a clone copy of this instance.
+    */
+   Object clone();
 }
