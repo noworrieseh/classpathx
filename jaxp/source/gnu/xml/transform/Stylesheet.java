@@ -336,11 +336,9 @@ class Stylesheet
     throws TransformerException
   {
     Object ret = select.evaluate(context);
-    //System.out.println("applyTemplates: "+select+" selected "+ret);
     if (ret != null && ret instanceof Collection)
       {
         Collection ns = (Collection) ret;
-        // TODO sort
         for (Iterator i = ns.iterator(); i.hasNext(); )
           {
             Node subject = (Node) i.next();

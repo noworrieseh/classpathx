@@ -41,6 +41,8 @@ package gnu.xml.transform;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
@@ -228,9 +230,9 @@ class Template
                     s = "child::node()";
                   }
                 Expr select = (Expr) stylesheet.factory.xpath.compile(s);
-                // TODO sort
+                List sortKeys = parseSortKeys(children);
                 return new ApplyTemplatesNode(null, parse(next),
-                                              select, mode);
+                                              select, mode, sortKeys);
               }
             else if ("call-template".equals(name))
               {
@@ -295,8 +297,12 @@ class Template
               {
                 String s = element.getAttribute("select");
                 Expr select = (Expr) stylesheet.factory.xpath.compile(s);
-                // TODO sort
-                return new ForEachNode(parse(children), parse(next), select);
+                List sortKeys = parseSortKeys(children);
+                return new ForEachNode(parse(children), parse(next), select, sortKeys);
+              }
+            else if ("sort".equals(name))
+              {
+                return new DummyNode(null, parse(next));
               }
           }
         catch (XPathExpressionException e)
@@ -306,6 +312,41 @@ class Template
           }
       }
     return new LiteralNode(parse(children), parse(next), source);
+  }
+
+  List parseSortKeys(Node node)
+    throws XPathExpressionException
+  {
+    List ret = new LinkedList();
+    while (node != null)
+      {
+        String namespaceUri = node.getNamespaceURI();
+        if (Stylesheet.XSL_NS.equals(namespaceUri) &&
+            Node.ELEMENT_NODE == node.getNodeType())
+          {
+            Element element = (Element) node;
+            String name = element.getLocalName();
+
+            if ("sort".equals(name))
+              {
+                String s = element.getAttribute("select");
+                Expr select = (Expr) stylesheet.factory.xpath.compile(s);
+                String lang = element.getAttribute("lang");
+                String dataType = element.getAttribute("data-type");
+                String order = element.getAttribute("order");
+                boolean descending = "descending".equals(order);
+                String caseOrder = element.getAttribute("case-order");
+                int co =
+                  "upper-first".equals(caseOrder) ? SortKey.UPPER_FIRST :
+                  "lower-first".equals(caseOrder) ? SortKey.LOWER_FIRST :
+                  SortKey.DEFAULT;
+                ret.add(new SortKey(select, lang, dataType, descending, co));
+              }
+          }
+    
+        node = node.getNextSibling();
+      }
+    return ret.isEmpty() ? null : ret;
   }
 
 }

@@ -487,6 +487,7 @@ $(src)/gnu/xml/transform/CallTemplateNode.java \
 $(src)/gnu/xml/transform/ChooseNode.java \
 $(src)/gnu/xml/transform/DOMSourceLocator.java \
 $(src)/gnu/xml/transform/DOMSourceWrapper.java \
+$(src)/gnu/xml/transform/DummyNode.java \
 $(src)/gnu/xml/transform/ElementNode.java \
 $(src)/gnu/xml/transform/ErrorListenerErrorHandler.java \
 $(src)/gnu/xml/transform/ForEachNode.java \
@@ -505,6 +506,7 @@ $(src)/gnu/xml/transform/TransformerImpl.java \
 $(src)/gnu/xml/transform/URIResolverEntityResolver.java \
 $(src)/gnu/xml/transform/ValueOfNode.java \
 $(src)/gnu/xml/transform/WhenNode.java \
+$(src)/gnu/xml/transform/XSLComparator.java \
 $(src)/gnu/xml/util/DoParse.java \
 $(src)/gnu/xml/util/DomParser.java \
 $(src)/gnu/xml/util/Resolver.java \

@@ -1,5 +1,5 @@
 /*
- * ForEachNode.java
+ * XSLComparator.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,62 +38,56 @@
 
 package gnu.xml.transform;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.transform.TransformerException;
+import java.util.Locale;
+import java.text.Collator;
 import org.w3c.dom.Node;
-import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing an XSLT <code>for-each</code> instruction.
+ * Comparator for sorting lists of nodes according to a list of sort keys.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class ForEachNode
-  extends TemplateNode
+class XSLComparator
+  implements Comparator
 {
 
-  final Expr select;
   final List sortKeys;
 
-  ForEachNode(TemplateNode children, TemplateNode next, Expr select,
-              List sortKeys)
+  XSLComparator(List sortKeys)
   {
-    super(children, next);
-    this.select = select;
     this.sortKeys = sortKeys;
   }
 
-  void apply(Stylesheet stylesheet, Node context, String mode,
-             Node parent, Node nextSibling)
-    throws TransformerException
+  public int compare(Object o1, Object o2)
   {
-    if (children != null)
+    if (o1 instanceof Node && o2 instanceof Node)
       {
-        Object ret = select.evaluate(context);
-        if (ret instanceof Collection)
+        Node n1 = (Node) o1;
+        Node n2 = (Node) o2;
+        for (Iterator i = sortKeys.iterator(); i.hasNext(); )
           {
-            Collection ns = (Collection) ret;
-            if (sortKeys != null)
+            SortKey sortKey = (SortKey) i.next();
+            String k1 = sortKey.key(n1);
+            String k2 = sortKey.key(n2);
+            Locale locale = (sortKey.lang == null) ? Locale.getDefault() :
+              new Locale(sortKey.lang);
+            Collator collator = Collator.getInstance(locale);
+            int d = collator.compare(k1, k2);
+            if (sortKey.descending)
               {
-                List list = new ArrayList(ns);
-                Collections.sort(list, new XSLComparator(sortKeys));
-                ns = list;
+                d = -d;
               }
-            for (Iterator i = ns.iterator(); i.hasNext(); )
+            // TODO sortKey.caseOrder
+            if (d != 0)
               {
-                Node node = (Node) i.next();
-                children.apply(stylesheet, node, mode, parent, nextSibling);
+                return d;
               }
           }
       }
-    if (next != null)
-      {
-        next.apply(stylesheet, context, mode, parent, nextSibling);
-      }
+    return 0;
   }
   
 }

@@ -1,5 +1,5 @@
 /*
- * ForEachNode.java
+ * DummyNode.java
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -38,58 +38,27 @@
 
 package gnu.xml.transform;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
-import gnu.xml.xpath.Expr;
 
 /**
- * A template node representing an XSLT <code>for-each</code> instruction.
+ * A template node that simply continues processing the next node.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class ForEachNode
+final class DummyNode
   extends TemplateNode
 {
 
-  final Expr select;
-  final List sortKeys;
-
-  ForEachNode(TemplateNode children, TemplateNode next, Expr select,
-              List sortKeys)
+  DummyNode(TemplateNode children, TemplateNode next)
   {
     super(children, next);
-    this.select = select;
-    this.sortKeys = sortKeys;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    if (children != null)
-      {
-        Object ret = select.evaluate(context);
-        if (ret instanceof Collection)
-          {
-            Collection ns = (Collection) ret;
-            if (sortKeys != null)
-              {
-                List list = new ArrayList(ns);
-                Collections.sort(list, new XSLComparator(sortKeys));
-                ns = list;
-              }
-            for (Iterator i = ns.iterator(); i.hasNext(); )
-              {
-                Node node = (Node) i.next();
-                children.apply(stylesheet, node, mode, parent, nextSibling);
-              }
-          }
-      }
     if (next != null)
       {
         next.apply(stylesheet, context, mode, parent, nextSibling);

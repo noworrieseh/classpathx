@@ -49,20 +49,24 @@ import gnu.xml.xpath.Expr;
 final class SortKey
 {
 
+  static final int DEFAULT = 0;
+  static final int UPPER_FIRST = 1;
+  static final int LOWER_FIRST = 2;
+
   final Expr select;
   final String lang;
   final String dataType;
   final boolean descending;
-  final boolean upperCaseFirst;
+  final int caseOrder;
 
   SortKey(Expr select, String lang, String dataType,
-          boolean descending, boolean upperCaseFirst)
+          boolean descending, int caseOrder)
   {
     this.select = select;
     this.lang = lang;
     this.dataType = dataType;
     this.descending = descending;
-    this.upperCaseFirst = upperCaseFirst;
+    this.caseOrder = caseOrder;
   }
 
   String key(Node node)

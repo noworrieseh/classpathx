@@ -38,6 +38,11 @@
 
 package gnu.xml.transform;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Node;
 import gnu.xml.xpath.Expr;
@@ -54,24 +59,40 @@ final class ApplyTemplatesNode
 
   final Expr select;
   final String mode;
+  final List sortKeys;
 
   ApplyTemplatesNode(TemplateNode children, TemplateNode next,
-                     Expr select, String mode)
+                     Expr select, String mode, List sortKeys)
   {
     super(children, next);
     this.select = select;
     this.mode = mode;
+    this.sortKeys = sortKeys;
   }
 
   void apply(Stylesheet stylesheet, Node context, String mode,
              Node parent, Node nextSibling)
     throws TransformerException
   {
-    // TODO sort
     // TODO with-param
-    stylesheet.applyTemplates(context, select,
-                              (this.mode != null) ? this.mode : mode,
-                              parent, nextSibling);
+    Object ret = select.evaluate(context);
+    if (ret != null && ret instanceof Collection)
+      {
+        Collection ns = (Collection) ret;
+        if (sortKeys != null)
+          {
+            List list = new ArrayList(ns);
+            Collections.sort(list, new XSLComparator(sortKeys));
+            ns = list;
+          }
+        for (Iterator i = ns.iterator(); i.hasNext(); )
+          {
+            Node subject = (Node) i.next();
+            stylesheet.applyTemplates(context, subject,
+                                      (this.mode != null) ? this.mode : mode,
+                                      parent, nextSibling);
+          }
+      }
     // apply-templates doesn't have processable children
     if (next != null)
       {
