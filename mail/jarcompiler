@@ -1,0 +1,160 @@
+#!/bin/bash
+
+# The jar compiler.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to the
+# Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+
+
+# What does it do?
+# Builds a jar file by compiling some java source and then jaring up
+# the resulting classes.
+#
+# (C) Tapsell-Ferrier Limited 2003
+# Nic Ferrier, <nferrier@tapsellferrier.co.uk>
+
+
+# Argument 1 MUST contain the name of the JAR file 
+# Stdin MUST contain the list of the Java source files to compile.
+# The following environment variables MUST be present:
+#   JARCOMPILER_JAVAC               the java compiler command
+#   JARCOMPILER_JAVAC_OPTS          options for the java compiler
+#   JARCOMPILER_CLASSPATH           the CLASSPATH for the compile
+#   JARCOMPILER_JAR                 the jar command
+
+# About Stdin
+# The files passed on stdin need not be JUST java source files, the
+# jarcompiler script also recognises META-INF files and a manifest.mf
+# file. All META-INF files are added to the META-INF directory in the
+# resulting JAR file and the manifest.mf, if present, is used as the
+# resulting JAR file's manifest.  The first manifest.mf found in the
+# input list is used.
+
+# Why BASH specific?  
+# This is BASH specific because error messages are redirected to
+# stderr using the /dev/stderr special form. I've no idea how to do
+# this in bourne shell.
+
+# Other requirements.
+#  grep   with -e
+#  rm
+#  trap
+#  tr
+
+# Here's the program source.
+
+
+# What's the target jar file called?
+TARGETJAR=
+if [ $1 ]
+then
+  TARGETJAR=$1
+else
+  echo 'No jar file specified.'
+  exit 1
+fi
+
+
+# Make the filelist from stdin.
+FILELIST=filelist-$$
+tr ' ' '\012' | tr '\009' '\012' > $FILELIST
+
+# Add the file list to the clean up list
+export CLEANUP=${FILELIST}
+# Traps cause the CLEANUP to be removed
+trap 'rm -rf `echo ${CLEANUP} | tr ":" " "`' 1 2 3 15
+
+
+# Make the list of source files.
+SOURCEFILELIST=sourcefilelist-$$
+grep -e '\.java$' ${FILELIST} > $SOURCEFILELIST
+
+
+# Add the source file list to the clean up list.
+CLEANUP=${CLEANUP}:${SOURCEFILELIST}
+
+# Make the list of META-INF files
+METAINFCONTENTS=metainf-$$
+grep -e '^META-INF/.*$' ${FILELIST} > $METAINFCONTENTS
+
+# Add the meta inf file list to the clean up list.
+CLEANUP=${CLEANUP}:${METAINFCONTENTS}
+
+# Find a manifest file.
+MANIFESTFILE=`grep -e 'manifest.mf$' ${FILELIST}  | head -1`
+
+
+# Check the directory for temporary storage
+TARGETDIR=classes-$$
+if [ -f $TARGETDIR ]
+then
+  echo 'The target directory already exists.'
+  exit 1
+else
+  mkdir $TARGETDIR
+  # Add the target directory to the clean up list.
+  CLEANUP=${CLEANUP}:${TARGETDIR}
+fi
+
+
+# Set the current directory.
+CURRENT=`pwd`
+
+
+# Unpack existing target if necessary.
+if [ -f $TARGETJAR ]
+then
+  sh -c "cd ${TARGETDIR} ; ${JARCOMPILER_JAR} -xf ${CURRENT}/${TARGETJAR}" 2> /dev/null
+fi
+
+
+# Compile the java source files, quitting if it fails.
+FILESTOCOMPILE=`cat ${SOURCEFILELIST} | tr '\012' ' '`
+
+CLASSPATH="$JARCOMPILER_CLASSPATH":${TARGETDIR} ${JARCOMPILER_JAVAC} ${JARCOMPILER_JAVAC_OPTS} -d ${TARGETDIR} @${SOURCEFILELIST} > /dev/null 
+
+JAVACEXITVALUE=$?
+if [ $JAVACEXITVALUE -gt 0 ]
+then
+  echo Compilation failed. > /dev/stderr
+  rm -rf `echo ${CLEANUP} | tr ':' ' '`
+  exit $JAVACEXITVALUE
+fi
+
+
+
+# Create the jar from the compiled classes, adding manifest if necessary.
+JAROPTS=cf
+if [ $MANIFESTFILE ]
+then
+  JAROPTS="m${JAROPTS} ${MANIFESTFILE}"
+fi
+
+
+# Now jar the things that need to be jarred.
+TOJAR=
+for JARTARGET in `ls ${TARGETDIR}`
+do
+  TOJAR="${TOJAR} -C ${TARGETDIR} ${JARTARGET}"
+done
+
+${JARCOMPILER_JAR} ${JAROPTS} ${CURRENT}/${TARGETJAR} ${TOJAR}  2> /dev/null
+
+
+# Now remove all the temporary stuff (including the .class files)
+rm -rf `echo ${CLEANUP} | tr ':' ' '`
+
+# End.
