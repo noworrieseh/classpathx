@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.11 2002-06-24 11:31:05 raif Exp $
+   $Id: build.xml,v 1.12 2002-06-28 13:20:48 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -230,6 +230,13 @@
          </antcall>
          <antcall target="nist-kat">
             <param name="cipher" value="twofish"/>
+         </antcall>
+         <!-- NIST KAT can be applied to non NIST ciphers -->
+         <antcall target="nist-kat">
+            <param name="cipher" value="khazad"/>
+         </antcall>
+         <antcall target="nist-kat">
+            <param name="cipher" value="square"/>
          </antcall>
       </parallel>
    </target>
