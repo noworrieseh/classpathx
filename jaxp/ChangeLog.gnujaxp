@@ -1,3 +1,8 @@
+2004-07-31  Musachy Barroso  <musachy@gmail.com>
+
+	* XmlParser.java: Added check for partial character references
+	in internal entities. 
+	
 2004-07-29  Musachy Barroso  <musachy@gmail.com>
 
 	* SAXDriver.java: Added checks for invalid use of reserved 
