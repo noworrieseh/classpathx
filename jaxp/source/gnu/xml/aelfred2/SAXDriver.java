@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.18 2001-11-07 01:12:46 db Exp $
+ * $Id: SAXDriver.java,v 1.19 2001-11-09 20:26:43 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -63,7 +63,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.18 2001-11-07 01:12:46 db Exp $
+// $Id: SAXDriver.java,v 1.19 2001-11-09 20:26:43 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
@@ -118,7 +118,7 @@ import gnu.xml.util.DefaultHandler;
  *
  * @author Written by David Megginson (version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-11-07 01:12:46 $
+ * @version $Date: 2001-11-09 20:26:43 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -187,7 +187,7 @@ final public class SAXDriver
      */
     public EntityResolver getEntityResolver ()
     {
-	return entityResolver;
+	return (entityResolver == base) ? null : entityResolver;
     }
 
     /**
@@ -208,7 +208,7 @@ final public class SAXDriver
      */
     public DTDHandler getDTDHandler ()
     {
-	return dtdHandler;
+	return (dtdHandler == base) ? null : dtdHandler;
     }
 
     /**
@@ -247,7 +247,7 @@ final public class SAXDriver
      */
     public ContentHandler getContentHandler ()
     {
-	return contentHandler;
+	return contentHandler == base ? null : contentHandler;
     }
 
     /**
@@ -279,7 +279,7 @@ final public class SAXDriver
      * errors of all levels (fatal, nonfatal, warning); this is never null;
      */
     public ErrorHandler getErrorHandler ()
-	{ return errorHandler; }
+	{ return errorHandler == base ? null : errorHandler; }
 
 
     /**
@@ -311,7 +311,9 @@ final public class SAXDriver
 		if (source.getByteStream () != null
 			&& source.getCharacterStream () != null)
 		    fatal ("two input streams");
-		else if (systemId == null)
+		else if (systemId == null
+			&& source.getByteStream () == null
+			&& source.getCharacterStream () == null)
 		    fatal ("no input URI");
 		parser.doParse (systemId,
 			      source.getPublicId (),
@@ -535,29 +537,35 @@ final public class SAXDriver
     throws SAXException
 	{ contentHandler.skippedEntity (name); }
 
-    InputSource resolveEntity (boolean isPE, InputSource in)
+    InputSource resolveEntity (boolean isPE, String name, InputSource in)
     throws SAXException, IOException
     {
+	InputSource	source;
+
 	// external entities might be skipped
 	if (isPE && !extPE)
 	    return null;
 	if (!isPE && !extGE)
 	    return null;
 
-	InputSource source = entityResolver.resolveEntity (
+	// ... or not
+	lexicalHandler.startEntity (name);
+	source = entityResolver.resolveEntity (
 			in.getPublicId (), in.getSystemId ());
-	return (source == null) ? in : source;
+	if (source == null)
+	    source = in;
+	startExternalEntity (name, source.getSystemId ());
+	return source;
     }
-
 
     void startExternalEntity (String name, String systemId)
     throws SAXException
     {
+	if (systemId == null) {
+	    warn ("URI was not reported to parser for entity " + name);
+	    systemId = "[unidentified data stream]";
+	}
 	entityStack.push (systemId);
-	if (!"[document]".equals (name))
-	    lexicalHandler.startEntity (name);
-	else if (systemId == null)
-	    warn ("document URI was not reported to parser");
     }
 
     void endExternalEntity (String name)
