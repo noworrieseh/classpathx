@@ -3,7 +3,6 @@ Implementation-Title: GNU JAXP
 Implementation-URL: http://www.gnu.org/software/classpathx/jaxp
 Implementation-Vendor: Free Software Foundation
 Main-Class: gnu.xml.util.DoParse
-Sealed: true
 
 Name: gnu/xml/aelfred2/
 Implementation-Title: AElfred2
