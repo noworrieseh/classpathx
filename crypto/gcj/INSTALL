@@ -1,0 +1,70 @@
+Installation procedure for GCJ (GNU Compiler for Java)
+---------------------------------------------------------
+
+This installation requires a recent gcj compiler, at least version
+3.1. It does not depend on any other java tools (javac, jikes...).
+
+The build creates the folowing files:
+
+  gnu-crypto.jar      .class files compiled with gcj.
+  lib-gnu-crypto.so   a native shared library equivalent of the jar file.
+
+Ideally, the files in this directory should go to the root of the
+project, however it is difficult to create Automake makefiles that 
+accomodate both byte code compilation with jikes or javac and native 
+compilation with gcj. In any case, such a makefile does not follow 
+the current ClasspathX standard and it is simpler for me to keep the 
+whole thing separated.
+
+
+First a few conventions:
+This build does not allow the compilation in the source tree. You must 
+build the software in a temporary directory.
+Lets assume that you have installed the crypto sources under 
+$HOME/crypto and created a tmp directory under $HOME/crypto_tmp.
+
+For the rest of this discussion I am going to refer to the gcj
+sub-directory ($HOME/crypto/gcj) as GCJ_CRYPTO_ROOT and the tmp 
+directory as CRYPTO_TMP.
+
+so:
+
+  GCJ_CRYPTO_ROOT=$HOME/crypto/gcj
+  CRYPTO_TMP=$HOME/crypto_tmp
+
+
+The installation is as follow:
+
+  cd $GCJ_CRYPTO_ROOT
+  ./admin.sh links
+
+These first two commands change to the gcj sub-directory and build a
+few sym-links pointing to the real source directory and some important
+files that configure expects.
+
+then
+
+  cd $CRYPTO_TMP
+  $GCJ_CRYPTO_ROOT/configure --prefix=/usr/local/gnu_crypto
+  make
+  make install
+
+and that should be it!
+
+
+Optionally you can run the "minimal test suite":
+
+  make check
+
+compiles the test programs, then
+
+  make test-vectors
+
+runs the tests.
+As of now the test source/nistMCT anubis 288 crashes, all other tests
+are working.
+
+
+
+If you have any problem with the GCJ build please email to the gnu-crypto
+mailing list: classpathx-crypto@gnu.org.

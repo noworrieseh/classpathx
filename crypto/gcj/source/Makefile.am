@@ -1,0 +1,183 @@
+## Process this file with automake to produce Makefile.in.
+##
+AUTOMAKE_OPTIONS = gnu
+
+# #############################################################################
+# Variables
+#
+crypto_jar = gnu-crypto.jar
+AM_GCJFLAGS = --encoding=UTF-8 -fassume-compiled -fCLASSPATH=.
+
+BUILT_SOURCES = $(crypto_jar)
+data_DATA = $(crypto_jar)
+EXTRA_DIST = 
+
+# #############################################################################
+# Libraries and executables to compile.
+#
+lib_LTLIBRARIES = lib-gnu-crypto.la
+check_PROGRAMS = \
+ nessieCipherTVEmitter \
+ nessieHashTVEmitter \
+ cipherSpeed \
+ hashSpeed \
+ nistKat \
+ nistMCT
+
+# #############################################################################
+# Crypto library config
+#
+lib_gnu_crypto_la_LIBADD = 
+lib_gnu_crypto_la_LDFLAGS = -version-info 1:0
+lib_gnu_crypto_la_SOURCES = $(crypto_sources)
+
+# #############################################################################
+# NessieCipherTVEmitter executable
+#
+nessieCipherTVEmitter_SOURCES = gnu/crypto/tool/NessieCipherTVEmitter.java
+nessieCipherTVEmitter_LDADD   = -l-gnu-crypto
+nessieCipherTVEmitter_LDFLAGS = --main=gnu.crypto.tool.NessieCipherTVEmitter
+
+# #############################################################################
+# NessieHashTVEmitter executable
+#
+nessieHashTVEmitter_SOURCES = gnu/crypto/tool/NessieHashTVEmitter.java
+nessieHashTVEmitter_LDADD   = -l-gnu-crypto
+nessieHashTVEmitter_LDFLAGS = --main=gnu.crypto.tool.NessieHashTVEmitter
+
+# #############################################################################
+# CipherSpeed executable
+#
+cipherSpeed_SOURCES = gnu/crypto/tool/CipherSpeed.java
+cipherSpeed_LDADD   = -l-gnu-crypto
+cipherSpeed_LDFLAGS = --main=gnu.crypto.tool.CipherSpeed
+
+# #############################################################################
+# HashSpeed executable
+#
+hashSpeed_SOURCES = gnu/crypto/tool/HashSpeed.java
+hashSpeed_LDADD   = -l-gnu-crypto
+hashSpeed_LDFLAGS = --main=gnu.crypto.tool.HashSpeed
+
+# #############################################################################
+# NistKat executable
+#
+nistKat_SOURCES = gnu/crypto/tool/NistKat.java
+nistKat_LDADD   = -l-gnu-crypto
+nistKat_LDFLAGS = --main=gnu.crypto.tool.NistKat
+
+# #############################################################################
+# NistMCT executable
+#
+nistMCT_SOURCES = gnu/crypto/tool/NistMCT.java
+nistMCT_LDADD   = -l-gnu-crypto
+nistMCT_LDFLAGS = --main=gnu.crypto.tool.NistMCT
+
+# #############################################################################
+# library source files.
+#
+crypto_sources = \
+ gnu/crypto/Registry.java \
+ gnu/crypto/cipher/Anubis.java \
+ gnu/crypto/cipher/BaseCipher.java \
+ gnu/crypto/cipher/CipherFactory.java \
+ gnu/crypto/cipher/IBlockCipher.java \
+ gnu/crypto/cipher/IBlockCipherSpi.java \
+ gnu/crypto/cipher/Khazad.java \
+ gnu/crypto/cipher/NullCipher.java \
+ gnu/crypto/cipher/Rijndael.java \
+ gnu/crypto/cipher/Square.java \
+ gnu/crypto/cipher/Twofish.java \
+ gnu/crypto/hash/BaseHash.java \
+ gnu/crypto/hash/HashFactory.java \
+ gnu/crypto/hash/IMessageDigest.java \
+ gnu/crypto/hash/MD5.java \
+ gnu/crypto/hash/RipeMD128.java \
+ gnu/crypto/hash/RipeMD160.java \
+ gnu/crypto/hash/Sha160.java \
+ gnu/crypto/hash/Whirlpool.java \
+ gnu/crypto/mode/BaseMode.java \
+ gnu/crypto/mode/CTR.java \
+ gnu/crypto/mode/ECB.java \
+ gnu/crypto/mode/ICM.java \
+ gnu/crypto/mode/IMode.java \
+ gnu/crypto/mode/ModeFactory.java \
+ gnu/crypto/pad/BasePad.java \
+ gnu/crypto/pad/IPad.java \
+ gnu/crypto/pad/PKCS7.java \
+ gnu/crypto/pad/PadFactory.java \
+ gnu/crypto/pad/TBC.java \
+ gnu/crypto/pad/WrongPaddingException.java \
+ gnu/crypto/prng/BasePRNG.java \
+ gnu/crypto/prng/ICMGenerator.java \
+ gnu/crypto/prng/IRandom.java \
+ gnu/crypto/prng/LimitReachedException.java \
+ gnu/crypto/prng/MDGenerator.java \
+ gnu/crypto/prng/PRNGFactory.java \
+ gnu/crypto/util/PRNG.java \
+ gnu/crypto/util/Prime.java \
+ gnu/crypto/util/Util.java \
+ gnu/crypto/jce/DSSKeyPairGeneratorSpi.java \
+ gnu/crypto/jce/DSSRawSignatureSpi.java \
+ gnu/crypto/jce/GnuCrypto.java \
+ gnu/crypto/jce/KeyPairGeneratorAdapter.java \
+ gnu/crypto/jce/MD5Spi.java \
+ gnu/crypto/jce/MessageDigestAdapter.java \
+ gnu/crypto/jce/RSAKeyPairGeneratorSpi.java \
+ gnu/crypto/jce/RSAPSSRawSignatureSpi.java \
+ gnu/crypto/jce/RipeMD128Spi.java \
+ gnu/crypto/jce/RipeMD160RandomSpi.java \
+ gnu/crypto/jce/RipeMD160Spi.java \
+ gnu/crypto/jce/SecureRandomAdapter.java \
+ gnu/crypto/jce/Sha160RandomSpi.java \
+ gnu/crypto/jce/Sha160Spi.java \
+ gnu/crypto/jce/SignatureAdapter.java \
+ gnu/crypto/jce/WhirlpoolRandomSpi.java \
+ gnu/crypto/jce/WhirlpoolSpi.java \
+ gnu/crypto/mac/BaseMac.java \
+ gnu/crypto/mac/HMac.java \
+ gnu/crypto/mac/HMacFactory.java \
+ gnu/crypto/mac/IMac.java \
+ gnu/crypto/sig/BaseSignature.java \
+ gnu/crypto/sig/IKeyPairCodec.java \
+ gnu/crypto/sig/IKeyPairGenerator.java \
+ gnu/crypto/sig/ISignature.java \
+ gnu/crypto/sig/ISignatureCodec.java \
+ gnu/crypto/sig/KeyPairGeneratorFactory.java \
+ gnu/crypto/sig/SignatureFactory.java \
+ gnu/crypto/sig/dss/DSSKey.java \
+ gnu/crypto/sig/dss/DSSKeyPairGenerator.java \
+ gnu/crypto/sig/dss/DSSKeyPairRawCodec.java \
+ gnu/crypto/sig/dss/DSSPrivateKey.java \
+ gnu/crypto/sig/dss/DSSPublicKey.java \
+ gnu/crypto/sig/dss/DSSSignature.java \
+ gnu/crypto/sig/dss/DSSSignatureRawCodec.java \
+ gnu/crypto/sig/rsa/EMSA_PSS.java \
+ gnu/crypto/sig/rsa/GnuRSAKey.java \
+ gnu/crypto/sig/rsa/GnuRSAPrivateKey.java \
+ gnu/crypto/sig/rsa/GnuRSAPublicKey.java \
+ gnu/crypto/sig/rsa/RSA.java \
+ gnu/crypto/sig/rsa/RSAKeyPairGenerator.java \
+ gnu/crypto/sig/rsa/RSAKeyPairRawCodec.java \
+ gnu/crypto/sig/rsa/RSAPSSSignature.java \
+ gnu/crypto/sig/rsa/RSAPSSSignatureRawCodec.java
+
+## ################################################################
+## Extra targets.
+##
+SUFFIXES = .java .lo .o .obj .class .jar
+
+%.class: %.java
+	$(GCJ) -C --encoding=UTF-8 -fCLASSPATH=$(srcdir) -d . $<
+
+CLASSFILES = $(lib_gnu_crypto_la_SOURCES:.java=.class)
+
+$(crypto_jar): $(CLASSFILES)
+	jar cf $@ `find ./ -name \*.class`
+
+MOSTLYCLEANFILES = $(crypto_jar)
+
+clean-local:
+## We just remove every .class and .txt file that was created.
+	find . -name '*.class' -print | xargs rm -f
+	find . -name '*.txt' -print | xargs rm -f
