@@ -13,9 +13,11 @@ Classpath project:
 
 	http://www.gnu.org/software/classpath/
 
-Compiled jarfiles of both libraries are distributed along with this package,
-in the lib subdirectory. At runtime, you will need to reference these
-libraries in your classpath along with the JavaMail jarfiles.
+The configuration script will search for these jarfiles in some standard
+locations, or you can use the --with-activation-jar and --with-inetlib-jar
+configuration options to specify your own locations. At runtime, you will
+need to reference these libraries in your classpath along with the JavaMail
+jarfiles.
 
 
 Configuration
@@ -61,4 +63,4 @@ Installation
 
 
 $Author: dog $
-$Date: 2004-01-11 18:10:01 $
+$Date: 2004-03-13 21:14:06 $

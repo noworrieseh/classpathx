@@ -271,7 +271,7 @@ PACKAGE_STRING='gnumail 0.1'
 PACKAGE_BUGREPORT=''
 
 ac_unique_file="source/gnu/mail/providers/ReadOnlyMessage.java"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAVADOC JAR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE ACTIVATION_JAR INETLIB_JAR ENABLE_SMTP_TRUE ENABLE_SMTP_FALSE ENABLE_IMAP_TRUE ENABLE_IMAP_FALSE ENABLE_POP3_TRUE ENABLE_POP3_FALSE ENABLE_NNTP_TRUE ENABLE_NNTP_FALSE ENABLE_MBOX_TRUE ENABLE_MBOX_FALSE ENABLE_MAILDIR_TRUE ENABLE_MAILDIR_FALSE JAVAC JAVADOC JAR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -795,6 +795,17 @@ Optional Features:
   --enable-nntp           Enable the NNTP provider (default=yes).
   --enable-mbox           Enable the mbox provider (default=yes).
   --enable-maildir        Enable the Maildir provider (default=yes).
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-activation-jar=DIR
+                          path to JAF (activation.jar). If unspecified,
+                          /usr/share/java and /usr/local/share/java are
+                          searched, in that order.
+  --with-inetlib-jar=DIR  path to GNU inetlib (inetlib.jar). If unspecified,
+                          /usr/share/java and /usr/local/share/java are
+                          searched, in that order.
 
 _ACEOF
 fi
@@ -1596,6 +1607,102 @@ VERSION="0.1"
 
 
 
+
+
+# Check whether --with-activation_jar or --without-activation_jar was given.
+if test "${with_activation_jar+set}" = set; then
+  withval="$with_activation_jar"
+  if test "x${withval}" != x ; then
+		echo "$as_me:$LINENO: checking for ${withval}/activation.jar" >&5
+echo $ECHO_N "checking for ${withval}/activation.jar... $ECHO_C" >&6
+		if test -r ${withval}/activation.jar ; then
+			echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+			ACTIVATION_JAR=${withval}/activation.jar
+			found_activation_jar=true
+		else
+			{ { echo "$as_me:$LINENO: error: can't find activation.jar in specified path" >&5
+echo "$as_me: error: can't find activation.jar in specified path" >&2;}
+   { (exit 1); exit 1; }; }
+		fi
+	fi
+else
+  found_activation_jar=false
+fi;
+if test "x${ACTIVATION_JAR}" = x ; then
+
+echo "$as_me:$LINENO: checking for activation.jar" >&5
+echo $ECHO_N "checking for activation.jar... $ECHO_C" >&6
+for _F in /usr/share/java /usr/local/share/java ;do
+	if test -r ${_F}/activation.jar ; then
+		ACTIVATION_JAR=${_F}/activation.jar
+		break
+	fi
+done
+if test x${ACTIVATION_JAR} = x ; then
+	echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+else
+	echo "$as_me:$LINENO: result: ${ACTIVATION_JAR}" >&5
+echo "${ECHO_T}${ACTIVATION_JAR}" >&6
+fi
+	if test "x${ACTIVATION_JAR}" = x; then
+		{ { echo "$as_me:$LINENO: error: can't find activation.jar; use --with-activation-jar" >&5
+echo "$as_me: error: can't find activation.jar; use --with-activation-jar" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
+fi
+
+
+
+
+# Check whether --with-inetlib_jar or --without-inetlib_jar was given.
+if test "${with_inetlib_jar+set}" = set; then
+  withval="$with_inetlib_jar"
+  if test "x${withval}" != x; then
+		echo "$as_me:$LINENO: checking for ${withval}/inetlib.jar" >&5
+echo $ECHO_N "checking for ${withval}/inetlib.jar... $ECHO_C" >&6
+		if test -r ${withval}/inetlib.jar ; then
+			echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+			INETLIB_JAR=${withval}/inetlib.jar
+			found_inetlib_jar=true
+		else
+			{ { echo "$as_me:$LINENO: error: can't find inetlib.jar in specified path" >&5
+echo "$as_me: error: can't find inetlib.jar in specified path" >&2;}
+   { (exit 1); exit 1; }; }
+		fi
+	fi
+else
+  found_inetlib_jar=false
+fi;
+if test "x${INETLIB_JAR}" = x ;then
+
+echo "$as_me:$LINENO: checking for inetlib.jar" >&5
+echo $ECHO_N "checking for inetlib.jar... $ECHO_C" >&6
+for _F in /usr/share/java /usr/local/share/java ;do
+	if test -r ${_F}/inetlib.jar ; then
+		INETLIB_JAR=${_F}/inetlib.jar
+		break
+	fi
+done
+if test x${INETLIB_JAR} = x ; then
+	echo "$as_me:$LINENO: result: not found" >&5
+echo "${ECHO_T}not found" >&6
+else
+	echo "$as_me:$LINENO: result: ${INETLIB_JAR}" >&5
+echo "${ECHO_T}${INETLIB_JAR}" >&6
+fi
+	if test "x${INETLIB_JAR}" = x; then
+		{ { echo "$as_me:$LINENO: error: can't find inetlib.jar; use --with-inetlib-jar" >&5
+echo "$as_me: error: can't find inetlib.jar; use --with-inetlib-jar" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
+	found_inetlib_jar=true
+fi
+
+
+
 # Check whether --enable-smtp or --disable-smtp was given.
 if test "${enable_smtp+set}" = set; then
   enableval="$enable_smtp"
@@ -1821,7 +1928,7 @@ else
 JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 cat << \EOF > $JAVA_TEST
-/* #line 1824 "configure" */
+/* #line 1931 "configure" */
 public class Test {
 }
 EOF
@@ -2728,6 +2835,8 @@ s,@ac_ct_STRIP@,$ac_ct_STRIP,;t t
 s,@INSTALL_STRIP_PROGRAM@,$INSTALL_STRIP_PROGRAM,;t t
 s,@AWK@,$AWK,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
+s,@ACTIVATION_JAR@,$ACTIVATION_JAR,;t t
+s,@INETLIB_JAR@,$INETLIB_JAR,;t t
 s,@ENABLE_SMTP_TRUE@,$ENABLE_SMTP_TRUE,;t t
 s,@ENABLE_SMTP_FALSE@,$ENABLE_SMTP_FALSE,;t t
 s,@ENABLE_IMAP_TRUE@,$ENABLE_IMAP_TRUE,;t t

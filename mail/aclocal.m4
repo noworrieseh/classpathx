@@ -29,7 +29,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASS,[
 AC_REQUIRE([AC_PROG_JAVA])
@@ -133,7 +133,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_CHECK_CLASSPATH,[
 if test "x$CLASSPATH" = x; then
@@ -177,7 +177,7 @@ dnl     echo "exec @JUNIT@ my.package.name.AllJunitTests" >> $@
 dnl     chmod +x $@
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN([AC_CHECK_JUNIT],[
 AC_CACHE_VAL(ac_cv_prog_JUNIT,[
@@ -215,7 +215,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 
 AC_DEFUN(AC_CHECK_RQRD_CLASS,[
@@ -239,7 +239,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_JAVA_OPTIONS,[
 AC_ARG_WITH(java-prefix,
@@ -284,7 +284,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAR],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -360,7 +360,7 @@ dnl
 dnl    AC_OUTPUT(Makefile)
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -386,7 +386,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVA_WORKS, [
 AC_CHECK_PROG(uudecode, uudecode$EXEEXT, yes)
@@ -500,7 +500,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC,[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -526,7 +526,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_PROG_JAVAC_WORKS,[
 AC_CACHE_CHECK([if $JAVAC works], ac_cv_prog_javac_works, [
@@ -572,7 +572,7 @@ dnl The general documentation of those macros, as well as the sample
 dnl configure.in, is included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Egon Willighagen <egonw@sci.kun.nl>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVADOC],[
 AC_REQUIRE([AC_EXEEXT])dnl
@@ -592,7 +592,7 @@ dnl and looks for the jni.h header file. If available, JAVAH is set to
 dnl the full path of javah and CPPFLAGS is updated accordingly.
 dnl
 dnl @author Luc Maisonobe
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN([AC_PROG_JAVAH],[
 AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
@@ -627,7 +627,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_COMPILE_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -666,7 +666,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN(AC_TRY_RUN_JAVA,[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -706,7 +706,7 @@ dnl The general documentation, as well as the sample configure.in, is
 dnl included in the AC_PROG_JAVA macro.
 dnl
 dnl @author Devin Weaver <ktohg@tritarget.com>
-dnl @version $Id: aclocal.m4,v 1.8 2004-01-23 16:51:40 dog Exp $
+dnl @version $Id: aclocal.m4,v 1.9 2004-03-13 21:14:06 dog Exp $
 dnl
 AC_DEFUN([AC_TRY_RUN_JAVA],[
 AC_REQUIRE([AC_PROG_JAVAC])dnl
@@ -730,6 +730,89 @@ ifelse([$4], , , [  rm -fr Test*
 ])dnl
 fi
 rm -fr Test*])
+dnl @synopsis GNUMAIL_WITH_ACTIVATION_JAR
+dnl
+AC_DEFUN([GNUMAIL_WITH_ACTIVATION_JAR],[
+AC_ARG_WITH([activation_jar],
+	AC_HELP_STRING([--with-activation-jar=DIR],
+		[path to JAF (activation.jar). If unspecified, /usr/share/java and /usr/local/share/java are searched, in that order.]),
+	[if test "x${withval}" != x ; then
+		AC_MSG_CHECKING([for ${withval}/activation.jar])
+		if test -r ${withval}/activation.jar ; then
+			AC_MSG_RESULT(yes)
+			ACTIVATION_JAR=${withval}/activation.jar
+			found_activation_jar=true
+		else
+			AC_MSG_ERROR([can't find activation.jar in specified path])
+		fi
+	fi],
+	[found_activation_jar=false])
+if test "x${ACTIVATION_JAR}" = x ; then
+	dnl AC_MSG_NOTICE([no value supplied, searching default locations])
+	_GNUMAIL_FIND_ACTIVATION_JAR([/usr/share/java /usr/local/share/java])
+	if test "x${ACTIVATION_JAR}" = x; then
+		AC_MSG_ERROR([can't find activation.jar; use --with-activation-jar])
+	fi
+fi
+AC_SUBST(ACTIVATION_JAR)
+])
+dnl @synopsis _GNUMAIL_FIND_ACTIVATION_JAR
+dnl
+AC_DEFUN([_GNUMAIL_FIND_ACTIVATION_JAR],[
+AC_MSG_CHECKING([for activation.jar])
+for _F in $1 ;do
+	if test -r ${_F}/activation.jar ; then
+		ACTIVATION_JAR=${_F}/activation.jar
+		break
+	fi
+done
+if test x${ACTIVATION_JAR} = x ; then
+	AC_MSG_RESULT([not found])
+else
+	AC_MSG_RESULT([${ACTIVATION_JAR}])
+fi])
+dnl @synopsis GNUMAIL_WITH_INETLIB_JAR
+dnl
+AC_DEFUN([GNUMAIL_WITH_INETLIB_JAR],[
+AC_ARG_WITH([inetlib_jar],
+	AC_HELP_STRING([--with-inetlib-jar=DIR],
+		[path to GNU inetlib (inetlib.jar). If unspecified, /usr/share/java and /usr/local/share/java are searched, in that order.]),
+	[if test "x${withval}" != x; then
+		AC_MSG_CHECKING([for ${withval}/inetlib.jar])
+		if test -r ${withval}/inetlib.jar ; then
+			AC_MSG_RESULT(yes)
+			INETLIB_JAR=${withval}/inetlib.jar
+			found_inetlib_jar=true
+		else
+			AC_MSG_ERROR([can't find inetlib.jar in specified path])
+		fi
+	fi],
+	[found_inetlib_jar=false])
+if test "x${INETLIB_JAR}" = x ;then
+	dnl AC_MSG_NOTICE([no value supplied, searching default locations])
+	_GNUMAIL_FIND_INETLIB_JAR([/usr/share/java /usr/local/share/java])
+	if test "x${INETLIB_JAR}" = x; then
+		AC_MSG_ERROR([can't find inetlib.jar; use --with-inetlib-jar])
+	fi
+	found_inetlib_jar=true
+fi
+AC_SUBST(INETLIB_JAR)
+])
+dnl @synopsis _GNUMAIL_FIND_INETLIB_JAR
+dnl
+AC_DEFUN([_GNUMAIL_FIND_INETLIB_JAR],[
+AC_MSG_CHECKING([for inetlib.jar])
+for _F in $1 ;do
+	if test -r ${_F}/inetlib.jar ; then
+		INETLIB_JAR=${_F}/inetlib.jar
+		break
+	fi
+done
+if test x${INETLIB_JAR} = x ; then
+	AC_MSG_RESULT([not found])
+else
+	AC_MSG_RESULT([${INETLIB_JAR}])
+fi])
 
 # Do all the work for Automake.                            -*- Autoconf -*-
 

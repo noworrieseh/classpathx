@@ -7,9 +7,9 @@ JAVAC = @JAVAC@
 JAVACFLAGS = -g
 JAVADOC = @JAVADOC@
 
-src = source
-dst = classes
-doc = docs
+src = @srcdir@/source
+dst = @srcdir@/classes
+doc = @srcdir@/docs
 
 # The java source files that make up the GNU version of the javax.mail API.
 gnumail_sources = \
@@ -254,27 +254,27 @@ $(maildir_package_name) \
 gnu.mail.util
 
 # The main jar file.
-gnumail_jar = gnumail.jar
+gnumail_jar = @srcdir@/gnumail.jar
 
 # The providers jar file.
-providers_jar = providers.jar
+providers_jar = @srcdir@/providers.jar
 
 # The GNU JAF library.
-activation_jar = lib/activation.jar
+activation_jar = @ACTIVATION_JAR@
 
 # The GNU classpath inetlib library.
-inetlib_jar = lib/inetlib.jar
+inetlib_jar = @INETLIB_JAR@
 
 # The META stuff
 gnumail_meta = \
-META-INF/COPYING \
-META-INF/mime.types \
-META-INF/mailcap \
-META-INF/javamail.charset.map
+@srcdir@/META-INF/COPYING \
+@srcdir@/META-INF/mime.types \
+@srcdir@/META-INF/mailcap \
+@srcdir@/META-INF/javamail.charset.map
 
 providers_meta = \
-META-INF/javamail.default.providers \
-META-INF/javamail.default.address.map
+@srcdir@/META-INF/javamail.default.providers \
+@srcdir@/META-INF/javamail.default.address.map
 
 # Classpaths
 classpath = $(src):$(activation_jar):$(inetlib_jar)

@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.4 2004-01-19 09:16:47 dog Exp $
+# $Id: configure.ac,v 1.5 2004-03-13 21:14:07 dog Exp $
 # Copyright (C) 2003 Nic Ferrier
 # 
 # This file is part of GNU JavaMail.
@@ -30,6 +30,9 @@ PACKAGE="mail"
 VERSION="0.1"
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
+
+GNUMAIL_WITH_ACTIVATION_JAR
+GNUMAIL_WITH_INETLIB_JAR
 
 AC_ARG_ENABLE(smtp, AC_HELP_STRING([--enable-smtp],
 	[Enable the SMTP provider (default=yes).]),

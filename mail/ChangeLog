@@ -1,3 +1,9 @@
+2004-03-13  Chris Burdess  <dog@bluezoo.org>
+
+	* acinclude.m4: Added macros to find activation.jar and inetlib.jar.
+	* configure.ac: Search for jarfiles.
+	* Makefile.am: Allow builds in other directories.
+
 2004-02-10  Chris Burdess  <dog@bluezoo.org>
 
 	* javamail.charset.map: Added some missing Java charsets.
