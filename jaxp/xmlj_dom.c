@@ -1099,9 +1099,11 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
                                                  jobject newChild,
                                                  jobject refChild)
 {
+  xmlNodePtr node;
   xmlNodePtr newChildNode;
   xmlNodePtr refChildNode;
 
+  node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
   refChildNode = xmljGetNodeID (env, refChild);
 
@@ -1110,7 +1112,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_insertBefore (JNIEnv * env,
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
     }
-  if (refChildNode == NULL)
+  if (refChildNode == NULL ||
+      refChildNode->parent == NULL ||
+      refChildNode->parent != node)
     {
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
@@ -1132,9 +1136,12 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
                                                  jobject newChild,
                                                  jobject oldChild)
 {
+  xmlNodePtr node;
   xmlNodePtr newChildNode;
   xmlNodePtr oldChildNode;
+  xmlNodePtr cur;
 
+  node = xmljGetNodeID (env, self);
   newChildNode = xmljGetNodeID (env, newChild);
   oldChildNode = xmljGetNodeID (env, oldChild);
 
@@ -1143,7 +1150,9 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
     }
-  if (oldChildNode == NULL)
+  if (oldChildNode == NULL ||
+      oldChildNode->parent == NULL ||
+      oldChildNode->parent != node)
     {
       xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
       return NULL;
@@ -1151,12 +1160,80 @@ Java_gnu_xml_libxmlj_dom_GnomeNode_replaceChild (JNIEnv * env,
   if (newChildNode->doc != oldChildNode->doc)
     {
       xmljThrowDOMException (env, 4, NULL);	/* WRONG_DOCUMENT_ERR */
+      return NULL;
     }
-  if (!xmlReplaceNode (oldChildNode, newChildNode))
+  /* Check that new node is of an allowed type */
+  switch (node->type)
     {
+    case XML_ATTRIBUTE_NODE:
+    case XML_CDATA_SECTION_NODE:
+    case XML_COMMENT_NODE:
+    case XML_TEXT_NODE:
+    case XML_ENTITY_NODE:
+    case XML_ENTITY_REF_NODE:
+    case XML_NOTATION_NODE:
+    case XML_PI_NODE:
+      /* these can't have any children */
       xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+      return NULL;
+    case XML_DOCUMENT_FRAG_NODE:
+      if (newChildNode->type == XML_ATTRIBUTE_NODE)
+        {
+          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+          return NULL;
+        }
+      /* fall through */
+    case XML_ELEMENT_NODE:
+      if (newChildNode->type == XML_DTD_NODE ||
+          newChildNode->type == XML_DOCUMENT_TYPE_NODE ||
+          newChildNode->type == XML_ENTITY_NODE ||
+          newChildNode->type == XML_NOTATION_NODE ||
+          newChildNode->type == XML_PI_NODE)
+        {
+          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+          return NULL;
+        }
+      /* fall through */
+    default:
+      if (newChildNode->type == XML_DOCUMENT_NODE ||
+          newChildNode->type == XML_DOCUMENT_FRAG_NODE)
+        {
+          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+          return NULL;
+        }
+      /* TODO others? */
     }
-  return newChild;
+  /* Check that new node is not self or an ancestor */
+  for (cur = node; cur != NULL; cur = cur->parent)
+    {
+      if (cur == newChildNode)
+        {
+          xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+          return NULL;
+        }
+    }
+  /* Check that new node does not add a second doctype or root element
+   * to a document node */
+  if (node->type == XML_DOCUMENT_NODE)
+    {
+      cur = node->children;
+      while (cur != NULL)
+        {
+          if (cur->type == XML_DTD_NODE ||
+              cur->type == XML_DOCUMENT_TYPE_NODE ||
+              cur->type == XML_ELEMENT_NODE)
+            {
+              if (newChildNode->type == cur->type && newChildNode != cur)
+                {
+                  xmljThrowDOMException (env, 3, NULL);	/* HIERARCHY_REQUEST_ERR */
+                  return NULL;
+                }
+            }
+          cur = cur->next;
+        }
+    }
+  newChildNode = xmlReplaceNode (oldChildNode, newChildNode);
+  return xmljGetNodeInstance (env, newChildNode);
 }
 
 JNIEXPORT jobject JNICALL

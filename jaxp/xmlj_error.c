@@ -40,9 +40,6 @@
 #include "xmlj_io.h"
 #include "xmlj_util.h"
 
-jclass jaxpDOMExceptionClass = NULL;
-jmethodID jaxpDOMExceptionConstructor = NULL;
-
 void
 xmljXsltErrorFunc (void *ctx, const char *msg, ...)
 {
@@ -138,36 +135,30 @@ xmljThrowDOMException (JNIEnv *env,
                        int code,
                        const char *message)
 {
+  jclass cls;
+  jmethodID method;
   jthrowable ex;
   jstring jmsg;
 
-  if (jaxpDOMExceptionClass == NULL)
+  if ((*env)->ExceptionOccurred (env))
     {
-      jaxpDOMExceptionClass =
-        (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeDOMException");
-      if (jaxpDOMExceptionClass == NULL)
-        {
-          fprintf (stderr, "Can't find DOMException class!\n");
-          return;
-        }
+      return;
     }
-  if (jaxpDOMExceptionConstructor == NULL)
+
+  cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeDOMException");
+  if (cls == NULL)
     {
-      jaxpDOMExceptionConstructor =
-        (*env)->GetMethodID (env, jaxpDOMExceptionClass,
-                             "<init>", "(SLjava/lang/String;)V");
-      if (jaxpDOMExceptionConstructor == NULL)
-        {
-          fprintf (stderr, "Can't find DOMException constructor!\n");
-          return;
-        }
+      fprintf (stderr, "Can't find DOMException class!\n");
+      return;
+    }
+  method = (*env)->GetMethodID (env, cls, "<init>", "(SLjava/lang/String;)V");
+  if (method == NULL)
+    {
+      fprintf (stderr, "Can't find DOMException constructor!\n");
+      return;
     }
   jmsg = (message == NULL) ? NULL : (*env)->NewStringUTF (env, message);
-  ex = (jthrowable) (*env)->NewObject (env,
-                                       jaxpDOMExceptionClass,
-                                       jaxpDOMExceptionConstructor,
-                                       code,
-                                       jmsg);
+  ex = (jthrowable) (*env)->NewObject (env, cls, method, code, jmsg);
   (*env)->Throw (env, ex);
 }
 
