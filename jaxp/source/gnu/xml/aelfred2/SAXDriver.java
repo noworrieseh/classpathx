@@ -1,5 +1,5 @@
 /*
- * $Id: SAXDriver.java,v 1.12 2001-07-31 06:42:30 db Exp $
+ * $Id: SAXDriver.java,v 1.13 2001-10-07 04:04:53 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,14 +55,13 @@ import org.xml.sax.helpers.NamespaceSupport;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: SAXDriver.java,v 1.12 2001-07-31 06:42:30 db Exp $
+// $Id: SAXDriver.java,v 1.13 2001-10-07 04:04:53 db Exp $
 
 /**
  * An enhanced SAX2 version of Microstar's &AElig;lfred XML parser.
  * The enhancements primarily relate to significant improvements in
  * conformance to the XML specification, and SAX2 support.  Performance
- * has been improved.  However, the &AElig;lfred proprietary APIs are
- * no longer public.  See the package level documentation for more
+ * has been improved.  See the package level documentation for more
  * information.
  *
  * <table border="1" width='100%' cellpadding='3' cellspacing='0'>
@@ -77,6 +76,10 @@ import gnu.xml.util.DefaultHandler;
  *	<td>Value is fixed at <em>true</em></td></tr>
  * <tr><td>(URL)/external-parameter-entities</td>
  *	<td>Value is fixed at <em>true</em></td></tr>
+ * <tr><td>(URL)/is-standalone</td>
+ *	<td>(PRELIMINARY) Returns true iff the document's parsing
+ *	has started (some non-error event after <em>startDocument()</em>
+ *	was reported) and the document's standalone flag is set.</td></tr>
  * <tr><td>(URL)/namespace-prefixes</td>
  *	<td>Value defaults to <em>false</em> (but XML 1.0 names are
  *		always reported)</td></tr>
@@ -108,7 +111,7 @@ import gnu.xml.util.DefaultHandler;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a from Microstar)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-07-31 06:42:30 $
+ * @version $Date: 2001-10-07 04:04:53 $
  * @see org.xml.sax.Parser
  */
 final public class SAXDriver
@@ -342,7 +345,7 @@ final public class SAXDriver
      *	is neither built in, nor yet assigned.
      */
     public boolean getFeature (String featureId)
-    throws SAXNotRecognizedException
+    throws SAXNotRecognizedException, SAXNotSupportedException
     {
 	if ((FEATURE + "validation").equals (featureId))
 	    return false;
@@ -368,6 +371,13 @@ final public class SAXDriver
 	// always interns
 	if ((FEATURE + "string-interning").equals (featureId))
 	    return true;
+	
+	// meaningful between startDocument/endDocument
+	if ((FEATURE + "is-standalone").equals (featureId)) {
+	    if (parser == null)
+		throw new SAXNotSupportedException (featureId);
+	    return parser.isStandalone ();
+	}
 
 	throw new SAXNotRecognizedException (featureId);
     }
@@ -517,19 +527,19 @@ final public class SAXDriver
     void startExternalEntity (String name, String systemId)
     throws SAXException
     {
+	entityStack.push (systemId);
 	if (!"[document]".equals (name))
 	    lexicalHandler.startEntity (name);
 	else if (systemId == null)
 	    warn ("document URI was not reported to parser");
-	entityStack.push (systemId);
     }
 
     void endExternalEntity (String name)
     throws SAXException
     {
-	entityStack.pop ();
 	if (!"[document]".equals (name))
 	    lexicalHandler.endEntity (name);
+	entityStack.pop ();
     }
 
     void startInternalEntity (String name)
@@ -747,20 +757,12 @@ final public class SAXDriver
     void processingInstruction (String target, String data)
     throws SAXException
     {
-	// XXX if within DTD, perhaps it's best to discard
-	// PIs since the decls to which they (usually)
-	// apply get significantly rearranged
-
 	contentHandler.processingInstruction (target, data);
     }
 
     void comment (char ch[], int start, int length)
     throws SAXException
     {
-	// XXX if within DTD, perhaps it's best to discard
-	// comments since the decls to which they (usually)
-	// apply get significantly rearranged
-
 	if (lexicalHandler != base)
 	    lexicalHandler.comment (ch, start, length);
     }
@@ -797,10 +799,6 @@ final public class SAXDriver
 	errorHandler.warning (err);
     }
 
-
-    //
-    // Before the endDtd event, deliver all non-PE declarations.
-    //
 
     //
     // Implementation of org.xml.sax.Attributes.
@@ -998,7 +996,7 @@ final public class SAXDriver
 	return parser.getColumnNumber ();
     }
 
-    // adapter between content handler and document handler callbacks
+    // adapter between SAX2 content handler and SAX1 document handler callbacks
     private static class Adapter implements ContentHandler
     {
 	private DocumentHandler		docHandler;
