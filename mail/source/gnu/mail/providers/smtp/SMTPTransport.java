@@ -204,9 +204,12 @@ public class SMTPTransport
         // User authentication
         String auth = getProperty ("auth");
         boolean authRequired = "required".equals (auth);
-        if (authenticationMechanisms != null &&
-            !authenticationMechanisms.isEmpty () &&
-            (authRequired || propertyIsTrue ("auth")))
+        if (authenticationMechanisms == null ||
+            authenticationMechanisms.isEmpty ())
+          {
+            return !authRequired;
+          }
+        if (authRequired || propertyIsTrue ("auth"))
           {
             if (username == null || password == null)
               {
@@ -254,7 +257,25 @@ public class SMTPTransport
                       }
                   }
               }
+            else
+              {
+                if (session.getDebug ())
+                  {
+                    System.err.println ("smtp: WARNING: server requested " +
+                                        "AUTH, but authentication principal " +
+                                        "and credentials are not available");
+                  }
+              }
             return false;
+          }
+        else
+          {
+            if (session.getDebug ())
+              {
+                System.err.println ("smtp: WARNING: server requested " +
+                                    "AUTH, but authentication is not " +
+                                    "enabled");
+              }
           }
         return !authRequired;
       }
