@@ -111,6 +111,11 @@ extends FilterOutputStream
    */
   public void flush() throws IOException 
   {
+    if (gotSpace)
+    {
+      output(0x20, false);
+      gotSpace = false;
+    }
     out.flush();
   } // flush()
 
@@ -176,10 +181,13 @@ extends FilterOutputStream
       else
         outputCRLF();
     }
-    if (b<' ' || b>=127 || b=='=')
-      output(b, true);
     else
-      output(b, false);
+    {
+      if (b<' ' || b>=127 || b=='=')
+        output(b, true);
+      else
+        output(b, false);
+    }
   } // write()
 
   /**

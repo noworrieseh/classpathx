@@ -1,3 +1,8 @@
+2004-01-29  Chris Burdess  <dog@bluezoo.org>
+
+	* QPOutputStream.java: Applied O/yvind Harboe's patch to correct output of
+	    space character.
+
 2004-01-26  Chris Burdess  <dog@bluezoo.org>
 
     * build.xml: Updated ant build script to match new build system.
