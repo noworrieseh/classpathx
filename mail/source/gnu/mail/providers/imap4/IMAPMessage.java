@@ -31,7 +31,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,7 +46,6 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
-import javax.mail.internet.MailDateFormat;
 import javax.mail.internet.MimeMessage;
 
 import gnu.mail.providers.ReadOnlyMessage;
@@ -60,11 +61,25 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
 
   static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
   static final String FETCH_CONTENT = "BODY.PEEK[]";
+  static final String HEADERFIELDS = "BODYHEADER.FIELDS";
 
   /**
-   * If set, this contains the RFC822-formatted value of the received date.
+   * If set, this contains the string value of the received date.
    */
   protected String internalDate;
+
+  /**
+   * The date format used to parse IMAP INTERNALDATE values.
+   */
+  protected static final DateFormat internalDateFormat =
+    new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss zzzzz");
+
+  /**
+   * If set, the current set of headers is complete.
+   * If false, and a header is requested but returns null, all headers will
+   * be requested from the server.
+   */
+  protected boolean headersComplete;
 
   IMAPMessage(IMAPFolder folder, InputStream in, int msgnum) 
     throws MessagingException 
@@ -175,6 +190,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       {
         InputStream in = new ByteArrayInputStream(status.getContent());
         headers = createInternetHeaders(in);
+        headersComplete = true;
       }
       else if (key==BODY)
       {
@@ -184,6 +200,20 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       else if (key==INTERNALDATE)
       {
         internalDate = (String)status.get(key);
+        // Strip quotes if necessary
+        int idlen = internalDate.length();
+        if (idlen>0 &&
+            internalDate.charAt(0)=='"' &&
+            internalDate.charAt(idlen-1)=='"')
+          internalDate = internalDate.substring(1, idlen-1).trim();
+      }
+      else if (key==HEADERFIELDS)
+      {
+        if (!headersComplete)
+        {
+          InputStream in = new ByteArrayInputStream(status.getContent());
+          headers = createInternetHeaders(in);
+        }
       }
       else
         throw new MessagingException("Unknown message status key: "+key);
@@ -197,13 +227,13 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Date getReceivedDate()
     throws MessagingException
   {
-    if (headers==null)
+    if (internalDate==null && headers==null)
       fetchHeaders(); // seems reasonable
     if (internalDate==null)
       return null;
     try
     {
-      return new MailDateFormat().parse(internalDate);
+      return internalDateFormat.parse(internalDate);
     }
     catch (ParseException e)
     {
@@ -245,7 +275,11 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   {
     if (headers==null)
       fetchHeaders();
-    return super.getHeader(name);
+    String[] header = super.getHeader(name);
+    if (header==null && !headersComplete)
+      fetchHeaders();
+    header = super.getHeader(name);
+    return header;
   }
 
   /**
@@ -256,13 +290,17 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   {
     if (headers==null)
       fetchHeaders();
-    return super.getHeader(name, delimiter);
+    String header = super.getHeader(name, delimiter);
+    if (header==null && !headersComplete)
+      fetchHeaders();
+    header = super.getHeader(name, delimiter);
+    return header;
   }
 
   public Enumeration getAllHeaders() 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getAllHeaders();
   }
@@ -270,7 +308,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Enumeration getAllHeaderLines() 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getAllHeaderLines();
   }
@@ -278,7 +316,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Enumeration getMatchingHeaders(String[] names) 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getMatchingHeaders(names);
   }
@@ -286,7 +324,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Enumeration getMatchingHeaderLines(String[] names) 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getMatchingHeaderLines(names);
   }
@@ -294,7 +332,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Enumeration getNonMatchingHeaders(String[] names) 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getNonMatchingHeaders(names);
   }
@@ -302,7 +340,7 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   public Enumeration getNonMatchingHeaderLines(String[] names) 
     throws MessagingException 
   {
-    if (headers==null)
+    if (!headersComplete)
       fetchHeaders();
     return super.getNonMatchingHeaderLines(names);
   }
