@@ -1,5 +1,5 @@
 /*
- * $Id: JAXPFactory.java,v 1.1 2001-06-22 14:50:18 db Exp $
+ * $Id: JAXPFactory.java,v 1.2 2001-06-23 21:13:31 db Exp $
  * Copyright (C) 2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,8 @@ package gnu.xml.dom;
 import java.io.IOException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.DOMImplementation;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -36,13 +38,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import gnu.xml.pipeline.DomConsumer;
-
 
 /**
  * DOM bootstrapping API, for use with JAXP.
  *
+ * @see Consumer
+ *
  * @author David Brownell
+ * @version $Date: 2001-06-23 21:13:31 $
  */
 public final class JAXPFactory extends DocumentBuilderFactory
 {
@@ -104,15 +107,18 @@ public final class JAXPFactory extends DocumentBuilderFactory
     static final class JAXPBuilder extends DocumentBuilder
 	implements ErrorHandler
     {
-	private DomConsumer	consumer;
+	private Consumer	consumer;
 	private XMLReader	producer;
+	private DomImpl		impl;
 
 	JAXPBuilder (XMLReader parser, JAXPFactory factory)
 	throws ParserConfigurationException
 	{
+	    impl = new DomImpl ();
+
 	    // set up consumer side
 	    try {
-		consumer = new DomConsumer (DomDocument.class);
+		consumer = new Consumer ();
 	    } catch (SAXException e) {
 		throw new ParserConfigurationException (e.getMessage ());
 	    }
@@ -145,8 +151,10 @@ public final class JAXPFactory extends DocumentBuilderFactory
 
 		    id = PROPERTY + "lexical-handler";
 		    producer.setProperty (id, consumer.getProperty (id));
+
 		    id = PROPERTY + "declaration-handler";
 		    producer.setProperty (id, consumer.getProperty (id));
+
 		} catch (SAXException e) {
 		    throw new ParserConfigurationException (e.getMessage ());
 		}
@@ -186,6 +194,9 @@ public final class JAXPFactory extends DocumentBuilderFactory
 	    producer.setErrorHandler (handler);
 	    consumer.setErrorHandler (handler);
 	}
+
+	public DOMImplementation getDOMImplementation ()
+	    { return impl; }
 
 	public Document newDocument ()
 	    { return new DomDocument (); }

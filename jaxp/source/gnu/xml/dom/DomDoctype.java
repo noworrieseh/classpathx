@@ -1,5 +1,5 @@
 /*
- * $Id: DomDoctype.java,v 1.1 2001-06-20 21:30:05 db Exp $
+ * $Id: DomDoctype.java,v 1.2 2001-06-23 21:13:31 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomDoctype.java,v 1.1 2001-06-20 21:30:05 db Exp $
+// $Id: DomDoctype.java,v 1.2 2001-06-23 21:13:31 db Exp $
 
 /**
  * <p> "DocumentType" implementation (with no extensions for supporting
@@ -51,7 +51,7 @@ import org.w3c.dom.*;
  * @see DomNotation
  *
  * @author David Brownell 
- * @version $Date: 2001-06-20 21:30:05 $
+ * @version $Date: 2001-06-23 21:13:31 $
  */
 public class DomDoctype extends DomExtern implements DocumentType
 {
@@ -95,6 +95,19 @@ public class DomDoctype extends DomExtern implements DocumentType
 	subset = internalSubset;
     }
 
+    // package private
+    // for JAXP-style builder backdoors
+    DomDoctype (
+	DomDocument	doc,
+	String		name,
+	String		publicId,
+	String		systemId
+    )
+    {
+	super (doc, DOCUMENT_TYPE_NODE, name, publicId, systemId);
+	implementation = doc.getImplementation ();
+    }
+
 
     /**
      * <b>DOM L1</b>
@@ -133,7 +146,9 @@ public class DomDoctype extends DomExtern implements DocumentType
      * @param systemId Provides the entity's SYSTEM identifier
      * @param notation If non-null, provides the entity's notation
      *	(indicating an unparsed entity)
-     * @return The Entity that was declared.
+     * @return The Entity that was declared, or null if the entity wasn't
+     *	recorded (because it's a parameter entity or because an entity with
+     *	this name was already declared).
      *
      * @exception DOMException NO_MODIFICATION_ALLOWED_ERR if the
      *	DocumentType is no longer writable.
@@ -149,11 +164,15 @@ public class DomDoctype extends DomExtern implements DocumentType
     {
 	DomEntity entity;
 
+	if (name.charAt (0) == '%' || "[dtd]".equals (name))
+	    return null;
 	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
 	getEntities ();
 
 	DomDocument.verifyXmlName (name);
+	if (entities.getNamedItem (name) != null)
+	    return null;
 
 	entity = new DomEntity (getOwnerDocument (),
 		name, publicId, systemId, notation);

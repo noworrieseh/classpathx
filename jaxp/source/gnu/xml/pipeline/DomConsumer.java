@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.2 2001-06-22 15:50:42 db Exp $
+ * $Id: DomConsumer.java,v 1.3 2001-06-23 21:13:31 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import java.util.Hashtable;
 
 import org.w3c.dom.*;
 import org.xml.sax.*;
+import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -42,8 +43,10 @@ import org.xml.sax.helpers.AttributesImpl;
  * DOM only represents a limited subset, but has some behaviors that depend
  * on much deeper knowledge of a document's DTD.  You shouldn't have much to
  * worry about unless you change handling of "extra" nodes from its default
- * setting (which ignores them all).  (The only worry will be if you use a
- * SAX parser that doesn't flag ignorable whitespace.  That's only XP for now.)
+ * setting (which ignores them all); note if you use JAXP to populate your
+ * DOM trees, it wants to save "extra" nodes by default.  Otherwise, your
+ * main worry will be if you use a SAX parser that doesn't flag ignorable
+ * whitespace unless it's validating (few don't).
  *
  * <p> The SAX2 events used as input must contain XML Names for elements
  * and attributes, with original prefixes.  In SAX2,
@@ -53,15 +56,18 @@ import org.xml.sax.helpers.AttributesImpl;
  * you should plan to postprocess it to create or repair such namespace
  * information.</em> The {@link NSFilter} pipeline stage does such work.
  *
- * <p> <em>Note:  due to changes in the DOM L2 Candidate Recommendation,
- * it became completely impractical to attempt to create the DocumentType
- * node.  Unless (and until) these problems are fixed in DOM L2, this class
- * will not attempt to create DocumentType nodes. </em>
+ * <p> <em>Note:  changes late in DOM L2 process made it impractical to
+ * attempt to create the DocumentType node in any implementation-neutral way,
+ * much less to populate it (L1 didn't support even creating such nodes).
+ * To create and populate such a node, subclass the inner
+ * {@link DomConsumer.Handler} class and teach it about the backdoors into
+ * whatever DOM implementation you want.  It's possible that some revised
+ * DOM API will finally resolve this problem. </em>
  *
  * @see DomProducer
  *
  * @author David Brownell
- * @version $Date: 2001-06-22 15:50:42 $
+ * @version $Date: 2001-06-23 21:13:31 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -91,8 +97,21 @@ public class DomConsumer implements EventConsumer
     throws SAXException
     {
 	domImpl = impl;
-	handler = new Handler (emptyDocument ());
+	handler = new Handler (this);
     }
+
+    /**
+     * This is the hook through which a subclass provides a handler
+     * which knows how to access DOM extensions, specific to some
+     * implementation, to record additional data in a DOM.
+     * Treat this as part of construction; don't call it except
+     * before (or between) parses.
+     */
+    protected void setHandler (Handler h)
+    {
+	handler = h;
+    }
+
 
     private Document emptyDocument ()
     throws SAXException
@@ -144,7 +163,7 @@ public class DomConsumer implements EventConsumer
      */
     final public Document getDocument ()
     {
-	return handler.getDocument ();
+	return handler.clearDocument ();
     }
 
     public void setErrorHandler (ErrorHandler handler)
@@ -240,38 +259,44 @@ public class DomConsumer implements EventConsumer
 
     /** Returns the DTD handler being used. */
     final public DTDHandler getDTDHandler ()
-	{ return null; }
+	{ return handler; }
 
-    /** Returns the declaration or lexical handler being used. */
+    /**
+     * Returns the lexical handler being used.
+     * (DOM construction can't really use declaration handlers.)
+     */
     final public Object getProperty (String id)
     throws SAXNotRecognizedException
     {
 	if ("http://xml.org/sax/properties/lexical-handler".equals (id))
 	    return handler;
+	if ("http://xml.org/sax/properties/declaration-handler".equals (id))
+	    return handler;
 	throw new SAXNotRecognizedException (id);
     }
 
-    
-    // XXX this class could become public/nonfinal.  Its name could become
-    // a settable value -- custom subclasses could be provided,
-    // leveraging additional handlers (proprietary, open, or whatever).
+    EventConsumer getNext () { return next; }
 
+    ErrorHandler getErrorHandler () { return errHandler; }
+
+    
     /**
-     * Class used to intercept various parsing events and use
-     * them to populate a DOM document.
-     *
-     * <p> This handler isn't <em>yet</em> re-usable -- or subclassable.
+     * Class used to intercept various parsing events and use them to
+     * populate a DOM document.  Subclasses would typically know and use
+     * backdoors into specific DOM implementations, used to implement 
+     * DTD-related functionality.
      *
      * <p> Note that if this ever throws a DOMException (runtime exception)
      * that will indicate a bug in the DOM (e.g. doesn't support something
      * per specification) or the parser (e.g. emitted an illegal name, or
      * accepted illegal input data). </p>
      */
-    final class Handler
-	implements ContentHandler, LexicalHandler
-	    // DeclHandler, DTDHandler,
-		// DOM doesn't support even partial population of the DTD
+    public static class Handler
+	implements ContentHandler, LexicalHandler,
+	    DTDHandler, DeclHandler
     {
+	protected DomConsumer		consumer;
+
 	private DOMImplementation	impl;
 	private Document 		document;
 	private boolean		isL2;
@@ -286,9 +311,15 @@ public class DomConsumer implements EventConsumer
 	private boolean		recreatedAttrs;
 	private AttributesImpl	attributes = new AttributesImpl ();
 
-	Handler (Document d)
+	/**
+	 * Subclasses may use SAX2 events to provide additional
+	 * behaviors in the resulting DOM.
+	 */
+	protected Handler (DomConsumer consumer)
+	throws SAXException
 	{
-	    document = d;
+	    this.consumer = consumer;
+	    document = consumer.emptyDocument ();
 	    impl = document.getImplementation ();
 	    isL2 = impl.hasFeature ("XML", "2.0");
 	}
@@ -297,6 +328,7 @@ public class DomConsumer implements EventConsumer
 	throws SAXException
 	{
 	    SAXParseException	e;
+	    ErrorHandler	errHandler = consumer.getErrorHandler ();;
 
 	    if (locator == null)
 		e = new SAXParseException (message, null, null, -1, -1, x);
@@ -311,13 +343,19 @@ public class DomConsumer implements EventConsumer
 	 * Returns and forgets the document produced.  If the handler is
 	 * reused, a new document may be created.
 	 */
-	public Document getDocument ()
+	Document clearDocument ()
 	{
 	    Document retval = document;
 	    document = null;
 	    locator = null;
 	    return retval;
 	}
+
+	/**
+	 * Returns the document under construction.
+	 */
+	protected Document getDocument ()
+	    { return document; }
 
 
 	// SAX1
@@ -337,7 +375,7 @@ public class DomConsumer implements EventConsumer
 			document = impl.createDocument (null, "foo", null);
 			document.removeChild (document.getFirstChild ());
 		    } else {
-			document = emptyDocument ();
+			document = consumer.emptyDocument ();
 		    }
 		} catch (Exception e) {
 		    fatal ("DOM create document", e);
@@ -350,7 +388,7 @@ public class DomConsumer implements EventConsumer
 	throws SAXException
 	{
 	    try {
-		if (next != null && document != null)
+		if (consumer.getNext () != null && document != null)
 		    // new DomProducer (document).produce (next);
 // FIXME
 throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
@@ -370,7 +408,9 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	    ProcessingInstruction	pi;
 
-	    if (isL2 && usingNamespaces && target.indexOf (':') != -1)
+	    if (isL2
+		    && consumer.isUsingNamespaces ()
+		    && target.indexOf (':') != -1)
 		namespaceError (
 		    "PI target name is namespace nonconformant: "
 			+ target);
@@ -382,6 +422,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX1
 	public void characters (char buf [], int off, int len)
+	throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly
@@ -394,7 +435,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	    // merge consecutive text or CDATA nodes if appropriate.
 	    if (lastChild instanceof Text) {
-		if (!isSavingExtraNodes ()
+		if (!consumer.isSavingExtraNodes ()
 			// consecutive Text content ... always merge
 			|| (!inCDATA
 			    && !(lastChild instanceof CDATASection))
@@ -409,7 +450,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 		    return;
 		}
 	    }
-	    if (inCDATA && isSavingExtraNodes ()) {
+	    if (inCDATA && consumer.isSavingExtraNodes ()) {
 		top.appendChild (document.createCDATASection (value));
 		mergeCDATA = true;
 	    } else
@@ -429,6 +470,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX2
 	public void startPrefixMapping (String prefix, String uri)
+	throws SAXException
 	{
 	    // reconstruct "xmlns" attributes deleted by all
 	    // SAX2 parsers without "namespace-prefixes" = true
@@ -443,6 +485,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX2
 	public void endPrefixMapping (String prefix)
+	throws SAXException
 	    { }
 
 	// SAX2
@@ -468,7 +511,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	    Element	element;
 	    int		length = attrs.getLength ();
 
-	    if (!isL2 || !usingNamespaces) {
+	    if (!isL2 || !consumer.isUsingNamespaces ()) {
 		element = document.createElement (name);
 
 		// first the explicit attributes ...
@@ -633,6 +676,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX2
 	public void endElement (String uri, String local, String name)
+	throws SAXException
 	{
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly)
@@ -644,13 +688,15 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX1 (mandatory reporting if validating)
 	public void ignorableWhitespace (char buf [], int off, int len)
+	throws SAXException
 	{
-	    if (isSavingExtraNodes ())
+	    if (consumer.isSavingExtraNodes ())
 		characters (buf, off, len);
 	}
 
 	// SAX2 lexical event
 	public void startCDATA ()
+	throws SAXException
 	{
 	    inCDATA = true;
 	    // true except for the first fragment of a cdata section
@@ -659,6 +705,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	
 	// SAX2 lexical event
 	public void endCDATA ()
+	throws SAXException
 	{
 	    inCDATA = false;
 	}
@@ -672,6 +719,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	//    with other lexical information.
 	//
 	public void startDTD (String name, String pubid, String sysid)
+	throws SAXException
 	{
 	    // need to filter out comments and PIs within the DTD
 	    inDTD = true;
@@ -708,18 +756,22 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	
 	// SAX2 lexical event
 	public void endDTD ()
+	throws SAXException
 	{
 	    inDTD = false;
 	}
 	
 	// SAX2 lexical event
 	public void comment (char buf [], int off, int len)
+	throws SAXException
 	{
 	    Node	comment;
 
 	    // we can't create populated entity ref nodes using
 	    // only public DOM APIs (they've got to be readonly)
-	    if (!isSavingExtraNodes () || inDTD || currentEntity != null)
+	    if (!consumer.isSavingExtraNodes ()
+		    || inDTD
+		    || currentEntity != null)
 		return;
 	    comment = document.createComment (new String (buf, off, len));
 	    top.appendChild (comment);
@@ -727,9 +779,11 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX2 lexical event
 	public void startEntity (String name)
+	throws SAXException
 	{
 	    // Avoid creating entity ref nodes
-	    if (!isSavingExtraNodes () || isExpandingReferences ())
+	    if (!consumer.isSavingExtraNodes ()
+		    || consumer.isExpandingReferences ())
 		return;
 
 	    // we can't create populated entity ref nodes using
@@ -737,7 +791,7 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 	    if (currentEntity != null)
 		return;
 
-	    // a remaining API bug in SAX2 entity handling
+	    // SAX2 shows parameter entities DOM doesn't care about
 	    if (name.charAt (0) == '%' || "[dtd]".equals (name))
 		return;
 
@@ -756,15 +810,76 @@ throw new RuntimeException ("NYET imported -- 'parse' DOM to SAX2");
 
 	// SAX2 lexical event
 	public void endEntity (String name)
+	throws SAXException
 	{
-	    if (!isSavingExtraNodes () 
-		    || isExpandingReferences ()
+	    if (!consumer.isSavingExtraNodes () 
+		    || consumer.isExpandingReferences ()
 		    || currentEntity == null)
 		return;
 	    if (currentEntity.equals (name))
 		currentEntity = null;
 	}
 
+
+	// SAX1 DTD event
+	public void notationDecl (
+	    String name,
+	    String pubid, String sysid
+	) throws SAXException
+	{
+	    /* IGNORE -- no public DOM API lets us store these
+	     * into the doctype node
+	     */
+	}
+
+	// SAX1 DTD event
+	public void unparsedEntityDecl (
+	    String name,
+	    String pubid, String sysid,
+	    String notation
+	) throws SAXException
+	{
+	    /* IGNORE -- no public DOM API lets us store these
+	     * into the doctype node
+	     */
+	}
+
+	// SAX2 declaration event
+	public void elementDecl (String name, String model)
+	throws SAXException
+	{
+	    /* IGNORE -- no content model support in DOM L2 */
+	}
+
+	// SAX2 declaration event
+	public void attributeDecl (
+	    String element,
+	    String attr,
+	    String x,
+	    String y,
+	    String z
+	) throws SAXException
+	{
+	    /* IGNORE -- no content model support in DOM L2 */
+	}
+
+	// SAX2 declaration event
+	public void internalEntityDecl (String name, String value)
+	throws SAXException
+	{
+	    /* IGNORE -- no public DOM API lets us store these
+	     * into the doctype node
+	     */
+	}
+
+	// SAX2 declaration event
+	public void externalEntityDecl (String name, String pubid, String sysid)
+	throws SAXException
+	{
+	    /* IGNORE -- no public DOM API lets us store these
+	     * into the doctype node
+	     */
+	}
 
 	//
 	// These really should offer the option of nonfatal handling,
