@@ -325,14 +325,9 @@ public class MimeMultipart
         byte[] bbytes = boundary.getBytes();
         int blen = bbytes.length;
         
-        /*
-         * Using a CRLFInputStream simplifies things here, but it may buffer
-         * too much if the underlying stream does a read() beyond the end of
-         * the MIME content. Return to this problem.
-         */
-        CRLFInputStream crlfis = new CRLFInputStream(is);
+        LineInputStream lis = new LineInputStream(is);
         String line;
-        while ((line = crlfis.readLine())!=null)
+        while ((line = lis.readLine())!=null)
         {
           if (line.trim().equals(boundary))
             break;
@@ -341,67 +336,76 @@ public class MimeMultipart
           throw new MessagingException("No start boundary");
         
         long start = 0L, end = 0L;
-        for (boolean done = false; !done;) // A
+        for (boolean done = false; !done;)
         {
           InternetHeaders headers = null;
           if (sis!=null)
           {
             start = sis.getPosition();
-            while ((line = crlfis.readLine())!=null && line.length()>0);
+            while ((line = lis.readLine())!=null && line.length()>0);
             if (line==null)
               throw new IOException("EOF before content body");
           }
           else
-            headers = createInternetHeaders(crlfis);
+          {
+            headers = createInternetHeaders(is);
+          }
           ByteArrayOutputStream bos = null;
           if (sis==null)
             bos = new ByteArrayOutputStream();
 
+          // NB this routine uses the InputStream.mark() method
+          // if it is not supported by the underlying stream we will run into
+          // problems
+					if (!is.markSupported())
+						throw new MessagingException("FIXME: mark not supported on underlying input stream: "+is.getClass().getName());
           boolean eol = true;
           int last = -1;
-          while (true) // B
+          int afterLast = -1;
+          while (true)
           {
-            int c = -1;
+            int c;
             if (eol)
             {
+              is.mark(blen+1024);
               int pos = 0;
-              while (pos<blen) // C
+              while (pos<blen)
               {
-                c = crlfis.read();
-                if (c!=bbytes[pos])
-                {
-                  crlfis.unread(c);
-                  crlfis.unread(bbytes, 0, pos);
-                  break; // out of C loop
-                }
+                if (is.read()!=bbytes[pos])
+                  break;
                 pos++;
               }
               
               if (pos==blen)
               {
-                c = crlfis.read();
-                if (c=='-')
+                c = is.read();
+                if (c=='-' && is.read()=='-')
                 {
-                  c = crlfis.read();
-                  if (c=='-')
-                  {
-                    done = true; // end of MIME multipart
-                    break; // out of B loop
-                  }
+                  done = true;
+                  break;
                 }
-                  
                 while (c==' ' || c=='\t')
-                  c = crlfis.read();
+                  c = is.read();
+                if (c=='\r')
+                {
+                  is.mark(1);
+                  if (is.read()!='\n')
+                    is.reset();
+                  break;
+                }
                 if (c=='\n')
                   break;
               }
               if (bos!=null && last!=-1)
               {
                 bos.write(last);
-                last = -1;
+                if (afterLast!=-1)
+                  bos.write(afterLast);
+                last = afterLast = -1;
               }
+              is.reset();
             }
-            c = crlfis.read();
+            c = is.read();
             if (c<0)
             {
               done = true;
@@ -413,6 +417,14 @@ public class MimeMultipart
               if (sis!=null)
                 end = sis.getPosition()-1L;
               last = c;
+              if (c=='\r')
+              {
+                is.mark(1);
+                if ((c = is.read())=='\n')
+                  afterLast = c;
+                else
+                  is.reset();
+              }
             }
             else
             {
@@ -421,7 +433,7 @@ public class MimeMultipart
                 bos.write(c);
             }
           }
-        
+          
           // Create a body part from the stream
           MimeBodyPart bp;
           if (sis!=null)

@@ -27,8 +27,11 @@
 
 package gnu.mail.providers.pop3;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.ProtocolException;
 import java.net.UnknownHostException;
@@ -39,6 +42,7 @@ import java.util.List;
 
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.LineInputStream;
 import gnu.mail.util.MessageInputStream;
 
 /**
@@ -87,7 +91,7 @@ public class POP3Connection
 	/**
 	 * The socket input stream.
 	 */
-  protected CRLFInputStream in;
+  protected LineInputStream in;
 
 	/**
 	 * The socket output stream.
@@ -144,8 +148,14 @@ public class POP3Connection
 		if (timeout>0)
 			socket.setSoTimeout(timeout);
 		
-		in = new CRLFInputStream(socket.getInputStream());
-		out = new CRLFOutputStream(socket.getOutputStream());
+		InputStream in = socket.getInputStream();
+		in = new BufferedInputStream(in);
+		in = new CRLFInputStream(in);
+		this.in = new LineInputStream(in);
+		OutputStream out = socket.getOutputStream();
+		out = new BufferedOutputStream(out);
+		this.out = new CRLFOutputStream(out);
+		
 		if (!getResponse())
 			throw new ProtocolException("Connect failed: "+response);
 		// APOP timestamp
@@ -251,10 +261,18 @@ public class POP3Connection
       args[1] = socket.getInetAddress().getHostName();
       args[2] = new Integer(socket.getPort());
       args[3] = Boolean.TRUE;
-      socket = (Socket)createSocket.invoke(factory, args);
-      // set up streams
-      in = new CRLFInputStream(socket.getInputStream());
-      out = new CRLFOutputStream(socket.getOutputStream());
+      
+			socket = (Socket)createSocket.invoke(factory, args);
+      
+			// set up streams
+			InputStream in = socket.getInputStream();
+			in = new BufferedInputStream(in);
+			in = new CRLFInputStream(in);
+			this.in = new LineInputStream(in);
+			OutputStream out = socket.getOutputStream();
+			out = new BufferedOutputStream(out);
+			this.out = new CRLFOutputStream(out);
+			
       return true;
     }
     catch (Exception e)
@@ -481,7 +499,11 @@ public class POP3Connection
 			return false;
 		}
 		else
-			throw new ProtocolException("Unexpected response: "+response);
+		{
+			ProtocolException e = new ProtocolException("Unexpected response: "+response);
+			e.printStackTrace(System.err);
+			throw e;
+		}
   }
 
 	/*

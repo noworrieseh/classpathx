@@ -50,11 +50,6 @@ public class IMAPStore
 {
 
   /**
-   * The default IMAP port.
-   */
-  public static final int DEFAULT_PORT = 143;
-
-  /**
    * The connection to the IMAP server.
    */
   protected IMAPConnection connection = null;

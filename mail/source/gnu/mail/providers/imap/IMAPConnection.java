@@ -27,6 +27,9 @@
 
 package gnu.mail.providers.imap;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ProtocolException;
@@ -42,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import gnu.mail.util.BASE64;
+import gnu.mail.util.CRLFOutputStream;
 
 /**
  * The protocol class implementing IMAP4rev1.
@@ -62,6 +66,11 @@ public class IMAPConnection implements IMAPConstants
    */
   protected static final String US_ASCII = "US-ASCII";
 
+	/**
+	 * The default IMAP port.
+	 */
+	protected static final int DEFAULT_PORT = 143;
+
   /**
    * The socket used for communication with the server.
    */
@@ -75,7 +84,7 @@ public class IMAPConnection implements IMAPConstants
   /**
    * The output stream.
    */
-  protected OutputStream out;
+  protected CRLFOutputStream out;
 
   /**
    * List of responses received asynchronously.
@@ -124,14 +133,22 @@ public class IMAPConnection implements IMAPConstants
   {
     this.debug = debug;
     // TODO connectionTimeout
+		
+		if (port<0)
+			port = DEFAULT_PORT;
     
     // Set up socket
     socket = new Socket(host, port);
     if (timeout>0)
       socket.setSoTimeout(timeout);
     
-    in = new IMAPResponseTokenizer(socket.getInputStream());
-    out = socket.getOutputStream();
+		InputStream in = socket.getInputStream();
+		in = new BufferedInputStream(in);
+    this.in = new IMAPResponseTokenizer(in);
+		OutputStream out = socket.getOutputStream();
+		out = new BufferedOutputStream(out);
+    this.out = new CRLFOutputStream(out);
+		
     asyncResponses = new ArrayList();
     alerts = new ArrayList();
   }
@@ -159,14 +176,13 @@ public class IMAPConnection implements IMAPConstants
   {
     if (debug)
       System.err.println("imap: > "+tag+" "+command);
-    byte[] bytes = new StringBuffer(tag)
+    String cmd = new StringBuffer(tag)
       .append(' ')
       .append(command)
-      .append('\r')
-      .append('\n')
-      .toString()
-      .getBytes(US_ASCII);
-    out.write(bytes);
+      .toString();
+    out.write(cmd);
+		out.writeln();
+		out.flush();
   }
 
   /**
@@ -381,8 +397,12 @@ public class IMAPConnection implements IMAPConstants
       args[2] = new Integer(socket.getPort());
       args[3] = Boolean.TRUE;
       socket = (Socket)createSocket.invoke(factory, args);
-      in = new IMAPResponseTokenizer(socket.getInputStream());
-      out = socket.getOutputStream();
+			InputStream in = socket.getInputStream();
+			in = new BufferedInputStream(in);
+			this.in = new IMAPResponseTokenizer(in);
+			OutputStream out = socket.getOutputStream();
+			out = new BufferedOutputStream(out);
+			this.out = new CRLFOutputStream(out);
       return true;
     }
     catch (Exception e)

@@ -41,6 +41,7 @@ import java.util.List;
 import gnu.mail.util.BASE64;
 import gnu.mail.util.CRLFInputStream;
 import gnu.mail.util.CRLFOutputStream;
+import gnu.mail.util.LineInputStream;
 
 /**
  * An SMTP client.
@@ -87,7 +88,7 @@ public class SMTPConnection
   /**
    * The input stream used to read responses from the server.
    */
-  protected CRLFInputStream in;
+  protected LineInputStream in;
 
   /**
    * The output stream used to send commands to the server.
@@ -160,7 +161,8 @@ public class SMTPConnection
     // Initialise streams
     InputStream in = socket.getInputStream();
     in = new BufferedInputStream(in);
-    this.in = new CRLFInputStream(in);
+    in = new CRLFInputStream(in);
+		this.in = new LineInputStream(in);
     OutputStream out = socket.getOutputStream();
     out = new BufferedOutputStream(out);
     this.out = new CRLFOutputStream(out);
@@ -503,7 +505,8 @@ public class SMTPConnection
       // Set up streams
       InputStream in = socket.getInputStream();
       in = new BufferedInputStream(in);
-      this.in = new CRLFInputStream(in);
+      in = new CRLFInputStream(in);
+			this.in = new LineInputStream(in);
       OutputStream out = socket.getOutputStream();
       out = new BufferedOutputStream(out);
       this.out = new CRLFOutputStream(out);
@@ -577,7 +580,7 @@ public class SMTPConnection
       if (debug)
         System.err.println("smtp: > "+command);
       out.write(command.getBytes("US-ASCII")); // TODO check encoding
-      out.write('\n'); // This is automatically converted to CRLF
+      out.writeln();
       out.flush();
     }
 

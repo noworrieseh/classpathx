@@ -27,10 +27,14 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * A utility class for feeding message contents to messages.
+ * This stream returns -1 from <code>read</code> when the stream termination
+ * sequence LF,END,LF is read from the underlying stream.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
@@ -39,33 +43,30 @@ public class MessageInputStream
 {
 	
 	/**
-	 * The stream termination octet.
+	 * The stream termination octet ('.').
 	 */
 	public static final int END = 46;
 	
 	/**
-	 * The line termination octet.
+	 * The line termination octet ('\n').
 	 */
 	public static final int LF = 10;
 	
-	boolean done = false, debug = false;
-	private boolean lf = false, lf_end = false;
+	protected boolean eof;
+	
+	protected int buf1 = -1;
+	protected int buf2 = -1;
+
+	protected int markBuf1;
+	protected int markBuf2;
 	
 	/**
-	 * Constructs a message input stream connected to the specified pushback input stream.
+	 * Constructs a message input stream connected to the specified input stream.
 	 */
-	public MessageInputStream(PushbackInputStream in)
+	public MessageInputStream(InputStream in)
 	{
 		super(in);
-	}
-	
-	/**
-	 * Constructs a message input stream connected to the specified pushback input stream.
-	 */
-	public MessageInputStream(PushbackInputStream in, boolean debug)
-	{
-		super(in);
-		this.debug = debug;
+		eof = false;
 	}
 	
 	/**
@@ -76,36 +77,45 @@ public class MessageInputStream
 	public int read()
 		throws IOException
 	{
-		if (done) return -1;
-		int ch = in.read();
-		if (lf && lf_end)
+		if (eof)
+			return -1;
+		int c;
+		if (buf1!=-1)
 		{
-			int ch2 = in.read(); // look ahead for LF
-			if (ch2==LF)
-			{
-				done = true;
-				return -1; // swallow the END and LF
-			}
-			else
-			{
-				((PushbackInputStream)in).unread(ch2);
-				lf = lf_end = false;
-			}
-		}
-		else if (lf)
-		{
-			if (ch==END)
-				lf_end = true;
-		}
-		else if (ch==LF)
-		{
-			lf = true;
+			c = buf1;
+			buf1 = buf2;
+			buf2 = -1;
 		}
 		else
+			c = super.read();
+		if (c==LF)
 		{
-			lf = lf_end = false;
+			if (buf1==-1)
+			{
+				buf1 = super.read();
+				if (buf1==END)
+				{
+					buf2 = super.read();
+					if (buf2==LF)
+					{
+						eof = true;
+						// Allow the final LF to be read
+					}
+				}
+			}
+			else if (buf1==END)
+			{
+				if (buf2==-1)
+				{
+					buf2 = super.read();
+					if (buf2==LF)
+						eof = true;
+				}
+				else if (buf2==LF)
+					eof = true;
+			}
 		}
-		return ch;
+		return c;
 	}
 	
 	/**
@@ -129,132 +139,41 @@ public class MessageInputStream
 	public int read(byte[] b, int off, int len)
 		throws IOException
 	{
-		if (done) return -1;
-		int l = doRead(b, off, len);
-		int i = indexOfEnd(b, off, l);
-		if (i>=0)
+		if (eof)
+			return -1;
+		int c, end = off+len;
+		for (int i=off; i<end; i++)
 		{
-			((PushbackInputStream)in).unread(b, i+off+2, (l-(i+2)));
-			done = true;
-			l = i;
-		}
-		else if ((l>0) && b[l-1]==LF)
-		{
-			lf = true;
-			l--;
-		}
-		else if ((l>1) && (b[l-2]==LF && b[l-1]==END))
-		{
-			lf_end = true;
-			l-=2;
-		}
-		if (debug)
-		{
-			System.err.println("DEBUG: stream: read "+l+" bytes");
-			System.err.println(new String(b, off, l));
-		}
-		return l;
-	}
-	
-	// Prefixes a read with special LF or LF&END combinations if necessary
-	private int doRead(byte[] b, int off, int len)
-		throws IOException
-	{
-		int l = 0;
-		if (lf_end)
-		{
-			b[off] = LF;
-			b[off+1] = END;
-			l += 2;
-		}
-		else if (lf)
-		{
-			b[off] = LF;
-			l++;
-		}
-		l += in.read(b, off+l, len-l);
-		lf_end = lf = false;
-		return l;
-	}
-	
-	/**
-	 * Reads a line of input from this input stream.
-	 */
-	public String readLine()
-		throws IOException
-	{
-		if (done)
-			return null;
-		StringBuffer buf = new StringBuffer();
-		int l = 1024;
-		byte[] b = new byte[l];
-		l = doRead(b, 0, l);
-		if (l<0)
-			return null;
-		while (l>-1 && !done)
-		{
-			int i = indexOfEnd(b, 0, l);
-			if (b[0]==END && (b[1]==LF || b[1]==0))
+			c = read();
+			if (c==-1)
 			{
-				done = true;
-				return null;
-			}
-			else if (b[0]==LF && b[1]==END && (b[2]==LF || b[2]==0))
-			{
-				done = true;
-				return null;
-			}
-			else if (i>0)
-			{
-				((PushbackInputStream)in).unread(b, i+2, (l-(i+2)));
-				l = i;
-			}
-			else if ((l>0) && b[l-1]==LF)
-			{
-				lf = true;
-				l--;
-			}
-			else if ((l>1) && (b[l-2]==LF && b[l-1]==END))
-			{
-				lf_end = true;
-				l-=2;
-			}
-			i = indexOfLF(b, 0, l);
-			if (i>=0)
-			{
-				((PushbackInputStream)in).unread(b, i+1, l-i);
-				buf.append(new String(b, 0, i));
+				len = i-off;
 				break;
 			}
 			else
-			{
-				buf.append(new String(b, 0, l));
-			}
-			l = doRead(b, 0, l);
+				b[i] = (byte)c;
 		}
-		if (debug)
-		{
-			System.err.println("DEBUG: stream: readLine: "+buf.toString());
-		}
-		return buf.toString();
+		return len;
 	}
-	
-	// Discover the index of END in a byte array.
-	int indexOfEnd(byte[] b, int off, int len)
+
+	public boolean markSupported()
 	{
-		for (int i=off+2; i<(off+len); i++)
-			if (b[i]==LF && b[i-1]==END && b[i-2]==LF)
-				return i-off-1;
-		return -1;
+		return in.markSupported();
 	}
-	
-	// Discover the index of LF in a byte array.
-	int indexOfLF(byte[] b, int off, int len)
+
+	public void mark(int readlimit)
 	{
-		for (int i=off; i<(off+len); i++)
-			if (b[i]==LF)
-				return i;
-		return -1;
+		in.mark(readlimit);
+		markBuf1 = buf1;
+		markBuf2 = buf2;
+	}
+
+	public void reset()
+		throws IOException
+	{
+		in.reset();
+		buf1 = markBuf1;
+		buf2 = markBuf2;
 	}
 	
 }

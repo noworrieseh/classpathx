@@ -9,6 +9,8 @@ JAVAC = gcj
 JAVAC_OPTS = -C
 JAR = jar
 
+OPTIONS = -Dmail.pop3.apop=false  -Dmail.debug=true
+
 all: test
 
 test_sourcedir=$(PROJECTROOT)/src
@@ -20,7 +22,7 @@ test_debugclasses=$(test_sourcefiles:.java=.class)
 test_classfiles=$(test_debugclasses:$(test_sourcedir)%=$(test_classesdest)%)
 
 test: test-init $(test_classfiles) test-compilation $(test_otherfiles) $(test_manifest)
-	$(JAVA) -cp $(call PATHMK,$(test_classesdest) $(call PATHMK,$(test_classpath))) AllTests
+	$(JAVA) -cp $(call PATHMK,$(test_classesdest) $(call PATHMK,$(test_classpath))) $(OPTIONS) AllTests
 
 .PHONY: test-init test-compilation
 

@@ -27,7 +27,10 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * An input stream that can read lines of input.
@@ -38,69 +41,66 @@ public class LineInputStream
   extends FilterInputStream
 {
 
-  private char[] line;
-  private static final int LF = 10, CR = 13;
+	/*
+	 * Line buffer.
+	 */
+  private ByteArrayOutputStream buf;
+
+	/*
+	 * Encoding to use when translating bytes to characters.
+	 */
+	private String encoding;
+
+	/*
+	 * End-of-stream flag.
+	 */
+	private boolean eof;
 
   /**
-   * Constructor.
+   * Constructor using the US-ASCII character encoding.
+   * @param in the underlying input stream
    */
   public LineInputStream(InputStream in)
   {
-    this(in, 80);
+		this(in, "US-ASCII");
   }
   
   /**
    * Constructor.
    * @param in the underlying input stream
-   * @param size the buffer size
+	 * @param encoding the character encoding to use
    */
-  public LineInputStream(InputStream in, int size)
+  public LineInputStream(InputStream in, String encoding)
   {
-    super(in);
-    line = new char[size];
-  }
-
+		super(in);
+    buf = new ByteArrayOutputStream();
+		this.encoding = encoding;
+		eof = false;
+	}
+	
   /**
    * Read a line of input.
    */
   public String readLine()
     throws IOException
   {
-    char[] chars = line;
-    int len = chars.length;
-    int pos = 0;
-    int c;
-    for (c = in.read(); c!=-1; c = in.read()) 
-    {
-      if (c==LF)
-        break;
-      if (c==CR)
-      {
-        // Peek ahead
-        int peek = in.read();
-        if (peek!=LF)
-        {
-          if (!(in instanceof PushbackInputStream))
-            in = new PushbackInputStream(in);
-          ((PushbackInputStream)in).unread(peek);
-        }
-        break;
-      }
-      len--;
-      if (len<0)
-      {
-        chars = new char[pos+line.length];
-        len = (chars.length-pos)-1;
-        System.arraycopy(line, 0, chars, 0, len+1);
-        line = chars;
-      }
-      chars[pos] = (char)c;
-      pos++;
-    }
-    if (c==-1 && pos==0)
-      return null;
-    else
-      return new String(chars, 0, pos);
-  }
+		if (eof)
+			return null;
+		do
+		{
+			int c = in.read();
+			switch (c)
+			{
+				case -1:
+					eof = true;
+				case 10: // LF
+					String ret = buf.toString(encoding);
+					buf.reset();
+					return ret;
+				default:
+					buf.write(c);
+			}
+		} while (true);
+	}
 
 }

@@ -168,7 +168,7 @@ public class SMTPTransport
           else if (authenticationMechanisms.contains("PLAIN"))
             return connection.authPlain(username, password);
           else
-            Session.log("smtp: No supported authentication mechanisms");
+            System.err.println("smtp: No supported authentication mechanisms");
         }
         return false;
       }

@@ -14,6 +14,7 @@ public class AllTests
 		suite.addTest(StoreTest.suite());
 		suite.addTest(FolderTest.suite());
 		suite.addTest(NonFolderTest.suite());
+		suite.addTest(MimeMessageTest.suite());
 		return suite;
 	}
 

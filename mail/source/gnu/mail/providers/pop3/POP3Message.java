@@ -78,9 +78,16 @@ public final class POP3Message
     POP3Connection connection = ((POP3Store)folder.getStore()).connection;
 		synchronized (connection)
 		{
+			if (content!=null)
+				return;
 			try
 			{
-				parse(connection.retr(msgnum));
+				InputStream retr = connection.retr(msgnum);
+				parse(retr);
+				// Read to end of stream
+				int c = retr.read();
+				while (c!=-1)
+					c = retr.read();
 			}
 			catch (IOException e)
 			{
@@ -136,9 +143,16 @@ public final class POP3Message
     POP3Connection connection = ((POP3Store)folder.getStore()).connection;
 		synchronized (connection)
 		{
+			if (headers!=null)
+				return;
 			try
 			{
-				headers = createInternetHeaders(connection.top(msgnum));
+				InputStream top = connection.top(msgnum);
+				headers = createInternetHeaders(top);
+				// Read to end of stream
+				int c = top.read();
+				while (c!=-1)
+					c = top.read();
 			}
 			catch (IOException e)
 			{

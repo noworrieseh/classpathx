@@ -27,7 +27,9 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * An input stream that filters out CR/LF pairs into LFs.
@@ -35,7 +37,7 @@ import java.io.*;
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class CRLFInputStream
-  extends PushbackInputStream
+  extends FilterInputStream
 {
 
   /**
@@ -48,22 +50,23 @@ public class CRLFInputStream
    */
   public static final int LF = 10;
 
+	/**
+	 * Buffer.
+	 */
+	protected int buf = -1;
+
+	/**
+	 * Buffer at time of mark.
+	 */
+	protected int markBuf = -1;
+	
   /**
    * Constructs a CR/LF input stream connected to the specified input
    * stream.
    */
   public CRLFInputStream(InputStream in) 
   {
-    super(in, 4096);
-  }
-
-  /**
-   * Constructs a CR/LF input stream connected to the specified input
-   * stream, with the specified pushback buffer size.
-   */
-  public CRLFInputStream(InputStream in, int bufsize)
-  {
-    super(in, bufsize);
+    super(in);
   }
 
   /**
@@ -74,9 +77,26 @@ public class CRLFInputStream
   public int read()
     throws IOException
   {
-    int c = super.read();
-    if (c==CR) // skip CR
-      return super.read();
+		int c;
+		if (buf!=-1)
+		{
+			c = buf;
+			buf = -1;
+			return c;
+		}
+		else
+		{
+			c = super.read();
+			if (c==CR)
+			{
+				buf = super.read();
+				if (buf==LF)
+				{
+					c = buf;
+					buf = -1;
+				}
+			}
+		}
     return c;
   }
 
@@ -101,6 +121,58 @@ public class CRLFInputStream
   public int read(byte[] b, int off, int len)
     throws IOException
   {
+		int shift = 0;
+		if (buf!=-1)
+		{
+			// Push buf onto start of byte array
+			b[off] = (byte)buf;
+			off++;
+			len--;
+			buf = -1;
+			shift++;
+		}
+    int l = super.read(b, off, len);
+    l = removeCRLF(b, off-shift, l);
+    return l;
+	}
+
+	/**
+	 * Indicates whether this stream supports the mark and reset methods.
+	 */
+	public boolean markSupported()
+	{
+		return in.markSupported();
+	}
+
+	/**
+	 * Marks the current position in this stream.
+	 */
+	public void mark(int readlimit)
+	{
+		in.mark(readlimit);
+		markBuf = buf;
+	}
+
+	/**
+	 * Repositions this stream to the position at the time the mark method was
+	 * called.
+	 */
+	public void reset()
+		throws IOException
+	{
+		in.reset();
+		buf = markBuf;
+	}
+	
+  /*
+   * Reads up to len bytes of data from this input stream into an
+   * array of bytes, starting at the specified offset.
+   * Returns -1 if the end of the stream has been reached.
+   * @exception IOException if an I/O error occurs
+   *
+  public int read(byte[] b, int off, int len)
+    throws IOException
+  {
     int l = doRead(b, off, len);
     l = removeCRs(b, off, l);
     return l;
@@ -110,7 +182,7 @@ public class CRLFInputStream
    * Slight modification of PushbackInputStream.read() not to do a
    * blocking read on the underlying stream if there are bytes in the
    * buffer.
-   */
+   *
   private int doRead(byte[] b, int off, int len)
     throws IOException
   {
@@ -136,10 +208,10 @@ public class CRLFInputStream
     return avail;
   }
 
-  /**
+  /*
    * Reads a line of input terminated by LF.
    * @exception IOException if an I/O error occurs
-   */
+   *
   public String readLine()
     throws IOException
   {
@@ -176,27 +248,33 @@ public class CRLFInputStream
       return null;
     else
       return sb.toString();
-  }
+  }*/
 
-  private int removeCRs(byte[] b, int off, int len)
+  private int removeCRLF(byte[] b, int off, int len)
   {
-    for (int index = indexOfCR(b, off, len);
-        index>-1;
-        index = indexOfCR(b, off, len))
-    {
-      for (int i=index; i<b.length-1; i++)
-        b[i] = b[i+1];
-      len--;
-    }
+		int end = off+len;
+		for (int i=off; i<end; i++)
+		{
+			if (b[i]==CR)
+			{
+				if (i+1==end)
+				{
+					// This is the last byte, impossible to determine whether CRLF
+					buf = CR;
+					len--;
+				}
+				else if (b[i+1]==LF)
+				{
+					// Shift left
+					end--;
+					for (int j=i; j<end; j++)
+						b[j] = b[j+1];
+					len--;
+					end = off+len;
+				}
+			}
+		}
     return len;
-  }
-
-  private int indexOfCR(byte[] b, int off, int len)
-  {
-    for (int i=off; i<off+len; i++)
-      if (b[i]==CR)
-        return i;
-    return -1;
   }
 
 }
