@@ -38,8 +38,10 @@
 
 package gnu.xml.transform;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -162,4 +164,61 @@ public class Bindings
     return get(qName.toString(), null);
   }
   
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer();
+    boolean next = false;
+    Collection seen = new HashSet();
+    buf.append('{');
+    for (Iterator i = variables.iterator(); i.hasNext(); )
+      {
+        Map ctx = (Map) i.next();
+        for (Iterator j = ctx.entrySet().iterator(); j.hasNext(); )
+          {
+            if (next)
+              {
+                buf.append(',');
+              }
+            else
+              {
+                next = true;
+              }
+            Map.Entry entry = (Map.Entry) j.next();
+            Object key = entry.getKey();
+            if (!seen.contains(key))
+              {
+                buf.append(key);
+                buf.append('=');
+                buf.append(entry.getValue());
+                seen.add(key);
+              }
+          } 
+      }
+    for (Iterator i = parameters.iterator(); i.hasNext(); )
+      {
+        Map ctx = (Map) i.next();
+        for (Iterator j = ctx.entrySet().iterator(); j.hasNext(); )
+          {
+            if (next)
+              {
+                buf.append(',');
+              }
+            else
+              {
+                next = true;
+              }
+            Map.Entry entry = (Map.Entry) j.next();
+            Object key = entry.getKey();
+            if (!seen.contains(key))
+              {
+                buf.append(key);
+                buf.append('=');
+                buf.append(entry.getValue());
+                seen.add(key);
+              }
+          } 
+      }
+    buf.append('}');
+    return buf.toString();
+  }
 }

@@ -88,7 +88,8 @@ final class ApplyTemplatesNode
             for (Iterator i = withParams.iterator(); i.hasNext(); )
               {
                 WithParam p = (WithParam) i.next();
-                stylesheet.bindings.set(p.name, p.value, false);
+                Object value = p.getValue(stylesheet, context, mode);
+                stylesheet.bindings.set(p.name, value, false);
               }
           }
         Collection ns = (Collection) ret;

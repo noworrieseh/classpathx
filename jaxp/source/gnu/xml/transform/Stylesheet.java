@@ -506,6 +506,12 @@ class Stylesheet
               {
                 return true;
               }
+            else if ("text".equals(ctx.getLocalName()) &&
+                     XSL_NS.equals(ctx.getNamespaceURI()))
+              {
+                // xsl:text implies xml:space='preserve'
+                return true;
+              }
           }
         ctx = ctx.getParentNode();
       }
@@ -576,16 +582,19 @@ class Stylesheet
                     Node parent, Node nextSibling)
     throws TransformerException
   {
+    
     for (Iterator j = templates.iterator(); j.hasNext(); )
       {
         Template t = (Template) j.next();
         if (name.equals(t.name))
           {
+            //System.err.println("*** calling "+t);
+            //System.err.println("*** bindings="+bindings);
             t.apply(this, context, mode, parent, nextSibling);
             return;
           }
       }
-    System.err.println("WARNING: call-template: '"+name+"' not found");
+    throw new TransformerException("template '" + name + "' not found");
   }
 
   public XPathFunction resolveFunction(QName name, int arity)

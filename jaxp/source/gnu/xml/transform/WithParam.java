@@ -38,6 +38,14 @@
 
 package gnu.xml.transform;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
+import gnu.xml.xpath.Expr;
+
 /**
  * A specification for setting a variable or parameter during template
  * processing with <code>apply-templates</code> or
@@ -55,6 +63,35 @@ final class WithParam
   {
     this.name = name;
     this.value = value;
+  }
+
+  Object getValue(Stylesheet stylesheet, Node context, String mode)
+    throws TransformerException
+  {
+    if (value instanceof Expr)
+      {
+        Expr select = (Expr) value;
+        return select.evaluate(context);
+      }
+    else if (value instanceof TemplateNode)
+      {
+        TemplateNode tn = (TemplateNode) value;
+        Document doc = (context instanceof Document) ? (Document) context :
+          context.getOwnerDocument();
+        DocumentFragment fragment = doc.createDocumentFragment();
+        tn.apply(stylesheet, context, mode, fragment, null);
+        Collection acc = new LinkedList();
+        Node ctx = fragment.getFirstChild();
+        for (; ctx != null; ctx = ctx.getNextSibling())
+          {
+            acc.add(ctx);
+          }
+        return acc;
+      }
+    else
+      {
+        return value;
+      }
   }
 
 }

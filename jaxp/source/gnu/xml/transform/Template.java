@@ -455,6 +455,9 @@ class Template
                 return parse(next);
               }
             break;
+          case Node.COMMENT_NODE:
+            // Ignore comments
+            return parse(next);
           case Node.ELEMENT_NODE:
             // Check for attribute value templates
             NamedNodeMap attrs = source.getAttributes();
@@ -601,7 +604,7 @@ class Template
 
             if ("with-param".equals(name))
               {
-                Object content = element.getFirstChild();
+                Object content = parse(element.getFirstChild());
                 String paramName = element.getAttribute("name");
                 if (paramName.length() == 0)
                   {
