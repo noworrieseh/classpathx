@@ -1,6 +1,6 @@
 ##
 ## ----------------------------------------------------------------------------
-## $Id: Makefile.am,v 1.4 2002-06-15 07:32:25 olf Exp $
+## $Id: Makefile.am,v 1.5 2002-06-22 10:02:31 raif Exp $
 ##
 ## Copyright (C) 2002 Free Software Foundation, Inc.
 ##
@@ -37,30 +37,40 @@ SUBDIRS = source
 ###############################################################################
 # test targets
 test-vectors:
-	test -e tv || mkdir tv
-	source/nessieCipherTVEmitter anubis 128 > tv/anubis-128-tv.txt
-	source/nessieCipherTVEmitter anubis 160 > tv/anubis-160-tv.txt
-	source/nessieCipherTVEmitter anubis 192 > tv/anubis-192-tv.txt
-	source/nessieCipherTVEmitter anubis 224 > tv/anubis-224-tv.txt
-	source/nessieCipherTVEmitter anubis 256 > tv/anubis-256-tv.txt
-	source/nessieCipherTVEmitter anubis 288 > tv/anubis-288-tv.txt
-	source/nessieCipherTVEmitter anubis 320 > tv/anubis-320-tv.txt
-	source/nessieCipherTVEmitter khazad     > tv/khazad-tv.txt
-	source/nessieHashTVEmitter whirlpool    > tv/whirlpool-tv.txt
-	source/nistKat khazad 128 > tv/khazad-ecb-128-kat.txt
-	source/nistKat anubis 128 > tv/anubis-ecb-128-kat.txt
-	source/nistKat anubis 160 > tv/anubis-ecb-160-kat.txt
-	source/nistKat anubis 192 > tv/anubis-ecb-192-kat.txt
-	source/nistKat anubis 224 > tv/anubis-ecb-224-kat.txt
-	source/nistKat anubis 256 > tv/anubis-ecb-256-kat.txt
-	source/nistKat anubis 288 > tv/anubis-ecb-288-kat.txt
-	source/nistKat anubis 320 > tv/anubis-ecb-320-kat.txt
-	source/nistMCT khazad 128 > tv/khazad-128-mct.txt
-	source/nistMCT anubis 128 > tv/anubis-128-mct.txt
-	source/nistMCT anubis 160 > tv/anubis-160-mct.txt
-	source/nistMCT anubis 192 > tv/anubis-192-mct.txt
-	source/nistMCT anubis 224 > tv/anubis-224-mct.txt
-	source/nistMCT anubis 256 > tv/anubis-256-mct.txt
+	test -e tv || mkdir tv/nessie || mkdir tv/nist
+	source/nessieCipherTVEmitter anubis 128 > tv/nessie/anubis-128-tv.txt
+	source/nessieCipherTVEmitter anubis 160 > tv/nessie/anubis-160-tv.txt
+	source/nessieCipherTVEmitter anubis 192 > tv/nessie/anubis-192-tv.txt
+	source/nessieCipherTVEmitter anubis 224 > tv/nessie/anubis-224-tv.txt
+	source/nessieCipherTVEmitter anubis 256 > tv/nessie/anubis-256-tv.txt
+	source/nessieCipherTVEmitter anubis 288 > tv/nessie/anubis-288-tv.txt
+	source/nessieCipherTVEmitter anubis 320 > tv/nessie/anubis-320-tv.txt
+	source/nessieCipherTVEmitter khazad     > tv/nessie/khazad-tv.txt
+	source/nessieHashTVEmitter whirlpool    > tv/nessie/whirlpool-tv.txt
+	source/nistKat -k anubis > tv/nist/anubis/ecb_vk.txt
+	source/nistKat -t anubis > tv/nist/anubis/ecb_vt.txt
+	source/nistKat -k rijndael > tv/nist/rijndael/ecb_vk.txt
+	source/nistKat -t rijndael > tv/nist/rijndael/ecb_vt.txt
+	source/nistKat -k serpent > tv/nist/serpent/ecb_vk.txt
+	source/nistKat -t serpent > tv/nist/serpent/ecb_vt.txt
+	source/nistKat -k twofish > tv/nist/twofish/ecb_vk.txt
+	source/nistKat -t twofish > tv/nist/twofish/ecb_vt.txt
+	source/nistMCT -E -e anubis > tv/nist/anubis/ecb_e_m.txt
+	source/nistMCT -E -d anubis > tv/nist/anubis/ecb_d_m.txt
+	source/nistMCT -C -e anubis > tv/nist/anubis/cbc_e_m.txt
+	source/nistMCT -C -d anubis > tv/nist/anubis/cbc_d_m.txt
+	source/nistMCT -E -e rijndael > tv/nist/rijndael/ecb_e_m.txt
+	source/nistMCT -E -d rijndael > tv/nist/rijndael/ecb_d_m.txt
+	source/nistMCT -C -e rijndael > tv/nist/rijndael/cbc_e_m.txt
+	source/nistMCT -C -d rijndael > tv/nist/rijndael/cbc_d_m.txt
+	source/nistMCT -E -e serpent > tv/nist/serpent/ecb_e_m.txt
+	source/nistMCT -E -d serpent > tv/nist/serpent/ecb_d_m.txt
+	source/nistMCT -C -e serpent > tv/nist/serpent/cbc_e_m.txt
+	source/nistMCT -C -d serpent > tv/nist/serpent/cbc_d_m.txt
+	source/nistMCT -E -e twofish > tv/nist/twofish/ecb_e_m.txt
+	source/nistMCT -E -d twofish > tv/nist/twofish/ecb_d_m.txt
+	source/nistMCT -C -e twofish > tv/nist/twofish/cbc_e_m.txt
+	source/nistMCT -C -d twofish > tv/nist/twofish/cbc_d_m.txt
 	source/cipherSpeed
 	source/hashSpeed
 
