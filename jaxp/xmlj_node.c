@@ -119,23 +119,13 @@ xmljFreeDoc (JNIEnv * env, xmlDocPtr doc)
 int
 xmljMatch (const xmlChar * name, xmlNodePtr node)
 {
-  xmlNsPtr ns;
-
   switch (node->type)
     {
     case XML_ELEMENT_NODE:
     case XML_ATTRIBUTE_NODE:
-      ns = node->ns;
-      if (ns == NULL || ns->prefix == NULL)
-        {
-          return xmlStrcmp (node->name, name);
-        }
-      else
-        {
-          return xmlStrQEqual (node->ns->prefix, node->name, name);
-        }
+      return xmlStrcmp (node->name, name);
     default:
-      return 0;
+      return 1;
     }
 }
 
@@ -143,11 +133,24 @@ int
 xmljMatchNS (const xmlChar * uri, const xmlChar * localName, xmlNodePtr node)
 {
   xmlNsPtr ns;
+  const xmlChar *nodeLocalName;
+  int *len;
+  int ret;
 
   switch (node->type)
     {
     case XML_ELEMENT_NODE:
     case XML_ATTRIBUTE_NODE:
+      len = (int *) malloc (sizeof (int));
+      if (xmlSplitQName3 (node->name, len) != NULL)
+        {
+          nodeLocalName = node->name + (*len);
+        }
+      else
+        {
+          nodeLocalName = node->name;
+        }
+      free (len);
       ns = node->ns;
       if (ns == NULL || ns->href == NULL)
         {
@@ -155,7 +158,7 @@ xmljMatchNS (const xmlChar * uri, const xmlChar * localName, xmlNodePtr node)
             {
               return 0;
             }
-          return xmlStrcmp (localName, node->name);
+          ret = xmlStrcmp (localName, nodeLocalName);
         }
       else
         {
@@ -163,9 +166,11 @@ xmljMatchNS (const xmlChar * uri, const xmlChar * localName, xmlNodePtr node)
             {
               return 0;
             }
-          return (xmlStrcmp (localName, node->name) && xmlStrcmp (uri, ns->href));
+          ret = (xmlStrcmp (localName, nodeLocalName) &&
+                 xmlStrcmp (uri, ns->href));
         }
+      return ret;
     default:
-      return 0;
+      return 1;
     }
 }

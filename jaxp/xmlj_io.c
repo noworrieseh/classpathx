@@ -347,8 +347,9 @@ xmlParserCtxtPtr
 xmljNewParserContext (JNIEnv * env,
                       jobject inputStream,
                       jbyteArray detectBuffer,
-                      jstring inSystemId,
-                      jstring inPublicId,
+                      jstring publicId,
+                      jstring systemId,
+                      jstring base,
                       jboolean validate,
                       jboolean coalesce,
                       jboolean expandEntities,
@@ -365,11 +366,13 @@ xmljNewParserContext (JNIEnv * env,
       inputContext = xmljNewInputStreamContext (env, inputStream);
       if (NULL != inputContext)
         {
-          ctx = xmlCreateIOParserCtxt (NULL, NULL,
-                                       /* NOTE: userdata must be NULL for DOM to work */
+          /* NOTE: userdata must be NULL for DOM to work */
+          ctx = xmlCreateIOParserCtxt (NULL,
+                                       NULL,
                                        xmljInputReadCallback,
                                        xmljInputCloseCallback,
-                                       inputContext, encoding);
+                                       inputContext,
+                                       encoding);
           if (NULL != ctx)
             {
               ctx->userData = ctx;
@@ -397,6 +400,11 @@ xmljNewParserContext (JNIEnv * env,
                   xmljThrowException (env,
                                       "java/lang/RuntimeException",
                                       "Unable to set xmlParserCtxtPtr options");
+                }
+              if (base != NULL)
+                {
+                  ctx->input->directory =
+                    (*env)->GetStringUTFChars (env, base, 0);
                 }
               return ctx;
             }
@@ -431,6 +439,7 @@ xmljParseDocument (JNIEnv * env,
                    jbyteArray detectBuffer,
                    jstring publicId,
                    jstring systemId,
+                   jstring base,
                    jboolean validate,
                    jboolean coalesce,
                    jboolean expandEntities,
@@ -446,7 +455,7 @@ xmljParseDocument (JNIEnv * env,
   SAXParseContext *saxCtx;
   xmlSAXHandlerPtr sax;
 
-  ctx = xmljNewParserContext (env, in, detectBuffer, systemId, publicId,
+  ctx = xmljNewParserContext (env, in, detectBuffer, publicId, systemId, base,
                               validate, coalesce, expandEntities,
                               entityResolver);
   if (ctx != NULL)
@@ -533,6 +542,7 @@ xmljNewParserInput (JNIEnv * env,
                     jbyteArray detectBuffer,
                     xmlParserCtxtPtr parserContext)
 {
+  xmlParserInputPtr ret;
   xmlParserInputBufferPtr input;
   xmlCharEncoding encoding;
 
@@ -541,7 +551,10 @@ xmljNewParserInput (JNIEnv * env,
     {
       input = xmljNewParserInputBuffer (env, inputStream, encoding);
       if (input != NULL)
-        return xmlNewIOInputStream (parserContext, input, encoding);
+        {
+          ret = xmlNewIOInputStream (parserContext, input, encoding);
+          return ret;
+        }
       xmlFreeParserInputBuffer (input);
     }
   return NULL;

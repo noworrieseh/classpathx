@@ -125,6 +125,7 @@ implements DOMImplementation
     byte[] detectBuffer = in.getDetectBuffer ();
     String publicId = input.getPublicId ();
     String systemId = input.getSystemId ();
+    String base = XMLJ.getBaseURI (systemId);
     // Handle zero-length document
     if (detectBuffer == null)
       {
@@ -134,8 +135,9 @@ implements DOMImplementation
     seenFatalError = false;
     return parseStream(in,
                        detectBuffer,
-                       input.getPublicId (),
-                       input.getSystemId (),
+                       publicId,
+                       systemId,
+                       base,
                        validate,
                        coalesce,
                        expandEntities,
@@ -147,6 +149,7 @@ implements DOMImplementation
                                        byte[] detectBuffer,
                                        String publicId,
                                        String systemId,
+                                       String base,
                                        boolean validate,
                                        boolean coalesce,
                                        boolean expandEntities,

@@ -364,11 +364,11 @@ implements XMLReader
     byte[] detectBuffer = in.getDetectBuffer ();
     String publicId = input.getPublicId ();
     String systemId = input.getSystemId ();
+    base = XMLJ.getBaseURI (systemId);
     // Reset state
     standalone = false;
     seenFatalError = false;
     seenStartDocument = false;
-    base = getDefaultBaseURL ();
     if (systemId != null)
       {
         int lsi = systemId.lastIndexOf ('/');
@@ -390,6 +390,7 @@ implements XMLReader
                 detectBuffer,
                 publicId,
                 systemId,
+                base,
                 validation,
                 contentHandler != null,
                 dtdHandler != null,
@@ -400,18 +401,11 @@ implements XMLReader
     in.close ();
   }
 
-  protected String getDefaultBaseURL ()
-    throws IOException
-  {
-    String base = System.getProperty ("user.dir");
-    base = "file:" + base.replace ('\\', '/');
-    return base;
-  }
-
   native void parseStream (InputStream in,
                            byte[] detectBuffer,
                            String publicId,
                            String systemId,
+                           String base,
                            boolean validate,
                            boolean contentHandler,
                            boolean dtdHandler,

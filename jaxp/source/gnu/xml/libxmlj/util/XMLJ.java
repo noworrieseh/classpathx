@@ -183,5 +183,18 @@ public final class XMLJ
         return uri;
       }
   }
+
+  public static String getBaseURI (String uri)
+  {
+    if (uri != null)
+      {
+        int si = uri.lastIndexOf('/');
+        if (si != -1)
+          {
+            uri = uri.substring (0, si + 1);
+          }
+      }
+    return uri;
+  }
   
 }

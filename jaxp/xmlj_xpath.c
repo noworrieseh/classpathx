@@ -1,4 +1,5 @@
 #include "gnu_xml_libxmlj_dom_GnomeDocument.h"
+#include "gnu_xml_libxmlj_dom_GnomeElement.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathExpression.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathNodeList.h"
 #include "gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h"
@@ -354,10 +355,20 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagName (JNIEnv *env,
                                                              jobject self,
                                                              jstring name)
 {
+  return Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagName (env,
+                                                                     self,
+                                                                     name);
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagName (JNIEnv *env,
+                                                             jobject self,
+                                                             jstring name)
+{
   const xmlChar *s_name;
   const xmlChar *format;
   xmlChar expr[256];
-  xmlDocPtr doc;
+  xmlNodePtr node;
   xmlXPathContextPtr ctx;
   xmlXPathObjectPtr eval = NULL;
   
@@ -367,12 +378,12 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagName (JNIEnv *env,
     {
       return NULL;
     }
-  doc = (xmlDocPtr) xmljGetNodeID (env, self);
-  if (doc == NULL)
+  node = xmljGetNodeID (env, self);
+  if (node == NULL)
     {
       return NULL;
     }
-  ctx = xmljCreateXPathContextPtr (env, xmlDocGetRootElement (doc));
+  ctx = xmljCreateXPathContextPtr (env, node);
   if (ctx != NULL)
     {
       eval = xmlXPathEval (expr, ctx);
@@ -387,11 +398,23 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagNameNS (JNIEnv *env,
                                                                jstring uri,
                                                                jstring localName)
 {
+  return Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagNameNS (env,
+                                                                       self,
+                                                                       uri,
+                                                                       localName);
+}
+
+JNIEXPORT jobject JNICALL
+Java_gnu_xml_libxmlj_dom_GnomeElement_getElementsByTagNameNS (JNIEnv *env,
+                                                               jobject self,
+                                                               jstring uri,
+                                                               jstring localName)
+{
   const xmlChar *s_uri;
   const xmlChar *s_localName;
   const xmlChar *format;
   xmlChar expr[256];
-  xmlDocPtr doc;
+  xmlNodePtr node;
   xmlXPathContextPtr ctx;
   xmlXPathObjectPtr eval = NULL;
   
@@ -413,12 +436,12 @@ Java_gnu_xml_libxmlj_dom_GnomeDocument_getElementsByTagNameNS (JNIEnv *env,
           return NULL;
         }
     }
-  doc = (xmlDocPtr) xmljGetNodeID (env, self);
-  if (doc == NULL)
+  node = xmljGetNodeID (env, self);
+  if (node == NULL)
     {
       return NULL;
     }
-  ctx = xmljCreateXPathContextPtr (env, xmlDocGetRootElement (doc));
+  ctx = xmljCreateXPathContextPtr (env, node);
   if (ctx != NULL)
     {
       eval = xmlXPathEval (expr, ctx);

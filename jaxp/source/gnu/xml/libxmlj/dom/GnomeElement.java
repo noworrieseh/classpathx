@@ -83,10 +83,7 @@ implements Element
   public native Attr removeAttributeNode (Attr oldAttr)
     throws DOMException;
 
-  public NodeList getElementsByTagName (String name)
-  {
-    return new MatchingNodeList (id, null, name, false);
-  }
+  public native NodeList getElementsByTagName (String name);
   
   public native String getAttributeNS (String namespaceURI, String localName);
   
@@ -110,11 +107,8 @@ implements Element
   public native Attr setAttributeNodeNS (Attr newAttr)
     throws DOMException;
 
-  public NodeList getElementsByTagNameNS (String namespaceURI,
-                                          String localName)
-  {
-    return new MatchingNodeList (id, namespaceURI, localName, true);
-  }
+  public native NodeList getElementsByTagNameNS (String namespaceURI,
+                                                 String localName);
   
   public boolean hasAttribute (String name)
   {

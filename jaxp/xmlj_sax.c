@@ -117,6 +117,7 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                                                      jbyteArray detectBuffer,
                                                      jstring publicId,
                                                      jstring systemId,
+                                                     jstring base,
                                                      jboolean validate,
                                                      jboolean contentHandler,
                                                      jboolean dtdHandler,
@@ -132,6 +133,7 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                      detectBuffer,
                      publicId,
                      systemId,
+                     base,
                      validate,
                      0,
                      0,
@@ -146,7 +148,7 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
 
 xmlParserInputPtr
 xmljExternalEntityLoader (const char *url, const char *id,
-                          xmlParserCtxtPtr context)
+                          xmlParserCtxtPtr ctx)
 {
   const xmlChar *systemId;
   const xmlChar *publicId;
@@ -154,10 +156,11 @@ xmljExternalEntityLoader (const char *url, const char *id,
 
   systemId = xmlCharStrdup (url);
   publicId = xmlCharStrdup (id);
-  ret = xmljSAXResolveEntity (context, publicId, systemId);
+  /* TODO convert systemId to absolute URI */
+  ret = xmljSAXResolveEntity (ctx, publicId, systemId);
   if (ret == NULL)
     {
-      ret = defaultLoader (url, id, context);
+      ret = defaultLoader (url, id, ctx);
     }
   return ret;
 }
@@ -191,16 +194,11 @@ xmljNewSAXHandler (jboolean contentHandler,
   if (defaultLoader == NULL)
     {
       defaultLoader = xmlGetExternalEntityLoader ();
+      xmlSetExternalEntityLoader (xmljExternalEntityLoader);
     }
   if (entityResolver)
     {
       sax->resolveEntity = &xmljSAXResolveEntity;
-      /* The above function is never called in libxml2 */
-      xmlSetExternalEntityLoader (xmljExternalEntityLoader);
-    }
-  else
-    {
-      xmlSetExternalEntityLoader (defaultLoader);
     }
 
   if (declarationHandler)
