@@ -1,5 +1,5 @@
 /*
- * $Id: PipelineFactory.java,v 1.2 2001-10-15 02:23:03 db Exp $
+ * $Id: PipelineFactory.java,v 1.3 2001-10-18 22:20:55 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ import org.xml.sax.ext.*;
 import gnu.xml.util.DefaultHandler;
 
 
-// $Id: PipelineFactory.java,v 1.2 2001-10-15 02:23:03 db Exp $
+// $Id: PipelineFactory.java,v 1.3 2001-10-18 22:20:55 db Exp $
 
 /**
  * This provides static factory methods for creating simple event pipelines.
@@ -65,8 +65,8 @@ import gnu.xml.util.DefaultHandler;
     </tr>
 
     <tr valign="top" align="center">
-	<td><a href="DomConsumer.html">dom</a></td>
-	<td><em>optional</em><br> Document classname</td>
+	<td><a href="../dom/Consumer.html">dom</a></td>
+	<td><em>none</em></td>
 	<td> yes </td>
 	<td align="left"> Applications code can access a DOM Document built
 	from the input event stream.  When used as a filter, this buffers
@@ -166,7 +166,7 @@ import gnu.xml.util.DefaultHandler;
  * it's absolutely necessary.
  *
  * @author David Brownell
- * @version $Date: 2001-10-15 02:23:03 $
+ * @version $Date: 2001-10-18 22:20:55 $
  */
 public class PipelineFactory
 {
@@ -302,7 +302,7 @@ public class PipelineFactory
     // terminus explicitly.
     //
     private static final String builtinStages [][] = {
-	{ "dom",	"gnu.xml.pipeline.DomConsumer" },
+	{ "dom",	"gnu.xml.dom.Consumer" },
 	{ "nsfix",	"gnu.xml.pipeline.NSFilter" },
 	{ "null",	"gnu.xml.pipeline.EventFilter" },
 	{ "server",	"gnu.xml.pipeline.CallFilter" },
@@ -444,7 +444,7 @@ public class PipelineFactory
 			}
 		    }
 
-		    // gotta be a terminus stage, with or
+		    // build from a terminus stage, with or
 		    // without the optional string param
 		    if (constructor == null) {
 			String	tmp;
