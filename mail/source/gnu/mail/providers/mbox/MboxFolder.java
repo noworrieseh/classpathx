@@ -184,12 +184,13 @@ public class MboxFolder
   public void open(int mode) 
     throws MessagingException 
   {
+    String filename = file.getAbsolutePath();
     if (mode==READ_WRITE) 
     {
       if (!file.canWrite())
         throw new MessagingException("Folder is read-only");
       if (!acquireLock())
-        throw new MessagingException("Unable to acquire lock");
+        throw new MessagingException("Unable to acquire lock: "+filename);
       readOnly = false;
     }
 
@@ -197,7 +198,6 @@ public class MboxFolder
       throw new MessagingException("Can't read folder: "+file.getName());
 
     LineInputStream in = null;
-    String filename = file.getAbsolutePath();
     try 
     {
       // Read messages
@@ -707,7 +707,8 @@ public class MboxFolder
         }
         if (!readOnly)
           releaseLock();
-        file.delete();
+        if (!file.delete())
+          return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
       } 
@@ -728,7 +729,8 @@ public class MboxFolder
         }
         if (!readOnly)
           releaseLock();
-        file.delete();
+        if (!file.delete())
+          return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
       } 
@@ -750,8 +752,9 @@ public class MboxFolder
       String filename = folder.getFullName();
       if (filename!=null) 
       {
-        file.renameTo(new File(filename));
-        notifyFolderListeners(FolderEvent.RENAMED);
+        if (!file.renameTo(new File(filename)))
+          return false;
+        notifyFolderRenamedListeners(folder);
         return true;
       } 
       else

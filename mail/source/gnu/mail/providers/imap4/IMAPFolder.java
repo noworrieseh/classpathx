@@ -218,7 +218,7 @@ public class IMAPFolder
       int lsi = path.lastIndexOf(getSeparator());
       String parent = (lsi==-1) ? "" : path.substring(0, lsi);
       String name = (lsi==-1) ? path : path.substring(lsi+1);
-      IMAPConnection connection = ((IMAPStore)store).connection;
+      IMAPConnection connection = ((IMAPStore)store).getConnection();
       try
       {
         ListEntry[] entries = null;
@@ -281,7 +281,7 @@ public class IMAPFolder
     throws MessagingException 
   {
     IMAPStore s = (IMAPStore)store;
-    IMAPConnection connection = s.connection;
+    IMAPConnection connection = s.getConnection();
     try
     {
       MailboxStatus status = null;
@@ -317,24 +317,29 @@ public class IMAPFolder
   public boolean create(int type) 
     throws MessagingException 
   {
-    getSeparator();
-    if (delimiter=='\u0000') // this folder cannot be created
-      throw new FolderNotFoundException(this);
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       String path = this.path;
       if (type==HOLDS_FOLDERS)
+      {
+        getSeparator();
+        if (delimiter=='\u0000') // this folder cannot be created
+          throw new FolderNotFoundException(this, path);
         path = new StringBuffer(path)
           .append(delimiter)
           .toString();
+      }
       boolean ret = false;
       synchronized (connection)
       {
         ret = connection.create(path);
       }
       if (ret)
+      {
+        type = -1;
         notifyFolderListeners(FolderEvent.CREATED);
+      }
       if (connection.alertsPending())
         ((IMAPStore)store).processAlerts();
       return ret;
@@ -351,7 +356,7 @@ public class IMAPFolder
   public boolean delete(boolean flag) 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       boolean ret = false;
@@ -360,7 +365,10 @@ public class IMAPFolder
         ret = connection.delete(path);
       }
       if (ret)
+      {
+        type = -1;
         notifyFolderListeners(FolderEvent.DELETED);
+      }
       if (connection.alertsPending())
         ((IMAPStore)store).processAlerts();
       return ret;
@@ -377,7 +385,7 @@ public class IMAPFolder
   public boolean renameTo(Folder folder) 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       boolean ret = false;
@@ -386,7 +394,10 @@ public class IMAPFolder
         ret = connection.rename(path, folder.getFullName());
       }
       if (ret)
+      {
+        type = -1;
         notifyFolderRenamedListeners(folder); // do we have to close?
+      }
       if (connection.alertsPending())
         ((IMAPStore)store).processAlerts();
       return ret;
@@ -417,7 +428,7 @@ public class IMAPFolder
     {
       if (!selected)
         throw new FolderClosedException(this);
-      IMAPConnection connection = s.connection;
+      IMAPConnection connection = s.getConnection();
       try
       {
         boolean success = false;
@@ -449,7 +460,7 @@ public class IMAPFolder
       throw new MessagingException("Folder is not open");
     if (mode==Folder.READ_ONLY)
       throw new MessagingException("Folder was opened read-only");
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       int[] messageNumbers = null;
@@ -497,7 +508,7 @@ public class IMAPFolder
     throws MessagingException 
   {
     MailboxStatus ms = null;
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       if (mode==-1 || messageCount<0)
@@ -537,7 +548,7 @@ public class IMAPFolder
     throws MessagingException 
   {
     MailboxStatus ms = null;
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       if (mode==-1 || newMessageCount<0)
@@ -605,7 +616,7 @@ public class IMAPFolder
     }
     try
     {
-      IMAPConnection connection = ((IMAPStore)store).connection;
+      IMAPConnection connection = ((IMAPStore)store).getConnection();
       for (int i=0; i<m.length; i++)
       {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -685,7 +696,7 @@ public class IMAPFolder
     // execute
     try
     {
-      IMAPConnection connection = ((IMAPStore)store).connection;
+      IMAPConnection connection = ((IMAPStore)store).getConnection();
       synchronized (connection)
       {
         MessageStatus[] ms = connection.fetch(msgnums, commands);
@@ -746,7 +757,7 @@ public class IMAPFolder
     try
     {
       int[] mn = null;
-      IMAPConnection connection = ((IMAPStore)store).connection;
+      IMAPConnection connection = ((IMAPStore)store).getConnection();
       synchronized (connection)
       {
         mn = connection.search(null, criteria);
@@ -978,7 +989,7 @@ public class IMAPFolder
   public Folder[] list(String pattern) 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       ListEntry[] entries;
@@ -1002,7 +1013,7 @@ public class IMAPFolder
   public Folder[] listSubscribed(String pattern) 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPConnection connection = ((IMAPStore)store).getConnection();
     try
     {
       ListEntry[] entries = null;
@@ -1051,11 +1062,12 @@ public class IMAPFolder
   public Folder getParent() 
     throws MessagingException 
   {
-    IMAPConnection connection = ((IMAPStore)store).connection;
+    IMAPStore s = (IMAPStore)store;
+    IMAPConnection connection = s.getConnection();
     getSeparator();
     int di = path.lastIndexOf(delimiter);
     if (di==-1)
-      return null;
+      return s.getDefaultFolder();
     return new IMAPFolder(store, path.substring(0, di), delimiter);
   }
 
@@ -1093,7 +1105,7 @@ public class IMAPFolder
     {
       try
       {
-        IMAPConnection connection = ((IMAPStore)store).connection;
+        IMAPConnection connection = ((IMAPStore)store).getConnection();
         ListEntry[] entries = null;
         synchronized (connection)
         {

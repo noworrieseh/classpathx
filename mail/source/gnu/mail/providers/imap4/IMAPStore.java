@@ -34,6 +34,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.StoreClosedException;
 import javax.mail.URLName;
 import javax.mail.event.StoreEvent;
 
@@ -172,6 +173,18 @@ public class IMAPStore
     throws MessagingException
   {
     return getFolder(urlname.getFile());
+  }
+
+  /**
+   * Returns the IMAP connection used by this store.
+   * @exception StoreClosedException if the store is not currently connected
+   */
+  protected IMAPConnection getConnection()
+    throws StoreClosedException
+  {
+    if (!isConnected())
+      throw new StoreClosedException(this);
+    return connection;
   }
 
   /**

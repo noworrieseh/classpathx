@@ -3,10 +3,13 @@ SMTPTransport Architecture
 gnu.mail.providers.smtp.SMTPTransport subclasses javax.mail.Transport
 and overrides the sendMessage() and protocolConnect() methods. It 
 asks for a socket to the SMTP server. The InputStream from the socket is
-wrapped into a BufferedReader and read one line at a time. The OutputStream
+wrapped in a CRLFInputStream and read one line at a time. The OutputStream
 is wrapped in SMTPOutputStream and gnu.mail.util.CRLFOutputStream, which 
 makes sure that our line endings are sent as CRLF. When sendMessage() is 
 called, it casts its Message to a MimeMessage and sends off the parts.
 
 See Sun's Service Provider Guide for the general description of how to
 create a Transport provider.
+
+The GNU SMTPTransport currently supports LOGIN and PLAIN authentication
+mechanisms.

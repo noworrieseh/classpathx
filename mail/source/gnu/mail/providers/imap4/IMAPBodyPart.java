@@ -115,7 +115,7 @@ public class IMAPBodyPart
     try
     {
       IMAPConnection connection =
-        ((IMAPStore)message.getFolder().getStore()).connection;
+        ((IMAPStore)message.getFolder().getStore()).getConnection();
       int msgnum = message.getMessageNumber();
       int[] messages = new int[] { msgnum };
       synchronized (connection)

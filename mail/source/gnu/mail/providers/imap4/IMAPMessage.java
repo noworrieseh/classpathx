@@ -163,7 +163,8 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
   {
     try
     {
-      IMAPConnection connection = ((IMAPStore)folder.getStore()).connection;
+      IMAPConnection connection =
+        ((IMAPStore)folder.getStore()).getConnection();
       // Select folder
       if (!folder.isOpen())
         folder.open(Folder.READ_WRITE);
@@ -683,7 +684,8 @@ public final class IMAPMessage extends ReadOnlyMessage implements IMAPConstants
       // Perform store
       IMAPStore store = (IMAPStore)folder.getStore();
       int[] messages = new int[] { msgnum };
-      MessageStatus[] ms = store.connection.store(messages, FLAGS, aflags);
+      MessageStatus[] ms =
+        store.getConnection().store(messages, FLAGS, aflags);
       for (int i=0; i<ms.length; i++)
       {
         if (ms[i].getMessageNumber()==msgnum)

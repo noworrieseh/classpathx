@@ -257,16 +257,30 @@ public final class MaildirFolder
         // delete in new
         if (newdir.messages!=null)
         {
-          int nlen = newdir.messages.length;
-          for (int i=0; i<nlen; i++)
-            newdir.messages[i].file.delete();
+          int len = newdir.messages.length;
+          for (int i=0; i<len; i++)
+          {
+            MaildirMessage message = newdir.messages[i];
+            if (message.getFlags().contains(Flags.Flag.DELETED))
+            {
+              message.file.delete();
+              elist.add(message);
+            }
+          }
         }
         // delete in cur
-        if (newdir.messages!=null)
+        if (curdir.messages!=null)
         {
-          int nlen = newdir.messages.length;
-          for (int i=0; i<nlen; i++)
-            newdir.messages[i].file.delete();
+          int len = curdir.messages.length;
+          for (int i=0; i<len; i++)
+          {
+            MaildirMessage message = curdir.messages[i];
+            if (message.getFlags().contains(Flags.Flag.DELETED))
+            {
+              message.file.delete();
+              elist.add(message);
+            }
+          }
         }
       }
       catch (SecurityException e)
@@ -722,8 +736,9 @@ public final class MaildirFolder
       String filename = folder.getFullName();
       if (filename!=null) 
       {
-        maildir.renameTo(new File(filename));
-        notifyFolderListeners(FolderEvent.RENAMED);
+        if (!maildir.renameTo(new File(filename)))
+          return false;
+        notifyFolderRenamedListeners(folder);
         return true;
       } 
       else
