@@ -2,6 +2,8 @@
 
 	* SMTPTransport.java: Expose ESMTP extension list.
 	* SMTPTransport.java: Don't pass ESMTP parameters when EHLO fails.
+	* SMTPTransport.java: Don't invoke DATA when no valid recipients are
+	    specified.
 
 2004-08-06  Chris Burdess  <dog@bluezoo.org>
 

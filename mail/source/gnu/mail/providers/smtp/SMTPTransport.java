@@ -247,7 +247,7 @@ public class SMTPTransport
     List sent = new ArrayList (len);
     List unsent = new ArrayList (len);
     List invalid = new ArrayList (len);
-    int deliveryStatus = 0;
+    int deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
     ParameterList params = null; // ESMTP parameters
     
     synchronized (connection)
@@ -402,44 +402,48 @@ public class SMTPTransport
             throw new SendFailedException (e.getMessage ());
           }
         
-        try
-          {  
-            // DATA
-            OutputStream dataStream = connection.data ();
-            if (dataStream == null)
-              {
-                throw new MessagingException (connection.getLastResponse ());
-              }
-            mimeMessage.writeTo (dataStream);
-            dataStream.flush ();
-            if (!connection.finishData ())
-              {
-                unsent.addAll (sent);
-                sent.clear ();
-                deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
-              }
-            else 
-              {
-                deliveryStatus = invalid.isEmpty () ?
-                  TransportEvent.MESSAGE_DELIVERED :
-                  TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
-              }
-          }
-        catch (IOException e)
+        if (sent.size () > 0)
           {
             try
-              {
-                // Attempt to ensure that connection is in control mode
-                if (connection.finishData ())
+              {  
+                // DATA
+                OutputStream dataStream = connection.data ();
+                if (dataStream == null)
                   {
-                    connection.rset ();
+                    String msg = connection.getLastResponse ();
+                    throw new MessagingException (msg);
+                  }
+                mimeMessage.writeTo (dataStream);
+                dataStream.flush ();
+                if (!connection.finishData ())
+                  {
+                    unsent.addAll (sent);
+                    sent.clear ();
+                    deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
+                  }
+                else 
+                  {
+                    deliveryStatus = invalid.isEmpty () ?
+                      TransportEvent.MESSAGE_DELIVERED :
+                      TransportEvent.MESSAGE_PARTIALLY_DELIVERED;
                   }
               }
-            catch (IOException e2)
+            catch (IOException e)
               {
-                // Possible transport-level problem
+                try
+                  {
+                    // Attempt to ensure that connection is in control mode
+                    if (connection.finishData ())
+                      {
+                        connection.rset ();
+                      }
+                  }
+                catch (IOException e2)
+                  {
+                    // Possible transport-level problem
+                  }
+                throw new SendFailedException (e.getMessage ());
               }
-            throw new SendFailedException (e.getMessage ());
           }
       }
   
