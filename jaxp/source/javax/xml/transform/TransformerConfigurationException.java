@@ -40,11 +40,11 @@ public class TransformerConfigurationException extends TransformerException {
 		super(msg);
 	} // TransformerConfigurationException()
 
-	public TransformerConfigurationException(Exception ex) {
+	public TransformerConfigurationException(Throwable ex) {
 		super(ex);
 	} // TransformerConfigurationException()
 
-	public TransformerConfigurationException(String msg, Exception ex) {
+	public TransformerConfigurationException(String msg, Throwable ex) {
 		super(msg, ex);
 	} // TransformerConfigurationException()
 
