@@ -1,6 +1,6 @@
 /*
- * $Id: DomEvent.java,v 1.2 2001-10-23 17:42:25 db Exp $
- * Copyright (C) 1999-2000 David Brownell
+ * $Id: DomEvent.java,v 1.3 2001-11-20 04:57:05 db Exp $
+ * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
  *
@@ -32,7 +32,7 @@ import org.w3c.dom.events.*;
 import org.w3c.dom.views.AbstractView;		// used by UIEvent
 
 
-// $Id: DomEvent.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomEvent.java,v 1.3 2001-11-20 04:57:05 db Exp $
 
 /**
  * "Event" implementation.  Events are
@@ -44,7 +44,7 @@ import org.w3c.dom.views.AbstractView;		// used by UIEvent
  * event objects.
  *
  * @author David Brownell
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-20 04:57:05 $
  */
 public class DomEvent implements Event
 {
