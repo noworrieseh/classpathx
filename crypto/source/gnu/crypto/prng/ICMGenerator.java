@@ -1,9 +1,9 @@
 package gnu.crypto.prng;
 
 // ----------------------------------------------------------------------------
-// $Id: ICMGenerator.java,v 1.5 2002-01-17 11:51:15 raif Exp $
+// $Id: ICMGenerator.java,v 1.6 2002-06-08 05:24:34 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -31,8 +31,8 @@ package gnu.crypto.prng;
 // ----------------------------------------------------------------------------
 
 import gnu.crypto.Registry;
-import gnu.crypto.cipher.CipherFactory;
 import gnu.crypto.cipher.IBlockCipher;
+import gnu.crypto.cipher.CipherFactory;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -41,20 +41,23 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Counter Mode is a way to define a pseudorandom keystream generator using a
- * block cipher. The keystream can be used for additive encryption, key
- * derivation, or any other application requiring pseudorandom data.<p>
+ * <p>Counter Mode is a way to define a pseudorandom keystream generator using
+ * a block cipher. The keystream can be used for additive encryption, key
+ * derivation, or any other application requiring pseudorandom data.</p>
  *
- * In ICM, the keystream is logically broken into segments. Each segment is
+ * <p>In ICM, the keystream is logically broken into segments. Each segment is
  * identified with a segment index, and the segments have equal lengths. This
  * segmentation makes ICM especially appropriate for securing packet-based
- * protocols.<p>
+ * protocols.</p>
  *
- * References:<br>
- * <a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
- * Integer Counter Mode</a>, David A. McGrew.<p>
+ * <p>References:</p>
  *
- * @version $Revision: 1.5 $
+ * <ol>
+ *    <li><a href="http://www.ietf.org/internet-drafts/draft-mcgrew-saag-icm-00.txt">
+ *    Integer Counter Mode</a>, David A. McGrew.</li>
+ * </ol>
+ *
+ * @version $Revision: 1.6 $
  */
 public class ICMGenerator extends BasePRNG {
 
@@ -64,10 +67,6 @@ public class ICMGenerator extends BasePRNG {
    /** Property name of underlying block cipher for this ICM generator. */
    public static final String CIPHER = "gnu.crypto.prng.icm.cipher.name";
 
-   /** Property name of underlying cipher's block size. */
-   public static final String BLOCK_LENGTH =
-         "gnu.crypto.prng.icm.cipher.block.size";
-
    /** Property name of ICM's block index length. */
    public static final String BLOCK_INDEX_LENGTH =
          "gnu.crypto.prng.icm.block.index.length";
@@ -75,9 +74,6 @@ public class ICMGenerator extends BasePRNG {
    /** Property name of ICM's segment index length. */
    public static final String SEGMENT_INDEX_LENGTH =
          "gnu.crypto.prng.icm.segment.index.length";
-
-   /** Property name of ICM's underlying cipher key material. */
-   public static final String KEY_MATERIAL = "gnu.crypto.prng.icm.key.material";
 
    /** Property name of ICM's segment index length. */
    public static final String OFFSET = "gnu.crypto.prng.icm.offset";
@@ -93,15 +89,6 @@ public class ICMGenerator extends BasePRNG {
 
    /** The underlying cipher block size to use, in octets. */
    private int cipherBlockSize;
-
-   /** The number of octets in the block index. */
-   private int blockIndexLength;
-
-   /** The number of octets in the segment index. */
-   private int segmentIndexLength;
-
-   /** Maximum number segments possible. */
-   private BigInteger maxSegmentCount;
 
    /** Maximum number of blocks per segment. */
    private BigInteger maxBlocksPerSegment;
@@ -126,8 +113,10 @@ public class ICMGenerator extends BasePRNG {
    // Class methods
    // -------------------------------------------------------------------------
 
-   // Implementation of abstract methods in BaseRandom
+   // Instance methods
    // -------------------------------------------------------------------------
+
+   // Implementation of abstract methods in BasePRNG --------------------------
 
    // Conceptually, ICM is a keystream generator that takes a secret key
    // and a segment index as an input and then outputs a keystream
@@ -151,7 +140,7 @@ public class ICMGenerator extends BasePRNG {
 
       // find out what block size we should use for it. if null stick with
       // default;
-      Integer i = (Integer) attributes.get(BLOCK_LENGTH);
+      Integer i = (Integer) attributes.get(IBlockCipher.CIPHER_BLOCK_SIZE);
       if (i != null) {
          cipherBlockSize = i.intValue();
       }
@@ -166,12 +155,12 @@ public class ICMGenerator extends BasePRNG {
          }
       }
       if (!ok)
-         throw new IllegalArgumentException(BLOCK_LENGTH);
+         throw new IllegalArgumentException(IBlockCipher.CIPHER_BLOCK_SIZE);
 
       // get the key material
-      byte[] key = (byte[]) attributes.get(KEY_MATERIAL);
+      byte[] key = (byte[]) attributes.get(IBlockCipher.KEY_MATERIAL);
       if (key == null) {
-         throw new IllegalArgumentException(KEY_MATERIAL);
+         throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
       }
 
       int keyLength = key.length;
@@ -189,7 +178,7 @@ public class ICMGenerator extends BasePRNG {
       }
 
       // ensure that remaining params make sense
-      blockIndexLength = -1;
+      int blockIndexLength = -1; // number of octets in the block index
       i = (Integer) attributes.get(BLOCK_INDEX_LENGTH);
       if (i != null) {
          blockIndexLength = i.intValue();
@@ -198,7 +187,7 @@ public class ICMGenerator extends BasePRNG {
          }
       }
 
-      segmentIndexLength = -1;
+      int segmentIndexLength = -1; // number of octets in the segment index
       i = (Integer) attributes.get(SEGMENT_INDEX_LENGTH);
       if (i != null) {
          segmentIndexLength = i.intValue();
@@ -222,7 +211,8 @@ public class ICMGenerator extends BasePRNG {
       }
 
       maxBlocksPerSegment = TWO_FIFTY_SIX.pow(blockIndexLength);
-      maxSegmentCount = TWO_FIFTY_SIX.pow(segmentIndexLength);
+      // Maximum number segments possible
+      BigInteger maxSegmentCount = TWO_FIFTY_SIX.pow(segmentIndexLength);
       counterRange = TWO_FIFTY_SIX.pow(cipherBlockSize);
 
       Object obj = attributes.get(OFFSET);
@@ -260,11 +250,11 @@ public class ICMGenerator extends BasePRNG {
       try {
          cipher.init(map);
       } catch (InvalidKeyException x) {
-         throw new IllegalArgumentException(KEY_MATERIAL);
+         throw new IllegalArgumentException(IBlockCipher.KEY_MATERIAL);
       }
    }
 
-   public byte[] nextBlock() throws LimitReachedException {
+   public void fillBlock() throws LimitReachedException {
       if (!(blockNdx.compareTo(maxBlocksPerSegment) < 0))
          throw new LimitReachedException();
 
@@ -272,21 +262,19 @@ public class ICMGenerator extends BasePRNG {
       // C[i] = (C[0] + i) modulo (256^BLOCK_LENGTH).
 
       BigInteger Ci = C0.add(blockNdx).modPow(BigInteger.ONE, counterRange);
-      byte[] result = Ci.toByteArray();
-      int limit = result.length;
+      buffer = Ci.toByteArray();
+      int limit = buffer.length;
       if (limit < cipherBlockSize) {
          byte[] data = new byte[cipherBlockSize];
-         System.arraycopy(result, 0, data, cipherBlockSize-limit, limit);
-         result = data;
+         System.arraycopy(buffer, 0, data, cipherBlockSize-limit, limit);
+         buffer = data;
       } else if (limit > cipherBlockSize) {
          byte[] data = new byte[cipherBlockSize];
-         System.arraycopy(result, limit-cipherBlockSize, data, 0, cipherBlockSize);
-         result = data;
+         System.arraycopy(buffer, limit-cipherBlockSize, data, 0, cipherBlockSize);
+         buffer = data;
       }
 
-      cipher.encryptBlock(result, 0, result, 0);
+      cipher.encryptBlock(buffer, 0, buffer, 0);
       blockNdx = blockNdx.add(BigInteger.ONE); // increment blockNdx
-
-      return result;
    }
 }
