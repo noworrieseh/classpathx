@@ -1,5 +1,5 @@
 /*
- * $Id: NSFilter.java,v 1.3 2001-07-10 22:52:42 db Exp $
+ * $Id: NSFilter.java,v 1.4 2001-10-18 06:41:04 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ import gnu.xml.util.DefaultHandler;
  * appropriate logic (perhaps adding additional heuristics in a subclass).
  *
  * @author David Brownell
- * @version $Date: 2001-07-10 22:52:42 $
+ * @version $Date: 2001-10-18 06:41:04 $
  */
 public class NSFilter extends EventFilter
 {
@@ -153,7 +153,8 @@ public class NSFilter extends EventFilter
 		+ "' ... " + uri + " (was " + nsStack.getURI (prefix) + ")");
 	}
 
-	nsStack.declarePrefix (prefix, uri);
+	if (!nsStack.declarePrefix (prefix, uri))
+	    fatalError ("illegal prefix declared: " + prefix);
     }
 
     private String fixName (String ns, String l, String name, boolean isAttr)
@@ -251,8 +252,10 @@ public class NSFilter extends EventFilter
 
 	    if ("xmlns".equals (aName))
 		prefix = "";
-	    else
-		prefix = aName.substring (aName.indexOf (':') + 1);
+	    else if (aName.indexOf (':') == 5)
+		prefix = aName.substring (6);
+	    else	// "xmlnsfoo" etc.
+		continue;
 	    startPrefixMapping (prefix, atts.getValue (i));
 	}
 
