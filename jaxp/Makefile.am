@@ -645,8 +645,8 @@ org-w3c-dom-$(VERSION).jar: classes $(org_w3c_dom_jar_CLASSES)
 org-xml-sax-$(VERSION).jar: classes $(org_xml_sax_jar_CLASSES)
 	$(JAR) cf $@ -C classes org/xml
 
-$(libj_jarfile): $(gnu_xml_jar_CLASSES) $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES)
-	$(JAR) cfm $@ @srcdir@/manifest.mf -C classes gnu -C classes javax -C classes org
+$(libj_jarfile): $(gnu_xml_jar_CLASSES) $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) classes/META-INF/services/javax.xml.parsers.SAXParserFactory classes/META-INF/services/javax.xml.parsers.DocumentBuilderFactory classes/META-INF/services/javax.xml.parsers.TransformerFactory
+	$(JAR) cfm $@ @srcdir@/manifest.mf -C classes META-INF -C classes gnu -C classes javax -C classes org
 
 $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $(gnu_xml_jar_CLASSES): classes
 
@@ -656,6 +656,21 @@ $(javax_xml_jar_CLASSES) $(org_w3c_dom_jar_CLASSES) $(org_xml_sax_jar_CLASSES) $
 
 classes:
 	mkdir -p classes
+
+classes/META-INF: classes
+	mkdir -p classes/META-INF
+
+classes/META-INF/services: classes/META-INF
+	mkdir -p classes/META-INF/services
+
+classes/META-INF/services/javax.xml.parsers.SAXParserFactory: classes/META-INF/services
+	echo "gnu.xml.aelfred2.JAXPFactory" > $@
+
+classes/META-INF/services/javax.xml.parsers.DocumentBuilderFactory: classes/META-INF/services
+	echo "gnu.xml.dom.DomDocumentBuilderFactory" > $@
+
+classes/META-INF/services/javax.xml.parsers.TransformerFactory: classes/META-INF/services
+	echo "gnu.xml.transform.TransformerFactoryImpl" > $@
 
 # API documentation
 javadoc:

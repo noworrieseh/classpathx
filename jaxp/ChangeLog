@@ -1,3 +1,7 @@
+2004-12-22  Chris Burdess  <dog@gnu.org>
+
+	* Makefile.am: Generate META-INF/services factory configuration files.
+
 2004-12-17  Mark Wielaard  <mark@klomp.org>
 
 	* css,html2: Updated APIs to final versions of W3C specifications
