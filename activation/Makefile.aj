@@ -31,6 +31,6 @@ activation.jar:
 	sourcefiles=`find $sourcedir -name "*.java" -print`
 	classpath=$(wildcard lib/*.jar)
 	classesdest=$(PROJECTROOT)/classes
-	otherfiles=META-INF/mailcap.default META-INF/mimetypes.default
+	otherfiles=$(PROJECTROOT)/META-INF/mailcap.default $(PROJECTROOT)/META-INF/mimetypes.default
 
 # End Makefile.

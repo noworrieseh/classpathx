@@ -87,13 +87,14 @@ endif
 p
 EOF
 
-
 # The file to produce.
 Makefile=${1:-Makefile}
 
 # The name of the template file.
-MakeTemplate=Makefile.aj
+MakeTemplate=`dirname $0`/Makefile.aj
 
+
+echo Making $Makefile from $MakeTemplate
 
 # Make a bespoke sed script and then edit the source Makefile.
 for something in `sed -n 's/^\([A-Za-z0-9_-]*\)\.jar:/\1/p' ${MakeTemplate}`
