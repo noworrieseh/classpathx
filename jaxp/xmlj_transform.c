@@ -251,7 +251,7 @@ xmljDocumentFunction (xmlXPathParserContextPtr ctxt, int nargs)
  * Method:    newLibxsltStylesheet
  * Signature: ([B)J
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   JNIEnv * env, jclass clazz, jobject inputStream, jbyteArray detectBuffer,
   jstring inSystemId,
@@ -433,7 +433,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
   /*xmljFreeParserContext (ctx);*/
   
   /* Return handle/address casted to Java int value */
-  return (jint) nativeStylesheetHandle;
+  return (jlong) nativeStylesheetHandle;
 }
 
 /*
@@ -443,18 +443,20 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_newLibxsltStylesheet(
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_freeLibxsltStylesheet
-(JNIEnv * env, jclass clazz, jint nativeStylesheetHandle)
+(JNIEnv * env, jclass clazz, jlong nativeStylesheetHandle)
 {
 
   /* Cast Java int value to handle/address and free associated
    * libxslt resources.
    */
 
-  xsltStylesheetPtr nativeStylesheet = (xsltStylesheetPtr) nativeStylesheetHandle;
-  nativeStylesheet->_private = NULL;
-  xmlFreeDoc(nativeStylesheet->doc);
-  nativeStylesheet->doc = NULL;
-  xsltFreeStylesheet (nativeStylesheet);
+  xsltStylesheetPtr stylesheet;
+ 
+  stylesheet = (xsltStylesheetPtr) nativeStylesheetHandle;
+  stylesheet->_private = NULL;
+  xmlFreeDoc (stylesheet->doc);
+  stylesheet->doc = NULL;
+  xsltFreeStylesheet (stylesheet);
 }
 
 xmlXPathFunction
@@ -483,7 +485,7 @@ xmljXPathFuncLookupFunc (void * ctxt,
  */
 JNIEXPORT void JNICALL
 Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
-  JNIEnv *env, jclass clazz, jint xsltSource, jobject jdocument,
+  JNIEnv *env, jclass clazz, jlong xsltSource, jobject jdocument,
   jstring inSystemId, jstring inPublicId, jobject outputStream,
   jobjectArray parametersArray, jobject javaContext)
 {
@@ -491,7 +493,7 @@ Java_gnu_xml_libxmlj_transform_LibxsltStylesheet_libxsltTransform(
   xmlDocPtr sourceDoc;
   xmlDocPtr resultDoc;
   
-  stylesheet = ((xsltStylesheetPtr) (int) xsltSource);
+  stylesheet = ((xsltStylesheetPtr) xsltSource);
   sourceDoc = (xmlDocPtr) xmljGetNodeID (env, jdocument);
   
   if (!(*env)->ExceptionOccurred (env) && NULL != sourceDoc)

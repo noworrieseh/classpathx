@@ -41,6 +41,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
+import org.w3c.dom.xpath.XPathEvaluator;
+import org.w3c.dom.xpath.XPathException;
+import org.w3c.dom.xpath.XPathExpression;
+import org.w3c.dom.xpath.XPathNSResolver;
 
 /**
  * A DOM document node implemented in libxml2.
@@ -49,7 +53,7 @@ import org.w3c.dom.Text;
  */
 public class GnomeDocument
 extends GnomeNode
-implements Document
+implements Document, XPathEvaluator
 {
 
   DOMImplementation dom;
@@ -59,33 +63,33 @@ implements Document
    */
   boolean strictErrorChecking;
   
-  GnomeDocument(int id)
-  {
-    super(id);
-    strictErrorChecking = true;
-  }
-
+  GnomeDocument(long id)
+    {
+      super(id);
+      strictErrorChecking = true;
+    }
+  
   protected void finalize()
-  {
-    free(id);
-  }
-
-  private native void free(int id);
+    {
+      free(id);
+    }
+  
+  private native void free(long id);
 
   public native DocumentType getDoctype();
 
   public DOMImplementation getImplementation()
-  {
-    return dom;
-  }
+    {
+      return dom;
+    }
 
   public native Element getDocumentElement();
 
   public Element createElement(String tagName)
     throws DOMException
-  {
-    return createElementNS(null, tagName);
-  }
+    {
+      return createElementNS(null, tagName);
+    }
 
   public native DocumentFragment createDocumentFragment();
 
@@ -102,17 +106,17 @@ implements Document
 
   public Attr createAttribute(String name)
     throws DOMException
-  {
-    return createAttributeNS(null, name);
-  }
+    {
+      return createAttributeNS(null, name);
+    }
 
   public native EntityReference createEntityReference(String name)
     throws DOMException;
 
   public NodeList getElementsByTagName(String tagName)
-  {
-    return new MatchingNodeList(id, null, tagName, false);
-  }
+    {
+      return new MatchingNodeList(id, null, tagName, false);
+    }
 
   public native Node importNode(Node importedNode, boolean deep)
     throws DOMException;
@@ -127,9 +131,9 @@ implements Document
 
   public NodeList getElementsByTagNameNS(String namespaceURI,
       String localName)
-  {
-    return new MatchingNodeList(id, namespaceURI, localName, true);
-  }
+    {
+      return new MatchingNodeList(id, namespaceURI, localName, true);
+    }
 
   public native Element getElementById(String elementId);
 
@@ -184,5 +188,26 @@ implements Document
 
   public native Node renameNode (Node n, String namespaceURI,
                                  String qualifiedName);
+
+  // -- XPathEvaluator methods --
+
+  public XPathExpression createExpression (String expression,
+                                           XPathNSResolver resolver)
+    throws XPathException, DOMException
+    {
+      return new GnomeXPathExpression (this, expression, resolver);
+    }
+
+  public XPathNSResolver createNSResolver (Node nodeResolver)
+    {
+      return new GnomeXPathNSResolver (this);
+    }
+
+  public native Object evaluate (String expression,
+                                 Node contextNode,
+                                 XPathNSResolver resolver,
+                                 short type,
+                                 Object result)
+    throws XPathException, DOMException;
 
 }

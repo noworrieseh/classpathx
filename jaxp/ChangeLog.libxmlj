@@ -1,3 +1,8 @@
+2004-06-03  Chris Burdess <dog@gnu.org>
+
+	* all: Use longs for native pointers.
+	* dom: Added dom.xpath interfaces.
+
 2004-06-02  Chris Burdess <dog@gnu.org>
 
 	* GnomeNode.java et al, xmlj_dom.c: Implementation of some DOM Level 3
@@ -34,7 +39,7 @@
 
 2004-04-29  Chris Burdess <dog@gnu.org>
 
-    * xmlj_[dom,io].c: Use Java streams for DOM input.
+ 	* xmlj_[dom,io].c: Use Java streams for DOM input.
 
 2004-04-28  Chris Burdess <dog@gnu.org>
 

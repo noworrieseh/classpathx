@@ -38,43 +38,43 @@ implements Locator
 {
 
   // An xmlParserCtxtPtr
-  private final int ctx;
+  private final long ctx;
 
   // An xmlSAXLocatorPtr
-  private final int loc;
+  private final long loc;
 
-  GnomeLocator(int ctx, int loc)
-  {
-    this.ctx = ctx;
-    this.loc = loc;
-  }
+  GnomeLocator (long ctx, long loc)
+    {
+      this.ctx = ctx;
+      this.loc = loc;
+    }
 
-  public String getPublicId()
-  {
-    return getPublicId(ctx, loc);
-  }
+  public String getPublicId ()
+    {
+      return getPublicId (ctx, loc);
+    }
 
-  private native String getPublicId(int ctx, int loc);
+  private native String getPublicId (long ctx, long loc);
 
-  public String getSystemId()
-  {
-    return getSystemId(ctx, loc);
-  }
+  public String getSystemId ()
+    {
+      return getSystemId (ctx, loc);
+    }
 
-  private native String getSystemId(int ctx, int loc);
+  private native String getSystemId (long ctx, long loc);
 
-  public int getLineNumber()
-  {
-    return getLineNumber(ctx, loc);
-  }
+  public int getLineNumber ()
+    {
+      return getLineNumber (ctx, loc);
+    }
   
-  private native int getLineNumber(int ctx, int loc);
+  private native int getLineNumber (long ctx, long loc);
 
-  public int getColumnNumber()
-  {
-    return getColumnNumber(ctx, loc);
-  }
+  public int getColumnNumber ()
+    {
+      return getColumnNumber (ctx, loc);
+    }
   
-  private native int getColumnNumber(int ctx, int loc);
+  private native int getColumnNumber (long ctx, long loc);
 
 }

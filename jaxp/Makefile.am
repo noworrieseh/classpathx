@@ -183,6 +183,12 @@ $(src)/org/w3c/dom/traversal/NodeIterator.java \
 $(src)/org/w3c/dom/traversal/TreeWalker.java \
 $(src)/org/w3c/dom/views/AbstractView.java \
 $(src)/org/w3c/dom/views/DocumentView.java \
+$(src)/org/w3c/dom/xpath/XPathEvaluator.java \
+$(src)/org/w3c/dom/xpath/XPathException.java \
+$(src)/org/w3c/dom/xpath/XPathExpression.java \
+$(src)/org/w3c/dom/xpath/XPathNamespace.java \
+$(src)/org/w3c/dom/xpath/XPathNSResolver.java \
+$(src)/org/w3c/dom/xpath/XPathResult.java \
 $(src)/org/xml/sax/AttributeList.java \
 $(src)/org/xml/sax/Attributes.java \
 $(src)/org/xml/sax/ContentHandler.java \
@@ -321,6 +327,9 @@ $(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
 $(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTemplates.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
@@ -350,6 +359,9 @@ gnu_xml_libxmlj_dom_GnomeNode.h \
 gnu_xml_libxmlj_dom_GnomeNodeList.h \
 gnu_xml_libxmlj_dom_GnomeNotation.h \
 gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
+gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
+gnu_xml_libxmlj_dom_GnomeXPathResult.h \
 gnu_xml_libxmlj_dom_MatchingNodeList.h \
 javax_xml_transform_OutputKeys.h \
 gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
@@ -365,7 +377,8 @@ xmlj_io.c \
 xmlj_node.c \
 xmlj_sax.c \
 xmlj_transform.c \
-xmlj_util.c
+xmlj_util.c \
+xmlj_xpath.c
 
 libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
 libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
@@ -386,6 +399,7 @@ org.w3c.dom.ranges \
 org.w3c.dom.stylesheets \
 org.w3c.dom.traversal \
 org.w3c.dom.views \
+org.w3c.dom.xpath \
 org.xml.sax \
 org.xml.sax.ext \
 org.xml.sax.helpers \

@@ -37,7 +37,8 @@ xmlExternalEntityLoader defaultLoader = NULL;
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
                                                    jobject self,
-                                                   jint j_ctx, jint j_loc)
+                                                   jlong j_ctx,
+                                                   jlong j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -50,7 +51,8 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
                                                    jobject self,
-                                                   jint j_ctx, jint j_loc)
+                                                   jlong j_ctx,
+                                                   jlong j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -63,7 +65,8 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
                                                      jobject self,
-                                                     jint j_ctx, jint j_loc)
+                                                     jlong j_ctx,
+                                                     jlong j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -76,7 +79,8 @@ Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
 JNIEXPORT jint JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv * env,
                                                        jobject self,
-                                                       jint j_ctx, jint j_loc)
+                                                       jlong j_ctx,
+                                                       jlong j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
@@ -705,7 +709,7 @@ xmljSAXSetDocumentLocator (void *vctx, xmlSAXLocatorPtr loc)
       sax->setDocumentLocator = xmljGetMethodID (env,
                                                  target,
                                                  "setDocumentLocator",
-                                                 "(II)V");
+                                                 "(JJ)V");
       if (sax->setDocumentLocator == NULL)
         {
           return;
@@ -715,8 +719,8 @@ xmljSAXSetDocumentLocator (void *vctx, xmlSAXLocatorPtr loc)
   (*env)->CallVoidMethod (env,
                           target,
                           sax->setDocumentLocator,
-                          (jint) ctx,
-                          (jint) loc);
+                          (jlong) ctx,
+                          (jlong) loc);
 }
 
 void

@@ -468,7 +468,7 @@ implements XMLReader
                                      notationName);
     }
 
-  private void setDocumentLocator (int ctx, int loc)
+  private void setDocumentLocator (long ctx, long loc)
     {
       locator = new GnomeLocator (ctx, loc);
       if (seenFatalError || contentHandler == null)

@@ -298,6 +298,12 @@ $(src)/org/w3c/dom/traversal/NodeIterator.java \
 $(src)/org/w3c/dom/traversal/TreeWalker.java \
 $(src)/org/w3c/dom/views/AbstractView.java \
 $(src)/org/w3c/dom/views/DocumentView.java \
+$(src)/org/w3c/dom/xpath/XPathEvaluator.java \
+$(src)/org/w3c/dom/xpath/XPathException.java \
+$(src)/org/w3c/dom/xpath/XPathExpression.java \
+$(src)/org/w3c/dom/xpath/XPathNamespace.java \
+$(src)/org/w3c/dom/xpath/XPathNSResolver.java \
+$(src)/org/w3c/dom/xpath/XPathResult.java \
 $(src)/org/xml/sax/AttributeList.java \
 $(src)/org/xml/sax/Attributes.java \
 $(src)/org/xml/sax/ContentHandler.java \
@@ -436,6 +442,9 @@ $(src)/gnu/xml/libxmlj/dom/GnomeNodeList.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeNotation.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeProcessingInstruction.java \
 $(src)/gnu/xml/libxmlj/dom/GnomeText.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathExpression.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathNSResolver.java \
+$(src)/gnu/xml/libxmlj/dom/GnomeXPathResult.java \
 $(src)/gnu/xml/libxmlj/dom/MatchingNodeList.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTemplates.java \
 $(src)/gnu/xml/libxmlj/transform/GnomeTransformerFactory.java \
@@ -466,6 +475,9 @@ gnu_xml_libxmlj_dom_GnomeNode.h \
 gnu_xml_libxmlj_dom_GnomeNodeList.h \
 gnu_xml_libxmlj_dom_GnomeNotation.h \
 gnu_xml_libxmlj_dom_GnomeProcessingInstruction.h \
+gnu_xml_libxmlj_dom_GnomeXPathExpression.h \
+gnu_xml_libxmlj_dom_GnomeXPathNSResolver.h \
+gnu_xml_libxmlj_dom_GnomeXPathResult.h \
 gnu_xml_libxmlj_dom_MatchingNodeList.h \
 javax_xml_transform_OutputKeys.h \
 gnu_xml_libxmlj_transform_GnomeTransformerFactory.h \
@@ -482,7 +494,8 @@ xmlj_io.c \
 xmlj_node.c \
 xmlj_sax.c \
 xmlj_transform.c \
-xmlj_util.c
+xmlj_util.c \
+xmlj_xpath.c
 
 
 libxmlj_la_LDFLAGS = -release 0.1.2 -export-dynamic
@@ -504,6 +517,7 @@ org.w3c.dom.ranges \
 org.w3c.dom.stylesheets \
 org.w3c.dom.traversal \
 org.w3c.dom.views \
+org.w3c.dom.xpath \
 org.xml.sax \
 org.xml.sax.ext \
 org.xml.sax.helpers \
@@ -527,7 +541,7 @@ libxmlj_la_LIBADD =
 am_libxmlj_la_OBJECTS = libxmlj_la-xmlj_dom.lo libxmlj_la-xmlj_error.lo \
 	libxmlj_la-xmlj_io.lo libxmlj_la-xmlj_node.lo \
 	libxmlj_la-xmlj_sax.lo libxmlj_la-xmlj_transform.lo \
-	libxmlj_la-xmlj_util.lo
+	libxmlj_la-xmlj_util.lo libxmlj_la-xmlj_xpath.lo
 libxmlj_la_OBJECTS = $(am_libxmlj_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -541,7 +555,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_node.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_sax.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_transform.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_util.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_util.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -613,6 +628,7 @@ libxmlj_la-xmlj_node.lo: xmlj_node.c
 libxmlj_la-xmlj_sax.lo: xmlj_sax.c
 libxmlj_la-xmlj_transform.lo: xmlj_transform.c
 libxmlj_la-xmlj_util.lo: xmlj_util.c
+libxmlj_la-xmlj_xpath.lo: xmlj_xpath.c
 libxmlj.la: $(libxmlj_la_OBJECTS) $(libxmlj_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libxmlj_la_LDFLAGS) $(libxmlj_la_OBJECTS) $(libxmlj_la_LIBADD) $(LIBS)
 
@@ -629,6 +645,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_sax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_transform.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -776,6 +793,24 @@ libxmlj_la-xmlj_util.lo: xmlj_util.c
 @AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_util.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_util.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_util.lo `test -f 'xmlj_util.c' || echo '$(srcdir)/'`xmlj_util.c
+
+libxmlj_la-xmlj_xpath.o: xmlj_xpath.c
+@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.o `test -f 'xmlj_xpath.c' || echo '$(srcdir)/'`xmlj_xpath.c
+
+libxmlj_la-xmlj_xpath.obj: xmlj_xpath.c
+@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Po' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.obj `cygpath -w xmlj_xpath.c`
+
+libxmlj_la-xmlj_xpath.lo: xmlj_xpath.c
+@AMDEP_TRUE@	source='xmlj_xpath.c' object='libxmlj_la-xmlj_xpath.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.Plo' tmpdepfile='$(DEPDIR)/libxmlj_la-xmlj_xpath.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libxmlj_la_CFLAGS) $(CFLAGS) -c -o libxmlj_la-xmlj_xpath.lo `test -f 'xmlj_xpath.c' || echo '$(srcdir)/'`xmlj_xpath.c
 CCDEPMODE = @CCDEPMODE@
 
 mostlyclean-libtool:
