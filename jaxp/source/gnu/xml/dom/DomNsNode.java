@@ -1,5 +1,5 @@
 /*
- * $Id: DomNsNode.java,v 1.2 2001-10-23 17:42:25 db Exp $
+ * $Id: DomNsNode.java,v 1.3 2001-11-16 22:44:43 db Exp $
  * Copyright (C) 1999-2000 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -30,14 +30,14 @@ package gnu.xml.dom;
 import org.w3c.dom.*;
 
 
-// $Id: DomNsNode.java,v 1.2 2001-10-23 17:42:25 db Exp $
+// $Id: DomNsNode.java,v 1.3 2001-11-16 22:44:43 db Exp $
 
 /**
  * <p> Abstract implemention of namespace support.  This facilitates
  * sharing code for attribute and element nodes.
  *
  * @author David Brownell 
- * @version $Date: 2001-10-23 17:42:25 $
+ * @version $Date: 2001-11-16 22:44:43 $
  */
 public abstract class DomNsNode extends DomNode
 {
@@ -94,6 +94,9 @@ public abstract class DomNsNode extends DomNode
      */
     public String getPrefix ()
     {
+	if (namespace == null)
+	    return null;
+
 	int index = name.indexOf (':');
 	if (index < 0)
 	    return null;
@@ -110,27 +113,34 @@ public abstract class DomNsNode extends DomNode
     {
 	String local = getLocalName ();
 
-	if (isReadonly () || namespace == null)
+	if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
 
 	if (prefix == null) {
 	    name = local;
 	    return;
-	}
+	} else if (namespace == null)
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		"can't set prefix, node has no namespace URI", this, 0);
 
 	DomDocument.verifyXmlName (prefix);
-	
+	if (prefix.indexOf (':') != -1)
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		"illegal prefix " + prefix, this, 0);
+
 	if ("xml".equals (prefix)
 		&& !DomDocument.xmlNamespace.equals (namespace))
 	    throw new DomEx (DomEx.NAMESPACE_ERR,
 		"xml namespace is always " + DomDocument.xmlNamespace, this, 0);
 
 	if ("xmlns".equals (prefix)) {
-		if (!(namespace == null || "".equals (namespace))
-			|| getNodeType () != ATTRIBUTE_NODE)
-		    throw new DomEx (DomEx.NAMESPACE_ERR,
+	    if (namespace != null || getNodeType () != ATTRIBUTE_NODE)
+		throw new DomEx (DomEx.NAMESPACE_ERR,
 			"xmlns attribute prefix is reserved", this, 0);
-	}
+	} else if (getNodeType () == ATTRIBUTE_NODE
+		&& ("xmlns".equals (name) || name.startsWith ("xmlns:")))
+	    throw new DomEx (DomEx.NAMESPACE_ERR,
+		    "namespace declarations can't change names", this, 0);
 
 	name = prefix + ':' + local;
     }
