@@ -1,5 +1,5 @@
 /*
- * $Id: XIncludeFilter.java,v 1.5 2003-01-21 18:29:23 db Exp $
+ * $Id: XIncludeFilter.java,v 1.6 2003-11-06 11:11:39 avdyk Exp $
  * Copyright (C) 2001-2002 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -50,7 +50,7 @@ import gnu.xml.util.Resolver;
 
 
 
-// $Id: XIncludeFilter.java,v 1.5 2003-01-21 18:29:23 db Exp $
+// $Id: XIncludeFilter.java,v 1.6 2003-11-06 11:11:39 avdyk Exp $
 
 /**
  * Filter to process an XPointer-free subset of
@@ -91,7 +91,7 @@ import gnu.xml.util.Resolver;
  * <p>TBD: "IURI" handling.
  *
  * @author David Brownell
- * @version $Date: 2003-01-21 18:29:23 $
+ * @version $Date: 2003-11-06 11:11:39 $
  */
 public class XIncludeFilter extends EventFilter implements Locator
 {
@@ -457,12 +457,12 @@ public class XIncludeFilter extends EventFilter implements Locator
 	    super (f);
 
 	    // process all content events
-	    setContentHandler (this);
-	    setProperty (LEXICAL_HANDLER, this);
+	    super.setContentHandler (this);
+	    super.setProperty (LEXICAL_HANDLER, this);
 
 	    // drop all DTD events
-	    setDTDHandler (null);
-	    setProperty (DECL_HANDLER, null);
+	    super.setDTDHandler (null);
+	    super.setProperty (DECL_HANDLER, null);
 	}
 
 	// maintain proxy locator
