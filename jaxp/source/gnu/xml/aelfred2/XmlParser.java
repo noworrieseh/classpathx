@@ -1099,7 +1099,7 @@ loop:
 
 	// Read the value, normalizing whitespace
 	// unless it is CDATA.
-	if (type == "CDATA" || type == null) {
+	if ("CDATA".equals (type) || type == null) {
 	    value = readLiteral (flags);
 	} else {
 	    value = readLiteral (flags | LIT_NORMALIZE);
@@ -1510,7 +1510,7 @@ loop:
 	type = readAttType ();
 
 	// Get the string of enumerated values if necessary.
-	if ("ENUMERATION" == type || "NOTATION" == type)
+	if ("ENUMERATION".equals (type) || "NOTATION".equals (type))
 	    enum = dataBufferToString ();
 
 	// Read the default value.
@@ -1540,15 +1540,15 @@ loop:
 	    if ("NOTATION" == typeString) {
 		parseNotationType ();
 		return typeString;
-	    } else if ("CDATA" == typeString
-		    || "ID" == typeString
-		    || "IDREF" == typeString
-		    || "IDREFS" == typeString
-		    || "ENTITY" == typeString
-		    || "ENTITIES" == typeString
-		    || "NMTOKEN" == typeString
-		    || "NMTOKENS" == typeString)
-		return typeString;
+	    } else if ("CDATA".equals (typeString)
+                 || "ID".equals (typeString)
+                 || "IDREF".equals (typeString)
+                 || "IDREFS".equals (typeString)
+                 || "ENTITY".equals (typeString)
+                 || "ENTITIES".equals (typeString)
+                 || "NMTOKEN".equals (typeString)
+                 || "NMTOKENS".equals (typeString))
+        return typeString;
 	    error ("illegal attribute type", typeString, null);
 	    return null;
 	}
@@ -1651,9 +1651,9 @@ loop:
 	    value = readLiteral (flags);
 	expandPE = saved;
 	setAttribute (elementName, name, type, enum, value, valueType);
-	if ("ENUMERATION" == type)
+	if ("ENUMERATION".equals (type))
 	    type = enum;
-	else if ("NOTATION" == type)
+	else if ("NOTATION".equals (type))
 	    type = "NOTATION " + enum;
 	if (!skippedPE) handler.getDeclHandler ()
 	    .attributeDecl (elementName, name, type, defaultType, value);
@@ -3192,8 +3192,8 @@ loop:
 	    entity [3] = value;
 	    entityInfo.put (eName, entity);
 	}
-	if ("lt" == eName || "gt" == eName || "quot" == eName
-		|| "apos" == eName || "amp" == eName)
+	if ("lt".equals (eName) || "gt".equals (eName) || "quot".equals (eName)
+		|| "apos".equals (eName) || "amp".equals (eName))
 	    return;
 	handler.getDeclHandler ()
 	    .internalEntityDecl (eName, value);
@@ -3462,7 +3462,7 @@ loop:
 	    source = scratch;
 	    systemId = ids [1];
 	    handler.startExternalEntity (ename, systemId,
-		    "[document]" == ename);
+		    "[document]".equals (ename));
 	}
 
 	// we may have been given I/O streams directly
