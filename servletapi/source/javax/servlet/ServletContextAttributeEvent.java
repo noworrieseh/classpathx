@@ -21,7 +21,6 @@
 package javax.servlet;
 
 
-import java.util.EventObject;
 
 
 /** an attribute within the <code>ServletContext</code> changed.
@@ -30,9 +29,10 @@ import java.util.EventObject;
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
  * @version Servlet API 2.3
  * @since Servlet API 2.3
+ * @see ServletContextAttributeListener
  */
 public class ServletContextAttributeEvent
-extends EventObject
+extends ServletContextEvent
 {
 
   /** the name of the attribute.
@@ -43,17 +43,11 @@ extends EventObject
    */
   Object value;
 
-  /** the servlet context this attribute is mapped within.
-   */
-  ServletContext sc;
-
-
   /** create the event.
    */
   public ServletContextAttributeEvent(ServletContext sc,String name,Object value)
   {
     super(sc);
-    this.sc=sc;
     this.name=name;
     this.value=value;
   }
