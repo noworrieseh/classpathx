@@ -261,6 +261,10 @@ class JavaContext
           {
             NamedInputStream in = XMLJ.getInputStream (source);
             byte[] detectBuffer = in.getDetectBuffer ();
+            if (detectBuffer == null)
+              {
+                throw new TransformerException ("No document element");
+              }
             GnomeDocument value =
               parseDocument (in, detectBuffer, systemId, null);
             cache.remove (systemId);

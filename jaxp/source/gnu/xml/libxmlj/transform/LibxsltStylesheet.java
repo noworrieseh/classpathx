@@ -69,6 +69,10 @@ public class LibxsltStylesheet
         NamedInputStream in = XMLJ.getInputStream (xsltSource);
         String systemId = in.getName ();
         byte[] detectBuffer = in.getDetectBuffer ();
+        if (detectBuffer == null)
+          {
+            throw new TransformerException ("No document element");
+          }
         this.nativeStylesheetHandle
           = newLibxsltStylesheet (in,
                                   detectBuffer,
@@ -141,6 +145,10 @@ public class LibxsltStylesheet
         NamedInputStream in = XMLJ.getInputStream (source);
         String systemId = in.getName ();
         byte[] detectBuffer = in.getDetectBuffer ();
+        if (detectBuffer == null)
+          {
+            throw new TransformerException ("No document element");
+          }
         libxsltTransform (nativeStylesheetHandle,
                           in,
                           detectBuffer,

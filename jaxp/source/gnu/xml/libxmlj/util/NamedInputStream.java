@@ -31,6 +31,13 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
 
+/**
+ * An input stream associated with an XML system ID.
+ * It can report the system ID and the first few bytes of the stream
+ * in order to detect the character encoding of the stream.
+ *
+ * @author <a href='dog@gnu.org'>Chris Burdess</a>
+ */
 public class NamedInputStream
 extends FilterInputStream
 {
@@ -45,11 +52,20 @@ extends FilterInputStream
       this.name = name;
     }
 
+  /**
+   * Returns the name of the stream (the XML system ID).
+   */
   public String getName ()
     {
       return name;
     }
 
+  /**
+   * Returns the first few bytes of the stream for character encoding
+   * purposes. The entire stream can thereafter be read normally from the
+   * beginning. This method is only valid if no bytes have yet been read
+   * from the stream.
+   */
   public byte[] getDetectBuffer ()
     throws IOException
     {

@@ -28,6 +28,7 @@ package gnu.xml.libxmlj.sax;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
@@ -72,14 +73,14 @@ implements XMLReader
     }
 
   private static final String FEATURES_PREFIX = "http://xml.org/sax/features/";
-  private static final List RECOGNIZED_FEATURES = Arrays.asList(new String[] {
+  private static final List RECOGNIZED_FEATURES = Arrays.asList (new String[] {
     "external-general-entities", "external-parameter-entities",
           "is-standalone", "lexical-handler/parameter-entities", "namespaces",
           "namespace-prefixes", "resolve-dtd-uris", "string-interning",
           "use-attributes2", "use-locator2", "use-entity-resolver2", "validation"
   });
   private static final String PROPERTIES_PREFIX = "http://xml.org/sax/properties/";
-  private static final List RECOGNIZED_PROPERTIES = Arrays.asList(new String[] {
+  private static final List RECOGNIZED_PROPERTIES = Arrays.asList (new String[] {
     "declaration-handler", "dom-node", "lexical-handler", "xml-string"
   });
 
@@ -116,166 +117,184 @@ implements XMLReader
 
   private transient String base;
 
-  public GnomeXMLReader()
+  public GnomeXMLReader ()
     {
-      this(true, true);
+      this (true, true);
     }
 
-  public GnomeXMLReader(boolean namespaces, boolean validation)
+  public GnomeXMLReader (boolean namespaces, boolean validation)
     {
       this.namespaces = namespaces;
       this.validation = validation;
-      ns = new Namespaces();
+      ns = new Namespaces ();
     }
 
-  public ContentHandler getContentHandler()
+  public ContentHandler getContentHandler ()
     {
       return contentHandler;
     }
 
-  public void setContentHandler(ContentHandler handler)
+  public void setContentHandler (ContentHandler handler)
     {
       contentHandler = handler;
     }
 
-  public DTDHandler getDTDHandler()
+  public DTDHandler getDTDHandler ()
     {
       return dtdHandler;
     }
 
-  public void setDTDHandler(DTDHandler handler)
+  public void setDTDHandler (DTDHandler handler)
     {
       dtdHandler = handler;
     }
 
-  public EntityResolver getEntityResolver()
+  public EntityResolver getEntityResolver ()
     {
       return entityResolver;
     }
 
-  public void setEntityResolver(EntityResolver resolver)
+  public void setEntityResolver (EntityResolver resolver)
     {
       entityResolver = resolver;
     }
 
-  public ErrorHandler getErrorHandler()
+  public ErrorHandler getErrorHandler ()
     {
       return errorHandler;
     }
 
-  public void setErrorHandler(ErrorHandler handler)
+  public void setErrorHandler (ErrorHandler handler)
     {
       errorHandler = handler;
     }
 
   // Features
 
-  public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException
+  public boolean getFeature (String name) throws SAXNotRecognizedException, SAXNotSupportedException
     {
-      checkFeatureName(name);
-      String key = name.substring(FEATURES_PREFIX.length());
-      if ("external-general-entities".equals(key))
+      checkFeatureName (name);
+      String key = name.substring (FEATURES_PREFIX.length ());
+      if ("external-general-entities".equals (key))
         return validation; // TODO check this
-      else if ("external-parameter-entities".equals(key))
+      else if ("external-parameter-entities".equals (key))
         return validation; // TODO check this
-      else if ("standalone".equals(key))
+      else if ("standalone".equals (key))
         return standalone;
-      else if ("namespaces".equals(key))
+      else if ("namespaces".equals (key))
         return namespaces;
-      else if ("namespace-prefixes".equals(key))
+      else if ("namespace-prefixes".equals (key))
         return namespacePrefixes;
-      else if ("resolve-dtd-uris".equals(key))
+      else if ("resolve-dtd-uris".equals (key))
         return true; // TODO check this
-      else if ("validation".equals(key))
+      else if ("validation".equals (key))
         return validation;
       else
         return false;
     }
 
-  public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException
+  public void setFeature (String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException
     {
-      checkFeatureName(name);
-      String key = name.substring(FEATURES_PREFIX.length());
-      if ("namespaces".equals(key))
+      checkFeatureName (name);
+      String key = name.substring (FEATURES_PREFIX.length ());
+      if ("namespaces".equals (key))
         namespaces = value;
-      else if ("namespace-prefixes".equals(key))
+      else if ("namespace-prefixes".equals (key))
         namespacePrefixes = value;
-      else if ("validation".equals(key))
+      else if ("validation".equals (key))
         validation = value;
     }
 
   /**
    * Check that the specified feature name is recognized.
    */
-  static void checkFeatureName(String name) throws SAXNotRecognizedException
+  static void checkFeatureName (String name) throws SAXNotRecognizedException
     {
-      if (name == null || !name.startsWith(FEATURES_PREFIX))
-        throw new SAXNotRecognizedException(name);
-      String key = name.substring(FEATURES_PREFIX.length());
-      if (!RECOGNIZED_FEATURES.contains(key))
-        throw new SAXNotRecognizedException(name);
+      if (name == null || !name.startsWith (FEATURES_PREFIX))
+        throw new SAXNotRecognizedException (name);
+      String key = name.substring (FEATURES_PREFIX.length ());
+      if (!RECOGNIZED_FEATURES.contains (key))
+        throw new SAXNotRecognizedException (name);
     }
 
   // Properties
 
-  public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException
+  public Object getProperty (String name) throws SAXNotRecognizedException, SAXNotSupportedException
     {
-      checkPropertyName(name);
-      String key = name.substring(PROPERTIES_PREFIX.length());
-      if ("declaration-handler".equals(key))
+      checkPropertyName (name);
+      String key = name.substring (PROPERTIES_PREFIX.length ());
+      if ("declaration-handler".equals (key))
         return declarationHandler;
-      else if ("lexical-handler".equals(key))
+      else if ("lexical-handler".equals (key))
         return lexicalHandler;
       else
-        throw new SAXNotSupportedException(name);
+        throw new SAXNotSupportedException (name);
     }
 
-  public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException
+  public void setProperty (String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException
     {
-      checkPropertyName(name);
-      String key = name.substring(PROPERTIES_PREFIX.length());
-      if ("declaration-handler".equals(key))
-        declarationHandler = (DeclHandler)value;
-      else if ("lexical-handler".equals(key))
-        lexicalHandler = (LexicalHandler)value;
+      checkPropertyName (name);
+      String key = name.substring (PROPERTIES_PREFIX.length ());
+      if ("declaration-handler".equals (key))
+        declarationHandler = (DeclHandler) value;
+      else if ("lexical-handler".equals (key))
+        lexicalHandler = (LexicalHandler) value;
     }
 
   /**
    * Check that the specified property name is recognized.
    */
-  static void checkPropertyName(String name) throws SAXNotRecognizedException
+  static void checkPropertyName (String name) throws SAXNotRecognizedException
     {
-      if (!name.startsWith(PROPERTIES_PREFIX))
-        throw new SAXNotRecognizedException(name);
-      String key = name.substring(PROPERTIES_PREFIX.length());
-      if (!RECOGNIZED_PROPERTIES.contains(key))
-        throw new SAXNotRecognizedException(name);
+      if (!name.startsWith (PROPERTIES_PREFIX))
+        throw new SAXNotRecognizedException (name);
+      String key = name.substring (PROPERTIES_PREFIX.length ());
+      if (!RECOGNIZED_PROPERTIES.contains (key))
+        throw new SAXNotRecognizedException (name);
     }
 
   // Parse
 
-  public void parse(String filename) throws IOException, SAXException
+  public void parse (String systemId) throws IOException, SAXException
     {
-      File file = new File(filename);
-      String url  = file.getAbsolutePath();
-      if (File.separatorChar != '/')
-        url = url.replace (File.separatorChar, '/');
-      if (!url.startsWith ("/"))
-        url = "/" + url;
-      if (!url.endsWith ("/") && file.isDirectory ())
-        url = url + "/";
-      url = "file:" + url;
-      InputSource source = new InputSource(url);
-      source.setByteStream(new FileInputStream(file));
-      parse(source);
+      URL url = null;
+      try
+        {
+          url = new URL (systemId);
+        }
+      catch (MalformedURLException e)
+        {
+          File file = new File(systemId);
+          if (!file.exists ())
+            throw new FileNotFoundException (systemId);
+          String path  = file.getAbsolutePath();
+          if (File.separatorChar != '/')
+            path = path.replace (File.separatorChar, '/');
+          if (!path.startsWith ("/"))
+            path = "/" + path;
+          if (!path.endsWith ("/") && file.isDirectory ())
+            path = path + "/";
+          url = new URL ("file:" + path);
+        }
+      InputSource source = new InputSource(url.toString ());
+      source.setByteStream (url.openStream ());
+      parse (source);
     }
 
-  public synchronized void parse(InputSource input) throws IOException, SAXException
+  public synchronized void parse (InputSource input) throws IOException, SAXException
     {
-      NamedInputStream in = XMLJ.getInputStream(input);
-      byte[] detectBuffer = in.getDetectBuffer();
-      String publicId = input.getPublicId();
-      String systemId = input.getSystemId();
+      NamedInputStream in = XMLJ.getInputStream (input);
+      byte[] detectBuffer = in.getDetectBuffer ();
+      String publicId = input.getPublicId ();
+      String systemId = input.getSystemId ();
+      // Handle zero-length document
+      if (detectBuffer == null)
+        {
+          startDocument (true);
+          fatalError ("No document element", 0, 0, publicId, systemId);
+          endDocument ();
+          return;
+        }
       // Reset state
       standalone = false;
       seenFatalError = false;
@@ -313,37 +332,37 @@ implements XMLReader
         }
       catch (IOException e)
         {
-          String message = e.getMessage();
-          if ("document is empty".equals(message))
+          String message = e.getMessage ();
+          if ("document is empty".equals (message))
             {
-              startDocument(false);
-              fatalError(message, -1, -1, publicId, systemId);
-              endDocument();
+              startDocument (false);
+              fatalError (message, -1, -1, publicId, systemId);
+              endDocument ();
             }
           else
             throw e;
         }
-      in.close();
+      in.close ();
     }
 
-  native void parseStream(InputStream in,
-                          byte[] detectBuffer,
-                          String publicId,
-                          String systemId,
-                          boolean validate,
-                          boolean contentHandler,
-                          boolean dtdHandler,
-                          boolean entityResolver,
-                          boolean errorHandler,
-                          boolean declarationHandler,
-                          boolean lexicalHandler)
+  native void parseStream (InputStream in,
+                           byte[] detectBuffer,
+                           String publicId,
+                           String systemId,
+                           boolean validate,
+                           boolean contentHandler,
+                           boolean dtdHandler,
+                           boolean entityResolver,
+                           boolean errorHandler,
+                           boolean declarationHandler,
+                           boolean lexicalHandler)
     throws IOException, SAXException;
 
-  String getURI(String prefix)
+  String getURI (String prefix)
     {
       if (!namespaces)
         return null;
-      return ns.getURI(prefix);
+      return ns.getURI (prefix);
     }
 
   // Callbacks from libxmlj

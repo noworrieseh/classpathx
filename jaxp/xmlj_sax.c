@@ -105,6 +105,7 @@ Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
                                                      declarationHandler,
                                                      jboolean lexicalHandler)
 {
+  printf("parseStream\n");
   xmljParseDocument (env,
                      self,
                      in,

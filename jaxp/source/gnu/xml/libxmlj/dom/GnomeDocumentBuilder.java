@@ -123,6 +123,12 @@ implements DOMImplementation
       byte[] detectBuffer = in.getDetectBuffer ();
       String publicId = input.getPublicId();
       String systemId = input.getSystemId();
+      // Handle zero-length document
+      if (detectBuffer == null)
+        {
+          throw new SAXParseException ("No document element", publicId,
+                                       systemId, 0, 0);
+        }
       seenFatalError = false;
       return parseStream(in,
                          detectBuffer,
