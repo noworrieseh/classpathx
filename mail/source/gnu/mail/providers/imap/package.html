@@ -73,6 +73,14 @@ determine trust in TLS negotiation.</td>
 </tr>
 
 <tr>
+<td>mail.imap.auth.mechanisms</td>
+<td>comma-delimited list of SASL mechanisms</td>
+<td>If set, only the specified SASL mechanisms will be attempted during
+authentication, in the given order. If not present, the SASL mechanisms
+advertised by the server will be used.</td>
+</tr>
+
+<tr>
 <td>mail.imap.debug.ansi</td>
 <td>boolean</td>
 <td>If set to true, and mail.debug is also true, and your terminal supports

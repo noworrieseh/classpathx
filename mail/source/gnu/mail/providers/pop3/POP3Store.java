@@ -30,8 +30,11 @@ package gnu.mail.providers.pop3;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -127,40 +130,80 @@ extends Store
             List capa = connection.capa ();
             if (capa != null)
               {
-                if (!propertyIsFalse ("tls") &&
-                    capa.contains ("STLS"))
+                if (capa.contains ("STLS"))
                   {
-                    // Locate custom trust manager
-                    String tmt = getProperty ("trustmanager");
-                    if (tmt == null)
+                    if (!propertyIsFalse ("tls"))
                       {
-                        connection.stls ();
-                  }
-                    else
-                      {
-                        try
+                        // Locate custom trust manager
+                        String tmt = getProperty ("trustmanager");
+                        if (tmt == null)
                           {
-                            Class t = Class.forName (tmt);
-                            TrustManager tm = (TrustManager) t.newInstance ();
-                            connection.stls (tm);
+                            connection.stls ();
                           }
-                        catch (Exception e)
+                        else
                           {
-                            throw new MessagingException (e.getMessage (), e);
+                            try
+                              {
+                                Class t = Class.forName (tmt);
+                                TrustManager tm =
+                                  (TrustManager) t.newInstance ();
+                                connection.stls (tm);
+                              }
+                            catch (Exception e)
+                              {
+                                String m = e.getMessage ();
+                                throw new MessagingException (m, e);
+                              }
                           }
+                        // Capabilities may have changed since STLS
+                        capa = connection.capa ();
                       }
                   }
-                // Try SASL authentication
-                // TODO user ordering of mechanisms
+                // Build list of SASL mechanisms
+                List authenticationMechanisms = null;
                 for (Iterator i = capa.iterator (); i.hasNext (); )
                   {
                     String cap = (String) i.next ();
                     if (cap.startsWith ("SASL "))
                       {
-                        cap = cap.substring (5);
-                        if (connection.auth (cap, username, password))
+                        if (authenticationMechanisms == null)
                           {
-                            return true;
+                            authenticationMechanisms = new ArrayList ();
+                          }
+                        authenticationMechanisms.add (cap.substring (5));
+                      }
+                  }
+                // User authentication
+                if (authenticationMechanisms != null &&
+                    !authenticationMechanisms.isEmpty ())
+                  {
+                    if (username != null && password != null)
+                      {
+                        // Discover user ordering preferences for auth
+                        // mechanisms
+                        String authPrefs = getProperty ("auth.mechanisms");
+                        Iterator i = null;
+                        if (authPrefs == null)
+                          {
+                            i = authenticationMechanisms.iterator ();
+                          }
+                        else
+                          {
+                            StringTokenizer st =
+                              new StringTokenizer (authPrefs, ",");
+                            List authPrefList = Collections.list (st);
+                            i = authPrefList.iterator ();
+                          }
+                        // Try each mechanism in the list in turn
+                        while (i.hasNext ())
+                          {
+                            String mechanism = (String) i.next ();
+                            if (authenticationMechanisms.contains (mechanism) &&
+                                connection.auth (mechanism, username,
+                                                 password))
+                              {
+                                return true;
+                              }
                           }
                       }
                   }

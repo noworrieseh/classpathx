@@ -81,6 +81,14 @@ connect when authentication could not be performed.</td>
 </tr>
 
 <tr>
+<td>mail.smtp.auth.mechanisms</td>
+<td>comma-delimited list of SASL mechanisms</td>
+<td>If set, only the specified SASL mechanisms will be attempted during
+authentication, in the given order. If not present, the SASL mechanisms
+advertised by the server will be used.</td>
+</tr>
+
+<tr>
 <td>mail.smtp.dsn.notify</td>
 <td>string</td>
 <td>The RCPT NOTIFY option. Should be set to either "never", or one or more

@@ -85,6 +85,14 @@ determine trust in TLS negotiation.</td>
 </tr>
 
 <tr>
+<td>mail.pop3.auth.mechanisms</td>
+<td>comma-delimited list of SASL mechanisms</td>
+<td>If set, only the specified SASL mechanisms will be attempted during
+authentication, in the given order. If not present, the SASL mechanisms
+advertised by the server will be used.</td>
+</tr>
+
+<tr>
 <td>mail.pop3.apop</td>
 <td>boolean</td>
 <td>If set to false, APOP authentication will not be attempted.</td>

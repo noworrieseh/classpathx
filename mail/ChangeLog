@@ -1,3 +1,8 @@
+2004-09-10  Chris Burdess  <dog@bluezoo.org>
+
+	* SMTPTransport.java,IMAPStore.java,POP3Store.java: Implement
+	    user ordering of SASL mechanism preferences.
+
 2004-09-09  Chris Burdess  <dog@bluezoo.org>
 
 	* SMTPTransport.java: Only use DSN if server advertises the

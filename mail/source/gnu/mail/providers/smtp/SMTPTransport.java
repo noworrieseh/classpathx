@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -187,13 +188,9 @@ public class SMTPTransport
                     String extension = (String) i.next ();
                     if (extension.startsWith ("AUTH "))
                       {
-                        authenticationMechanisms = new ArrayList ();
-                        StringTokenizer st =
-                          new StringTokenizer (extension.substring (5));
-                        while (st.hasMoreTokens ())
-                          {
-                            authenticationMechanisms.add (st.nextToken ());
-                          }
+                        String m = extension.substring (5);
+                        authenticationMechanisms =
+                          Collections.list (new StringTokenizer (m));
                       }
                   }
               }
@@ -208,12 +205,25 @@ public class SMTPTransport
           {
             if (username != null && password != null)
               {
-                // TODO user ordering preferences for auth mechanisms
-                for (Iterator i = authenticationMechanisms.iterator ();
-                     i.hasNext (); )
+                // Discover user ordering preferences for auth mechanisms
+                String authPrefs = getProperty ("auth.mechanisms");
+                Iterator i = null;
+                if (authPrefs == null)
+                  {
+                    i = authenticationMechanisms.iterator ();
+                  }
+                else
+                  {
+                    List authPrefList =
+                      Collections.list (new StringTokenizer (authPrefs, ","));
+                    i = authPrefList.iterator ();
+                  }
+                // Try each mechanism in the list in turn
+                while (i.hasNext ())
                   {
                     String mechanism = (String) i.next ();
-                    if (connection.authenticate (mechanism, username,
+                    if (authenticationMechanisms.contains (mechanism) &&
+                        connection.authenticate (mechanism, username,
                                                  password))
                       {
                         return true;

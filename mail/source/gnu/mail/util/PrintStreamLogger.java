@@ -45,7 +45,7 @@ public class PrintStreamLogger
    * Constructor.
    * @param out the underlying print stream to write to
    */
-  public PrintStreamLogger(PrintStream out)
+  public PrintStreamLogger (PrintStream out)
   {
     this.out = out;
   }
@@ -53,22 +53,29 @@ public class PrintStreamLogger
   /**
    * Returns the underlying print stream used by this logger.
    */
-  public PrintStream getPrintStream()
+  public PrintStream getPrintStream ()
   {
     return out;
   }
 
-  public void config(String message)
+  public void config (String message)
   {
-    out.print("DEBUG: ");
-    out.println(message);
+    out.print ("DEBUG: ");
+    out.println (message);
   }
 
-  public void log(String protocol, String message)
+  public void log (String protocol, String message)
   {
-    System.err.print(protocol);
-    System.err.print(": ");
-    System.err.println(message);
+    out.print (protocol);
+    out.print (": ");
+    out.println (message);
+  }
+
+  public void error (String protocol, Throwable t)
+  {
+    out.print (protocol);
+    out.print (": ");
+    t.printStackTrace (out);
   }
   
 }

@@ -30,8 +30,11 @@ package gnu.mail.providers.imap;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -120,31 +123,73 @@ public class IMAPStore
               }
         
             List capabilities = connection.capability ();
-            if (!propertyIsFalse ("tls") &&
-                capabilities.contains (IMAPConstants.STARTTLS))
+            if (capabilities.contains (IMAPConstants.STARTTLS))
               {
-                // Locate custom trust manager
-                TrustManager tm = getTrustManager ();
-                if (tm == null)
+                if (!propertyIsFalse ("tls"))
                   {
-                    connection.starttls ();
-                  }
-                else
-                  {
-                    connection.starttls (tm);
+                    // Locate custom trust manager
+                    TrustManager tm = getTrustManager ();
+                    if (tm == null)
+                      {
+                        connection.starttls ();
+                      }
+                    else
+                      {
+                        connection.starttls (tm);
+                      }
+                    // Capabilities may have changed since STARTTLS
+                    capabilities = connection.capability ();
                   }
               }
-            // Try SASL authentication
-            // TODO user ordering of mechanisms
+            else if ("required".equals (getProperty ("tls")))
+              {
+                throw new MessagingException ("TLS not available");
+              }
+            // Build list of available SASL mechanisms
+            List authenticationMechanisms = null;
             for (Iterator i = capabilities.iterator (); i.hasNext (); )
               {
                 String cap = (String) i.next ();
                 if (cap.startsWith ("AUTH="))
                   {
-                    cap = cap.substring (5);
-                    if (connection.authenticate (cap, username, password))
+                    if (authenticationMechanisms == null)
                       {
-                        return true;
+                        authenticationMechanisms = new ArrayList ();
+                      }
+                    authenticationMechanisms.add (cap.substring (5));
+                  }
+              }
+            // User authentication
+            if (authenticationMechanisms != null &&
+                !authenticationMechanisms.isEmpty ())
+              {
+                if (username != null && password != null)
+                  {
+                    // Discover user ordering preferences for auth
+                    // mechanisms
+                    String authPrefs = getProperty ("auth.mechanisms");
+                    Iterator i = null;
+                    if (authPrefs == null)
+                      {
+                        i = authenticationMechanisms.iterator ();
+                      }
+                    else
+                      {
+                        StringTokenizer st =
+                          new StringTokenizer (authPrefs, ",");
+                        List authPrefList = Collections.list (st);
+                        i = authPrefList.iterator ();
+                      }
+                    // Try each mechanism in the list in turn
+                    while (i.hasNext ())
+                      {
+                        String mechanism = (String) i.next ();
+                        if (authenticationMechanisms.contains (mechanism) &&
+                            connection.authenticate (mechanism, username,
+                                                     password))
+                          {
+                            return true;
+                          }
                       }
                   }
               }
