@@ -537,14 +537,6 @@ ac_env_target_alias_set=${target_alias+set}
 ac_env_target_alias_value=$target_alias
 ac_cv_env_target_alias_set=${target_alias+set}
 ac_cv_env_target_alias_value=$target_alias
-ac_env_JAVA_CC_set=${JAVA_CC+set}
-ac_env_JAVA_CC_value=$JAVA_CC
-ac_cv_env_JAVA_CC_set=${JAVA_CC+set}
-ac_cv_env_JAVA_CC_value=$JAVA_CC
-ac_env_JAVA_CC_FLAGS_set=${JAVA_CC_FLAGS+set}
-ac_env_JAVA_CC_FLAGS_value=$JAVA_CC_FLAGS
-ac_cv_env_JAVA_CC_FLAGS_set=${JAVA_CC_FLAGS+set}
-ac_cv_env_JAVA_CC_FLAGS_value=$JAVA_CC_FLAGS
 
 #
 # Report the --help message.
@@ -611,14 +603,6 @@ fi
 if test -n "$ac_init_help"; then
 
   cat <<\EOF
-
-Some influential environment variables:
-  JAVA_CC     java compiler command
-  JAVA_CC_FLAGS
-              java compiler flags
-
-Use these variables to override the choices made by `configure' or to help
-it to find libraries and programs with nonstandard names/locations.
 
 EOF
 fi
@@ -800,7 +784,7 @@ if test -z "$CONFIG_SITE"; then
 fi
 for ac_site_file in $CONFIG_SITE; do
   if test -r "$ac_site_file"; then
-    { echo "$as_me:803: loading site script $ac_site_file" >&5
+    { echo "$as_me:787: loading site script $ac_site_file" >&5
 echo "$as_me: loading site script $ac_site_file" >&6;}
     cat "$ac_site_file" >&5
     . "$ac_site_file"
@@ -811,7 +795,7 @@ if test -r "$cache_file"; then
   # Some versions of bash will fail to source /dev/null (special
   # files actually), so we avoid doing that.
   if test -f "$cache_file"; then
-    { echo "$as_me:814: loading cache $cache_file" >&5
+    { echo "$as_me:798: loading cache $cache_file" >&5
 echo "$as_me: loading cache $cache_file" >&6;}
     case $cache_file in
       [\\/]* | ?:[\\/]* ) . $cache_file;;
@@ -819,7 +803,7 @@ echo "$as_me: loading cache $cache_file" >&6;}
     esac
   fi
 else
-  { echo "$as_me:822: creating cache $cache_file" >&5
+  { echo "$as_me:806: creating cache $cache_file" >&5
 echo "$as_me: creating cache $cache_file" >&6;}
   >$cache_file
 fi
@@ -835,21 +819,21 @@ for ac_var in `(set) 2>&1 |
   eval ac_new_val="\$ac_env_${ac_var}_value"
   case $ac_old_set,$ac_new_set in
     set,)
-      { echo "$as_me:838: error: \`$ac_var' was set to \`$ac_old_val' in the previous run" >&5
+      { echo "$as_me:822: error: \`$ac_var' was set to \`$ac_old_val' in the previous run" >&5
 echo "$as_me: error: \`$ac_var' was set to \`$ac_old_val' in the previous run" >&2;}
       ac_cache_corrupted=: ;;
     ,set)
-      { echo "$as_me:842: error: \`$ac_var' was not set in the previous run" >&5
+      { echo "$as_me:826: error: \`$ac_var' was not set in the previous run" >&5
 echo "$as_me: error: \`$ac_var' was not set in the previous run" >&2;}
       ac_cache_corrupted=: ;;
     ,);;
     *)
       if test "x$ac_old_val" != "x$ac_new_val"; then
-        { echo "$as_me:848: error: \`$ac_var' has changed since the previous run:" >&5
+        { echo "$as_me:832: error: \`$ac_var' has changed since the previous run:" >&5
 echo "$as_me: error: \`$ac_var' has changed since the previous run:" >&2;}
-        { echo "$as_me:850:   former value:  $ac_old_val" >&5
+        { echo "$as_me:834:   former value:  $ac_old_val" >&5
 echo "$as_me:   former value:  $ac_old_val" >&2;}
-        { echo "$as_me:852:   current value: $ac_new_val" >&5
+        { echo "$as_me:836:   current value: $ac_new_val" >&5
 echo "$as_me:   current value: $ac_new_val" >&2;}
         ac_cache_corrupted=:
       fi;;
@@ -868,9 +852,9 @@ echo "$as_me:   current value: $ac_new_val" >&2;}
   fi
 done
 if $ac_cache_corrupted; then
-  { echo "$as_me:871: error: changes in the environment can compromise the build" >&5
+  { echo "$as_me:855: error: changes in the environment can compromise the build" >&5
 echo "$as_me: error: changes in the environment can compromise the build" >&2;}
-  { { echo "$as_me:873: error: run \`make distclean' and/or \`rm $cache_file' and start over" >&5
+  { { echo "$as_me:857: error: run \`make distclean' and/or \`rm $cache_file' and start over" >&5
 echo "$as_me: error: run \`make distclean' and/or \`rm $cache_file' and start over" >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -890,10 +874,10 @@ esac
 echo "#! $SHELL" >conftest.sh
 echo  "exit 0"   >>conftest.sh
 chmod +x conftest.sh
-if { (echo "$as_me:893: PATH=\".;.\"; conftest.sh") >&5
+if { (echo "$as_me:877: PATH=\".;.\"; conftest.sh") >&5
   (PATH=".;."; conftest.sh) 2>&5
   ac_status=$?
-  echo "$as_me:896: \$? = $ac_status" >&5
+  echo "$as_me:880: \$? = $ac_status" >&5
   (exit $ac_status); }; then
   ac_path_separator=';'
 else
@@ -904,7 +888,7 @@ rm -f conftest.sh
 
 # Extract the first word of "jar", so it can be a program name with args.
 set dummy jar; ac_word=$2
-echo "$as_me:907: checking for $ac_word" >&5
+echo "$as_me:891: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_JAR_TOOL+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -921,7 +905,7 @@ for ac_dir in $ac_dummy; do
   test -z "$ac_dir" && ac_dir=.
   if $as_executable_p "$ac_dir/$ac_word"; then
    ac_cv_path_JAR_TOOL="$ac_dir/$ac_word"
-   echo "$as_me:924: found $ac_dir/$ac_word" >&5
+   echo "$as_me:908: found $ac_dir/$ac_word" >&5
    break
 fi
 done
@@ -932,246 +916,65 @@ fi
 JAR_TOOL=$ac_cv_path_JAR_TOOL
 
 if test -n "$JAR_TOOL"; then
-  echo "$as_me:935: result: $JAR_TOOL" >&5
+  echo "$as_me:919: result: $JAR_TOOL" >&5
 echo "${ECHO_T}$JAR_TOOL" >&6
 else
-  echo "$as_me:938: result: no" >&5
+  echo "$as_me:922: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}gcj", so it can be a program name with args.
-set dummy ${ac_tool_prefix}gcj; ac_word=$2
-echo "$as_me:945: checking for $ac_word" >&5
+for ac_prog in jikes gcj javac
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:930: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVA_CC+set}" = set; then
+if test "${ac_cv_path_JAVA_CC+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$JAVA_CC"; then
-  ac_cv_prog_JAVA_CC="$JAVA_CC" # Let the user override the test.
-else
+  case $JAVA_CC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_JAVA_CC="$JAVA_CC" # Let the user override the test with a path.
+  ;;
+  *)
   ac_save_IFS=$IFS; IFS=$ac_path_separator
 ac_dummy="$PATH"
 for ac_dir in $ac_dummy; do
   IFS=$ac_save_IFS
   test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_JAVA_CC="${ac_tool_prefix}gcj"
-echo "$as_me:960: found $ac_dir/$ac_word" >&5
-break
+  if $as_executable_p "$ac_dir/$ac_word"; then
+   ac_cv_path_JAVA_CC="$ac_dir/$ac_word"
+   echo "$as_me:947: found $ac_dir/$ac_word" >&5
+   break
+fi
 done
 
+  ;;
+esac
 fi
-fi
-JAVA_CC=$ac_cv_prog_JAVA_CC
+JAVA_CC=$ac_cv_path_JAVA_CC
+
 if test -n "$JAVA_CC"; then
-  echo "$as_me:968: result: $JAVA_CC" >&5
+  echo "$as_me:958: result: $JAVA_CC" >&5
 echo "${ECHO_T}$JAVA_CC" >&6
 else
-  echo "$as_me:971: result: no" >&5
+  echo "$as_me:961: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-fi
-if test -z "$ac_cv_prog_JAVA_CC"; then
-  ac_ct_JAVA_CC=$JAVA_CC
-  # Extract the first word of "gcj", so it can be a program name with args.
-set dummy gcj; ac_word=$2
-echo "$as_me:980: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_ac_ct_JAVA_CC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$ac_ct_JAVA_CC"; then
-  ac_cv_prog_ac_ct_JAVA_CC="$ac_ct_JAVA_CC" # Let the user override the test.
-else
-  ac_save_IFS=$IFS; IFS=$ac_path_separator
-ac_dummy="$PATH"
-for ac_dir in $ac_dummy; do
-  IFS=$ac_save_IFS
-  test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_ac_ct_JAVA_CC="gcj"
-echo "$as_me:995: found $ac_dir/$ac_word" >&5
-break
+  test -n "$JAVA_CC" && break
 done
-
-fi
-fi
-ac_ct_JAVA_CC=$ac_cv_prog_ac_ct_JAVA_CC
-if test -n "$ac_ct_JAVA_CC"; then
-  echo "$as_me:1003: result: $ac_ct_JAVA_CC" >&5
-echo "${ECHO_T}$ac_ct_JAVA_CC" >&6
-else
-  echo "$as_me:1006: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  JAVA_CC=$ac_ct_JAVA_CC
-else
-  JAVA_CC="$ac_cv_prog_JAVA_CC"
-fi
-
-if test -z "$JAVA_CC"; then
-  if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}javac", so it can be a program name with args.
-set dummy ${ac_tool_prefix}javac; ac_word=$2
-echo "$as_me:1019: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVA_CC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAVA_CC"; then
-  ac_cv_prog_JAVA_CC="$JAVA_CC" # Let the user override the test.
-else
-  ac_save_IFS=$IFS; IFS=$ac_path_separator
-ac_dummy="$PATH"
-for ac_dir in $ac_dummy; do
-  IFS=$ac_save_IFS
-  test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_JAVA_CC="${ac_tool_prefix}javac"
-echo "$as_me:1034: found $ac_dir/$ac_word" >&5
-break
-done
-
-fi
-fi
-JAVA_CC=$ac_cv_prog_JAVA_CC
-if test -n "$JAVA_CC"; then
-  echo "$as_me:1042: result: $JAVA_CC" >&5
-echo "${ECHO_T}$JAVA_CC" >&6
-else
-  echo "$as_me:1045: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-fi
-if test -z "$ac_cv_prog_JAVA_CC"; then
-  ac_ct_JAVA_CC=$JAVA_CC
-  # Extract the first word of "javac", so it can be a program name with args.
-set dummy javac; ac_word=$2
-echo "$as_me:1054: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_ac_ct_JAVA_CC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$ac_ct_JAVA_CC"; then
-  ac_cv_prog_ac_ct_JAVA_CC="$ac_ct_JAVA_CC" # Let the user override the test.
-else
-  ac_save_IFS=$IFS; IFS=$ac_path_separator
-ac_dummy="$PATH"
-for ac_dir in $ac_dummy; do
-  IFS=$ac_save_IFS
-  test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_ac_ct_JAVA_CC="javac"
-echo "$as_me:1069: found $ac_dir/$ac_word" >&5
-break
-done
-
-fi
-fi
-ac_ct_JAVA_CC=$ac_cv_prog_ac_ct_JAVA_CC
-if test -n "$ac_ct_JAVA_CC"; then
-  echo "$as_me:1077: result: $ac_ct_JAVA_CC" >&5
-echo "${ECHO_T}$ac_ct_JAVA_CC" >&6
-else
-  echo "$as_me:1080: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  JAVA_CC=$ac_ct_JAVA_CC
-else
-  JAVA_CC="$ac_cv_prog_JAVA_CC"
-fi
-
-fi
-if test -z "$JAVA_CC"; then
-  if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}jikes", so it can be a program name with args.
-set dummy ${ac_tool_prefix}jikes; ac_word=$2
-echo "$as_me:1094: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_JAVA_CC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$JAVA_CC"; then
-  ac_cv_prog_JAVA_CC="$JAVA_CC" # Let the user override the test.
-else
-  ac_save_IFS=$IFS; IFS=$ac_path_separator
-ac_dummy="$PATH"
-for ac_dir in $ac_dummy; do
-  IFS=$ac_save_IFS
-  test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_JAVA_CC="${ac_tool_prefix}jikes"
-echo "$as_me:1109: found $ac_dir/$ac_word" >&5
-break
-done
-
-fi
-fi
-JAVA_CC=$ac_cv_prog_JAVA_CC
-if test -n "$JAVA_CC"; then
-  echo "$as_me:1117: result: $JAVA_CC" >&5
-echo "${ECHO_T}$JAVA_CC" >&6
-else
-  echo "$as_me:1120: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-fi
-if test -z "$ac_cv_prog_JAVA_CC"; then
-  ac_ct_JAVA_CC=$JAVA_CC
-  # Extract the first word of "jikes", so it can be a program name with args.
-set dummy jikes; ac_word=$2
-echo "$as_me:1129: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_ac_ct_JAVA_CC+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$ac_ct_JAVA_CC"; then
-  ac_cv_prog_ac_ct_JAVA_CC="$ac_ct_JAVA_CC" # Let the user override the test.
-else
-  ac_save_IFS=$IFS; IFS=$ac_path_separator
-ac_dummy="$PATH"
-for ac_dir in $ac_dummy; do
-  IFS=$ac_save_IFS
-  test -z "$ac_dir" && ac_dir=.
-  $as_executable_p "$ac_dir/$ac_word" || continue
-ac_cv_prog_ac_ct_JAVA_CC="jikes"
-echo "$as_me:1144: found $ac_dir/$ac_word" >&5
-break
-done
-
-fi
-fi
-ac_ct_JAVA_CC=$ac_cv_prog_ac_ct_JAVA_CC
-if test -n "$ac_ct_JAVA_CC"; then
-  echo "$as_me:1152: result: $ac_ct_JAVA_CC" >&5
-echo "${ECHO_T}$ac_ct_JAVA_CC" >&6
-else
-  echo "$as_me:1155: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  JAVA_CC=$ac_ct_JAVA_CC
-else
-  JAVA_CC="$ac_cv_prog_JAVA_CC"
-fi
-
-fi
 
 if test "$JAVA_CC" = "gcj"; then
    if test "$GCJ_OPTS" = ""; then
+      echo > /dev/null
       GCJ_OPTS=-C
 
    fi
    JAVA_CC_OPTS=@GCJ_OPTS@
 
 fi
-test -z "$JAVA_CC" && { { echo "$as_me:1174: error: no acceptable java compiler found in \$PATH" >&5
+test -z "$JAVA_CC" && { { echo "$as_me:977: error: no acceptable java compiler found in \$PATH" >&5
 echo "$as_me: error: no acceptable java compiler found in \$PATH" >&2;}
    { (exit 1); exit 1; }; }
 
@@ -1285,7 +1088,7 @@ rm -f confdef2opt.sed
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:1288: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:1091: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -1452,7 +1255,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:1455: error: ambiguous option: $1
+    { { echo "$as_me:1258: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -1471,7 +1274,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:1474: error: unrecognized option: $1
+  -*) { { echo "$as_me:1277: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -1507,7 +1310,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  *) { { echo "$as_me:1510: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:1313: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -1589,8 +1392,6 @@ s,@DEFS@,$DEFS,;t t
 s,@LIBS@,$LIBS,;t t
 s,@JAR_TOOL@,$JAR_TOOL,;t t
 s,@JAVA_CC@,$JAVA_CC,;t t
-s,@JAVA_CC_FLAGS@,$JAVA_CC_FLAGS,;t t
-s,@ac_ct_JAVA_CC@,$ac_ct_JAVA_CC,;t t
 s,@GCJ_OPTS@,$GCJ_OPTS,;t t
 s,@JAVA_CC_OPTS@,$JAVA_CC_OPTS,;t t
 CEOF
@@ -1702,7 +1503,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:1705: creating $ac_file" >&5
+    { echo "$as_me:1506: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -1720,7 +1521,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:1723: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:1524: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -1733,7 +1534,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:1736: error: cannot find input file: $f" >&5
+           { { echo "$as_me:1537: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;

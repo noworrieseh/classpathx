@@ -14,8 +14,10 @@
 #  automakejar Makefile.in
 #
 
+TMP=${TEMP:-/tmp/}
+
 # Create the generic editor script.
-SEDSCRIPT=/tmp/automakejar.$$
+SEDSCRIPT=$TMP/automakejar.$$
 cat > ${SEDSCRIPT} <<\EOF
 #-n
 # A first stage sed script to produce a Makefile from a template.
@@ -23,9 +25,12 @@ cat > ${SEDSCRIPT} <<\EOF
 #
 # This script would be much easier if GNU Make's target specific variables
 # cascaded into sub-targets. But they don't as of 3.79.1.
-/^__JARFILENAME__.jar/,/^$/{
-    # Remove the dummy target.
-    /^__JARFILENAME__.jar:$/d
+/^__JARFILENAME__.jar:.*/,/^$/{
+    # Store the dummy target.
+    /^__JARFILENAME__.jar:.*$/ {
+       h
+       d
+    }
     # Make sure the variable definitions appear at the start of lines.
     s/^	sourcedir=/sourcedir=/
     s/^	sourcefiles=/sourcefiles=/
@@ -45,13 +50,20 @@ cat > ${SEDSCRIPT} <<\EOF
     # Change quoted sh syntax to make syntax
     s/`\(.*\)`/$(shell \1)/
     # Ensure the variables appear
-    /^[__JARFILENAME___jar_*]/p
-    # Insert the rest of the template.
-    /^$/i\
+    # /^__JARFILENAME___jar_.*/p
+    # At the end of the automakejar decleration put the real Make decl.
+    /^$/ {
+       i\
 __JARFILENAME___jar_debugclasses=$(__JARFILENAME___jar_sourcefiles:.java=.class)\
 __JARFILENAME___jar_classfiles=$(__JARFILENAME___jar_debugclasses:$(__JARFILENAME___jar_sourcedir)%=$(__JARFILENAME___jar_classesdest)%)\
-\
-__JARFILENAME__.jar: __JARFILENAME__-init $(__JARFILENAME___jar_classfiles) __JARFILENAME__-compilation\
+
+       # This ensures that the target that the user put in is inserted.
+       {
+          g
+          p
+       }
+       i\
+__JARFILENAME__.jar: __JARFILENAME__-init $(__JARFILENAME___jar_classfiles) __JARFILENAME__-compilation $(__JARFILENAME___jar_otherfiles) $(__JARFILENAME___jar_manifest)\
 	$(JAR) cf$(if $(__JARFILENAME___jar_manifest),m) __JARFILENAME__.jar $(__JARFILENAME___jar_manifest) $(__JARFILENAME___jar_otherfiles) -C $(__JARFILENAME___jar_classesdest) .\
 \
 .PHONY: __JARFILENAME__-init __JARFILENAME__-compilation\
@@ -80,8 +92,9 @@ PATHMK = $(subst $(space),;,$(1))\
 else\
 PATHMK = $(subst $(space),:,$(1))\
 endif
-# Ensure we branch to end of script once template is done.
-    t
+       # Ensure we branch to end of script once template is done.
+       t
+    }
 }
 # Output all other lines as they are.
 p
@@ -93,15 +106,26 @@ Makefile=${1:-Makefile}
 # The name of the template file.
 MakeTemplate=`dirname $0`/Makefile.aj
 
-
 echo Making $Makefile from $MakeTemplate
 
+
+# The Makefile to be mangled, changes every iteration.
+MakeSource=${MakeTemplate}
 # Make a bespoke sed script and then edit the source Makefile.
 for something in `sed -n 's/^\([A-Za-z0-9_-]*\)\.jar:/\1/p' ${MakeTemplate}`
 do
+  MakeOutput=${Makefile}.${RANDOM}
+  echo creating the target: $something
   EDITSCRIPT=${SEDSCRIPT}.edit.$$
   sed -n "s/__JARFILENAME__/${something}/g ; p" ${SEDSCRIPT} > ${EDITSCRIPT}
-  sed -n -f ${EDITSCRIPT} ${MakeTemplate} > ${Makefile}
+  sed -n -f ${EDITSCRIPT} ${MakeSource} > ${MakeOutput}
+  if [ "${MakeSource}" != "${MakeTemplate}" ] ;
+  then
+      rm ${MakeSource}
+  fi
+  MakeSource=${MakeOutput}
 done
+
+mv ${MakeOutput} ${Makefile}
 
 # end.
