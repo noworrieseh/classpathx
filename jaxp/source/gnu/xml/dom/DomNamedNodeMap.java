@@ -1,5 +1,5 @@
 /*
- * $Id: DomNamedNodeMap.java,v 1.3 2001-11-16 20:14:40 db Exp $
+ * $Id: DomNamedNodeMap.java,v 1.4 2001-11-16 22:42:26 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -34,13 +34,13 @@ import org.w3c.dom.*;
 import DomDoctype.ElementInfo;
 
 
-// $Id: DomNamedNodeMap.java,v 1.3 2001-11-16 20:14:40 db Exp $
+// $Id: DomNamedNodeMap.java,v 1.4 2001-11-16 22:42:26 db Exp $
 
 /**
  * <p> "NamedNodeMap" implementation. </p>
  *
  * @author David Brownell 
- * @version $Date: 2001-11-16 20:14:40 $
+ * @version $Date: 2001-11-16 22:42:26 $
  */
 public class DomNamedNodeMap implements NamedNodeMap
 {
@@ -232,7 +232,7 @@ public class DomNamedNodeMap implements NamedNodeMap
 	return null;
     }
 
-    private void maybeRestoreDefault (String name)
+    private void maybeRestoreDefault (String uri, String name)
     {
 	DomDoctype	doctype = (DomDoctype)owner.getDoctype ();
 	ElementInfo	info;
@@ -245,7 +245,10 @@ public class DomNamedNodeMap implements NamedNodeMap
 	    return;
 	if ((value = info.getAttrDefault (name)) == null)
 	    return;
-	attr = (DomAttr) owner.createAttribute (name);
+	if (uri == null)
+	    attr = (DomAttr) owner.createAttribute (name);
+	else
+	    attr = (DomAttr) owner.createAttributeNS (uri, name);
 	attr.setNodeValue (value);
 	attr.setSpecified (false);
 	setNamedItem (attr);
@@ -269,7 +272,7 @@ public class DomNamedNodeMap implements NamedNodeMap
 // maybe attribute REMOVAL
 		v.removeElementAt (i);
 		if (element != null)
-		    maybeRestoreDefault (name);
+		    maybeRestoreDefault (temp.getNamespaceURI (), name);
 		return temp;
 	    }
 	}
@@ -299,6 +302,8 @@ public class DomNamedNodeMap implements NamedNodeMap
 		if ((ns == null && namespaceURI == null)
 			|| ns.equals (namespaceURI)) {
 		    v.removeElementAt (i);
+		    if (element != null)
+			maybeRestoreDefault (ns, temp.getNodeName ());
 		    return temp;
 		}
 	    }
