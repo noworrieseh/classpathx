@@ -153,6 +153,7 @@ final public class SAXDriver
     private boolean			extPE = true;
     private boolean			resolveAll = true;
     private boolean			useResolver2 = true;
+    private boolean     stringInterning = true;
 
     private int				attributeCount = 0;
     private boolean			attributes;
@@ -393,9 +394,9 @@ final public class SAXDriver
 	if ((FEATURE + "lexical-handler/parameter-entities").equals (featureId))
 	    return true;
 
-	// always interns
+	// default is true
 	if ((FEATURE + "string-interning").equals (featureId))
-	    return true;
+	    return stringInterning;
 	
 	// EXTENSIONS 1.1
 
