@@ -1099,7 +1099,7 @@ loop:
 
 	// Read the value, normalizing whitespace
 	// unless it is CDATA.
-  if (handler.getFeature (FEATURE + "string-interning")) {
+  if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
     if (type == "CDATA" || type == null) {
 	    value = readLiteral (flags);
     } else {
@@ -1518,7 +1518,7 @@ loop:
 	type = readAttType ();
 
 	// Get the string of enumerated values if necessary.
-  if (hander.getFeature (FEATURE + "string-interning")) {
+  if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
     if ("ENUMERATION" == type || "NOTATION" == type)
 	    enum = dataBufferToString ();
   } else {
@@ -1550,7 +1550,7 @@ loop:
 	    return "ENUMERATION";
     } else {
 	    String typeString = readNmtoken (true);
-      if (hander.getFeature (FEATURE + "string-interning")) {
+      if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
         if ("NOTATION" == typeString) {
           parseNotationType ();
           return typeString;
@@ -1655,7 +1655,7 @@ loop:
 
 	if (!skippedPE) {
     flags |= LIT_ENTITY_REF;
-    if (hander.getFeature (FEATURE + "string-interning")) {
+    if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
 	    if ("CDATA" != type)
         flags |= LIT_NORMALIZE;
     } else {
@@ -1684,7 +1684,7 @@ loop:
 	    value = readLiteral (flags);
 	expandPE = saved;
 	setAttribute (elementName, name, type, enum, value, valueType);
-  if (hander.getFeature (FEATURE + "string-interning")) {
+  if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
     if ("ENUMERATION" == type)
 	    type = enum;
     else if ("NOTATION" == type)
@@ -3232,7 +3232,7 @@ loop:
 	    entity [3] = value;
 	    entityInfo.put (eName, entity);
 	}
-  if (hander.getFeature (FEATURE + "string-interning")) {
+  if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
     if ("lt" == eName || "gt" == eName || "quot" == eName
         || "apos" == eName || "amp" == eName)
 	    return;
@@ -3507,7 +3507,7 @@ loop:
 	    scratch.setEncoding (encoding);
 	    source = scratch;
 	    systemId = ids [1];
-      if (hander.getFeature (FEATURE + "string-interning")) {
+      if (handler.getFeature (SAXDriver.FEATURE + "string-interning")) {
         handler.startExternalEntity (ename, systemId,
                                      "[document]" == ename);
       } else {
