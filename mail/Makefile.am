@@ -111,58 +111,34 @@ source/gnu/mail/handler/Text.java \
 source/gnu/mail/handler/TextHtml.java \
 source/gnu/mail/handler/TextPlain.java \
 source/gnu/mail/handler/TextXml.java \
-source/gnu/mail/util/BASE64.java \
 source/gnu/mail/util/BOutputStream.java \
 source/gnu/mail/util/Base64InputStream.java \
 source/gnu/mail/util/Base64OutputStream.java \
-source/gnu/mail/util/CRLFInputStream.java \
-source/gnu/mail/util/CRLFOutputStream.java \
-source/gnu/mail/util/LineInputStream.java \
-source/gnu/mail/util/Logger.java \
-source/gnu/mail/util/MessageInputStream.java \
-source/gnu/mail/util/MessageOutputStream.java \
 source/gnu/mail/util/QInputStream.java \
 source/gnu/mail/util/QOutputStream.java \
 source/gnu/mail/util/QPInputStream.java \
 source/gnu/mail/util/QPOutputStream.java \
 source/gnu/mail/util/RFC2822OutputStream.java \
-source/gnu/mail/util/StderrLogger.java \
 source/gnu/mail/util/UUDecoderStream.java \
 source/gnu/mail/util/UUEncoderStream.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
 # The SMTP provider
 SMTP_JAVASRC = \
-source/gnu/mail/providers/smtp/Parameter.java \
-source/gnu/mail/providers/smtp/ParameterList.java \
-source/gnu/mail/providers/smtp/SMTPConnection.java \
-source/gnu/mail/providers/smtp/SMTPOutputStream.java \
 source/gnu/mail/providers/smtp/SMTPTransport.java
 
 # The IMAP provider
 IMAP_JAVASRC = \
 source/gnu/mail/providers/imap/IMAPBodyPart.java \
-source/gnu/mail/providers/imap/IMAPCommand.java \
-source/gnu/mail/providers/imap/IMAPConnection.java \
-source/gnu/mail/providers/imap/IMAPConstants.java \
-source/gnu/mail/providers/imap/IMAPException.java \
 source/gnu/mail/providers/imap/IMAPFolder.java \
 source/gnu/mail/providers/imap/IMAPMessage.java \
 source/gnu/mail/providers/imap/IMAPMultipart.java \
 source/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
-source/gnu/mail/providers/imap/IMAPResponse.java \
-source/gnu/mail/providers/imap/IMAPResponseTokenizer.java \
 source/gnu/mail/providers/imap/IMAPStore.java \
-source/gnu/mail/providers/imap/IMAPTest.java \
-source/gnu/mail/providers/imap/ListEntry.java \
-source/gnu/mail/providers/imap/MailboxStatus.java \
-source/gnu/mail/providers/imap/MessageStatus.java \
-source/gnu/mail/providers/imap/Pair.java \
-source/gnu/mail/providers/imap/UTF7imap.java
+source/gnu/mail/providers/imap/IMAPTest.java
 
 # POP3 protocol
 POP3_JAVASRC = \
-source/gnu/mail/providers/pop3/POP3Connection.java \
 source/gnu/mail/providers/pop3/POP3Folder.java \
 source/gnu/mail/providers/pop3/POP3Message.java \
 source/gnu/mail/providers/pop3/POP3Store.java
