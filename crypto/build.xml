@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!--
-   $Id: build.xml,v 1.17 2002-08-15 12:19:29 raif Exp $
+   $Id: build.xml,v 1.18 2002-08-25 04:25:49 raif Exp $
 
    Copyright (C) 2001-2002, Free Software Foundation, Inc.
 
@@ -336,15 +336,38 @@
    <!--
    Generating Javadoc API in HTML format ......................................
    -->
-   <target name="docs" depends="jar"
-           description="Generate programmer documentation in Javadoc HTML format">
+   <target name="docs" depends="jar,check-jdk,javadoc,javadoc2"
+           description="Generate programmer's documentation in Javadoc HTML format">
+   </target>
+
+   <target name="check-jdk">
+      <condition property="jdk2">
+         <equals arg1="${ant.java.version}" arg2="1.4"/>
+      </condition>
+   </target>
+
+   <target name="javadoc" unless="jdk2">
       <mkdir dir="${docs.dir}/api"/>
+      <antcall target="make-docs">
+         <param name="javadoc.opts" value=""/>
+      </antcall>
+   </target>
+
+   <target name="javadoc2" if="jdk2">
+      <mkdir dir="${docs.dir}/api"/>
+      <antcall target="make-docs">
+         <param name="javadoc.opts" value="-breakiterator"/>
+      </antcall>
+   </target>
+
+   <target name="make-docs">
       <javadoc packagenames="gnu.crypto.*"
                sourcepath="${src.dir}"
                destdir="${docs.dir}/api"
                package="true"
                version="true"
-               windowtitle="${oneliner}, version ${version}">
+               windowtitle="${oneliner}, version ${version}"
+               additionalparam="${javadoc.opts}">
          <doctitle>
             <![CDATA[<H1>${oneliner}<BR>Programmer's Documentation</H1>]]>
          </doctitle>
