@@ -1,5 +1,5 @@
 /*
- * $Id: DomConsumer.java,v 1.1 2001-06-22 14:44:52 db Exp $
+ * $Id: DomConsumer.java,v 1.2 2001-06-22 15:50:42 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -61,7 +61,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @see DomProducer
  *
  * @author David Brownell
- * @version $Date: 2001-06-22 14:44:52 $
+ * @version $Date: 2001-06-22 15:50:42 $
  */
 public class DomConsumer implements EventConsumer
 {
@@ -122,7 +122,7 @@ public class DomConsumer implements EventConsumer
      * @param impl class implementing {@link org.w3c.dom.Document Document}
      *	which publicly exposes a default constructor
      * @param next receives a "replayed" sequence of parse events when
-     *	the {@link #endDocument} method is called.
+     *	the <em>endDocument</em> method is invoked.
      *
      * @exception SAXException when there is a problem creating an
      *	empty DOM document using the specified DOM implementation
