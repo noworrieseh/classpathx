@@ -284,13 +284,16 @@ public class IMAPFolder
   public boolean create(int type) 
     throws MessagingException 
   {
+    getSeparator();
+    if (delimiter=='\u0000') // this folder cannot be created
+      throw new FolderNotFoundException(this);
     IMAPConnection connection = ((IMAPStore)store).connection;
     try
     {
       String path = this.path;
       if (type==HOLDS_FOLDERS)
         path = new StringBuffer(path)
-          .append(getSeparator())
+          .append(delimiter)
           .toString();
       boolean ret;
       synchronized (connection)
@@ -679,6 +682,8 @@ public class IMAPFolder
         }
         if (entries.length>0)
           delimiter = entries[0].delimiter;
+        else
+          throw new MessagingException("Error retrieving separator"); 
       }
       catch (IOException e)
       {
