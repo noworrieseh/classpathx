@@ -122,19 +122,21 @@ public class MimeBodyPart
   public MimeBodyPart(InputStream is)
     throws MessagingException
   {
-    // Buffer the stream if necessary
-    if (!(is instanceof ByteArrayInputStream) &&
-        !(is instanceof BufferedInputStream))
-      is = new BufferedInputStream(is);
-    // Read the headers
-    headers = new InternetHeaders(is);
-    
     if (is instanceof SharedInputStream)
     {
+      headers = new InternetHeaders(is);
       SharedInputStream sis = (SharedInputStream)is;
       contentStream = sis.newStream(sis.getPosition(), -1L);
       return;
     }
+    
+    // Buffer the stream if necessary
+    if (!(is instanceof ByteArrayInputStream) &&
+        !(is instanceof BufferedInputStream))
+      is = new BufferedInputStream(is);
+    
+    // Read the headers
+    headers = new InternetHeaders(is);
     
     // Read stream into byte array (see MimeMessage.parse())
     try

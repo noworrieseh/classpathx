@@ -295,20 +295,20 @@ public class MimeMessage
   protected void parse(InputStream is)
     throws MessagingException
   {
-    // buffer it
-    if (!(is instanceof ByteArrayInputStream) && 
-        !(is instanceof BufferedInputStream))
-      is = new BufferedInputStream(is);
-    // headers
-    headers = createInternetHeaders(is);
-    // content
     if (is instanceof SharedInputStream)
     {
+      headers = createInternetHeaders(is);
       SharedInputStream sis = (SharedInputStream)is;
       contentStream = sis.newStream(sis.getPosition(), -1L);
     }
     else
     {
+      // buffer it
+      if (!(is instanceof ByteArrayInputStream) && 
+          !(is instanceof BufferedInputStream))
+        is = new BufferedInputStream(is);
+      // headers
+      headers = createInternetHeaders(is);
       // Read stream into byte array
       try
       {
