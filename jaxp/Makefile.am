@@ -20,9 +20,12 @@
 # 02111-1307 USA. 
 #
 
+JAVADOC = javadoc
+
 lib_LTLIBRARIES = libxmlj.la
 
 jni = @srcdir@/jni
+doc = @srcdir@/apidoc
 
 libxmlj_la_DEPENDENCIES = \
 org/w3c/dom/Attr.class \
@@ -342,6 +345,31 @@ libxmlj_la_CFLAGS = -pedantic -Wall -fbounds-check
 JARFILE = gnujaxp.jar
 data_DATA = ${JARFILE}
 
+package_names = \
+javax.xml.parsers \
+javax.xml.transform \
+javax.xml.transform.dom \
+javax.xml.transform.sax \
+javax.xml.transform.stream \
+org.w3c.dom \
+org.w3c.dom.css \
+org.w3c.dom.events \
+org.w3c.dom.html \
+org.w3c.dom.ranges \
+org.w3c.dom.stylesheets \
+org.w3c.dom.traversal \
+org.w3c.dom.views \
+org.xml.sax \
+org.xml.sax.ext \
+org.xml.sax.helpers \
+gnu.xml.aelfred2 \
+gnu.xml.dom \
+gnu.xml.libxmlj.dom \
+gnu.xml.libxmlj.sax \
+gnu.xml.libxmlj.transform \
+gnu.xml.pipeline \
+gnu.xml.util
+
 BUILT_SOURCES = ${libxmlj_la_DEPENDENCIES} ${JARFILE}
 
 # Generate header files for classes containing native code.
@@ -405,12 +433,19 @@ gnu/%.class: @srcdir@/source/gnu/%.java
 ${JARFILE}: gnu javax org
 	@JAR@ cfm $(top_builddir)/${JARFILE} $(top_srcdir)/manifest.mf $^
 
+# API documentation
+
+javadoc:
+	mkdir -p $(doc)
+	$(JAVADOC) -d $(doc) -windowtitle "GNU JAXP Library" \
+		-sourcepath @srcdir@/source $(package_names)
+
 # Remove classes and jar file
 
 clean-local:
 	rm -f ${JARFILE}
 	rm -rf gnu javax org
-	rm -f *.h *.o
+	rm -f $(jni)/gnu_*.h $(jni)/javax_*.h *.o
 
 # Run a simple transformation to check that the package is working
 

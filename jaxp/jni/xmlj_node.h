@@ -4,7 +4,7 @@
 #ifndef _Included_node_h
 #define _Included_node_h
 
-// Utility method definitions
+/* -- Utility method definitions -- */
 
 /*
  * Returns the node for the given Java node instance

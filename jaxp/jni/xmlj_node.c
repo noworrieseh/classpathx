@@ -43,7 +43,7 @@ xmljGetNodeID (JNIEnv *env,
     field = (*env)->GetFieldID(env, cls, "id", "I");
     node = (xmlNodePtr)(*env)->GetIntField(env, self, field);
     if (node == NULL)
-      throwDOMException(env, 8, NULL); // NOT_FOUND_ERR
+      xmljThrowDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
     return node;
 }
 
@@ -61,8 +61,8 @@ xmljGetNodeInstance (JNIEnv *env,
 	if (node == NULL)
 		return NULL;
 
-	// This method just constructs a new object of the given type
-	cls = (*env)->FindClass(env, nodeClass(node->type));
+	/* This method just constructs a new object of the given type */
+	cls = (*env)->FindClass(env, xmljNodeClass(node->type));
     method = (*env)->GetMethodID(env, cls, "<init>", "(I)V");
     return (*env)->NewObject(env, cls, method, node);
 }
