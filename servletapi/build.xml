@@ -3,7 +3,7 @@
 <project name="servletapi" default="dist" basedir=".">
 
   <!--
-  $Id: build.xml,v 1.1 2003-07-27 15:46:22 avdyk Exp $
+  $Id: build.xml,v 1.2 2003-09-14 20:09:56 avdyk Exp $
   -->
 
   <!-- Global properties -->
@@ -47,9 +47,9 @@
   <target name="dist" depends="compile"
     description="Prepare the jar file">
     <mkdir dir="${dist}" />
-    <jar destfile="${dist}/${project.name}-${project.version}.jar" basedir=".">
-      <fileset dir="${build}">
-      </fileset>
+    <jar destfile="${dist}/${project.name}-${project.version}.jar" basedir="${build}">
+      <!--fileset dir="${build}">
+      </fileset-->
       <!--include name="LICENSE"/-->
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
