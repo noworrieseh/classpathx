@@ -1,7 +1,7 @@
 package gnu.crypto.cipher;
 
 // ----------------------------------------------------------------------------
-// $Id: BaseCipher.java,v 1.6 2002-06-28 13:05:27 raif Exp $
+// $Id: BaseCipher.java,v 1.7 2002-07-06 23:37:04 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -40,7 +40,7 @@ import java.util.Map;
  * <p>A basic abstract class to facilitate implementing symmetric key block
  * ciphers.</p>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
 
@@ -118,7 +118,25 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
          }
 
          Integer bs = (Integer) attributes.get(CIPHER_BLOCK_SIZE);
-         currentBlockSize = (bs == null ? defaultBlockSize : bs.intValue());
+         if (bs == null) { // no block size was specified.
+            if (currentBlockSize == 0) { // happy birthday
+               currentBlockSize = defaultBlockSize;
+            } // else it's a clone. use as is
+         } else {
+            currentBlockSize = bs.intValue();
+            // ensure that value is valid
+            Iterator it;
+            boolean ok = false;
+            for (it = blockSizes(); it.hasNext(); ) {
+               ok = (currentBlockSize == ((Integer) it.next()).intValue());
+               if (ok) {
+                  break;
+               }
+            }
+            if (!ok) {
+               throw new IllegalArgumentException(IBlockCipher.CIPHER_BLOCK_SIZE);
+            }
+         }
 
          byte[] k = (byte[]) attributes.get(KEY_MATERIAL);
          currentKey = makeKey(k, currentBlockSize);
@@ -134,7 +152,7 @@ public abstract class BaseCipher implements IBlockCipher, IBlockCipherSpi {
 
    public void reset() {
       synchronized(lock) {
-         currentBlockSize = 0;
+//         currentBlockSize = 0;
          currentKey = null;
       }
    }
