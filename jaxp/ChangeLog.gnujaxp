@@ -1,3 +1,7 @@
+2005-02-21  Chris Burdess  <dog@gnu.org>
+
+	* aelfred2: Applied GNU Java coding style.
+
 2005-02-08  Chris Burdess  <dog@gnu.org>
 
 	* validation: Continuation of XML Schema processing work.
