@@ -117,13 +117,13 @@ CONFORMANCE TESTING
     DOM Level 1 (and Level 2 Events) Tests
 	The "domunit 0.0.6" tests use the JAXP API to hook up a DOM
 	implementation to a parser (out of scope for DOM Level 2).
-
-	At this writing, this passes the bulk of those tests except
-	for a handful which require magic handling of attributes.  The
-	specific issue is that DOM expects that attributes that are
-	defaulted in a DTD to reappear when they're deleted.  This DOM
-	could implement that behavior (using SAX2 features) but at this
-	time it doesn't; the feature is rarely needed.
-
 	Those DOM unit tests are mostly related to Level 1, except
 	for a few relating to the Level 2 events module.
+
+	All of these tests pass.
+
+	However, you may want to be aware that Entity nodes, and all
+	EntityReference nodes not created by parsing a document, will
+	have no children.  Since you should as a rule avoid both these
+	node types, you probably won't run into related problems.
+
