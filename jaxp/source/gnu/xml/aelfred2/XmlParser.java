@@ -4543,7 +4543,7 @@ loop:
 		    // Sec 2.1
 		    // [3] the single character #x85
 		    // [4] the single character #x2028
-		    if(c == 0x0085 || c == 0x2028)
+		    if((c == 0x0085 || c == 0x2028) && xmlVersion == XML_11)
 		    	readBuffer[j++] = '\r';
 		} else if ((b1 & 0xf0) == 0xe0) {
 		    // 3-byte sequence:
@@ -4663,6 +4663,8 @@ loop:
 	    if ((c & mask) != 0)
 		throw new CharConversionException ("non-ASCII character U+"
 						    + Integer.toHexString (c));
+	    if (c == 0x0085 && xmlVersion == XML_11)
+	       c = '\r';	
 	    readBuffer [j] = c;
 	    if (c == '\r') {
 		sawCR = true;
