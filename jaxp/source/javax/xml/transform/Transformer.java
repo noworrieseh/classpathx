@@ -43,35 +43,37 @@ public abstract class Transformer {
 	// Methods ----------------------------------------------------
 	//-------------------------------------------------------------
 
-	public abstract void transform(Source source, Result result) 
-		throws TransformerException;
-
-	public abstract void setParameter(String name, Object value);
-
-	public abstract Object getParameter(String name);
-
 	public abstract void clearParameters();
 
-	public abstract void setURIResolver(URIResolver resolver);
 
-	public abstract URIResolver getURIResolver();
-
-	public abstract void setOutputProperties(Properties outputformat) 
-		throws IllegalArgumentException;
+	public abstract ErrorListener getErrorListener();
 
 	public abstract Properties getOutputProperties();
-
-	public abstract void setOutputProperty(String name, String value) 
-		throws IllegalArgumentException;
 
 	public abstract String getOutputProperty(String name) 
 		throws IllegalArgumentException;
 
+	public abstract Object getParameter(String name);
+
+	public abstract URIResolver getURIResolver();
+
+
 	public abstract void setErrorListener(ErrorListener listener) 
 		throws IllegalArgumentException;
 
-	public abstract ErrorListener getErrorListener();
+	public abstract void setOutputProperties(Properties outputformat) 
+		throws IllegalArgumentException;
 
+	public abstract void setOutputProperty(String name, String value) 
+		throws IllegalArgumentException;
+
+	public abstract void setParameter(String name, Object value);
+
+	public abstract void setURIResolver(URIResolver resolver);
+
+
+	public abstract void transform(Source source, Result result) 
+		throws TransformerException;
 
 } // Transformer
 
