@@ -1,54 +1,82 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.1 2003-08-12 15:19:04 nferrier Exp $
+# $Id: configure.ac,v 1.2 2003-09-13 14:15:39 dog Exp $
 # Copyright (C) 2003 Nic Ferrier
 # 
-# This file is part of GNU Paperclips, a free servlet container.
+# This file is part of GNU JavaMail.
 # 
-# GNU Paperclips is free software; you can redistribute it and/or modify it
+# GNU JavaMail is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
 # Free Software Foundation; either version 2, or (at your option) any
 # later version.
 #  
-# GNU Paperclips is distributed in the hope that it will be useful, but
+# GNU JavaMail is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with GNU Paperclips; see the file COPYING.  If not, write to the
+# along with GNU JavaMail; see the file COPYING.  If not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 # 02111-1307 USA. 
 #
 
 AC_INIT(gnumail, 0.1)
 AC_CONFIG_SRCDIR(source/gnu/mail/providers/ReadOnlyMessage.java)
-AC_CONFIG_AUX_DIR(config)
+AM_INIT_AUTOMAKE
 
-AM_INIT_AUTOMAKE(gnumail, 0.1)
+AC_ARG_ENABLE(smtp, AC_HELP_STRING([--enable-smtp],
+	[Enable the SMTP provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_smtp=no ;;
+		*) enable_smtp=yes ;;
+	esac], [enable_smtp=yes])
+AM_CONDITIONAL(ENABLE_SMTP, test "x$enable_smtp" = "xyes")
 
-AC_JAVA_OPTIONS
+AC_ARG_ENABLE(imap, AC_HELP_STRING([--enable-imap],
+	[Enable the IMAP provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_imap=no ;;
+		*) enable_imap=yes ;;
+	esac], [enable_imap=yes])
+AM_CONDITIONAL(ENABLE_IMAP, test "x$enable_imap" = "xyes")
 
-AC_SUBST(LIBS)
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(JAVACFLAGS)
+AC_ARG_ENABLE(pop3, AC_HELP_STRING([--enable-pop3],
+	[Enable the POP3 provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_pop3=no ;;
+		*) enable_pop3=yes ;;
+	esac], [enable_pop3=yes])
+AM_CONDITIONAL(ENABLE_POP3, test "x$enable_pop3" = "xyes")
 
-AC_CANONICAL_HOST
-AC_CHECK_CLASSPATH
+AC_ARG_ENABLE(nntp, AC_HELP_STRING([--enable-nntp],
+	[Enable the NNTP provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_nntp=no ;;
+		*) enable_nntp=yes ;;
+	esac], [enable_nntp=yes])
+AM_CONDITIONAL(ENABLE_NNTP, test "x$enable_nntp" = "xyes")
 
-# Checks for programs.
+AC_ARG_ENABLE(mbox, AC_HELP_STRING([--enable-mbox],
+	[Enable the mbox provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_mbox=no ;;
+		*) enable_mbox=yes ;;
+	esac], [enable_mbox=yes])
+AM_CONDITIONAL(ENABLE_MBOX, test "x$enable_mbox" = "xyes")
 
-AC_PROG_CC
-#AC_PROG_LIBTOOL
-AC_ISC_POSIX
+AC_ARG_ENABLE(maildir, AC_HELP_STRING([--enable-maildir],
+	[Enable the Maildir provider (default=yes).]),
+	[case "$enableval" in
+		no) enable_maildir=no ;;
+		*) enable_maildir=yes ;;
+	esac], [enable_maildir=yes])
+AM_CONDITIONAL(ENABLE_MAILDIR, test "x$enable_maildir" = "xyes")
+
 AC_PROG_JAVAC
-AC_PROG_JAVAH
 AC_PROG_JAR
-
-
-AC_STDC_HEADERS
+AC_CHECK_CLASSPATH
 
 AC_CONFIG_FILES(Makefile)
 

@@ -1,23 +1,7 @@
 # Makefile.am for GNU Classpathx Mail.
 
 # The java source files that make up the GNU version of the javax.mail API.
-API_JAVASRC = source/javax/mail/event/ConnectionAdapter.java \
-source/javax/mail/event/ConnectionEvent.java \
-source/javax/mail/event/ConnectionListener.java \
-source/javax/mail/event/FolderAdapter.java \
-source/javax/mail/event/FolderEvent.java \
-source/javax/mail/event/FolderListener.java \
-source/javax/mail/event/MailEvent.java \
-source/javax/mail/event/MessageChangedEvent.java \
-source/javax/mail/event/MessageChangedListener.java \
-source/javax/mail/event/MessageCountAdapter.java \
-source/javax/mail/event/MessageCountEvent.java \
-source/javax/mail/event/MessageCountListener.java \
-source/javax/mail/event/StoreEvent.java \
-source/javax/mail/event/StoreListener.java \
-source/javax/mail/event/TransportAdapter.java \
-source/javax/mail/event/TransportEvent.java \
-source/javax/mail/event/TransportListener.java \
+API_JAVASRC = \
 source/javax/mail/Address.java \
 source/javax/mail/AuthenticationFailedException.java \
 source/javax/mail/Authenticator.java \
@@ -50,6 +34,23 @@ source/javax/mail/StoreClosedException.java \
 source/javax/mail/Transport.java \
 source/javax/mail/UIDFolder.java \
 source/javax/mail/URLName.java \
+source/javax/mail/event/ConnectionAdapter.java \
+source/javax/mail/event/ConnectionEvent.java \
+source/javax/mail/event/ConnectionListener.java \
+source/javax/mail/event/FolderAdapter.java \
+source/javax/mail/event/FolderEvent.java \
+source/javax/mail/event/FolderListener.java \
+source/javax/mail/event/MailEvent.java \
+source/javax/mail/event/MessageChangedEvent.java \
+source/javax/mail/event/MessageChangedListener.java \
+source/javax/mail/event/MessageCountAdapter.java \
+source/javax/mail/event/MessageCountEvent.java \
+source/javax/mail/event/MessageCountListener.java \
+source/javax/mail/event/StoreEvent.java \
+source/javax/mail/event/StoreListener.java \
+source/javax/mail/event/TransportAdapter.java \
+source/javax/mail/event/TransportEvent.java \
+source/javax/mail/event/TransportListener.java \
 source/javax/mail/internet/AddressException.java \
 source/javax/mail/internet/ContentDisposition.java \
 source/javax/mail/internet/ContentType.java \
@@ -93,7 +94,8 @@ source/javax/mail/search/StringTerm.java \
 source/javax/mail/search/SubjectTerm.java
 
 # Utility and helper classes for the provders.
-GNU_SRC = source/gnu/mail/treeutil/StatusEvent.java \
+GNU_SRC = \
+source/gnu/mail/treeutil/StatusEvent.java \
 source/gnu/mail/treeutil/StatusListener.java \
 source/gnu/mail/treeutil/StatusSource.java \
 source/gnu/mail/handler/Application.java \
@@ -127,8 +129,17 @@ source/gnu/mail/util/UUDecoderStream.java \
 source/gnu/mail/util/UUEncoderStream.java \
 source/gnu/mail/providers/ReadOnlyMessage.java
 
+# The SMTP provider
+SMTP_JAVASRC = \
+source/gnu/mail/providers/smtp/Parameter.java \
+source/gnu/mail/providers/smtp/ParameterList.java \
+source/gnu/mail/providers/smtp/SMTPConnection.java \
+source/gnu/mail/providers/smtp/SMTPOutputStream.java \
+source/gnu/mail/providers/smtp/SMTPTransport.java
+
 # The IMAP provider
-IMAP_JAVASRC = source/gnu/mail/providers/imap/IMAPBodyPart.java \
+IMAP_JAVASRC = \
+source/gnu/mail/providers/imap/IMAPBodyPart.java \
 source/gnu/mail/providers/imap/IMAPCommand.java \
 source/gnu/mail/providers/imap/IMAPConnection.java \
 source/gnu/mail/providers/imap/IMAPConstants.java \
@@ -147,38 +158,33 @@ source/gnu/mail/providers/imap/MessageStatus.java \
 source/gnu/mail/providers/imap/Pair.java \
 source/gnu/mail/providers/imap/UTF7imap.java
 
-# The SMTP provider
-SMTP_JAVASRC = source/gnu/mail/providers/smtp/SMTPOutputStream.java \
-source/gnu/mail/providers/smtp/SMTPTransport.java \
-source/gnu/mail/providers/smtp/SMTPConnection.java \
-source/gnu/mail/providers/smtp/Parameter.java \
-source/gnu/mail/providers/smtp/ParameterList.java
-
 # POP3 protocol
-POP3_JAVASRC = source/gnu/mail/providers/pop3/POP3Folder.java \
+POP3_JAVASRC = \
+source/gnu/mail/providers/pop3/POP3Connection.java \
+source/gnu/mail/providers/pop3/POP3Folder.java \
 source/gnu/mail/providers/pop3/POP3Message.java \
-source/gnu/mail/providers/pop3/POP3Store.java \
-source/gnu/mail/providers/pop3/POP3Connection.java
+source/gnu/mail/providers/pop3/POP3Store.java
 
 # News protocol
-NNTP_JAVASRC = source/gnu/mail/providers/nntp/NNTPFolder.java \
+NNTP_JAVASRC = \
+source/gnu/mail/providers/nntp/NNTPFolder.java \
 source/gnu/mail/providers/nntp/NNTPMessage.java \
 source/gnu/mail/providers/nntp/NNTPRootFolder.java \
 source/gnu/mail/providers/nntp/NNTPStore.java \
 source/gnu/mail/providers/nntp/NNTPTransport.java
 
-# Maildir message store provider.
-MAILDIR_JAVASRC = source/gnu/mail/providers/maildir/MaildirFolder.java \
-source/gnu/mail/providers/maildir/MaildirMessage.java \
-source/gnu/mail/providers/maildir/MaildirStore.java
-
 # Mbox provider.
-MBOX_JAVASRC = source/gnu/mail/providers/mbox/MboxFolder.java \
+MBOX_JAVASRC = \
+source/gnu/mail/providers/mbox/MboxFolder.java \
 source/gnu/mail/providers/mbox/MboxMessage.java \
 source/gnu/mail/providers/mbox/MboxOutputStream.java \
 source/gnu/mail/providers/mbox/MboxStore.java
 
-
+# Maildir message store provider.
+MAILDIR_JAVASRC = \
+source/gnu/mail/providers/maildir/MaildirFolder.java \
+source/gnu/mail/providers/maildir/MaildirMessage.java \
+source/gnu/mail/providers/maildir/MaildirStore.java
 
 # The main jar file.
 GNUMAILJAR = gnumail.jar
@@ -187,15 +193,35 @@ GNUMAILJAR = gnumail.jar
 NNTPLIBJAR = lib/nntplib.jar
 
 # The META stuff
-MAIL_META = META-INF/COPYING \
-	META-INF/mime.types \
-	META-INF/mailcap \
-  META-INF/javamail.default.providers \
-  META-INF/javamail.default.address.map
+MAIL_META = \
+META-INF/COPYING \
+META-INF/mime.types \
+META-INF/mailcap \
+META-INF/javamail.default.providers \
+META-INF/javamail.default.address.map
 
-# Tell automake that we're specifying rules for these ourselves.
-BUILT_SOURCES = $(GNUMAILJAR) imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
+# Targets
+BUILT_SOURCES = $(GNUMAILJAR) smtp.jar imap.jar pop3.jar nntp.jar mbox.jar maildir.jar
 
+#if ENABLE_SMTP
+#smtp.jar \
+#endif
+#if ENABLE_IMAP
+#imap.jar \
+#endif
+#if ENABLE_POP3
+#pop3.jar \
+#endif
+#if ENABLE_NNTP
+#nntp.jar \
+#endif
+#if ENABLE_MBOX
+#mbox.jar \
+#endif
+#if ENABLE_MAILDIR
+#maildir.jar \
+#endif
+#$(GNUMAILJAR)
 
 META-INF/COPYING: COPYING
 	mkdir -p META-INF
@@ -262,14 +288,10 @@ mbox.jar: $(GNUMAILJAR) $(MBOX_JAVASRC) $(MAIL_META)
 		   JARCOMPILER_CLASSPATH=$(MAIL_CLASSPATH):$(GNUMAILJAR) \
                          ./jarcompiler mbox.jar
 
-
 # Remove jar file
 clean-local:
 	rm -f $(GNUMAILJAR) 
 	rm -f imap.jar smtp.jar pop3.jar nntp.jar maildir.jar mbox.jar
-	rm -f META-INF/COPYING META-INF/mime.types META-INF/mailcap
-	rm -f META-INF/javamail.default.providers
-	rm -f META-INF/javamail.default.address.map
-	rmdir META-INF
+	rm -f $(MAIL_META)
 
 # End of Makefile.am
