@@ -76,7 +76,7 @@ implements Serializable
    * @exception IOException if an IOException occurs
    */
   protected void doDelete(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		       "Method \"DELETE\" is not supported by this servlet");
@@ -96,7 +96,7 @@ implements Serializable
    * @exception IOException if an IOException occurs
    */
   protected void doGet(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		       "Method \"GET\" is not supported by this servlet");
@@ -118,7 +118,7 @@ implements Serializable
    * @exception IOException if an IOException occurs
    */
   protected void doHead(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     doGet(request, new DoHeadHttpServletResponse(response));
   }
@@ -144,43 +144,43 @@ implements Serializable
    * @throws IOException if an IOException occurs
    */
   protected void doOptions(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     if(optionString == null) 
-    {
-      try 
       {
-	Method[] methodList = this.getClass().getMethods();
-	String basisClassName = "javax.servlet.http.HttpServlet";
-	StringBuffer result = new StringBuffer("");
-	for(int i = 0; i < methodList.length; i++) 
-	{
-	  Method servletMethod=methodList[i];
-	  //first check which class declared the method we're looking at
-	  if(!basisClassName.equals(servletMethod.getDeclaringClass().getName()))
+	try 
 	  {
-	    //if this class did not declare the method that means
-	    //the servlet is supporting is directly
-	    if("doGet".equals(methodList[i].getName()))
-	    result.append("GET, ");
-	    else if("doDelete".equals(methodList[i].getName()))
-	    result.append("DELETE, ");
-	    else if("doPut".equals(methodList[i].getName()))
-	    result.append("PUT, ");
-	    else if("doPost".equals(methodList[i].getName()))
-	    result.append("POST, ");
+	    Method[] methodList = this.getClass().getMethods();
+	    String basisClassName = "javax.servlet.http.HttpServlet";
+	    StringBuffer result = new StringBuffer("");
+	    for(int i = 0; i < methodList.length; i++) 
+	      {
+		Method servletMethod=methodList[i];
+		//first check which class declared the method we're looking at
+		if(!basisClassName.equals(servletMethod.getDeclaringClass().getName()))
+		  {
+		    //if this class did not declare the method that means
+		    //the servlet is supporting is directly
+		    if("doGet".equals(methodList[i].getName()))
+		      result.append("GET, ");
+		    else if("doDelete".equals(methodList[i].getName()))
+		      result.append("DELETE, ");
+		    else if("doPut".equals(methodList[i].getName()))
+		      result.append("PUT, ");
+		    else if("doPost".equals(methodList[i].getName()))
+		      result.append("POST, ");
+		  }
+	      }
+	    //this class provides usefull implementations of these methods
+	    result.append("HEAD, TRACE, OPTIONS");
+	    optionString = result.toString();
 	  }
-	}
-	//this class provides usefull implementations of these methods
-	result.append("HEAD, TRACE, OPTIONS");
-	optionString = result.toString();
+	catch (SecurityException e) 
+	  {
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+			       "Method \"OPTIONS\" is not supported by this servlet");
+	  }
       }
-      catch (SecurityException e) 
-      {
-	response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-			   "Method \"OPTIONS\" is not supported by this servlet");
-      }
-    }
     response.setHeader("Allow",optionString);
   }
 
@@ -198,7 +198,7 @@ implements Serializable
    * @throws IOException if an IOException occurs
    */
   protected void doPost(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		       "Method \"POST\" is not supported by this servlet");
@@ -218,7 +218,7 @@ implements Serializable
    * @exception IOException if an IOException occurs
    */
   protected void doPut(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		       "Method \"PUT\" is not supported by this servlet");
@@ -241,16 +241,16 @@ implements Serializable
    * @exception IOException if an IOException occurs
    */
   protected void doTrace(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     StringBuffer result = new StringBuffer("\r\n");
     result.append("TRACE " + request.getRequestURI() + " " + request.getProtocol() + "\r\n");
     String headerName;
     for(Enumeration e = request.getHeaderNames(); e.hasMoreElements();) 
-    {
-      headerName = (String)e.nextElement();
-      result.append(headerName + ": " + request.getHeader(headerName) + "\r\n");
-    }
+      {
+	headerName = (String)e.nextElement();
+	result.append(headerName + ": " + request.getHeader(headerName) + "\r\n");
+      }
     response.setContentType("message/http");
     response.setContentLength(result.length());
     PrintWriter out = response.getWriter();
@@ -283,43 +283,43 @@ implements Serializable
    * @exception IOException an error has occured
    */
   protected void service(HttpServletRequest request,HttpServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     if(request.getMethod().equals("GET") ) 
-    {
-      if(testConditional(request,response)) 
-      doGet(request,response);
-    }
+      {
+	if(testConditional(request,response)) 
+	  doGet(request,response);
+      }
     else if (request.getMethod().equals("HEAD") ) 
-    {
-      if(testConditional(request,response)) 
-      doHead(request,response);
-    }
+      {
+	if(testConditional(request,response)) 
+	  doHead(request,response);
+      }
     else if (request.getMethod().equals("POST") ) 
-    {
-      doPost(request,response);
-    }
+      {
+	doPost(request,response);
+      }
     else if (request.getMethod().equals("DELETE") ) 
-    {
-      doDelete(request,response);
-    }
+      {
+	doDelete(request,response);
+      }
     else if (request.getMethod().equals("OPTIONS") ) 
-    {
-      doOptions(request,response);
-    }
+      {
+	doOptions(request,response);
+      }
     else if (request.getMethod().equals("PUT") ) 
-    {
-      doPut(request,response);
-    }
+      {
+	doPut(request,response);
+      }
     else if (request.getMethod().equals("TRACE") ) 
-    {
-      doTrace(request,response);
-    }
+      {
+	doTrace(request,response);
+      }
     else 
-    {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Method \""
-			 +request.getMethod()+"\" is not supported by this servlet");
-    }
+      {
+	response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Method \""
+			   +request.getMethod()+"\" is not supported by this servlet");
+      }
   }
 
 
@@ -338,13 +338,13 @@ implements Serializable
    * @exception IOException an error has occured
    */
   public void service(ServletRequest request,ServletResponse response)
-  throws ServletException, IOException 
+    throws ServletException, IOException 
   {
     if ((request instanceof HttpServletRequest) &&
 	(response instanceof HttpServletResponse)) 
-    service((HttpServletRequest)request, (HttpServletResponse)response);
+      service((HttpServletRequest)request, (HttpServletResponse)response);
     else 
-    throw new ServletException("This servlet only expects http requests");
+      throw new ServletException("This servlet only expects http requests");
   }
 
 
@@ -360,22 +360,22 @@ implements Serializable
    * false: don't get it.
    */
   private boolean testConditional(HttpServletRequest request,HttpServletResponse response)
-  throws IOException 
+    throws IOException 
   {
     response.setDateHeader("Date",System.currentTimeMillis());
     response.setHeader("Server",getServletConfig().getServletContext().getServerInfo());
     long lastModifiedTime = getLastModified(request);
     if(lastModifiedTime >= 0) 
-    {
-      response.setDateHeader("Last-Modified",lastModifiedTime);
-      long requestModifiedTime = request.getDateHeader("If-Modified-Since");
-      if((requestModifiedTime >= 0)
-	 &&(requestModifiedTime <= lastModifiedTime )) 
       {
-	response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-	return false;
+	response.setDateHeader("Last-Modified",lastModifiedTime);
+	long requestModifiedTime = request.getDateHeader("If-Modified-Since");
+	if((requestModifiedTime >= 0)
+	   &&(requestModifiedTime <= lastModifiedTime )) 
+	  {
+	    response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+	    return false;
+	  }
       }
-    }
     return true;
   }
 
@@ -402,7 +402,7 @@ implements Serializable
    * </PRE>
    */
   private class DoHeadHttpServletResponse
-  implements HttpServletResponse 
+    implements HttpServletResponse 
   {
 
     HttpServletResponse response;
@@ -440,21 +440,21 @@ implements Serializable
 
 
     public void sendError(int errorCode, String errorMessage)
-    throws IOException 
+      throws IOException 
     {
       response.sendError(errorCode,errorMessage);
     }
 
 
     public void sendError(int errorCode)
-    throws IOException 
+      throws IOException 
     {
       response.sendError(errorCode);
     }
 
 
     public void sendRedirect(String location)
-    throws IOException 
+      throws IOException 
     {
       response.sendRedirect(location);
     }
@@ -519,7 +519,7 @@ implements Serializable
     }
 
     public void flushBuffer()
-    throws IOException 
+      throws IOException 
     {
       response.flushBuffer();
     }
@@ -595,19 +595,19 @@ implements Serializable
      * and an empty write(byte[],int,int) implementation.
      */
     public ServletOutputStream getOutputStream()
-    throws IOException 
+      throws IOException 
     {
       return new ServletOutputStream() 
 	{
 	  public void write(int aByte)
-	  throws IOException 
+	    throws IOException 
 	  {
 	  }
 
 	  public void write(byte[] buffer,
 			    int offset,
 			    int length)
-	  throws IOException 
+	    throws IOException 
 	  {
 	  }
 	};
@@ -615,7 +615,7 @@ implements Serializable
 
 
     public PrintWriter getWriter()
-    throws IOException 
+      throws IOException 
     {
       return response.getWriter();
     }
