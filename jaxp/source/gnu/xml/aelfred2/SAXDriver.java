@@ -745,7 +745,7 @@ final public class SAXDriver
 	    int	index;
 
 	    // default NS declaration?
-	    if ("xmlns" == qname) {
+	    if ("xmlns".equals (qname)) {
 		declarePrefix ("", value);
 		if (!xmlNames)
 		    return;
@@ -815,7 +815,7 @@ final public class SAXDriver
 		int	index;
 
 		// default NS declaration?
-		if ("xmlns" == qname)
+		if ("xmlns".equals (qname))
 		    continue;
 
 		index = qname.indexOf (':');
@@ -1001,7 +1001,7 @@ final public class SAXDriver
 	if (type == null)
 	    return "CDATA";
 	// ... use DeclHandler.attributeDecl to see enumerations
-	if (type == "ENUMERATION")
+	if ("ENUMERATION".equals (type))
 	    return "NMTOKEN";
 	return type;
     }
