@@ -1,4 +1,5 @@
-/* xmlj_sax.c
+/*
+ * xmlj_sax.c
  * Copyright (C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JAXP, a library.
@@ -29,53 +30,29 @@
 #include "xmlj_util.h"
 #include <unistd.h>
 
-static xmlSAXHandler handler = {
-  (internalSubsetSAXFunc)xmljSAXInternalSubset,
-  (isStandaloneSAXFunc)xmljSAXIsStandalone,
-  (hasInternalSubsetSAXFunc)xmljSAXHasInternalSubset,
-  (hasExternalSubsetSAXFunc)xmljSAXHasExternalSubset,
-  (resolveEntitySAXFunc)xmljSAXResolveEntity,
-  (getEntitySAXFunc)xmljSAXGetEntity,
-  (entityDeclSAXFunc)xmljSAXEntityDecl,
-  (notationDeclSAXFunc)xmljSAXNotationDecl,
-  (attributeDeclSAXFunc)xmljSAXAttributeDecl,
-  (elementDeclSAXFunc)xmljSAXElementDecl,
-  (unparsedEntityDeclSAXFunc)xmljSAXUnparsedEntityDecl,
-  (setDocumentLocatorSAXFunc)xmljSAXSetDocumentLocator,
-  (startDocumentSAXFunc)xmljSAXStartDocument,
-  (endDocumentSAXFunc)xmljSAXEndDocument,
-  (startElementSAXFunc)xmljSAXStartElement,
-  (endElementSAXFunc)xmljSAXEndElement,
-  (referenceSAXFunc)xmljSAXReference,
-  (charactersSAXFunc)xmljSAXCharacters,
-  (ignorableWhitespaceSAXFunc)xmljSAXIgnorableWhitespace,
-  (processingInstructionSAXFunc)xmljSAXProcessingInstruction,
-  (commentSAXFunc)xmljSAXComment,
-  (warningSAXFunc)xmljSAXWarning,
-  (errorSAXFunc)xmljSAXError,
-  (fatalErrorSAXFunc)xmljSAXFatalError,
-};
-
 typedef struct _SAXParseContext
 {
-  
-  JNIEnv *env; /* Current JNI environment */
-  jobject obj; /* The gnu.xml.libxmlj.sax.GnomeXmlReader instance */
-  xmlParserCtxtPtr ctx; /* libxml2 parser context */
-  
+
+  JNIEnv *env;			/* Current JNI environment */
+  jobject obj;			/* The gnu.xml.libxmlj.sax.GnomeXmlReader instance */
+  xmlParserCtxtPtr ctx;		/* libxml2 parser context */
+
 }
 SAXParseContext;
 
-void xmljInitSAXHandler(xmlSAXHandler *sax);
+xmlSAXHandler *xmljNewSAXHandler (jboolean contentHandler,
+                                  jboolean dtdHandler,
+                                  jboolean entityResolver,
+                                  jboolean errorHandler,
+                                  jboolean declarationHandler,
+                                  jboolean lexicalHandler);
 
 SAXParseContext *
-xmljNewSAXParseContext(JNIEnv *env,
-    jobject obj,
-    xmlParserCtxtPtr ctx)
+xmljNewSAXParseContext (JNIEnv * env, jobject obj, xmlParserCtxtPtr ctx)
 {
   SAXParseContext *ret;
 
-  ret = (SAXParseContext *)malloc(sizeof(SAXParseContext));
+  ret = (SAXParseContext *) malloc (sizeof (SAXParseContext));
   ret->env = env;
   ret->obj = obj;
   ret->ctx = ctx;
@@ -83,266 +60,373 @@ xmljNewSAXParseContext(JNIEnv *env,
 }
 
 void
-xmljFreeSAXParseContext(SAXParseContext *saxCtx)
+xmljFreeSAXParseContext (SAXParseContext * saxCtx)
 {
-  free(saxCtx);
+  free (saxCtx);
 }
 
 /* -- GnomeLocator -- */
 
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getPublicId (JNIEnv * env,
-	jobject self,
-    jint j_ctx,
-    jint j_loc)
+                                                   jobject self,
+                                                   jint j_ctx, jint j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
   const xmlChar *ret;
   jstring j_ret;
 
-  ctx = (xmlParserCtxtPtr)j_ctx;
-  loc = (xmlSAXLocatorPtr)j_loc;
+  ctx = (xmlParserCtxtPtr) j_ctx;
+  loc = (xmlSAXLocatorPtr) j_loc;
 
-  ret = loc->getPublicId(ctx);
-  j_ret = xmljNewString(env, ret);
+  ret = loc->getPublicId (ctx);
+  j_ret = xmljNewString (env, ret);
   return j_ret;
 }
 
 JNIEXPORT jstring JNICALL
 Java_gnu_xml_libxmlj_sax_GnomeLocator_getSystemId (JNIEnv * env,
-    jobject self,
-    jint j_ctx,
-    jint j_loc)
+                                                   jobject self,
+                                                   jint j_ctx, jint j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
   const xmlChar *ret;
   jstring j_ret;
 
-  ctx = (xmlParserCtxtPtr)j_ctx;
-  loc = (xmlSAXLocatorPtr)j_loc;
+  ctx = (xmlParserCtxtPtr) j_ctx;
+  loc = (xmlSAXLocatorPtr) j_loc;
 
-  ret = loc->getSystemId(ctx);
-  j_ret = xmljNewString(env, ret);
+  ret = loc->getSystemId (ctx);
+  j_ret = xmljNewString (env, ret);
   return j_ret;
 }
 
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv *env,
-	jobject self,
-    jint j_ctx,
-    jint j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_getLineNumber (JNIEnv * env,
+                                                     jobject self,
+                                                     jint j_ctx, jint j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
   jint ret;
 
-  ctx = (xmlParserCtxtPtr)j_ctx;
-  loc = (xmlSAXLocatorPtr)j_loc;
+  ctx = (xmlParserCtxtPtr) j_ctx;
+  loc = (xmlSAXLocatorPtr) j_loc;
 
-  ret = loc->getLineNumber(ctx);
+  ret = loc->getLineNumber (ctx);
   return ret;
 }
 
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv *env,
-	jobject self,
-    jint j_ctx,
-    jint j_loc)
+Java_gnu_xml_libxmlj_sax_GnomeLocator_getColumnNumber (JNIEnv * env,
+                                                       jobject self,
+                                                       jint j_ctx, jint j_loc)
 {
   xmlParserCtxtPtr ctx;
   xmlSAXLocatorPtr loc;
   jint ret;
 
-  ctx = (xmlParserCtxtPtr)j_ctx;
-  loc = (xmlSAXLocatorPtr)j_loc;
-	
-  ret = loc->getColumnNumber(ctx);
+  ctx = (xmlParserCtxtPtr) j_ctx;
+  loc = (xmlSAXLocatorPtr) j_loc;
+
+  ret = loc->getColumnNumber (ctx);
   return ret;
 }
 
 /* -- GnomeXMLReader -- */
 
+/* Not currently used */
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_getFeature (JNIEnv *env,
-		jobject self,
-		jint context,
-		jstring name)
+Java_gnu_xml_libxmlj_sax_GnomeXMLReader_getFeature (JNIEnv * env,
+                                                    jobject self,
+                                                    jint context,
+                                                    jstring name)
 {
-	jint ret;
-	const char *s_name;
-	void *result;
+  jint ret;
+  const char *s_name;
+  void *result;
 
-	s_name = (*env)->GetStringUTFChars(env, name, 0);
-    result = NULL; /* TODO */
-	ret = xmlGetFeature((xmlParserCtxtPtr)context, s_name, result);
-	(*env)->ReleaseStringUTFChars(env, name, s_name);
-	if (ret == -1)
-		return ret;
-	else
-		return 0; /* TODO */
+  s_name = (*env)->GetStringUTFChars (env, name, 0);
+  result = NULL;		/* TODO */
+  ret = xmlGetFeature ((xmlParserCtxtPtr) context, s_name, result);
+  (*env)->ReleaseStringUTFChars (env, name, s_name);
+  if (ret == -1)
+    return ret;
+  else
+    return 0;			/* TODO */
 }
 
+/* Not currently used */
 JNIEXPORT jint JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_setFeature (JNIEnv *env,
-		jobject self,
-		jint context,
-		jstring name,
-		jint value)
+Java_gnu_xml_libxmlj_sax_GnomeXMLReader_setFeature (JNIEnv * env,
+                                                    jobject self,
+                                                    jint context,
+                                                    jstring name, jint value)
 {
-	jint ret;
-	const char *s_name;
-	void *p_value;
+  jint ret;
+  const char *s_name;
+  void *p_value;
 
-	s_name = (*env)->GetStringUTFChars(env, name, 0);
-	p_value = &value;
-	ret = xmlSetFeature((xmlParserCtxtPtr)context, s_name, p_value);
-	(*env)->ReleaseStringUTFChars(env, name, s_name);
-	return ret;
+  s_name = (*env)->GetStringUTFChars (env, name, 0);
+  p_value = &value;
+  ret = xmlSetFeature ((xmlParserCtxtPtr) context, s_name, p_value);
+  (*env)->ReleaseStringUTFChars (env, name, s_name);
+  return ret;
 }
 
+/*
+ * Entry point for SAX parsing.
+ */
 JNIEXPORT void JNICALL
-Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv *env,
-    jobject self,
-    jobject in,
-    jstring publicId,
-    jstring systemId,
-    jboolean validate)
+Java_gnu_xml_libxmlj_sax_GnomeXMLReader_parseStream (JNIEnv * env,
+                                                     jobject self,
+                                                     jobject in,
+                                                     jstring publicId,
+                                                     jstring systemId,
+                                                     jboolean validate,
+                                                     jboolean contentHandler,
+                                                     jboolean dtdHandler,
+                                                     jboolean entityResolver,
+                                                     jboolean errorHandler,
+                                                     jboolean
+                                                     declarationHandler,
+                                                     jboolean lexicalHandler)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *saxCtx;
-  
-  ctx = xmljEstablishParserContext(env, in, systemId, publicId,
-     validate, 0, 0, NULL, NULL, 0);
+  xmlSAXHandler *sax;
+  xmlSAXHandler *orig;
+
+  ctx = xmljEstablishParserContext (env, in, systemId, publicId,
+                                    validate, 0, 0, NULL, NULL, 0);
   if (ctx != NULL)
-  {
-    saxCtx = xmljNewSAXParseContext(env, self, ctx);
-    if (saxCtx != NULL)
     {
-      ctx->_private = saxCtx;
-      ctx->userData = ctx;
-      /*xmljInitSAXHandler(ctx->sax);*/
-      ctx->sax = &handler;
-      xmlParseDocument(ctx);
-      xmljFreeSAXParseContext(saxCtx);
-      return;
+      saxCtx = xmljNewSAXParseContext (env, self, ctx);
+      if (saxCtx != NULL)
+        {
+          ctx->_private = saxCtx;
+          ctx->userData = ctx;
+          sax = xmljNewSAXHandler (contentHandler,
+                                   dtdHandler,
+                                   entityResolver,
+                                   errorHandler,
+                                   declarationHandler, lexicalHandler);
+          if (sax != NULL)
+            {
+              orig = ctx->sax;
+              ctx->sax = sax;
+              xmlParseDocument (ctx);
+              ctx->sax = orig;
+              free (sax);
+              xmljFreeSAXParseContext (saxCtx);
+              xmljSAXFreeParserContext (ctx);
+              return;
+            }
+          xmljFreeSAXParseContext (saxCtx);
+        }
+      xmljReleaseParserContext (ctx);
     }
-    else
-      xmljReleaseParserContext(ctx);
-  }
-  if (!(*env)->ExceptionOccurred(env))
-  {
-    xmljThrowException(env, "java/io/IOException",
-        "Unable to create parser context");
-  }
+  if (!(*env)->ExceptionOccurred (env))
+    {
+      xmljThrowException (env, "java/io/IOException",
+                          "Unable to create parser context");
+    }
 }
 
-/* Causes NullPointerException. Why? */
-void
-xmljInitSAXHandler (xmlSAXHandler *sax)
+/*
+ * Allocates and configures a SAX handler that can report the various
+ * classes of callback.
+ */
+xmlSAXHandler *
+xmljNewSAXHandler (jboolean contentHandler,
+                   jboolean dtdHandler,
+                   jboolean entityResolver,
+                   jboolean errorHandler,
+                   jboolean declarationHandler, jboolean lexicalHandler)
 {
-  sax->internalSubset = &xmljSAXInternalSubset;
+  xmlSAXHandler *sax;
+
+  sax = (xmlSAXHandler *) malloc (sizeof (xmlSAXHandler));
+  if (sax == NULL)
+    return NULL;
+
+  if (dtdHandler)
+    {
+      sax->internalSubset = &xmljSAXInternalSubset;
+    }
+  else
+    {
+      sax->internalSubset = NULL;
+    }
   sax->isStandalone = &xmljSAXIsStandalone;
   sax->hasInternalSubset = &xmljSAXHasInternalSubset;
   sax->hasExternalSubset = &xmljSAXHasExternalSubset;
-  sax->resolveEntity = &xmljSAXResolveEntity;
-  sax->getEntity = &xmljSAXGetEntity;
-  sax->entityDecl = &xmljSAXEntityDecl;
-  sax->notationDecl = &xmljSAXNotationDecl;
-  sax->attributeDecl = &xmljSAXAttributeDecl;
-  sax->elementDecl = &xmljSAXElementDecl;
-  sax->unparsedEntityDecl = &xmljSAXUnparsedEntityDecl;
-  sax->setDocumentLocator = &xmljSAXSetDocumentLocator;
-  sax->startDocument = &xmljSAXStartDocument;
-  sax->endDocument = &xmljSAXEndDocument;
-  sax->startElement = &xmljSAXStartElement;
-  sax->endElement = &xmljSAXEndElement;
-  sax->reference = &xmljSAXReference;
-  sax->characters = &xmljSAXCharacters;
-  sax->ignorableWhitespace = &xmljSAXIgnorableWhitespace;
-  sax->processingInstruction = &xmljSAXProcessingInstruction;
-  sax->comment = &xmljSAXComment;
-  sax->warning = &xmljSAXWarning;
-  sax->error = &xmljSAXError;
-  sax->fatalError = &xmljSAXFatalError;
+  if (entityResolver)
+    {
+      sax->resolveEntity = &xmljSAXResolveEntity;
+    }
+  else
+    {
+      sax->resolveEntity = NULL;
+      sax->getEntity = NULL;
+    }
+
+  if (declarationHandler)
+    {
+      sax->entityDecl = &xmljSAXEntityDecl;
+      sax->notationDecl = &xmljSAXNotationDecl;
+      sax->attributeDecl = &xmljSAXAttributeDecl;
+      sax->elementDecl = &xmljSAXElementDecl;
+      sax->unparsedEntityDecl = &xmljSAXUnparsedEntityDecl;
+    }
+  else
+    {
+      sax->entityDecl = NULL;
+      sax->notationDecl = NULL;
+      sax->attributeDecl = NULL;
+      sax->elementDecl = NULL;
+      sax->unparsedEntityDecl = NULL;
+    }
+
+  if (contentHandler)
+    {
+      sax->setDocumentLocator = &xmljSAXSetDocumentLocator;
+      sax->startDocument = &xmljSAXStartDocument;
+      sax->endDocument = &xmljSAXEndDocument;
+      sax->startElement = &xmljSAXStartElement;
+      sax->endElement = &xmljSAXEndElement;
+      sax->characters = &xmljSAXCharacters;
+      sax->ignorableWhitespace = &xmljSAXIgnorableWhitespace;
+      sax->processingInstruction = &xmljSAXProcessingInstruction;
+    }
+  else
+    {
+      sax->setDocumentLocator = NULL;
+      sax->startDocument = NULL;
+      sax->endDocument = NULL;
+      sax->startElement = NULL;
+      sax->endElement = NULL;
+      sax->characters = NULL;
+      sax->ignorableWhitespace = NULL;
+      sax->processingInstruction = NULL;
+    }
+
+  if (lexicalHandler)
+    {
+      /*sax->getEntity = &xmljSAXGetEntity;*/
+      sax->getEntity = NULL;
+      sax->reference = &xmljSAXReference;
+      sax->comment = &xmljSAXComment;
+      sax->cdataBlock = &xmljSAXCdataBlock;
+    }
+  else
+    {
+      sax->getEntity = NULL;
+      sax->reference = NULL;
+      sax->comment = NULL;
+      sax->cdataBlock = NULL;
+    }
+
+  if (errorHandler)
+    {
+      sax->warning = &xmljSAXWarning;
+      sax->error = &xmljSAXError;
+      sax->fatalError = &xmljSAXFatalError;
+    }
+  else
+    {
+      sax->warning = NULL;
+      sax->error = NULL;
+      sax->fatalError = NULL;
+    }
+
+  /* Remaining fields */
+  sax->getParameterEntity = NULL;
+  sax->externalSubset = NULL;
+  sax->initialized = 0;
+  sax->_private = NULL;
+  sax->startElementNs = NULL;
+  sax->endElementNs = NULL;
+  sax->serror = NULL;
+
+  return sax;
 }
 
 /* -- Callback functions -- */
 
 void
-xmljSAXInternalSubset(void *vctx,
-    const xmlChar *name,
-    const xmlChar *publicId,
-    const xmlChar *systemId)
+xmljSAXInternalSubset (void *vctx,
+                       const xmlChar * name,
+                       const xmlChar * publicId, const xmlChar * systemId)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
+
   JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jstring j_publicId;
   jstring j_systemId;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the startDTD method */
-  method = (*env)->GetMethodID(env, cls, "startDTD",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
-  j_publicId = xmljNewString(env, publicId);
-  j_systemId = xmljNewString(env, systemId);
-  
+  method = (*env)->GetMethodID (env, cls, "startDTD",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
+  j_publicId = xmljNewString (env, publicId);
+  j_systemId = xmljNewString (env, systemId);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name,
-                         j_publicId, j_systemId);
+  (*env)->CallVoidMethod (env, target, method, j_name,
+                          j_publicId, j_systemId);
 }
 
 int
-xmljSAXIsStandalone(void *vctx)
+xmljSAXIsStandalone (void *vctx)
 {
   xmlParserCtxtPtr ctx;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
+
+  ctx = (xmlParserCtxtPtr) vctx;
   return ctx->standalone;
 }
 
 int
-xmljSAXHasInternalSubset(void *vctx)
+xmljSAXHasInternalSubset (void *vctx)
 {
   xmlParserCtxtPtr ctx;
   xmlDocPtr doc;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
+
+  ctx = (xmlParserCtxtPtr) vctx;
   doc = ctx->myDoc;
   return (doc->intSubset != NULL);
 }
 
 int
-xmljSAXHasExternalSubset(void *vctx)
+xmljSAXHasExternalSubset (void *vctx)
 {
   xmlParserCtxtPtr ctx;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
+
+  ctx = (xmlParserCtxtPtr) vctx;
   return ctx->hasExternalSubset;
 }
-  
+
 xmlParserInputPtr
 xmljSAXResolveEntity (void *vctx,
-    const xmlChar *publicId,
-    const xmlChar *systemId)
+                      const xmlChar * publicId, const xmlChar * systemId)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
@@ -356,25 +440,25 @@ xmljSAXResolveEntity (void *vctx,
   jstring j_systemId;
   jobject inputStream;
 
-  printf("xmljSAXResolveEntity %s %s\n", publicId, systemId);
+  /* printf ("xmljSAXResolveEntity %s %s\n", publicId, systemId); */
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  cls = (*env)->GetObjectClass(env, target);
+  cls = (*env)->GetObjectClass (env, target);
 
   /* Get the resolveEntity method */
-  method = (*env)->GetMethodID(env, cls, "resolveEntity",
-      "(Ljava/lang/String;Ljava/lang/String;)Ljava/io/InputStream;");
+  method = (*env)->GetMethodID (env, cls, "resolveEntity",
+                                "(Ljava/lang/String;Ljava/lang/String;)Ljava/io/InputStream;");
 
-  j_publicId = xmljNewString(env, publicId);
-  j_systemId = xmljNewString(env, systemId);
+  j_publicId = xmljNewString (env, publicId);
+  j_systemId = xmljNewString (env, systemId);
 
   /* Invoke the method */
-  inputStream = (*env)->CallObjectMethod(env, target, method,
-                         j_publicId, j_systemId);
+  inputStream = (*env)->CallObjectMethod (env, target, method,
+                                          j_publicId, j_systemId);
 
   /* Return an xmlParserInputPtr corresponding to the input stream */
   if (inputStream != NULL)
@@ -384,260 +468,252 @@ xmljSAXResolveEntity (void *vctx,
 }
 
 xmlEntityPtr
-xmljSAXGetEntity(void *vctx,
-    const xmlChar *name)
+xmljSAXGetEntity (void *vctx, const xmlChar * name)
 {
   /* TODO */
-  printf("xmljSAXGetEntity %s\n", name);
+  printf ("xmljSAXGetEntity %s\n", name);
   return NULL;
 }
 
 void
-xmljSAXEntityDecl(void *vctx,
-    const xmlChar *name,
-    int type,
-    const xmlChar *publicId,
-    const xmlChar *systemId,
-    xmlChar *content)
+xmljSAXEntityDecl (void *vctx,
+                   const xmlChar * name,
+                   int type,
+                   const xmlChar * publicId,
+                   const xmlChar * systemId, xmlChar * content)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
+
   JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jstring j_publicId;
   jstring j_systemId;
   jstring j_value;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the method */
-  j_name = xmljNewString(env, name);
+  j_name = xmljNewString (env, name);
   switch (type)
-  {
+    {
     case XML_INTERNAL_GENERAL_ENTITY:
     case XML_INTERNAL_PARAMETER_ENTITY:
     case XML_INTERNAL_PREDEFINED_ENTITY:
-      method = (*env)->GetMethodID(env, cls, "internalEntityDecl",
-          "(Ljava/lang/String;Ljava/lang/String;)V");
-      j_value = xmljNewString(env, content);
-      (*env)->CallVoidMethod(env, target, method, j_name, j_value);
+      method = (*env)->GetMethodID (env, cls, "internalEntityDecl",
+                                    "(Ljava/lang/String;Ljava/lang/String;)V");
+      j_value = xmljNewString (env, content);
+      (*env)->CallVoidMethod (env, target, method, j_name, j_value);
       break;
     default:
-      method = (*env)->GetMethodID(env, cls, "externalEntityDecl",
-          "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-      j_publicId = xmljNewString(env, publicId);
-      j_systemId = xmljNewString(env, systemId);
-      (*env)->CallVoidMethod(env, target, method, j_name,
-                             j_publicId, j_systemId);
-  }
+      method = (*env)->GetMethodID (env, cls, "externalEntityDecl",
+                                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+      j_publicId = xmljNewString (env, publicId);
+      j_systemId = xmljNewString (env, systemId);
+      (*env)->CallVoidMethod (env, target, method, j_name,
+                              j_publicId, j_systemId);
+    }
 }
 
 void
-xmljSAXNotationDecl (void *vctx, 
-    const xmlChar *name, 
-    const xmlChar *publicId, 
-    const xmlChar *systemId)
+xmljSAXNotationDecl (void *vctx,
+                     const xmlChar * name,
+                     const xmlChar * publicId, const xmlChar * systemId)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
+
   JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jstring j_publicId;
   jstring j_systemId;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the notationDecl method */
-  method = (*env)->GetMethodID(env, cls, "notationDecl",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
-  j_publicId = xmljNewString(env, publicId);
-  j_systemId = xmljNewString(env, systemId);
-  
+  method = (*env)->GetMethodID (env, cls, "notationDecl",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
+  j_publicId = xmljNewString (env, publicId);
+  j_systemId = xmljNewString (env, systemId);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name,
-                         j_publicId, j_systemId);
+  (*env)->CallVoidMethod (env, target, method, j_name,
+                          j_publicId, j_systemId);
 }
 
 void
-xmljSAXAttributeDecl(void *vctx,
-    const xmlChar *elem,
-    const xmlChar *fullName,
-    int type,
-    int def,
-    const xmlChar *defaultValue,
-    xmlEnumerationPtr tree)
+xmljSAXAttributeDecl (void *vctx,
+                      const xmlChar * elem,
+                      const xmlChar * fullName,
+                      int type,
+                      int def,
+                      const xmlChar * defaultValue, xmlEnumerationPtr tree)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
+
   JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_eName;
   jstring j_aName;
   jstring j_type;
   jstring j_mode;
   jstring j_value;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the attributeDecl method */
-  method = (*env)->GetMethodID(env, cls, "attributeDecl",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_eName = xmljNewString(env, elem);
-  j_aName = xmljNewString(env, fullName);
-  j_type = xmljAttributeTypeName(env, type);
-  j_mode = xmljAttributeModeName(env, def);
-  j_value = xmljNewString(env, defaultValue);
-  
+  method = (*env)->GetMethodID (env, cls, "attributeDecl",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_eName = xmljNewString (env, elem);
+  j_aName = xmljNewString (env, fullName);
+  j_type = xmljAttributeTypeName (env, type);
+  j_mode = xmljAttributeModeName (env, def);
+  j_value = xmljNewString (env, defaultValue);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_eName, j_aName,
-                         j_type, j_mode, j_value);
+  (*env)->CallVoidMethod (env, target, method, j_eName, j_aName,
+                          j_type, j_mode, j_value);
 }
 
 void
-xmljSAXElementDecl(void *vctx,
-    const xmlChar *name,
-    int type,
-    xmlElementContentPtr content)
+xmljSAXElementDecl (void *vctx,
+                    const xmlChar * name,
+                    int type, xmlElementContentPtr content)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
+
   JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jstring j_model;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the elementDecl method */
-  method = (*env)->GetMethodID(env, cls, "elementDecl",
-      "(Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
-  j_model = NULL; /* TODO */
-  
+  method = (*env)->GetMethodID (env, cls, "elementDecl",
+                                "(Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
+  j_model = NULL;		/* TODO */
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name, j_model);
+  (*env)->CallVoidMethod (env, target, method, j_name, j_model);
 }
 
 void
-xmljSAXUnparsedEntityDecl (void *vctx, 
-    const xmlChar *name, 
-    const xmlChar *publicId, 
-    const xmlChar *systemId, 
-    const xmlChar *notationName)
+xmljSAXUnparsedEntityDecl (void *vctx,
+                           const xmlChar * name,
+                           const xmlChar * publicId,
+                           const xmlChar * systemId,
+                           const xmlChar * notationName)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jstring j_publicId;
   jstring j_systemId;
   jstring j_notationName;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-	
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the unparsedEntityDecl method */
-  method = (*env)->GetMethodID(env, cls,
-      "unparsedEntityDecl",
-      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
-  j_publicId = xmljNewString(env, publicId);
-  j_systemId = xmljNewString(env, systemId);
-  j_notationName = xmljNewString(env, notationName);
-  
+  method = (*env)->GetMethodID (env, cls,
+                                "unparsedEntityDecl",
+                                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
+  j_publicId = xmljNewString (env, publicId);
+  j_systemId = xmljNewString (env, systemId);
+  j_notationName = xmljNewString (env, notationName);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name,
-                         j_publicId, j_systemId, j_notationName);
+  (*env)->CallVoidMethod (env, target, method, j_name,
+                          j_publicId, j_systemId, j_notationName);
 }
 
 void
-xmljSAXSetDocumentLocator (void *vctx, 
-    xmlSAXLocatorPtr loc)
+xmljSAXSetDocumentLocator (void *vctx, xmlSAXLocatorPtr loc)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  cls = (*env)->GetObjectClass(env, target);
-	
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the setDocumentLocator method */
-  method = (*env)->GetMethodID(env, cls,
-      "setDocumentLocator",
-      "(II)V");
-  
+  method = (*env)->GetMethodID (env, cls, "setDocumentLocator", "(II)V");
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, (jint)ctx, (jint)loc);
+  (*env)->CallVoidMethod (env, target, method, (jint) ctx, (jint) loc);
 }
 
 void
@@ -645,27 +721,26 @@ xmljSAXStartDocument (void *vctx)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
+  xmljCheckWellFormed (ctx);
 
-  cls = (*env)->GetObjectClass(env, target);
-  
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the startDocument method */
-  method = (*env)->GetMethodID(env, cls, "startDocument",
-      "(Z)V");
-  
+  method = (*env)->GetMethodID (env, cls, "startDocument", "(Z)V");
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, ctx->standalone);
+  (*env)->CallVoidMethod (env, target, method, ctx->standalone);
 }
 
 void
@@ -673,403 +748,412 @@ xmljSAXEndDocument (void *vctx)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
+  xmljCheckWellFormed (ctx);
 
-  cls = (*env)->GetObjectClass(env, target);
-  
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the endDocument method */
-  method = (*env)->GetMethodID(env, cls, "endDocument",
-      "()V");
-  
+  method = (*env)->GetMethodID (env, cls, "endDocument", "()V");
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method);
+  (*env)->CallVoidMethod (env, target, method);
 }
 
 void
-xmljSAXStartElement (void *vctx,
-    const xmlChar *name,
-    const xmlChar **attrs)
+xmljSAXStartElement (void *vctx, const xmlChar * name, const xmlChar ** attrs)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
   jobjectArray j_attrs;
   jstring j_attr;
   jsize len;
- 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
+  xmljCheckWellFormed (ctx);
 
-  cls = (*env)->GetObjectClass(env, target);
-  
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the startElement method */
-  method = (*env)->GetMethodID(env, cls, "startElement",
-      "(Ljava/lang/String;[Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
+  method = (*env)->GetMethodID (env, cls, "startElement",
+                                "(Ljava/lang/String;[Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
   /* build attributes array */
   len = 0;
-  for (len = 0; attrs && attrs[len] != NULL; len ++)
-  {
-  }
-  cls = (*env)->FindClass(env, "java/lang/String");
-  j_attrs = (*env)->NewObjectArray(env, len, cls, NULL);
+  for (len = 0; attrs && attrs[len] != NULL; len++)
+    {
+    }
+  cls = (*env)->FindClass (env, "java/lang/String");
+  j_attrs = (*env)->NewObjectArray (env, len, cls, NULL);
   len = 0;
-  for (len = 0; attrs && attrs[len] != NULL; len ++)
-  {
-    j_attr = xmljNewString(env, attrs[len]);
-    (*env)->SetObjectArrayElement(env, j_attrs, len,
-                                  j_attr);
-  }
-  
+  for (len = 0; attrs && attrs[len] != NULL; len++)
+    {
+      j_attr = xmljNewString (env, attrs[len]);
+      (*env)->SetObjectArrayElement (env, j_attrs, len, j_attr);
+    }
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name,
-                         j_attrs);
+  (*env)->CallVoidMethod (env, target, method, j_name, j_attrs);
 }
 
 void
-xmljSAXEndElement (void *vctx,
-    const xmlChar *name)
+xmljSAXEndElement (void *vctx, const xmlChar * name)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_name;
 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
-  
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the endElement method */
-  method = (*env)->GetMethodID(env, cls, "endElement",
-      "(Ljava/lang/String;)V");
-  
-  j_name = xmljNewString(env, name);
-  
+  method = (*env)->GetMethodID (env, cls, "endElement",
+                                "(Ljava/lang/String;)V");
+
+  j_name = xmljNewString (env, name);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_name);
+  (*env)->CallVoidMethod (env, target, method, j_name);
 }
 
 void
-xmljSAXReference(void *vctx,
-    const xmlChar *name)
+xmljSAXReference (void *vctx, const xmlChar * name)
 {
   /* TODO */
 }
 
 void
-xmljSAXCharacters (void *vctx,
-    const xmlChar *ch,
-    int len)
+xmljSAXCharacters (void *vctx, const xmlChar * ch, int len)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_ch;
   xmlChar *dup;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the characters method */
-  method = (*env)->GetMethodID(env, cls, "characters",
-      "(Ljava/lang/String;)V");
-  
-  dup = xmlStrndup(ch, len);
-  j_ch = xmljNewString(env, dup);
-  
+  method = (*env)->GetMethodID (env, cls, "characters",
+                                "(Ljava/lang/String;)V");
+
+  dup = xmlStrndup (ch, len);
+  j_ch = xmljNewString (env, dup);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_ch);
-  xmlFree(dup);
+  (*env)->CallVoidMethod (env, target, method, j_ch);
+  xmlFree (dup);
 }
 
 void
-xmljSAXIgnorableWhitespace (void *vctx,
-    const xmlChar *ch,
-    int len)
+xmljSAXIgnorableWhitespace (void *vctx, const xmlChar * ch, int len)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_ch;
   xmlChar *dup;
-    
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the ignorableWhitespace method */
-  method = (*env)->GetMethodID(env, cls,
-      "ignorableWhitespace",
-      "(Ljava/lang/String;)V");
-  
-  dup = xmlStrndup(ch, len);
-  j_ch = xmljNewString(env, dup);
-  
+  method = (*env)->GetMethodID (env, cls,
+                                "ignorableWhitespace",
+                                "(Ljava/lang/String;)V");
+
+  dup = xmlStrndup (ch, len);
+  j_ch = xmljNewString (env, dup);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_ch);
-  xmlFree(dup);
+  (*env)->CallVoidMethod (env, target, method, j_ch);
+  xmlFree (dup);
 }
 
 void
 xmljSAXProcessingInstruction (void *vctx,
-    const xmlChar *targ,
-    const xmlChar *data)
+                              const xmlChar * targ, const xmlChar * data)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_targ;
   jstring j_data;
- 
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the processingInstruction method */
-  method = (*env)->GetMethodID(env, cls,
-      "processingInstruction",
-      "(Ljava/lang/String;Ljava/lang/String;)V");
-  
-  j_targ = xmljNewString(env, targ);
-  j_data = xmljNewString(env, data);
-  
+  method = (*env)->GetMethodID (env, cls,
+                                "processingInstruction",
+                                "(Ljava/lang/String;Ljava/lang/String;)V");
+
+  j_targ = xmljNewString (env, targ);
+  j_data = xmljNewString (env, data);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method,
-                         j_targ, j_data);
+  (*env)->CallVoidMethod (env, target, method, j_targ, j_data);
 }
 
 void
-xmljSAXComment(void *vctx,
-    const xmlChar *value)
+xmljSAXComment (void *vctx, const xmlChar * value)
 {
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   jstring j_text;
-    
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  xmljCheckWellFormed(ctx);
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the comment method */
-  method = (*env)->GetMethodID(env, cls, "comment",
-      "(Ljava/lang/String;)V");
-  
-  j_text = xmljNewString(env, value);
-  
+  method = (*env)->GetMethodID (env, cls, "comment", "(Ljava/lang/String;)V");
+
+  j_text = xmljNewString (env, value);
+
   /* Invoke the method */
-  (*env)->CallVoidMethod(env, target, method, j_text);
+  (*env)->CallVoidMethod (env, target, method, j_text);
 }
 
 void
-xmljSAXWarning (void *vctx, 
-    const char *msg, 
-    ...)
+xmljSAXCdataBlock (void *vctx, const xmlChar * ch, int len)
 {
-	va_list args;
-
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
-  xmlChar *x_msg;
-  jstring j_msg;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  jstring j_ch;
+  xmlChar *dup;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+
+  xmljCheckWellFormed (ctx);
+
+  cls = (*env)->GetObjectClass (env, target);
+
+  /* Get the cdataBlock method */
+  method = (*env)->GetMethodID (env, cls, "cdataBlock",
+                                "(Ljava/lang/String;)V");
+
+  dup = xmlStrndup (ch, len);
+  j_ch = xmljNewString (env, dup);
+
+  /* Invoke the method */
+  (*env)->CallVoidMethod (env, target, method, j_ch);
+  xmlFree (dup);
+}
+
+void
+xmljSAXWarning (void *vctx, const char *msg, ...)
+{
+  va_list args;
+
+  xmlParserCtxtPtr ctx;
+  SAXParseContext *sax;
+
+  JNIEnv *env;
+  jobject target;
+  jclass cls;
+  jmethodID method;
+
+  xmlChar *x_msg;
+  jstring j_msg;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
+  env = sax->env;
+  target = sax->obj;
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the warning method */
-  method = (*env)->GetMethodID(env, cls,
-      "warning",
-      "(Ljava/lang/String;)V");
-  
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
-  j_msg = xmljNewString(env, x_msg);
-  
+  method = (*env)->GetMethodID (env, cls, "warning", "(Ljava/lang/String;)V");
+
+  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
+  j_msg = xmljNewString (env, x_msg);
+
   /* Invoke the method */
-  va_start(args, msg);
-  (*env)->CallVoidMethod(env, target, method, j_msg);
-  va_end(args);
+  va_start (args, msg);
+  (*env)->CallVoidMethod (env, target, method, j_msg);
+  va_end (args);
 }
 
 void
-xmljSAXError (void *vctx, 
-    const char *msg, 
-    ...)
+xmljSAXError (void *vctx, const char *msg, ...)
 {
   va_list args;
-  
+
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   xmlChar *x_msg;
   jstring j_msg;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
-  
-  cls = (*env)->GetObjectClass(env, target);
-  
+
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the error method */
-  method = (*env)->GetMethodID(env, cls,
-      "error",
-      "(Ljava/lang/String;)V");
-  
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
-  j_msg = xmljNewString(env, x_msg);
-  
+  method = (*env)->GetMethodID (env, cls, "error", "(Ljava/lang/String;)V");
+
+  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
+  j_msg = xmljNewString (env, x_msg);
+
   /* Invoke the method */
-  va_start(args, msg);
-  (*env)->CallVoidMethod(env, target, method, j_msg);
-  va_end(args);
+  va_start (args, msg);
+  (*env)->CallVoidMethod (env, target, method, j_msg);
+  va_end (args);
 }
 
 void
-xmljSAXFatalError (void *vctx, 
-    const char *msg, 
-    ...)
+xmljSAXFatalError (void *vctx, const char *msg, ...)
 {
   va_list args;
 
   xmlParserCtxtPtr ctx;
   SAXParseContext *sax;
-  
-  JNIEnv * env;
+
+  JNIEnv *env;
   jobject target;
   jclass cls;
   jmethodID method;
-  
+
   xmlChar *x_msg;
   jstring j_msg;
-  
-  ctx = (xmlParserCtxtPtr)vctx;
-  sax = (SAXParseContext *)ctx->_private;
+
+  ctx = (xmlParserCtxtPtr) vctx;
+  sax = (SAXParseContext *) ctx->_private;
   env = sax->env;
   target = sax->obj;
 
-  cls = (*env)->GetObjectClass(env, target);
-  
+  cls = (*env)->GetObjectClass (env, target);
+
   /* Get the fatalError method */
-  method = (*env)->GetMethodID(env, cls,
-      "fatalError",
-      "(Ljava/lang/String;)V");
-  
-  x_msg = (msg == NULL) ? NULL : xmlCharStrdup(msg);
-  j_msg = xmljNewString(env, x_msg);
-  
+  method = (*env)->GetMethodID (env, cls,
+                                "fatalError", "(Ljava/lang/String;)V");
+
+  x_msg = (msg == NULL) ? NULL : xmlCharStrdup (msg);
+  j_msg = xmljNewString (env, x_msg);
+
   /* Invoke the method */
-  va_start(args, msg);
-  (*env)->CallVoidMethod(env, target, method, j_msg);
-  va_end(args);
+  va_start (args, msg);
+  (*env)->CallVoidMethod (env, target, method, j_msg);
+  va_end (args);
 }
 
 void
 xmljCheckWellFormed (xmlParserCtxtPtr ctx)
 {
   if (!ctx->wellFormed)
-    xmljSAXFatalError(ctx, "document is not well-formed");
+    xmljSAXFatalError (ctx, "document is not well-formed");
   if (ctx->validate && !ctx->valid)
-    xmljSAXFatalError(ctx, "document is not valid");
+    xmljSAXFatalError (ctx, "document is not valid");
 }
 
 /*
  * Convert a libxml2 attribute type to a string.
  */
-jstring xmljAttributeTypeName (JNIEnv *env,
-    int type)
+jstring
+xmljAttributeTypeName (JNIEnv * env, int type)
 {
   const char *text;
-  
+
   switch (type)
-  {
+    {
     case XML_ATTRIBUTE_CDATA:
       text = "CDATA";
       break;
@@ -1096,21 +1180,21 @@ jstring xmljAttributeTypeName (JNIEnv *env,
       break;
     default:
       return NULL;
-  }
+    }
 
-  return (*env)->NewStringUTF(env, text);
+  return (*env)->NewStringUTF (env, text);
 }
 
 /*
  * Convert a libxml2 attribute default value type to a string.
  */
-jstring xmljAttributeModeName (JNIEnv *env,
-    int type)
+jstring
+xmljAttributeModeName (JNIEnv * env, int type)
 {
   const char *text;
-  
+
   switch (type)
-  {
+    {
     case XML_ATTRIBUTE_IMPLIED:
       text = "#IMPLIED";
       break;
@@ -1122,8 +1206,7 @@ jstring xmljAttributeModeName (JNIEnv *env,
       break;
     default:
       return NULL;
-  }
-  
-  return (*env)->NewStringUTF(env, text);
-}
+    }
 
+  return (*env)->NewStringUTF (env, text);
+}

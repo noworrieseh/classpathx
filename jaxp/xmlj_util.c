@@ -29,39 +29,37 @@
 #include <unistd.h>
 
 jstring
-xmljNewString(JNIEnv *env,
-		const xmlChar *text)
+xmljNewString (JNIEnv * env, const xmlChar * text)
 {
   char *s_text;
   jstring ret;
-  
+
   if (text == NULL)
     return NULL;
   /*s_text = (char *)malloc(sizeof(char *));
-  sprintf(s_text, "%s", text);*/
-  s_text = (char *)text; /* TODO signedness? */
-  ret = (*env)->NewStringUTF(env, s_text);
-  /*free(s_text);*/
+    sprintf(s_text, "%s", text); */
+  s_text = (char *) text;	/* TODO signedness? */
+  ret = (*env)->NewStringUTF (env, s_text);
+  /*free(s_text); */
   return ret;
 }
 
 const xmlChar *
-xmljGetStringChars(JNIEnv *env,
-		jstring text)
+xmljGetStringChars (JNIEnv * env, jstring text)
 {
   const char *s_text;
   xmlChar *x_text;
-  
+
   if (text == NULL)
     return NULL;
-  
-  s_text = (*env)->GetStringUTFChars(env, text, 0);
-  x_text = (s_text == NULL) ? NULL : xmlCharStrdup(s_text);
+
+  s_text = (*env)->GetStringUTFChars (env, text, 0);
+  x_text = (s_text == NULL) ? NULL : xmlCharStrdup (s_text);
   if (s_text != NULL && x_text == NULL)
-  {
-    /* TODO raise exception */
-  }
-  (*env)->ReleaseStringUTFChars(env, text, s_text);
+    {
+      /* TODO raise exception */
+    }
+  (*env)->ReleaseStringUTFChars (env, text, s_text);
   return x_text;
 }
 
@@ -72,16 +70,16 @@ xmljGetPrefix (const xmlChar * qName)
   const xmlChar *ret;
   xmlChar **prefix;
 
-  prefix = (xmlChar **)malloc(sizeof(xmlChar *));
-  localName = xmlSplitQName2(qName, prefix);
+  prefix = (xmlChar **) malloc (sizeof (xmlChar *));
+  localName = xmlSplitQName2 (qName, prefix);
   if (localName == NULL)
     return NULL;
   else
-  {
-    ret = *prefix;
-    free(prefix);
-    return ret;
-  }
+    {
+      ret = *prefix;
+      free (prefix);
+      return ret;
+    }
 }
 
 const xmlChar *
@@ -90,14 +88,13 @@ xmljGetLocalName (const xmlChar * qName)
   const xmlChar *localName;
   xmlChar **prefix;
 
-  prefix = (xmlChar **)malloc(sizeof(xmlChar *));
-  localName = xmlSplitQName2(qName, prefix);
+  prefix = (xmlChar **) malloc (sizeof (xmlChar *));
+  localName = xmlSplitQName2 (qName, prefix);
   if (localName == NULL)
     return qName;
   else
-  {
-    free(prefix);
-    return localName;
-  }
+    {
+      free (prefix);
+      return localName;
+    }
 }
-

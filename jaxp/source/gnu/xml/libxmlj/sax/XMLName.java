@@ -43,7 +43,7 @@ class XMLName
   {
     this.qName = qName;
     int ci = qName.lastIndexOf(':');
-    if (ci == -1)
+    if (ci < 1)
     {
       localName = qName;
       prefix = null;

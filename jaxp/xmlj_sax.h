@@ -37,9 +37,9 @@
 /* -- Function declarations for callback functions -- */
 
 void xmljSAXInternalSubset(void *ctx,
-    const xmlChar *name,
-    const xmlChar *publicId,
-    const xmlChar *systemId);
+                           const xmlChar *name,
+                           const xmlChar *publicId,
+                           const xmlChar *systemId);
 
 int xmljSAXIsStandalone(void *ctx);
 
@@ -48,93 +48,97 @@ int xmljSAXHasInternalSubset(void *ctx);
 int xmljSAXHasExternalSubset(void *ctx);
 
 xmlParserInputPtr xmljSAXResolveEntity(void *ctx,
-    const xmlChar *publicId,
-    const xmlChar *systemId);
+                                       const xmlChar *publicId,
+                                       const xmlChar *systemId);
 
 xmlEntityPtr xmljSAXGetEntity(void *ctx,
-    const xmlChar *name);
+                              const xmlChar *name);
 
 void xmljSAXEntityDecl(void *ctx,
-    const xmlChar *name,
-    int type,
-    const xmlChar *publicId,
-    const xmlChar *systemId,
-    xmlChar *content);
-    
+                       const xmlChar *name,
+                       int type,
+                       const xmlChar *publicId,
+                       const xmlChar *systemId,
+                       xmlChar *content);
+
 void xmljSAXNotationDecl(void *ctx,
-    const xmlChar *name,
-    const xmlChar *publicId,
-    const xmlChar *systemId);
+                         const xmlChar *name,
+                         const xmlChar *publicId,
+                         const xmlChar *systemId);
 
 void xmljSAXAttributeDecl(void *ctx,
-    const xmlChar *elem,
-    const xmlChar *fullName,
-    int type,
-    int def,
-    const xmlChar *defaultValue,
-    xmlEnumerationPtr tree);
+                          const xmlChar *elem,
+                          const xmlChar *fullName,
+                          int type,
+                          int def,
+                          const xmlChar *defaultValue,
+                          xmlEnumerationPtr tree);
 
 void xmljSAXElementDecl(void *ctx,
-    const xmlChar *name,
-    int type,
-    xmlElementContentPtr content);
+                        const xmlChar *name,
+                        int type,
+                        xmlElementContentPtr content);
 
 void xmljSAXUnparsedEntityDecl(void *ctx,
-    const xmlChar *name,
-    const xmlChar *publicId, 
-    const xmlChar *systemId,
-    const xmlChar *notationName);
+                               const xmlChar *name,
+                               const xmlChar *publicId, 
+                               const xmlChar *systemId,
+                               const xmlChar *notationName);
 
 void xmljSAXSetDocumentLocator(void *ctx,
-    xmlSAXLocatorPtr loc);
+                               xmlSAXLocatorPtr loc);
 
 void xmljSAXStartDocument(void *ctx);
 
 void xmljSAXEndDocument(void *ctx);
 
 void xmljSAXStartElement(void *ctx,
-    const xmlChar *name,
-    const xmlChar **atts);
+                         const xmlChar *name,
+                         const xmlChar **atts);
 
 void xmljSAXEndElement(void *ctx,
-    const xmlChar *name);
+                       const xmlChar *name);
 
 void xmljSAXReference(void *ctx,
-    const xmlChar *name);
+                      const xmlChar *name);
 
 void xmljSAXCharacters(void *ctx,
-    const xmlChar *ch,
-    int len);
+                       const xmlChar *ch,
+                       int len);
 
 void xmljSAXIgnorableWhitespace(void *ctx,
-    const xmlChar *ch,
-    int len);
+                                const xmlChar *ch,
+                                int len);
 
 void xmljSAXProcessingInstruction(void *ctx,
-    const xmlChar *target,
-    const xmlChar *data);
+                                  const xmlChar *target,
+                                  const xmlChar *data);
 
 void xmljSAXComment(void *ctx,
-    const xmlChar *value);
+                    const xmlChar *value);
+
+void xmljSAXCdataBlock(void *ctx,
+                       const xmlChar *ch,
+                       int len);
 
 void xmljSAXWarning(void *ctx,
-    const char *msg,
-    ...);
+                    const char *msg,
+                    ...);
 
 void xmljSAXError(void *ctx,
-    const char *msg,
-    ...);
+                  const char *msg,
+                  ...);
 
 void xmljSAXFatalError(void *ctx,
-    const char *msg,
-    ...);
+                       const char *msg,
+                       ...);
 
 void xmljCheckWellFormed(xmlParserCtxtPtr ctx);
 
 jstring xmljAttributeTypeName (JNIEnv *env,
-    int type);
+                               int type);
 
 jstring xmljAttributeModeName (JNIEnv *env,
-    int type);
+                               int type);
 
 #endif /* !defined XMLJ_SAX_H */

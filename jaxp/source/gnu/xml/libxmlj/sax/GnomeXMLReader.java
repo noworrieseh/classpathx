@@ -97,11 +97,11 @@ implements XMLReader
 
   private ErrorHandler errorHandler;
 
-  private GnomeLocator locator;
-
   private DeclHandler declarationHandler;
 
   private LexicalHandler lexicalHandler;
+
+  private GnomeLocator locator;
 
   // Namespace helper for handling callbacks
   private transient Namespaces ns;
@@ -288,7 +288,16 @@ implements XMLReader
     // Parse
     try
     {
-      parseStream(in, publicId, systemId, validation);
+      parseStream(in,
+          publicId,
+          systemId,
+          validation,
+          contentHandler != null,
+          dtdHandler != null,
+          entityResolver != null,
+          errorHandler != null,
+          declarationHandler != null,
+          lexicalHandler != null);
     }
     catch (IOException e)
     {
@@ -320,8 +329,16 @@ implements XMLReader
     return new PushbackInputStream(in, 50);
   }
 
-  native void parseStream(InputStream in, String publicId, String systemId,
-      boolean validate)
+  native void parseStream(InputStream in,
+      String publicId,
+      String systemId,
+      boolean validate,
+      boolean contentHandler,
+      boolean dtdHandler,
+      boolean entityResolver,
+      boolean errorHandler,
+      boolean declarationHandler,
+      boolean lexicalHandler)
     throws IOException, SAXException;
 
   String getURI(String prefix)
@@ -559,6 +576,19 @@ implements XMLReader
       char[] ch = text.toCharArray();
       lexicalHandler.comment(ch, 0, ch.length);
     }
+  }
+
+  private void cdataBlock(String text)
+    throws SAXException
+  {
+    if (!seenFatalError && text != null)
+      {
+        if (lexicalHandler != null)
+          lexicalHandler.startCDATA();
+        characters(text);
+        if (lexicalHandler != null)
+          lexicalHandler.endCDATA();
+      }
   }
 
   private void warning(String message)

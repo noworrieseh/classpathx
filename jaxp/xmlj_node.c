@@ -32,98 +32,91 @@
  * Returns the node ID for the given GnomeNode object.
  */
 xmlNodePtr
-xmljGetNodeID (JNIEnv *env,
-	jobject self)
+xmljGetNodeID (JNIEnv * env, jobject self)
 {
-    jclass cls;
-    jfieldID field;
-    xmlNodePtr node;
+  jclass cls;
+  jfieldID field;
+  xmlNodePtr node;
 
-	cls = (*env)->GetObjectClass(env, self);
-    field = (*env)->GetFieldID(env, cls, "id", "I");
-    node = (xmlNodePtr)(*env)->GetIntField(env, self, field);
-    if (node == NULL)
-      xmljThrowDOMException(env, 8, NULL); /* NOT_FOUND_ERR */
-    return node;
+  cls = (*env)->GetObjectClass (env, self);
+  field = (*env)->GetFieldID (env, cls, "id", "I");
+  node = (xmlNodePtr) (*env)->GetIntField (env, self, field);
+  if (node == NULL)
+    xmljThrowDOMException (env, 8, NULL);	/* NOT_FOUND_ERR */
+  return node;
 }
 
 /*
  * Returns the Java node instanced corresponding to the specified node ID.
  */
 jobject
-xmljGetNodeInstance (JNIEnv *env,
-	xmlNodePtr node)
+xmljGetNodeInstance (JNIEnv * env, xmlNodePtr node)
 {
-	jclass cls;
-	jmethodID method;
+  jclass cls;
+  jmethodID method;
 
-	if (node == NULL)
-		return NULL;
+  if (node == NULL)
+    return NULL;
 
-	/* Invoke the GnomeNode.newInstance class method */
-	cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeNode");
-    method = (*env)->GetStaticMethodID(env, cls, "newInstance",
-        "(III)Lgnu/xml/libxmlj/dom/GnomeNode;");
-    return (*env)->CallStaticObjectMethod(env, cls, method,
-        (jint)node->doc, (jint)node, (jint)node->type);
+  /* Invoke the GnomeNode.newInstance class method */
+  cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeNode");
+  method = (*env)->GetStaticMethodID (env, cls, "newInstance",
+                                      "(III)Lgnu/xml/libxmlj/dom/GnomeNode;");
+  return (*env)->CallStaticObjectMethod (env, cls, method,
+                                         (jint) node->doc, (jint) node,
+                                         (jint) node->type);
 }
 
 void
-xmljFreeDoc (JNIEnv *env,
-    xmlDocPtr doc)
+xmljFreeDoc (JNIEnv * env, xmlDocPtr doc)
 {
-	jclass cls;
-	jmethodID method;
+  jclass cls;
+  jmethodID method;
 
-	/* Invoke the GnomeNode.freeDocument class method */
-	cls = (*env)->FindClass(env, "gnu/xml/libxmlj/dom/GnomeNode");
-    method = (*env)->GetStaticMethodID(env, cls, "freeDocument", "(I)V");
-    (*env)->CallStaticVoidMethod(env, cls, method, (jint)doc);
+  /* Invoke the GnomeNode.freeDocument class method */
+  cls = (*env)->FindClass (env, "gnu/xml/libxmlj/dom/GnomeNode");
+  method = (*env)->GetStaticMethodID (env, cls, "freeDocument", "(I)V");
+  (*env)->CallStaticVoidMethod (env, cls, method, (jint) doc);
 }
 
 int
-xmljMatch (const xmlChar *name,
-    xmlNodePtr node)
+xmljMatch (const xmlChar * name, xmlNodePtr node)
 {
   xmlNsPtr ns;
   xmlChar *qName;
   int ret;
-  
+
   ns = node->ns;
   if (ns == NULL || ns->prefix == NULL)
-    qName = xmlStrdup(node->name);
+    qName = xmlStrdup (node->name);
   else
-  {
-    qName = xmlCharStrdup("");
-    xmlStrcat(qName, ns->prefix);
-    xmlStrcat(qName, xmlCharStrdup(":"));
-    xmlStrcat(qName, node->name);
-  }
-  ret = xmlStrcmp(name, qName);
-  free(qName);
+    {
+      qName = xmlCharStrdup ("");
+      xmlStrcat (qName, ns->prefix);
+      xmlStrcat (qName, xmlCharStrdup (":"));
+      xmlStrcat (qName, node->name);
+    }
+  ret = xmlStrcmp (name, qName);
+  free (qName);
   return ret;
 }
 
 int
-xmljMatchNS (const xmlChar *uri,
-    const xmlChar *localName,
-    xmlNodePtr node)
+xmljMatchNS (const xmlChar * uri, const xmlChar * localName, xmlNodePtr node)
 {
   xmlNsPtr ns;
 
   ns = node->ns;
   if (ns == NULL || ns->href == NULL)
-  {
-    if (uri != NULL)
-      return 0;
-    return xmlStrcmp(localName, node->name);
-  }
+    {
+      if (uri != NULL)
+        return 0;
+      return xmlStrcmp (localName, node->name);
+    }
   else
-  {
-    if (uri == NULL)
-      return 0;
-    return (xmlStrcmp(localName, node->name) &&
-        xmlStrcmp(uri, ns->href));
-  }
+    {
+      if (uri == NULL)
+        return 0;
+      return (xmlStrcmp (localName, node->name) && xmlStrcmp (uri, ns->href));
+    }
 }
-

@@ -33,10 +33,10 @@
 
 jstring xmljNewString (JNIEnv *, const xmlChar *);
 
-const xmlChar * xmljGetStringChars (JNIEnv *, jstring);
+const xmlChar *xmljGetStringChars (JNIEnv *, jstring);
 
-const xmlChar * xmljGetPrefix (const xmlChar * qName);
+const xmlChar *xmljGetPrefix (const xmlChar * qName);
 
-const xmlChar * xmljGetLocalName (const xmlChar * qName);
+const xmlChar *xmljGetLocalName (const xmlChar * qName);
 
 #endif /* !defined XMLJ_UTIL_H */

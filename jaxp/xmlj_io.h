@@ -45,57 +45,63 @@
 
 xmlParserCtxtPtr
 xmljEstablishParserContext (JNIEnv * env,
-    jobject inputStream,
-    jstring inSystemId,
-    jstring inPublicId,
-    jboolean validate,
-    jboolean coalesce,
-    jboolean expandEntities,
-    jobject saxEntityResolver,
-    jobject saxErrorAdapter,
-    int useSaxErrorContext);
+			    jobject inputStream,
+			    jstring inSystemId,
+			    jstring inPublicId,
+			    jboolean validate,
+			    jboolean coalesce,
+			    jboolean expandEntities,
+			    jobject saxEntityResolver,
+			    jobject saxErrorAdapter, int useSaxErrorContext);
 
+/* for DOM and transform */
 void
 xmljReleaseParserContext (xmlParserCtxtPtr inputParserCtx);
 
-xmlDocPtr 
-xmljParseJavaInputStream (JNIEnv * env,
-    jobject inputStream,
-    jstring inSystemId,
-    jstring inPublicId,
-    jboolean validate,
-    jboolean coalesce,
-    jboolean expandEntities,
-    jobject saxEntityResolver,
-    jobject saxErrorAdapter);
+/* for SAX */
+void
+xmljSAXFreeParserContext (xmlParserCtxtPtr parserContext);
 
 xmlDocPtr
-xmljParseDocument (JNIEnv *env,
-    xmlParserCtxtPtr inputParserCtx);
+xmljParseJavaInputStream (JNIEnv * env,
+			  jobject inputStream,
+			  jstring inSystemId,
+			  jstring inPublicId,
+			  jboolean validate,
+			  jboolean coalesce,
+			  jboolean expandEntities,
+			  jobject saxEntityResolver, jobject saxErrorAdapter);
+
+xmlDocPtr
+xmljParseDocument (JNIEnv * env, xmlParserCtxtPtr inputParserCtx);
 
 xmlParserInputPtr
-xmljNewParserInput (JNIEnv *env,
-    jobject inputStream,
-    xmlParserCtxtPtr parserContext);
+xmljNewParserInput (JNIEnv * env,
+		    jobject inputStream, xmlParserCtxtPtr parserContext);
 
 xmlParserInputBufferPtr
-xmljNewParserInputBuffer (JNIEnv *env,
-    jobject inputStream,
-    xmlCharEncoding encoding);
+xmljNewParserInputBuffer (JNIEnv * env,
+			  jobject inputStream, xmlCharEncoding encoding);
 
-void xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
-					xmlDocPtr tree,
-					const char *outputEncoding);
-xmlParserInputPtr  xmljLoadExternalEntity (const char *URL, const char *ID,
-					      xmlParserCtxtPtr ctxt);
-jobject xmljResolveURI (SaxErrorContext * saxErrorContext, const char *URL,
-			  const char *ID);
+void
+xmljSaveFileToJavaOutputStream (JNIEnv * env, jobject outputStream,
+                                xmlDocPtr tree,
+                                const char *outputEncoding);
+
+xmlParserInputPtr
+xmljLoadExternalEntity (const char *URL, const char *ID,
+					  xmlParserCtxtPtr ctxt);
+
+jobject
+xmljResolveURI (SaxErrorContext * saxErrorContext, const char *URL,
+			const char *ID);
+
 xmlDocPtr
 xmljResolveURIAndOpen (SaxErrorContext * saxErrorContext,
 		       const char *URL, const char *ID);
 
 void
-xmljSetThreadContext (SaxErrorContext *ctxt);
+xmljSetThreadContext (SaxErrorContext * ctxt);
 
 SaxErrorContext *
 xmljGetThreadContext (void);
@@ -103,6 +109,4 @@ xmljGetThreadContext (void);
 void
 xmljClearThreadContext ();
 
-
-#endif	/* !defined XMLJ_IO_H */
-
+#endif /* !defined XMLJ_IO_H */
