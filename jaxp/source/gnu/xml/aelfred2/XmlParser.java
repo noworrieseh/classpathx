@@ -1,5 +1,5 @@
 /*
- * $Id: XmlParser.java,v 1.29 2001-12-03 21:35:10 db Exp $
+ * $Id: XmlParser.java,v 1.30 2001-12-05 20:54:38 db Exp $
  * Copyright (C) 1999-2001 David Brownell
  * 
  * This file is part of GNU JAXP, a library.
@@ -28,6 +28,10 @@
 //
 // Copyright (c) 1997, 1998 by Microstar Software Ltd.
 // From Microstar's README (the entire original license):
+//
+//	Separate statements also said it's in the public domain.
+//	All modifications are distributed under the license
+//	above (GPL with library exception).
 //
 // AElfred is free for both commercial and non-commercial use and
 // redistribution, provided that Microstar's copyright and disclaimer are
@@ -65,7 +69,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-// $Id: XmlParser.java,v 1.29 2001-12-03 21:35:10 db Exp $
+// $Id: XmlParser.java,v 1.30 2001-12-05 20:54:38 db Exp $
 
 /**
  * Parse XML documents and return parse events through call-backs.
@@ -75,7 +79,7 @@ import org.xml.sax.SAXException;
  * @author Written by David Megginson &lt;dmeggins@microstar.com&gt;
  *	(version 1.2a with bugfixes)
  * @author Updated by David Brownell &lt;dbrownell@users.sourceforge.net&gt;
- * @version $Date: 2001-12-03 21:35:10 $
+ * @version $Date: 2001-12-05 20:54:38 $
  * @see SAXDriver
  */
 final class XmlParser
@@ -894,26 +898,52 @@ final class XmlParser
     private void parseMarkupdecl ()
     throws Exception
     {
+	char	saved [] = null;
+	boolean	savedPE = expandPE;
+
+	// prevent "<%foo;" and ensures saved entity is right
+	require ('<');
+	unread ('<');
+	expandPE = false;
+
 	if (tryRead ("<!ELEMENT")) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parseElementDecl ();
 	} else if (tryRead ("<!ATTLIST")) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parseAttlistDecl ();
 	} else if (tryRead ("<!ENTITY")) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parseEntityDecl ();
 	} else if (tryRead ("<!NOTATION")) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parseNotationDecl ();
 	} else if (tryRead (startDelimPI)) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parsePI ();
 	} else if (tryRead (startDelimComment)) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    parseComment ();
 	} else if (tryRead ("<![")) {
+	    saved = readBuffer;
+	    expandPE = savedPE;
 	    if (inputStack.size () > 0)
-		parseConditionalSect ();
+		parseConditionalSect (saved);
 	    else
 		error ("conditional sections illegal in internal subset");
 	} else {
 	    error ("expected markup declaration");
 	}
+
+	// VC: Proper Decl/PE Nesting
+	if (readBuffer != saved)
+	    handler.verror ("Illegal Declaration/PE nesting");
     }
 
 
@@ -1258,17 +1288,20 @@ loop:
 		handler.getDeclHandler ().elementDecl (name, "ANY");
 	    return;
 	} else {
-	    String model;
+	    String	model;
+	    char	saved []; 
+
 	    require ('(');
+	    saved = readBuffer;
 	    dataBufferAppend ('(');
 	    skipWhitespace ();
 	    if (tryRead ("#PCDATA")) {
 		dataBufferAppend ("#PCDATA");
-		parseMixed ();
+		parseMixed (saved);
 		model = dataBufferToString ();
 		setElement (name, CONTENT_MIXED, model, null);
 	    } else {
-		parseElements ();
+		parseElements (saved);
 		model = dataBufferToString ();
 		setElement (name, CONTENT_ELEMENTS, model, null);
 	    }
@@ -1286,8 +1319,10 @@ loop:
      * </pre>
      *
      * <p> NOTE: the opening '(' and S have already been read.
+     *
+     * @param saved Buffer for entity that should have the terminal ')'
      */
-    private void parseElements ()
+    private void parseElements (char saved [])
     throws Exception
     {
 	char c;
@@ -1302,6 +1337,10 @@ loop:
 	c = readCh ();
 	switch (c) {
 	case ')':
+	    // VC: Proper Group/PE Nesting
+	    if (readBuffer != saved)
+		handler.verror ("Illegal Group/PE nesting");
+
 	    dataBufferAppend (')');
 	    c = readCh ();
 	    switch (c) {
@@ -1331,6 +1370,10 @@ loop:
 	    skipWhitespace ();
 	    c = readCh ();
 	    if (c == ')') {
+		// VC: Proper Group/PE Nesting
+		if (readBuffer != saved)
+		    handler.verror ("Illegal Group/PE nesting");
+
 		dataBufferAppend (')');
 		break;
 	    } else if (c != sep) {
@@ -1367,7 +1410,7 @@ loop:
     {
 	if (tryRead ('(')) {
 	    dataBufferAppend ('(');
-	    parseElements ();
+	    parseElements (readBuffer);
 	} else {
 	    dataBufferAppend (readNmtoken (true));
 	    char c = readCh ();
@@ -1391,13 +1434,19 @@ loop:
      * [51] Mixed ::= '(' S? ( '#PCDATA' (S? '|' S? Name)*) S? ')*'
      *	      | '(' S? ('#PCDATA') S? ')'
      * </pre>
+     *
+     * @param saved Buffer for entity that should have the terminal ')'
      */
-    private void parseMixed ()
+    private void parseMixed (char saved [])
     throws Exception
     {
 	// Check for PCDATA alone.
 	skipWhitespace ();
 	if (tryRead (')')) {
+	    // VC: Proper Group/PE Nesting
+	    if (readBuffer != saved)
+		handler.verror ("Illegal Group/PE nesting");
+
 	    dataBufferAppend (")*");
 	    tryRead ('*');
 	    return;
@@ -1412,6 +1461,11 @@ loop:
 	    dataBufferAppend (readNmtoken (true));
 	    skipWhitespace ();
 	}
+
+	// VC: Proper Group/PE Nesting
+	if (readBuffer != saved)
+	    handler.verror ("Illegal Group/PE nesting");
+
 	require ('*');
 	dataBufferAppend (")*");
     }
@@ -1626,13 +1680,16 @@ loop:
      * </pre>
      * <p> NOTE: the '&gt;![' has already been read.
      */
-    private void parseConditionalSect ()
+    private void parseConditionalSect (char saved [])
     throws Exception
     {
 	skipWhitespace ();
 	if (tryRead ("INCLUDE")) {
 	    skipWhitespace ();
 	    require ('[');
+	    // VC: Proper Conditional Section/PE Nesting
+	    if (readBuffer != saved)
+		handler.verror ("Illegal Conditional Section/PE nesting");
 	    skipWhitespace ();
 	    while (!tryRead ("]]>")) {
 		parseMarkupdecl ();
@@ -1641,6 +1698,9 @@ loop:
 	} else if (tryRead ("IGNORE")) {
 	    skipWhitespace ();
 	    require ('[');
+	    // VC: Proper Conditional Section/PE Nesting
+	    if (readBuffer != saved)
+		handler.verror ("Illegal Conditional Section/PE nesting");
 	    int nesting = 1;
 	    char c;
 	    expandPE = false;
@@ -1765,10 +1825,20 @@ loop2:
 	require (';');
 	switch (getEntityType (name)) {
 	case ENTITY_UNDECLARED:
-	    if (skippedPE)
-		handler.warn ("reference to undeclared entity " + name);
-	    else
-		error ("reference to undeclared entity", name, null);
+	    // NOTE:  XML REC describes amazingly convoluted handling for
+	    // this case.  Nothing as meaningful as being a WFness error
+	    // unless the processor might _legitimately_ not have seen a
+	    // declaration ... which is what this implements.
+	    String	message;
+	    
+	    message = "reference to undeclared general entity " + name;
+	    if (skippedPE && !docIsStandalone) {
+		handler.verror (message);
+		// we don't know this entity, and it might be external...
+		if (externalAllowed)
+		    handler.skippedEntity (name);
+	    } else
+		error (message);
 	    break;
 	case ENTITY_INTERNAL:
 	    pushString (name, getEntityValue (name));
@@ -1790,6 +1860,8 @@ loop2:
 			name, null);
 	    }
 	    break;
+	default:
+	    throw new RuntimeException ();
 	}
     }
 
