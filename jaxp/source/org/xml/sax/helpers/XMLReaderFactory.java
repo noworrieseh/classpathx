@@ -4,7 +4,7 @@
 // and by David Brownell
 // NO WARRANTY!  This class is in the Public Domain.
 
-// $Id: XMLReaderFactory.java,v 1.4 2001-09-29 05:34:42 db Exp $
+// $Id: XMLReaderFactory.java,v 1.5 2001-10-07 04:09:42 db Exp $
 
 package org.xml.sax.helpers;
 import java.io.BufferedReader;
@@ -107,7 +107,7 @@ final public class XMLReaderFactory
 	ClassLoader	loader = NewInstance.getClassLoader ();
 	
 	// 1. try the JVM-instance-wide system property
-	try { System.getProperty (property); }
+	try { className = System.getProperty (property); }
 	catch (Exception e) { /* normally fails for applets */ }
 
 	// 2. if that fails, try META-INF/services/
@@ -136,9 +136,7 @@ final public class XMLReaderFactory
 	if (className == null) {
 // BEGIN DISTRIBUTION-SPECIFIC
 
-	    // EXAMPLE:
-	    // className = "com.example.sax.XmlReader";
-	    // or a $JAVA_HOME/jre/lib/*properties setting...
+	    className = "gnu.xml.aelfred2.XmlReader";
 
 // END DISTRIBUTION-SPECIFIC
 	}
