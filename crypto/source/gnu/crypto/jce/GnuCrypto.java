@@ -1,9 +1,9 @@
 package gnu.crypto.jce;
 
 // ----------------------------------------------------------------------------
-// $Id: GnuCrypto.java,v 1.2 2002-01-18 02:27:53 raif Exp $
+// $Id: GnuCrypto.java,v 1.3 2002-06-12 10:25:59 raif Exp $
 //
-// Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -37,7 +37,7 @@ import java.util.Set;
  * The GNU Crypto implementation of the Java Cryptographic Extension (JCE)
  * provider.<p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class GnuCrypto extends Provider {
 
@@ -61,6 +61,8 @@ public final class GnuCrypto extends Provider {
       put("MessageDigest.SHA-160 ImplementedIn", "Software");
       put("MessageDigest.MD5", "gnu.crypto.jce.MD5Spi");
       put("MessageDigest.MD5 ImplementedIn", "Software");
+      put("MessageDigest.MD4", "gnu.crypto.jce.MD4Spi");
+      put("MessageDigest.MD4 ImplementedIn", "Software");
 
       // SecureRandom
       put("SecureRandom.SHAPRNG", "gnu.crypto.jce.Sha160RandomSpi");

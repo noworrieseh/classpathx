@@ -1,7 +1,7 @@
 package gnu.crypto;
 
 // ----------------------------------------------------------------------------
-// $Id: Registry.java,v 1.2 2002-06-08 05:30:48 raif Exp $
+// $Id: Registry.java,v 1.3 2002-06-12 10:23:33 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -33,7 +33,7 @@ package gnu.crypto;
 /**
  * <p>A placeholder for <i>names</i> used throughout this library.</p>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface Registry {
 
@@ -62,6 +62,7 @@ public interface Registry {
    String RIPEMD160_HASH = "ripemd160";
    String SHA160_HASH =    "sha-160";
    String MD5_HASH =       "md5";
+   String MD4_HASH =       "md4";
 
    /** RIPEMD-128 is synonymous to RIPEMD128. */
    String RIPEMD_128_HASH = "ripemd-128";

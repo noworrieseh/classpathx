@@ -1,9 +1,9 @@
 package test.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: AllTests.java,v 1.3 2001-12-08 21:32:59 raif Exp $
+// $Id: AllTests.java,v 1.4 2002-06-12 10:28:25 raif Exp $
 //
-// Copyright (C) 2001 Free Software Foundation, Inc.
+// Copyright (C) 2001-2002 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -36,9 +36,9 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 /**
- * TestSuite that runs all tests of the hash package.
+ * <p>TestSuite that runs all tests of the hash package.</p>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AllTests extends TestCase {
 
@@ -69,6 +69,7 @@ public class AllTests extends TestCase {
       result.addTest(TestOfWhirlpool.suite());
       result.addTest(TestOfSha160.suite());
       result.addTest(TestOfMD5.suite());
+      result.addTest(TestOfMD4.suite());
 
       return result;
    }

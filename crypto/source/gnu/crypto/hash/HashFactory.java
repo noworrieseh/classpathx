@@ -1,7 +1,7 @@
 package gnu.crypto.hash;
 
 // ----------------------------------------------------------------------------
-// $Id: HashFactory.java,v 1.6 2002-05-14 08:50:38 raif Exp $
+// $Id: HashFactory.java,v 1.7 2002-06-12 10:24:14 raif Exp $
 //
 // Copyright (C) 2001-2002, Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@ import java.util.Set;
 /**
  * <p>A <i>Factory</i> to instantiate message digest algorithm instances.</p>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class HashFactory implements Registry {
 
@@ -87,6 +87,8 @@ public class HashFactory implements Registry {
          result = new Sha160();
       } else if (name.equalsIgnoreCase(MD5_HASH)) {
          result = new MD5();
+      } else if (name.equalsIgnoreCase(MD4_HASH)) {
+         result = new MD4();
       }
 
       if (result != null && !result.selfTest()) {
@@ -109,6 +111,7 @@ public class HashFactory implements Registry {
       hs.add(RIPEMD160_HASH);
       hs.add(SHA160_HASH);
       hs.add(MD5_HASH);
+      hs.add(MD4_HASH);
 
       return Collections.unmodifiableSet(hs);
    }
