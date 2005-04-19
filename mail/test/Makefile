@@ -4,10 +4,11 @@ space:=$(empty) $(empty)
 
 # Set by configure.
 PROJECTROOT = .
-JAVA = java
+JAVA = jamvm
 JAVAC = javac
 JAVAC_OPTS = 
 JAR = jar
+CLASSPATH = /usr/local/classpath/share/classpath/glibj.zip
 
 prefix = /usr/local/share/java
 extra = /usr/local/share/java
@@ -31,7 +32,7 @@ test_debugclasses=$(test_sourcefiles:.java=.class)
 test_classfiles=$(test_debugclasses:$(test_sourcedir)%=$(test_classesdest)%)
 
 test: test-init $(test_classfiles) test-compilation $(test_otherfiles) $(test_manifest)
-	$(JAVA) -cp $(call PATHMK,$(test_classesdest) $(call PATHMK,$(test_classpath))) $(OPTIONS) AllTests
+	$(JAVA) -cp $(call PATHMK,$(CLASSPATH) $(call PATHMK,$(test_classesdest) $(call PATHMK,$(test_classpath)))) $(OPTIONS) AllTests
 
 .PHONY: test-init test-compilation
 

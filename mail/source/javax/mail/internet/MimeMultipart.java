@@ -340,7 +340,6 @@ public class MimeMultipart
             String line;
             while ((line = lis.readLine()) != null)
               {
-                System.out.println(line);
                 if (trim(line) .equals(boundary))
                   {
                     break;
