@@ -71,6 +71,9 @@ extends ReadOnlyMessage
   static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
   static final String FETCH_CONTENT = "BODY.PEEK[]";
 
+  static final String PLUS_FLAGS = "+FLAGS";
+  static final String MINUS_FLAGS = "-FLAGS";
+
   // BODYSTRUCTURE response atom indices
   static final int BS_CONTENT_TYPE = 0;
   static final int BS_CONTENT_SUBTYPE = 1;
@@ -309,7 +312,7 @@ extends ReadOnlyMessage
         else if (key == IMAPConstants.FLAGS)
           {
             List fl = (List) code.get(i + 1);
-            flags = new Flags();
+            flags = new IMAPFlags();
             for (Iterator j = fl.iterator(); j.hasNext(); )
               {
                 Object f = j.next();
@@ -342,6 +345,7 @@ extends ReadOnlyMessage
                     flags.add((String) f);
                   }
               }
+            ((IMAPFlags) flags).checkpoint();
           }
         else if (key == IMAPConstants.INTERNALDATE)
           {
@@ -781,52 +785,31 @@ extends ReadOnlyMessage
           {
             flags.remove(flag);
           }
-        // Create a list of flags to send to the server
-        Flags.Flag[] sflags = flags.getSystemFlags();
-        String[] uflags = flags.getUserFlags();
-        List iflags = new ArrayList(sflags.length + uflags.length);
-        for (int i = 0; i < sflags.length; i++)
-          {
-            Flags.Flag f = sflags[i];
-            if (f == Flags.Flag.ANSWERED)
-              {
-                iflags.add(IMAPConstants.FLAG_ANSWERED);
-              }
-            else if (f == Flags.Flag.DELETED)
-              {
-                iflags.add(IMAPConstants.FLAG_DELETED);
-              }
-            else if (f == Flags.Flag.DRAFT)
-              {
-                iflags.add(IMAPConstants.FLAG_DRAFT);
-              }
-            else if (f == Flags.Flag.FLAGGED)
-              {
-                iflags.add(IMAPConstants.FLAG_FLAGGED);
-              }
-            else if (f == Flags.Flag.RECENT)
-              {
-                iflags.add(IMAPConstants.FLAG_RECENT);
-              }
-            else if (f == Flags.Flag.SEEN)
-              {
-                iflags.add(IMAPConstants.FLAG_SEEN);
-              }
-          }
-        iflags.addAll(Arrays.asList(uflags));
-        String[] aflags = new String[iflags.size()];
-        iflags.toArray(aflags);
+        
+        // Create lists of flags to send to the server
+        IMAPFlags iflags = (IMAPFlags) flags;
+        List aflagList = iflags.getAddedFlags();
+        String[] aflags = new String[aflagList.size()];
+        aflagList.toArray(aflags);
+        List rflagList = iflags.getRemovedFlags();
+        String[] rflags = new String[rflagList.size()];
+        rflagList.toArray(rflags);
+        
         // Perform store
-        IMAPStore store = (IMAPStore) folder.getStore();
-        int[] messages = new int[] { msgnum };
-        MessageStatus[] ms =
-          store.getConnection().store(messages, IMAPConstants.FLAGS, aflags);
-        for (int i = 0; i < ms.length; i++)
+        if (aflags.length > 0 || rflags.length > 0)
           {
-            if (ms[i].getMessageNumber() == msgnum)
+            IMAPStore store = (IMAPStore) folder.getStore();
+            IMAPConnection c = store.getConnection();
+            int[] messages = new int[] { msgnum };
+            if (aflags.length > 0)
               {
-                update(ms[i]);
+                c.store(messages, PLUS_FLAGS, aflags);
               }
+            if (rflags.length > 0)
+              {
+                c.store(messages, MINUS_FLAGS, rflags);
+              }
+            flags = null; // Reread from server next time
           }
       }
     catch (IOException e)

@@ -155,6 +155,7 @@ endif
 if ENABLE_IMAP
 imap_sources = \
 $(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
+$(src)/gnu/mail/providers/imap/IMAPFlags.java \
 $(src)/gnu/mail/providers/imap/IMAPFolder.java \
 $(src)/gnu/mail/providers/imap/IMAPMessage.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipart.java \

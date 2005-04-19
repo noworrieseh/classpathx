@@ -1,5 +1,10 @@
 2005-04-19  Chris Burdess  <dog@bluezoo.org>
 
+	* IMAPMessage.java,IMAPFlags.java: Store only flag deltas using
+	+FLAGS and -FLAGS during setFlags.
+
+2005-04-19  Chris Burdess  <dog@bluezoo.org>
+
 	* MimeMultipart.java: Remove debugging code.
 	* mailcap,MultipartReport.java: Mailcap entry for multipart/report.
 

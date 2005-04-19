@@ -41,7 +41,7 @@ import javax.mail.internet.MimeMultipart;
  * subtypes which simply need to override their default constructor to provide
  * the correct MIME content-type and description.
  */
-public abstract class Multipart
+public class Multipart
   implements DataContentHandler
 {
 
@@ -51,11 +51,19 @@ public abstract class Multipart
   protected DataFlavor flavor;
   
   /**
+   * Generic constructor.
+   */
+  public Multipart()
+  {
+    this("multipart/*", "multipart");
+  }
+  
+  /**
    * Constructor specifying the data flavor.
    * @param mimeType the MIME content type
    * @param description the description of the content type
    */
-  protected Multipart(String mimeType, String description)
+  public Multipart(String mimeType, String description)
   {
     flavor = new ActivationDataFlavor(javax.mail.internet.MimeMultipart.class,
         mimeType, description);
