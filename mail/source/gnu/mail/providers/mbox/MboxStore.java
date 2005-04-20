@@ -102,20 +102,21 @@ public final class MboxStore
    */
   public File getMailRootDir()
   {
-    // If the url used to contruct the store references a file directly,
-    // return this file.
+    // If the url used to contruct the store references a directory directly,
+    // return this directory.
     if (url != null) 
       {
         String file = url.getFile();
         if (file != null && file.length() > 0) 
           {
-            File f = new File(file);
-            if (f.exists())
+            File f = new File("/" + file);
+            if (f.exists() && f.isDirectory() && f.canRead())
               {
-                if (!f.isDirectory())
-                  {
-                    f = f.getParentFile();
-                  }
+                return f;
+              }
+            f = new File(file);
+            if (f.exists() && f.isDirectory() && f.canRead())
+              {
                 return f;
               }
           }

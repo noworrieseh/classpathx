@@ -333,10 +333,10 @@ public class MboxFolder
             char c = line.charAt(i);
             if (i > 0 &&
                 (c == 'F' &&
-                 line.charAt(i+1) == 'r' &&
-                 line.charAt(i+2) == 'o' &&
-                 line.charAt(i+3) == 'm' &&
-                 line.charAt(i+4) == ' '))
+                 line.charAt(i + 1) == 'r' &&
+                 line.charAt(i + 2) == 'o' &&
+                 line.charAt(i + 3) == 'm' &&
+                 line.charAt(i + 4) == ' '))
               {
                 return line.substring(1);
               }

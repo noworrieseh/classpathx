@@ -1,3 +1,7 @@
+2005-04-20  Chris Burdess  <dog@bluezoo.org>
+
+	* MboxStore.java: Clarification of default mailbox directory location.
+
 2005-04-19  Chris Burdess  <dog@bluezoo.org>
 
 	* IMAPMessage.java,IMAPFlags.java: Store only flag deltas using
