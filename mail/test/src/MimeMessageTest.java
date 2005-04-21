@@ -43,9 +43,9 @@ public class MimeMessageTest
         {
           store = session.getStore(url);
           assertNotNull(store);
-          folder = store.getFolder(url.getFile());
-          assertNotNull(folder);
           store.connect();
+          getFolder();
+          assertNotNull(folder);
           folder.open(Folder.READ_ONLY);
           message = (MimeMessage)folder.getMessage(msgnum);
         }
@@ -54,6 +54,21 @@ public class MimeMessageTest
           fail(e.getMessage());
         }
     }
+
+  void getFolder()
+    throws MessagingException
+  {
+    String file = url.getFile();
+    if (file != null && file.length() > 0)
+      {
+        folder = store.getFolder(url);
+      }
+    else
+      {
+        folder = store.getDefaultFolder();
+      }
+    assertNotNull(folder);
+  }
 
   protected void tearDown()
     {
@@ -161,6 +176,8 @@ public class MimeMessageTest
           BufferedReader r = new BufferedReader(new FileReader("message-urls"));
           for (String line = r.readLine(); line!=null; line = r.readLine())
             {
+              if (line.startsWith("#"))
+                continue;
               int si = line.indexOf(' ');
               String url = line.substring(0, si);
               int msgnum = Integer.parseInt(line.substring(si+1));

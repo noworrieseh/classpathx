@@ -57,10 +57,14 @@ public final class MboxStore
 {
 
   private static final char separatorChar = '/';
-  private static final String INBOX = "inbox";
   
   static boolean attemptFallback = true;
 
+  /**
+   * File representing the root of this store's hierarchy.
+   */
+  File root;
+  
   private List statusListeners = new ArrayList();
 	
   /**
@@ -75,7 +79,7 @@ public final class MboxStore
         attemptFallback = Boolean.valueOf(af).booleanValue();
       }
   }
-	
+  
   /**
    * There isn't a protocol to implement, so this method just returns.
    */
@@ -85,7 +89,52 @@ public final class MboxStore
                                     String password) 
     throws MessagingException 
   {
-    return true;
+    if (url != null)
+      {
+        String path = url.getFile();
+        if (path != null && !"".equals(path))
+          {
+            // Relative or Windows absolute path
+            root = new File(path);
+            if (!root.exists() && File.separatorChar == '/')
+              {
+                // Absolute path on POSIX platform
+                root = new File("/" + path);
+              }
+          }
+      }
+    if (root == null)
+      {
+        String mailhome = session.getProperty("mail.mbox.mailhome");
+        if (mailhome != null)
+          {
+            root = new File(mailhome);
+          }
+      }
+    if (root == null)
+      {
+        PrivilegedAction a = new GetSystemPropertyAction("user.name");
+        String userhome = (String) AccessController.doPrivileged(a);
+        root = new File(userhome, "Mail"); // elm
+        if (!root.exists())
+          {
+            root = new File(userhome, "mail");
+            if (!root.exists())
+              {
+                root = null;
+              }
+          }
+      }
+    return root == null || root.exists();
+  }
+
+  /**
+   * Sets the correct form of the URLName.
+   */
+  protected void setURLName(URLName url)
+  {
+    url = new URLName(url.getProtocol(), null, -1, url.getFile(), null, null);
+    super.setURLName(url);
   }
   
   /**
@@ -98,131 +147,68 @@ public final class MboxStore
   }
 
   /**
-   * Returns the root directory for mailbox files.
-   */
-  public File getMailRootDir()
-  {
-    // If the url used to contruct the store references a directory directly,
-    // return this directory.
-    if (url != null) 
-      {
-        String file = url.getFile();
-        if (file != null && file.length() > 0) 
-          {
-            File f = new File("/" + file);
-            if (f.exists() && f.isDirectory() && f.canRead())
-              {
-                return f;
-              }
-            f = new File(file);
-            if (f.exists() && f.isDirectory() && f.canRead())
-              {
-                return f;
-              }
-          }
-      }
-    // Otherwise attempt to return a sensible root folder.
-    String mailhome = session.getProperty("mail.mbox.mailhome");
-    if (mailhome == null)
-      {
-        try
-          {
-            String userhome = System.getProperty("user.home");
-            mailhome = userhome + "/Mail"; // elm
-            if (!exists(mailhome))
-              {
-                mailhome = userhome + "/mail";
-              }
-            if (!exists(mailhome))
-              {
-                mailhome = null;
-              }
-          } 
-        catch (SecurityException e) 
-          {
-            log("access denied reading system properties");
-            mailhome = "/";
-          }
-      }
-    return (mailhome == null) ? null : new File(mailhome);
-  }
-
-  /**
    * Returns the folder with the specified filename.
    */
   public Folder getFolder(String name)
     throws MessagingException
   {
-    if (name == null)
+    if (name == null || "".equals(name))
       {
-        name = "";
+        // Default folder
+        return (root != null) ? new MboxFolder(this, root, false) : null;
       }
-    boolean inbox = false;
-    if (INBOX.equalsIgnoreCase(name) &&
-        !new File(getMailRootDir(), name).exists())
+    File file = null;
+    if (root != null && root.isDirectory())
       {
-        // First try the session property mail.mbox.inbox.
-        String inboxname = session.getProperty("mail.mbox.inbox");
-        if (!exists(inboxname))
+        file = new File(root, name);
+      }
+    if (file == null || !file.exists())
+      {
+        // Relative or absolute path
+        file = new File(name);
+      }
+    if ("INBOX".equalsIgnoreCase(name) && !file.exists())
+      {
+        File inbox = file;
+        // If the root is a file try that first.
+        if (root != null && root.isFile())
           {
-            inboxname = null;
+            inbox = root;
           }
-        if (inboxname == null && attemptFallback) 
+        if (!inbox.exists())
           {
-            // Try some common(UNIX) locations.
-            try 
+            // Try the session property mail.mbox.inbox.
+            String inboxname = session.getProperty("mail.mbox.inbox");
+            if (inboxname != null)
               {
-                PrivilegedAction a = new GetSystemPropertyAction("user.name");
-                String username = (String) AccessController.doPrivileged(a);
-                inboxname = "/var/mail/" + username; // GNU
-                if (!exists(inboxname))
-                  {
-                    inboxname = "/var/spool/mail/" + username;
-                    // common alternative
-                  }
-                if (!exists(inboxname))
-                  {
-                    a = new GetSystemPropertyAction("user.home");
-                    String userhome = (String) AccessController.doPrivileged(a);
-                    inboxname = userhome + "/Mailbox"; // qmail etc
-                  }
-                if (!exists(inboxname))
-                  {
-                    inboxname = null;
-                  }
-              } 
-            catch (SecurityException e) 
-              {
-                // not allowed to read system properties
-                log("unable to access system properties");
+                inbox = new File(inboxname);
               }
           }
-        if (inboxname != null)
+        if (!inbox.exists() && attemptFallback && File.separatorChar == '/') 
           {
-            name = inboxname;
-            inbox = true;
+            PrivilegedAction a;
+            if (File.separatorChar == '/')
+              {
+                // Try some common (UNIX) locations.
+                a = new GetSystemPropertyAction("user.name");
+                String username = (String) AccessController.doPrivileged(a);
+                inbox = new File("/var/mail/" + username); // GNU
+                if (!inbox.exists())
+                  {
+                    inbox = new File("/var/spool/mail/" + username);
+                    // common alternative
+                  }
+              }
+            if (!inbox.exists())
+              {
+                a = new GetSystemPropertyAction("user.home");
+                String userhome = (String) AccessController.doPrivileged(a);
+                inbox = new File(userhome, "Mailbox"); // qmail etc
+              }
           }
-        // otherwise we assume it is actually a file called "inbox"
+        return new MboxFolder(this, inbox, true);
       }
-    return new MboxFolder(this, name, inbox);
-  }
-
-  /*
-   * Indicates whether the file referred to by the specified filename exists.
-   */
-  private boolean exists(String filename)
-  {
-    if (filename != null)
-      {
-        File file = new File(filename);
-        if (separatorChar != File.separatorChar)
-          {
-            file = new File(filename.replace(separatorChar,
-                                             File.separatorChar));
-          }
-        return file.exists();
-      }
-    return false;
+    return new MboxFolder(this, file, false);
   }
 
   /**
@@ -231,9 +217,9 @@ public final class MboxStore
   public Folder getFolder(URLName urlname) 
     throws MessagingException 
   {
-    return getFolder("/" + urlname.getFile());
+    return getFolder(urlname.getFile());
   }
-	
+  
   Session getSession() 
   {
     return session;

@@ -37,11 +37,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,39 +81,21 @@ public class MboxFolder
   static final String GNU_MESSAGE_ID = "X-GNU-Message-Id";
   static final String FROM = "From ";
 	
-  File file;
-  String name;
+  final File file;
+  final boolean inbox;
   MboxMessage[] messages;
   boolean open;
   boolean readOnly;
-  int type;
-  boolean inbox;
   
   Flags permanentFlags = null;
 		
   /**
    * Constructor.
    */
-  protected MboxFolder(MboxStore store, String name, boolean inbox)
+  protected MboxFolder(Store store, File file, boolean inbox)
   {
     super(store);
-    this.name = name;
-    if (name.startsWith("/"))
-      {
-        file = new File(canonicalNameToLocal(name));
-      }
-    else
-      {
-        file = new File(store.getMailRootDir(), canonicalNameToLocal(name));
-      }
-    if (file.exists() && file.isDirectory())
-      {
-        type = HOLDS_FOLDERS;
-      }
-    else
-      {
-        type = HOLDS_MESSAGES;
-      }
+    this.file = file;
     this.inbox = inbox;
     open = false;
     readOnly = true;
@@ -119,35 +103,45 @@ public class MboxFolder
   }
 	
   /**
-   * Constructor.
-   */
-  protected MboxFolder(MboxStore store, String name)
-  {
-    this(store, name, false);
-  }
-
-  /**
    * Returns the name of this folder.
    */
   public String getName() 
   {
-    if (inbox)
-      {
-        return "INBOX";
-      }
-    return file.getName();
+    return inbox ? "INBOX" : file.getName();
   }
-	
+  
   /**
    * Returns the full name of this folder.
+   * If the folder resides under the root hierarchy of this Store, the
+   * returned name is relative to the root. Otherwise an absolute name,
+   * starting with the hierarchy delimiter, is returned.
    */
   public String getFullName() 
   {
-    if (inbox)
+    MboxStore s = (MboxStore) store;
+    File f = file;
+    StringBuffer buf = new StringBuffer();
+    while (f != null && !f.equals(s.root))
       {
-        return "INBOX";
+        if (buf.length() > 0)
+          {
+            buf.insert(0, File.separatorChar);
+          }
+        buf.insert(0, f.getName());
+        f = f.getParentFile();
       }
-    return name;
+    if (f == null)
+      {
+        // This file is relative to the root of the store.
+        // Under Windows, we have to return a name starting with the
+        // hierarchy delimiter, so we will return a special sequence of 3
+        // backslashes followed by the full Windows path name.
+        if (File.separatorChar == '\\')
+          {
+            return "\\\\\\" + file.getPath();
+          }
+      }
+    return buf.toString();
   }
 
   /**
@@ -156,10 +150,15 @@ public class MboxFolder
   public URLName getURLName()
     throws MessagingException
   {
-    URLName url = super.getURLName();
-    return new URLName(url.getProtocol(), 
-                       null, -1, url.getFile(),
-                       null, null);
+    try
+      {
+        URL url = file.toURL();
+        return new URLName("mbox", null, -1, url.getPath(), null, null);
+      }
+    catch (MalformedURLException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
 
   /**
@@ -169,7 +168,11 @@ public class MboxFolder
   public int getType() 
     throws MessagingException 
   {
-    return type;
+    if (file.exists())
+      {
+        return file.isDirectory() ? HOLDS_FOLDERS : HOLDS_MESSAGES;
+      }
+    return 0;
   }
 
   /**
@@ -201,7 +204,7 @@ public class MboxFolder
   public void open(int mode) 
     throws MessagingException 
   {
-    String filename = file.getAbsolutePath();
+    String filename = file.getPath();
     if (mode == READ_WRITE) 
       {
         if (!file.canWrite())
@@ -651,58 +654,35 @@ public class MboxFolder
   public Folder getParent() 
     throws MessagingException 
   {
-    int i = name.length() - 1;
-    while (i >= 0 && name.charAt(i) == '/')
-      {
-        i--;
-      }
-    if (i <= 0)
+    if (inbox)
       {
         return store.getDefaultFolder();
       }
-    while (i >= 0 && name.charAt(i) != '/')
+    if (file.equals(((MboxStore) store).root))
       {
-        i--;
+        return null;
       }
-    return store.getFolder(name.substring(0, i + 1));
+    File parent = file.getParentFile();
+    return new MboxFolder(store, parent, false);
   }
 
-  /**
-   * Convert into a valid filename for this platform.
-   * This allows you to use "//c:/foo/bar" as a hack for "c:/foo/bar".
-   * This is because the MboxStore specification specifies that only
-   * names starting with the separator ( / ) are treated as absolute.
-   */
-  static String canonicalNameToLocal(String name)
-  {
-    if ('/' != File.separatorChar)
-      {
-        if (name.startsWith("//"))
-          {
-            name = name.substring(2);
-          }
-        name = name.replace('/', File.separatorChar);
-      }
-    return name;
-  }
-  
   /**
    * Returns the subfolders of this folder.
    */
   public Folder[] list() 
     throws MessagingException 
   {
-    if (type != HOLDS_FOLDERS)
+    if (getType() != HOLDS_FOLDERS)
       {
         throw new MessagingException("This folder can't contain subfolders");
       }
     try 
       {
-        String[] files = file.list();
+        File[] files = file.listFiles();
         Folder[] folders = new Folder[files.length];
         for (int i = 0; i < files.length; i++)
           {
-            folders[i] = store.getFolder(makeName(name, files[i]));
+            folders[i] = new MboxFolder(store, files[i], false);
           }
         return folders;
       }
@@ -718,17 +698,17 @@ public class MboxFolder
   public Folder[] list(String pattern) 
     throws MessagingException 
   {
-    if (type != HOLDS_FOLDERS)
+    if (getType() != HOLDS_FOLDERS)
       {
         throw new MessagingException("This folder can't contain subfolders");
       }
     try 
       {
-        String[] files = file.list(new MboxFilenameFilter(pattern));
+        File[] files = file.listFiles(new MboxFilenameFilter(pattern));
         Folder[] folders = new Folder[files.length];
         for (int i = 0; i < files.length; i++)
           {
-            folders[i] = store.getFolder(makeName(name, files[i]));
+            folders[i] = new MboxFolder(store, files[i], false);
           }
         return folders;
       } 
@@ -762,8 +742,10 @@ public class MboxFolder
       case HOLDS_FOLDERS:
         try 
           {
-            file.mkdirs();
-            this.type = type;
+            if (!file.mkdirs())
+              {
+                return false;
+              }
             notifyFolderListeners(FolderEvent.CREATED);
             return true;
           }
@@ -774,11 +756,18 @@ public class MboxFolder
       case HOLDS_MESSAGES:
         try 
           {
+            File parent = file.getParentFile();
+            if (!parent.exists())
+              {
+                if (!parent.mkdirs())
+                  {
+                    return false;
+                  }
+              }
             synchronized (this) 
               {
                 createNewFile(file);
               }
-            this.type = type;
             notifyFolderListeners(FolderEvent.CREATED);
             return true;
           } 
@@ -804,7 +793,7 @@ public class MboxFolder
       {
         try 
           {
-            if (type == HOLDS_FOLDERS) 
+            if (file.isDirectory()) 
               {
                 Folder[] folders = list();
                 for (int i = 0; i < folders.length; i++)
@@ -835,7 +824,7 @@ public class MboxFolder
       {
         try 
           {
-            if (type == HOLDS_FOLDERS) 
+            if (file.isDirectory())
               {
                 Folder[] folders = list();
                 if (folders.length > 0)
@@ -867,60 +856,36 @@ public class MboxFolder
   public boolean renameTo(Folder folder) 
     throws MessagingException 
   {
-    try 
+    if (folder instanceof MboxFolder)
       {
-        if (folder.getFullName() != null)
+        File newfile = ((MboxFolder) folder).file;
+        if (!file.renameTo(newfile))
           {
-            MboxStore ms = (MboxStore) store;
-            File newfile =
-              new File(ms.getMailRootDir(),
-                       canonicalNameToLocal(folder.getFullName()));
-            if (!file.renameTo(newfile))
-              {
-                return false;
-              }
-            notifyFolderRenamedListeners(folder);
-            return true;
-          } 
-        else
-          {
-            throw new MessagingException("Illegal filename: null");
+            return false;
           }
+        notifyFolderRenamedListeners(folder);
+        return true;
       } 
-    catch (SecurityException e) 
+    else
       {
-        throw new MessagingException("Access denied", e);
+        throw new MessagingException("Target not an MboxFolder");
       }
   }
 
   /**
    * Returns the subfolder of this folder with the specified name.
    */
-  public Folder getFolder(String fname)
+  public Folder getFolder(String name)
     throws MessagingException 
   {
-    if (!fname.startsWith("/"))
+    if (!file.isDirectory())
       {
-        fname = makeName(name, fname);
+        throw new MessagingException("Folder cannot contain folders");
       }
-    return store.getFolder(fname);
+    File f = new File(file, name);
+    return new MboxFolder(store, f, false);
   }
 
-  static String makeName(String parent, String child)
-  {
-    if (parent.length() == 0)
-      {
-        return child;
-      }
-    else if (parent.endsWith("/"))
-      {
-        return parent + child;
-      }
-    else
-      {
-        return parent + '/' + child;
-      }
-  }
   /**
    * Checks if the current file is or is supposed to be
    * compressed. Uses the filename to figure it out.
@@ -969,12 +934,12 @@ public class MboxFolder
    */
   public synchronized boolean acquireLock() 
   {
+    MboxStore mstore = (MboxStore) store;
     try
       {
         String filename = file.getPath();
         String lockFilename = filename + ".lock";
         File lock = new File(lockFilename);
-        MboxStore mstore = (MboxStore) this.store;
         mstore.log("creating " + lock.getPath());
         if (lock.exists())
           {
@@ -987,12 +952,10 @@ public class MboxFolder
       }
     catch (IOException e)
       {
-        MboxStore mstore = (MboxStore)this.store;
         mstore.log("I/O exception acquiring lock on " + file.getPath());
       }
     catch (SecurityException e)
       {
-        MboxStore mstore = (MboxStore)this.store;
         mstore.log("Security exception acquiring lock on " + file.getPath());
       }
     return false;
@@ -1025,12 +988,12 @@ public class MboxFolder
    */
   public synchronized boolean releaseLock() 
   {
+    MboxStore mstore = (MboxStore) store;
     try
       {
         String filename = file.getPath();
         String lockFilename = filename + ".lock";
         File lock = new File(lockFilename);
-        MboxStore mstore = (MboxStore) this.store;
         mstore.log("removing "+lock.getPath());
         if (lock.exists())
           {
@@ -1043,14 +1006,13 @@ public class MboxFolder
       }
     catch (SecurityException e)
       {
-        MboxStore mstore = (MboxStore) this.store;
         mstore.log("Security exception releasing lock on " + file.getPath());
       }
     return false;
   }
 
   class MboxFilenameFilter 
-    implements FilenameFilter 
+    implements FileFilter 
   {
 
     String pattern;
@@ -1063,20 +1025,22 @@ public class MboxFolder
       percentIndex = pattern.indexOf('%');
     }
 	   
-    public boolean accept(File directory, String name) 
+    public boolean accept(File f) 
     {
-      if (asteriskIndex>-1) 
+      String name = f.getName();
+      if (asteriskIndex > -1) 
         {
           String start = pattern.substring(0, asteriskIndex);
-          String end = pattern.substring(asteriskIndex+1, pattern.length());
+          String end = pattern.substring(asteriskIndex + 1, pattern.length());
           return (name.startsWith(start) &&
                   name.endsWith(end));
         } 
-      else if (percentIndex>-1) 
+      else if (percentIndex > -1) 
         {
           String start = pattern.substring(0, percentIndex);
-          String end = pattern.substring(percentIndex+1, pattern.length());
-          return (directory.equals(file) &&
+          String end = pattern.substring(percentIndex + 1, pattern.length());
+          File parent = f.getParentFile();
+          return (parent != null && parent.equals(file) &&
                   name.startsWith(start) &&
                   name.endsWith(end));
         }

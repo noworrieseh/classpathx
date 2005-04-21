@@ -1,3 +1,8 @@
+2005-04-21  Chris Burdess  <dog@bluezoo.org>
+
+	* MboxStore.java,MboxFolder.java: Rework of path framework to better
+	follow JavaMail standard.
+
 2005-04-20  Chris Burdess  <dog@bluezoo.org>
 
 	* MboxStore.java: Clarification of default mailbox directory location.
