@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.12 2004-09-30 07:57:10 dog Exp $
+$Id: build.xml,v 1.13 2005-04-23 15:06:29 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -76,6 +76,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
   </target>
 
   <target name='init' depends='preinit,activation.jar.unavailable,inetlib.jar.unavailable'>
+    <echo>WARNING: compilation using Ant is not supported, see the file INSTALL for details</echo>
     <tstamp/>
     <mkdir dir='${dst}'/>
     <mkdir dir='${META-INF}'/>

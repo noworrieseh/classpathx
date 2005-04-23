@@ -3,10 +3,9 @@
 # Makefile.am for GNU Classpathx JavaMail.
 
 JAVAC = @JAVAC@
-#JAVACFLAGS = @JAVACFLAGS@
-JAVACFLAGS = -g
-JAVADOC = javadoc
-JAVADOCFLAGS =
+JAVACFLAGS = @JAVACFLAGS@
+JAVADOC = @JAVADOC@
+JAVADOCFLAGS = @JAVADOCFLAGS@
 
 src = @srcdir@/source
 dst = classes
@@ -354,14 +353,14 @@ $(dst):
 
 # Jars
 
-$(gnumail_jar): $(gnumail_meta) $(gnumail_classes) $(util_classes)
+$(gnumail_jar): $(dst) $(gnumail_meta) $(gnumail_classes) $(util_classes)
 	$(JAR) cfm $(gnumail_jar) $(manifest_mf) \
 		$(gnumail_meta) \
 		-C $(dst) javax \
 		-C $(dst) gnu/mail/handler \
 		-C $(dst) gnu/mail/util 
 
-$(providers_jar): $(providers_meta) $(provider_classes) $(smtp_classes) \
+$(providers_jar): $(dst) $(providers_meta) $(provider_classes) $(smtp_classes) \
 	$(imap_classes) $(pop3_classes) $(nntp_classes) $(mbox_classes) \
 	$(maildir_classes)
 	$(JAR) cfm $(providers_jar) $(manifest_mf) \
@@ -373,47 +372,47 @@ $(providers_jar): $(providers_meta) $(provider_classes) $(smtp_classes) \
 
 #gnumail: util $(gnumail_classes)
 
-$(gnumail_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(gnumail_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #util: $(util_classes)
 
-$(util_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(util_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #provider_util: $(gnumail_jar) $(provider_classes)
 
-$(provider_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(provider_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #smtp: provider_util $(smtp_classes)
 
-$(smtp_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(smtp_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #imap: provider_util $(imap_classes)
 
-$(imap_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(imap_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #pop3: provider_util $(pop3_classes)
 
-$(pop3_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(pop3_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #nntp: provider_util $(nntp_classes)
 
-$(nntp_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(nntp_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #mbox: provider_util $(mbox_classes)
 
-$(mbox_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(mbox_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 #maildir: provider_util $(maildir_classes)
 
-$(maildir_classes): $(dst)/%.class: $(src)/%.java $(dst)
+$(maildir_classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 # Javadoc

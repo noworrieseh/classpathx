@@ -72,5 +72,12 @@ This installs gnumail.jar and gnumail-providers.jar in $(prefix)/share/java
 (see the configuration options to change the prefix variable).
 
 
+Ant build
+
+A simple Ant buildfile is included for platforms where GNU Make is not
+installed. This buildfile is not officially supported and may not provide
+options available during the standard autotools-based installation.
+
+
 $Author: dog $
-$Date: 2004-09-07 12:58:26 $
+$Date: 2005-04-23 15:06:29 $
