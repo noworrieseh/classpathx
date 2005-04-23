@@ -3,16 +3,15 @@
 # Makefile.am for GNU classpathx activation.
 
 JAVAC = @JAVAC@
-#JAVACFLAGS = @JAVACFLAGS@
-JAVACFLAGS = -g
-JAVADOC = javadoc
-JAVADOCFLAGS =
+JAVACFLAGS = @JAVACFLAGS@
+JAVADOC = @JAVADOC@
+JAVADOCFLAGS = @JAVADOCFLAGS@
 
 src = @srcdir@/source
-dst = @srcdir@/classes
+dst = classes
 doc = @srcdir@/docs
 
-activation_jar = @srcdir@/activation.jar
+activation_jar = activation.jar
 
 # Source files.
 sources = \
@@ -77,7 +76,10 @@ $(META_INF)/mimetypes.default: @srcdir@/mimetypes.default
 
 # Compilation
 
-activation: $(classes)
+activation: $(dst) $(classes)
+
+$(dst):
+	mkdir -p $(dst)
 
 $(classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(ACTIVATION_CLASSPATH) -d $(dst) $<
@@ -90,8 +92,7 @@ javadoc:
           -windowtitle "GNU JAF API documentation" $(package_names)
 
 clean-local:
-	rm -rf $(META_INF_FILES) $(META_INF) $(doc) $(activation_jar)
-	find $(dst) -name '*.class' -exec rm -f '{}' ';'
+	rm -rf $(dst) $(doc) $(activation_jar)
 
 distclean-local: clean-local
 	rm -f config.log config.status

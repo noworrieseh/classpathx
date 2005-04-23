@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.1 2004-01-26 15:59:23 dog Exp $
+$Id: build.xml,v 1.2 2005-04-23 14:29:46 dog Exp $
 (C) Copyright 2004 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -39,6 +39,7 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
     <property name='install-dir' location='/usr/share/java'/>
 
     <target name='init'>
+        <echo>WARNING: compilation using Ant is not supported, see the file INSTALL for details</echo>
         <tstamp/>
         <mkdir dir='${dst}' />
         <mkdir dir='${META-INF}' />
