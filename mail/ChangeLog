@@ -1,3 +1,8 @@
+2005-04-26  Chris Burdess  <dog@bluezoo.org>
+
+	* MboxStore.java,MboxFolder.java: Convert slashes in folder
+	pathnames to platform path separator before interpreting.
+
 2005-04-23  Chris Burdess  <dog@bluezoo.org>
 
 	* Makefile.am,Makefile.in,acinclude.m4,build.xml,configure,

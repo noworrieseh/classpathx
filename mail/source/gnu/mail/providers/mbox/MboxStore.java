@@ -95,6 +95,10 @@ public final class MboxStore
         if (path != null && !"".equals(path))
           {
             // Relative or Windows absolute path
+            if (File.separatorChar != '/')
+              {
+                path = path.replace('/', File.separatorChar);
+              }
             root = new File(path);
             if (!root.exists() && File.separatorChar == '/')
               {
@@ -152,12 +156,39 @@ public final class MboxStore
   public Folder getFolder(String name)
     throws MessagingException
   {
+    return getFolder(name, false);
+  }
+
+  /**
+   * Returns the folder specified by the filename of the URLName.
+   */
+  public Folder getFolder(URLName urlname) 
+    throws MessagingException 
+  {
+    return getFolder(urlname.getFile(), true);
+  }
+  
+  private Folder getFolder(String name, boolean tryPrepend)
+    throws MessagingException
+  {
+    if (File.separatorChar == '\\' && name != null &&
+        name.startsWith("\\\\\\"))
+      {
+        // Remove spurious leading backslashes for Windows absolute
+        // pathnames created by MboxFolder.getFullPath
+        name = name.substring(3);
+      }
     if (name == null || "".equals(name))
       {
         // Default folder
         return (root != null) ? new MboxFolder(this, root, false) : null;
       }
     File file = null;
+    // Convert any slashes to platform path separator
+    if (File.separatorChar != '/')
+      {
+        name = name.replace('/', File.separatorChar);
+      }
     if (root != null && root.isDirectory())
       {
         file = new File(root, name);
@@ -166,6 +197,10 @@ public final class MboxStore
       {
         // Relative or absolute path
         file = new File(name);
+        if (!file.exists() && tryPrepend)
+          {
+            file = new File(File.separator + name);
+          }
       }
     if ("INBOX".equalsIgnoreCase(name) && !file.exists())
       {
@@ -211,15 +246,6 @@ public final class MboxStore
     return new MboxFolder(this, file, false);
   }
 
-  /**
-   * Returns the folder specified by the filename of the URLName.
-   */
-  public Folder getFolder(URLName urlname) 
-    throws MessagingException 
-  {
-    return getFolder(urlname.getFile());
-  }
-  
   Session getSession() 
   {
     return session;

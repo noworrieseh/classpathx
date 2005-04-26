@@ -882,6 +882,11 @@ public class MboxFolder
       {
         throw new MessagingException("Folder cannot contain folders");
       }
+    // Convert any slashes to platform path separator
+    if (File.separatorChar != '/')
+      {
+        name = name.replace('/', File.separatorChar);
+      }
     File f = new File(file, name);
     return new MboxFolder(store, f, false);
   }
