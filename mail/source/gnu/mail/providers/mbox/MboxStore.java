@@ -94,6 +94,9 @@ public final class MboxStore
         String path = url.getFile();
         if (path != null && !"".equals(path))
           {
+            path = decodeUrlPath(path);
+            System.out.println("protocolConnect: "+path);
+            
             // Relative or Windows absolute path
             if (File.separatorChar != '/')
               {
@@ -129,7 +132,7 @@ public final class MboxStore
               }
           }
       }
-    return root == null || root.exists();
+    return true;
   }
 
   /**
@@ -165,12 +168,18 @@ public final class MboxStore
   public Folder getFolder(URLName urlname) 
     throws MessagingException 
   {
-    return getFolder(urlname.getFile(), true);
+    String path = urlname.getFile();
+    if (path != null)
+      {
+        path = decodeUrlPath(path);
+      }
+    return getFolder(path, true);
   }
   
   private Folder getFolder(String name, boolean tryPrepend)
     throws MessagingException
   {
+    System.out.println("getFolder: "+name);
     if (File.separatorChar == '\\' && name != null &&
         name.startsWith("\\\\\\"))
       {
@@ -327,6 +336,31 @@ public final class MboxStore
           }
         break;
     }
+  }
+
+  static String decodeUrlPath(String path)
+  {
+    StringBuffer buf = null;
+    int len = path.length();
+    for (int i = 0; i < len; i++)
+      {
+        char c = path.charAt(i);
+        if (c == '%' && i < (len - 2))
+          {
+            if (buf == null)
+              {
+                buf = new StringBuffer(path.substring(0, i));
+              }
+            int code = Integer.parseInt(path.substring(i + 1, i + 3), 16);
+            buf.append((char) code); // FIXME decode UTF-8 sequence
+            i += 2;
+          }
+        else if (buf != null)
+          {
+            buf.append(c);
+          }
+      }
+    return (buf != null) ? buf.toString() : path;
   }
 
 }
