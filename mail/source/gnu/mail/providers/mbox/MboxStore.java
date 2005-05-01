@@ -28,6 +28,7 @@
 package gnu.mail.providers.mbox;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.security.AccessController;
@@ -95,7 +96,6 @@ public final class MboxStore
         if (path != null && !"".equals(path))
           {
             path = decodeUrlPath(path);
-            System.out.println("protocolConnect: "+path);
             
             // Relative or Windows absolute path
             if (File.separatorChar != '/')
@@ -179,7 +179,6 @@ public final class MboxStore
   private Folder getFolder(String name, boolean tryPrepend)
     throws MessagingException
   {
-    System.out.println("getFolder: "+name);
     if (File.separatorChar == '\\' && name != null &&
         name.startsWith("\\\\\\"))
       {
@@ -340,6 +339,7 @@ public final class MboxStore
 
   static String decodeUrlPath(String path)
   {
+    boolean hi = false;
     StringBuffer buf = null;
     int len = path.length();
     for (int i = 0; i < len; i++)
@@ -352,7 +352,11 @@ public final class MboxStore
                 buf = new StringBuffer(path.substring(0, i));
               }
             int code = Integer.parseInt(path.substring(i + 1, i + 3), 16);
-            buf.append((char) code); // FIXME decode UTF-8 sequence
+            if (code > 127)
+              {
+                hi = true;
+              }
+            buf.append((char) code);
             i += 2;
           }
         else if (buf != null)
@@ -360,7 +364,85 @@ public final class MboxStore
             buf.append(c);
           }
       }
-    return (buf != null) ? buf.toString() : path;
+    if (buf != null)
+      {
+        if (!hi)
+          {
+            // ASCII only
+            return buf.toString();
+          }
+        // decode UTF-8 sequence
+        len = buf.length();
+        byte[] seq = new byte[len];
+        for (int i = 0; i < len; i++)
+          {
+            seq[i] = (byte) buf.charAt(i);
+          }
+        try
+          {
+            return new String(seq, "UTF-8");
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            RuntimeException e2 = new RuntimeException();
+            e2.initCause(e);
+            throw e2;
+          }
+      }
+    // No encoded characters
+    return path;
+  }
+
+  static String encodeUrlPath(String path)
+  {
+    int len = path.length();
+    StringBuffer buf = null;
+    for (int i = 0; i < len; i++)
+      {
+        char c = path.charAt(i);
+        if (!isUnreservedPathChar(c))
+          {
+            if (buf == null)
+              {
+                buf = new StringBuffer(path.substring(0, i));
+              }
+            try
+              {
+                // UTF-8 sequence for character
+                byte[] seq = path.substring(i, i + 1).getBytes("UTF-8");
+                for (int j = 0; j < seq.length; j++)
+                  {
+                    String code = Integer.toHexString(seq[j]).toUpperCase();
+                    buf.append('%');
+                    if (code.length() < 2)
+                      {
+                        buf.append('0');
+                      }
+                    buf.append(code);
+                  }
+                return buf.toString();
+              }
+            catch (UnsupportedEncodingException e)
+              {
+                RuntimeException e2 = new RuntimeException();
+                e2.initCause(e);
+                throw e2;
+              }
+          }
+        else if (buf != null)
+          {
+            buf.append(c);
+          }
+      }
+    // ASCII only
+    return path;
+  }
+
+  static boolean isUnreservedPathChar(char c)
+  {
+    return (c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) ||
+      (c >= 0x30 && c <= 0x39) || c == '-' || c == '.' || c == '_' ||
+      c == '~' || c == '/';
   }
 
 }

@@ -42,8 +42,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -150,15 +148,13 @@ public class MboxFolder
   public URLName getURLName()
     throws MessagingException
   {
-    try
+    String path = getFullName();
+    if (File.separatorChar != '/')
       {
-        URL url = file.toURL();
-        return new URLName("mbox", null, -1, url.getPath(), null, null);
+        path = path.replace(File.separatorChar, '/');
       }
-    catch (MalformedURLException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
+    path = MboxStore.encodeUrlPath(path);
+    return new URLName("mbox", null, -1, path, null, null);
   }
 
   /**

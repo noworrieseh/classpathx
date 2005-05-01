@@ -657,7 +657,6 @@ public class InternetAddress
     for (pos = 0; pos < len; pos++)
       {
         char c = addresslist.charAt(pos);
-        //System.out.println("c="+c);
         switch (c)
           {
           case '\t':
@@ -688,7 +687,6 @@ public class InternetAddress
             while (pos<len && !gotKet)
               {
                 char c2 = addresslist.charAt(pos);
-                //System.out.println("c2="+c2);
                 switch (c2)
                   {
                   case '"':
