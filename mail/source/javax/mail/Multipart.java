@@ -29,8 +29,7 @@ package javax.mail;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 import javax.activation.DataSource;
 
 /**
@@ -55,9 +54,9 @@ public abstract class Multipart
 {
 
   /**
-   * List of BodyPart objects.
+   * Vector of BodyPart objects.
    */
-  protected List parts;
+  protected Vector parts;
 
   /**
    * This field specifies the content-type of this multipart object.
@@ -75,7 +74,6 @@ public abstract class Multipart
    */
   protected Multipart()
   {
-    parts = new ArrayList();
     contentType = "multipart/mixed";
     parent = null;
   }
@@ -203,7 +201,7 @@ public abstract class Multipart
   {
     if (parts == null)
       {
-        parts = new ArrayList();
+        parts = new Vector();
       }
     synchronized (parts)
       {
@@ -227,7 +225,7 @@ public abstract class Multipart
   {
     if (parts == null)
       {
-        parts = new ArrayList();
+        parts = new Vector();
       }
     synchronized (parts)
       {

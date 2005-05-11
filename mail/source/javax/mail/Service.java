@@ -30,6 +30,8 @@ package javax.mail;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.ConnectionListener;
 import javax.mail.event.MailEvent;
@@ -567,6 +569,17 @@ public abstract class Service
   {
     URLName urlName = getURLName();
     return (urlName != null) ? urlName.toString() : super.toString();
+  }
+
+  /**
+   * Add the event and vector of listeners to be notified.
+   */
+  protected void queueEvent(MailEvent event, Vector vector)
+  {
+    for (Iterator i = vector.iterator(); i.hasNext(); )
+      {
+        event.dispatch(i.next());
+      }
   }
 
 }

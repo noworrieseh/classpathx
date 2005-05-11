@@ -122,7 +122,7 @@ public class SMTPTransport
     // Check host
     if (host == null)
       {
-        throw new MessagingException("No SMTP host set(mail.smtp.host)");
+        host = localHostName;
       }
     
     try
