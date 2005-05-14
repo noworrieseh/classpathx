@@ -68,44 +68,50 @@ public class TransformTest
     *  @fixme It would be nice to use 
     */
   public static void main(String[] args)
-    throws Exception
   {
-
-    // Force use of Libxsltj
-    /*System.setProperty ("javax.xml.transform.TransformerFactory",
-			"gnu.xml.libxmlj.transform.GnomeTransformerFactory");*/
-
-    TransformerFactory factory = TransformerFactory.newInstance();
-    Transformer transformer;
-    Source source = new StreamSource(System.in);
-    Result target = new StreamResult(System.out);
-    // Read arguments
-    if (args.length >= 1)
+    try
       {
-        Source xsltSource = new StreamSource(args[0]);
-        if (args.length > 1)
+        // Force use of Libxsltj
+        /*System.setProperty ("javax.xml.transform.TransformerFactory",
+          "gnu.xml.libxmlj.transform.GnomeTransformerFactory");*/
+        
+        TransformerFactory factory = TransformerFactory.newInstance();
+        Transformer transformer;
+        Source source = new StreamSource(System.in);
+        Result target = new StreamResult(System.out);
+        // Read arguments
+        if (args.length >= 1)
           {
-            source = new StreamSource(args[1]);
-            if (args.length > 2)
+            Source xsltSource = new StreamSource(args[0]);
+            if (args.length > 1)
               {
-                target = new StreamResult(args[2]);
+                source = new StreamSource(args[1]);
+                if (args.length > 2)
+                  {
+                    target = new StreamResult(args[2]);
+                  }
               }
+            
+            // Prepare stylesheet
+            transformer = factory.newTransformer(xsltSource);
+          }
+        else
+          {
+            // Identity transform
+            transformer = factory.newTransformer();
           }
         
-        // Prepare stylesheet
-        transformer = factory.newTransformer(xsltSource);
+        // Set test parameters
+        transformer.setParameter("bar", "lala");
+        
+        // Perform transformation
+        transformer.transform(source, target);
       }
-    else
+    catch (Exception e)
       {
-        // Identity transform
-        transformer = factory.newTransformer();
+        e.printStackTrace(System.err);
+        System.err.flush();
       }
-
-    // Set test parameters
-    transformer.setParameter("bar", "lala");
-    
-    // Perform transformation
-    transformer.transform(source, target);
   }
   
 }
