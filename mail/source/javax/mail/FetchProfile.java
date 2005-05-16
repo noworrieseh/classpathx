@@ -114,11 +114,6 @@ public class FetchProfile
       this.name = name;
     }
 
-    public String toString()
-    {
-      return name;
-    }
-    
   }
 
 

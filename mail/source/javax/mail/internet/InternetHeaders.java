@@ -77,6 +77,14 @@ public class InternetHeaders
     extends Header
   {
     
+    /**
+     * The name.
+     */
+    String name;
+
+    /**
+     * The value.
+     */
     String line;
     
     InternetHeader(String line)
@@ -89,7 +97,8 @@ public class InternetHeaders
     
     InternetHeader(String name, String value)
     {
-      super(name, null);
+      super(null, null);
+      this.name = name;
       if (value != null)
         {
           StringBuffer buffer = new StringBuffer();
@@ -99,6 +108,11 @@ public class InternetHeaders
           buffer.append(value);
           line = buffer.toString();
         }
+    }
+
+    public String getName()
+    {
+      return name;
     }
 
     public String getValue()

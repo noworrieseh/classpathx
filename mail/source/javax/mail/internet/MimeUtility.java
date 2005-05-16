@@ -1105,7 +1105,7 @@ public class MimeUtility
   // all-ASCII, majority-ASCII, or minority-ASCII bytes.
   
   // Constants
-  static final int ALL = -1;
+  public static final int ALL = -1;
   static final int ALL_ASCII = 1;
   static final int MAJORITY_ASCII = 2;
   static final int MINORITY_ASCII = 3;

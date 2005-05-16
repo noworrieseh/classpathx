@@ -39,12 +39,12 @@ public class Header
   /**
    * The name.
    */
-  protected String name;
+  String name;
 
   /**
    * The value.
    */
-  protected String value;
+  String value;
 
   /**
    * Construct a Header object.

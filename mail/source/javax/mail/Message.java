@@ -134,6 +134,12 @@ public abstract class Message
       throw new InvalidObjectException("Unknown RecipientType: " + type);
     }
 
+    public String toString()
+    {
+      return type;
+    }
+
+
   }
 
   /**

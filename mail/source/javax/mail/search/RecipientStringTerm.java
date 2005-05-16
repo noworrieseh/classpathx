@@ -47,7 +47,7 @@ public final class RecipientStringTerm
   /**
    * The recipient type.
    */
-  protected Message.RecipientType type;
+  private Message.RecipientType type;
 
   /**
    * Constructor.
