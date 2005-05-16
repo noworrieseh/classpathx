@@ -122,7 +122,7 @@ public class SMTPTransport
     // Check host
     if (host == null)
       {
-        host = localHostName;
+        host = "localhost";
       }
     
     try

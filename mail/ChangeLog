@@ -1,5 +1,10 @@
 2005-05-16  Fernando Nasser  <fnasser@redhat.com>
 
+	* SMTPConnection.java: Make SMTP transport behave the same as the
+	Sun RI when host is not supplied on connect.
+
+2005-05-16  Fernando Nasser  <fnasser@redhat.com>
+
 	* FetchProfile.java,Header.java,Message.java,MimeUtility.java,
 	InternetHeaders.java: Changes to conform to JavaMail 1.3 API.
 
