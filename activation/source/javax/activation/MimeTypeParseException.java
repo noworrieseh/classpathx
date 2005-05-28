@@ -30,40 +30,42 @@ package javax.activation;
  * Exception thrown to indicate a malformed MIME content type.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
-public class MimeTypeParseException extends Exception
+public class MimeTypeParseException
+  extends Exception
 {
 
-    /**
-     * Constructs a MimeTypeParseException with no detail message.
-     */
-    public MimeTypeParseException()
-    {
-    }
+  /**
+   * Constructs a MimeTypeParseException with no detail message.
+   */
+  public MimeTypeParseException()
+  {
+  }
+  
+  /**
+   * MimeTypeParseException with the specified detail message.
+   * @param message the exception message
+   */
+  public MimeTypeParseException(String message)
+  {
+    super(message);
+  }
 
-    /**
-     * MimeTypeParseException with the specified detail message.
-     * @param message the exception message
-     */
-    public MimeTypeParseException(String message)
-    {
-        super(message);
-    }
-
-    /**
-     * Constructs a MimeTypeParseException with the specified detail message
-     * and token in error.
-     * @param message the exception message
-     * @param token the token in error
-     */
-    MimeTypeParseException(String message, String token)
-    {
-        this(new StringBuffer(message)
-                .append(':')
-                .append(' ')
-                .append(token)
-                .toString());
-    }
-    
+  /**
+   * Constructs a MimeTypeParseException with the specified detail message
+   * and token in error.
+   * @param message the exception message
+   * @param token the token in error
+   */
+  MimeTypeParseException(String message, String token)
+  {
+    this(new StringBuffer(message)
+         .append(':')
+         .append(' ')
+         .append(token)
+         .toString());
+  }
+  
 }
+

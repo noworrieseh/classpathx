@@ -35,39 +35,40 @@ import java.io.OutputStream;
  * Provider that can convert streams to objects and vice versa.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public interface DataContentHandler
 {
 
-    /**
-     * Returns a list of the flavors that data can be provided in, ordered
-     * by preference.
-     */
-    DataFlavor[] getTransferDataFlavors();
-
-    /**
-     * Returns an object representing the data to be transferred.
-     * @param df the flavor representing the requested type
-     * @param ds the data source of the data to be converted
-     */
-    Object getTransferData(DataFlavor df, DataSource ds)
-        throws UnsupportedFlavorException, IOException;
-
-    /**
-     * Returns an object representing the data in its most preferred form.
-     * @param ds the data source of the data to be converted
-     */
-    Object getContent(DataSource ds)
-        throws IOException;
-
-    /**
-     * Writes the object as a stream of bytes.
-     * @param obj the object to convert
-     * @param mimeType the MIME type of the stream
-     * @param os the byte stream
-     */
-    void writeTo(Object obj, String mimeType, OutputStream os)
-        throws IOException;
-
+  /**
+   * Returns a list of the flavors that data can be provided in, ordered
+   * by preference.
+   */
+  DataFlavor[] getTransferDataFlavors();
+  
+  /**
+   * Returns an object representing the data to be transferred.
+   * @param df the flavor representing the requested type
+   * @param ds the data source of the data to be converted
+   */
+  Object getTransferData(DataFlavor df, DataSource ds)
+    throws UnsupportedFlavorException, IOException;
+  
+  /**
+   * Returns an object representing the data in its most preferred form.
+   * @param ds the data source of the data to be converted
+   */
+  Object getContent(DataSource ds)
+    throws IOException;
+  
+  /**
+   * Writes the object as a stream of bytes.
+   * @param obj the object to convert
+   * @param mimeType the MIME type of the stream
+   * @param os the byte stream
+   */
+  void writeTo(Object obj, String mimeType, OutputStream os)
+    throws IOException;
+  
 }
+

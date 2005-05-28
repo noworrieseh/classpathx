@@ -35,66 +35,81 @@ import java.io.OutputStream;
  * Data content handler using an existing DCH and a data source.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 class DataSourceDataContentHandler
-    implements DataContentHandler
+  implements DataContentHandler
 {
 
-    private DataSource ds;
-    private DataFlavor[] flavors;
-    private DataContentHandler dch;
-
-    public DataSourceDataContentHandler(DataContentHandler dch, DataSource ds)
-    {
-        this.ds = ds;
-        this.dch = dch;
-    }
-
-    public Object getContent(DataSource ds)
-        throws IOException
-    {
+  private DataSource ds;
+  private DataFlavor[] flavors;
+  private DataContentHandler dch;
+  
+  public DataSourceDataContentHandler(DataContentHandler dch, DataSource ds)
+  {
+    this.ds = ds;
+    this.dch = dch;
+  }
+  
+  public Object getContent(DataSource ds)
+    throws IOException
+  {
+    if (dch != null)
+      {
+        return dch.getContent(ds);
+      }
+    else
+      {
+        return ds.getInputStream();
+      }
+  }
+  
+  public Object getTransferData(DataFlavor flavor, DataSource ds)
+    throws UnsupportedFlavorException, IOException
+  {
+    if (dch != null)
+      {
+        return dch.getTransferData(flavor, ds);
+      }
+    DataFlavor[] flavors = getTransferDataFlavors();
+    if (flavors.length > 0 && flavor.equals(flavors[0]))
+      {
+        return ds.getInputStream();
+      }
+    else
+      {
+        throw new UnsupportedFlavorException(flavor);
+      }
+  }
+  
+  public DataFlavor[] getTransferDataFlavors()
+  {
+    if (flavors == null)
+      {
         if (dch != null)
-            return dch.getContent(ds);
+          {
+            flavors = dch.getTransferDataFlavors();
+          }
         else
-            return ds.getInputStream();
-    }
+          {
+            String mimeType = ds.getContentType();
+            flavors = new DataFlavor[1];
+            flavors[0] = new ActivationDataFlavor(mimeType, mimeType);
+          }
+      }
+    return flavors;
+  }
 
-    public Object getTransferData(DataFlavor flavor, DataSource ds)
-        throws UnsupportedFlavorException, IOException
-    {
-        if (dch != null)
-            return dch.getTransferData(flavor, ds);
-        DataFlavor[] flavors = getTransferDataFlavors();
-        if (flavors.length > 0 && flavor.equals(flavors[0]))
-            return ds.getInputStream();
-        else
-            throw new UnsupportedFlavorException(flavor);
-    }
-
-    public DataFlavor[] getTransferDataFlavors()
-    {
-        if (flavors == null)
-        {
-            if (dch != null)
-                flavors = dch.getTransferDataFlavors();
-            else
-            {
-                String mimeType = ds.getContentType();
-                flavors = new DataFlavor[1];
-                flavors[0] = new ActivationDataFlavor(mimeType, mimeType);
-            }
-        }
-        return flavors;
-    }
-
-    public void writeTo(Object obj, String mimeType, OutputStream out)
-        throws IOException
-    {
-        if (dch == null)
-            throw new UnsupportedDataTypeException(
-                    "no DCH for content type " + ds.getContentType());
-        dch.writeTo(obj, mimeType, out);
-    }
+  public void writeTo(Object obj, String mimeType, OutputStream out)
+    throws IOException
+  {
+    if (dch == null)
+      {
+        throw new UnsupportedDataTypeException("no DCH for content type " +
+                                               ds.getContentType());
+      }
+    dch.writeTo(obj, mimeType, out);
+  }
     
 }
+

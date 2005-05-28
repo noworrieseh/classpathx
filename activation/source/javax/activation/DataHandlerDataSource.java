@@ -34,38 +34,40 @@ import java.io.OutputStream;
  * Data source that is a proxy for a data handler.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 final class DataHandlerDataSource
-    implements DataSource
+  implements DataSource
 {
 
-    final DataHandler dh;
+  final DataHandler dh;
+  
+  DataHandlerDataSource(DataHandler dh)
+  {
+    this.dh = dh;
+  }
+  
+  public String getContentType()
+  {
+    return dh.getContentType();
+  }
+  
+  public InputStream getInputStream()
+    throws IOException
+  {
+    return dh.getInputStream();
+  }
+  
+  public String getName()
+  {
+    return dh.getName();
+  }
+  
+  public OutputStream getOutputStream()
+    throws IOException
+  {
+    return dh.getOutputStream();
+  }
 
-    DataHandlerDataSource(DataHandler dh)
-    {
-        this.dh = dh;
-    }
-
-    public String getContentType()
-    {
-        return dh.getContentType();
-    }
-
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return dh.getInputStream();
-    }
-
-    public String getName()
-    {
-        return dh.getName();
-    }
-
-    public OutputStream getOutputStream()
-        throws IOException
-    {
-        return dh.getOutputStream();
-    }
 }
+

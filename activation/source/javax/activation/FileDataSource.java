@@ -32,75 +32,76 @@ import java.io.*;
  * Data source encapsulating a file.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public class FileDataSource
-    implements DataSource
+  implements DataSource
 {
 
-    private File file;
-    private FileTypeMap typeMap;
+  private File file;
+  private FileTypeMap typeMap;
+  
+  /**
+   * Constructor.
+   * @param file the underlying file to use
+   */
+  public FileDataSource(File file)
+  {
+    this.file = file;
+  }
+  
+  /**
+   * Constructor.
+   * @param name the path to the underlying file to use
+   */
+  public FileDataSource(String name)
+  {
+    this(new File(name));
+  }
+  
+  public InputStream getInputStream()
+    throws IOException
+  {
+    return new FileInputStream(file);
+  }
 
-    /**
-     * Constructor.
-     * @param file the underlying file to use
-     */
-    public FileDataSource(File file)
-    {
-        this.file = file;
-    }
+  public OutputStream getOutputStream()
+    throws IOException
+  {
+    return new FileOutputStream(file);
+  }
+  
+  public String getContentType()
+  {
+    if (typeMap == null)
+      {
+        FileTypeMap dftm = FileTypeMap.getDefaultFileTypeMap();
+        return dftm.getContentType(file);
+      }
+    return typeMap.getContentType(file);
+  }
+  
+  public String getName()
+  {
+    return file.getName();
+  }
+  
+  /**
+   * Returns the underlying file.
+   */
+  public File getFile()
+  {
+    return file;
+  }
 
-    /**
-     * Constructor.
-     * @param name the path to the underlying file to use
-     */
-    public FileDataSource(String name)
-    {
-        this(new File(name));
-    }
-
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return new FileInputStream(file);
-    }
-
-    public OutputStream getOutputStream()
-        throws IOException
-    {
-        return new FileOutputStream(file);
-    }
-
-    public String getContentType()
-    {
-        if (typeMap == null)
-        {
-            FileTypeMap dftm = FileTypeMap.getDefaultFileTypeMap();
-            return dftm.getContentType(file);
-        }
-        return typeMap.getContentType(file);
-    }
-
-    public String getName()
-    {
-        return file.getName();
-    }
-
-    /**
-     * Returns the underlying file.
-     */
-    public File getFile()
-    {
-        return file;
-    }
-
-    /**
-     * Sets the file type map to use to determine the content type of the file.
-     * @param map the file type map
-     */
-    public void setFileTypeMap(FileTypeMap map)
-    {
-        typeMap = map;
-    }
-    
+  /**
+   * Sets the file type map to use to determine the content type of the file.
+   * @param map the file type map
+   */
+  public void setFileTypeMap(FileTypeMap map)
+  {
+    typeMap = map;
+  }
+  
 }
+

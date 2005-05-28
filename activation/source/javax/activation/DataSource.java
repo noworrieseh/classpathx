@@ -34,31 +34,32 @@ import java.io.OutputStream;
  * An interface by which MIME data can be retrieved and stored.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public interface DataSource
 {
-
-    /**
-     * Returns an input stream from which the data can be read.
-     */
-    InputStream getInputStream()
-        throws IOException;
-    
-    /**
-     * Returns an output stream to which the data can be written.
-     */
-    OutputStream getOutputStream()
-        throws IOException;
-
-    /**
-     * Returns the MIME content type of the data.
-     */
-    String getContentType();
-
-    /**
-     * Returns the underlying name of this object.
-     */
-    String getName();
-
+  
+  /**
+   * Returns an input stream from which the data can be read.
+   */
+  InputStream getInputStream()
+    throws IOException;
+  
+  /**
+   * Returns an output stream to which the data can be written.
+   */
+  OutputStream getOutputStream()
+    throws IOException;
+  
+  /**
+   * Returns the MIME content type of the data.
+   */
+  String getContentType();
+  
+  /**
+   * Returns the underlying name of this object.
+   */
+  String getName();
+  
 }
+

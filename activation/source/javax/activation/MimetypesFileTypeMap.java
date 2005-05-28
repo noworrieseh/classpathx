@@ -55,333 +55,371 @@ import java.util.Map;
  * </ol>
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
-public class MimetypesFileTypeMap extends FileTypeMap
+public class MimetypesFileTypeMap
+  extends FileTypeMap
 {
 
-    private static final int PROG = 0;
-    private static final int HOME = 1;
-    private static final int SYS = 2;
-    private static final int JAR = 3;
-    private static final int DEF = 4;
-    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-    private static boolean debug = false;
-    static
-    {
-        try
-        {
-            String d = System.getProperty("javax.activation.debug");
-            debug = Boolean.valueOf(d).booleanValue();
-        }
-        catch (SecurityException e)
-        {
-        }
-    }
-    
-    private Map[] mimetypes;
-
-    /**
-     * Default constructor.
-     */
-    public MimetypesFileTypeMap()
-    {
-        init(null);
-    }
-    
-    /**
-     * Constructor specifying a filename.
-     * @param mimeTypeFileName the name of the file to read mime.types
-     * entries from
-     */
-    public MimetypesFileTypeMap(String mimeTypeFileName)
-        throws IOException
-    {
-        Reader in = null;
-        try
-        {
-            in = new FileReader(mimeTypeFileName);
-            init(in);
-        }
-        finally
-        {
-            if (in != null)
-                in.close();
-        }
-    }
-
-    /**
-     * Constructor specifying an input stream.
-     * @param is the input stream to read mime.types entries from
-     */
-    public MimetypesFileTypeMap(InputStream is)
-    {
-        init(new InputStreamReader(is));
-    }
-
-    private void init(Reader in)
-    {
-        mimetypes = new Map[5];
-        for (int i = 0; i < mimetypes.length; i++)
-            mimetypes[i] = new HashMap();
+  private static final int PROG = 0;
+  private static final int HOME = 1;
+  private static final int SYS = 2;
+  private static final int JAR = 3;
+  private static final int DEF = 4;
+  private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+  private static boolean debug = false;
+  static
+  {
+    try
+      {
+        String d = System.getProperty("javax.activation.debug");
+        debug = Boolean.valueOf(d).booleanValue();
+      }
+    catch (SecurityException e)
+      {
+      }
+  }
+  
+  private Map[] mimetypes;
+  
+  /**
+   * Default constructor.
+   */
+  public MimetypesFileTypeMap()
+  {
+    init(null);
+  }
+  
+  /**
+   * Constructor specifying a filename.
+   * @param mimeTypeFileName the name of the file to read mime.types
+   * entries from
+   */
+  public MimetypesFileTypeMap(String mimeTypeFileName)
+    throws IOException
+  {
+    Reader in = null;
+    try
+      {
+        in = new FileReader(mimeTypeFileName);
+        init(in);
+      }
+    finally
+      {
         if (in != null)
-        {
-            if (debug)
-                System.out.println("MimetypesFileTypeMap: load PROG");
+          {
+            in.close();
+          }
+      }
+  }
+  
+  /**
+   * Constructor specifying an input stream.
+   * @param is the input stream to read mime.types entries from
+   */
+  public MimetypesFileTypeMap(InputStream is)
+  {
+    init(new InputStreamReader(is));
+  }
+
+  private void init(Reader in)
+  {
+    mimetypes = new Map[5];
+    for (int i = 0; i < mimetypes.length; i++)
+      {
+        mimetypes[i] = new HashMap();
+      }
+    if (in != null)
+      {
+        if (debug)
+          {
+            System.out.println("MimetypesFileTypeMap: load PROG");
+          }
+        try
+          {
+            parse(mimetypes[PROG], in);
+          }
+        catch (IOException e)
+          {
+          }
+      }
+    
+    if (debug)
+      {
+        System.out.println("MimetypesFileTypeMap: load HOME");
+      }
+    try
+      {
+        String home = System.getProperty("user.home");
+        if (home != null)
+          {
+            parseFile(mimetypes[HOME], new StringBuffer(home)
+                      .append(File.separatorChar)
+                      .append(".mime.types")
+                      .toString());
+          }
+      }
+    catch (SecurityException e)
+      {
+      }
+    
+    if (debug)
+      {
+        System.out.println("MimetypesFileTypeMap: load SYS");
+      }
+    try
+      {
+        parseFile(mimetypes[SYS],
+                  new StringBuffer(System.getProperty("java.home"))
+                  .append(File.separatorChar)                                                     .append("lib")
+                  .append(File.separatorChar)
+                  .append("mime.types")
+                  .toString());
+      }
+    catch (SecurityException e)
+      {
+      }
+    if (debug)
+      {
+        System.out.println("MimetypesFileTypeMap: load JAR");
+      }
+    List systemResources = getSystemResources("META-INF/mime.types");
+    int len = systemResources.size();
+    if (len > 0)
+      {
+        for (int i = 0; i < len ; i++)
+          {
+            Reader urlIn = null;
+            URL url = (URL)systemResources.get(i);
             try
-            {
-                parse(mimetypes[PROG], in);
-            }
+              {
+                urlIn = new InputStreamReader(url.openStream());
+                parse(mimetypes[JAR], urlIn);
+              }
             catch (IOException e)
-            {
-            }
-        }
+              {
+              }
+            finally
+              {
+                if (urlIn != null)
+                  {
+                    try
+                      {
+                        urlIn.close();
+                      }
+                    catch (IOException e)
+                      {
+                      }
+                  }
+              }
+          }
+      }
+    else
+      {
+        parseResource(mimetypes[JAR], "/META-INF/mime.types");
+      }
+    
+    if (debug)
+      {
+        System.out.println("MimetypesFileTypeMap: load DEF");
+      }
+    parseResource(mimetypes[DEF], "/META-INF/mimetypes.default");
+  }
+  
+  /**
+   * Adds entries prorammatically to the registry.
+   * @param mime_types a mime.types formatted entries string
+   */
+  public synchronized void addMimeTypes(String mime_types)
+  {
+    if (debug)
+      {
+        System.out.println("MimetypesFileTypeMap: add to PROG");
+      }
+    try
+      {
+        parse(mimetypes[PROG], new StringReader(mime_types));
+      }
+    catch (IOException e)
+      {
+      }
+  }
 
-        if (debug)
-            System.out.println("MimetypesFileTypeMap: load HOME");
-        try
-        {
-            String home = System.getProperty("user.home");
-            if (home != null)
-            {
-                parseFile(mimetypes[HOME], new StringBuffer(home)
-                        .append(File.separatorChar)
-                        .append(".mime.types")
-                        .toString());
-            }
-        }
-        catch (SecurityException e)
-        {
-        }
-
-        if (debug)
-            System.out.println("MimetypesFileTypeMap: load SYS");
-        try
-        {
-            parseFile(mimetypes[SYS],
-                    new StringBuffer(System.getProperty("java.home"))
-                    .append(File.separatorChar)                                                     .append("lib")
-                    .append(File.separatorChar)
-                    .append("mime.types")
-                    .toString());
-        }
-        catch (SecurityException e)
-        {
-        }
-        if (debug)
-            System.out.println("MimetypesFileTypeMap: load JAR");
-        List systemResources = getSystemResources("META-INF/mime.types");
-        int len = systemResources.size();
-        if (len > 0)
-        {
-            for (int i = 0; i < len ; i++)
-            {
-                Reader urlIn = null;
-                URL url = (URL)systemResources.get(i);
-                try
-                {
-                    urlIn = new InputStreamReader(url.openStream());
-                    parse(mimetypes[JAR], urlIn);
-                }
-                catch (IOException e)
-                {
-                }
-                finally
-                {
-                    if (urlIn != null)
-                    {
-                        try
-                        {
-                            urlIn.close();
-                        }
-                        catch (IOException e)
-                        {
-                        }
-                    }
-                }
-            }
-        }
-        else
-            parseResource(mimetypes[JAR], "/META-INF/mime.types");
-
-        if (debug)
-            System.out.println("MimetypesFileTypeMap: load DEF");
-        parseResource(mimetypes[DEF], "/META-INF/mimetypes.default");
-    }
-
-    /**
-     * Adds entries prorammatically to the registry.
-     * @param mime_types a mime.types formatted entries string
-     */
-    public synchronized void addMimeTypes(String mime_types)
-    {
-        if (debug)
-            System.out.println("MimetypesFileTypeMap: add to PROG");
-        try
-        {
-            parse(mimetypes[PROG], new StringReader(mime_types));
-        }
-        catch (IOException e)
-        {
-        }
-    }
-
-    /**
-     * Returns the MIME content type of the file.
-     * This calls <code>getContentType(f.getName())</code>.
-     * @param f the file
-     */
-    public String getContentType(File f)
-    {
-        return getContentType(f.getName());
-    }
-
-    /**
-     * Returns the MIME type based on the given filename.
-     * If no entry is found, returns "application/octet-stream".
-     * @param filename the filename
-     */
-    public synchronized String getContentType(String filename)
-    {
-        int di = filename.lastIndexOf('.');
-        if (di < 0)
-            return DEFAULT_MIME_TYPE;
-        String tail = filename.substring(di + 1);
-        if (tail.length() < 1)
-            return DEFAULT_MIME_TYPE;
-        for (int i = 0; i < mimetypes.length; i++)
-        {
-            String mimeType = (String)mimetypes[i].get(tail);
-            if (mimeType != null)
-                return mimeType;
-        }
+  /**
+   * Returns the MIME content type of the file.
+   * This calls <code>getContentType(f.getName())</code>.
+   * @param f the file
+   */
+  public String getContentType(File f)
+  {
+    return getContentType(f.getName());
+  }
+  
+  /**
+   * Returns the MIME type based on the given filename.
+   * If no entry is found, returns "application/octet-stream".
+   * @param filename the filename
+   */
+  public synchronized String getContentType(String filename)
+  {
+    int di = filename.lastIndexOf('.');
+    if (di < 0)
+      {
         return DEFAULT_MIME_TYPE;
-    }
-
-    private void parseFile(Map mimetypes, String filename)
-    {
-        Reader in = null;
-        try
-        {
-            in = new FileReader(filename);
+      }
+    String tail = filename.substring(di + 1);
+    if (tail.length() < 1)
+      {
+        return DEFAULT_MIME_TYPE;
+      }
+    for (int i = 0; i < mimetypes.length; i++)
+      {
+        String mimeType = (String)mimetypes[i].get(tail);
+        if (mimeType != null)
+          {
+            return mimeType;
+          }
+      }
+    return DEFAULT_MIME_TYPE;
+  }
+  
+  private void parseFile(Map mimetypes, String filename)
+  {
+    Reader in = null;
+    try
+      {
+        in = new FileReader(filename);
+        parse(mimetypes, in);
+      }
+    catch (IOException e)
+      {
+      }
+    finally
+      {
+        if (in != null)
+          {
+            try
+              {
+                in.close();
+              }
+            catch (IOException e)
+              {
+              }
+          }
+      }
+  }
+  
+  private void parseResource(Map mimetypes, String name)
+  {
+    Reader in = null;
+    try
+      {
+        InputStream is = getClass().getResourceAsStream(name);
+        if (is != null)
+          {
+            in = new InputStreamReader(is);
             parse(mimetypes, in);
-        }
-        catch (IOException e)
-        {
-        }
-        finally
-        {
-            if (in != null)
-            {
-                try
-                {
-                    in.close();
-                }
-                catch (IOException e)
-                {
-                }
-            }
-        }
-    }
-
-    private void parseResource(Map mimetypes, String name)
-    {
-        Reader in = null;
-        try
-        {
-            InputStream is = getClass().getResourceAsStream(name);
-            if (is != null)
-            {
-                in = new InputStreamReader(is);
-                parse(mimetypes, in);
-            }
-        }
-        catch (IOException e)
-        {
-        }
-        finally
-        {
-            if (in != null)
-            {
-                try
-                {
-                    in.close();
-                }
-                catch (IOException e)
-                {
-                }
-            }
-        }
-    }
-
-    private void parse(Map mimetypes, Reader in)
-        throws IOException
-    {
-        BufferedReader br = new BufferedReader(in);
-        StringBuffer buf = null;
-        for (String line = br.readLine(); line != null; line = br.readLine())
-        {
-            line = line.trim();
-            int len = line.length();
-            if (len == 0 || line.charAt(0) == '#')
-                continue; // Empty line / comment
-            if (line.charAt(len - 1) == '\\')
-            {
-                if (buf == null)
-                    buf = new StringBuffer();
-                buf.append(line.substring(0, len - 1));
-            }
-            else if (buf != null)
-            {
-                buf.append(line);
-                parseEntry(mimetypes, buf.toString());
-                buf = null;
-            }
-            else
-                parseEntry(mimetypes, line);
-        }
-    }
-
-    private void parseEntry(Map mimetypes, String line)
-    {
-        // Tokenize
-        String mimeType = null;
-        char[] chars = line.toCharArray();
-        int len = chars.length;
-        StringBuffer buffer = new StringBuffer();
-        for (int i = 0; i < len; i++)
-        {
-            char c = chars[i];
-            if (Character.isWhitespace(c))
-            {
-                if (mimeType == null)
-                    mimeType = buffer.toString();
-                else if (buffer.length() > 0)
-                    mimetypes.put(buffer.toString(), mimeType);
-                buffer.setLength(0);
-            }
-            else
-                buffer.append(c);
-        }
-        if (buffer.length() > 0)
-            mimetypes.put(buffer.toString(), mimeType);
-    }
-
-    // -- Utility methods --
-
-    private List getSystemResources(String name)
-    {
-        List acc = new ArrayList();
-        try
-        {
-            for (Enumeration i = ClassLoader.getSystemResources(name);
-                    i.hasMoreElements(); )
-                acc.add(i.nextElement());
-        }
-        catch (IOException e)
-        {
-        }
-        return acc;
-    }
-
+          }
+      }
+    catch (IOException e)
+      {
+      }
+    finally
+      {
+        if (in != null)
+          {
+            try
+              {
+                in.close();
+              }
+            catch (IOException e)
+              {
+              }
+          }
+      }
+  }
+  
+  private void parse(Map mimetypes, Reader in)
+    throws IOException
+  {
+    BufferedReader br = new BufferedReader(in);
+    StringBuffer buf = null;
+    for (String line = br.readLine(); line != null; line = br.readLine())
+      {
+        line = line.trim();
+        int len = line.length();
+        if (len == 0 || line.charAt(0) == '#')
+          {
+            continue; // Empty line / comment
+          }
+        if (line.charAt(len - 1) == '\\')
+          {
+            if (buf == null)
+              {
+                buf = new StringBuffer();
+              }
+            buf.append(line.substring(0, len - 1));
+          }
+        else if (buf != null)
+          {
+            buf.append(line);
+            parseEntry(mimetypes, buf.toString());
+            buf = null;
+          }
+        else
+          {
+            parseEntry(mimetypes, line);
+          }
+      }
+  }
+  
+  private void parseEntry(Map mimetypes, String line)
+  {
+    // Tokenize
+    String mimeType = null;
+    char[] chars = line.toCharArray();
+    int len = chars.length;
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < len; i++)
+      {
+        char c = chars[i];
+        if (Character.isWhitespace(c))
+          {
+            if (mimeType == null)
+              {
+                mimeType = buffer.toString();
+              }
+            else if (buffer.length() > 0)
+              {
+                mimetypes.put(buffer.toString(), mimeType);
+              }
+            buffer.setLength(0);
+          }
+        else
+          buffer.append(c);
+      }
+    if (buffer.length() > 0)
+      {
+        mimetypes.put(buffer.toString(), mimeType);
+      }
+  }
+  
+  // -- Utility methods --
+  
+  private List getSystemResources(String name)
+  {
+    List acc = new ArrayList();
+    try
+      {
+        for (Enumeration i = ClassLoader.getSystemResources(name);
+             i.hasMoreElements(); )
+          acc.add(i.nextElement());
+      }
+    catch (IOException e)
+      {
+      }
+    return acc;
+  }
+  
 }
+

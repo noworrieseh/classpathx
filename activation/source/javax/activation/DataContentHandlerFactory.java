@@ -30,15 +30,16 @@ package javax.activation;
  * Factory interface for creating data content handlers.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public interface DataContentHandlerFactory
 {
 
-    /**
-     * Returns a new data content handler for the specified MIME type.
-     * @param mimeType the MIME type
-     */
-    DataContentHandler createDataContentHandler(String mimeType);
-
+  /**
+   * Returns a new data content handler for the specified MIME type.
+   * @param mimeType the MIME type
+   */
+  DataContentHandler createDataContentHandler(String mimeType);
+  
 }
+

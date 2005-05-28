@@ -33,25 +33,27 @@ import java.io.IOException;
  * specified data type.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public class UnsupportedDataTypeException extends IOException
 {
 
-    /**
-     * Constructs an UnsupportedDataTypeException with no detail message.
-     */
-    public UnsupportedDataTypeException()
-    {
-    }
-
-    /**
-     * Constructs an UnsupportedDataTypeException with the specified detail
-     * message.
-     * @param message the message
-     */
-    public UnsupportedDataTypeException(String message)
-    {
-        super(message);
-    }
+  /**
+   * Constructs an UnsupportedDataTypeException with no detail message.
+   */
+  public UnsupportedDataTypeException()
+  {
+  }
+  
+  /**
+   * Constructs an UnsupportedDataTypeException with the specified detail
+   * message.
+   * @param message the message
+   */
+  public UnsupportedDataTypeException(String message)
+  {
+    super(message);
+  }
+  
 }
+

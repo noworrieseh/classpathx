@@ -33,18 +33,19 @@ import java.io.IOException;
  * command verb.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0.2
+ * @version 1.1
  */
 public interface CommandObject
 {
 
-    /**
-     * Initializes the command with the verb it is expected to perform and
-     * the data handler describing the data to operate on.
-     * @param verb the command verb
-     * @param dh the data handler describing the data to process
-     */
-    void setCommandContext(String verb, DataHandler dh)
-        throws IOException;
-
+  /**
+   * Initializes the command with the verb it is expected to perform and
+   * the data handler describing the data to operate on.
+   * @param verb the command verb
+   * @param dh the data handler describing the data to process
+   */
+  void setCommandContext(String verb, DataHandler dh)
+    throws IOException;
+  
 }
+

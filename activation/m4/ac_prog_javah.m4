@@ -5,9 +5,9 @@ AC_DEFUN([AC_PROG_JAVAH],[
 AC_REQUIRE([AC_CANONICAL_SYSTEM])dnl
 AC_REQUIRE([AC_PROG_CPP])dnl
 if test "x$JAVAPREFIX" = x; then
-        test "x$JAVAH" = x && AC_CHECK_PROGS(JAVADOC, gcjh$EXEEXT javah$EXEEXT)
+        test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, gcjh$EXEEXT javah$EXEEXT)
 else
-        test "x$JAVAH" = x && AC_CHECK_PROGS(JAVADOC, gcjh$EXEEXT javah$EXEEXT, $JAVAPREFIX)
+        test "x$JAVAH" = x && AC_CHECK_PROGS(JAVAH, gcjh$EXEEXT javah$EXEEXT, $JAVAPREFIX)
 fi
 test "x$JAVAH" = x && AC_MSG_ERROR([no acceptable JNI header file generator found in \$PATH])
 AC_PROVIDE([$0])dnl
