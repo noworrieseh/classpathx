@@ -36,11 +36,11 @@ package javax.servlet;
  * A class can ask the exception for that number of seconds.
  * </DL>
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  */
 public class UnavailableException
-extends ServletException 
+  extends ServletException 
 {
 
   private Servlet servlet;
@@ -133,4 +133,6 @@ extends ServletException
   {
     return seconds;
   }
+  
 }
+

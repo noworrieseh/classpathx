@@ -31,7 +31,7 @@ import java.util.Locale;
  * methods which are part of the {@link ServletResponse} interface fall
  * through to the underlying wrapped object.
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Charles Lowell (cowboyd@pobox.com)
  */
@@ -39,6 +39,7 @@ import java.util.Locale;
 public class ServletResponseWrapper 
   implements ServletResponse
 {
+  
   private ServletResponse _impl;
 
   /**
@@ -50,30 +51,31 @@ public class ServletResponseWrapper
    * @param wrappedResponse the object to be wrapped
    * @throws java.lang.IllegalArgumentException if wrappedResponse is null
    */
-  public ServletResponseWrapper (ServletResponse wrappedResponse)
+  public ServletResponseWrapper(ServletResponse wrappedResponse)
   {
     if (wrappedResponse == null)
-    {
-      throw new IllegalArgumentException ("constructor called with null argument");
-    }
+      {
+        throw new IllegalArgumentException ("constructor called with " +
+                                            "null argument");
+      }
     _impl = wrappedResponse;
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public String getCharacterEncoding ()
+  public String getCharacterEncoding()
   {
-    return _impl.getCharacterEncoding ();
+    return _impl.getCharacterEncoding();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public ServletOutputStream getOutputStream ()
+  public ServletOutputStream getOutputStream()
     throws IOException
   {
-    return _impl.getOutputStream ();
+    return _impl.getOutputStream();
   }
 
   /**
@@ -82,92 +84,92 @@ public class ServletResponseWrapper
    * @throws java.io.UnsupportedEncodingException
    * @throws IllegalStateException
    */
-  public PrintWriter getWriter ()
+  public PrintWriter getWriter()
     throws IOException
   {
-    return _impl.getWriter ();
+    return _impl.getWriter();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void setContentLength (int length)
+  public void setContentLength(int length)
   {
-    _impl.setContentLength (length);
+    _impl.setContentLength(length);
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void setContentType (String type)
+  public void setContentType(String type)
   {
-    _impl.setContentType (type);
+    _impl.setContentType(type);
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void setBufferSize (int size)
+  public void setBufferSize(int size)
   {
-    _impl.setBufferSize (size);
+    _impl.setBufferSize(size);
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public int getBufferSize ()
+  public int getBufferSize()
   {
-    return _impl.getBufferSize ();
+    return _impl.getBufferSize();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void flushBuffer ()
+  public void flushBuffer()
     throws IOException
   {
-    _impl.flushBuffer ();
+    _impl.flushBuffer();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public boolean isCommitted ()
+  public boolean isCommitted()
   {
-    return _impl.isCommitted ();
+    return _impl.isCommitted();
   }
 
   /**
    * fall through to the underlying object by default.
    * @throws IllegalStateException 
    */
-  public void reset ()
+  public void reset()
   {
-    _impl.reset ();
+    _impl.reset();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void resetBuffer ()
+  public void resetBuffer()
   {
-    _impl.resetBuffer ();
+    _impl.resetBuffer();
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public void setLocale (Locale locale)
+  public void setLocale(Locale locale)
   {
-    _impl.setLocale (locale);
+    _impl.setLocale(locale);
   }
 
   /**
    * fall through to the underlying object by default.
    */
-  public Locale getLocale ()
+  public Locale getLocale()
   {
-    return _impl.getLocale ();
+    return _impl.getLocale();
   }
 
   /**
@@ -192,9 +194,10 @@ public class ServletResponseWrapper
   public void setResponse(ServletResponse wrappedResponse)
   {
     if (wrappedResponse == null)
-    {
-      throw new IllegalArgumentException ("constructor called with null argument");
-    }
+      {
+        throw new IllegalArgumentException("constructor called with " +
+                                           "null argument");
+      }
     _impl = wrappedResponse;
   }
 
@@ -203,9 +206,9 @@ public class ServletResponseWrapper
    * @since Servlet API 2.3
    * @param enc the character encoding
    */
-  public void setCharacterEncoding (String enc)
+  public void setCharacterEncoding(String enc)
   {
-    _impl.setCharacterEncoding (enc);
+    _impl.setCharacterEncoding(enc);
   }
 
   /**
@@ -213,9 +216,10 @@ public class ServletResponseWrapper
    * @since Servlet API 2.3
    * @return the content type
    */
-  public String getContentType ()
+  public String getContentType()
   {
-    return _impl.getContentType ();
+    return _impl.getContentType();
   }
 
 }
+

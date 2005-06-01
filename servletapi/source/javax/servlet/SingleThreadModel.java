@@ -24,7 +24,7 @@ package javax.servlet;
  * SingleThreadModel.java -- Interface indicating a "single" thread model.
  * Use of this interface is discouraged because of performance concerns.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */

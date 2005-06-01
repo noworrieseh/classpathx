@@ -32,7 +32,7 @@ import java.util.EventObject;
  * @since Servlet API 2.4
  */
 public class ServletRequestEvent
-extends EventObject
+  extends EventObject
 {
 
   ServletContext sc;
@@ -41,11 +41,12 @@ extends EventObject
 
   /** create the event.
    */
-  public ServletRequestEvent(ServletContext source,ServletRequest request)
+  public ServletRequestEvent(ServletContext source,
+                             ServletRequest request)
   {
     super(source);
-    sc=source;
-    rq=request;
+    sc = source;
+    rq = request;
   }
 
   public ServletContext getServletContext()
@@ -59,3 +60,4 @@ extends EventObject
   }
 
 }
+

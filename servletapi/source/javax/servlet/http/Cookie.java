@@ -30,12 +30,12 @@ package javax.servlet.http;
  * A formal specification of Cookies can be found in RFC 2109
  * ("HTTP State Management Mechanism")
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
 public class Cookie
-implements Cloneable 
+  implements Cloneable 
 {
 
   private String myName;
@@ -48,8 +48,9 @@ implements Cloneable
   private int myVersion = 0;
 
   // Valid HTTP/1.1 token characters
-  private static String validChars  = "!#$%&'*+-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  +"^_`abcdefghijklmnopqrstuvwxyz|~";
+  private static String validChars  = "!#$%&'*+-.0123456789" +
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "^_`abcdefghijklmnopqrstuvwxyz|~";
 
   /**
    * Creates a cookie with a name and a value.
@@ -62,19 +63,30 @@ implements Cloneable
    * @exception IllegalArgumentException if name is not a valid HTTP/1.1 token
    * or starts with $
    */
-  public Cookie(String name, String value) throws IllegalArgumentException 
+  public Cookie(String name, String value)
+    throws IllegalArgumentException 
   {
-    if(name.length() == 0) 
-    throw new IllegalArgumentException("Empty names are not allowed");
-    if(name.charAt(0) == '$') 
-    throw new IllegalArgumentException("'$' not allowed as first char of Cookie name");
+    int len = name.length();
+    if (len == 0) 
+      {
+        throw new IllegalArgumentException("Empty names are not allowed");
+      }
+    if (name.charAt(0) == '$') 
+      {
+        throw new IllegalArgumentException("'$' not allowed as first char " +
+                                           "of Cookie name");
+      }
     //check the rest of the chars for validity
-    for(int i = 0; i < name.length(); i++) 
-    {
-      if (validChars.indexOf(name.charAt(i)) == -1) 
-      throw new IllegalArgumentException("Character '"+name.charAt(i)
-					 +"' is not a valid HTTP/1.1 token");
-    }
+    for (int i = 0; i < len; i++) 
+      {
+        char c = name.charAt(i);
+        if (validChars.indexOf(c) == -1) 
+          {
+            throw new IllegalArgumentException("Character '" + c +
+                                               "' is not a valid " +
+                                               "HTTP/1.1 token");
+          }
+      }
     myName = name;
     myValue = value;
   }
@@ -322,12 +334,16 @@ implements Cloneable
   public Object clone() 
   {
     try 
-    {
-      return super.clone();
-    }
+      {
+        return super.clone();
+      }
     catch (CloneNotSupportedException e) 
-    {
-      return null; // This should never happen
-    }
+      {
+        RuntimeException e2 = new RuntimeException();
+        e2.initCause(e);
+        throw e2;
+      }
   }
+  
 }
+

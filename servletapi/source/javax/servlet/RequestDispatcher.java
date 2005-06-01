@@ -36,7 +36,7 @@ import java.io.IOException;
  *
  * @see javax.servlet.ServletContext#getRequestDispatcher(java.lang.String)
  * 
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 2.1
  * @author Paul Siegmann (pauls@euronet.nl)
  */
@@ -64,8 +64,8 @@ public interface RequestDispatcher
    * @exception IOException if an I/O-error occurs
    * @exception IllegalStateException if <code>getOutputStream</code> or <code>getWriter</code> has already been called on the <code>response</code>
    */
-  void forward(ServletRequest request,ServletResponse response)
-  throws ServletException, IOException;
+  void forward(ServletRequest request, ServletResponse response)
+    throws ServletException, IOException;
 
   /**
    * Includes into the <code>ServletResponse</code> any output written by the
@@ -86,7 +86,7 @@ public interface RequestDispatcher
    * @exception ServletException can be thrown by the target resource
    * @exception IOException if an I/O-error occurs
    */
-  void include(ServletRequest request,ServletResponse response)
-  throws ServletException, IOException;
+  void include(ServletRequest request, ServletResponse response)
+    throws ServletException, IOException;
 
 }

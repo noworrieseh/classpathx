@@ -33,11 +33,12 @@ import java.io.OutputStream;
  * It seems saver to use <code>ServletResponse.getWriter()</code> for all
  * output that is not binary.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
-public abstract class ServletOutputStream extends OutputStream 
+public abstract class ServletOutputStream
+  extends OutputStream 
 {
 
   protected ServletOutputStream() 
@@ -71,7 +72,7 @@ public abstract class ServletOutputStream extends OutputStream
   public void print(boolean value)
     throws IOException 
   {
-	print(String.valueOf(value));
+    print(String.valueOf(value));
   }
 
 
@@ -273,4 +274,6 @@ public abstract class ServletOutputStream extends OutputStream
     print(value);
     println();
   }
+
 }
+

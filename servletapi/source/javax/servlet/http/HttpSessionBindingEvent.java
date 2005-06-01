@@ -32,11 +32,11 @@ package javax.servlet.http;
  * @see javax.servlet.http.HttpSession#invalidate()
  * @see javax.servlet.http.HttpSessionBindingListener
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  */
 public class HttpSessionBindingEvent
-extends HttpSessionEvent
+  extends HttpSessionEvent
 {
 
   private String myName;
@@ -68,7 +68,8 @@ extends HttpSessionEvent
    * @param name which was used to refer to the object
    * @param value 
    */
-  public HttpSessionBindingEvent(HttpSession session, String name, Object value) 
+  public HttpSessionBindingEvent(HttpSession session,
+                                 String name, Object value) 
   {
     this(session,name);
     myValue = value;
@@ -95,4 +96,6 @@ extends HttpSessionEvent
   {
     return myValue;
   }
+  
 }
+

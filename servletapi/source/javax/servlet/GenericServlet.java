@@ -28,7 +28,7 @@ import java.util.Enumeration;
 /**
  * Abstract base class for all servlets.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
@@ -64,7 +64,8 @@ implements Servlet, ServletConfig, Serializable
    * @param servletConfig This servlet configuration class
    * @exception ServletException If an error occurs
    */
-  public void init (ServletConfig servletConfig) throws ServletException 
+  public void init(ServletConfig servletConfig)
+    throws ServletException 
   {
     this.servletConfig = servletConfig;
     log("started");
@@ -79,7 +80,8 @@ implements Servlet, ServletConfig, Serializable
    *
    * @exception ServletException If an error occurs
    */
-  public void init () throws ServletException 
+  public void init()
+    throws ServletException 
   {
   }
 
@@ -105,7 +107,7 @@ implements Servlet, ServletConfig, Serializable
    * @return the value of the wanted parameter.
    * null if the named parameter is not present.
    */
-  public String getInitParameter (String name) 
+  public String getInitParameter(String name) 
   {
     return servletConfig.getInitParameter(name);
   }
@@ -118,7 +120,7 @@ implements Servlet, ServletConfig, Serializable
    *
    * @return an Enumeration of all the parameters
    */
-  public Enumeration getInitParameterNames () 
+  public Enumeration getInitParameterNames() 
   {
     return servletConfig.getInitParameterNames();
   }
@@ -194,8 +196,9 @@ implements Servlet, ServletConfig, Serializable
    * @exception ServletException If an error occurs
    * @exception IOException If an error occurs
    */
-  public abstract void service(ServletRequest request,ServletResponse response)
-  throws ServletException, IOException;
+  public abstract void service(ServletRequest request,
+                               ServletResponse response)
+    throws ServletException, IOException;
 
 
   /**

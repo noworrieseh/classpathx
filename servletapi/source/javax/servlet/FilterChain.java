@@ -32,7 +32,7 @@ import java.io.IOException;
  * method to pass control from his filter to the next filter in
  * the chain.
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
  */
@@ -44,7 +44,7 @@ public interface FilterChain
    * @param request the request
    * @param response the response
    */
-  public void doFilter(ServletRequest request,ServletResponse response)
-  throws ServletException,IOException;
+  public void doFilter(ServletRequest request, ServletResponse response)
+    throws ServletException, IOException;
 
 }

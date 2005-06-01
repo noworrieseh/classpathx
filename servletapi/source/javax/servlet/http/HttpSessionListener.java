@@ -25,11 +25,11 @@ import java.util.EventListener;
 /** listener class for simple session events.
  *
  * @author Nic Ferrier - nferrier@tapsellferrier.co.uk
- * @version servlet API 2.3
+ * @version servlet API 2.4
  * @since Servlet API 2.3
  */
 public interface HttpSessionListener
-extends EventListener
+  extends EventListener
 {
 
   /** signalled when the session is created.
@@ -41,3 +41,4 @@ extends EventListener
   public void sessionDestroyed(HttpSessionEvent evt);
 
 }
+

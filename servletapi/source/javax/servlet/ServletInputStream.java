@@ -28,12 +28,12 @@ import java.io.IOException;
  * This class serves as a stream where servlets can read data supplied by
  * the client from.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
 public abstract class ServletInputStream
-extends InputStream 
+  extends InputStream 
 {
 
   /**
@@ -83,7 +83,7 @@ extends InputStream
    * @exception IOException If an error occurs.
    */
   public int readLine(byte[] buffer, int offset, int length)
-  throws IOException 
+    throws IOException 
   {
     /* Note:
        Both the code and the javadocs are originally from Aaron
@@ -92,41 +92,49 @@ extends InputStream
        detection. I like free software!
     */
     if (length == 0) 
-    {
-      return(0);
-    }
+      {
+        return 0;
+      }
     // Read the first byte here in order to allow IOException's to 
     // propagate up
     int readChar = read();
     if (readChar == -1) 
-    {
-      return(-1);
-    }
-    buffer[offset] = (byte)readChar;
+      {
+        return -1;
+      }
+    buffer[offset] = (byte) readChar;
     int totalRead = 1;
     int readState = 0;
     // Read the rest of the bytes
     try 
-    {
-      for (int i = 1; i < length; i++) 
       {
-	if (readChar == '\r')
-	  readState = CR_FOUND;
-	else if (readChar == '\n' && readState == CR_FOUND)
-	  return(totalRead);
-	// Read again and cycle round.
-	readChar = read();
-	if (readChar == -1) 
-	  return(totalRead);
-	buffer[offset + i] = (byte)readChar;
-	totalRead++;
+        for (int i = 1; i < length; i++) 
+          {
+            if (readChar == '\r')
+              {
+                readState = CR_FOUND;
+              }
+            else if (readChar == '\n' && readState == CR_FOUND)
+              {
+                return totalRead;
+              }
+            // Read again and cycle round.
+            readChar = read();
+            if (readChar == -1) 
+              {
+                return totalRead;
+              }
+            buffer[offset + i] = (byte) readChar;
+            totalRead++;
+          }
       }
-    }
     catch (IOException e) 
-    {
-      return(totalRead);
-    }
+      {
+        return totalRead;
+      }
 
-    return(totalRead);
+    return totalRead;
   }
+  
 }
+

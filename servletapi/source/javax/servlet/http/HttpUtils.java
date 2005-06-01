@@ -72,71 +72,72 @@ public class HttpUtils
    * an error it can't handle.
    */
   public static Hashtable parseQueryString(String queryString)
-  throws IllegalArgumentException 
+    throws IllegalArgumentException 
   {
     // Use of a StringTokenizer would be easier to build and
     // maintain, but leads to the creation of many unnecessary
     // substring calls.
     // This is a bit more work, but should be more efficient.
 
-    if(queryString == null) 
-    {
-      throw new IllegalArgumentException();
-    }
+    if (queryString == null) 
+      {
+        throw new IllegalArgumentException();
+      }
     Hashtable result = new Hashtable();
 
     int parameterBegin = 0;
     int parameterSeparator = queryString.indexOf('=',parameterBegin);
     int parameterEnd;
 
-    while(parameterBegin < queryString.length()) 
-    {
+    while (parameterBegin < queryString.length()) 
+      {
 
-      parameterEnd = queryString.indexOf('&',parameterBegin);
-      if(parameterEnd == -1) 
-      {
-	parameterEnd = queryString.length();
+        parameterEnd = queryString.indexOf('&', parameterBegin);
+        if (parameterEnd == -1) 
+          {
+            parameterEnd = queryString.length();
+          }
+        if ((parameterSeparator > parameterEnd) || (parameterSeparator < 0)) 
+          {
+            addParameter(result,
+                         urlDecode(queryString, parameterBegin,
+                                   parameterEnd),
+                         "");
+            // XXX what should be the policy in this case?
+          }
+        else 
+          {
+            addParameter(result,
+                         urlDecode(queryString,
+                                   parameterBegin,
+                                   parameterSeparator),
+                         urlDecode(queryString,
+                                   parameterSeparator + 1,
+                                   parameterEnd));
+            parameterSeparator =
+              queryString.indexOf('=', parameterEnd + 1);
+          }
+        parameterBegin = parameterEnd + 1;
       }
-      if((parameterSeparator > parameterEnd)
-	 ||(parameterSeparator < 0)) 
-      {
-	addParameter(
-		     result,
-		     urlDecode(queryString,parameterBegin,parameterEnd),
-		     "");
-	// XXX what should be the policy in this case?
-      } else 
-      {
-	addParameter(
-		     result,
-		     urlDecode(queryString,
-			       parameterBegin,
-			       parameterSeparator),
-		     urlDecode(queryString,
-			       parameterSeparator+1,
-			       parameterEnd));
-	parameterSeparator = queryString.indexOf('=',parameterEnd + 1);
-      }
-      parameterBegin = parameterEnd + 1;
-    }
     return result;
   }
 
 
-  private static void addParameter(Hashtable parameterTable,String name,String value) 
+  private static void addParameter(Hashtable parameterTable,
+                                   String name, String value) 
   {
     try 
-    {
-      String[] oldArray = ((String[])parameterTable.get(name));
-      String[] newArray = new String[oldArray.length + 1];
-      System.arraycopy(oldArray,0,newArray,0,oldArray.length);
-      newArray[oldArray.length] = value;
-      parameterTable.put(name, newArray);
-    }
-    catch(NullPointerException e) 
-    {
-      parameterTable.put(name, new String[] {value});
-    }
+      {
+        String[] oldArray = ((String[]) parameterTable.get(name));
+        String[] newArray = new String[oldArray.length + 1];
+        System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
+        newArray[oldArray.length] = value;
+        parameterTable.put(name, newArray);
+      }
+    catch (NullPointerException e) 
+      {
+        parameterTable.put(name, new String[] { value });
+      }
   }
 
 
@@ -152,8 +153,9 @@ public class HttpUtils
    * urlDecode(s,0,s.length())
    * @return the string in its url decoded form
    */
-  private static String urlDecode(String aString, int firstChar, int beyondLastChar)
-  throws IllegalArgumentException 
+  private static String urlDecode(String aString, int firstChar,
+                                  int beyondLastChar)
+    throws IllegalArgumentException 
   {
     // The problem with this initial StringBuffer size is that
     // every "%xx" piece of string will result in only 1 character.
@@ -167,38 +169,37 @@ public class HttpUtils
     // *sigh* decisions, decisions.
     StringBuffer result = new StringBuffer(beyondLastChar - firstChar);
     char currentChar;
-    for(int i = firstChar; i < beyondLastChar; i++) 
-    {
-      currentChar = aString.charAt(i);
-      if (currentChar == '+') 
+    for (int i = firstChar; i < beyondLastChar; i++) 
       {
-	result.append(' ');
+        currentChar = aString.charAt(i);
+        if (currentChar == '+') 
+          {
+            result.append(' ');
+          }
+        else if (currentChar == '%') 
+          {
+            try 
+              {
+                result.append(new String(new byte[] {(byte) Integer.parseInt(aString.substring(i + 1, i + 3), 16)}));
+              }
+            catch (StringIndexOutOfBoundsException e) 
+              {
+                throw new IllegalArgumentException();
+              }
+            catch (NumberFormatException f) 
+              {
+                throw new IllegalArgumentException();
+              }
+            i += 2;
+          }
+        else 
+          {
+            result.append(currentChar);
+          }
       }
-      else if (currentChar == '%') 
-      {
-	try 
-	{
-	  result.append(new String(new byte
-	    [] {(byte)Integer.parseInt(aString.substring(i+1, i+3),16)}));
-	}
-	catch(StringIndexOutOfBoundsException e) 
-	{
-	  throw new IllegalArgumentException();
-	}
-	catch(NumberFormatException f) 
-	{
-	  throw new IllegalArgumentException();
-	}
-	i += 2;
-      }
-      else 
-      {
-	result.append(currentChar);
-      }
-    }
     return result.toString();
   }
-
+  
 
   /**
    * Reads the data provided by the client using the POST method, 
@@ -216,41 +217,47 @@ public class HttpUtils
    * @exception IllegalArgumentException If an IO error occurs or
    * the POST data contains an error it can't handle.
    */
-  public static Hashtable parsePostData(int contentLength,ServletInputStream in)
-  throws IllegalArgumentException 
+  public static Hashtable parsePostData(int contentLength,
+                                        ServletInputStream in)
+    throws IllegalArgumentException 
   {
     try 
-    {
-      // the size of contentLength is known
-      // try to read contentLength bytes
-      if(contentLength >= 0) 
       {
-	byte[] buffer = new byte[contentLength];
-	int bytesRead = in.read(buffer, 0, buffer.length);
-	int totalBytesRead = bytesRead;
-	while(bytesRead > 0 && totalBytesRead < contentLength) 
-	{
-	  bytesRead = in.read(buffer, totalBytesRead,contentLength - totalBytesRead);
-	  totalBytesRead += bytesRead;
-	}
-	// check wether there was to little data
-	if(totalBytesRead < contentLength) 
-	{
-	  throw new IllegalArgumentException("Amount of POST data doesn't match contentLength");
-	}
-	return parseQueryString(new String(buffer));
+        // the size of contentLength is known
+        // try to read contentLength bytes
+        if (contentLength >= 0) 
+          {
+            byte[] buffer = new byte[contentLength];
+            int bytesRead = in.read(buffer, 0, buffer.length);
+            int totalBytesRead = bytesRead;
+            while (bytesRead > 0 && totalBytesRead < contentLength) 
+              {
+                bytesRead = in.read(buffer, totalBytesRead,
+                                    contentLength - totalBytesRead);
+                totalBytesRead += bytesRead;
+              }
+            // check wether there was to little data
+            if (totalBytesRead < contentLength) 
+              {
+                throw new IllegalArgumentException("Amount of POST data " +
+                                                   "doesn't match " +
+                                                   "contentLength");
+              }
+            return parseQueryString(new String(buffer));
+          }
+        else 
+          {
+            throw new IllegalArgumentException("Missing or illegal content " +
+                                               "length in Post request");
+          }
       }
-      else 
-      {
-	throw new IllegalArgumentException("Missing or illegal content length in Post request");
-      }
-    }
     catch (IOException e) 
-    {
-      throw new IllegalArgumentException("Error reading POST data:" + e.getMessage());
-    }
+      {
+        throw new IllegalArgumentException("Error reading POST data:" +
+                                           e.getMessage());
+      }
   }
-
+  
 
   /**
    * Determines which URL the client used when issuing his request.
@@ -269,15 +276,14 @@ public class HttpUtils
     result.append(request.getServerName());
     int serverPort = request.getServerPort();
     if(serverPort != 80) 
-    {
-      result.append(":");
-      result.append(serverPort);
-    }
+      {
+        result.append(":");
+        result.append(serverPort);
+      }
     result.append(request.getContextPath());
     result.append(request.getRequestURI());
     return result;
   }
+  
 }
-
-
 

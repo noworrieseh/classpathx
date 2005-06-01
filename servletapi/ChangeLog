@@ -1,3 +1,7 @@
+2005-06-01  Chris Burdess  <dog@gnu.org>
+
+	* HttpSession.java: Removed spurious logout() method.
+
 2005-01-05  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am,configure.ac,acinclude.m4: New automake-based build

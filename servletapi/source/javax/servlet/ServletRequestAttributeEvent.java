@@ -31,7 +31,7 @@ package javax.servlet;
  * @since Servlet API 2.4
  */
 public class ServletRequestAttributeEvent
-extends ServletRequestEvent
+  extends ServletRequestEvent
 {
 
   /** the name of the attribute.
@@ -45,21 +45,25 @@ extends ServletRequestEvent
 
   /** create the event.
    */
-  public ServletRequestAttributeEvent(ServletContext sc,ServletRequest rq,String name,Object value)
+  public ServletRequestAttributeEvent(ServletContext sc,
+                                      ServletRequest rq,
+                                      String name,
+                                      Object value)
   {
-    super(sc,rq);
-    this.name=name;
-    this.value=value;
+    super(sc, rq);
+    this.name = name;
+    this.value = value;
   }
 
   public String getAttributeName()
   {
-    return this.name;
+    return name;
   }
 
   public Object getAttributeValue()
   {
-    return this.value;
+    return value;
   }
 
 }
+

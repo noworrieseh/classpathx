@@ -31,14 +31,15 @@ import java.util.EventListener;
  * container to notify all such objects implementing this interface
  * upon activation and passivation
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public interface HttpSessionActivationListener
-extends EventListener
+  extends EventListener
 {
+  
   /**
    * This method is called to notify that the session has just been activated
    * 
@@ -46,7 +47,7 @@ extends EventListener
    * 
    * @param event the event representing the session activation
    */
-  void sessionDidActivate (HttpSessionEvent event);
+  void sessionDidActivate(HttpSessionEvent event);
 
   /**
    * This method is called to notify that the session will soon be passivated
@@ -55,5 +56,7 @@ extends EventListener
    *
    * @param event the event representing the upcoming passivation
    */
-  void sessionWillPassivate (HttpSessionEvent event);
+  void sessionWillPassivate(HttpSessionEvent event);
+
 }
+

@@ -44,7 +44,7 @@ import javax.servlet.ServletContext;
  * </DD>
  * </DL>
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
  * @author Charles Lowell (cowboyd@pobox.com)
@@ -187,7 +187,7 @@ public interface HttpSession
    * @since Servlet API 2.0
    * @deprecated Servlet API 2.2 use {@link #setAttribute instead}
    */
-  void putValue(String name,Object value);
+  void putValue(String name, Object value);
 
   /**
    * Removes an item from the session.
@@ -269,12 +269,5 @@ public interface HttpSession
    */
   HttpSessionContext getSessionContext();
 
-  /**
-   * invalidate all the sessions with this client.
-   * 
-   * @since Servlet API 2.4
-   * @throws IllegalStateException if the session has been invalidated.
-   */
-  void logout();
-
 }
+

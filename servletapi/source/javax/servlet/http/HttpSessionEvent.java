@@ -32,7 +32,7 @@ import java.util.EventObject;
  * @since Servlet API 2.3
  */
 public class HttpSessionEvent
-extends EventObject
+  extends EventObject
 {
 
   /** construct the event with the session the event is about.
@@ -46,7 +46,8 @@ extends EventObject
    */
   public HttpSession getSession()
   {
-    return (HttpSession)super.getSource();
+    return (HttpSession) super.getSource();
   }
 
 }
+

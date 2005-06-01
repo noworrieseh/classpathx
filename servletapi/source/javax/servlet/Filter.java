@@ -52,7 +52,7 @@ import java.io.IOException;
  * specification.</p>
  *
  * @see FilterChain for more information on how the chains work
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
  * @author Charles Lowell - cowboyd@pobox.com
@@ -65,7 +65,7 @@ public interface Filter
    * @param init the filter's configuration information (including init params)
    */
   public void init(FilterConfig init)
-  throws ServletException;
+    throws ServletException;
 
   /** destroy a filter.
    */
@@ -79,7 +79,9 @@ public interface Filter
    * @throws ServletException
    * @throws IOException
    */
-  public void doFilter(ServletRequest request,ServletResponse response,FilterChain chain)
-  throws ServletException,IOException;
+  public void doFilter(ServletRequest request,
+                       ServletResponse response,
+                       FilterChain chain)
+    throws ServletException, IOException;
 
 }

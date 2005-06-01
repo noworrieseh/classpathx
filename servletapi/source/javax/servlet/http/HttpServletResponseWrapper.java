@@ -30,13 +30,15 @@ import java.io.IOException;
  * are part of the HttpServletResponse interface to the underlying 
  * implementation
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Charles Lowell (cowboyd@pobox.com)
  */
-public class HttpServletResponseWrapper extends ServletResponseWrapper 
+public class HttpServletResponseWrapper
+  extends ServletResponseWrapper 
   implements HttpServletResponse
 {
+  
   private HttpServletResponse _impl;
 
   /**
@@ -49,9 +51,9 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
    *
    * @throws java.lang.IllegalArgumentException if wrappedResponse is null
    */
-  public HttpServletResponseWrapper (HttpServletResponse wrappedResponse)
+  public HttpServletResponseWrapper(HttpServletResponse wrappedResponse)
   {
-    super (wrappedResponse);
+    super(wrappedResponse);
     _impl = wrappedResponse;
   }
 
@@ -63,142 +65,144 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void addCookie (Cookie cookie)
+  public void addCookie(Cookie cookie)
   {
-    _impl.addCookie (cookie);
+    _impl.addCookie(cookie);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public boolean containsHeader (String name)
+  public boolean containsHeader(String name)
   {
-    return _impl.containsHeader (name);
+    return _impl.containsHeader(name);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public String encodeURL (String url)
+  public String encodeURL(String url)
   {
-    return _impl.encodeURL (url);
+    return _impl.encodeURL(url);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public String encodeRedirectURL (String url)
+  public String encodeRedirectURL(String url)
   {
-    return _impl.encodeRedirectURL (url);
+    return _impl.encodeRedirectURL(url);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    * @deprecated use <code>encodeURL()</code>
    */
-  public String encodeUrl (String url)
+  public String encodeUrl(String url)
   {
-    return _impl.encodeURL (url);
+    return _impl.encodeURL(url);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    * @deprecated use <code>encodeRedirectURL()</code>
    */
-  public String encodeRedirectUrl (String url)
+  public String encodeRedirectUrl(String url)
   {
-    return _impl.encodeRedirectURL (url);
+    return _impl.encodeRedirectURL(url);
   }
   
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void sendError (int status,String message)
+  public void sendError(int status, String message)
     throws IOException
   {
-    _impl.sendError (status,message);
+    _impl.sendError(status,message);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void sendError (int status)
+  public void sendError(int status)
     throws IOException
   {
-    _impl.sendError (status);
+    _impl.sendError(status);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void sendRedirect (String location)
+  public void sendRedirect(String location)
     throws IOException
   {
-    _impl.sendRedirect (location);
+    _impl.sendRedirect(location);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void setDateHeader (String name,long date)
+  public void setDateHeader(String name, long date)
   {
-    _impl.setDateHeader (name,date);
+    _impl.setDateHeader(name, date);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void addDateHeader (String name,long date)
+  public void addDateHeader(String name, long date)
   {
-    _impl.addDateHeader (name,date);
+    _impl.addDateHeader(name, date);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void setHeader (String name,String value)
+  public void setHeader(String name, String value)
   {
-    _impl.setHeader (name,value);
+    _impl.setHeader(name, value);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void addHeader (String name,String value)
+  public void addHeader(String name, String value)
   {
-    _impl.addHeader (name,value);
+    _impl.addHeader(name, value);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void setIntHeader (String name,int value)
+  public void setIntHeader(String name, int value)
   {
-    _impl.setIntHeader (name,value);
+    _impl.setIntHeader(name, value);
   }
 
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void addIntHeader (String name,int value)
+  public void addIntHeader(String name, int value)
   {
-    _impl.addIntHeader (name,value);
+    _impl.addIntHeader(name, value);
   }
   
   /**
    * By default passes the call to the underlying HttpServletResponse
    */
-  public void setStatus (int status)
+  public void setStatus(int status)
   {
-    _impl.setStatus (status);
+    _impl.setStatus(status);
   }
   
   /**
    * By default passes the call to the underlying HttpServletResponse
    * @deprecated only errors should give an extra error message,
    */
-  public void setStatus (int status,String msg)
+  public void setStatus(int status, String msg)
   {
-    _impl.setStatus (status,msg);
+    _impl.setStatus(status, msg);
   }
+  
 }
+

@@ -33,12 +33,13 @@ import java.util.EventListener;
  * @see javax.servlet.http.HttpSession#invalidate()
  * @see javax.servlet.http.HttpSessionBindingEvent
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  */
 public interface HttpSessionBindingListener
-extends EventListener
+  extends EventListener
 {
+  
   /**
    * Called when the object is bound to a session.
    *
@@ -46,7 +47,7 @@ extends EventListener
    *
    * @param event The event object containing the name and session
    */
-  void valueBound (HttpSessionBindingEvent event);
+  void valueBound(HttpSessionBindingEvent event);
 
   /**
    * Called when the object is unbound from a session.
@@ -55,5 +56,7 @@ extends EventListener
    *
    * @param event The event object containing the name and session
    */
-  void valueUnbound (HttpSessionBindingEvent event);
+  void valueUnbound(HttpSessionBindingEvent event);
+  
 }
+

@@ -55,7 +55,7 @@ import java.io.IOException;
  * reclaiming the memory used by this servlet.
  * </OL>
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
@@ -80,8 +80,8 @@ public interface Servlet
    * @exception UnavailableException If servlet is temporarily or permanently
    * unavailable
    */
-  void init (ServletConfig config)
-  throws ServletException;
+  void init(ServletConfig config)
+    throws ServletException;
 
 
   /**
@@ -100,8 +100,8 @@ public interface Servlet
    * @exception ServletException If an error occurs
    * @exception IOException If an error occurs
    */
-  void service (ServletRequest request, ServletResponse response)
-  throws IOException, ServletException;
+  void service(ServletRequest request, ServletResponse response)
+    throws IOException, ServletException;
 
 
   /**
@@ -111,7 +111,7 @@ public interface Servlet
    *
    * @since Servlet API 1.0
    */
-  void destroy ();
+  void destroy();
 
 
   /**
@@ -122,7 +122,7 @@ public interface Servlet
    * @since Servlet API 1.0
    * @return The config class
    */
-  ServletConfig getServletConfig ();
+  ServletConfig getServletConfig();
 
   /** 
    * Gets a string containing information about the servlet.
@@ -131,12 +131,7 @@ public interface Servlet
    *
    * @since Servlet API 1.0
    */
-  String getServletInfo ();
+  String getServletInfo();
 
 }
-
-
-
-
-
 

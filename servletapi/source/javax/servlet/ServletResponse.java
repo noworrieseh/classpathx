@@ -28,7 +28,7 @@ import java.util.Locale;
 /**
  * A servlet can use this class to pass information to the client.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  * @author Charles Lowell (cowboyd@pobox.com)
@@ -79,7 +79,7 @@ public interface ServletResponse
    *   for this stream.
    */
   ServletOutputStream getOutputStream()
-  throws IOException;
+    throws IOException;
 
 
   /**
@@ -102,11 +102,11 @@ public interface ServletResponse
    *   already called on this response
    * @throws java.io.UnsupportedEncodingException if no suitable character
    *   encoding can be used
-   * @see #setContentType which must be called before this if you want to specify
-   *  a charset to affect this writer.
+   * @see #setContentType which must be called before this if you want to
+   *   specify a charset to affect this writer.
    */
   PrintWriter getWriter()
-  throws IOException;
+    throws IOException;
 
 
   /**
@@ -162,7 +162,7 @@ public interface ServletResponse
    * @since Servlet API 2.2
    */
   void flushBuffer()
-  throws IOException;
+    throws IOException;
 
   /**
    * Resets the underlying response buffer, but does not clear the response code
@@ -173,7 +173,7 @@ public interface ServletResponse
    * @throws IllegalStateException if the response has already been committed
    */
   
-  void resetBuffer ();
+  void resetBuffer();
 
   /**
    * set the locale for the response.
@@ -207,6 +207,7 @@ public interface ServletResponse
    * @parameter a IANA Character Sets
    * {@link (http://www.iana.org/assignments/character-sets)} string.
    */
-    void setCharacterEncoding(String encoding);
+  void setCharacterEncoding(String encoding);
 
 }
+

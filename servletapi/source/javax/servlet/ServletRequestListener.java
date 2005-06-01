@@ -29,6 +29,7 @@ package javax.servlet;
  */
 public interface ServletRequestListener
 {
+
   public void requestDestroyed(ServletRequestEvent evt);
 
   public void requestInitialized(ServletRequestEvent evt);

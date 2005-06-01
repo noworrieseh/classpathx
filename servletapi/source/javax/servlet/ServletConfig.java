@@ -29,7 +29,7 @@ import java.util.Enumeration;
  * The server then adds {String,String} pairs to the class, and the servlet
  * can read these using this interface.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
@@ -45,7 +45,7 @@ public interface ServletConfig
    * @return The value of this name's initparameter or null if it doesn't
    * exist
    */
-  String getInitParameter (String name);
+  String getInitParameter(String name);
 
 
   /**
@@ -56,7 +56,7 @@ public interface ServletConfig
    * @return An enumeration consisting of all the init parameter names
    * or an empty empty enumeration when there are no init parameters
    */
-  Enumeration getInitParameterNames ();
+  Enumeration getInitParameterNames();
 
 
   /**
@@ -66,11 +66,14 @@ public interface ServletConfig
    *
    * @return The context of the servlet whose Config this is
    */
-  ServletContext getServletContext ();
+  ServletContext getServletContext();
 
 
   /**
-   * XXX
+   * Returns the name of the servlet definition, as specified in the
+   * deployment descriptor.
    */
   String getServletName();
+
 }
+

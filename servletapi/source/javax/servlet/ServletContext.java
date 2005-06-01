@@ -42,7 +42,7 @@ import java.util.Set;
  * Servlet specific information can be transferred to a servlet using
  * a class implementing the ServletConfig interface.<BR>
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  * @author Charles Lowell (cowboyd@pobox.com)
@@ -59,7 +59,7 @@ public interface ServletContext
    * @return the value of the attribute or null if there is no attribute with
    * this name
    */
-  Object getAttribute (String name);
+  Object getAttribute(String name);
 
 
   /**
@@ -69,7 +69,7 @@ public interface ServletContext
    *
    * @return The enumeration containing all the attribute names
    */
-  Enumeration getAttributeNames ();
+  Enumeration getAttributeNames();
 
 
   /**
@@ -88,7 +88,7 @@ public interface ServletContext
    * servlet at the requested <code>UriPath</code> or when it is unavailable
    * due to security restrictions
    */
-  ServletContext getContext (String UriPath);
+  ServletContext getContext(String UriPath);
 
 
   /**
@@ -98,7 +98,7 @@ public interface ServletContext
    *
    * @return 2 if the 2.1 Servlet API is supported
    */
-  int getMajorVersion ();
+  int getMajorVersion();
 
   /**
    * Minor version number of the Servlet API the servlet engine supports.
@@ -107,7 +107,7 @@ public interface ServletContext
    *
    * @return 1 if the 2.1 Servlet API is supported
    */
-  int getMinorVersion ();
+  int getMinorVersion();
 
 
   /**
@@ -155,7 +155,7 @@ public interface ServletContext
    * @return a Set containing the paths of the matching resources
    * or null if no resources with the specified prefix can be found 
    */
-  Set getResourcePaths (String pathPrefix);
+  Set getResourcePaths(String pathPrefix);
  
 
   /**
@@ -197,7 +197,7 @@ public interface ServletContext
    * or null if the resource cannot be found
    */
   URL getResource(String virtualPath)
-  throws MalformedURLException;
+    throws MalformedURLException;
 
       
 
@@ -236,7 +236,7 @@ public interface ServletContext
    * @return an <code>RequestDispatcher</code> for the (active) resource
    * found at <code>UriPath</code>
    */
-  RequestDispatcher getRequestDispatcher (String UriPath);
+  RequestDispatcher getRequestDispatcher(String UriPath);
 
 
   /**
@@ -260,7 +260,7 @@ public interface ServletContext
    *
    * @return the string
    */
-  String getServerInfo ();
+  String getServerInfo();
 
 
   /**
@@ -292,7 +292,7 @@ public interface ServletContext
    *
    * @param message the message to write
    */
-  void log (String message);
+  void log(String message);
 
 
   /**
@@ -303,7 +303,7 @@ public interface ServletContext
    * @param t the exception
    * @param message the message
    */
-  void log (String message, Throwable t);
+  void log(String message, Throwable t);
 
 
   /**
@@ -318,7 +318,7 @@ public interface ServletContext
    * @param exception the exception
    * @param message the message
    */
-  void log (Exception exception, String message);
+  void log(Exception exception, String message);
 
 
   /**
@@ -361,7 +361,7 @@ public interface ServletContext
    *   instead; this now always returns <code>null</code>
    */
   Servlet getServlet(String name)
-  throws ServletException;
+    throws ServletException;
 
 
   /**
@@ -398,4 +398,6 @@ public interface ServletContext
    * @since Servlet API 2.3
    */
   String getServletContextName();
+
 }
+

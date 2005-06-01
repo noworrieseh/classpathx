@@ -55,13 +55,14 @@ public class ServletRequestWrapper
    * by this object 
    * @throws java.lang.IllegalArgumentException if wrappedRequest is null
    */
-  public ServletRequestWrapper (ServletRequest wrappedRequest)
+  public ServletRequestWrapper(ServletRequest wrappedRequest)
   {
     if (wrappedRequest == null) 
-    {
-      throw new IllegalArgumentException ("Constructor called with null argument");
-    }
-    _impl  = wrappedRequest;
+      {
+        throw new IllegalArgumentException("Constructor called with " +
+                                           "null argument");
+      }
+    _impl = wrappedRequest;
   }
   
   /**
@@ -72,130 +73,120 @@ public class ServletRequestWrapper
    * @return the wrapped request object
    */
 
-  public ServletRequest getRequest ()
+  public ServletRequest getRequest()
   {
     return _impl;
   }
 
   /**
-   * Set the request wrapped by this object
-   *
-   * @since Servlet API 2.3
-   *
-   * @param request the request to wrap
-   * 
-   * @throws java.lang.IllegalArgumentException if the argument is null
-   */
-
-  /**
    * Calls the wrapped request object's method
    */
-  public Object getAttribute (String name)
+  public Object getAttribute(String name)
   {
-    return _impl.getAttribute (name);
+    return _impl.getAttribute(name);
   }
   /**
    * Calls the wrapped request object's method
    */
-  public Enumeration getAttributeNames ()
+  public Enumeration getAttributeNames()
   {
-    return _impl.getAttributeNames ();
+    return _impl.getAttributeNames();
   }
 
   /**
    * Calls the wrapped request object's method
    */
-  public String getCharacterEncoding ()
+  public String getCharacterEncoding()
   {
-    return _impl.getCharacterEncoding ();
+    return _impl.getCharacterEncoding();
   }
   /**
    * Calls the wrapped request object's method
    */
-  public void setCharacterEncoding (String enc)
+  public void setCharacterEncoding(String enc)
     throws UnsupportedEncodingException
   {
-    _impl.setCharacterEncoding (enc);
+    _impl.setCharacterEncoding(enc);
   }
   /**
    * Calls the wrapped request object's method
    */
-  public int getContentLength ()
+  public int getContentLength()
   {
-    return _impl.getContentLength ();
+    return _impl.getContentLength();
   }
   /**
    * Calls the wrapped request object's method
    */
-  public String getContentType ()
+  public String getContentType()
   {
-    return _impl.getContentType ();
+    return _impl.getContentType();
   }
   /**
    * Calls the underlying request object's method
    * @throws IOException
    * @throws IllegalStateException
    */
-  public ServletInputStream getInputStream ()
-  throws IOException
+  public ServletInputStream getInputStream()
+    throws IOException
   {
-    return _impl.getInputStream ();
+    return _impl.getInputStream();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getParameter (String name)
+  public String getParameter(String name)
   {
-    return _impl.getParameter (name);
+    return _impl.getParameter(name);
   }
   /**
    * Calls the underlying request object's method
    */
-  public Map getParameterMap ()
+  public Map getParameterMap()
   {
-    return _impl.getParameterMap ();
+    return _impl.getParameterMap();
   }
    /**
    * Calls the underlying request object's method
    */
-  public Enumeration getParameterNames ()
+  public Enumeration getParameterNames()
   {
-    return _impl.getParameterNames ();
+    return _impl.getParameterNames();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String [] getParameterValues (String name)
+  public String[] getParameterValues(String name)
   {
-    return _impl.getParameterValues (name);
+    return _impl.getParameterValues(name);
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getProtocol ()
+  public String getProtocol()
   {
-    return _impl.getProtocol ();
+    return _impl.getProtocol();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getScheme ()
+  public String getScheme()
   {
-    return _impl.getScheme ();
+    return _impl.getScheme();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getServerName ()
+  public String getServerName()
   {
-    return _impl.getServerName ();
+    return _impl.getServerName();
   }
   /**
    * Calls the underlying request object's method
    */
-  public int getServerPort ()
+  public int getServerPort()
   {
-    return _impl.getServerPort ();
+    return _impl.getServerPort();
   }
   /**
    * Calls the underlying request object's method
@@ -203,75 +194,75 @@ public class ServletRequestWrapper
    * @throws java.io.UnsupportedEncodingException
    * @throws IllegalStateException
    */
-  public BufferedReader getReader ()
-  throws IOException
+  public BufferedReader getReader()
+    throws IOException
   {
-    return _impl.getReader ();
+    return _impl.getReader();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getRemoteAddr ()
+  public String getRemoteAddr()
   {
-    return _impl.getRemoteAddr ();
+    return _impl.getRemoteAddr();
   }
   /**
    * Calls the underlying request object's method
    */
-  public String getRemoteHost ()
+  public String getRemoteHost()
   {
-    return _impl.getRemoteHost ();
+    return _impl.getRemoteHost();
   }
   /**
    * Calls the underlying request object's method
    */
-  public void setAttribute (String name,Object value)
+  public void setAttribute(String name, Object value)
   {
-    _impl.setAttribute (name,value);
+    _impl.setAttribute(name, value);
   }
   /**
    * Calls the underlying request object's method
    */
-  public void removeAttribute (String name)
+  public void removeAttribute(String name)
   {
-    _impl.removeAttribute (name);
+    _impl.removeAttribute(name);
   }
   /**
    * Calls the underlying request object's method
    */
-  public Locale getLocale ()
+  public Locale getLocale()
   {
-    return _impl.getLocale ();
+    return _impl.getLocale();
   }
   /**
    * Calls the underlying request object's method
    */
-  public Enumeration getLocales ()
+  public Enumeration getLocales()
   {
-    return _impl.getLocales ();
+    return _impl.getLocales();
   }
   /**
    * Calls the underlying request object's method
    */
-  public boolean isSecure ()
+  public boolean isSecure()
   {
-    return _impl.isSecure ();
+    return _impl.isSecure();
   }
   /**
    * Calls the underlying request object's method
    */
-  public RequestDispatcher getRequestDispatcher (String path)
+  public RequestDispatcher getRequestDispatcher(String path)
   {
-    return _impl.getRequestDispatcher (path);
+    return _impl.getRequestDispatcher(path);
   }
   /**
    * Calls the underlying request object's method
    * @deprecated Should use getRealPath from the current ServletContext.
    * @see javax.servlet.ServletContext#getRealPath(java.lang.String)
    */
-  public String getRealPath (String path)
+  public String getRealPath(String path)
   {
-    return _impl.getRealPath (path);
+    return _impl.getRealPath(path);
   }
 
   /**
@@ -283,13 +274,15 @@ public class ServletRequestWrapper
    * by this object 
    * @throws java.lang.IllegalArgumentException if wrappedRequest is null
    */
-  public void setRequest (ServletRequest wrappedRequest)
+  public void setRequest(ServletRequest wrappedRequest)
   {
     if (wrappedRequest == null) 
-    {
-      throw new IllegalArgumentException ("setRequest called with null argument");
-    }
+      {
+        throw new IllegalArgumentException("setRequest called with " +
+                                           "null argument");
+      }
     _impl  = wrappedRequest;
   }
   
 }
+

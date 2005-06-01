@@ -20,6 +20,7 @@
 */
 package javax.servlet.http;
 
+import java.security.Principal;
 import java.util.Enumeration;
 import javax.servlet.ServletRequest;
 
@@ -27,12 +28,12 @@ import javax.servlet.ServletRequest;
  * Contains all the client's request information.
  * <B>Implementation note:</B> all the headername matching in this class should be case<B>in</B>sensitive.
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Charles Lowell (cowboyd@pobox.com)
  */
 public interface HttpServletRequest
-extends ServletRequest
+  extends ServletRequest
 {
 
   /**
@@ -116,7 +117,7 @@ extends ServletRequest
 
 
   /**
-   * XXX
+   * Returns the values of the specified header as an enumeration of String.
    *
    * @since Servlet API 2.2
    */
@@ -167,14 +168,6 @@ extends ServletRequest
 
 
   /**
-   * XXX
-   *
-   * @since Servlet API 2.2
-   */
-  String getContextPath();
-
-
-  /**
    * Extra path info. Everything after the actual Servlet except the query
    * data. This is the same as the CGI request metadata <code>PATH_INFO</code>
    * and identifies the source or sub-resource to be returned by the Servlet.
@@ -214,6 +207,14 @@ extends ServletRequest
 
 
   /**
+   * Returns the part of the request path used to identify the servlet context.
+   *
+   * @since Servlet API 2.2
+   */
+  String getContextPath();
+
+
+  /**
    * Gets the request's query string.
    * The query string is the part of the request that follows the '?'.<BR>
    * This is the same as the CGI request metadata <code>QUERY_STRING</code>.
@@ -250,7 +251,7 @@ extends ServletRequest
    *
    * @since Servlet API 2.2
    */
-  java.security.Principal getUserPrincipal();
+  Principal getUserPrincipal();
 
 
   /**
@@ -292,7 +293,7 @@ extends ServletRequest
    * this Stringbuffer can be easily appended to, to add the query
    * string if needed.
    */
-  StringBuffer getRequestURL ();
+  StringBuffer getRequestURL();
 
   /**
    * Gets the part of the URI up to and including the servlet name.
@@ -368,4 +369,6 @@ extends ServletRequest
    * @since Servlet API 2.0
    */
   boolean isRequestedSessionIdFromUrl();
+
 }
+

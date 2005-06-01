@@ -30,12 +30,13 @@ import java.util.Enumeration;
  * This class has been deprecated for security reasons.<BR>
  * We don't want serlvets messing around in other sessions.<BR>
  * However convenient that might be.<BR>
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 2.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
 public interface HttpSessionContext
 {
+  
   /**
    * Get the session with the given id.
    * @deprecated This method should always return null
@@ -57,4 +58,6 @@ public interface HttpSessionContext
    * @return an Enumeration containing all session id's.
    */
   Enumeration getIds();
+  
 }
+

@@ -29,6 +29,7 @@ package javax.servlet;
  */
 public interface ServletRequestAttributeListener
 {
+
   public void attributeAdded(ServletRequestAttributeEvent evt);
 
   public void attributeReplaced(ServletRequestAttributeEvent evt);

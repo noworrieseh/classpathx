@@ -31,13 +31,15 @@ import java.security.Principal;
  * by default, passes all method calls which are part of the {@link HttpServletRequest}
  * interface through to the wrapped object
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Charles Lowell (cowboyd@pobox.com)
  */
-public class HttpServletRequestWrapper extends ServletRequestWrapper 
+public class HttpServletRequestWrapper
+  extends ServletRequestWrapper 
   implements HttpServletRequest
 {
+  
   private HttpServletRequest _impl;
 
   /**
@@ -48,202 +50,202 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper
    *
    * @throws java.lang.IllegalArgumentException if wrappedObject is null
    */
-  public HttpServletRequestWrapper (HttpServletRequest wrappedRequest)
+  public HttpServletRequestWrapper(HttpServletRequest wrappedRequest)
   {
-    super (wrappedRequest);
+    super(wrappedRequest);
     _impl = wrappedRequest;
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getAuthType ()
+  public String getAuthType()
   {
-    return _impl.getAuthType ();
+    return _impl.getAuthType();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public Cookie [] getCookies ()
+  public Cookie[] getCookies()
   {
-    return _impl.getCookies ();
+    return _impl.getCookies();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public long getDateHeader (String name)
+  public long getDateHeader(String name)
   {
-    return _impl.getDateHeader (name);
+    return _impl.getDateHeader(name);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getHeader (String name)
+  public String getHeader(String name)
   {
-    return _impl.getHeader (name);
+    return _impl.getHeader(name);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public Enumeration getHeaders (String name)
+  public Enumeration getHeaders(String name)
   {
-    return _impl.getHeaders (name);
+    return _impl.getHeaders(name);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public Enumeration getHeaderNames ()
+  public Enumeration getHeaderNames()
   {
-    return _impl.getHeaderNames ();
+    return _impl.getHeaderNames();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public int getIntHeader (String name)
+  public int getIntHeader(String name)
   {
-    return _impl.getIntHeader (name);
+    return _impl.getIntHeader(name);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getMethod ()
+  public String getMethod()
   {
-    return _impl.getMethod ();
+    return _impl.getMethod();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getPathInfo ()
+  public String getPathInfo()
   {
-    return _impl.getPathInfo ();
+    return _impl.getPathInfo();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getPathTranslated ()
+  public String getPathTranslated()
   {
-    return _impl.getPathTranslated ();
+    return _impl.getPathTranslated();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getContextPath ()
+  public String getContextPath()
   {
-    return _impl.getContextPath ();
+    return _impl.getContextPath();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getQueryString ()
+  public String getQueryString()
   {
-    return _impl.getQueryString ();
+    return _impl.getQueryString();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getRemoteUser ()
+  public String getRemoteUser()
   {
-    return _impl.getRemoteUser ();
+    return _impl.getRemoteUser();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public boolean isUserInRole (String role)
+  public boolean isUserInRole(String role)
   {
-    return _impl.isUserInRole (role);
+    return _impl.isUserInRole(role);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public Principal getUserPrincipal ()
+  public Principal getUserPrincipal()
   {
-    return _impl.getUserPrincipal ();
+    return _impl.getUserPrincipal();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getRequestedSessionId ()
+  public String getRequestedSessionId()
   {
-    return _impl.getRequestedSessionId ();
+    return _impl.getRequestedSessionId();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getRequestURI ()
+  public String getRequestURI()
   {
-    return _impl.getRequestURI ();
+    return _impl.getRequestURI();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public StringBuffer getRequestURL ()
+  public StringBuffer getRequestURL()
   {
-    return _impl.getRequestURL ();
+    return _impl.getRequestURL();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public String getServletPath ()
+  public String getServletPath()
   {
-    return _impl.getServletPath ();
+    return _impl.getServletPath();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public HttpSession getSession (boolean create)
+  public HttpSession getSession(boolean create)
   {
-    return _impl.getSession (create);
+    return _impl.getSession(create);
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public HttpSession getSession ()
+  public HttpSession getSession()
   {
-    return _impl.getSession ();
+    return _impl.getSession();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public boolean isRequestedSessionIdValid ()
+  public boolean isRequestedSessionIdValid()
   {
-    return _impl.isRequestedSessionIdValid ();
+    return _impl.isRequestedSessionIdValid();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public boolean isRequestedSessionIdFromCookie ()
+  public boolean isRequestedSessionIdFromCookie()
   {
-    return _impl.isRequestedSessionIdFromCookie ();
+    return _impl.isRequestedSessionIdFromCookie();
   }
 
   /**
    * By default passes the call to the underlying HttpServletRequest
    */
-  public boolean isRequestedSessionIdFromURL ()
+  public boolean isRequestedSessionIdFromURL()
   {
-    return _impl.isRequestedSessionIdFromURL ();
+    return _impl.isRequestedSessionIdFromURL();
   }
 
   /**
@@ -251,8 +253,10 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper
    * @deprecated Use {@link #isRequestedSessionIdFromURL}
    * @since Servlet API 2.0
    */
-  public boolean isRequestedSessionIdFromUrl ()
+  public boolean isRequestedSessionIdFromUrl()
   {
-    return _impl.isRequestedSessionIdFromURL ();
+    return _impl.isRequestedSessionIdFromURL();
   }
+  
 }
+

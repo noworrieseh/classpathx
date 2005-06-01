@@ -31,7 +31,7 @@ import java.util.Map;
  * puts all the request information in it and passes this along with
  * a ServletResponse object to the approriate servlet.
  *
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  * @author Charles Lowell (cowboyd@pobox.com)
@@ -145,7 +145,7 @@ public interface ServletRequest
    * called on this request.
    */
   ServletInputStream getInputStream()
-  throws IOException;
+    throws IOException;
 
   /**
    * Gets the value of a named requestparameter.
@@ -173,7 +173,7 @@ public interface ServletRequest
    * value is an array of Strings containing the parameter values
    */
 
-  Map getParameterMap ();
+  Map getParameterMap();
 
   /**
    * Gets an array of Strings containing all the request parameter's
@@ -333,5 +333,4 @@ public interface ServletRequest
   RequestDispatcher getRequestDispatcher(String path);
 
 }
-
 

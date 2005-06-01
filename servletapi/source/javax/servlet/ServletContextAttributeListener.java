@@ -25,11 +25,12 @@ package javax.servlet;
  *
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
  * @author Charles Lowell (cowboyd@pobox.com)
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  */
 public interface ServletContextAttributeListener
 {
+  
   public void attributeAdded(ServletContextAttributeEvent evt);
 
   public void attributeReplaced(ServletContextAttributeEvent evt);

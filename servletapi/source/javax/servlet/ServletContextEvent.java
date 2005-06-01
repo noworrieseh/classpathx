@@ -32,7 +32,7 @@ import java.util.EventObject;
  * @since Servlet API 2.3
  */
 public class ServletContextEvent
-extends EventObject
+  extends EventObject
 {
 
   ServletContext sc;

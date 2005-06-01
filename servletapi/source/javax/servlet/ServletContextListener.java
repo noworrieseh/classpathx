@@ -24,11 +24,12 @@ package javax.servlet;
 /** listen for <code>ServletContext</code> events.
  *
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  */
 public interface ServletContextListener
 {
+  
   public void contextDestroyed(ServletContextEvent evt);
 
   public void contextInitialized(ServletContextEvent evt);

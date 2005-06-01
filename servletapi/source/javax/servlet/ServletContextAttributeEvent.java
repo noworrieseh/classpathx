@@ -27,12 +27,12 @@ package javax.servlet;
  * The event source is defined as the source <code>ServletContext</code>.
  *
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @see ServletContextAttributeListener
  */
 public class ServletContextAttributeEvent
-extends ServletContextEvent
+  extends ServletContextEvent
 {
 
   /** the name of the attribute.
@@ -45,11 +45,13 @@ extends ServletContextEvent
 
   /** create the event.
    */
-  public ServletContextAttributeEvent(ServletContext sc,String name,Object value)
+  public ServletContextAttributeEvent(ServletContext sc,
+                                      String name,
+                                      Object value)
   {
     super(sc);
-    this.name=name;
-    this.value=value;
+    this.name = name;
+    this.value = value;
   }
 
   public String getAttributeName()
@@ -63,3 +65,4 @@ extends ServletContextEvent
   }
 
 }
+

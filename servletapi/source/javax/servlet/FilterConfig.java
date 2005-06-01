@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * The server then adds {String,String} pairs to the class, and the servlet
  * can read these using this interface.
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
  */
@@ -43,7 +43,7 @@ public interface FilterConfig
    *  or null if it doesn't exist
    * @since Servlet API 2.3
    */
-  String getInitParameter (String name);
+  String getInitParameter(String name);
 
   /** get the names of all the init parameters.
    *
@@ -51,14 +51,14 @@ public interface FilterConfig
    *   when there are no init parameters
    * @since Servlet API 1.0
    */
-  Enumeration getInitParameterNames ();
+  Enumeration getInitParameterNames();
 
   /** get the context that this filter belongs to.
    *
    * @return the context of the filter whose config this is
    * @since Servlet API 1.0
    */
-  ServletContext getServletContext ();
+  ServletContext getServletContext();
 
   /** get the name of the filter.
    * As specified in a webapp deployment descriptor for example.

@@ -28,32 +28,35 @@ import java.util.EventListener;
  * the attributes of the sessions in a web application change
  * either through addittion, deletion, or replacement
  *
- * @version Servlet API 2.3
+ * @version Servlet API 2.4
  * @since Servlet API 2.3
  * @author Charles Lowell (cowboyd@pobox.com)
  */
 
 public interface HttpSessionAttributeListener
-extends EventListener
+  extends EventListener
 {
+  
   /**
    * Indicates that an attribute has been added to a session
    *
    * @since Servlet API 2.3
    */
-  void attributeAdded (HttpSessionBindingEvent event);
+  void attributeAdded(HttpSessionBindingEvent event);
 
   /**
    * Indicates that an attribute has been removed from a session
    *
    * @since Servlet API 2.3
    */
-  void attributeRemoved (HttpSessionBindingEvent event);
+  void attributeRemoved(HttpSessionBindingEvent event);
 
   /**
    * Indicates that an attribute has been replaced in a session
    *
    * @since Servlet API 2.3
    */
-  void attributeReplaced (HttpSessionBindingEvent event);
+  void attributeReplaced(HttpSessionBindingEvent event);
+
 }
+

@@ -24,15 +24,13 @@ package javax.servlet;
 /**
  * This exception is thrown by a servlet when a servlet related problem occurs.
  * 
- * @version Servlet API 2.2
+ * @version Servlet API 2.4
  * @since Servlet API 1.0
  * @author Paul Siegmann (pauls@euronet.nl)
  */
 public class ServletException
-extends Exception 
+  extends Exception 
 {
-
-  private Throwable cause = null;
 
   /**
    * Creates a new ServletException.
@@ -69,7 +67,7 @@ extends Exception
   public ServletException(String message, Throwable cause) 
   {
     super(message);
-    this.cause = cause;
+    initCause(cause);
   }
 
   /**
@@ -83,7 +81,7 @@ extends Exception
   public ServletException(Throwable cause) 
   {
     super(cause.getLocalizedMessage());
-    this.cause = cause;
+    initCause(cause);
   }
 
 
@@ -96,7 +94,8 @@ extends Exception
    */
   public Throwable getRootCause() 
   {
-    return cause;
+    return getCause();
   }
 
 }
+
