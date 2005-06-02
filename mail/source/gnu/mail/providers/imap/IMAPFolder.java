@@ -1527,4 +1527,53 @@ implements UIDFolder
       }
   }
 
+  /**
+   * Returns the number of unread messages in this folder.
+   * @see javax.mail.Folder#getUnreadMessageCount()
+   */
+  public synchronized int getUnreadMessageCount()
+    throws MessagingException
+  {
+    return getMessageCountByCriteria("NOT SEEN");
+  }
+
+  /**
+   * Returns the number of deleted messages in this folder.
+   * @see javax.mail.Folder#getDeletedMessageCount()
+   */
+  public synchronized int getDeletedMessageCount()
+    throws MessagingException
+  {
+    return getMessageCountByCriteria("DELETED");
+  }
+
+  /**
+   * Convenience method for returning the number of messages in the
+   * current folder that match the single criteria.
+   */
+  public int getMessageCountByCriteria(String criteria)
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return -1;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    String[] criterias = new String[] { criteria };
+    
+    int[] ids = null;
+    try
+      { 
+        ids = connection.search(null, criterias);
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    
+    return ids.length;
+  }
+  
 }

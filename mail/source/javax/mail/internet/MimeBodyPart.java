@@ -1,13 +1,13 @@
 /*
  * MimeBodyPart.java
- * Copyright(C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,10 +36,13 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.StringTokenizer;
 import javax.activation.DataHandler;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+
+import gnu.mail.util.RFC2822OutputStream;
 
 /**
  * This class represents a MIME body part.
@@ -62,7 +65,7 @@ import javax.mail.Multipart;
  * MIME requirements for the specified headers. 
  * In addition, these header fields must be folded(wrapped) before being 
  * sent if they exceed the line length limitation for the transport
- *(1000 bytes for SMTP).
+ * (1000 bytes for SMTP).
  * Received headers may have been folded.
  * The application is responsible for folding and unfolding headers as 
  * appropriate.
@@ -890,16 +893,48 @@ public class MimeBodyPart
     
     // Write the headers
     for (Enumeration e = getAllHeaderLines();
-        e.hasMoreElements(); )
+         e.hasMoreElements(); )
       {
-        String line = (String)e.nextElement();
-        os.write(line.getBytes(charset));
-        os.write(sep);
+        String line = (String) e.nextElement();
+        StringTokenizer st = new StringTokenizer(line, "\r\n");
+        int count = 0;
+        while (st.hasMoreTokens())
+          {
+            String line2 = st.nextToken();
+            if (count > 0 && line2.charAt(0) != '\t')
+              {
+                // Folded line must start with tab
+                os.write(0x09);
+              }
+            /*
+             * RFC 2822, section 2.1 states that each line should be no more
+             * than 998 characters.
+             * Ensure that any headers we emit have no lines longer than
+             * this by folding the line.
+             */
+            int max = (count > 0) ? 997 : 998;
+            while (line2.length() > max)
+              {
+                String left = line2.substring(0, max);
+                byte[] bytes = left.getBytes(charset);
+                os.write(bytes);
+                os.write(sep);
+                os.write(0x09);
+                line2 = line2.substring(max);
+                max = 997; // make space for the tab
+              }
+            byte[] bytes = line2.getBytes(charset);
+            os.write(bytes);
+            os.write(sep);
+            count++;
+          }
       }
     os.write(sep);
+    os.flush();
 
     // Write the content
-    os = MimeUtility.encode(os, getEncoding());
+    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
+    os = MimeUtility.encode(rfc2822os, getEncoding());
     getDataHandler().writeTo(os);
     os.flush();
   }

@@ -1,13 +1,13 @@
 /*
  * InternetHeaders.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,7 +60,7 @@ import gnu.inet.util.LineInputStream;
  * responsible for enforcing the MIME requirements for the specified headers.
  * In addition, these header fields must be folded(wrapped) before being 
  * sent if they exceed the line length limitation for the transport 
- *(1000 bytes for SMTP). Received headers may have been folded.
+ * (1000 bytes for SMTP). Received headers may have been folded.
  * The application is responsible for folding and unfolding headers 
  * as appropriate.
  *

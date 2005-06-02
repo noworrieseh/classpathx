@@ -1,3 +1,8 @@
+2005-06-02  Byron Foster  <byron@base2.cc>
+
+	* IMAPFolder.java: Do server-side searches for unread message
+	counts.
+
 2005-05-16  Fernando Nasser  <fnasser@redhat.com>
 
 	* SMTPConnection.java: Make SMTP transport behave the same as the
