@@ -1,5 +1,6 @@
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import junit.framework.TestResult;
 //import junit.swingui.TestRunner;
 import junit.textui.TestRunner;
 
@@ -22,6 +23,8 @@ public class AllTests
   {
     try
       {
+        //TestResult result = new TestResult();
+        //new AllTests().run(result);
         TestRunner.run(new AllTests());
       }
     catch (Exception e)

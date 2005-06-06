@@ -118,23 +118,29 @@ public class IMAPStore
           {
             int connectionTimeout = getIntProperty("connectiontimeout");
             int timeout = getIntProperty("timeout");
+            if (session.getDebug())
+              {
+                IMAPConnection.logger.setLevel(IMAPConnection.IMAP_TRACE);
+              }
+            boolean tls = "imaps".equals(url.getProtocol());
+            // Locate custom trust manager
+            TrustManager tm = getTrustManager();
             connection = new IMAPConnection(host, port,
                                             connectionTimeout, timeout,
-                                            session.getDebug());
-        
+                                            tls, tm);
             if (propertyIsTrue("debug.ansi"))
               {
                 connection.setAnsiDebug(true);
               }
         
             List capabilities = connection.capability();
-            boolean tls = false;
-            if (capabilities.contains(IMAPConstants.STARTTLS))
+
+            // Ignore tls settings if we are making the connection
+            // to a dedicated SSL port. (imaps)
+            if (!tls && capabilities.contains(IMAPConstants.STARTTLS))
               {
                 if (!propertyIsFalse("tls"))
                   {
-                    // Locate custom trust manager
-                    TrustManager tm = getTrustManager();
                     if (tm == null)
                       {
                         tls = connection.starttls();

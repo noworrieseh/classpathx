@@ -130,7 +130,6 @@ $(src)/gnu/mail/util/QInputStream.java \
 $(src)/gnu/mail/util/QOutputStream.java \
 $(src)/gnu/mail/util/QPInputStream.java \
 $(src)/gnu/mail/util/QPOutputStream.java \
-$(src)/gnu/mail/util/PrintStreamLogger.java \
 $(src)/gnu/mail/util/RFC2822OutputStream.java \
 $(src)/gnu/mail/util/UUInputStream.java \
 $(src)/gnu/mail/util/UUOutputStream.java

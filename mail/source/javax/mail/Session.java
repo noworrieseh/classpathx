@@ -35,9 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
-
-import gnu.inet.util.Logger;
-import gnu.mail.util.PrintStreamLogger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Session class represents a mail session and is not subclassed.
@@ -99,24 +98,19 @@ public final class Session
 
   private Properties addressMap = new Properties();
 
-  private PrintStreamLogger logger;
-  
   private static Session defaultSession = null;
+
+  private Logger logger = Logger.getLogger(Session.class.getName());
 
   /** Create the session object.
    */
   private Session(Properties props, Authenticator authenticator)
   {
-    logger = new PrintStreamLogger(System.out);
-    Logger.setInstance(logger);
-    
     this.props = props;
     this.authenticator = authenticator;
     debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
-    if (debug)
-      {
-        logger.config("using GNU JavaMail 1.3");
-      }
+    logger.setLevel(debug ? Level.FINER : Level.SEVERE);
+    logger.info("using GNU JavaMail 1.3");
     ClassLoader loader = null;
     if (authenticator == null)
       {
@@ -137,23 +131,17 @@ public final class Session
       }
     catch (FileNotFoundException e)
       {
-        if (debug)
-          {
-            logger.config("no system providers");
-          }
+        logger.log(Level.WARNING, "no system providers", e);
       }
-    if (debug)
-      {
-        logger.config("Providers by class name: "
-                       + providersByClassName.toString());
-        logger.config("Providers by protocol: "
-                       + providersByProtocol.toString());
-      }
+    logger.log(Level.FINE, "Providers by class name: "
+               + providersByClassName.toString());
+    logger.log(Level.FINE, "Providers by protocol: "
+               + providersByProtocol.toString());
     // Load the address map
     loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP),
-                    "default");
+                   "default");
     loadAddressMap(getResourceAsStream(loader, CUSTOM_ADDRESS_MAP),
-                    "custom");
+                   "custom");
     try
       {
         File file = new File(SYSTEM_ADDRESS_MAP);
@@ -162,10 +150,7 @@ public final class Session
       }
     catch (FileNotFoundException e)
       {
-        if (debug)
-          {
-            logger.config("no system address map");
-          }
+        logger.log(Level.WARNING, "no system address map", e);
       }
   }
 
@@ -204,10 +189,7 @@ public final class Session
   {
     if (in == null)
       {
-        if (debug)
-          {
-            logger.config("no " + description + " providers");
-          }
+        logger.info("no " + description + " providers");
         return;
       }
     try
@@ -263,10 +245,7 @@ public final class Session
                 
                 if (type == null || protocol == null || className == null)
                   {
-                    if (debug)
-                      {
-                        logger.config("Invalid provider: " + line);
-                      }
+                    logger.warning("Invalid provider: " + line);
                   }
                 else
                   {
@@ -282,24 +261,16 @@ public final class Session
               }
           }
         in.close();
-        if (debug)
-          {
-            logger.config("loaded " + description + " providers");
-          }
+        logger.info("loaded " + description + " providers");
       }
     catch (IOException e)
       {
-        if (debug)
-          {
-            logger.config(e.getMessage());
-          }
+        logger.log(Level.WARNING, e.getMessage(), e);
       }
     catch (SecurityException e)
       {
-        if (debug)
-          {
-            logger.config("can't load " + description + " providers");
-          }
+        logger.log(Level.WARNING, "can't load " + description +
+                   " providers", e);
       }
   }
   
@@ -307,34 +278,23 @@ public final class Session
   {
     if (in == null)
       {
-        if (debug)
-          {
-            logger.config("no " + description + " address map");
-          }
+        logger.info("no " + description + " address map");
         return;
       }
     try
       {
         addressMap.load(in);
         in.close();
-        if (debug)
-          {
-            logger.config("loaded " + description + " address map");
-          }
+        logger.info("loaded " + description + " address map");
       }
     catch (IOException e)
       {
-        if (debug)
-          {
-            logger.config(e.getMessage());
-          }
+        logger.log(Level.WARNING, e.getMessage(), e);
       }
     catch (SecurityException e)
       {
-        if (debug)
-          {
-            logger.config("can't load " + description + " address map");
-          }
+        logger.log(Level.WARNING, "can't load " + description +
+                   " address map", e);
       }
   }
   
@@ -512,10 +472,6 @@ public final class Session
       {
         if (providerClassName != null)
           {
-            if (debug)
-              {
-                logger.config(providerClassKey + "=" + providerClassName);
-              }
             provider = (Provider) providersByClassName.get(providerClassName);
           }
         if (provider == null)
@@ -526,10 +482,6 @@ public final class Session
     if (provider == null)
       {
         throw new NoSuchProviderException("No provider for " + protocol);
-      }
-    if (debug)
-      {
-        logger.config("getProvider(): " + provider.toString());
       }
     return provider;
   }
@@ -884,9 +836,9 @@ public final class Session
   {
     if (out == null)
       {
-        out = System.out;
+        out = System.err;
       }
-    logger = new PrintStreamLogger(out);
+    // TODO
   }
 
   /**
@@ -896,7 +848,8 @@ public final class Session
    */
   public PrintStream getDebugOut()
   {
-    return logger.getPrintStream();
+    // TODO
+    return null;
   }
 
 }

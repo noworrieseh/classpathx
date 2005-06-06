@@ -29,6 +29,7 @@ package gnu.mail.providers.pop3;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ import gnu.inet.pop3.POP3Connection;
  * @version 1.3
  */
 public final class POP3Store
-extends Store
+  extends Store
 {
 
   /*
@@ -120,9 +121,16 @@ extends Store
           {
             int connectionTimeout = getIntProperty("connectiontimeout");
             int timeout = getIntProperty("timeout");
+            if (session.getDebug())
+              {
+                POP3Connection.logger.setLevel(POP3Connection.POP3_TRACE);
+              }
+            boolean tls = "pop3s".equals(url.getProtocol());
+            // Locate custom trust manager
+            TrustManager tm = getTrustManager();
             connection = new POP3Connection(host, port,
-                                             connectionTimeout, timeout,
-                                             session.getDebug());
+                                            connectionTimeout, timeout,
+                                            tls, tm);
             // Disable APOP if necessary
             if (propertyIsFalse("apop"))
               {
@@ -130,33 +138,19 @@ extends Store
               }
             // Get capabilities
             List capa = connection.capa();
-            boolean tls = false;
             if (capa != null)
               {
                 if (capa.contains("STLS"))
                   {
-                    if (!propertyIsFalse("tls"))
+                    if (!tls && !propertyIsFalse("tls"))
                       {
-                        // Locate custom trust manager
-                        String tmt = getProperty("trustmanager");
-                        if (tmt == null)
+                        if (tm == null)
                           {
                             tls = connection.stls();
                           }
                         else
                           {
-                            try
-                              {
-                                Class t = Class.forName(tmt);
-                                TrustManager tm =
-                                 (TrustManager) t.newInstance();
-                                tls = connection.stls(tm);
-                              }
-                            catch (Exception e)
-                              {
-                                String m = e.getMessage();
-                                throw new MessagingException(m, e);
-                              }
+                            tls = connection.stls(tm);
                           }
                         // Capabilities may have changed since STLS
                         if (tls)
@@ -254,6 +248,44 @@ extends Store
         catch (IOException e)
           {
             throw new MessagingException("Connect failed", e);
+          }
+      }
+  }
+
+  /**
+   * Returns a trust manager used for TLS negotiation.
+   */
+  protected TrustManager getTrustManager()
+    throws MessagingException
+  {
+    String tmt = getProperty("trustmanager");
+    if (tmt == null)
+      {
+        return null;
+      }
+    else
+      {
+        try
+          {
+            // Instantiate the trust manager
+            Class t = Class.forName(tmt);
+            TrustManager tm = (TrustManager) t.newInstance();
+            // If there is a setSession method, call it
+            try
+              {
+                Class[] pt = new Class[] { Session.class };
+                Method m = t.getMethod("setSession", pt);
+                Object[] args = new Object[] { session };
+                m.invoke(tm, args);
+              }
+            catch (NoSuchMethodException e)
+              {
+              }
+            return tm;
+          }
+        catch (Exception e)
+          {
+            throw new MessagingException(e.getMessage(), e);
           }
       }
   }

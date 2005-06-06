@@ -28,11 +28,15 @@
 package gnu.mail.providers.mbox;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -40,12 +44,10 @@ import javax.mail.Store;
 import javax.mail.URLName;
 
 import gnu.inet.util.GetSystemPropertyAction;
+import gnu.inet.util.TraceLevel;
 import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
-
-import gnu.inet.util.Logger;
-import java.io.IOException;
 
 /**
  * The storage class implementing the Mbox mailbox file format.
@@ -56,6 +58,11 @@ public final class MboxStore
   extends Store 
   implements StatusSource
 {
+
+  static final Logger logger =
+    Logger.getLogger("gnu.mail.util.providers.mbox");
+
+  static final Level MBOX_TRACE = new TraceLevel("mbox");
 
   private static final char separatorChar = '/';
   
@@ -78,6 +85,10 @@ public final class MboxStore
     if (af != null) 
       {
         attemptFallback = Boolean.valueOf(af).booleanValue();
+      }
+    if (session.getDebug())
+      {
+        logger.setLevel(MBOX_TRACE);
       }
   }
   
@@ -264,11 +275,7 @@ public final class MboxStore
    */
   void log(String message)
   {
-    if (session.getDebug())
-      {
-        Logger logger = Logger.getInstance();
-        logger.log("mbox", message);
-      }
+    logger.log(MBOX_TRACE, message);
   }
 
   // -- StatusSource --

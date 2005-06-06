@@ -46,7 +46,6 @@ import javax.net.ssl.TrustManager;
 import gnu.inet.smtp.Parameter;
 import gnu.inet.smtp.ParameterList;
 import gnu.inet.smtp.SMTPConnection;
-import gnu.inet.util.Logger;
 
 /** 
  * This transport handles communications with an SMTP server.
@@ -129,16 +128,22 @@ public class SMTPTransport
       {	
         int connectionTimeout = getIntProperty("connectiontimeout");
         int timeout = getIntProperty("timeout");
+        if (session.getDebug())
+          {
+            SMTPConnection.logger.setLevel(SMTPConnection.SMTP_TRACE);
+          }
+        boolean tls = "stmps".equals(url.getProtocol());
+        // Locate custom trust manager
+        String tmt = getProperty("trustmanager");
         connection = new SMTPConnection(host, port,
-                                         connectionTimeout, timeout,
-                                         session.getDebug());
+                                        connectionTimeout, timeout);
     
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))
           {
             if (!connection.helo(localHostName))
               throw new MessagingException("HELO failed: "+
-                                            connection.getLastResponse());
+                                           connection.getLastResponse());
           }
         else
           {
@@ -153,13 +158,10 @@ public class SMTPTransport
               }
             else
               {
-                boolean tls = false;
-                if (extensions.contains("STARTTLS"))
+                if (!tls && extensions.contains("STARTTLS"))
                   {
                     if (!propertyIsFalse("tls"))
                       {
-                        // Locate custom trust manager
-                        String tmt = getProperty("trustmanager");
                         if (tmt == null)
                           {
                             tls = connection.starttls();

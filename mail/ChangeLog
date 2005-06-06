@@ -1,6 +1,15 @@
+2005-06-06  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am,Session.java,IMAPStore.java,POP3Store.java,
+	SMTPTransport.java,NNTPTransport.java,NNTPStore.java,
+	MboxStore.java,MaildirStore.java: New logging framework.
+	* POP3Store.java,SMTPTransport.java: Handle POP3S,
+	SMTPS protocols.
+
 2005-06-06  Byron Foster  <byron@base2.cc>
 
 	* Makefile.am: Fix creation of javamail.address.map.
+	* IMAPStore.java: Handle IMAPS protocol.
 
 2005-06-02  Byron Foster  <byron@base2.cc>
 

@@ -30,6 +30,9 @@ package gnu.mail.providers.nntp;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -41,7 +44,6 @@ import javax.mail.URLName;
 import gnu.inet.nntp.FileNewsrc;
 import gnu.inet.nntp.Newsrc;
 import gnu.inet.nntp.NNTPConnection;
-import gnu.inet.util.Logger;
 
 /**
  * An NNTP store provider.
@@ -53,6 +55,10 @@ import gnu.inet.util.Logger;
  */
 public class NNTPStore extends Store
 {
+
+  static final Logger logger = Logger.getLogger("gnu.mail.providers.nntp");
+
+  static final Level NNTP_TRACE = NNTPConnection.NNTP_TRACE;
 
   NNTPConnection connection;
   Newsrc newsrc;
@@ -82,8 +88,7 @@ public class NNTPStore extends Store
       if (tn != null)
         {
           // TODO implement independent way to instantiate newsrcs
-          Logger logger = Logger.getInstance();
-          logger.log("nntp", "ERROR: unable to instantiate newsrc");
+          logger.log(NNTP_TRACE, "ERROR: unable to instantiate newsrc");
         }
       else
         {
@@ -146,9 +151,12 @@ public class NNTPStore extends Store
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
+          if (session.getDebug())
+            {
+              NNTPConnection.logger.setLevel(NNTPConnection.NNTP_TRACE);
+            }
           connection = new NNTPConnection(host, port,
-                                           connectionTimeout, timeout,
-                                           session.getDebug());
+                                          connectionTimeout, timeout);
           if (username != null && password != null)
             {
               // TODO decide on authentication method

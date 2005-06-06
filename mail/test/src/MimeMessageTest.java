@@ -17,10 +17,14 @@ import junit.textui.TestRunner;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MimeMessageTest
   extends TestCase
 {
+
+  static Logger logger = Logger.getLogger("test");
 
   private Session session;
   private URLName url;
@@ -51,6 +55,7 @@ public class MimeMessageTest
         }
       catch (MessagingException e)
         {
+          logger.log(Level.SEVERE, e.getMessage(), e);
           fail(e.getMessage());
         }
     }
@@ -80,6 +85,7 @@ public class MimeMessageTest
             }
           catch (MessagingException e)
             {
+          logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
       if (store!=null)
@@ -90,6 +96,7 @@ public class MimeMessageTest
             }
           catch (MessagingException e)
             {
+          logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
       url = null;
@@ -103,16 +110,19 @@ public class MimeMessageTest
     {
       try
         {
+          System.out.println(url.toString());
           assertNotNull(message.getFrom());
           assertNotNull(message.getAllRecipients());
           testContent(message.getContent());
         }
       catch (MessagingException e)
         {
+          logger.log(Level.SEVERE, e.getMessage(), e);
           fail(e.getMessage());
         }
       catch (IOException e)
         {
+          logger.log(Level.SEVERE, e.getMessage(), e);
           fail(e.getMessage());
         }
     }
@@ -187,6 +197,7 @@ public class MimeMessageTest
         }
       catch (IOException e)
         {
+          logger.log(Level.SEVERE, e.getMessage(), e);
           System.err.println("No folder URLs");
         }
       return suite;

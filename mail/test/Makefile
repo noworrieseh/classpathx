@@ -14,7 +14,8 @@ prefix = /usr/local/share/java
 extra = /usr/local/share/java
 
 OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true -Djavax.net.debug=true \
--Dmail.smtp.host=bluezoo.org -Dmail.smtp.auth=required
+-Dmail.smtp.host=bluezoo.org -Dmail.smtp.auth=required \
+-Djava.util.logging.config.file=logging.properties
 
 all: test
 

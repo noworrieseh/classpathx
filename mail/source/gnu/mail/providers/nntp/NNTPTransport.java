@@ -102,9 +102,12 @@ public class NNTPTransport extends Transport
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
+          if (session.getDebug())
+            {
+              NNTPConnection.logger.setLevel(NNTPConnection.NNTP_TRACE);
+            }
           connection = new NNTPConnection(host, port,
-                                           connectionTimeout, timeout,
-                                           debug);
+                                          connectionTimeout, timeout);
           if (username != null && password != null)
             {
               // TODO decide on authentication method

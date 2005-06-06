@@ -30,12 +30,16 @@ package gnu.mail.providers.maildir;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
 
+import gnu.inet.util.TraceLevel;
 import gnu.mail.treeutil.StatusEvent;
 import gnu.mail.treeutil.StatusListener;
 import gnu.mail.treeutil.StatusSource;
@@ -50,6 +54,11 @@ public final class MaildirStore
   implements StatusSource
 {
 
+  static final Logger logger =
+    Logger.getLogger("gnu.mail.util.providers.maildir");
+
+  static final Level MAILDIR_TRACE = new TraceLevel("maildir");
+
   private static final char separatorChar = '/';
   
   private List statusListeners = new ArrayList();
@@ -60,6 +69,10 @@ public final class MaildirStore
   public MaildirStore(Session session, URLName urlname) 
   {
     super(session, urlname);
+    if (session.getDebug())
+      {
+        logger.setLevel(MAILDIR_TRACE);
+      }
   }
 	
   /**
@@ -205,8 +218,7 @@ public final class MaildirStore
    */
   void log(String message)
   {
-    if (session.getDebug())
-      System.out.println("maildir: "+message);
+    logger.log(MAILDIR_TRACE, message);
   }
 
   // -- StatusSource --
