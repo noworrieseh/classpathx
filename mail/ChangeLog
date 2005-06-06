@@ -1,3 +1,7 @@
+2005-06-06  Byron Foster  <byron@base2.cc>
+
+	* Makefile.am: Fix creation of javamail.address.map.
+
 2005-06-02  Byron Foster  <byron@base2.cc>
 
 	* IMAPFolder.java: Do server-side searches for unread message

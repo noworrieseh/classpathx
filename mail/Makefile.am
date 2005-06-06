@@ -342,10 +342,10 @@ META-INF/javamail.default.address.map: META-INF javamail.address.map
 javamail.address.map:
 	rm -f javamail.address.map
 if ENABLE_SMTP
-	echo "rfc822=smtp" > javamail.address.map
+	echo "rfc822=smtp" >> javamail.address.map
 endif
 if ENABLE_NNTP
-	echo "news=nntp-post" > javamail.address.map
+	echo "news=nntp-post" >> javamail.address.map
 endif
 
 $(dst):
