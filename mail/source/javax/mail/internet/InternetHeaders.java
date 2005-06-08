@@ -332,7 +332,7 @@ public class InternetHeaders
   public void load(InputStream is)
     throws MessagingException
   {
-    LineInputStream in = new LineInputStream(new CRLFInputStream(is));
+    LineInputStream in = new LineInputStream(is);
     try
       {
         for (String line = in.readLine(); line != null; line = in.readLine()) 

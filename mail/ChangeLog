@@ -1,3 +1,8 @@
+2005-06-08  Archit Shah  <ashah@redhat.com>
+
+	* InternetHeaders.java: Do not wrap header input stream in
+	CRLFInputStream.
+
 2005-06-06  Chris Burdess  <dog@bluezoo.org>
 
 	* Makefile.am,Session.java,IMAPStore.java,POP3Store.java,
