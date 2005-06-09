@@ -144,6 +144,10 @@ sources = \
 	$(src)/javax/servlet/ServletInputStream.java \
 	$(src)/javax/servlet/ServletOutputStream.java \
 	${src}/javax/servlet/ServletRequest.java \
+	${src}/javax/servlet/ServletRequestAttributeEvent.java \
+	${src}/javax/servlet/ServletRequestAttributeListener.java \
+	${src}/javax/servlet/ServletRequestEvent.java \
+	${src}/javax/servlet/ServletRequestListener.java \
 	${src}/javax/servlet/ServletRequestWrapper.java \
 	${src}/javax/servlet/ServletResponse.java \
 	${src}/javax/servlet/ServletResponseWrapper.java \

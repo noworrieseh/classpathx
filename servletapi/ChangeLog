@@ -1,3 +1,7 @@
+2005-06-09  Chris Burdess  <dog@gnu.org>
+
+	* Makefile.am: Added missing classes to build.
+
 2005-06-01  Chris Burdess  <dog@gnu.org>
 
 	* HttpSession.java: Removed spurious logout() method.

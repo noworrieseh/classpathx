@@ -68,7 +68,6 @@ implements Servlet, ServletConfig, Serializable
     throws ServletException 
   {
     this.servletConfig = servletConfig;
-    log("started");
     init();
   }
 
