@@ -45,30 +45,14 @@ import javax.mail.Multipart;
 import gnu.mail.util.RFC2822OutputStream;
 
 /**
- * This class represents a MIME body part.
- * It implements the BodyPart abstract class and the MimePart interface.
- * MimeBodyParts are contained in MimeMultipart objects.
+ * A MIME body part.
+ * Body parts are components of multipart parts.
  * <p>
- * MimeBodyPart uses the InternetHeaders class to parse and store 
- * the headers of that body part.
- * <p>
- * <hr>
- * A note on RFC 822 and MIME headers
- * <p>
- * RFC 822 header fields must contain only US-ASCII characters.
- * MIME allows non ASCII characters to be present in certain portions
- * of certain headers, by encoding those characters.
- * RFC 2047 specifies the rules for doing this.
- * The MimeUtility class provided in this package can be used to achieve this.
- * Callers of the <code>setHeader</code>, <code>addHeader</code>, and 
- * <code>addHeaderLine</code> methods are responsible for enforcing the 
- * MIME requirements for the specified headers. 
- * In addition, these header fields must be folded(wrapped) before being 
- * sent if they exceed the line length limitation for the transport
- * (1000 bytes for SMTP).
- * Received headers may have been folded.
- * The application is responsible for folding and unfolding headers as 
- * appropriate.
+ * The string representation of RFC822 and MIME header fields must contain
+ * only US-ASCII characters. Non US-ASCII characters must be encoded as per
+ * the rules in RFC 2047. This class does not enforce those rules; the
+ * caller is expected to use <code>MimeUtility</code> to ensure that header
+ * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -79,25 +63,24 @@ public class MimeBodyPart
 {
 
   /**
-   * The DataHandler object representing this Part's content.
+   * The data handler managing this part's content.
    */
   protected DataHandler dh;
 
   /**
-   * Byte array that holds the bytes of the content of this Part.
+   * The bytes of the content of this part, if the part can be stored in
+   * memory.
    */
   protected byte[] content;
 
   /**
-   * If the data for this body part was supplied by an InputStream that
-   * implements the SharedInputStream interface, contentStream is another 
-   * such stream representing the content of this body part.
-   * In this case, content will be null.
+   * A SharedInputStream containing the bytes of this part, if it cannot be
+   * stored in memory.
    */
   protected InputStream contentStream;
 
   /**
-   * The InternetHeaders object that stores all the headers of this body part.
+   * The headers of this body part.
    */
   protected InternetHeaders headers;
 
@@ -116,9 +99,7 @@ public class MimeBodyPart
   static final String TEXT_PLAIN = "text/plain";
 
   /**
-   * An empty MimeBodyPart object is created.
-   * This body part maybe filled in by a client 
-   * constructing a multipart message.
+   * Constructor for an empty MIME body part.
    */
   public MimeBodyPart()
   {
@@ -126,17 +107,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Constructs a MimeBodyPart by reading and parsing the data from the
-   * specified input stream.
-   * The parser consumes data till the end of the given input stream.
-   * The input stream must start at the beginning of a valid MIME body part 
-   * and must terminate at the end of that body part.
-   * <p>
-   * Note that the "boundary" string that delimits body parts must not be
-   * included in the input stream. The intention is that the MimeMultipart
-   * parser will extract each body part's bytes from a multipart stream and feed
-   * them into this constructor, without the delimiter strings.
-   * @param is the body part Input Stream
+   * Constructor with an input stream.
+   * The stream must be positioned at the start of a valid MIME body part
+   * and terminate at the end of that body part: the boundary string must
+   * not be included in the stream.
+   * @param is the input stream
    */
   public MimeBodyPart(InputStream is)
     throws MessagingException
@@ -188,11 +163,9 @@ public class MimeBodyPart
   }
 
   /**
-   * Constructs a MimeBodyPart using the given header and content bytes.
-   * <p>
-   * Used by providers.
-   * @param headers The header of this part
-   * @param content bytes representing the body of this part.
+   * Constructor with headers and byte content.
+   * @param headers the header
+   * @param content the byte content of this part
    */
   public MimeBodyPart(InternetHeaders headers, byte[] content)
     throws MessagingException
@@ -202,17 +175,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Return the size of the content of this body part in bytes.
-   * Return -1 if the size cannot be determined.
+   * Returns the size of the content of this body part in bytes, or -1 if
+   * the size cannot be determined.
    * <p>
-   * Note that this number may not be an exact measure of the content size and
-   * may or may not account for any transfer encoding of the content.
-   * <p>
-   * This implementation returns the size of the content array(if not null),
-   * or, if contentStream is not null, and the available method returns a
-   * positive number, it returns that number as the size. Otherwise, it 
-   * returns -1.
-   * @return size in bytes, or -1 if not known
+   * Note that this number may not be an exact measure, but if not -1, it
+   * will be suitable for display to the user.
    */
   public int getSize()
     throws MessagingException
@@ -239,14 +206,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Return the number of lines for the content of this Part.
-   * Return -1 if this number cannot be determined.
+   * Returns the number of lines in the content of this body part, or -1 if
+   * this number cannot be determined.
    * <p>
-   * Note that this number may not be an exact measure of the content length 
-   * and may or may not account for any transfer encoding of the content.
-   * <p>
-   * This implementation returns -1.
-   * @return number of lines, or -1 if not known
+   * Note that this number may not be an exact measure, but if not -1, it
+   * will be suitable for display to the user.
    */
   public int getLineCount()
     throws MessagingException
@@ -255,14 +219,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the value of the RFC 822 "Content-Type" header field.
-   * This represents the content type of the content of this body part.
-   * This value must not be null.
-   * If this field is unavailable, "text/plain" should be returned.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
-   * @return Content-Type of this body part
+   * Returns the value of the RFC 822 Content-Type header field, or
+   * "text/plain" if the header is not available.
    */
   public String getContentType()
     throws MessagingException
@@ -276,15 +234,10 @@ public class MimeBodyPart
   }
 
   /**
-   * Is this Part of the specified MIME type?
-   * This method compares only the primaryType and subType.
-   * The parameters of the content types are ignored.
+   * Indicates whether this part is of the specified MIME type.
    * <p>
-   * For example, this method will return true when comparing a Part 
-   * of content type "text/plain" with "text/plain; charset=foobar".
-   * <p>
-   * If the subType of <code>mimeType</code> is the special character '*',
-   * then the subtype is ignored during the comparison.
+   * If the subtype of <code>mimeType</code> is the special character '*',
+   * the subtype is ignored during the comparison.
    */
   public boolean isMimeType(String mimeType)
     throws MessagingException
@@ -301,14 +254,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the value of the "Content-Disposition" header field.
-   * This represents the disposition of this part.
-   * The disposition describes how the part should be presented to the user.
-   * <p>
-   * If the Content-Disposition field is unavailable, null is returned.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain the 
-   * requisite header field.
+   * Returns the value of the RFC 822 Content-Disposition header field, or
+   * <code>null</code> if the header is not available.
    */
   public String getDisposition()
     throws MessagingException
@@ -322,13 +269,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the "Content-Disposition" header field of this body part.
-   * If the disposition is null, any existing "Content-Disposition" 
-   * header field is removed.
+   * Sets the Content-Disposition header field of this part.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setDisposition(String disposition)
     throws MessagingException
@@ -351,12 +296,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the content transfer encoding from the 
-   * "Content-Transfer-Encoding" header field.
-   * Returns null if the header is unavailable or its value is absent.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
+   * Returns the value of the Content-Transfer-Encoding header field.
    */
   public String getEncoding()
     throws MessagingException
@@ -392,11 +332,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the value of the "Content-ID" header field.
-   * Returns null if the field is unavailable or its value is absent.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
+   * Returns the value of the Content-ID header field.
    */
   public String getContentID()
     throws MessagingException
@@ -405,13 +341,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the "Content-ID" header field of this body part.
-   * If the <code>cid</code> parameter is null, any existing "Content-ID" is
-   * removed.
+   * Sets the Content-ID header field of this part.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    * @since JavaMail 1.3
    */
   public void setContentID(String cid)
@@ -428,11 +362,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the value of the "Content-MD5" header field.
-   * Returns null if the field is unavailable or its value is absent.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
+   * Returns the value of the Content-MD5 header field.
    */
   public String getContentMD5()
     throws MessagingException
@@ -441,11 +371,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the "Content-MD5" header field of this body part.
+   * Sets the Content-MD5 header field of this part.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setContentMD5(String md5)
     throws MessagingException
@@ -454,13 +384,9 @@ public class MimeBodyPart
   }
 
   /**
-   * Get the languages specified in the Content-Language header of this
-   * MimePart.
-   * The Content-Language header is defined by RFC 1766. Returns null if 
-   * this header is not available or its value is absent.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
+   * Returns the languages specified in the Content-Language header of this
+   * part, as defined by RFC 1766. This method returns <code>null</code> if 
+   * this header is not available.
    */
   public String[] getContentLanguage()
     throws MessagingException
@@ -494,9 +420,12 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the Content-Language header of this MimePart.
-   * The Content-Language header is defined by RFC 1766.
-   * @param languages array of language tags
+   * Sets the Content-Language header of this part.
+   * @param languages the array of language tags
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification
+   * @exception IllegalStateException if this body part is obtained 
+   * from a READ_ONLY folder
    */
   public void setContentLanguage(String[] languages)
     throws MessagingException
@@ -519,16 +448,10 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the "Content-Description" header field of this body part.
-   * This typically associates some descriptive information with this part.
-   * Returns null if this field is unavailable or its value is absent.
+   * Returns the Content-Description header field of this part.
    * <p>
    * If the Content-Description field is encoded as per RFC 2047,
    * it is decoded and converted into Unicode.
-   * If the decoding or conversion fails, the raw data is returned as is.
-   * <p>
-   * This implementation uses <code>getHeader(name)</code> to obtain 
-   * the requisite header field.
    */
   public String getDescription()
     throws MessagingException
@@ -549,22 +472,15 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the "Content-Description" header field for this body part.
-   * If the description parameter is null, then any existing
-   * "Content-Description" fields are removed.
+   * Sets the Content-Description header field for this part.
    * <p>
-   * If the description contains non US-ASCII characters, it will be encoded
-   * using the platform's default charset. If the description contains only
-   * US-ASCII characters, no encoding is done and it is used as is.
-   * <p>
-   * Note that if the charset encoding process fails, a MessagingException is
-   * thrown, and an UnsupportedEncodingException is included in the chain of
-   * nested exceptions within the MessagingException.
-   * @param description content description
+   * If <code>description</code> contains non US-ASCII characters, it will
+   * be encoded using the platform default charset.
+   * @param description the content description
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setDescription(String description)
     throws MessagingException
@@ -573,23 +489,16 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the "Content-Description" header field for this body part.
-   * If the description parameter is null, then any existing
-   * "Content-Description" fields are removed.
+   * Sets the Content-Description header field for this part.
    * <p>
-   * If the description contains non US-ASCII characters, it will be encoded
-   * using the specified charset. If the description contains only
-   * US-ASCII characters, no encoding is done and it is used as is.
-   * <p>
-   * Note that if the charset encoding process fails, a MessagingException is
-   * thrown, and an UnsupportedEncodingException is included in the chain of
-   * nested exceptions within the MessagingException.
-   * @param description content description
-   * @param charset Charset for encoding
+   * If <code>description</code> contains non US-ASCII characters, it will
+   * be encoded using the specified charset.
+   * @param description the content description
+   * @param charset the charset used for encoding
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setDescription(String description, String charset)
     throws MessagingException
@@ -613,13 +522,12 @@ public class MimeBodyPart
   }
 
   /**
-   * Get the filename associated with this body part.
+   * Returns the filename associated with this body part.
    * <p>
-   * Returns the value of the "filename" parameter from the
-   * "Content-Disposition" header field of this body part.
-   * If it's not available, returns the value of the "name" parameter 
-   * from the "Content-Type" header field of this body part.
-   * Returns null if both are absent.
+   * This method returns the value of the "filename" parameter from the
+   * Content-Disposition header field.
+   * If the latter is not available, it returns the value of the "name"
+   * parameter from the Content-Type header field.
    */
   public String getFileName()
     throws MessagingException
@@ -650,14 +558,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Set the filename associated with this body part, if possible.
-   * <p>
-   * Sets the "filename" parameter of the "Content-Disposition"
-   * header field of this body part.
+   * Sets the filename associated with this body part.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setFileName(String filename)
     throws MessagingException
@@ -686,13 +591,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return a decoded input stream for this body part's "content".
-   * <p>
-   * This implementation obtains the input stream from the DataHandler.
-   * That is, it invokes getDataHandler().getInputStream();
-   * @exception IOException this is typically thrown by the DataHandler.
-   * Refer to the documentation for javax.activation.DataHandler for more
-   * details.
+   * Returns a decoded input stream for this part's content.
+   * @exception IOException if an error occurs in the data handler layer
    */
   public InputStream getInputStream()
     throws IOException, MessagingException
@@ -701,10 +601,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Produce the raw bytes of the content. 
-   * This method is used when creating a DataHandler object for the content.
-   * Subclasses that can provide a separate input stream for just the Part 
-   * content might want to override this method.
+   * Returns the unencoded bytes of the content. 
    */
   protected InputStream getContentStream()
     throws MessagingException
@@ -721,15 +618,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return an InputStream to the raw data with any Content-Transfer-Encoding
-   * intact.
-   * This method is useful if the "Content-Transfer-Encoding" header is
-   * incorrect or corrupt, which would prevent the <code>getInputStream</code>
-   * method or <code>getContent</code> method from returning the correct data.
-   * In such a case the application may use this method and attempt to decode
-   * the raw data itself.
-   * <p>
-   * This implementation simply calls the <code>getContentStream</code> method.
+   * Returns the unencoded bytes of the content without applying any
+   * content transfer decoding.
    */
   public InputStream getRawInputStream()
     throws MessagingException
@@ -738,10 +628,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Return a DataHandler for this body part's content.
-   * <p>
-   * The implementation provided here works just like the the implementation
-   * in MimeMessage.
+   * Returns a data handler for accessing this part's content.
    */
   public DataHandler getDataHandler()
     throws MessagingException
@@ -754,18 +641,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return the content as a java object.
-   * The type of the object returned is of course dependent on the content
-   * itself. For example, the native format of a text/plain content is 
-   * usually a String object. The native format for a "multipart" content is 
-   * always a Multipart subclass. For content types that are unknown to the 
-   * DataHandler system, an input stream is returned as the content.
-   * <p>
-   * This implementation obtains the content from the DataHandler.
-   * That is, it invokes <code>getDataHandler().getContent();</code>
-   * @exception IOException - this is typically thrown by the DataHandler.
-   * Refer to the documentation for javax.activation.DataHandler for more 
-   * details.
+   * Returns this part's content as a Java object.
+   * @exception IOException if an error occurred in the data handler layer
    */
   public Object getContent()
     throws IOException, MessagingException
@@ -774,12 +651,11 @@ public class MimeBodyPart
   }
 
   /**
-   * This method provides the mechanism to set this body part's content.
-   * The given DataHandler object should wrap the actual content.
+   * Sets the content of this part using the specified data handler.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setDataHandler(DataHandler dh)
     throws MessagingException
@@ -792,20 +668,15 @@ public class MimeBodyPart
   }
 
   /**
-   * A convenience method for setting this body part's content.
-   * <p>
-   * The content is wrapped in a DataHandler object. Note that a
-   * DataContentHandler class for the specified type should be available 
-   * to the JavaMail implementation for this to work right.
-   * That is, to do <code>setContent(foobar, "application/x-foobar")</code>,
-   * a DataContentHandler for "application/x-foobar" should be installed.
-   * Refer to the Java Activation Framework for more information.
+   * Sets the content of this part using the specified Java object and MIME
+   * type. Note that a data content handler for the MIME type must be
+   * installed and accept objects of the type given.
    * @param o the content object
-   * @param type Mime type of the object
+   * @param type the MIME type of the object
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setContent(Object o, String type)
     throws MessagingException
@@ -821,18 +692,12 @@ public class MimeBodyPart
   }
 
   /**
-   * Convenience method that sets the given String as this part's content,
-   * with a MIME type of "text/plain".
-   * If the string contains non US-ASCII characters, it will be encoded 
-   * using the platform's default charset. The charset is also used to set 
-   * the "charset" parameter.
+   * Sets the content of this part using the specified text, and with a
+   * MIME type of "text/plain".
    * <p>
-   * Note that there may be a performance penalty if text is large,
-   * since this method may have to scan all the characters to determine what 
-   * charset to use.
-   * <p>
-   * If the charset is already known, use the <code>setText()</code> version
-   * that takes the <code>charset</code> parameter.
+   * If the text contains non US-ASCII characters, it will be encoded 
+   * using the platform default charset.
+   * @param text the text content
    */
   public void setText(String text)
     throws MessagingException
@@ -841,10 +706,13 @@ public class MimeBodyPart
   }
 
   /**
-   * Convenience method that sets the given String as this part's content,
-   * with a MIME type of "text/plain" and the specified charset.
-   * The given Unicode string will be charset-encoded using the specified 
-   * charset. The charset is also used to set the "charset" parameter.
+   * Sets the content of this part using the specified text, and with a
+   * MIME type of "text/plain".
+   * <p>
+   * If the text contains non US-ASCII characters, it will be encoded 
+   * using the specified charset.
+   * @param text the text content
+   * @param charset the charset used for any encoding
    */
   public void setText(String text, String charset)
     throws MessagingException
@@ -865,12 +733,12 @@ public class MimeBodyPart
   }
 
   /**
-   * This method sets the body part's content to a Multipart object.
-   * @param mp The multipart object that is the Message's content
+   * Sets the content of this part to be the specified multipart.
+   * @param mp the multipart content
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void setContent(Multipart mp)
     throws MessagingException
@@ -881,9 +749,9 @@ public class MimeBodyPart
   }
 
   /**
-   * Output the body part as an RFC 822 format stream.
-   * @exception IOException if an error occurs writing to the stream or if an
-   * error is generated by the javax.activation layer.
+   * Writes this body part to the specified stream in RFC 822 format.
+   * @exception IOException if an error occurs writing to the stream or in
+   * the data handler layer
    */
   public void writeTo(OutputStream os)
     throws IOException, MessagingException
@@ -940,10 +808,10 @@ public class MimeBodyPart
   }
 
   /**
-   * Get all the headers for this header_name.
-   * Note that certain headers may be encoded as per RFC 2047
-   * if they contain non US-ASCII characters and these should be decoded.
-   * @param name name of header
+   * Returns all the values for the specified header name.
+   * Note that headers may be encoded as per RFC 2047 if they contain
+   * non-US-ASCII characters: these should be decoded.
+   * @param name the header name
    */
   public String[] getHeader(String name)
     throws MessagingException
@@ -952,11 +820,12 @@ public class MimeBodyPart
   }
 
   /**
-   * Get all the headers for this header name, returned as a single String,
-   * with headers separated by the delimiter.
-   * If the delimiter is null, only the first header is returned.
-   * @param name the name of this header
-   * @param delimiter the delimiter to use
+   * Returns all the values for the specified header name as a single
+   * string, with headers separated by the given delimiter.
+   * If the delimiter is <code>null</code>, only the first header is
+   * returned.
+   * @param name the header name
+   * @param delimiter the delimiter
    */
   public String getHeader(String name, String delimiter)
     throws MessagingException
@@ -965,12 +834,13 @@ public class MimeBodyPart
   }
 
   /**
-   * Add this value to the existing values for this name.
-   * Note that RFC 822 headers must contain only US-ASCII characters,
-   * so a header that contains non US-ASCII characters must be encoded 
-   * as per the rules of RFC 2047.
+   * Sets the specified header.
    * @param name the header name
    * @param value the header value
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification
+   * @exception IllegalStateException if this body part is obtained 
+   * from a READ_ONLY folder
    */
   public void setHeader(String name, String value)
     throws MessagingException
@@ -979,12 +849,13 @@ public class MimeBodyPart
   }
 
   /**
-   * Add this value to the existing values for this name.
-   * Note that RFC 822 headers must contain only US-ASCII characters,
-   * so a header that contains non US-ASCII characters must be encoded 
-   * as per the rules of RFC 2047.
+   * Adds the specified header.
    * @param name the header name
    * @param value the header value
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification
+   * @exception IllegalStateException if this body part is obtained 
+   * from a READ_ONLY folder
    */
   public void addHeader(String name, String value)
     throws MessagingException
@@ -993,12 +864,12 @@ public class MimeBodyPart
   }
 
   /**
-   * Remove all headers with this name.
-   * @param name the name of this header
+   * Removes all headers with the specified name.
+   * @param name the header name
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void removeHeader(String name)
     throws MessagingException
@@ -1007,8 +878,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return all the headers from this Message as an Enumeration of Header
-   * objects.
+   * Returns all the headers.
+   * @return an Enumeration of Header objects
    */
   public Enumeration getAllHeaders()
     throws MessagingException
@@ -1017,8 +888,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return matching headers from this Message as an Enumeration of Header
-   * objects.
+   * Returns all the headers with any of the given names.
+   * @return an Enumeration of Header objects
    */
   public Enumeration getMatchingHeaders(String[] names)
     throws MessagingException
@@ -1027,8 +898,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Return non-matching headers from this Message as an Enumeration of Header
-   * objects.
+   * Returns all the headers without any of the given names.
+   * @return an Enumeration of Header objects
    */
   public Enumeration getNonMatchingHeaders(String[] names)
     throws MessagingException
@@ -1037,11 +908,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Add a header line to this body part.
+   * Adds an RFC 822 header-line to this part.
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification
    * @exception IllegalStateException if this body part is obtained 
-   * from a READ_ONLY folder.
+   * from a READ_ONLY folder
    */
   public void addHeaderLine(String line)
     throws MessagingException
@@ -1050,9 +921,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Get all header lines as an Enumeration of Strings.
-   * A Header line is a raw RFC 822 header line,
-   * containing both the "name" and "value" field.
+   * Returns all the header-lines.
+   * @return an Enumeration of Strings
    */
   public Enumeration getAllHeaderLines()
     throws MessagingException
@@ -1061,9 +931,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Get matching header lines as an Enumeration of Strings.
-   * A Header line is a raw RFC 822 header line,
-   * containing both the "name" and "value" field.
+   * Returns all the header-lines with any of the given names.
+   * @return an Enumeration of Strings
    */
   public Enumeration getMatchingHeaderLines(String[] names)
     throws MessagingException
@@ -1072,9 +941,8 @@ public class MimeBodyPart
   }
 
   /**
-   * Get non-matching header lines as an Enumeration of Strings.
-   * A Header line is a raw RFC 822 header line,
-   * containing both the "name" and "value" field.
+   * Returns all the header-lines without any of the given names.
+   * @return an Enumeration of Strings
    */
   public Enumeration getNonMatchingHeaderLines(String[] names)
     throws MessagingException
@@ -1083,21 +951,11 @@ public class MimeBodyPart
   }
 
   /**
-   * Examine the content of this body part and update the appropriate MIME
-   * headers.
-   * Typical headers that get set here are Content-Type and
-   * Content-Transfer-Encoding. Headers might need to be updated in two cases:
-   * <ul>
-   * <li>A message being crafted by a mail application will certainly need to
-   * activate this method at some point to fill up its internal headers.
-   * <li>A message read in from a Store will have obtained all its headers 
-   * from the store, and so doesn't need this.
-   * However, if this message is editable and if any edits have been made 
-   * to either the content or message structure, we might need to resync our 
-   * headers.
-   * </ul>
-   * In both cases this method is typically called by the 
-   * <code>Message.saveChanges</code> method.
+   * Updates the headers of this part, based on the content.
+   * @exception IllegalWriteException if the underlying implementation 
+   * does not support modification
+   * @exception IllegalStateException if this body part is obtained 
+   * from a READ_ONLY folder
    */
   protected void updateHeaders()
     throws MessagingException
@@ -1154,3 +1012,4 @@ public class MimeBodyPart
   }
 
 }
+

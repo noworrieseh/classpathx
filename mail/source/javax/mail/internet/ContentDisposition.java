@@ -1,13 +1,13 @@
 /*
  * ContentDisposition.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,10 +28,7 @@
 package javax.mail.internet;
 
 /**
- * This class represents a MIME Content-Disposition value.
- * It provides methods to parse a Content-Disposition string into 
- * individual components and to generate a MIME style Content-Disposition 
- * string.
+ * A MIME Content-Disposition value.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -45,12 +42,12 @@ public class ContentDisposition
   private String disposition;
 
   /*
-   * The available parameters.
+   * The parameters.
    */
   private ParameterList list;
 
   /**
-   * No-arg constructor.
+   * Constructor for an empty Content-Disposition.
    */
   public ContentDisposition()
   {
@@ -58,8 +55,8 @@ public class ContentDisposition
 
   /**
    * Constructor.
-   * @param disposition disposition
-   * @param list ParameterList
+   * @param disposition the disposition value
+   * @param list the parameters
    */
   public ContentDisposition(String disposition, ParameterList list)
   {
@@ -68,11 +65,10 @@ public class ContentDisposition
   }
 
   /**
-   * Constructor that takes a ContentDisposition string.
-   * The String is parsed into its constituents: disposition and parameters.
-   * A ParseException is thrown if the parse fails.
-   * @param s the ContentDisposition string.
-   * @exception ParseException if the parse fails.
+   * Constructor that parses a Content-Disposition value from an RFC 2045
+   * string representation.
+   * @param s the Content-Disposition value
+   * @exception ParseException if there was an error in the value
    */
   public ContentDisposition(String s)
     throws ParseException
@@ -94,8 +90,7 @@ public class ContentDisposition
   }
 
   /**
-   * Return the disposition value.
-   * @return the disposition
+   * Returns the disposition value.
    */
   public String getDisposition()
   {
@@ -103,10 +98,9 @@ public class ContentDisposition
   }
 
   /**
-   * Return the specified parameter value.
-   * Returns null if this parameter is absent.
-   * @param name the name of the parameter
-   * @return the parameter value
+   * Returns the specified parameter value, or <code>null</code> if this
+   * parameter is not present.
+   * @param name the parameter name
    */
   public String getParameter(String name)
   {
@@ -114,8 +108,8 @@ public class ContentDisposition
   }
 
   /**
-   * Return a ParameterList object that holds all the available parameters.
-   * Returns null if no parameters are available.
+   * Returns the parameters, or <code>null</code> if there are no
+   * parameters.
    */
   public ParameterList getParameterList()
   {
@@ -123,8 +117,8 @@ public class ContentDisposition
   }
 
   /**
-   * Set the primary type. Overrides existing primary type.
-   * @param primaryType the primary type
+   * Sets the disposition value.
+   * @param disposition the disposition value
    */
   public void setDisposition(String disposition)
   {
@@ -132,8 +126,7 @@ public class ContentDisposition
   }
 
   /**
-   * Set the specified parameter.
-   * If this parameter already exists, it is replaced by this new value.
+   * Sets the specified parameter.
    * @param name the parameter name
    * @param value the parameter value
    */
@@ -147,8 +140,8 @@ public class ContentDisposition
   }
 
   /**
-   * Set a new ParameterList.
-   * @param list the ParameterList
+   * Sets the parameters.
+   * @param list the parameters
    */
   public void setParameterList(ParameterList list)
   {
@@ -156,10 +149,7 @@ public class ContentDisposition
   }
 
   /**
-   * Retrieve a RFC2045 style string representation of this 
-   * ContentDisposition.
-   * Returns null if the conversion failed.
-   * @return RFC2045 style string
+   * Returns an RFC 2045 string representation of this Content-Disposition.
    */
   public String toString()
   {
@@ -186,3 +176,4 @@ public class ContentDisposition
   }
   
 }
+

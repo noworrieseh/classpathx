@@ -1,13 +1,13 @@
 /*
  * AddressTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 import javax.mail.Address;
 
 /**
- * This class implements Message Address comparisons.
+ * A comparison of message addresses.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -50,7 +50,7 @@ public abstract class AddressTerm
   }
 
   /**
-   * Return the address to match with.
+   * Returns the address to match.
    */
   public Address getAddress()
   {
@@ -58,28 +58,24 @@ public abstract class AddressTerm
   }
 
   /**
-   * Match against the argument Address.
+   * Returns true if the specified address matches the address specified in
+   * this term.
    */
   protected boolean match(Address address)
   {
     return address.equals(this.address);
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return ((other instanceof AddressTerm) && 
        ((AddressTerm) other).address.equals(address));
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return address.hashCode();
   }
   
 }
+

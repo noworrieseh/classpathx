@@ -1,13 +1,13 @@
 /*
  * Folder.java
- * Copyright(C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,58 +40,20 @@ import javax.mail.event.MessageCountListener;
 import javax.mail.search.SearchTerm;
 
 /**
- * Folder is an abstract class that represents a folder for mail messages.
- * Subclasses implement protocol specific Folders.
+ * A folder is a hierarchical messaging container in a store.
+ * Folders may contain Messages, other Folders or both, depending on the
+ * implementation.
  * <p>
- * Folders can contain Messages, other Folders or both, thus providing a
- * tree-like hierarchy rooted at the Store's default folder.
- *(Note that some Folder implementations may not allow both Messages and
- * other Folders in the same Folder).
+ * Folder names are implementation dependent; the hierarchy components in a
+ * folder's full name are separated by the folder's ancestors' hierarchy
+ * delimiter characters.
  * <p>
- * The interpretation of folder names is implementation dependent.
- * The different levels of hierarchy in a folder's full name are separated 
- * from each other by the hierarchy delimiter character.
+ * The special (case-insensitive) folder name INBOX is reserved to mean the
+ * primary folder for the authenticated user in the store. Not all stores 
+ * support INBOX folders, and not all users will have an INBOX folder.
  * <p>
- * The case-insensitive full folder name(that is, the full name relative
- * to the default folder for a Store) INBOX is reserved to mean the
- * "primary folder for this user on this server". Not all Stores will 
- * provide an INBOX folder, and not all users will have an INBOX folder 
- * at all times. The name INBOX is reserved to refer to this folder, when 
- * it exists, in Stores that provide it.
- * <p>
- * A Folder object obtained from a Store need not actually exist in the 
- * backend store. The <code>exists()</code> method tests whether the folder 
- * exists or not. The <code>create()</code> method creates a Folder.
- * <p>
- * A Folder is initially in the closed state.
- * Certain methods are valid in this state; the documentation for those
- * methods note this. A Folder is opened by calling its 'open' method.
- * All Folder methods, except <code>open()</code>, <code>delete()</code>
- * and <code>renameTo()</code>, are valid in this state.
- * <p>
- * The only way to get a Folder is by invoking the <code>getFolder()</code>
- * method on Store or Folder, or by invoking the <code>list()</code> or
- * <code>listSubscribed()</code> methods on Folder. Folder objects 
- * returned by the above methods are not cached by the Store. Thus,
- * invoking <code>getFolder(folder_name)</code> on the same
- * <code>folder_name</code> multiple times will return distinct Folder
- * objects. Likewise for <code>list()</code> and
- * <code>listSubscribed()</code>.
- * <p>
- * The Message objects within the Folder are cached by the Folder.
- * Thus, invoking <code>getMessage(msgno)</code> on the same message number 
- * multiple times will return the same Message object, until an expunge
- * is done on this Folder.
- * <p>
- * Note that a Message's message number can change within a session if the
- * containing Folder is expunged using the expunge method. Clients that use
- * message numbers as references to messages should be aware of this and 
- * should be prepared to deal with situation(probably by flushing out 
- * existing message number references and reloading them). 
- * Because of this complexity, it is better for clients to use Message
- * objects as references to messages, rather than message numbers.
- * Expunged Message objects still have to be pruned, but other Message 
- * objects in that folder are not affected by the expunge.
+ * Unless documented otherwise, a folder must be opened in order to invoke
+ * a method on it.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -110,13 +72,12 @@ public abstract class Folder
   public static final int HOLDS_FOLDERS = 2;
 
   /**
-   * The Folder is read only.
-   * The state and contents of this folder cannot be modified.
+   * This folder is read only.
    */
   public static final int READ_ONLY = 1;
 
   /**
-   * The state and contents of this folder can be modified.
+   * This folder can be modified.
    */
   public static final int READ_WRITE = 2;
   
@@ -126,8 +87,7 @@ public abstract class Folder
   protected Store store;
   
   /**
-   * The open mode of this folder.
-   * The open mode is Folder.READ_ONLY, Folder.READ_WRITE, or -1 if not known.
+   * The folder mode: Folder.READ_ONLY, Folder.READ_WRITE, or -1 if not known.
    */
   protected int mode = -1;
 
@@ -139,8 +99,8 @@ public abstract class Folder
   private volatile ArrayList messageChangedListeners = null;
 
   /**
-   * Constructor that takes a Store object.
-   * @param store the Store that holds this folder
+   * Constructor.
+   * @param store the parent store
    */
   protected Folder(Store store)
   {
@@ -148,27 +108,28 @@ public abstract class Folder
   }
 
   /**
-   * Returns the name of this Folder.
+   * Returns the name of this folder.
    * <p>
-   * This method can be invoked on a closed Folder.
+   * This method can be invoked on a closed folder.
    */
   public abstract String getName();
 
   /**
-   * Returns the full name of this Folder.
-   * If the folder resides under the root hierarchy of this Store,
+   * Returns the full name of this folder.
+   * If the folder resides under the root hierarchy of its store,
    * the returned name is relative to the root.
    * Otherwise an absolute name, starting with the hierarchy delimiter,
    * is returned.
    * <p>
-   * This method can be invoked on a closed Folder.
+   * This method can be invoked on a closed folder.
    */
   public abstract String getFullName();
 
   /**
-   * Return a URLName representing this folder.
-   * The returned URLName does not include the password 
-   * used to access the store.
+   * Return a URLName that can be used as a handle to access this folder.
+   * This will not include the password used to authenticate to the store.
+   * <p>
+   * This method can be invoked on a closed folder.
    */
   public URLName getURLName()
     throws MessagingException
@@ -181,8 +142,8 @@ public abstract class Folder
   }
 
   /**
-   * Returns the Store that owns this Folder object.
-   * This method can be invoked on a closed Folder.
+   * Returns the parent store.
+   * This method can be invoked on a closed folder.
    */
   public Store getStore()
   {
@@ -190,68 +151,41 @@ public abstract class Folder
   }
 
   /**
-   * Returns the parent folder of this folder.
-   * This method can be invoked on a closed Folder.
-   * If this folder is the top of a folder hierarchy, this method returns
-   * null.
+   * Returns the parent folder of this folder, or <code>null</code>
+   * if this folder is the root of a folder hierarchy.
    * <p>
-   * Note that since Folder objects are not cached, invoking this method 
-   * returns a new distinct Folder object.
+   * This method can be invoked on a closed folder.
    */
   public abstract Folder getParent()
     throws MessagingException;
 
   /**
-   * Indicates if this folder physically exists on the Store.
-   * This method can be invoked on a closed Folder.
+   * Indicates whether this folder exists in the Store.
+   * <p>
+   * This method can be invoked on a closed folder.
    */
   public abstract boolean exists()
     throws MessagingException;
 
   /**
-   * Returns a list of Folders belonging to this Folder's namespace 
-   * that match the specified pattern.
+   * Returns a list of subfolders matching the specified pattern.
    * Patterns may contain the wildcard characters "%",
    * which matches any character except hierarchy delimiters, and "*",
    * which matches any character.
    * <p>
-   * As an example, given the folder hierarchy:
-   * <pre>
-        Personal/
-           Finance/
-              Stocks
-              Bonus
-              StockOptions
-           Jokes
-     </pre>
-   * list("*") on "Personal" will return the whole hierarchy.<br>
-   * list("%") on "Personal" will return "Finance" and "Jokes".<br>
-   * list("Jokes") on "Personal" will return "Jokes".<br>
-   * list("Stock*") on "Finance" will return "Stocks" and "StockOptions".
-   * <p>
-   * Folder objects are not cached by the Store, so invoking this method 
-   * on the same pattern multiple times will return that many distinct 
-   * Folder objects.
-   * <p>
-   * This method can be invoked on a closed Folder.
+   * This method can be invoked on a closed folder.
    * @param pattern the match pattern
    */
   public abstract Folder[] list(String pattern)
     throws MessagingException;
 
   /**
-   * Returns a list of subscribed Folders belonging to 
-   * this Folder's namespace that match the specified pattern. 
-   * If the folder does not support subscription, this method should 
-   * resolve to <code>list</code>.
-   *(The default implementation provided here, does just this).
-   * The pattern can contain wildcards as for list.
+   * Returns a list of subscribed subfolders matching the specified pattern. 
+   * If the folder does not support subscription, returns the same as the
+   * <code>list</code> method.
+   * The pattern can contain wildcards.
    * <p>
-   * Folder objects are not cached by the Store, so invoking this method 
-   * on the same pattern multiple times will return that many distinct 
-   * Folder objects.
-   * <p>
-   * This method can be invoked on a closed Folder.
+   * This method can be invoked on a closed folder.
    * @param pattern the match pattern
    */
   public Folder[] listSubscribed(String pattern)
@@ -261,10 +195,9 @@ public abstract class Folder
   }
 
   /**
-   * Convenience method that returns the list of folders under this Folder.
-   * This method just calls the <code>list(String pattern)</code> method
-   * with "%" as the match pattern.
-   * This method can be invoked on a closed Folder.
+   * Returns the list of subfolders of this folder.
+   * <p>
+   * This method can be invoked on a closed folder.
    */
   public Folder[] list()
     throws MessagingException
@@ -273,11 +206,9 @@ public abstract class Folder
   }
 
   /**
-   * Convenience method that returns the list of subscribed folders 
-   * under this Folder.
-   * This method just calls the <code>listSubscribed(String pattern)</code>
-   * method with "%" as the match pattern.
-   * This method can be invoked on a closed Folder.
+   * Returns the list of subscribed subfolders of this folder.
+   * <p>
+   * This method can be invoked on a closed folder.
    */
   public Folder[] listSubscribed()
     throws MessagingException
@@ -286,40 +217,41 @@ public abstract class Folder
   }
 
   /**
-   * Return the delimiter character that separates this Folder's pathname
-   * from the names of immediate subfolders.
-   * This method can be invoked on a closed Folder.
+   * Return the hierarchy delimiter character for this folder.
+   * This separates the full name of this folder from the names of
+   * subfolders.
+   * <p>
+   * This method can be invoked on a closed folder.
    */
   public abstract char getSeparator()
     throws MessagingException;
 
   /**
-   * Returns the type of this Folder, that is, whether this folder can hold
+   * Returns the type of this Folder, i.e. whether this folder can hold
    * messages or subfolders or both.
    * The returned value is an integer bitfield with the appropriate bits set.
+   * <p>
    * This method can be invoked on a closed folder.
    */
   public abstract int getType()
     throws MessagingException;
 
   /**
-   * Create this folder on the Store.
+   * Create this folder in the store.
    * When this folder is created, any folders in its path 
    * that do not exist are also created.
    * <p>
    * If the creation is successful, a CREATED FolderEvent is delivered 
    * to any FolderListeners registered on this Folder and this Store.
-   * @param type The type of this folder.
+   * @param type the desired type of the folder
    */
   public abstract boolean create(int type)
     throws MessagingException;
 
   /**
-   * Returns true if this Folder is subscribed.
+   * Indicates whether this folder is subscribed.
    * <p>
-   * This method can be invoked on a closed Folder.
-   * <p>
-   * The default implementation provided here just returns true.
+   * This method can be invoked on a closed folder.
    */
   public boolean isSubscribed()
   {
@@ -327,13 +259,10 @@ public abstract class Folder
   }
 
   /**
-   * Subscribe or unsubscribe this Folder.
+   * Subscribe to or unsubscribe from this folder.
    * Not all Stores support subscription.
    * <p>
-   * This method can be invoked on a closed Folder.
-   * <p>
-   * The implementation provided here just throws the
-   * MethodNotSupportedException.
+   * This method can be invoked on a closed folder.
    */
   public void setSubscribed(boolean flag)
     throws MessagingException
@@ -342,158 +271,78 @@ public abstract class Folder
   }
 
   /**
-   * Returns true if this Folder has new messages since the last time 
-   * this indication was reset.
-   * When this indication is set or reset depends on the Folder 
-   * implementation(and in the case of IMAP, depends on the server).
-   * This method can be used to implement a lightweight "check for new mail"
-   * operation on a Folder without opening it.(For example, a thread that
-   * monitors a mailbox and flags when it has new mail.) This method should
-   * indicate whether any messages in the Folder have the RECENT flag set.
+   * Indicates whether this folder has new messages.
    * <p>
-   * Note that this is not an incremental check for new mail, i.e., it 
-   * cannot be used to determine whether any new messages have arrived since 
-   * the last time this method was invoked. To implement incremental checks,
-   * the Folder needs to be opened.
-   * <p>
-   * This method can be invoked on a closed Folder that can contain Messages.
+   * This method can be invoked on a closed folder that can contain
+   * messages.
    */
   public abstract boolean hasNewMessages()
     throws MessagingException;
 
   /**
-   * Return the Folder object corresponding to the given name.
-   * Note that this folder does not physically have to exist in the Store.
-   * The <code>exists()</code> method on a Folder indicates whether it 
-   * really exists on the Store.
+   * Return a folder corresponding to the given name.
+   * Note that the folder does not have to exist in the store.
    * <p>
-   * In some Stores, <code>name</code> can be an absolute path if it starts 
+   * In some stores, <code>name</code> can be an absolute path if it starts 
    * with the hierarchy delimiter. Otherwise, it is interpreted relative to 
-   * this Folder.
+   * this folder.
    * <p>
-   * Folder objects are not cached by the Store, so invoking this method on 
-   * the same name multiple times will return that many distinct Folder 
-   * objects.
-   * <p>
-   * This method can be invoked on a closed Folder.
-   * @param name name of the Folder
+   * This method can be invoked on a closed folder.
+   * @param name the name of the folder
    */
   public abstract Folder getFolder(String name)
     throws MessagingException;
 
   /**
-   * Delete this Folder.
-   * This method will succeed only on a closed Folder.
-   * <p>
-   * The <code>recurse</code> flag controls whether the deletion affects 
-   * subfolders or not. If true, all subfolders are deleted, then this 
-   * folder itself is deleted. If false, the behaviour is dependent on 
-   * the folder type and is elaborated below:
-   * <ul>
-   * <li> The folder can contain only messages:
-   *(<code>type==HOLDS_MESSAGES</code>).
-   * All messages within the folder are removed. The folder itself is then
-   * removed. An appropriate FolderEvent is generated by the Store and this
-   * folder.
-   * <li> The folder can contain only subfolders:
-   *(<code>type==HOLDS_FOLDERS</code>).
-   * If this folder is empty(does not contain any subfolders at all), it is
-   * removed. An appropriate FolderEvent is generated by the Store and this
-   * folder.
-   * If this folder contains any subfolders, the delete fails and returns
-   * false.
-   * <li> The folder can contain subfolders as well as messages:
-   * If the folder is empty(no messages or subfolders), it is removed. If
-   * the folder contains no subfolders, but only messages, then all messages
-   * are removed. The folder itself is then removed. In both the above
-   * cases, an appropriate FolderEvent is generated by the Store and this
-   * folder.
-   * <p>
-   * If the folder contains subfolders there are 3 possible choices an
-   * implementation is free to do:
-   * <ol>
-   * <li> The operation fails, irrespective of whether this folder contains
-   * messages or not. Some implementations might elect to go with this
-   * simple approach. The <code>delete()</code> method returns false.
-   * <li> Any messages within the folder are removed. Subfolders are not
-   * removed. The folder itself is not removed or affected in any
-   * manner. The <code>delete()</code> method returns true.
-   * And the <code>exists()</code> method on this folder will return true 
-   * indicating that this folder still exists.
-   * An appropriate FolderEvent is generated by the Store and this folder.
-   * <li> Any messages within the folder are removed. Subfolders are not
-   * removed. The folder itself changes its type from <code>HOLDS_FOLDERS |
-   * HOLDS_MESSAGES</code> to <code>HOLDS_FOLDERS</code>. Thus new messages 
-   * cannot be added to this folder, but new subfolders can be created 
-   * underneath. The <code>delete()</code> method returns true indicating 
-   * success. The <code>exists()</code> method on this folder will return 
-   * true indicating that this folder still exists.
-   * An appropriate FolderEvent is generated by the Store and this folder.
-   * @return true if the Folder is deleted successfully
+   * Deletes this folder.
+   * This method can only be invoked on a closed folder.
+   * @param recurse delete any subfolders
+   * @return true if the folder is deleted successfully, false otherwise
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not in the closed 
-   * state.
+   * @exception IllegalStateException if this folder is not closed 
    */
   public abstract boolean delete(boolean recurse)
     throws MessagingException;
 
   /**
-   * Rename this Folder.
-   * This method will succeed only on a closed Folder.
-   * <p>
-   * If the rename is successful, a RENAMED FolderEvent is delivered to
-   *  FolderListeners registered on this folder and its containing Store.
-   * @param folder a folder representing the new name for this Folder
-   * @return true if the Folder is renamed successfully
+   * Renames this folder.
+   * This method can only be invoked on a closed folder.
+   * @param folder a folder representing the new name for this folder
+   * @return true if the folder is renamed successfully, false otherwise
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not in the closed 
-   * state.
+   * @exception IllegalStateException if this folder is not closed 
    */
   public abstract boolean renameTo(Folder folder)
     throws MessagingException;
 
   /**
-   * Open this Folder.
-   * This method is valid only on Folders that can contain Messages and 
-   * that are closed.
-   * <p>
-   * If this folder is opened successfully, an OPENED ConnectionEvent is
-   * delivered to any ConnectionListeners registered on this Folder.
-   * <p>
-   * The effect of opening multiple connections to the same folder on a
-   * specific Store is implementation dependent. Some implementations allow 
-   * multiple readers, but only one writer. Others allow multiple writers 
-   * as well as readers.
+   * Opens this folder.
+   * This method can only be invoked on a closed folder that can contain
+   * messages.
    * @param mode open the Folder READ_ONLY or READ_WRITE
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not in the closed 
-   * state.
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is not closed 
    */
   public abstract void open(int mode)
     throws MessagingException;
 
   /**
-   * Close this Folder.
-   * This method is valid only on open Folders.
-   * A CLOSED ConnectionEvent is delivered to any ConnectionListeners
-   * registered on this Folder. Note that the folder is closed even if 
-   * this method terminates abnormally by throwing a MessagingException.
-   * @param expunge expunges all deleted messages if this flag is true
+   * Closes this folder.
+   * This method can only be invoked on an open folder.
+   * @param expunge if true, expunge all deleted messages
    */
   public abstract void close(boolean expunge)
     throws MessagingException;
 
   /**
-   * Indicates whether this Folder is in the 'open' state.
+   * Indicates whether this folder is open.
    */
   public abstract boolean isOpen();
 
   /**
-   * Return the open mode of this folder.
+   * Return the mode this folder is open in.
    * Returns <code>Folder.READ_ONLY</code>, <code>Folder.READ_WRITE</code>,
-   * or <code>-1</code> if the open mode is not known(usually only
-   * because an older Folder provider has not been updated to use this new
-   * method).
+   * or <code>-1</code> if the open mode is not known.
    * @exception IllegalStateException if this folder is not open
    */
   public int getMode()
@@ -506,54 +355,30 @@ public abstract class Folder
   }
 
   /**
-   * Get the permanent flags supported by this Folder.
-   * Returns a Flags object that contains all the flags supported.
-   * <p>
-   * The special flag <code>Flags.USER</code> indicates that this Folder 
-   * supports arbitrary user-defined flags.
-   * <p>
-   * The supported permanent flags for a folder may not be available 
-   * until the folder is opened.
+   * Returns the permanent flags supported by this folder.
    */
   public abstract Flags getPermanentFlags();
 
   /**
-   * Get total number of messages in this Folder.
+   * Returns the number of messages in this folder.
    * <p>
-   * This method can be invoked on a closed folder.
-   * However, note that for some folder implementations, getting the 
-   * total message count can be an expensive operation involving actually 
-   * opening the folder. In such cases, a provider can choose not to 
-   * support this functionality in the closed state, in which case this 
-   * method must return -1.
-   * <p>
-   * Clients invoking this method on a closed folder must be aware that 
-   * this is a potentially expensive operation. 
-   * Clients must also be prepared to handle a return value of -1 in 
-   * this case.
+   * This method can be invoked on a closed folder; however,
+   * note that for some stores, getting the message count can be an
+   * expensive operation involving actually opening the folder.
+   * In such cases, a provider can choose to return -1 here when the folder
+   * is closed.
    */
   public abstract int getMessageCount()
     throws MessagingException;
 
   /**
-   * Get the number of new messages in this Folder.
+   * Returns the number of new messages in this folder.
    * <p>
-   * This method can be invoked on a closed folder.
-   * However, note that for some folder implementations, getting the 
-   * new message count can be an expensive operation involving actually 
-   * opening the folder. In such cases, a provider can choose not to 
-   * support this functionality in the closed state, in which case this 
-   * method must return -1.
-   * <p>
-   * Clients invoking this method on a closed folder must be aware that 
-   * this is a potentially expensive operation.
-   * Clients must also be prepared to handle a return value of -1 in 
-   * this case.
-   * <p>
-   * This implementation returns -1 if this folder is closed.
-   * Else this implementation gets each Message in the folder using 
-   * <code>getMessage(int)</code> and checks whether its RECENT flag is 
-   * set. The total number of messages that have this flag set is returned.
+   * This method can be invoked on a closed folder; however,
+   * note that for some stores, getting the message count can be an
+   * expensive operation involving actually opening the folder.
+   * In such cases, a provider can choose to return -1 here when the folder
+   * is closed.
    */
   public synchronized int getNewMessageCount()
     throws MessagingException
@@ -581,24 +406,13 @@ public abstract class Folder
   }
 
   /**
-   * Get the total number of unread messages in this Folder.
+   * Returns the number of unread messages in this folder.
    * <p>
-   * This method can be invoked on a closed folder.
-   * However, note that for some folder implementations, getting the 
-   * unread message count can be an expensive operation involving actually 
-   * opening the folder. In such cases, a provider can choose not to 
-   * support this functionality in the closed state, in which case this 
-   * method must return -1.
-   * <p>
-   * Clients invoking this method on a closed folder must be aware that 
-   * this is a potentially expensive operation.
-   * Clients must also be prepared to handle a return value of -1 in 
-   * this case.
-   * <p>
-   * This implementation returns -1 if this folder is closed.
-   * Else this implementation gets each Message in the folder using 
-   * <code>getMessage(int)</code> and checks whether its SEEN flag is 
-   * set. The total number of messages that have this flag set is returned.
+   * This method can be invoked on a closed folder; however,
+   * note that for some stores, getting the message count can be an
+   * expensive operation involving actually opening the folder.
+   * In such cases, a provider can choose to return -1 here when the folder
+   * is closed.
    */
   public synchronized int getUnreadMessageCount()
     throws MessagingException
@@ -626,23 +440,13 @@ public abstract class Folder
   }
 
   /**
-   * Get the number of deleted messages in this folder.
+   * Returns the number of deleted messages in this folder.
    * <p>
-   * This method can be invoked on a closed folder. However, note that for
-   * some folder implementations, getting the deleted message count can be
-   * an expensive operation involving actually opening the folder. In such
-   * cases, a provider can choose not to support this functionality in the
-   * closed state, in which case this method must return -1.
-   * <p>
-   * Clients invoking this method on a closed folder must be aware that this
-   * is a potentially expensive operation. Clients must also be prepared to
-   * handle a return value of -1 in this case.
-   * <p>
-   * This implementation returns -1 if this folder is closed. Otherwise,
-   * this implementation gets each Message in the folder using
-   * <code>getMessage(int)</code> and checks whether its
-   * <code>DELETED</code> flag is set. The total number of messages that
-   * have this flag is returned.
+   * This method can be invoked on a closed folder; however,
+   * note that for some stores, getting the message count can be an
+   * expensive operation involving actually opening the folder.
+   * In such cases, a provider can choose to return -1 here when the folder
+   * is closed.
    * @exception FolderNotFoundException if this folder does not exist
    * @since JavaMail 1.3
    */
@@ -672,50 +476,28 @@ public abstract class Folder
   }
 
   /**
-   * Get the Message object corresponding to the given message number.
-   * A Message object's message number is the relative position of 
-   * this Message in itsFolder. Messages are numbered starting at 1
-   * through the total number of message in the folder.
-   * Note that the message number for a particular Message can change 
-   * during a session if other messages in the Folder are deleted and 
-   * the Folder is expunged.
+   * Returns the message with the given number.
+   * The message number is the relative position of a message in its
+   * folder, starting at 1.
    * <p>
-   * Message objects are light-weight references to the actual message that 
-   * get filled up on demand. Hence Folder implementations are expected to 
-   * provide light-weight Message objects.
-   * <p>
-   * Unlike Folder objects, repeated calls to getMessage with the same 
-   * message number will return the same Message object, as long as no 
-   * messages in this folder have been expunged.
-   * <p>
-   * Since message numbers can change within a session if the folder is 
-   * expunged, clients are advised not to use message numbers as references 
-   * to messages. Use Message objects instead.
+   * Note that message numbers can change within a session if the folder is 
+   * expunged, therefore the use of message numbers as references to
+   * messages is inadvisable.
    * @param msgnum the message number
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not opened
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is closed
    * @exception IndexOutOfBoundsException if the message number is out of 
-   * range.
+   * range
    */
   public abstract Message getMessage(int msgnum)
     throws MessagingException;
 
   /**
-   * Get the Message objects for message numbers ranging from 
-   * <code>start</code> through <code>end</code>, both start and end 
-   * inclusive. Note that message numbers start at 1, not 0.
-   * <p>
-   * Message objects are light-weight references to the actual message 
-   * that get filled up on demand. Hence Folder implementations are expected 
-   * to provide light-weight Message objects.
-   * <p>
-   * This implementation uses <code>getMessage(index)</code> to obtain the 
-   * required Message objects. Note that the returned array must contain 
-   * <code>(end-start+1)</code> Message objects.
+   * Returns the messages in the given range (inclusive).
    * @param start the number of the first message
    * @param end the number of the last message
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not opened.
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is closed
    * @exception IndexOutOfBoundsException if the start or end message 
    * numbers are out of range.
    */
@@ -731,20 +513,12 @@ public abstract class Folder
   }
 
   /**
-   * Get the Message objects for message numbers specified in the array.
-   * <p>
-   * Message objects are light-weight references to the actual message 
-   * that get filled up on demand. Hence Folder implementations are expected 
-   * to provide light-weight Message objects.
-   * <p>
-   * This implementation uses <code>getMessage(index)</code> to obtain the 
-   * required Message objects. Note that the returned array must contain 
-   * <code>msgnums.length</code> Message objects.
+   * Returns the messages for the specified message numbers.
    * @param msgnums the array of message numbers
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not opened.
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is closed
    * @exception IndexOutOfBoundsException if any message number in the 
-   * given array is out of range.
+   * given array is out of range
    */
   public synchronized Message[] getMessages(int msgnums[])
     throws MessagingException
@@ -759,19 +533,9 @@ public abstract class Folder
   }
 
   /**
-   * Get all Message objects from this Folder.
-   * Returns an empty array if the folder is empty.
-   * Clients can use Message objects(instead of sequence numbers)
-   * as references to the messages within a folder; this method supplies 
-   * the Message objects to the client.
-   * Folder implementations are expected to provide light-weight Message 
-   * objects, which get filled on demand.
-   * <p>
-   * This implementation invokes <code>getMessageCount()</code> to get 
-   * the current message count and then uses <code>getMessage()</code>
-   * to get Message objects from 1 till the message count.
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not opened.
+   * Returns all messages in this folder.
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is closed
    */
   public synchronized Message[] getMessages()
     throws MessagingException
@@ -790,51 +554,21 @@ public abstract class Folder
   }
 
   /**
-   * Append given Messages to this folder.
-   * This method can be invoked on a closed Folder.
-   * An appropriate MessageCountEvent is delivered to any 
-   * MessageCountListener registered on this folder when the messages arrive 
-   * in the folder.
+   * Appends the specified messages to this folder.
    * <p>
-   * Folder implementations must not abort this operation if a Message in the
-   * given message array turns out to be an expunged Message.
-   * @param msgs array of Messages to be appended
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception MessagingException if the append failed.
+   * This method can be invoked on a closed folder.
+   * @param msgs array of messages to be appended
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception MessagingException if the append operation failed
    */
   public abstract void appendMessages(Message[] msgs)
     throws MessagingException;
 
   /**
-   * Prefetch the items specified in the FetchProfile for the given Messages.
-   * <p>
-   * Clients use this method to indicate that the specified items are needed
-   * en-masse for the given message range. Implementations are expected to
-   * retrieve these items for the given message range in a efficient manner.
-   * Note that this method is just a hint to the implementation to prefetch 
-   * the desired items.
-   * <p>
-   * An example is a client filling its header-view window with the Subject,
-   * From and X-mailer headers for all messages in the folder.
-   * <pre>        
-          Message[] msgs = folder.getMessages();
-        
-          FetchProfile fp = new FetchProfile();
-          fp.add(FetchProfile.Item.ENVELOPE);
-          fp.add("X-mailer");
-          folder.fetch(msgs, fp);
-          
-          for (int i = 0; i < folder.getMessageCount(); i++) {
-              display(msg[i].getFrom());
-              display(msg[i].getSubject());
-              display(msg[i].getHeader("X-mailer"));
-          }
-          </pre>
-   * The implementation provided here just returns without doing anything
-   * useful. Providers wanting to provide a real implementation for this 
-   * method should override the method.
-   * @param msgs fetch items for these messages
-   * @param fp the FetchProfile
+   * Fetches the items specified in the given fetch profile for the specified
+   * messages.
+   * @param msgs the messages to fetch the items for
+   * @param fp the fetch profile
    */
   public void fetch(Message[] msgs, FetchProfile fp)
     throws MessagingException
@@ -842,27 +576,11 @@ public abstract class Folder
   }
 
   /**
-   * Set the specified flags on the messages specified in the array.
-   * This will result in appropriate MessageChangedEvents being delivered 
-   * to any MessageChangedListener registered on this Message's containing 
-   * folder.
-   * <p>
-   * Note that the specified Message objects must belong to this folder.
-   * Certain Folder implementations can optimize the operation of setting 
-   * Flags for a group of messages, so clients might want to use this 
-   * method, rather than invoking <code>Message.setFlags</code> for each 
-   * Message.
-   * <p>
-   * This implementation degenerates to invoking <code>setFlags()</code>
-   * on each Message object. Specific Folder implementations that can 
-   * optimize this case should do so. Also, an implementation must not 
-   * abort the operation if a Message in the array turns out to be an 
-   * expunged Message.
-   * @param msgnums the array of message objects
-   * @param flag Flags object containing the flags to be set
-   * @param value set the flags to this boolean value
-   * @exception IllegalStateException if this folder is not opened or 
-   * if it has been opened READ_ONLY.
+   * Sets the specified flags on each specified message.
+   * @param msgnums the messages
+   * @param flag the flags to be set
+   * @param value set the flags to this value
+   * @exception IllegalStateException if this folder is closed or READ_ONLY
    */
   public synchronized void setFlags(Message[] msgs, Flags flag, boolean value)
     throws MessagingException
@@ -880,30 +598,14 @@ public abstract class Folder
   }
 
   /**
-   * Set the specified flags on the messages numbered from <code>start</code>
-   * through <code>end</code>, both start and end inclusive.
-   * Note that message numbers start at 1, not 0.
-   * This will result in appropriate MessageChangedEvents being delivered 
-   * to any MessageChangedListener registered on this Message's containing 
-   * folder.
-   * <p>
-   * Certain Folder implementations can optimize the operation of setting 
-   * Flags for a group of messages, so clients might want to use this method,
-   * rather than invoking <code>Message.setFlags</code> for each Message.
-   * <p>
-   * The default implementation uses <code>getMessage(int)</code> to get 
-   * each Message object and then invokes <code>setFlags</code> on that 
-   * object to set the flags. Specific Folder implementations that can 
-   * optimize this case should do so. Also, an implementation must not abort 
-   * the operation if a message number refers to an expunged message.
+   * Set the specified flags on the given range of messages (inclusive).
    * @param start the number of the first message
    * @param end the number of the last message
-   * @param flag Flags object containing the flags to be set
-   * @param value set the flags to this boolean value
-   * @exception IllegalStateException if this folder is not opened or if 
-   * it has been opened READ_ONLY.
+   * @param flag the flags to be set
+   * @param value set the flags to this value
+   * @exception IllegalStateException if this folder is closed or READ_ONLY
    * @exception IndexOutOfBoundsException if the start or end message 
-   * numbers are out of range.
+   * numbers are out of range
    */
   public synchronized void setFlags(int start, int end, Flags flag, 
                                      boolean value)
@@ -922,30 +624,15 @@ public abstract class Folder
   }
 
   /**
-   * Set the specified flags on the messages whose message numbers 
-   * are in the array.
-   * This will result in appropriate MessageChangedEvents being delivered
-   * to any MessageChangedListener registered on this Message's containing
-   * folder.
-   * <p>
-   * Certain Folder implementations can optimize the operation of setting 
-   * Flags for a group of messages, so clients might want to use this method,
-   * rather than invoking <code>Message.setFlags</code> for each Message.
-   * <p>
-   * The default implementation uses <code>getMessage(int)</code> to get 
-   * each Message object and then invokes <code>setFlags</code> on that 
-   * object to set the flags. Specific Folder implementations that can 
-   * optimize this case should do so. Also, an implementation must not abort 
-   * the operation if a message number refers to an expunged message.
-   * @param msgnums the array of message numbers
-   * @param flag Flags object containing the flags to be set
-   * @param value set the flags to this boolean value
-   * @exception IllegalStateException if this folder is not opened or 
-   * if it has been opened READ_ONLY.
+   * Sets the specified flags on each of the specified messages.
+   * @param msgnums the message numbers
+   * @param flag the flags to be set
+   * @param value set the flags to this value
+   * @exception IllegalStateException if this folder is closed or READ_ONLY
    * @exception IndexOutOfBoundsException if any message number in the 
-   * given array is out of range.
+   * given array is out of range
    */
-  public synchronized void setFlags(int msgnums[], Flags flag, boolean value)
+  public synchronized void setFlags(int[] msgnums, Flags flag, boolean value)
     throws MessagingException
   {
     for (int i = 0; i < msgnums.length; i++)
@@ -961,24 +648,10 @@ public abstract class Folder
   }
 
   /**
-   * Copy the specified Messages from this Folder into another Folder.
-   * This operation appends these Messages to the destination Folder.
-   * The destination Folder does not have to be opened.
-   * An appropriate MessageCountEvent is delivered to any 
-   * MessageCountListener registered on the destination folder when the 
-   * messages arrive in the folder.
+   * Copies the specified messages into another folder.
    * <p>
-   * Note that the specified Message objects must belong to this folder.
-   * Folder implementations might be able to optimize this method by doing 
-   * server-side copies.
-   * <p>
-   * This implementation just invokes <code>appendMessages()</code> on the 
-   * destination folder to append the given Messages.
-   * Specific folder implementations that support server-side copies should 
-   * do so, if the destination folder's Store is the same as this folder's
-   * Store. Also, an implementation must not abort the operation if a 
-   * Message in the array turns out to be an expunged Message.
-   * @param msgnums the array of message objects
+   * The destination folder does not have to be open.
+   * @param msgs the messages
    * @param folder the folder to copy the messages to
    */
   public void copyMessages(Message[] msgs, Folder folder)
@@ -1001,46 +674,29 @@ public abstract class Folder
   }
 
   /**
-   * Expunge(permanently remove) messages marked DELETED.
-   * Returns an array containing the expunged message objects.
-   * The getMessageNumber method on each of these message objects returns 
-   * that Message's original(that is, prior to the expunge) sequence number.
-   * A MessageCountEvent containing the expunged messages is delivered 
-   * to any MessageCountListeners registered on the folder.
+   * Expunges (permanently removing) all the messages marked DELETED.
+   * Returns an array containing the expunged messages.
    * <p>
-   * Expunge causes the renumbering of Message objects subsequent to the
-   * expunged messages. Clients that use message numbers as references to
-   * messages should be aware of this and should be prepared to deal with the
-   * situation(probably by flushing out existing message number caches and
-   * reloading them). Because of this complexity, it is better for clients to
-   * use Message objects as references to messages, rather than message 
-   * numbers. Any expunged Messages objects still have to be pruned, but other 
-   * Messages in that folder are not affected by the expunge.
+   * Expunge causes the renumbering of any messages with numbers higher than
+   * the message number of the lowest-numbered expunged message.
    * <p>
-   * After a message is expunged, only the <code>isExpunged</code> and 
+   * After a message has been expunged, only the <code>isExpunged</code> and 
    * <code>getMessageNumber</code> methods are still valid on the 
    * corresponding Message object; other methods may throw 
-   * MessageRemovedException
+   * <code>MessageRemovedException</code>.
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not opened.
+   * @exception IllegalStateException if this folder is closed
    */
   public abstract Message[] expunge()
     throws MessagingException;
 
   /**
-   * Search this Folder for messages matching the specified search criterion.
-   * Returns an array containing the matching messages.
-   * Returns an empty array if no matches were found.
-   * <p>
-   * This implementation invokes <code>search(term, getMessages())</code>,
-   * to apply the search over all the messages in this folder.
-   * Providers that can implement server-side searching might want to 
-   * override this method to provide a more efficient implementation.
-   * @param term the search criterion
-   * @exception SearchException if the search term is too complex for the
-   * implementation to handle.
-   * @exception FolderNotFoundException if this folder does not exist.
-   * @exception IllegalStateException if this folder is not opened.
+   * Searches this folder for messages matching the specified search term.
+   * Returns the matching messages.
+   * @param term the search term
+   * @exception SearchException if there was a problem with the search
+   * @exception FolderNotFoundException if this folder does not exist
+   * @exception IllegalStateException if this folder is closed
    */
   public Message[] search(SearchTerm term)
     throws MessagingException
@@ -1049,28 +705,13 @@ public abstract class Folder
   }
 
   /**
-   * Search the given array of messages for those that match the specified
-   * search criterion.
-   * Returns an array containing the matching messages.
-   * Returns an empty array if no matches were found.
-   * <p>
-   * Note that the specified Message objects must belong to this folder.
-   * <p>
-   * This implementation iterates through the given array of messages, and
-   * applies the search criterion on each message by calling its 
-   * <code>match()</code> method with the given term. The messages that 
-   * succeed in the match are returned.
-   * Providers that can implement server-side searching might want to override
-   * this method to provide a more efficient implementation. If the search term
-   * is too complex or contains user-defined terms that cannot be executed on
-   * the server, providers may elect to either throw a SearchException or
-   * degenerate to client-side searching by calling 
-   * <code>super.search()</code> to invoke this implementation.
-   * @param term the search criterion
+   * Searches the given messages for those matching the specified search
+   * term.
+   * Returns the matching messages.
+   * @param term the search term
    * @param msgs the messages to be searched
-   * @exception SearchException if the search term is too complex for the
-   * implementation to handle.
-   * @exception IllegalStateException if this folder is not opened
+   * @exception SearchException if there was a problem with the search
+   * @exception IllegalStateException if this folder is closed
    */
   public Message[] search(SearchTerm term, Message[] msgs)
     throws MessagingException
@@ -1114,7 +755,7 @@ public abstract class Folder
   // -- Connection events --
 
   /**
-   * Add a listener for Connection events on this Folder.
+   * Add a listener for connection events on this folder.
    */
   public void addConnectionListener(ConnectionListener l)
   {
@@ -1129,7 +770,7 @@ public abstract class Folder
   }
 
   /**
-   * Remove a Connection event listener.
+   * Remove a connection event listener.
    */
   public void removeConnectionListener(ConnectionListener l)
   {
@@ -1143,9 +784,7 @@ public abstract class Folder
   }
 
   /**
-   * Notify all ConnectionListeners.
-   * Folder implementations are expected to use this method 
-   * to broadcast connection events.
+   * Notify all connection listeners.
    */
   protected void notifyConnectionListeners(int type)
   {
@@ -1227,7 +866,7 @@ public abstract class Folder
   // -- Folder events --
 
   /**
-   * Add a listener for Folder events on this Folder.
+   * Add a listener for folder events on this folder.
    */
   public void addFolderListener(FolderListener l)
   {
@@ -1242,7 +881,7 @@ public abstract class Folder
   }
 
   /**
-   * Remove a Folder event listener.
+   * Remove a folder event listener.
    */
   public void removeFolderListener(FolderListener l)
   {
@@ -1256,9 +895,8 @@ public abstract class Folder
   }
 
   /**
-   * Notify all FolderListeners registered on this Folder and this folder's
-   * Store. Folder implementations are expected to use this method to 
-   * broadcast Folder events.
+   * Notify all folder listeners registered on this Folder <em>and</em>
+   * this folder's store.
    */
   protected void notifyFolderListeners(int type)
   {
@@ -1276,10 +914,8 @@ public abstract class Folder
   }
 
   /**
-   * Notify all FolderListeners registered on this Folder and this folder's
-   * Store about the renaming of this folder. Folder implementations are
-   * expected to use this method to broadcast Folder events indicating the
-   * renaming of folders.
+   * Notify all folder listeners registered on this folder <em>and</em>
+   * this folder's store about the renaming of this folder.
    */
   protected void notifyFolderRenamedListeners(Folder folder)
   {
@@ -1352,7 +988,7 @@ public abstract class Folder
   // -- Message count events --
 
   /**
-   * Add a listener for MessageCount events on this Folder.
+   * Add a listener for message count events on this folder.
    */
   public void addMessageCountListener(MessageCountListener l)
   {
@@ -1367,7 +1003,7 @@ public abstract class Folder
   }
 
   /**
-   * Remove a MessageCount listener.
+   * Remove a message count event listener.
    */
   public void removeMessageCountListener(MessageCountListener l)
   {
@@ -1381,10 +1017,8 @@ public abstract class Folder
   }
 
   /**
-   * Notify all MessageCountListeners about the addition of messages
-   * into this folder. Folder implementations are expected to use this 
-   * method to broadcast MessageCount events for indicating arrival of 
-   * new messages.
+   * Notify all message count listeners about the addition of messages
+   * into this folder.
    */
   protected void notifyMessageAddedListeners(Message[] msgs)
   {
@@ -1394,9 +1028,8 @@ public abstract class Folder
   }
 
   /**
-   * Notify all MessageCountListeners about the removal of messages from this
-   * Folder. Folder implementations are expected to use this method to 
-   * broadcast MessageCount events indicating removal of messages.
+   * Notify all message count listeners about the removal of messages from
+   * this folder.
    */
   protected void notifyMessageRemovedListeners(boolean removed, Message[] msgs)
   {
@@ -1448,7 +1081,7 @@ public abstract class Folder
   // -- Message changed events --
 
   /**
-   * Add a listener for MessageChanged events on this Folder.
+   * Add a listener for message changed events on this folder.
    */
   public void addMessageChangedListener(MessageChangedListener l)
   {
@@ -1463,7 +1096,7 @@ public abstract class Folder
   }
 
   /**
-   * Remove a MessageChanged listener.
+   * Remove a message changed event listener.
    */
   public void removeMessageChangedListener(MessageChangedListener l)
   {
@@ -1477,8 +1110,7 @@ public abstract class Folder
   }
 
   /**
-   * Notify all MessageChangedListeners. Folder implementations are expected 
-   * to use this method to broadcast MessageChanged events.
+   * Notify all message changed event listeners.
    */
   protected void notifyMessageChangedListeners(int type, Message msg)
   {
@@ -1509,9 +1141,8 @@ public abstract class Folder
   // -- Utility methods --
 
   /**
-   * override the default toString(), 
-   * it will return the String from Folder.getFullName() or if that is null,
-   * it will use the default toString() behavior.
+   * Returns the value of Folder.getFullName(), or, if that is null,
+   * returns the default toString().
    */
   public String toString()
   {

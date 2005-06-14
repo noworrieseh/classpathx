@@ -1,13 +1,13 @@
 /*
  * MessageCountEvent.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,15 +31,7 @@ import javax.mail.Folder;
 import javax.mail.Message;
 
 /**
- * This class notifies changes in the number of messages in a folder.
- * <p>
- * Note that some folder types may only deliver MessageCountEvents at certain
- * times or after certain operations. IMAP in particular will only notify the
- * client of MessageCountEvents when a client issues a new command. Refer to 
- * RFC 2060 http://www.ietf.org/rfc/rfc2060.txt for details. 
- * A client may want "poll" the folder by occasionally calling the 
- * <code>getMessageCount</code> or <code>isConnected</code> methods
- * to solicit any such notifications.
+ * A change in the number of messages in a folder.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -49,12 +41,12 @@ public class MessageCountEvent
 {
 
   /**
-   * The messages were added to their folder
+   * Messages were added to the folder.
    */
   public static final int ADDED = 1;
 
   /**
-   * The messages were removed from their folder
+   * Messages were removed from the folder.
    */
   public static final int REMOVED = 2;
 
@@ -64,9 +56,8 @@ public class MessageCountEvent
   protected int type;
 
   /**
-   * If true, this event is the result of an explicit expunge by this client,
-   * and the messages in this folder have been renumbered to account for this.
-   * If false, this event is the result of an expunge by external sources.
+   * If true, this event is the result of an explicit expunge by this client.
+   * Otherwise this event is the result of an expunge by external mechanisms.
    */
   protected boolean removed;
 
@@ -77,16 +68,13 @@ public class MessageCountEvent
 
   /**
    * Constructor.
-   * @param source The containing folder
-   * @param type The event type
-   * @param removed If true, this event is the result of an explicit expunge by
-   * this client, and the messages in this folder have been renumbered to
-   * account for this. If false, this event is the result of an expunge by
-   * external sources.
-   * @param msgs The messages added/removed
+   * @param source the folder
+   * @param type the event type (ADDED or REMOVED)
+   * @param removed whether this event is the result of a specific expunge
+   * @param msgs the messages added or removed
    */
   public MessageCountEvent(Folder source, int type, boolean removed, 
-                            Message[] msgs)
+                           Message[] msgs)
   {
     super(source);
     this.type = type;
@@ -95,7 +83,7 @@ public class MessageCountEvent
   }
 
   /**
-   * Return the type of this event.
+   * Returns the type of this event.
    */
   public int getType()
   {
@@ -103,12 +91,8 @@ public class MessageCountEvent
   }
 
   /**
-   * Indicates whether this event is the result of an explicit expunge by this
-   * client, or due to an expunge from external sources. If true, this event is
-   * due to an explicit expunge and hence all remaining messages in this folder
-   * have been renumbered. If false, this event is due to an external expunge.
-   * <p>
-   * Note that this method is valid only if the type of this event is REMOVED
+   * Indicates whether this event is the result of an explicit expunge, or
+   * of an expunge by an external mechanism.
    */
   public boolean isRemoved()
   {
@@ -116,7 +100,7 @@ public class MessageCountEvent
   }
 
   /**
-   * Return the array of messages added or removed.
+   * Returns the messages that were added or removed.
    */
   public Message[] getMessages()
   {
@@ -124,7 +108,7 @@ public class MessageCountEvent
   }
 
   /**
-   * Invokes the appropriate MessageCountListener method.
+   * Invokes the appropriate listener method.
    */
   public void dispatch(Object listener)
   {

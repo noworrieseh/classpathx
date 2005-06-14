@@ -1,13 +1,13 @@
 /*
  * ReceivedDateTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ import java.util.Date;
 import javax.mail.Message;
 
 /**
- * This class implements comparisons for the Message Received date
+ * A comparison of message received dates.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -42,8 +42,8 @@ public final class ReceivedDateTerm
 
   /**
    * Constructor.
-   * @param comparison the Comparison type
-   * @param date the date to be compared
+   * @param comparison the comparison operator
+   * @param date the date for comparison
    */
   public ReceivedDateTerm(int comparison, Date date)
   {
@@ -51,9 +51,8 @@ public final class ReceivedDateTerm
   }
 
   /**
-   * The match method.
-   * @param msg the date comparator is applied to this Message's sent date
-   * @return true if the comparison succeeds, otherwise false
+   * Returns true only if the given message's received date matches this
+   * term.
    */
   public boolean match(Message msg)
   {
@@ -71,12 +70,10 @@ public final class ReceivedDateTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof ReceivedDateTerm && super.equals(other));
   }
 
 }
+

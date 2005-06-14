@@ -1,13 +1,13 @@
 /*
  * MessageCountAdapter.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,11 +28,7 @@
 package javax.mail.event;
 
 /**
- * The adapter which receives MessageCount events. 
- * The methods in this class are empty; this class is provided 
- * as a convenience for easily creating listeners by extending this class 
- * and overriding only the methods of interest.
- *
+ * An adapter for message count events.
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
  */
@@ -41,17 +37,18 @@ public abstract class MessageCountAdapter
 {
 
   /**
-   * Invoked when messages are added into a folder.
+   * Messages were added into a folder.
    */
   public void messagesAdded(MessageCountEvent e)
   {
   }
 
   /**
-   * Invoked when messages are removed(expunged) from a folder.
+   * Messages were removed (expunged) from a folder.
    */
   public void messagesRemoved(MessageCountEvent e)
   {
   }
 
 }
+

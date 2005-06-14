@@ -1,13 +1,13 @@
 /*
  * TransportEvent.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,7 +32,7 @@ import javax.mail.Message;
 import javax.mail.Transport;
 
 /**
- * This class models Transport events.
+ * A transport event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -42,26 +42,17 @@ public class TransportEvent
 {
 
   /**
-   * Message has been successfully delivered to all recipients by the
-   * transport firing this event.
-   * validSent[] contains all the addresses this transport sent to
-   * successfully. validUnsent[] and invalid[] should be null.
+   * The message was successfully delivered to all recipients.
    */
   public static final int MESSAGE_DELIVERED = 1;
 
   /**
-   * Message was not sent for some reason. 
-   * validSent[] should be null. validUnsent[] may have addresses that 
-   * are valid(but the message wasn't sent to them).
-   * invalid[] should likely contain invalid addresses.
+   * The message was not sent. 
    */
   public static final int MESSAGE_NOT_DELIVERED = 2;
 
   /**
-   * Message was successfully sent to some recipients but not to all.
-   * validSent[] holds addresses of recipients to whom the message was sent.
-   * validUnsent[] holds valid addresses to which the message was not sent.
-   * invalid[] holds invalid addresses, if any.
+   * The message was successfully sent to some but not all of the recipients.
    */
   public static final int MESSAGE_PARTIALLY_DELIVERED = 3;
 
@@ -77,11 +68,16 @@ public class TransportEvent
 
   /**
    * Constructor.
-   * @param source The Transport object
+   * @param source the transport
+   * @param type the event type
+   * @param validSent the valid sent addresses
+   * @param validUnsent the valid unsent addresses
+   * @param invalid the invalid addresses
+   * @param msg the message
    */
   public TransportEvent(Transport transport, int type,
-                         Address[] validSent, Address[] validUnsent,
-                         Address[] invalid, Message msg)
+                        Address[] validSent, Address[] validUnsent,
+                        Address[] invalid, Message msg)
   {
     super(transport);
     this.type = type;
@@ -92,7 +88,7 @@ public class TransportEvent
   }
 
   /**
-   * Return the type of this event.
+   * Returns the type of this event.
    */
   public int getType()
   {
@@ -100,7 +96,7 @@ public class TransportEvent
   }
 
   /**
-   * Return the addresses to which this message was sent succesfully.
+   * Returns the addresses to which this message was delivered succesfully.
    */
   public Address[] getValidSentAddresses()
   {
@@ -108,8 +104,8 @@ public class TransportEvent
   }
 
   /**
-   * Return the addresses that are valid but to which this message was not 
-   * sent.
+   * Returns the addresses that are valid but to which this message was not 
+   * delivered.
    */
   public Address[] getValidUnsentAddresses()
   {
@@ -117,7 +113,7 @@ public class TransportEvent
   }
 
   /**
-   * Return the addresses to which this message could not be sent.
+   * Returns the addresses to which this message could not be sent.
    */
   public Address[] getInvalidAddresses()
   {
@@ -125,7 +121,7 @@ public class TransportEvent
   }
 
   /**
-   * Get the Message object associated with this Transport Event.
+   * Returns the message.
    */
   public Message getMessage()
   {
@@ -133,7 +129,7 @@ public class TransportEvent
   }
 
   /**
-   * Invokes the appropriate TransportListener method.
+   * Invokes the appropriate listener method.
    */
   public void dispatch(Object listener)
   {
@@ -153,3 +149,4 @@ public class TransportEvent
   }
 
 }
+

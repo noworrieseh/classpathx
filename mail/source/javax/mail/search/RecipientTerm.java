@@ -1,13 +1,13 @@
 /*
  * RecipientTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ import javax.mail.Address;
 import javax.mail.Message;
 
 /**
- * This class implements comparisons for the Recipient Address headers.
+ * A comparison of recipient headers in a message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -48,7 +48,7 @@ public final class RecipientTerm
   /**
    * Constructor.
    * @param type the recipient type
-   * @param address the address to match for
+   * @param address the address to match
    */
   public RecipientTerm(Message.RecipientType type, Address address)
   {
@@ -57,7 +57,7 @@ public final class RecipientTerm
   }
 
   /**
-   * Return the type of recipient to match with.
+   * Returns the recipient type.
    */
   public Message.RecipientType getRecipientType()
   {
@@ -65,9 +65,8 @@ public final class RecipientTerm
   }
 
   /**
-   * The match method.
-   * @param msg The address match is applied to this Message's recepient address
-   * @param true if the match succeeds, otherwise false
+   * Returns true only if the recipient address in the given message matches
+   * the address specified in this term.
    */
   public boolean match(Message msg)
   {
@@ -92,9 +91,6 @@ public final class RecipientTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof RecipientTerm &&
@@ -102,12 +98,10 @@ public final class RecipientTerm
             super.equals(other));
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return type.hashCode() + super.hashCode();
   }
 
 }
+

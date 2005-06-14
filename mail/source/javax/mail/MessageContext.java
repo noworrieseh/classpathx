@@ -1,13 +1,13 @@
 /*
  * MessageContext.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,11 +28,7 @@
 package javax.mail;
 
 /**
- * The context in which a piece of Message content is contained. 
- * A MessageContext object is returned by the <code>getMessageContext</code>
- * method of the MessageAware interface. MessageAware is typically 
- * implemented by DataSources to allow a DataContentHandler to pass on 
- * information about the context in which a data content object is operating.
+ * The context of a datum of message content.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,12 +37,12 @@ public class MessageContext
 {
 
   /**
-   * The Part to describe.
+   * The part.
    */
   private Part part;
 
   /**
-   * Create a MessageContext object describing the context of the given Part.
+   * Creates a message context describing the given part.
    */
   public MessageContext(Part part)
   {
@@ -54,7 +50,7 @@ public class MessageContext
   }
 
   /**
-   * Return the Part that contains the content. May be null.
+   * Returns the part containing the content. This may be null.
    */
   public Part getPart()
   {
@@ -62,9 +58,7 @@ public class MessageContext
   }
 
   /**
-   * Return the Message that contains the content.
-   * Follows the parent chain up through containing Multipart objects 
-   * until it comes to a Message object, or null.
+   * Returns the message that contains the content.
    */
   public Message getMessage()
   {
@@ -90,7 +84,7 @@ public class MessageContext
   }
 
   /**
-   * Return the Session we're operating in.
+   * Returns the session context.
    */
   public Session getSession()
   {

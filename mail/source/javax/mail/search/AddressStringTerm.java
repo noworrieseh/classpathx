@@ -1,13 +1,13 @@
 /*
  * AddressStringTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,10 +31,7 @@ import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 /**
- * This abstract class implements string comparisons for Message addresses.
- * <p>
- * Note that this class differs from the AddressTerm class in that this 
- * class does comparisons on address strings rather than Address objects.
+ * A string comparison of message addresses.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -45,7 +42,7 @@ public abstract class AddressStringTerm
 
   /**
    * Constructor.
-   * @param pattern the address pattern to be compared.
+   * @param pattern the address pattern for comparison
    */
   protected AddressStringTerm(String pattern)
   {
@@ -53,14 +50,9 @@ public abstract class AddressStringTerm
   }
 
   /**
-   * Check whether the address pattern specified in the constructor is a
-   * substring of the string representation of the given Address object.
-   * <p>
-   * Note that if the string representation of the given Address object 
-   * contains charset or transfer encodings, the encodings must be accounted 
-   * for, during the match process.
-   * @param a The comparison is applied to this Address object.
-   * @return true if the match succeeds, otherwise false.
+   * Indicates whether the address pattern specified in the constructor is a
+   * substring of the string representation of the given address.
+   * @param a the address
    */
   protected boolean match(Address a)
   {
@@ -74,9 +66,6 @@ public abstract class AddressStringTerm
       }
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return ((other instanceof AddressStringTerm) && super.equals(other));

@@ -1,13 +1,13 @@
 /*
  * InternetAddress.java
- * Copyright(C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,7 @@ import javax.mail.Address;
 import javax.mail.Session;
 
 /**
- * This class models an RFC822 address.
+ * An RFC 822 address.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -47,12 +47,12 @@ public class InternetAddress
 {
 
   /*
-   * The type of InternetAddreses.
+   * The type of address.
    */
   private static final String RFC822 = "rfc822";
 
   /**
-   * The string form of the address.
+   * The string representation of the address.
    */
   protected String address;
 
@@ -67,29 +67,30 @@ public class InternetAddress
   protected String encodedPersonal;
   
   /**
-   * Default constructor.
+   * Constructor for an empty address.
    */
   public InternetAddress()
   {
   }
 
   /**
-   * Parse the given string and create an InternetAddress.
-   * @param address the address in RFC822 format
+   * Constructor with an RFC 822 string representation of the address.
+   * Note that this parses the address in non-strict mode: this is for
+   * compatibility with implementations and not with the JavaMail
+   * specification.
+   * @param address the address in RFC 822 format
    * @exception AddressException if the parse failed
    */
   public InternetAddress(String address)
     throws AddressException
   {
-    this(address, true);
+    this(address, false);
   }
 
   /**
-   * Parse the given string and create an InternetAddress.
-   * If <code>strict</code> is false, the detailed syntax of the address
-   * isn't checked.
-   * @param address the address in RFC822 format
-   * @param strict enforce RFC822 syntax
+   * Constructor with an RFC 822 string representation of the address.
+   * @param address the address in RFC 822 format
+   * @param strict enforce RFC 822 syntax
    * @exception AddressException if the parse failed
    * @since JavaMail 1.3
    */
@@ -111,9 +112,9 @@ public class InternetAddress
   }
 
   /**
-   * Construct an InternetAddress given the address and personal name.
-   * The address is assumed to be a syntactically valid RFC822 address.
-   * @param address the address in RFC822 format
+   * Constructor with an address and personal name.
+   * The address is assumed to be syntactically valid according to RFC 822.
+   * @param address the address in RFC 822 format
    * @param personal the personal name
    */
   public InternetAddress(String address, String personal)
@@ -123,11 +124,11 @@ public class InternetAddress
   }
 
   /**
-   * Construct an InternetAddress given the address and personal name.
-   * The address is assumed to be a syntactically valid RFC822 address.
-   * @param address the address in RFC822 format
+   * Construct with an address and personal name.
+   * The address is assumed to be syntactically valid according to RFC 822.
+   * @param address the address in RFC 822 format
    * @param personal the personal name
-   * @param charset the charset for the name
+   * @param charset the charset for the personal name
    */
   public InternetAddress(String address, String personal, String charset)
     throws UnsupportedEncodingException
@@ -137,7 +138,7 @@ public class InternetAddress
   }
 
   /**
-   * Return a copy of this InternetAddress object.
+   * Returns a copy of this address.
    */
   public Object clone()
   {
@@ -149,8 +150,8 @@ public class InternetAddress
   }
 
   /**
-   * Return the type of this address. The type of an InternetAddress is
-   * "rfc822".
+   * Returns the type of this address.
+   * The type of an <code>InternetAddress</code> is "rfc822".
    */
   public String getType()
   {
@@ -158,10 +159,9 @@ public class InternetAddress
   }
 
   /**
-   * Indicates whether this address is an RFC 822 group address. Note that a
-   * group address is different from the mailing list addresses supported by
-   * most mail servers. Group addresses are rarely used; see RFC 822 for
-   * details.
+   * Indicates whether this address is an RFC 822 group address.
+   * Group addresses are not mailing list addresses and are rarely used;
+   * see RFC 822 for details.
    * @since JavaMail 1.3
    */
   public boolean isGroup()
@@ -176,12 +176,10 @@ public class InternetAddress
   }
 
   /**
-   * Return the members of a group address. A group may have zero, one, or
-   * more members. If this address is not a group, null is returned. The
-   * <code>strict</code> parameter controls whether the group list is parsed
-   * using strict RFC 822 rules or not. The parsing is done using the
-   * <code>parseHeader</code> method.
-   * @exception AddressException if the group list can't be parsed
+   * Returns the members of a group address. A group may have any number of
+   * members. If this address is not a group, this method returns
+   * <code>null</code>.
+   * @exception AddressException if a parse error occurs
    * @since JavaMail 1.3
    */
   public InternetAddress[] getGroup(boolean strict)
@@ -197,7 +195,7 @@ public class InternetAddress
   }
 
   /**
-   * Set the email address.
+   * Sets the email address.
    */
   public void setAddress(String address)
   {
@@ -205,14 +203,12 @@ public class InternetAddress
   }
 
   /**
-   * Set the personal name.
-   * If the name contains non US-ASCII characters, then the name will be 
-   * encoded using the specified charset as per RFC 2047. If the name 
-   * contains only US-ASCII characters, no encoding is done and the
-   * name is used as is.
-   * @param name personal name
-   * @param charset charset to be used to encode the name as per RFC 2047.
-   * @param UnsupportedEncodingException if the charset encoding fails.
+   * Sets the personal name.
+   * If the name contains non US-ASCII characters, it will be encoded using
+   * the specified charset as per RFC 2047.
+   * @param name the personal name
+   * @param charset the charset to be used for any encoding
+   * @param UnsupportedEncodingException if charset encoding fails
    */
   public void setPersonal(String name, String charset)
     throws UnsupportedEncodingException
@@ -236,13 +232,11 @@ public class InternetAddress
   }
 
   /**
-   * Set the personal name.
-   * If the name contains non US-ASCII characters, then the name will be 
-   * encoded using the platform's default charset. If the name 
-   * contains only US-ASCII characters, no encoding is done and the
-   * name is used as is.
-   * @param name - personal name
-   * @exception UnsupportedEncodingException - if the charset encoding fails.
+   * Sets the personal name.
+   * If the name contains non US-ASCII characters, it will be encoded using
+   * the platform default charset.
+   * @param name the personal name
+   * @exception UnsupportedEncodingException if charset encoding fails
    */
   public void setPersonal(String name)
     throws UnsupportedEncodingException
@@ -251,7 +245,7 @@ public class InternetAddress
   }
 
   /**
-   * Get the email address.
+   * Returns the email address.
    */
   public String getAddress()
   {
@@ -259,10 +253,7 @@ public class InternetAddress
   }
 
   /**
-   * Get the personal name.
-   * If the name is encoded as per RFC 2047, it is decoded and converted 
-   * into Unicode. If the decoding or convertion fails, the raw data is 
-   * returned as is.
+   * Returns the personal name.
    */
   public String getPersonal()
   {
@@ -286,11 +277,9 @@ public class InternetAddress
   }
 
   /**
-   * Validate that this address conforms to the syntax rules of RFC 822.
-   * The current implementation checks many, not all, syntax rules.
-   * Note that, even though the syntax of the address may be correct,
-   * there's no guarantee that a mailbox of that name exists.
-   * @exception AddressException if the address isn't valid
+   * Validate this address according to the syntax rules of RFC 822.
+   * This implementation checks many but not all of the syntax rules.
+   * @exception AddressException if the address is invalid
    * @since JavaMail 1.3
    */
   public void validate()
@@ -300,9 +289,9 @@ public class InternetAddress
   }
 
   /**
-   * Convert this address into a RFC 822 / RFC 2047 encoded address.
+   * Returns the RFC 822 / RFC 2047 string representation of this address.
    * The resulting string contains only US-ASCII characters,
-   * and hence is mail-safe.
+   * and is therefore mail-safe.
    */
   public String toString()
   {
@@ -340,8 +329,9 @@ public class InternetAddress
   }
 
   /**
-   * Returns a properly formatted address(RFC 822 syntax) of Unicode
-   * characters.
+   * Returns the RFC 822 string representation of this address.
+   * The returned string may contain unencoded Unicode characters and may
+   * therefore not be mail-safe.
    */
   public String toUnicodeString()
   {
@@ -368,7 +358,7 @@ public class InternetAddress
   }
 
   /*
-   * Indicates if this address is simple.
+   * Indicates whether this address is simple.
    */
   private static boolean isSimpleAddress(String address)
   {
@@ -386,7 +376,7 @@ public class InternetAddress
   }
 
   /*
-   * Indicates if this address is a group address(see RFC822).
+   * Indicates whether this address is a group address (see RFC 822).
    */
   private static boolean isGroupAddress(String address)
   {
@@ -396,9 +386,6 @@ public class InternetAddress
             address.charAt(len - 1) == ';');
   }
 
-  /**
-   * The equality operator.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof InternetAddress)
@@ -410,23 +397,19 @@ public class InternetAddress
     return false;
   }
 
-  /**
-   * Compute a hash code for the address.
-   */
   public int hashCode()
   {
     return (address == null) ? 0 : address.hashCode();
   }
 
   /**
-   * Convert the given array of InternetAddress objects into a comma separated
+   * Converts the given array of InternetAddresses into a comma-separated
    * sequence of address strings.
    * The resulting string contains only US-ASCII characters,
-   * and hence is mail-safe.
-   * @param addresses array of InternetAddress objects
-   * @return comma separated address strings
-   * @exception ClassCastException if any address object in the given array 
-   * is not an InternetAddress objects. Note that this is a RuntimeException.
+   * and is therefore mail-safe.
+   * @param addresses the InternetAddresses
+   * @exception ClassCastException if any of the specified addresses is not
+   * an InternetAddress
    */
   public static String toString(Address[] addresses)
   {
@@ -434,21 +417,15 @@ public class InternetAddress
   }
 
   /**
-   * Convert the given array of InternetAddress objects into a comma separated
+   * Converts the given array of InternetAddresses into a comma-separated
    * sequence of address strings.
    * The resulting string contains only US-ASCII characters,
-   * and hence is mail-safe.
-   * <p>
-   * The 'used' parameter specifies the number of character positions already
-   * taken up in the field into which the resulting address sequence string is
-   * to be inserted. Its used to determine the line-break positions in the
-   * resulting address sequence string.
-   * @param addresses array of InternetAddress objects
-   * @param used number of character positions already used, in the field into
-   * which the address string is to be inserted.
-   * @return comma separated address strings
-   * @exception ClassCastException if any address object in the given array 
-   * is not an InternetAddress object. Note that this is a RuntimeException.
+   * and is therefore mail-safe.
+   * @param addresses the InternetAddresses
+   * @param used the number of character positions already used, in the
+   * field into which the address string is to be inserted
+   * @exception ClassCastException if any of the specified addresses is not
+   * an InternetAddress
    */
   public static String toString(Address[] addresses, int used)
   {
@@ -486,16 +463,17 @@ public class InternetAddress
   }
 
   /**
-   * Return an InternetAddress object representing the current user.
-   * The entire email address may be specified in the "mail.from" property.
-   * If not set, the "mail.user" and "mail.host" properties are tried.
-   * If those are not set, the "user.name" property and 
-   * InetAddress.getLocalHost method are tried.
-   * Security exceptions that may occur while accessing this information are
-   * ignored.
-   * If it is not possible to determine an email address, null is returned.
-   * @param session Session object used for property lookup
-   * @return current user's email address
+   * Returns an InternetAddress object representing the current user.
+   * This information is determined from the following locations, in order
+   * of preference:
+   * <ol>
+   * <li>the session property <code>mail.from</code></li>
+   * <li>the session properties <code>mail.user</code> or
+   * <code>user.name</code>, and <code>mail.host</code></li>
+   * <li>the system property <code>user.name</code> and the hostname of
+   * localhost as determined by <code>InetAddress.getLocalHost</code></li>
+   * </ol>
+   * @param session the session
    */
   public static InternetAddress getLocalAddress(Session session)
   {
@@ -560,11 +538,9 @@ public class InternetAddress
   }
 
   /**
-   * Parse the given comma separated sequence of addresses into 
-   * InternetAddress objects.
-   * Addresses must follow RFC822 syntax.
-   * @param addresslist comma separated address strings
-   * @return array of InternetAddress objects
+   * Parses the given comma-separated sequence of RFC 822 addresses into 
+   * InternetAddresses.
+   * @param addresslist the comma-separated addresses
    * @exception AddressException if the parse failed
    */
   public static InternetAddress[] parse(String addresslist)
@@ -574,20 +550,15 @@ public class InternetAddress
   }
 
   /**
-   * Parse the given sequence of addresses into InternetAddress objects.
+   * Parses the given comma-separated sequence of RFC 822 addresses into
+   * InternetAddresses.
    * If <code>strict</code> is false, simple email addresses separated by 
-   * spaces are also allowed. If strict is true, many(but not all) of the 
-   * RFC822 syntax rules are enforced. In particular, even if strict is true,
-   * addresses composed of simple names(with no "@domain" part) are allowed.
-   * Such "illegal" addresses are not uncommon in real messages.
-   * <p>
-   * Non-strict parsing is typically used when parsing a list of mail 
-   * addresses entered by a human.
-   * Strict parsing is typically used when parsing address headers in mail 
-   * messages.
-   * @param addresslist comma separated address strings
-   * @param strict enforce RFC822 syntax
-   * @return array of InternetAddress objects
+   * spaces are also allowed. If <code>strict</code> is true, many (but not
+   * all) of the RFC 822 syntax rules are enforced.
+   * Even if <code>strict</code> is true, addresses composed of simple
+   * names (with no "@domain" part) are allowed.
+   * @param addresslist the comma-separated addresses
+   * @param strict whether to enforce RFC 822 syntax
    * @exception AddressException if the parse failed
    */
   public static InternetAddress[] parse(String addresslist, boolean strict)
@@ -597,20 +568,18 @@ public class InternetAddress
   }
 
   /**
-   * Parse the given sequence of addresses into InternetAddress objects. If
-   * <code>strict</code> is false, the full syntax rules for individual
-   * addresses are not enforced. If <code>strict</code> is true, many(but
-   * not all) of the RFC822 syntax rules are enforced.
-   * <p>
-   * Non-strict parsing is typically used when parsing a list of mail
-   * addresses entered by a human. Strict parsing is typically used when
-   * parsing address headers in mail messages.
-   * @param addresslist comma separated address strings
-   * @param strict enforce RFC822 syntax
+   * Parses the given comma-separated sequence of RFC 822 addresses into
+   * InternetAddresses.
+   * If <code>strict</code> is false, simple email addresses separated by 
+   * spaces are also allowed. If <code>strict</code> is true, many (but not
+   * all) of the RFC 822 syntax rules are enforced.
+   * @param addresslist the comma-separated addresses
+   * @param strict whether to enforce RFC 822 syntax
+   * @exception AddressException if the parse failed
    * @since JavaMail 1.3
    */
   public static InternetAddress[] parseHeader(String addresslist,
-                                               boolean strict)
+                                              boolean strict)
     throws AddressException
   {
     return parse(addresslist, strict ? STRICT_OR_LAX : LAX);
@@ -1120,3 +1089,4 @@ public class InternetAddress
   }
 
 }
+

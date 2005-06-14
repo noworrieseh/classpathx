@@ -1,13 +1,13 @@
 /*
  * MessageNumberTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This class implements comparisons for Message numbers.
+ * A comparison of message numbers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,7 +41,7 @@ public final class MessageNumberTerm
 
   /**
    * Constructor.
-   * @param number the Message number
+   * @param number the message number to match
    */
   public MessageNumberTerm(int number)
   {
@@ -49,9 +49,8 @@ public final class MessageNumberTerm
   }
 
   /**
-   * The match method.
-   * @param msg the Message number is matched with this Message
-   * @param true if the match succeeds, otherwise false
+   * Returns true if the message number of the given message is equal to the
+   * message number specified in this term.
    */
   public boolean match(Message msg)
   {
@@ -65,12 +64,10 @@ public final class MessageNumberTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof MessageNumberTerm && super.equals(other));
   }
 
 }
+

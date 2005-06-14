@@ -1,13 +1,13 @@
 /*
  * Address.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,11 +30,8 @@ package javax.mail;
 import java.io.Serializable;
 
 /**
- * This abstract class models the addresses in a message.
- * Subclasses provide specific implementations.
- * Subclasses will typically be serializable so that(for example)
- * the use of Address objects in search terms can be serialized 
- * along with the search terms.
+ * An address representing an endpoint in a messaging system.
+ * Subclasses of this class should normally be serializable.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -44,18 +41,12 @@ public abstract class Address
 {
 
   /**
-   * Return a type string that identifies this address type.
+   * Returns the type of this address.
    */
   public abstract String getType();
 
-  /**
-   * Return a String representation of this address object.
-   */
   public abstract String toString();
 
-  /**
-   * The equality operator.
-   */
   public abstract boolean equals(Object obj);
 
 }

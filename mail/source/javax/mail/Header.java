@@ -1,13 +1,13 @@
 /*
  * Header.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,8 @@
 package javax.mail;
 
 /**
- * The Header class stores a name/value pair to represent headers.
+ * A header is a name/value pair containing metadata about a message's
+ * content and/or routing information.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -47,7 +48,7 @@ public class Header
   String value;
 
   /**
-   * Construct a Header object.
+   * Construct a header.
    * @param name name of the header
    * @param value value of the header
    */

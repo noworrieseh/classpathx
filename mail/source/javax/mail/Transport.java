@@ -1,13 +1,13 @@
 /*
  * Transport.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,12 +35,7 @@ import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 
 /**
- * An abstract class that models a message transport.
- * Subclasses provide actual implementations.
- * <p>
- * Note that Transport extends the Service class, which provides many common
- * methods for naming transports, connecting to transports, and listening to
- * connection events.
+ * A message transport mechanism that can be used to deliver messages.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.3
@@ -56,8 +51,8 @@ public abstract class Transport
 
   /**
    * Constructor.
-   * @param session Session object for this Transport.
-   * @param url URLName object to be used for this Transport
+   * @param session the session context for this transport
+   * @param url a URLName to be used for this transport
    */
   public Transport(Session session, URLName url)
   {
@@ -65,27 +60,13 @@ public abstract class Transport
   }
 
   /**
-   * Send a message.
+   * Sends the specified message.
    * The message will be sent to all recipient addresses specified in the 
-   * message(as returned from the Message method 
-   * <code>getAllRecipients</code>), using message transports appropriate to
-   * each address. The <code>send</code> method calls the 
-   * <code>saveChanges</code> method on the message before sending it.
-   * <p>
-   * If any of the recipient addresses is detected to be invalid by the
-   * Transport during message submission, a SendFailedException is thrown.
-   * Clients can get more detail about the failure by examining the exception.
-   * Whether or not the message is still sent succesfully to any valid 
-   * addresses depends on the Transport implementation. See 
-   * SendFailedException for more details. Note also that success does not 
-   * imply that the message was delivered to the ultimate recipient, as 
-   * failures may occur in later stages of delivery. Once a Transport 
-   * accepts a message for delivery to a recipient, failures that occur 
-   * later should be reported to the user via another mechanism, such as 
-   * returning the undeliverable message.
+   * message, using transports appropriate to each address (specified by the
+   * <code>javamail.address.map</code> resource).
    * @param msg the message to send
    * @exception SendFailedException if the message could not be sent to 
-   * some or any of the recipients.
+   * some or any of the recipients
    */
   public static void send(Message msg)
     throws MessagingException
@@ -95,13 +76,12 @@ public abstract class Transport
   }
 
   /**
-   * Send the message to the specified addresses, ignoring any recipients
-   * specified in the message itself. The <code>send</code> method calls 
-   * the <code>saveChanges</code> method on the message before sending it.
+   * Sends the message to the specified addresses, ignoring any recipients
+   * specified in the message itself.
    * @param msg the message to send
    * @param addresses the addresses to which to send the message
    * @exception SendFailedException if the message could not be sent to 
-   * some or any of the recipients.
+   * some or any of the recipients
    */
   public static void send(Message msg, Address[] addresses)
     throws MessagingException
@@ -256,21 +236,12 @@ public abstract class Transport
   }
 
   /**
-   * Send the Message to the specified list of addresses.
-   * An appropriate TransportEvent indicating the delivery status is 
-   * delivered to any TransportListener registered on this Transport. 
-   * Also, if any of the addresses is invalid, a SendFailedException is 
-   * thrown. Note however, that the message is sent to the valid addresses.
-   * <p>
-   * Unlike the static <code>send</code> method, the <code>sendMessage</code>
-   * method does not call the <code>saveChanges</code> method on the message;
-   * the caller should do so.
-   * @param msg The Message to be sent
-   * @param addresses List of addresses to send this message to
+   * Sends the message to the specified list of addresses.
+   * @param msg the message to be sent
+   * @param addresses the addresses to send this message to
    * @exception SendFailedException if the send failed because of 
-   * invalid addresses.
-   * @exception MessagingException if the connection is dead 
-   * or not in the connected state
+   * invalid addresses
+   * @exception MessagingException if the transport is not connected
    */
   public abstract void sendMessage(Message msg, Address[] addresses)
     throws MessagingException;
@@ -295,7 +266,7 @@ public abstract class Transport
   // -- Transport events --
 
   /**
-   * Add a listener for Transport events.
+   * Adds a listener for transport events.
    */
   public void addTransportListener(TransportListener l)
   {
@@ -310,7 +281,7 @@ public abstract class Transport
   }
 
   /**
-   * Remove a listener for Transport events.
+   * Removes a transport event listener.
    */
   public void removeTransportListener(TransportListener l)
   {
@@ -324,8 +295,7 @@ public abstract class Transport
   }
 
   /**
-   * Notify all TransportListeners. Transport implementations are expected to
-   * use this method to broadcast TransportEvents.
+   * Notifies all transport listeners.
    */
   protected void notifyTransportListeners(int type, 
                                            Address[] validSent,
@@ -413,3 +383,4 @@ public abstract class Transport
   }
   
 }
+

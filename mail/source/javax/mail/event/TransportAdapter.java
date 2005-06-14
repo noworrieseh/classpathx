@@ -1,13 +1,13 @@
 /*
  * TransportAdapter.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,10 +28,7 @@
 package javax.mail.event;
 
 /**
- * The adapter which receives Transport events.
- * The methods in this class are empty; this class is provided as 
- * a convenience for easily creating listeners by extending this class 
- * and overriding only the methods of interest.
+ * An adapter for transport events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,24 +38,25 @@ public abstract class TransportAdapter
 {
 
   /**
-   * Invoked when a Message is succesfully delivered.
+   * A message was delivered successfully.
    */
   public void messageDelivered(TransportEvent e)
   {
   }
 
   /**
-   * Invoked when a Message is not delivered.
+   * A message was not delivered.
    */
   public void messageNotDelivered(TransportEvent e)
   {
   }
 
   /**
-   * Invoked when a Message is partially delivered.
+   * A message was partially delivered.
    */
   public void messagePartiallyDelivered(TransportEvent e)
   {
   }
 
 }
+

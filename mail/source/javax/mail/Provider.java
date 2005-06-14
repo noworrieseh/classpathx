@@ -1,13 +1,13 @@
 /*
  * Provider.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +28,8 @@
 package javax.mail;
 
 /**
- * The Provider is a class that describes a protocol implementation.
- * The values come from the <code>javamail.providers</code> &amp; 
- * <code>javamail.default.providers</code> resource files.
+ * A description of a messaging implementation that can store or send
+ * messages.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -39,8 +38,7 @@ public class Provider
 {
 
   /**
-   * This inner class defines the Provider type.
-   * Currently, STORE and TRANSPORT are the only two provider types supported.
+   * A provider type (STORE or TRANSPORT).
    */
   public static class Type
   {
@@ -64,7 +62,7 @@ public class Provider
   private String version;
 
   Provider(Type type, String protocol, String className, String vendor,
-            String version)
+           String version)
   {
     this.type = type;
     this.protocol = protocol;
@@ -74,7 +72,7 @@ public class Provider
   }
 
   /**
-   * Returns the type of this Provider.
+   * Returns the provider type.
    */
   public Type getType()
   {
@@ -82,7 +80,7 @@ public class Provider
   }
 
   /**
-   * Returns the protocol supported by this Provider.
+   * Returns the protocol implemented by this provider.
    */
   public String getProtocol()
   {
@@ -90,7 +88,7 @@ public class Provider
   }
 
   /**
-   * Returns the name of the class that implements the protocol.
+   * Returns the name of the class implementing the protocol.
    */
   public String getClassName()
   {
@@ -98,8 +96,7 @@ public class Provider
   }
 
   /**
-   * Returns name of vendor associated with this implementation.
-   * May be null.
+   * Returns the name of the vendor associated with this implementation.
    */
   public String getVendor()
   {
@@ -107,16 +104,13 @@ public class Provider
   }
 
   /**
-   * Returns version of this implementation or null if no version.
+   * Returns the version of this implementation.
    */
   public String getVersion()
   {
     return version;
   }
 
-  /**
-   * Overrides Object.toString()
-   */
   public String toString()
   {
     StringBuffer buffer = new StringBuffer();
@@ -147,3 +141,4 @@ public class Provider
   }
   
 }
+

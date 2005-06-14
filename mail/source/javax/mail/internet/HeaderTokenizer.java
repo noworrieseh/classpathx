@@ -1,13 +1,13 @@
 /*
  * HeaderTokenizer.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,11 +28,7 @@
 package javax.mail.internet;
 
 /**
- * This class tokenizes RFC822 and MIME headers into the basic symbols 
- * specified by RFC822 and MIME.
- * <p>
- * This class handles folded headers(ie headers with embedded CRLF SPACE
- * sequences). The folds are removed in the returned tokens.
+ * A lexer for RFC 822 and MIME headers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,36 +37,37 @@ public class HeaderTokenizer
 {
 
   /**
-   * The Token class represents tokens returned by the HeaderTokenizer.
+   * A token returned by the lexer. These tokens are specified in RFC 822
+   * and MIME.
    */
   public static class Token
   {
 
     /**
-     * Token type indicating an ATOM.
+     * An ATOM.
      */
     public static final int ATOM = -1;
 
     /**
-     * Token type indicating a quoted string.
-     * The value field contains the string without the quotes.
+     * A quoted-string.
+     * The value of this token is the string without the quotes.
      */
     public static final int QUOTEDSTRING = -2;
 
     /**
-     * Token type indicating a comment.
-     * The value field contains the comment string without the comment 
+     * A comment.
+     * The value of this token is the comment string without the comment 
      * start and end symbols.
      */
     public static final int COMMENT = -3;
 
     /**
-     * Token type indicating end of input.
+     * The end of the input.
      */
     public static final int EOF = -4;
 
     /*
-     * The type of the token.
+     * The token type.
      */
     private int type;
 
@@ -82,8 +79,8 @@ public class HeaderTokenizer
 
     /**
      * Constructor.
-     * @param type Token type
-     * @param value Token value
+     * @param type the token type
+     * @param value the token value
      */
     public Token(int type, String value)
     {
@@ -92,16 +89,17 @@ public class HeaderTokenizer
     }
     
     /**
-     * Return the type of the token.
-     * If the token represents a delimiter or a control character,
-     * the type is that character itself, converted to an integer.
-     * Otherwise, it's value is one of the following:
+     * Returns the token type.
+     * If the token is a delimiter or a control character,
+     * the type is the integer value of that character.
+     * Otherwise, its value is one of the following:
      * <ul>
-     * <li>ATOM A sequence of ASCII characters delimited by either 
+     * <li>ATOM: a sequence of ASCII characters delimited by either 
      * SPACE, CTL, '(', '"' or the specified SPECIALS
-     * <li>QUOTEDSTRING A sequence of ASCII characters within quotes
-     * <li>COMMENT A sequence of ASCII characters within '(' and ')'.
-     * <li>EOF End of header
+     * <li>QUOTEDSTRING: a sequence of ASCII characters within quotes
+     * <li>COMMENT: a sequence of ASCII characters within '(' and ')'
+     * <li>EOF: the end of the header
+     * </ul>
      */
     public int getType()
     {
@@ -109,11 +107,7 @@ public class HeaderTokenizer
     }
 
     /**
-     * Returns the value of the token just read.
-     * When the current token is a quoted string, this field contains 
-     * the body of the string, without the quotes.
-     * When the current token is a comment, this field contains the body
-     * of the comment.
+     * Returns the value of the token.
      */
     public String getValue()
     {
@@ -123,12 +117,12 @@ public class HeaderTokenizer
   }
 
   /**
-   * RFC822 specials
+   * RFC 822 specials.
    */
   public static final String RFC822 = "()<>@,;:\\\"\t .[]";
 
   /**
-   * MIME specials
+   * MIME specials.
    */
   public static final String MIME = "()<>@,;:\\\"\t []/?=";
   
@@ -143,12 +137,12 @@ public class HeaderTokenizer
   private String header;
 
   /*
-   * The delimiters separating tokens.
+   * The delimiters.
    */
   private String delimiters;
 
   /*
-   * Whather or not to skip comments.
+   * Whather to skip comments.
    */
   private boolean skipComments;
 
@@ -173,15 +167,13 @@ public class HeaderTokenizer
   private int maxPos;
 
   /**
-   * Constructor that takes a rfc822 style header.
-   * @param header The rfc822 header to be tokenized
-   * @param delimiters Set of delimiter characters to be used to delimit ATOMS.
-   * These are usually RFC822 or MIME
-   * @param skipComments If true, comments are skipped and not returned 
-   * as tokens
+   * Constructor.
+   * @param header the RFC 822 header to be tokenized
+   * @param delimiters the delimiter characters to be used to delimit ATOMs
+   * @param skipComments whether to skip comments
    */
   public HeaderTokenizer(String header, String delimiters,
-                          boolean skipComments)
+                         boolean skipComments)
   {
     this.header = (header == null) ? "" : header;
     this.delimiters = delimiters;
@@ -192,9 +184,9 @@ public class HeaderTokenizer
 
   /**
    * Constructor.
-   * Comments are ignored and not returned as tokens
-   * @param header The header that is tokenized
-   * @param delimiters The delimiters to be used
+   * Comments are ignored.
+   * @param header the RFC 822 header to be tokenized
+   * @param delimiters the delimiter characters to be used to delimit ATOMs
    */
   public HeaderTokenizer(String header, String delimiters)
   {
@@ -203,8 +195,8 @@ public class HeaderTokenizer
 
   /**
    * Constructor.
-   * The RFC822 defined delimiters - RFC822 - are used to delimit ATOMS.
-   * Also comments are skipped and not returned as tokens
+   * The RFC822-defined delimiters are used to delimit ATOMs.
+   * Comments are ignored.
    */
   public HeaderTokenizer(String header)
   {
@@ -212,10 +204,7 @@ public class HeaderTokenizer
   }
 
   /**
-   * Parses the next token from this String.
-   * <p>
-   * Clients sit in a loop calling <code>next()</code> to parse successive 
-   * tokens until an EOF Token is returned.
+   * Returns the next token.
    * @return the next token
    * @exception ParseException if the parse fails
    */
@@ -230,11 +219,10 @@ public class HeaderTokenizer
   }
 
   /**
-   * Peek at the next token, without actually removing the token 
-   * from the parse stream.
-   * Invoking this method multiple times will return successive tokens,
+   * Peeks at the next token. The token will still be available to be read
+   * by <code>next()</code>.
+   * Invoking this method multiple times returns successive tokens,
    * until <code>next()</code> is called.
-   * @return the next peek token
    * @param ParseException if the parse fails
    */
   public Token peek()
@@ -247,7 +235,7 @@ public class HeaderTokenizer
   }
 
   /**
-   * Return the rest of the header.
+   * Returns the rest of the header.
    */
   public String getRemainder()
   {
@@ -389,7 +377,7 @@ public class HeaderTokenizer
   }
 
   /*
-   * Process out CR and backslash(line continuation) bytes.
+   * Process out CR and backslash (line continuation) bytes.
    */
   private String filter(String s, int start, int end)
   {
@@ -432,3 +420,4 @@ public class HeaderTokenizer
   }
 
 }
+

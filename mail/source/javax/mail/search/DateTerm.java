@@ -1,13 +1,13 @@
 /*
  * DateTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 import java.util.Date;
 
 /**
- * This class implements comparisons for Dates.
+ * A date comparison.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -47,6 +47,7 @@ public abstract class DateTerm
   /**
    * Constructor.
    * @param comparison the comparison type
+   * @param date the date
    */
   protected DateTerm(int comparison, Date date)
   {
@@ -55,7 +56,7 @@ public abstract class DateTerm
   }
 
   /**
-   * Return the Date to compare with.
+   * Returns the date to compare with.
    */
   public Date getDate()
   {
@@ -63,7 +64,7 @@ public abstract class DateTerm
   }
 
   /**
-   * Return the type of comparison.
+   * Returns the comparison operator.
    */
   public int getComparison()
   {
@@ -71,9 +72,7 @@ public abstract class DateTerm
   }
 
   /**
-   * The date comparison method.
-   * @param d the date in the constructor is compared with this date
-   * @return true if the dates match, otherwise false
+   * Returns true only if this comparison matches the supplied date.
    */
   protected boolean match(Date d)
   {
@@ -95,9 +94,6 @@ public abstract class DateTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return ((other instanceof DateTerm) &&
@@ -105,12 +101,10 @@ public abstract class DateTerm
             super.equals(other));
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return date.hashCode() + super.hashCode();
   }
 
 }
+

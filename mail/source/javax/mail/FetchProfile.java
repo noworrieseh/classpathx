@@ -1,13 +1,13 @@
 /*
  * FetchProfile.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,33 +30,8 @@ package javax.mail;
 import java.util.ArrayList;
 
 /**
- * Clients use a FetchProfile to list the Message attributes that it 
- * wishes to prefetch from the server for a range of messages.
- * <p>
- * Messages obtained from a Folder are light-weight objects that typically 
- * start off as empty references to the actual messages. Such a Message
- * object is filled in "on-demand" when the appropriate get*() methods are
- * invoked on that particular Message. Certain server-based message access
- * protocols(Ex: IMAP) allow batch fetching of message attributes for a
- * range of messages in a single request. Clients that want to use message
- * attributes for a range of Messages(Example: to display the top-level
- * headers in a headerlist) might want to use the optimization provided by
- * such servers. The FetchProfile allows the client to indicate this desire
- * to the server.
- * <p>
- * Note that implementations are not obligated to support FetchProfiles, since
- * there might be cases where the backend service does not allow easy,
- * efficient fetching of such profiles.
- * <p>
- * Sample code that illustrates the use of a FetchProfile is given below:
- * <pre>
-      Message[] msgs = folder.getMessages();
-    
-      FetchProfile fp = new FetchProfile();
-      fp.add(FetchProfile.Item.ENVELOPE);
-      fp.add("X-mailer");
-      folder.fetch(msgs, fp);
-   </pre>
+ * Specification of the facets of a message that are to be preloaded from
+ * the server.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -65,45 +40,27 @@ public class FetchProfile
 {
 
   /**
-   * This inner class is the base class of all items that can be requested
-   * in a FetchProfile. The items currently defined here are ENVELOPE,
-   * CONTENT_INFO and FLAGS. The UIDFolder interface defines the UID Item
-   * as well.
-   * <p>
-   * Note that this class only has a protected constructor, thereby
-   * restricting new Item types to either this class or subclasses.
-   * This effectively implements an enumeration of allowed Item types.
+   * Base class of all the facets of a message that can be fetched.
    */
   public static class Item
   {
 
     /**
-     * This is the Envelope item.
-     * <p>   
-     * The Envelope is an aggregration of the common attributes of a Message.
-     * Implementations should include the following attributes: 
+     * The common attributes of a message, e.g.:
      * From, To, Cc, Bcc, ReplyTo, Subject and Date.
-     * More items may be included as well.
-     * <p>
-     * For implementations of the IMAP4 protocol(RFC 2060),
-     * the Envelope should include the ENVELOPE data item.
-     * More items may be included too.
+     * Further items may be included as required.
      */
     public static final Item ENVELOPE = new Item("ENVELOPE");
 
     /**
-     * This item is for fetching information about the content of the message.
-     * <p>
-     * This includes all the attributes that describe the content of the 
-     * message.
-     * Implementations should include the following attributes: 
+     * The message content metadata, e.g.:
      * ContentType, ContentDisposition, ContentDescription, Size and LineCount. 
-     * Other items may be included as well.
+     * Further items may be included as required.
      */
     public static final Item CONTENT_INFO = new Item("CONTENT_INFO");
 
     /**
-     * This is the Flags item.
+     * The message flags.
      */
     public static final Item FLAGS = new Item("FLAGS");
     
@@ -121,15 +78,14 @@ public class FetchProfile
   private ArrayList headers = null;
 
   /**
-   * Create an empty FetchProfile.
+   * Create an empty fetch profile.
    */
   public FetchProfile()
   {
   }
 
   /**
-   * Add the given special item as one of the attributes to be prefetched.
-   * @param item the special item to be fetched
+   * Add the given item.
    */
   public void add(Item item)
   {
@@ -144,8 +100,7 @@ public class FetchProfile
   }
 
   /**
-   * Add the specified header-field to the list of attributes to be prefetched.
-   * @param header the header to be prefetched
+   * Add the specified header name.
    */
   public void add(String header)
   {
@@ -160,7 +115,7 @@ public class FetchProfile
   }
 
   /**
-   * Returns true if the fetch profile contains given special item.
+   * Indicates whether the fetch profile contains the specified item.
    */
   public boolean contains(Item item)
   {
@@ -168,7 +123,7 @@ public class FetchProfile
   }
 
   /**
-   * Returns true if the fetch profile contains the given header name.
+   * Indicates whether the fetch profile contains the given header name.
    */
   public boolean contains(String header)
   {
@@ -176,7 +131,7 @@ public class FetchProfile
   }
 
   /**
-   * Get the items set in this profile.
+   * Get the items in this profile.
    */
   public Item[] getItems()
   {
@@ -193,7 +148,7 @@ public class FetchProfile
   }
 
   /**
-   * Get the names of the header-fields set in this profile.
+   * Get the names of the header fields in this profile.
    */
   public String[] getHeaderNames()
   {

@@ -1,13 +1,13 @@
 /*
  * HeaderTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,8 +30,7 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This class implements comparisons for Message headers.
- * The comparison is case-insensitive.
+ * A case-insensitive string comparison of message header values.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,14 +40,14 @@ public final class HeaderTerm
 {
 
   /**
-   * The name of the header.
+   * The header name.
    */
   protected String headerName;
 
   /**
    * Constructor.
-   * @param headerName The name of the header
-   * @param pattern The pattern to search for
+   * @param headerName the header name
+   * @param pattern the pattern to search for
    */
   public HeaderTerm(String headerName, String pattern)
   {
@@ -57,7 +56,7 @@ public final class HeaderTerm
   }
 
   /**
-   * Return the name of the header to compare with.
+   * Returns the name of the header to compare with.
    */
   public String getHeaderName()
   {
@@ -65,9 +64,8 @@ public final class HeaderTerm
   }
 
   /**
-   * The header match method.
-   * @param msg The match is applied to this Message's header
-   * @return true if the match succeeds, otherwise false
+   * Returns true if the header in the specified message matches the pattern
+   * specified in this term.
    */
   public boolean match(Message msg)
   {
@@ -91,9 +89,6 @@ public final class HeaderTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof HeaderTerm)
@@ -105,12 +100,10 @@ public final class HeaderTerm
     return false;
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return headerName.toLowerCase().hashCode() + super.hashCode();
   }
   
 }
+

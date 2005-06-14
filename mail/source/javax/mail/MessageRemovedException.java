@@ -1,13 +1,13 @@
 /*
  * MessageRemovedException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,10 +28,8 @@
 package javax.mail;
 
 /**
- * The exception thrown when an invalid method is invoked on an expunged 
- * Message.
- * The only valid methods on an expunged Message are
- * <code>isExpunged()</code> and <code>getMessageNumber()</code>.
+ * An exception thrown when an invalid method is invoked on an expunged 
+ * message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3

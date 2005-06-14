@@ -1,13 +1,13 @@
 /*
  * StringTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +28,7 @@
 package javax.mail.search;
 
 /**
- * This class implements the match method for Strings.
- * The current implementation provides only for substring matching.
- * We could add comparisons(like strcmp ...).
+ * A comparison of string values.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,12 +38,12 @@ public abstract class StringTerm
 {
 
   /**
-   * The pattern.
+   * The pattern to match.
    */
   protected String pattern;
 
   /**
-   * Ignore case when comparing?
+   * Whether to ignore case during comparison.
    */
   protected boolean ignoreCase;
 
@@ -61,7 +59,7 @@ public abstract class StringTerm
   }
 
   /**
-   * Return the string to match with.
+   * Returns the pattern to match.
    */
   public String getPattern()
   {
@@ -69,14 +67,16 @@ public abstract class StringTerm
   }
 
   /**
-   * Return true if we should ignore case when matching.
+   * Indicates whether to ignore case during comparison.
    */
   public boolean getIgnoreCase()
   {
     return ignoreCase;
   }
 
-  // locate pattern in s
+  /**
+   * Returns true if the specified pattern is a substring of the given string.
+   */
   protected boolean match(String s)
   {
     int patlen = pattern.length();
@@ -91,9 +91,6 @@ public abstract class StringTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof StringTerm)
@@ -113,12 +110,10 @@ public abstract class StringTerm
     return false;
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return (ignoreCase) ? pattern.hashCode() : ~pattern.hashCode();
   }
   
 }
+

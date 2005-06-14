@@ -1,13 +1,13 @@
 /*
  * MessageChangeListener.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.event;
 import java.util.EventListener;
 
 /**
- * This is the Listener interface for MessageChanged events.
+ * A listener for message changed events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,8 +40,9 @@ public interface MessageChangedListener
 {
 
   /**
-   * Invoked when a message is changed.
+   * A message was changed.
    */
   void messageChanged(MessageChangedEvent e);
 
 }
+

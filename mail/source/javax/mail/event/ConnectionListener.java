@@ -1,13 +1,13 @@
 /*
  * ConnectionListener.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.event;
 import java.util.EventListener;
 
 /**
- * This is the Listener interface for Connection events.
+ * A listener for connection events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,20 +40,19 @@ public interface ConnectionListener
 {
 
   /**
-   * Invoked when a Store/Folder/Transport is opened.
+   * A service or folder was opened.
    */
   void opened(ConnectionEvent e);
 
   /**
-   * Invoked when a Store is disconnected.
-   * Note that a folder cannot be disconnected, so a folder will not fire 
-   * this event.
+   * A service was disconnected.
    */
   void disconnected(ConnectionEvent e);
 
   /**
-   * Invoked when a Store/Folder/Transport is closed.
+   * A service or folder was closed.
    */
   void closed(ConnectionEvent e);
 
 }
+

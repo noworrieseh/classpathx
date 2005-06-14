@@ -1,13 +1,13 @@
 /*
  * SearchException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,8 @@ package javax.mail.search;
 import javax.mail.MessagingException;
 
 /**
- * The exception thrown when a Search expression could not be handled.
+ * An exception thrown to indicate that a search expression could not be
+ * handled by the store implementation.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,14 +41,14 @@ public class SearchException
 {
 
   /**
-   * Constructs a SearchException with no detail message.
+   * Constructor with no detail message.
    */
   public SearchException()
   {
   }
 
   /**
-   * Constructs a SearchException with the specified detail message.
+   * Constructor with the specified detail message.
    * @param s the detail message
    */
   public SearchException(String s)
@@ -56,3 +57,4 @@ public class SearchException
   }
 
 }
+

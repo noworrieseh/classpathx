@@ -1,13 +1,13 @@
 /*
  * Multipart.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,20 +33,11 @@ import java.util.Vector;
 import javax.activation.DataSource;
 
 /**
- * Multipart is a container that holds multiple body parts. 
- * Multipart provides methods to retrieve and set its subparts.
+ * A multipart is a container for multiple body parts. 
  * <p>
- * Multipart also acts as the base class for the content object returned by 
- * most Multipart DataContentHandlers. For example, invoking 
- * <code>getContent()</code> on a DataHandler whose source is a 
- * "multipart/signed" data source may return an appropriate subclass 
- * of Multipart.
- * <p>
- * Some messaging systems provide different subtypes of Multiparts.
+ * Some messaging systems provide different subtypes of multiparts.
  * For example, MIME specifies a set of subtypes that include 
  * "alternative", "mixed", "related", "parallel", "signed", etc.
- * <p>
- * Multipart is an abstract class. Subclasses provide actual implementations.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
@@ -54,23 +45,23 @@ public abstract class Multipart
 {
 
   /**
-   * Vector of BodyPart objects.
+   * Vector of body parts.
    */
   protected Vector parts;
 
   /**
-   * This field specifies the content-type of this multipart object.
+   * The content-type of this multipart object.
    * It defaults to "multipart/mixed".
    */
   protected String contentType;
 
   /**
-   * The Part containing this Multipart, if known.
+   * The part containing this multipart, if known.
    */
   protected Part parent;
 
   /**
-   * Default constructor. An empty Multipart object is created.
+   * Constructor for an empty multipart of type "multipart/mixed".
    */
   protected Multipart()
   {
@@ -79,18 +70,11 @@ public abstract class Multipart
   }
 
   /**
-   * Setup this Multipart object from the given MultipartDataSource.
+   * Configures this multipart from the given data source.
    * <p>
-   * The method adds the MultipartDataSource's BodyPart objects into this
-   * Multipart. This Multipart's <code>contentType</code> is set to that of 
-   * the MultipartDataSource.
-   * <p>
-   * This method is typically used in those cases where one has a multipart 
-   * data source that has already been pre-parsed into the individual body 
-   * parts(for example, an IMAP datasource), but needs to create an 
-   * appropriate Multipart subclass that represents a specific multipart 
-   * subtype.
-   * @param mp Multipart datasource
+   * The method adds the body parts in the data source to this multipart,
+   * and sets the content-type.
+   * @param mp a multipart data source
    */
   protected void setMultipartDataSource(MultipartDataSource mp)
     throws MessagingException
@@ -104,10 +88,7 @@ public abstract class Multipart
   }
 
   /**
-   * Return the content-type of this Multipart.
-   * <p>
-   * This implementation just returns the value of the 
-   * <code>contentType</code> field.
+   * Returns the content-type of this multipart.
    */
   public String getContentType()
   {
@@ -115,7 +96,7 @@ public abstract class Multipart
   }
 
   /**
-   * Return the number of enclosed BodyPart objects.
+   * Returns the number of enclosed body parts.
    */
   public int getCount()
     throws MessagingException
@@ -124,10 +105,10 @@ public abstract class Multipart
   }
 
   /**
-   * Get the specified Part.
-   * Parts are numbered starting at 0.
-   * @param index the index of the desired Part
-   * @exception IndexOutOfBoundsException if the given index is out of range.
+   * Get the specified body part.
+   * The body parts in this container are numbered starting at 0.
+   * @param index the index of the desired body part
+   * @exception IndexOutOfBoundsException if the given index is out of range
    */
   public BodyPart getBodyPart(int index)
     throws MessagingException
@@ -140,11 +121,10 @@ public abstract class Multipart
   }
 
   /**
-   * Remove the specified part from the multipart message.
-   * Shifts all the parts after the removed part down one.
-   * @param part The part to remove
-   * @return true if part removed, false otherwise
-   * @exception MessagingException if no such Part exists
+   * Removes the specified body part from this multipart.
+   * @param part the body part to remove
+   * @return true if a body part was removed, false otherwise
+   * @exception MessagingException if the multipart has not been configured
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
@@ -167,10 +147,10 @@ public abstract class Multipart
   }
 
   /**
-   * Remove the part at specified location(starting from 0).
-   * Shifts all the parts after the removed part down one.
-   * @param index Index of the part to remove
-   * @exception IndexOutOfBoundsException if the given index is out of range.
+   * Removes the body part at the specified index.
+   * The body parts in this container are numbered starting at 0.
+   * @param index index of the part to remove
+   * @exception IndexOutOfBoundsException if the given index is out of range
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
@@ -190,9 +170,8 @@ public abstract class Multipart
   }
 
   /**
-   * Adds a Part to the multipart. 
-   * The BodyPart is appended to the list of existing Parts.
-   * @param part The Part to be appended
+   * Adds a body part to this multipart. 
+   * @param part the body part to be appended
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
@@ -211,12 +190,10 @@ public abstract class Multipart
   }
 
   /**
-   * Adds a BodyPart at position index.
-   * If index is not the last one in the list, the subsequent parts 
-   * are shifted up. If index is larger than the number of parts present,
-   * the BodyPart is appended to the end.
-   * @param part The BodyPart to be inserted
-   * @param index Location where to insert the part
+   * Inserts a body part at the specified index.
+   * The body parts in this container are numbered starting at 0.
+   * @param part the body part to be inserted
+   * @param index where to insert the part
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of existing values
    */
@@ -235,15 +212,14 @@ public abstract class Multipart
   }
 
   /**
-   * Output an appropriately encoded bytestream to the given OutputStream.
-   * The implementation subclass decides the appropriate encoding algorithm 
-   * to be used. The bytestream is typically used for sending.
+   * Writes this multipart to the specified byte stream.
    */
   public abstract void writeTo(OutputStream os)
     throws IOException, MessagingException;
 
   /**
-   * Return the Part that contains this Multipart object, or null if not known.
+   * Returns the part containing this multipart, or <code>null</code> if
+   * not known.
    */
   public Part getParent()
   {
@@ -251,10 +227,7 @@ public abstract class Multipart
   }
 
   /**
-   * Set the parent of this Multipart to be the specified Part.
-   * Normally called by the Message or BodyPart 
-   * <code>setContent(Multipart)</code> method. parent may be null if 
-   * the Multipart is being removed from its containing Part.
+   * Sets the parent of this multipart.
    */
   public void setParent(Part part)
   {

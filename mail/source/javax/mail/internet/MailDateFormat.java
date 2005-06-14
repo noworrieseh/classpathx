@@ -1,13 +1,13 @@
 /*
  * MailDateFormat.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,87 +28,22 @@
 package javax.mail.internet;
 
 import java.io.PrintStream;
-import java.text.*;
-import java.util.*;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
- * Formats and parses date specification based on the
+ * A date format that applies the rules specified by the Internet Draft
  * draft-ietf-drums-msg-fmt-08 dated January 26, 2000.
- * This is a followup spec to RFC822.
  * <p>
- * This class does not take pattern strings.
- * It always formats the date based on the specification below.
- * <p>
- * 3.3 Date and Time Specification
- * <p>
- * Date and time occur in several header fields of a message. This section
- * specifies the syntax for a full date and time specification. Though folding
- * whitespace is permitted throughout the date-time specification, it is
- * recommended that only a single space be used where FWS is required and 
- * no space be used where FWS is optional in the date-time specification;
- * some older implementations may not interpret other occurrences of folding 
- * whitespace correctly.
- * <pre>
-date-time = [ day-of-week "," ] date FWS time [CFWS]
-
-day-of-week = ([FWS] day-name) / obs-day-of-week
-
-day-name = "Mon" / "Tue" / "Wed" / "Thu" / "Fri" / "Sat" / "Sun"
-
-date = day month year
-
-year = 4*DIGIT / obs-year
-
-month = (FWS month-name FWS) / obs-month
-
-month-name = "Jan" / "Feb" / "Mar" / "Apr" /
-             "May" / "Jun" / "Jul" / "Aug" /
-             "Sep" / "Oct" / "Nov" / "Dec"
-
-
-day = ([FWS] 1*2DIGIT) / obs-day
-
-time = time-of-day FWS zone
-
-time-of-day = hour ":" minute [ ":" second ]
-
-hour = 2DIGIT / obs-hour
-
-minute = 2DIGIT / obs-minute
-
-second = 2DIGIT / obs-second
-
-zone = (( "+" / "-" ) 4DIGIT) / obs-zone
-</pre>
- * <p>
- * The day is the numeric day of the month.
- * The year is any numeric year in the common era.
- * <p>
- * The time-of-day specifies the number of hours, minutes, and optionally 
- * seconds since midnight of the date indicated.
- * <p>
- * The date and time-of-day SHOULD express local time.
- * <p>
- * The zone specifies the offset from Coordinated Universal Time(UTC,
- * formerly referred to as "Greenwich Mean Time") that the date and 
- * time-of-day represent.
- * The "+" or "-" indicates whether the time-of-day is ahead of or behind
- * Universal Time. The first two digits indicate the number of hours'
- * difference from Universal Time, and the last two digits indicate the 
- * number of minutes' difference from Universal Time.(Hence, +hhmm means 
- * +(hh * 60 + mm) minutes, and -hhmm means -(hh * 60 + mm) minutes).
- * The form "+0000" SHOULD be used to indicate a time zone at Universal Time.
- * Though "-0000" also indicates Universal Time, it is used to indicate that 
- * the time was generated on a system that may be in a local time zone other 
- * than Universal Time.
- * <p>
- * A date-time specification MUST be semantically valid.
- * That is, the day-of-the week(if included) MUST be the day implied by 
- * the date, the numeric day-of-month MUST be between 1 and the number of 
- * days allowed for the specified month(in the specified year), the 
- * time-of-day MUST be in the range 00:00:00 through 23:59:60(the number 
- * of seconds allowing for a leap second; see [STD-12]), and the zone MUST 
- * be within the range -9959 through +9959.
+ * This class cannot take pattern strings. It always formats the date
+ * based on the above specification.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -134,16 +69,16 @@ public class MailDateFormat
   }
 
   /**
-   * Appends the textual value for the specified field to the given string
-   * buffer. This method should be avoided, use <code>format(Date)</code>
-   * instead.
-   * @param date the Date object
+   * Appends the string representation for the specified field to the
+   * given string buffer. This method should be avoided, use
+   * <code>format(Date)</code> instead.
+   * @param date the date
    * @param buf the buffer to append to
    * @param field the current field position
    * @return the modified buffer
    */
   public StringBuffer format(Date date, StringBuffer buf,
-      FieldPosition field)
+                             FieldPosition field)
   {
     calendar.clear();
     calendar.setTime(date);
@@ -388,3 +323,4 @@ public class MailDateFormat
   }
 
 }
+

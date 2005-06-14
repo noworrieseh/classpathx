@@ -1,13 +1,13 @@
 /*
  * ComparisonTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +28,7 @@
 package javax.mail.search;
 
 /**
- * This class models the comparison operator.
- * This is an abstract class; subclasses implement comparisons 
- * for different datatypes.
+ * A comparison for scalar values.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -39,33 +37,51 @@ public abstract class ComparisonTerm
   extends SearchTerm
 {
 
+  /**
+   * The less than or equal to operator.
+   */
   public static final int LE = 1;
+
+  /**
+   * The less than operator.
+   */
   public static final int LT = 2;
+
+  /**
+   * The equality operator.
+   */
   public static final int EQ = 3;
+
+  /**
+   * The not equal to operator.
+   */
   public static final int NE = 4;
+
+  /**
+   * The greater than operator.
+   */
   public static final int GT = 5;
+
+  /**
+   * The greater than or equal to operator.
+   */
   public static final int GE = 6;
 
   /**
-   * The comparison.
+   * The comparison operator.
    */
   protected int comparison;
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return ((other instanceof ComparisonTerm) && 
        ((ComparisonTerm)other).comparison == comparison);
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return comparison;
   }
 
 }
+

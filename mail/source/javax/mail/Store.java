@@ -1,13 +1,13 @@
 /*
  * Store.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,13 +34,7 @@ import javax.mail.event.StoreEvent;
 import javax.mail.event.StoreListener;
 
 /**
- * An abstract class that models a message store and its access protocol,
- * for storing and retrieving messages.
- * Subclasses provide actual implementations.
- * <p>
- * Note that Store extends the Service class, which provides many common 
- * methods for naming stores, connecting to stores, and listening to 
- * connection events.
+ * A message store that can be used to save and retrieve messages.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -54,8 +48,8 @@ public abstract class Store
 
   /**
    * Constructor.
-   * @param session Session object for this Store.
-   * @param url URLName object to be used for this Store
+   * @param session session context for this store
+   * @param url URLName to be used for this store
    */
   protected Store(Session session, URLName url)
   {
@@ -63,56 +57,38 @@ public abstract class Store
   }
 
   /**
-   * Returns a Folder object that represents the 'root' of the default 
-   * namespace presented to the user by the Store.
-   * @exception IllegalStateException if this Store is not connected.
+   * Returns a folder that represents the root of the primary namespace
+   * presented to the user by this store.
+   * @exception IllegalStateException if the store is not connected
    */
   public abstract Folder getDefaultFolder()
     throws MessagingException;
 
   /**
-   * Return the Folder object corresponding to the given name.
-   * Note that a Folder object is returned even if the named folder 
-   * does not physically exist on the Store. The <code>exists()</code>
-   * method on the folder object indicates whether this folder really exists.
+   * Returns the folder with the given name.
    * <p>
-   * Folder objects are not cached by the Store, so invoking this method on 
-   * the same name multiple times will return that many distinct Folder 
-   * objects.
-   * @param name The name of the Folder. In some Stores, <code>name</code>
-   * can be an absolute path if it starts with the hierarchy delimiter.
-   * Else it is interpreted relative to the 'root' of this namespace.
-   * @exception IllegalStateException if this Store is not connected.
+   * The <code>exists</code> method can be used to determine whether the
+   * folder actually exists.
+   * <p>
+   * In some Stores, <code>name</code> can be an absolute path if it starts
+   * with the hierarchy delimiter. Otherwise it is interpreted relative
+   * to the root of this namespace.
+   * @param name the folder name
+   * @exception IllegalStateException if the store is not connected
    */
   public abstract Folder getFolder(String name)
     throws MessagingException;
 
   /**
-   * Return a closed Folder object, corresponding to the given URLName.
-   * The store specified in the given URLName should refer to this Store 
-   * object.
-   * <p>
-   * Implementations of this method may obtain the name of the actual folder
-   * using the <code>getFile()</code> method on URLName, and use that name 
-   * to create the folder.
-   * @param url URLName that denotes a folder
-   * @exception IllegalStateException if this Store is not connected.
+   * Returns the folder corresponding to the given URLName.
+   * @param url a URLName denoting a folder
+   * @exception IllegalStateException if this store is not connected
    */
   public abstract Folder getFolder(URLName url)
     throws MessagingException;
 
   /**
-   * Return a set of folders representing the personal namespaces for the
-   * current user. A personal namespace is a set of names that is considered
-   * within the personal scope of the authenticated user. Typically, only the
-   * authenticated user has access to mail folders in their personal namespace.
-   * If an INBOX exists for a user, it must appear within the user's personal
-   * namespace. In the typical case, there should be only one personal 
-   * namespace for each user in each Store.
-   * <p>
-   * This implementation returns an array with a single entry containing the
-   * return value of the getDefaultFolder method. Subclasses should override
-   * this method to return appropriate information.
+   * Returns the personal namespaces for the authenticated user.
    */
   public Folder[] getPersonalNamespaces()
     throws MessagingException
@@ -123,15 +99,7 @@ public abstract class Store
   }
 
   /**
-   * Return a set of folders representing the namespaces for user.
-   * The namespaces returned represent the personal namespaces for the user.
-   * To access mail folders in the other user's namespace, the currently
-   * authenticated user must be explicitly granted access rights. For example,
-   * it is common for a manager to grant to their secretary access rights to
-   * their mail folders.
-   * <p>
-   * This implementation returns an empty array. Subclasses should override 
-   * this method to return appropriate information.
+   * Returns the personal namespaces for the specified user.
    */
   public Folder[] getUserNamespaces(String user)
     throws MessagingException
@@ -140,13 +108,7 @@ public abstract class Store
   }
 
   /**
-   * Return a set of folders representing the shared namespaces.
-   * A shared namespace is a namespace that consists of mail folders that 
-   * are intended to be shared amongst users and do not exist within a 
-   * user's personal namespace.
-   * <p>
-   * This implementation returns an empty array. Subclasses should override 
-   * this method to return appropriate information.
+   * Returns the shared namespaces.
    */
   public Folder[] getSharedNamespaces()
     throws MessagingException
@@ -174,7 +136,7 @@ public abstract class Store
   // -- Store events --
 
   /**
-   * Add a listener for StoreEvents on this Store.
+   * Adds a listener for store events on this store.
    */
   public void addStoreListener(StoreListener l)
   {
@@ -189,7 +151,7 @@ public abstract class Store
   }
 
   /**
-   * Remove a listener for Store events.
+   * Removes a store events listener.
    */
   public void removeStoreListener(StoreListener l)
   {
@@ -203,9 +165,7 @@ public abstract class Store
   }
 
   /**
-   * Notify all StoreListeners.
-   * Store implementations are expected to use this method to broadcast 
-   * StoreEvents.
+   * Notifies all store event listeners.
    */
   protected void notifyStoreListeners(int type, String message)
   {
@@ -236,9 +196,8 @@ public abstract class Store
   // -- Folder events --
 
   /**
-   * Add a listener for Folder events on any Folder object obtained from this
-   * Store. FolderEvents are delivered to FolderListeners on the affected 
-   * Folder as well as to FolderListeners on the containing Store.
+   * Adds a listener for folder events on any folder object obtained from this
+   * store.
    */
   public void addFolderListener(FolderListener l)
   {
@@ -253,7 +212,7 @@ public abstract class Store
   }
 
   /**
-   * Remove a listener for Folder events.
+   * Removes a folder event listener.
    */
   public void removeFolderListener(FolderListener l)
   {
@@ -267,8 +226,7 @@ public abstract class Store
   }
 
   /**
-   * Notify all FolderListeners. Store implementations are expected to use 
-   * this method to broadcast Folder events.
+   * Notifies all folder listeners.
    */
   protected void notifyFolderListeners(int type, Folder folder)
   {
@@ -285,9 +243,7 @@ public abstract class Store
   }
 
   /**
-   * Notify all FolderListeners about the renaming of a folder. Store
-   * implementations are expected to use this method to broadcast Folder 
-   * events indicating the renaming of folders.
+   * Notifies all folder listeners about the renaming of a folder.
    */
   protected void notifyFolderRenamedListeners(Folder oldFolder, 
                                                Folder newFolder)
@@ -358,3 +314,4 @@ public abstract class Store
   }
 
 }
+

@@ -1,13 +1,13 @@
 /*
  * BodyTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,11 +32,13 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 
 /**
- * This class implements searches on Message Body.
- * Body searches are done only for:
- *(1) single-part messages whose primary-type is Text OR
- *(2) multipart/mixed messages whose first body-part's primary-type is Text.
- * In this case, the search is done on the first body-part.
+ * A textual search of the message content.
+ * Body searches are done only on:
+ * <ol>
+ * <li>single-part messages whose primary-type is <code>text</code> OR
+ * <li>multipart/mixed messages whose first body part's primary-type is
+ * <code>text</code>.
+ * </ol>
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -46,8 +48,8 @@ public final class BodyTerm
 {
 
   /**
-   * Constructor
-   * @param pattern The String to search for
+   * Constructor.
+   * @param pattern the text to search for
    */
   public BodyTerm(String pattern)
   {
@@ -55,9 +57,7 @@ public final class BodyTerm
   }
 
   /**
-   * The match method.
-   * @param msg The pattern search is applied on this Message's body
-   * @return true if the pattern is found; otherwise false
+   * Returns true only if the search text was found in the message body.
    */
   public boolean match(Message msg)
   {
@@ -85,12 +85,10 @@ public final class BodyTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return ((other instanceof BodyTerm) && super.equals(other));
   }
   
 }
+

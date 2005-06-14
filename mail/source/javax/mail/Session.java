@@ -1,13 +1,13 @@
 /*
  * Session.java
- * Copyright(C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -39,10 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The Session class represents a mail session and is not subclassed.
- * It collects together properties and defaults used by the mail API's.
- * A single default session can be shared by multiple applications on 
- * the desktop. Unshared sessions can also be created.
+ * A session represents the context of a messaging transaction. It provides
+ * a repository of configuration information in the form of properties.
  *
  * @author Andrew Selkirk
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
@@ -102,7 +100,10 @@ public final class Session
 
   private Logger logger = Logger.getLogger(Session.class.getName());
 
-  /** Create the session object.
+  /**
+   * Create the session.
+   * @param props the session properties
+   * @param authenticator callback for authentication
    */
   private Session(Properties props, Authenticator authenticator)
   {
@@ -155,9 +156,9 @@ public final class Session
   }
 
   /**
-   * Get an input stream for a resource.
+   * Returns an input stream for a resource name.
    * <code>ClassLoader.getResourceAsStream</code> should work,
-   * but Class.getClassLoader() returns null in kaffe(2003-01-22).
+   * but Class.getClassLoader() returns null in kaffe (2003-01-22).
    */
   private InputStream getResourceAsStream(ClassLoader loader, String resource)
   {
@@ -183,7 +184,8 @@ public final class Session
     return in;
   }
   
-  /** Load the provider database description.
+  /**
+   * Loads the provider database description.
    */
   private void loadProviders(InputStream in, String description)
   {
@@ -299,17 +301,17 @@ public final class Session
   }
   
   /**
-   * Get a new Session object.
-   * @param props Properties object that hold relevant properties.
+   * Returns a new session.
+   * @param props a properties object holding relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec(particularly
+   * listed in Appendix A of the JavaMail spec (particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
    * <code>mail.user</code>,
    * and <code>mail.from</code>)
    * as the defaults are unlikely to work in all cases.
-   * @param authenticator Authenticator object used to call back to the
+   * @param authenticator an authenticator used to call back to the
    * application when a user name and password is needed.
    */
   public static Session getInstance(Properties props, 
@@ -319,10 +321,10 @@ public final class Session
   }
 
   /**
-   * Get a new Session object.
-   * @param props Properties object that hold relevant properties.
+   * Returns a new Session.
+   * @param props a properties object holding relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec(particularly
+   * listed in Appendix A of the JavaMail spec (particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -336,8 +338,8 @@ public final class Session
   }
 
   /**
-   * Get the default Session object. 
-   * If a default has not yet been setup, a new Session object is created 
+   * Returns the default session.
+   * If a default has not yet been setup, a new session is created 
    * and installed as the default.
    * <p>
    * Since the default session is potentially available to all code 
@@ -358,7 +360,7 @@ public final class Session
    * access to the default session.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
-   * listed in Appendix A of the JavaMail spec(particularly
+   * listed in Appendix A of the JavaMail spec (particularly
    * <code>mail.store.protocol</code>, 
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
@@ -369,7 +371,7 @@ public final class Session
    * application when a user name and password is needed.
    */
   public static Session getDefaultInstance(Properties props,
-                                            Authenticator authenticator)
+                                           Authenticator authenticator)
   {
     if (defaultSession == null)
       {
@@ -377,9 +379,9 @@ public final class Session
       }
     else if (defaultSession.authenticator != authenticator
              &&(defaultSession.authenticator == null ||
-                 authenticator == null ||
+                authenticator == null ||
                 (defaultSession.authenticator.getClass().getClassLoader()
-                  != authenticator.getClass().getClassLoader())))
+                 != authenticator.getClass().getClassLoader())))
       {
         throw new SecurityException("Access denied");
       }

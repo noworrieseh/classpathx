@@ -1,13 +1,13 @@
 /*
  * RecipientStringTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,11 +31,7 @@ import javax.mail.Address;
 import javax.mail.Message;
 
 /**
- * This class implements string comparisons for the Recipient Address headers.
- * <p>
- * Note that this class differs from the RecipientTerm class in that this 
- * class does comparisons on address strings rather than Address objects.
- * The string comparisons are case-insensitive.
+ * A string comparison of the recipient headers in a message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -52,7 +48,7 @@ public final class RecipientStringTerm
   /**
    * Constructor.
    * @param type the recipient type
-   * @param address the address pattern to be compared.
+   * @param address the address pattern for comparison
    */
   public RecipientStringTerm(Message.RecipientType type, String pattern)
   {
@@ -61,7 +57,7 @@ public final class RecipientStringTerm
   }
 
   /**
-   * Return the type of recipient to match with.
+   * Return the recipient type.
    */
   public Message.RecipientType getRecipientType()
   {
@@ -69,10 +65,8 @@ public final class RecipientStringTerm
   }
 
   /**
-   * Check whether the address specified in the constructor is a substring of
-   * the recipient address of this Message.
-   * @param msg The comparison is applied to this Message's recepient address.
-   * @return true if the match succeeds, otherwise false.
+   * Returns true only if the address specified in this term is a substring
+   * of the recipient address in the given message.
    */
   public boolean match(Message msg)
   {
@@ -96,9 +90,6 @@ public final class RecipientStringTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof RecipientStringTerm &&
@@ -106,12 +97,10 @@ public final class RecipientStringTerm
             super.equals(other));
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return type.hashCode() + super.hashCode();
   }
   
 }
+

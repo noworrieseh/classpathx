@@ -1,13 +1,13 @@
 /*
  * AddressException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,7 @@
 package javax.mail.internet;
 
 /**
- * The exception thrown when a wrongly formatted address is encountered.
+ * An exception thrown when an incorrectly formatted address is encountered.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -38,17 +38,17 @@ public class AddressException
 {
 
   /**
-   * The string being parsed.
+   * The address(es) being parsed.
    */
   protected String ref;
 
   /**
-   * The index in the string where the error occurred, or -1 if not known.
+   * The index in <code>ref</code> where the error occurred, or -1 if not known.
    */
   protected int pos;
 
   /**
-   * Constructs an AddressException with no detail message.
+   * Constructor with no detail message.
    */
   public AddressException()
   {
@@ -56,7 +56,7 @@ public class AddressException
   }
 
   /**
-   * Constructs an AddressException with the specified detail message.
+   * Constructor with the specified detail message.
    * @param s the detail message
    */
   public AddressException(String s)
@@ -65,10 +65,9 @@ public class AddressException
   }
 
   /**
-   * Constructs an AddressException with the specified detail message and
-   * reference info.
+   * Constructor with the specified detail message and address being parsed.
    * @param s the detail message
-   * @param ref the reference info
+   * @param ref the address being parsed
    */
   public AddressException(String s, String ref)
   {
@@ -76,11 +75,10 @@ public class AddressException
   }
 
   /**
-   * Constructs an AddressException with the specified detail message and
-   * reference info.
+   * Constructor with the specified detail message and address being parsed.
    * @param s the detail message
-   * @param ref the reference info
-   * @param pos the index in the string where the error occurred
+   * @param ref the address being parsed
+   * @param pos the index in <code>ref</code> where the error occurred
    */
   public AddressException(String s, String ref, int pos)
   {
@@ -90,8 +88,7 @@ public class AddressException
   }
 
   /**
-   * Get the string that was being parsed when the error was detected
-   *(null if not relevant).
+   * Returns the address(es) being parsed when the error was detected.
    */
   public String getRef()
   {
@@ -99,8 +96,8 @@ public class AddressException
   }
 
   /**
-   * Get the position with the reference string where the error was detected 
-   *(-1 if not relevant).
+   * Returns the position within <code>ref</code> where the error was detected,
+   * or -1 if <code>ref</code> is null.
    */
   public int getPos()
   {
@@ -125,3 +122,4 @@ public class AddressException
   }
   
 }
+

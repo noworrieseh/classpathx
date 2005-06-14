@@ -1,13 +1,13 @@
 /*
  * BodyPart.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,11 +28,8 @@
 package javax.mail;
 
 /**
- * This class models a Part that is contained within a Multipart.
- * This is an abstract class. Subclasses provide actual implementations.
- * <p>
- * BodyPart implements the Part interface.
- * Thus, it contains a set of attributes and a "content".
+ * A MIME body part. This is a MIME part occurring inside a multipart in the
+ * message content.
  * 
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,14 +38,14 @@ public abstract class BodyPart
   implements Part
 {
 
-
   /**
-   * The Multipart object containing this BodyPart, if known.
+   * The Multipart object containing this BodyPart.
    */
   protected Multipart parent = null;
 
   /**
-   * Return the containing Multipart object, or null if not known.
+   * Returns the containing Multipart object, or <code>null</code> if not
+   * known.
    */
   public Multipart getParent()
   {

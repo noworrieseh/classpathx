@@ -1,13 +1,13 @@
 /*
  * Authenticator.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,20 +30,9 @@ package javax.mail;
 import java.net.InetAddress;
 
 /**
- * The class Authenticator represents an object that knows how to obtain
- * authentication for a network connection.
- * Usually, it will do this by prompting the user for information.
- * <p>
- * Applications use this class by creating a subclass, and registering an
- * instance of that subclass with the session when it is created.
- * When authentication is required, the system will invoke a method on the
- * subclass(like getPasswordAuthentication). The subclass's method can
- * query about the authentication being requested with a number of inherited
- * methods(getRequestingXXX()), and form an appropriate message for the
- * user.
- * <p>
- * All methods that request authentication have a default implementation that
- * fails.
+ * Callback object that can be used to obtain password information during
+ * authentication. This normally occurs by prompting the user for a password
+ * or retrieving it from secure storage.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -73,7 +62,7 @@ public abstract class Authenticator
   }
 
   /**
-   * Returns the default user name given by the requestor.
+   * Returns the default user name.
    */
   protected final String getDefaultUserName()
   {
@@ -82,11 +71,7 @@ public abstract class Authenticator
 
   /**
    * Called when password authentication is needed.
-   * Subclasses should override the default implementation, which returns null.
-   * <p>
-   * Note that if this method uses a dialog to prompt the user for this
-   * information, the dialog needs to block until the user supplies the
-   * information. This method can not simply return after showing the dialog.
+   * This method should be overridden by subclasses.
    */
   protected PasswordAuthentication getPasswordAuthentication()
   {
@@ -94,7 +79,7 @@ public abstract class Authenticator
   }
 
   /**
-   * Returns the port for the requested connection.
+   * Returns the port used in the request.
    */
   protected final int getRequestingPort()
   {
@@ -102,7 +87,7 @@ public abstract class Authenticator
   }
 
   /**
-   * Returns the prompt string given by the requestor.
+   * Returns the user prompt string for the request.
    */
   protected final String getRequestingPrompt()
   {
@@ -110,8 +95,7 @@ public abstract class Authenticator
   }
 
   /**
-   * Returns the protocol requesting the connection.
-   * Often this will be based on a URLName.
+   * Returns the protocol for the request.
    */
   protected final String getRequestingProtocol()
   {
@@ -119,7 +103,7 @@ public abstract class Authenticator
   }
 
   /**
-   * Returns the address of the site requesting authorization,
+   * Returns the IP address of the request host,
    * or null if not available.
    */
   protected final InetAddress getRequestingSite()

@@ -1,13 +1,13 @@
 /*
  * MimeUtility.java
- * Copyright(C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -55,41 +55,7 @@ import gnu.mail.util.UUInputStream;
 import gnu.mail.util.UUOutputStream;
 
 /**
- * This is a utility class that provides various MIME related functionality.
- * <p>
- * There are a set of methods to encode and decode MIME headers as per 
- * RFC 2047. A brief description on handling such headers is given below:
- * <p>
- * RFC 822 mail headers must contain only US-ASCII characters. Headers that
- * contain non US-ASCII characters must be encoded so that they contain only
- * US-ASCII characters. Basically, this process involves using either BASE64 
- * or QP to encode certain characters. RFC 2047 describes this in detail.
- * <p>
- * In Java, Strings contain(16 bit) Unicode characters. ASCII is a subset of
- * Unicode(and occupies the range 0 - 127). A String that contains only ASCII
- * characters is already mail-safe. If the String contains non US-ASCII
- * characters, it must be encoded. An additional complexity in this step is that
- * since Unicode is not yet a widely used charset, one might want to first
- * charset-encode the String into another charset and then do the
- * transfer-encoding.
- * <p>
- * Note that to get the actual bytes of a mail-safe String(say, for sending 
- * over SMTP), one must do
- * <pre>
-
-        byte[] bytes = string.getBytes("iso-8859-1");
-
-   <pre>
- * The <code>setHeader()</code> and <code>addHeader()</code> methods on
- * MimeMessage and MimeBodyPart assume that the given header values are 
- * Unicode strings that contain only US-ASCII characters. Hence the callers 
- * of those methods must insure that the values they pass do not contain non 
- * US-ASCII characters. The methods in this class help do this.
- * <p>
- * The <code>getHeader()</code> family of methods on MimeMessage and 
- * MimeBodyPart return the raw header value. These might be encoded as per 
- * RFC 2047, and if so, must be decoded into Unicode Strings.
- * The methods in this class help to do this.
+ * This is a utility class providing micellaneous MIME-related functionality.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -105,10 +71,8 @@ public class MimeUtility
   }
   
   /**
-   * Get the content-transfer-encoding that should be applied to the input
-   * stream of this datasource, to make it mailsafe.
-   * <p>
-   * The algorithm used here is:
+   * Returns the Content-Transfer-Encoding that should be applied to the input
+   * stream of this data source, to make it mail safe.
    * <ul>
    * <li>If the primary type of this datasource is "text" and if all the bytes
    * in its input stream are US-ASCII, then the encoding is "7bit". If more
@@ -118,9 +82,8 @@ public class MimeUtility
    * <li>If the primary type of this datasource is not "text", then if all the
    * bytes of its input stream are US-ASCII, the encoding is "7bit". If
    * there is even one non-US-ASCII character, the encoding is "base64".
-   * @param ds DataSource
-   * @return the encoding.
-   * This is either "7bit", "quoted-printable" or "base64"
+   * @param ds the data source
+   * @return "7bit", "quoted-printable" or "base64"
    */
   public static String getEncoding(DataSource ds)
   {
@@ -158,13 +121,12 @@ public class MimeUtility
   }
   
   /**
-   * Same as getEncoding(DataSource) except that instead of reading the data
-   * from an InputStream it uses the writeTo method to examine the data.
-   * This is more efficient in the common case of a DataHandler created 
-   * with an object and a MIME type(for example, a "text/plain" String)
-   * because all the I/O is done in this thread.
-   * In the case requiring an InputStream the DataHandler uses a thread,
-   * a pair of pipe streams, and the writeTo method to produce the data.
+   * Returns the Content-Transfer-Encoding that needs to be applied to the
+   * given content in order to make it mail safe.
+   * This is the same as the <code>getEncoding(DataSource)</code> method
+   * except that instead of reading the data from an input stream it uses
+   * the <code>writeTo</code> method to examine the data, which can be more
+   * efficient.
    */
   public static String getEncoding(DataHandler dh)
   {
@@ -207,14 +169,13 @@ public class MimeUtility
   }
 
   /**
-   * Decode the given input stream.
-   * The Input stream returned is the decoded input stream.
-   * All the encodings defined in RFC 2045 are supported here.
-   * They include "base64", "quoted-printable", "7bit", "8bit", and
-   * "binary". In addition, "uuencode" is also supported.
-   * @param is input stream
-   * @param encoding the encoding of the stream.
-   * @return decoded input stream.
+   * Decodes the given input stream.
+   * All the encodings defined in RFC 2045 are supported here, including
+   * "base64", "quoted-printable", "7bit", "8bit", and "binary".
+   * "uuencode" is also supported.
+   * @param is the input stream
+   * @param encoding the encoding
+   * @return the decoded input stream
    */
   public static InputStream decode(InputStream is, String encoding)
     throws MessagingException
@@ -242,13 +203,13 @@ public class MimeUtility
   }
 
   /**
-   * Wrap an encoder around the given output stream.
-   * All the encodings defined in RFC 2045 are supported here.
-   * They include "base64", "quoted-printable", "7bit", "8bit" and "binary".
-   * In addition, "uuencode" is also supported.
-   * @param os output stream
-   * @param encoding the encoding of the stream.
-   * @return output stream that applies the specified encoding.
+   * Encodes the given output stream.
+   * All the encodings defined in RFC 2045 are supported here, including
+   * "base64", "quoted-printable", "7bit", "8bit" and "binary".
+   * "uuencode" is also supported.
+   * @param os the output stream
+   * @param encoding the encoding
+   * @return an output stream that applies the specified encoding
    */
   public static OutputStream encode(OutputStream os, String encoding)
     throws MessagingException
@@ -280,19 +241,18 @@ public class MimeUtility
   }
 
   /**
-   * Wrap an encoder around the given output stream.
-   * All the encodings defined in RFC 2045 are supported here.
-   * They include "base64", "quoted-printable", "7bit", "8bit" and "binary".
-   * In addition, "uuencode" is also supported. The <code>filename</code>
-   * parameter is used with the "uuencode" encoding and is included in the 
-   * encoded output.
-   * @param os output stream
-   * @param encoding the encoding of the stream.
-   * @param filename name for the file being encoded(only used with uuencode)
-   * @return output stream that applies the specified encoding.
+   * Encodes the given output stream.
+   * All the encodings defined in RFC 2045 are supported here, including
+   * "base64", "quoted-printable", "7bit", "8bit" and "binary".
+   * "uuencode" is also supported.
+   * @param os the output stream
+   * @param encoding the encoding
+   * @param filename the name for the file being encoded (this is only used
+   * with the uuencode encoding)
+   * @return an output stream that applies the specified encoding
    */
   public static OutputStream encode(OutputStream os, String encoding,
-                                     String filename)
+                                    String filename)
     throws MessagingException
   {
     if (encoding == null)
@@ -322,34 +282,9 @@ public class MimeUtility
   }
 
   /**
-   * Encode a RFC 822 "text" token into mail-safe form as per RFC 2047.
-   * <p>
-   * The given Unicode string is examined for non US-ASCII characters. If the
-   * string contains only US-ASCII characters, it is returned as-is. If the
-   * string contains non US-ASCII characters, it is first character-encoded
-   * using the platform's default charset, then transfer-encoded using either
-   * the B or Q encoding. The resulting bytes are then returned as a Unicode
-   * string containing only ASCII characters.
-   * <p>
-   * Note that this method should be used to encode only "unstructured" 
-   * RFC 822 headers.
-   * <p>
-   * Example of usage:
-   * <pre>
-    MimePart part = ...
-    String rawvalue = "FooBar Mailer, Japanese version 1.1"
-    try {
-      // If we know for sure that rawvalue contains only US-ASCII
-      // characters, we can skip the encoding part
-      part.setHeader("X-mailer", MimeUtility.encodeText(rawvalue));
-    } catch (UnsupportedEncodingException e) {
-      // encoding failure
-    } catch (MessagingException me) {
-      // setHeader() failure
-    }
-    </pre>
-   * @param text unicode string
-   * @return Unicode string containing only US-ASCII characters
+   * Encodes an RFC 822 "text" token into mail-safe form according to
+   * RFC 2047.
+   * @param text the Unicode string
    * @param UnsupportedEncodingException if the encoding fails
    */
   public static String encodeText(String text)
@@ -359,27 +294,11 @@ public class MimeUtility
   }
 
   /**
-   * Encode a RFC 822 "text" token into mail-safe form as per RFC 2047.
-   * <p>
-   * The given Unicode string is examined for non US-ASCII characters. If the
-   * string contains only US-ASCII characters, it is returned as-is. If the
-   * string contains non US-ASCII characters, it is first character-encoded
-   * using the platform's default charset, then transfer-encoded using either
-   * the B or Q encoding. The resulting bytes are then returned as a Unicode
-   * string containing only ASCII characters.
-   * <p>
-   * Note that this method should be used to encode only "unstructured" 
-   * RFC 822 headers.
-   * <p>
-   * @param text the header value
-   * @param charset the charset. If this parameter is null, the platform's
-   * default chatset is used.
-   * @param encoding the encoding to be used. 
-   * Currently supported values are "B" and "Q".
-   * If this parameter is null, then the "Q" encoding is used if most of the
-   * characters to be encoded are in the ASCII charset, otherwise "B"
-   * encoding is used.
-   * @return Unicode string containing only US-ASCII characters
+   * Encodes an RFC 822 "text" token into mail-safe form according to
+   * RFC 2047.
+   * @param text the Unicode string
+   * @param charset the charset, or null to use the platform default charset
+   * @param encoding the encoding to be used ("B" or "Q") 
    */
   public static String encodeText(String text, String charset, String encoding)
     throws UnsupportedEncodingException
@@ -388,30 +307,9 @@ public class MimeUtility
   }
 
   /**
-   * Decode "unstructured" headers, that is, headers that are defined as '*text'
-   * as per RFC 822.
-   * <p>
-   * The string is decoded using the algorithm specified in RFC 2047, Section
-   * 6.1.1. If the charset-conversion fails for any sequence, an
-   * UnsupportedEncodingException is thrown. If the String is not an RFC 2047
-   * style encoded header, it is returned as-is
-   * <p>
-   * Example of usage:
-   * <pre>
-    MimePart part = ...
-    String rawvalue = null;
-    String  value = null;
-    try {
-      if ((rawvalue = part.getHeader("X-mailer")[0]) != null)
-        value = MimeUtility.decodeText(rawvalue);
-    } catch (UnsupportedEncodingException e) {
-        // Don't care
-        value = rawvalue;
-    } catch (MessagingException me) { }
-    return value;
-    <pre>
+   * Decodes headers that are defined as '*text' in RFC 822.
    * @param etext the possibly encoded value
-   * @exception UnsupportedEncodingException if the charset conversion failed.
+   * @exception UnsupportedEncodingException if the charset conversion failed
    */
   public static String decodeText(String etext)
     throws UnsupportedEncodingException
@@ -464,21 +362,9 @@ public class MimeUtility
   }
 
   /**
-   * Encode a RFC 822 "word" token into mail-safe form as per RFC 2047.
-   * <p>
-   * The given Unicode string is examined for non US-ASCII characters.
-   * If the string contains only US-ASCII characters, it is returned as-is.
-   * If the string contains non US-ASCII characters, it is first 
-   * character-encoded using the platform's default charset, then 
-   * transfer-encoded using either the B or Q encoding.
-   * The resulting bytes are then returned as a Unicode string containing 
-   * only ASCII characters.
-   * <p>
-   * This method is meant to be used when creating RFC 822 "phrases". The
-   * InternetAddress class, for example, uses this to encode it's 'phrase'
-   * component.
-   * @param text unicode string
-   * @return Unicode string containing only US-ASCII characters.
+   * Encodes an RFC 822 "word" token into mail-safe form according to
+   * RFC 2047.
+   * @param text the Unicode string
    * @exception UnsupportedEncodingException if the encoding fails
    */
   public static String encodeWord(String text)
@@ -488,28 +374,15 @@ public class MimeUtility
   }
 
   /**
-   * Encode a RFC 822 "word" token into mail-safe form as per RFC 2047.
-   * <p>
-   * The given Unicode string is examined for non US-ASCII characters.
-   * If the string contains only US-ASCII characters, it is returned as-is.
-   * If the string contains non US-ASCII characters, it is first 
-   * character-encoded using the platform's default charset, then 
-   * transfer-encoded using either the B or Q encoding.
-   * The resulting bytes are then returned as a Unicode string containing 
-   * only ASCII characters.
-   * <p>
-   * @param text unicode string
-   * @param charset the MIME charset
-   * @param encoding the encoding to be used.
-   * Currently supported values are "B" and "Q".
-   * If this parameter is null, then the "Q" encoding is used if most of the
-   * characters to be encoded are in the ASCII charset, otherwise "B"
-   * encoding is used.
-   * @return Unicode string containing only US-ASCII characters
+   * Encodes an RFC 822 "word" token into mail-safe form according to
+   * RFC 2047.
+   * @param text the Unicode string
+   * @param charset the charset, or null to use the platform default charset
+   * @param encoding the encoding to be used ("B" or "Q")
    * @exception UnsupportedEncodingException if the encoding fails
    */
   public static String encodeWord(String text, String charset,
-                                   String encoding)
+                                  String encoding)
     throws UnsupportedEncodingException
   {
     return encodeWord(text, charset, encoding, true);
@@ -655,16 +528,11 @@ public class MimeUtility
   }
   
   /**
-   * The string is parsed using the rules in RFC 2047 for parsing an
+   * Decodes the specified string using the RFC 2047 rules for parsing an
    * "encoded-word".
-   * If the parse fails, a ParseException is thrown. Otherwise, it is 
-   * transfer-decoded, and then charset-converted into Unicode. If the
-   * charset-conversion fails, an UnsupportedEncodingException is thrown.
    * @param eword the possibly encoded value
-   * @exception ParseException if the string is not an encoded-word as per 
-   * RFC 2047.
-   * @exception UnsupportedEncodingException if the charset conversion
-   * failed.
+   * @exception ParseException if the string is not an encoded-word
+   * @exception UnsupportedEncodingException if the decoding failed
    */
   public static String decodeWord(String text)
     throws ParseException, UnsupportedEncodingException
@@ -833,17 +701,13 @@ public class MimeUtility
   }
 
   /**
-   * A utility method to quote a word, if the word contains any characters 
-   * from the specified 'specials' list.
+   * Quotes the specified word, if it contains any characters from the
+   * given "specials" list.
    * <p>
-   * The HeaderTokenizer class defines two special sets of delimiters - 
+   * The HeaderTokenizer class defines two "specials" lists, 
    * MIME and RFC 822.
-   * <p>
-   * This method is typically used during the generation of RFC 822 and MIME
-   * header fields.
-   * @param word word to be quoted
+   * @param word the word to be quoted
    * @param specials the set of special characters
-   * @return the possibly quoted word
    */
   public static String quote(String text, String specials)
   {
@@ -969,11 +833,8 @@ public class MimeUtility
   }
 
   /**
-   * Convert a MIME charset name into a valid Java charset name.
+   * Converts a MIME charset name into a Java charset name.
    * @param charset the MIME charset name
-   * @return the Java charset equivalent.
-   * If a suitable mapping is not available, the passed in charset is 
-   * itself returned.
    */
   public static String javaCharset(String charset)
   {
@@ -998,13 +859,8 @@ public class MimeUtility
   }
 
   /**
-   * Convert a java charset into its MIME charset name.
-   * <p>
-   * Note that a future version of JDK(post 1.2) might provide this
-   * functionality, in which case, we may deprecate this method then.
-   * @param charset the JDK charset
-   * @return the MIME/IANA equivalent.
-   * If a mapping is not possible, the passed in charset itself is returned.
+   * Converts a Java charset name into a MIME charset name.
+   * @param charset the Java charset name
    */
   public static String mimeCharset(String charset)
   {
@@ -1025,10 +881,7 @@ public class MimeUtility
   private static String defaultJavaCharset;
 
   /**
-   * Get the default charset corresponding to the system's current default
-   * locale.
-   * @return the default charset of the system's default locale,
-   * as a Java charset.
+   * Returns the default Java charset.
    */
   public static String getDefaultJavaCharset()
   {
@@ -1324,3 +1177,4 @@ public class MimeUtility
   }
 
 }
+

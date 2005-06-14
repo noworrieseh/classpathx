@@ -1,13 +1,13 @@
 /*
  * Part.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,47 +34,21 @@ import java.util.Enumeration;
 import javax.activation.DataHandler;
 
 /**
+ * A part consists of a set of attributes and a content. Some of the
+ * attributes provide metadata describing the content and its encoding,
+ * others may describe how to process the part.
  * The Part interface is the common base interface for Messages and BodyParts.
  * <p>
- * Part consists of a set of attributes and a "Content".
- * <p>
- * Attributes:
- * <p>
- * The JavaMail API defines a set of standard Part attributes that are 
- * considered to be common to most existing Mail systems. These attributes 
- * have their own settor and gettor methods. Mail systems may support other 
- * Part attributes as well, these are represented as name-value pairs where 
- * both the name and value are Strings.
- * <p>
- * Content:
- * <p>
- * The data type of the "content" is returned by the 
- * <code>getContentType()</code> method. The MIME typing system is used to 
- * name data types.
- * <p>
- * The "content" of a Part is available in various formats:
+ * The content of a part is available in various forms:
  * <ul>
- * <li>As a DataHandler - using the <code>getDataHandler()</code> method.
- * The "content" of a Part is also available through a 
- * javax.activation.DataHandler object. The DataHandler object allows clients 
- * to discover the operations available on the content, and to instantiate 
- * the appropriate component to perform those operations.
- * <li>As an input stream - using the <code>getInputStream()</code> method.
- * Any mail-specific encodings are decoded before this stream is returned.
- * <li>As a Java object - using the <code>getContent()</code> method.
- * This method returns the "content" as a Java object.
- * The returned object is of course dependent on the content itself.
- * In particular, a "multipart" Part's content is always a Multipart or 
- * subclass thereof. That is, <code>getContent()</code> on a "multipart" type
- * Part will always return a Multipart(or subclass) object.
+ * <li>As a data handler, using the <code>getDataHandler</code> method.
+ * <li>As an input stream, using the <code>getInputStream</code> method.
+ * <li>As a Java object, using the <code>getContent</code> method.
  * </ul>
- * Part provides the <code>writeTo()</code> method that streams out its 
- * bytestream in mail-safe form suitable for transmission. 
- * This bytestream is typically an aggregation of the Part attributes 
- * and its content's bytestream.
+ * The <code>writeTo</code> method can be used to write the part to a
+ * byte stream in mail-safe form suitable for transmission. 
  * <p>
- * Message and BodyPart implement the Part interface. 
- * Note that in MIME parlance, Part models an Entity(RFC 2045, Section 2.4).
+ * In MIME terms, Part models an Entity (RFC 2045, Section 2.4).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -93,87 +67,73 @@ public interface Part
   String INLINE = "inline";
 
   /**
-   * Return the size of the content of this part in bytes.
-   * Return -1 if the size cannot be determined.
+   * Returns the size of the content of this part in bytes, or -1 if the
+   * size cannot be determined.
    * <p>
-   * Note that the size may not be an exact measure of the content size 
-   * and may or may not account for any transfer encoding of the content.
-   * The size is appropriate for display in a user interface to give the 
-   * user a rough idea of the size of this part.
+   * Note that the size may not be an exact measure of the content size,
+   * but will be suitable for display in a user interface to give the 
+   * user an idea of the size of this part.
    */
   int getSize()
     throws MessagingException;
 
   /**
-   * Return the number of lines in the content of this part.
-   * Return -1 if the number cannot be determined. 
-   * Note that this number may not be an exact measure of the content 
-   * length and may or may not account for any transfer encoding 
-   * of the content.
+   * Returns the number of lines in the content of this part, or -1 if the
+   * number cannot be determined. 
+   * Note that this number may not be an exact measure.
    */
   int getLineCount()
     throws MessagingException;
 
   /**
-   * Returns the Content-Type of the content of this part.
-   * Returns null if the Content-Type could not be determined.
+   * Returns the content-type of the content of this part, or
+   * <code>null</code> if the content-type could not be determined.
    * <p>
-   * The MIME typing system is used to name Content-types.
+   * The MIME typing system is used to name content-types.
    */
   String getContentType()
     throws MessagingException;
 
   /**
-   * Is this Part of the specified MIME type?
-   * This method compares only the primaryType and subType.
+   * Is this part of the specified MIME type?
+   * This method compares only the primary type and subtype.
    * The parameters of the content types are ignored.
    * <p>
-   * For example, this method will return true when comparing a Part 
-   * of content type "text/plain" with "text/plain; charset=foobar".
-   * <p>
-   * If the subType of mimeType is the special character '*', 
+   * If the subtype of <code>mimeType</code> is the special character '*', 
    * then the subtype is ignored during the comparison.
    */
   boolean isMimeType(String mimeType)
     throws MessagingException;
 
   /**
-   * Return the disposition of this part.
-   * The disposition describes how the part should be presented to the user.
-   *(See RFC 2183.) The return value should be considered without 
-   * regard to case. For example:
-   * <pre>
-         String disp = part.getDisposition();
-         if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT))
-            // treat as attachment if not first part
-     </pre>
+   * Returns the disposition of this part.
+   * The disposition describes how the part should be presented to the user
+   * (see RFC 2183).
+   * Return values are not case sensitive.
    */
   String getDisposition()
     throws MessagingException;
 
   /**
-   * Set the disposition of this part.
-   * @param disposition disposition of this part
+   * Sets the disposition of this part.
+   * @param disposition the disposition of this part
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setDisposition(String disposition)
     throws MessagingException;
 
   /**
-   * Return a description String for this part.
-   * This typically associates some descriptive information with this part.
-   * Returns null if none is available.
+   * Returns the description of this part.
    */
   String getDescription()
     throws MessagingException;
 
   /**
-   * Set a description String for this part.
-   * This typically associates some descriptive information with this part.
-   * @param description description of this part
+   * Sets the description of this part.
+   * @param description the description of this part
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
    * @exception IllegalStateException if this Part is obtained from 
@@ -183,20 +143,14 @@ public interface Part
     throws MessagingException;
 
   /**
-   * Get the filename associated with this part, if possible. 
-   * Useful if this part represents an "attachment" that was loaded 
-   * from a file. The filename will usually be a simple name, not 
-   * including directory components.
+   * Returns the filename associated with this part, if available.
    */
   String getFileName()
     throws MessagingException;
 
   /**
-   * Set the filename associated with this part, if possible.
-   * Useful if this part represents an "attachment" that was loaded 
-   * from a file. The filename will usually be a simple name, not 
-   * including directory components.
-   * @param filename Filename to associate with this part
+   * Sets the filename associated with this part.
+   * @param filename the filename to associate with this part
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
    * @exception IllegalStateException if this Part is obtained from 
@@ -206,110 +160,83 @@ public interface Part
     throws MessagingException;
 
   /**
-   * Return an input stream for this part's "content".
-   * Any mail-specific transfer encodings will be decoded before the 
-   * input stream is provided.
-   * <p>
-   * This is typically a convenience method that just invokes the 
-   * DataHandler's <code>getInputStream()</code> method.
-   * @exception IOException this is typically thrown by the DataHandler.
-   * Refer to the documentation for javax.activation.DataHandler for more
-   * details.
+   * Returns an input stream for reading the content of this part.
+   * Any mail-specific transfer encodings will be decoded by the
+   * implementation.
+   * @exception IOException when a data handler error occurs
    */
   InputStream getInputStream()
     throws IOException, MessagingException;
 
   /**
-   * Return a DataHandler for the content within this part. 
-   * The DataHandler allows clients to operate on as well as retrieve 
-   * the content.
+   * Returns a data handler for the content of this part. 
    */
   DataHandler getDataHandler()
     throws MessagingException;
 
   /**
-   * Return the content as a Java object.
+   * Returns the content of this part as a Java object.
    * The type of the returned object is of course dependent on the content 
-   * itself. For example, the object returned for "text/plain" content 
+   * itself. For instance, the object returned for "text/plain" content 
    * is usually a String object. The object returned for a "multipart"
    * content is always a Multipart subclass. For content-types that are 
-   * unknown to the DataHandler system, an input stream is returned as
-   * the content
-   * <p>
-   * This is a convenience method that just invokes the DataHandler's
-   * <code>getContent()</code> method
-   * @exception IOException this is typically thrown by the DataHandler.
-   * Refer to the documentation for javax.activation.DataHandler for more
-   * details.
+   * unknown to the data handler system, an input stream is returned.
+   * @exception IOException when a data handler error occurs
    */
   Object getContent()
     throws IOException, MessagingException;
 
   /**
-   * This method provides the mechanism to set this part's content.
-   * The DataHandler wraps around the actual content.
-   * @param dh The DataHandler for the content.
+   * Sets the content of this part using the specified data handler.
+   * @param dh the data handler for the content
    * @exception IllegalWriteException if the underlying implementation 
-   * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * does not support modification
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setDataHandler(DataHandler dh)
     throws MessagingException;
 
   /**
-   * A convenience method for setting this part's content.
-   * The part internally wraps the content in a DataHandler.
-   * <p>
-   * Note that a DataContentHandler class for the specified type should be
-   * available to the JavaMail implementation for this to work right. i.e., to
-   * do <code>setContent(foobar, "application/x-foobar")</code>,
-   * a DataContentHandler for "application/x-foobar" should be installed.
-   * Refer to the Java Activation Framework for more information.
-   * @param obj A java object.
-   * @param type MIME type of this object.
+   * Sets the content of this part using the specified object. The type of
+   * the supplied argument must be known to the data handler system.
+   * @param obj a Java object
+   * @param type the MIME content-type of this object
    * @exception IllegalWriteException if the underlying implementation 
-   * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * does not support modification
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setContent(Object obj, String type)
     throws MessagingException;
 
   /**
-   * A convenience method that sets the given String as this part's content 
-   * with a MIME type of "text/plain".
-   * @param text The text that is the Message's content.
+   * Sets the textual content of this part, using a MIME type of
+   * <code>text/plain</code>.
+   * @param text the textual content
    * @exception IllegalWriteException if the underlying implementation 
-   * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * does not support modification
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setText(String text)
     throws MessagingException;
 
   /**
-   * This method sets the given Multipart object as this message's content.
-   * @param mp The multipart object that is the Message's content
+   * Sets the multipart content of this part.
+   * @param mp the multipart content
    * @exception IllegalWriteException if the underlying implementation 
-   * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * does not support modification
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setContent(Multipart mp)
     throws MessagingException;
 
   /**
-   * Output a bytestream for this Part.
-   * This bytestream is typically an aggregration of the Part attributes 
-   * and an appropriately encoded bytestream from its 'content'.
-   * <p>
-   * Classes that implement the Part interface decide on the appropriate
-   * encoding algorithm to be used.
-   * <p>
-   * The bytestream is typically used for sending.
+   * Writes this part to the specified byte stream.
    * @exception IOException if an error occurs writing to the stream 
-   * or if an error is generated by the javax.activation layer.
+   * or if an error occurs in the data handler system.
    * @exception MessagingException if an error occurs fetching the data 
    * to be written
    */
@@ -317,66 +244,67 @@ public interface Part
     throws IOException, MessagingException;
 
   /**
-   * Get all the headers for this header name.
-   * Returns null if no headers for this header name are available.
-   * @param name the name of this header
+   * Returns all the values for the specified header name, or
+   * <code>null</code> if no such headers are available.
+   * @param name the header name
    */
   String[] getHeader(String name)
     throws MessagingException;
 
   /**
-   * Set the value for this header name.
-   * Replaces all existing header values with this new value.
-   * @param name the name of this header
-   * @param value the value for this header
+   * Sets the value for the specified header name.
+   * @param name the header name
+   * @param value the new value
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void setHeader(String name, String value)
     throws MessagingException;
 
   /**
-   * Add this value to the existing values for this header name.
-   * @param name the name of this header
-   * @param value the value for this header
+   * Adds the specified value to the existing values for this header name.
+   * @param name the header name
+   * @param value the value to add
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void addHeader(String name, String value)
     throws MessagingException;
 
   /**
-   * Remove all headers with this name.
-   * @param name the name of this header
+   * Removes all headers of the specified name.
+   * @param name the header name
    * @exception IllegalWriteException if the underlying implementation 
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this part is obtained from 
    * a READ_ONLY folder
    */
   void removeHeader(String name)
     throws MessagingException;
 
   /**
-   * Return all the headers from this part as an Enumeration of Header 
-   * objects.
+   * Returns all the headers from this part.
+   * @return an enumeration of Header
    */
   Enumeration getAllHeaders()
     throws MessagingException;
 
   /**
-   * Return matching headers from this part as an Enumeration of Header 
-   * objects.
+   * Returns the matching headers from this part.
+   * @param names the header names to match
+   * @return an enumeration of Header
    */
   Enumeration getMatchingHeaders(String[] names)
     throws MessagingException;
 
   /**
-   * Return non-matching headers from this envelope as an Enumeration of 
-   * Header objects.
+   * Returns the non-matching headers from this part.
+   * @param names the header names to ignore
+   * @return an enumeration of Header
    */
   Enumeration getNonMatchingHeaders(String[] names)
     throws MessagingException;

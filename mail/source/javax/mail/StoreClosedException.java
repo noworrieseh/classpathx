@@ -1,13 +1,13 @@
 /*
  * StoreClosedException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,16 +28,12 @@
 package javax.mail;
 
 /**
- * This exception is thrown when a method is invoked on a Messaging object 
- * and the Store that owns that object has died due to some reason.
- * This exception should be treated as a fatal error;
- * in particular any messaging object belonging to that Store must be 
+ * An exception thrown when a method is invoked on a message or folder
+ * whose owner store has been closed for some reason.
+ * <p>
+ * The <code>connect</connect> method may be invoked on the store object to
+ * reconnect, but any references to existing folders and messages should be
  * considered invalid.
- * <p>
- * The connect method may be invoked on the dead Store object to revive it.
- * <p>
- * The <code>getMessage()</code> method returns more detailed information 
- * about the error that caused this exception.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -47,7 +43,7 @@ public class StoreClosedException
 {
 
   /*
-   * The Store.
+   * The store.
    */
   private Store store;
 
@@ -63,7 +59,7 @@ public class StoreClosedException
   }
 
   /**
-   * Returns the dead Store object.
+   * Returns the store.
    */
   public Store getStore()
   {

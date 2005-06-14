@@ -1,13 +1,13 @@
 /*
  * ContentType.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +28,7 @@
 package javax.mail.internet;
 
 /**
- * This class represents a MIME Content-Type value.
- * It provides methods to parse a Content-Type string into individual 
- * components and to generate a MIME style Content-Type string.
+ * A MIME Content-Type value.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -49,12 +47,12 @@ public class ContentType
   private String subType;
 
   /*
-   * The list of additional parameters.
+   * The parameters.
    */
   private ParameterList list;
 
   /**
-   * No-arg Constructor.
+   * Constructor for an empty Content-Type.
    */
   public ContentType()
   {
@@ -64,7 +62,7 @@ public class ContentType
    * Constructor.
    * @param primaryType the primary type
    * @param subType the subtype
-   * @param list the list of additional parameters
+   * @param list the parameters
    */
   public ContentType(String primaryType, String subType, ParameterList list)
   {
@@ -74,11 +72,10 @@ public class ContentType
   }
 
   /**
-   * Constructor that takes a Content-Type string.
-   * The String is parsed into its constituents: primaryType, subType and 
-   * parameters. A ParseException is thrown if the parse fails.
-   * @param s the Content-Type string.
-   * @exception ParseException if the parse fails.
+   * Constructor that parses a Content-Type value from an RFC 2045 string
+   * representation.
+   * @param s the Content-Type value
+   * @exception ParseException if an error occurred during parsing
    */
   public ContentType(String s)
     throws ParseException
@@ -109,7 +106,7 @@ public class ContentType
   }
 
   /**
-   * Return the primary type.
+   * Returns the primary type.
    */
   public String getPrimaryType()
   {
@@ -117,7 +114,7 @@ public class ContentType
   }
 
   /**
-   * Return the subtype.
+   * Returns the subtype.
    */
   public String getSubType()
   {
@@ -125,12 +122,14 @@ public class ContentType
   }
 
   /**
-   * Return the MIME type string, without the parameters.
-   * The returned value is basically the concatenation of the primaryType,
-   * the '/' character and the secondaryType.
+   * Returns the MIME type string, without the parameters.
    */
   public String getBaseType()
   {
+    if (primaryType == null || subType == null)
+      {
+        return null;
+      }
     StringBuffer buffer = new StringBuffer();
     buffer.append(primaryType);
     buffer.append('/');
@@ -139,8 +138,7 @@ public class ContentType
   }
 
   /**
-   * Return the specified parameter value.
-   * Returns null if this parameter is absent.
+   * Returns the specified parameter value.
    */
   public String getParameter(String name)
   {
@@ -148,8 +146,7 @@ public class ContentType
   }
 
   /**
-   * Return a ParameterList object that holds all the available parameters.
-   * Returns null if no parameters are available.
+   * Returns the parameters.
    */
   public ParameterList getParameterList()
   {
@@ -157,9 +154,7 @@ public class ContentType
   }
 
   /**
-   * Set the primary type.
-   * Overrides existing primary type.
-   * @param primaryType the primary type
+   * Sets the primary type.
    */
   public void setPrimaryType(String primaryType)
   {
@@ -167,9 +162,7 @@ public class ContentType
   }
 
   /**
-   * Set the subtype.
-   * Overrides existing subtype
-   * @param type the subtype
+   * Sets the subtype.
    */
   public void setSubType(String subType)
   {
@@ -177,8 +170,7 @@ public class ContentType
   }
 
   /**
-   * Set the specified parameter.
-   * If this parameter already exists, it is replaced by this new value.
+   * Sets the specified parameter.
    * @param name the parameter name
    * @param value the parameter value
    */
@@ -192,7 +184,7 @@ public class ContentType
   }
 
   /**
-   * Set a new parameter list.
+   * Sets the parameters.
    * @param list the Parameter list
    */
   public void setParameterList(ParameterList list)
@@ -201,9 +193,7 @@ public class ContentType
   }
 
   /**
-   * Retrieve a RFC2045 style string representation of this Content-Type.
-   * Returns null if the conversion failed.
-   * @return RFC2045 style string
+   * Returns an RFC 2045 string representation of this Content-Type.
    */
   public String toString()
   {
@@ -228,17 +218,12 @@ public class ContentType
   }
 
   /**
-   * Match with the specified ContentType object.
-   * This method compares only the primaryType and subType.
-   * The parameters of both operands are ignored.
+   * Returns true if the specified Content-Type matches this Content-Type.
+   * Parameters are ignored.
    * <p>
-   * For example, this method will return true when comparing the 
-   * ContentTypes for "text/plain" and "text/plain; charset=foobar".
-   * If the subType of either operand is the special character '*', then 
+   * If the subtype of either Content-Type is the special character '*',
    * the subtype is ignored during the match.
-   * For example, this method will return true when comparing the
-   * ContentTypes for "text/plain" and "text/*"
-   * @param cType the content type to compare this against
+   * @param cType the Content-Type for comparison
    */
   public boolean match(ContentType cType)
   {
@@ -255,17 +240,12 @@ public class ContentType
   }
 
   /**
-   * Match with the specified content-type string.
-   * This method compares only the primaryType and subType.
-   * The parameters of both operands are ignored.
+   * Returns true if the specified Content-Type matches this Content-Type.
+   * Parameters are ignored.
    * <p>
-   * For example, this method will return true when comparing the 
-   * ContentType for "text/plain" with "text/plain; charset=foobar".
-   * If the subType of either operand is the special character '*', then 
+   * If the subtype of either Content-Type is the special character '*',
    * the subtype is ignored during the match.
-   * For example, this method will return true when comparing the 
-   * ContentType for "text/plain" with "text/*"
-   * @param s the string representation of the content type to match
+   * @param s the RFC 2045 string representation of the Content-Type to match
    */
   public boolean match(String s)
   {
@@ -280,3 +260,4 @@ public class ContentType
   }
   
 }
+

@@ -40,29 +40,13 @@ import gnu.inet.util.CRLFInputStream;
 import gnu.inet.util.LineInputStream;
 
 /**
- * InternetHeaders is a utility class that manages RFC822 style headers.
- * Given a rfc822 format message stream, it reads lines till the blank line 
- * that indicates end of header. The input stream is positioned at the start 
- * of the body. The lines are stored within the object and can be extracted 
- * as either Strings or Header objects.
+ * A collection of RFC 822 headers.
  * <p>
- * This class is mostly intended for service providers.
- * MimeMessage and MimeBody use this class for holding their headers.
- * <p>
- * <hr>
- * A note on RFC822 and MIME headers
- * <p>
- * RFC822 and MIME header fields must contain only US-ASCII characters.
- * If a header contains non US-ASCII characters, it must be encoded as per
- * the rules in RFC 2047. The MimeUtility class provided in this package can 
- * be used to to achieve this. Callers of the <code>setHeader</code>,
- * <code>addHeader</code>, and <code>addHeaderLine</code> methods are 
- * responsible for enforcing the MIME requirements for the specified headers.
- * In addition, these header fields must be folded(wrapped) before being 
- * sent if they exceed the line length limitation for the transport 
- * (1000 bytes for SMTP). Received headers may have been folded.
- * The application is responsible for folding and unfolding headers 
- * as appropriate.
+ * The string representation of RFC822 and MIME header fields must contain
+ * only US-ASCII characters. Non US-ASCII characters must be encoded as per
+ * the rules in RFC 2047. This class does not enforce those rules; the
+ * caller is expected to use <code>MimeUtility</code> to ensure that header
+ * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -278,7 +262,7 @@ public class InternetHeaders
   private ArrayList headers = new ArrayList(20);
 
   /**
-   * Create an empty InternetHeaders object.
+   * Constructor for an empty InternetHeaders.
    */
   public InternetHeaders()
   {
@@ -305,14 +289,10 @@ public class InternetHeaders
   }
 
   /**
-   * Read and parse the given rfc822 message stream till the blank line
-   * separating the header from the body.
-   * The input stream is left positioned at the start of the body.
-   * The header lines are stored internally.
-   * <p>
-   * For efficiency, wrap a BufferedInputStream around the actual input 
-   * stream and pass it as the parameter.
-   * @param is an rfc822 input stream
+   * Constructor with an RFC 822 message stream.
+   * The stream is parsed up to the blank line separating the headers from
+   * the body, and is left positioned at the start of the body.
+   * @param is an RFC 822 input stream
    */
   public InternetHeaders(InputStream is)
     throws MessagingException
@@ -321,13 +301,13 @@ public class InternetHeaders
   }
 
   /**
-   * Read and parse the given rfc822 message stream till the blank line
-   * separating the header from the body.
-   * Store the header lines inside this InternetHeaders object.
-   * <p>
-   * Note that the header lines are added into this InternetHeaders object,
-   * so any existing headers in this object will not be affected.
-   * @param is an rfc822 input stream
+   * Parses the specified RFC 822 message stream, storing the headers in
+   * this InternetHeaders.
+   * The stream is parsed up to the blank line separating the headers from
+   * the body, and is left positioned at the start of the body.
+   * Note that the headers are added into this InternetHeaders object:
+   * any existing headers in this object are not affected.
+   * @param is an RFC 822 input stream
    */
   public void load(InputStream is)
     throws MessagingException
@@ -352,8 +332,7 @@ public class InternetHeaders
   }
 
   /**
-   * Return all the values for the specified header.
-   * The values are String objects.
+   * Returns all the values for the specified header.
    * @param name the header name
    */
   public String[] getHeader(String name)
@@ -378,12 +357,11 @@ public class InternetHeaders
   }
 
   /**
-   * Get all the headers for this header name, returned as a single String,
-   * with headers separated by the delimiter.
-   * If the delimiter is null, only the first header is returned.
+   * Returns all the headers for this header name as a single string,
+   * with headers separated by the given delimiter.
+   * If the delimiter is <code>null</code>, only the first header is returned.
    * @param name the header name
    * @param delimiter the delimiter
-   * @return the value fields for all headers with this name
    */
   public String getHeader(String name, String delimiter)
   {
@@ -411,11 +389,9 @@ public class InternetHeaders
   }
 
   /**
-   * Change the first header line that matches <code>name</code> to have 
-   * <code>value</code>, adding a new header if no existing header matches.
-   * Remove all matching headers but the first.
-   * <p>
-   * Note that RFC822 headers can only contain US-ASCII characters
+   * Sets the specified header.
+   * If existing header lines match the given name, they are all replaced by
+   * the specified value.
    * @param name the header name
    * @param value the header value
    */
@@ -446,9 +422,7 @@ public class InternetHeaders
   }
 
   /**
-   * Add a header with the specified name and value to the header list.
-   * <p>
-   * Note that RFC822 headers can only contain US-ASCII characters.
+   * Adds the specified header.
    * @param name the header name
    * @param value the header value
    */
@@ -475,8 +449,8 @@ public class InternetHeaders
   }
 
   /**
-   * Remove all header entries that match the given name
-   * @param name header name
+   * Removes all headers matching the given name.
+   * @param name the header name
    */
   public void removeHeader(String name)
   {
@@ -495,7 +469,8 @@ public class InternetHeaders
   }
 
   /**
-   * Return all the headers as an Enumeration of Header objects
+   * Returns all the headers.
+   * @return an Enumeration of Header objects
    */
   public Enumeration getAllHeaders()
   {
@@ -503,8 +478,9 @@ public class InternetHeaders
   }
 
   /**
-   * Return all matching Header objects
+   * Returns all the headers with any of the given names.
    * @param names the names to match
+   * @return an Enumeration of Header objects
    */
   public Enumeration getMatchingHeaders(String[] names)
   {
@@ -512,8 +488,9 @@ public class InternetHeaders
   }
 
   /**
-   * Return all non-matching Header objects
+   * Returns all the headers without any of the given names.
    * @param names the names not to match
+   * @return an Enumeration of Header objects
    */
   public Enumeration getNonMatchingHeaders(String[] names)
   {
@@ -521,12 +498,10 @@ public class InternetHeaders
   }
 
   /**
-   * Add an RFC822 header line to the header store.
-   * If the line starts with a space or tab(a continuation line),
-   * add it to the last header line in the list.
-   * <p>
-   * Note that RFC822 headers can only contain US-ASCII characters
-   * @param line raw rfc822 header line
+   * Adds an RFC 822 header-line to this InternetHeaders.
+   * If the line starts with a space or tab (a continuation line for a
+   * folded header), adds it to the last header line in the list.
+   * @param line the raw RFC 822 header-line
    */
   public void addHeaderLine(String line)
   {
@@ -560,7 +535,8 @@ public class InternetHeaders
   }
 
   /**
-   * Return all the header lines as an Enumeration of Strings.
+   * Returns all the header-lines.
+   * @return an Enumeration of Strings
    */
   public Enumeration getAllHeaderLines()
   {
@@ -568,7 +544,8 @@ public class InternetHeaders
   }
 
   /**
-   * Return all matching header lines as an Enumeration of Strings.
+   * Returns all the header-lines with any of the given names.
+   * @return an Enumeration of Strings
    */
   public Enumeration getMatchingHeaderLines(String[] names)
   {
@@ -576,7 +553,8 @@ public class InternetHeaders
   }
 
   /**
-   * Return all non-matching header lines
+   * Returns all the header-lines without any of the given names.
+   * @return an Enumeration of Strings
    */
   public Enumeration getNonMatchingHeaderLines(String[] names)
   {
@@ -594,3 +572,4 @@ public class InternetHeaders
   }
   
 }
+

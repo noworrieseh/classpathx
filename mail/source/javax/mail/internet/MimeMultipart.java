@@ -1,13 +1,13 @@
 /*
  * MimeMultipart.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,31 +45,11 @@ import gnu.inet.util.CRLFOutputStream;
 import gnu.inet.util.LineInputStream;
 
 /**
- * The MimeMultipart class is an implementation of the abstract Multipart 
- * class that uses MIME conventions for the multipart data.
+ * A MIME multipart container.
  * <p>
- * A MimeMultipart is obtained from a MimePart whose primary type is
- * "multipart"(by invoking the part's <code>getContent()</code> method)
- * or it can be created by a client as part of creating a new MimeMessage.
- * <p>
- * The default multipart subtype is "mixed".
- * The other multipart subtypes, such as "alternative", "related", and so on,
- * can be implemented as subclasses of MimeMultipart with additional methods 
- * to implement the additional semantics of that type of multipart content.
- * The intent is that service providers, mail JavaBean writers and mail 
- * clients will write many such subclasses and their Command Beans,
- * and will install them into the JavaBeans Activation Framework,
- * so that any JavaMail implementation and its clients can transparently 
- * find and use these classes.
- * Thus, a MIME multipart handler is treated just like any other type handler,
- * thereby decoupling the process of providing multipart handlers from 
- * the JavaMail API. Lacking these additional MimeMultipart subclasses,
- * all subtypes of MIME multipart data appear as MimeMultipart objects.
- * <p>
- * An application can directly construct a MIME multipart object of any 
- * subtype by using the MimeMultipart(String subtype) constructor.
- * For example, to create a "multipart/alternative" object,
- * use <code>new MimeMultipart("alternative")</code>.
+ * The default multipart subtype is "mixed". However, an application can
+ * construct a MIME multipart object of any subtype using the
+ * <code>MimeMultipart(String)</code> constructor.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -79,25 +59,17 @@ public class MimeMultipart
 {
 
   /**
-   * The DataSource supplying our InputStream.
+   * The data source supplying the multipart data.
    */
   protected DataSource ds;
 
   /**
-   * Have we parsed the data from our InputStream yet?
-   * Defaults to true; set to false when our constructor is given 
-   * a DataSource with an InputStream that we need to parse.
+   * Indicates whether the data from the input stream has been parsed yet.
    */
   protected boolean parsed;
 
   /**
-   * Default constructor. 
-   * An empty MimeMultipart object is created. 
-   * Its content type is set to "multipart/mixed".
-   * A unique boundary string is generated and this string is set up
-   * as the "boundary" parameter for the <code>contentType</code> field.
-   * <p>
-   * MimeBodyParts may be added later.
+   * Constructor for an empty MIME multipart of type "multipart/mixed".
    */
   public MimeMultipart()
   {
@@ -105,11 +77,7 @@ public class MimeMultipart
   }
 
   /**
-   * Construct a MimeMultipart object of the given subtype.
-   * A unique boundary string is generated and this string is set up
-   * as the "boundary" parameter for the <code>contentType</code> field.
-   * <p>
-   * MimeBodyParts may be added later.
+   * Constructor for an empty MIME multipart of the given subtype.
    */
   public MimeMultipart(String subtype)
   {
@@ -121,21 +89,8 @@ public class MimeMultipart
   }
 
   /**
-   * Constructs a MimeMultipart object and its bodyparts from the given
-   * DataSource.
-   * <p>
-   * This constructor handles as a special case the situation where the given
-   * DataSource is a MultipartDataSource object. In this case, this method 
-   * just invokes the superclass(i.e., Multipart) constructor that takes a
-   * MultipartDataSource object.
-   * <p>
-   * Otherwise, the DataSource is assumed to provide a MIME multipart byte
-   * stream. The parsed flag is set to false. When the data for the body parts
-   * are needed, the parser extracts the "boundary" parameter from the content
-   * type of this DataSource, skips the 'preamble' and reads bytes till the
-   * terminating boundary and creates MimeBodyParts for each part of the 
-   * stream.
-   * @param ds DataSource, can be a MultipartDataSource
+   * Constructor with a given data source.
+   * @param ds the data source, which can be a MultipartDataSource
    */
   public MimeMultipart(DataSource ds)
     throws MessagingException
@@ -159,11 +114,7 @@ public class MimeMultipart
   }
 
   /**
-   * Set the subtype. 
-   * This method should be invoked only on a new MimeMultipart object 
-   * created by the client. The default subtype of such a multipart object 
-   * is "mixed".
-   * @param subtype Subtype
+   * Sets the subtype.
    */
   public void setSubType(String subtype)
     throws MessagingException
@@ -174,7 +125,7 @@ public class MimeMultipart
   }
 
   /**
-   * * Return the number of enclosed BodyPart objects.
+   * Returns the number of component body parts.
    */
   public int getCount()
     throws MessagingException
@@ -187,10 +138,10 @@ public class MimeMultipart
   }
 
   /**
-   * Get the specified BodyPart.
-   * BodyParts are numbered starting at 0.
-   * @param index the index of the desired BodyPart
-   * @exception MessagingException if no such BodyPart exists
+   * Returns the specified body part.
+   * Body parts are numbered starting at 0.
+   * @param index the body part index
+   * @exception MessagingException if no such part exists
    */
   public BodyPart getBodyPart(int index)
     throws MessagingException
@@ -203,9 +154,8 @@ public class MimeMultipart
   }
 
   /**
-   * Get the MimeBodyPart referred to by the given ContentID(CID).
-   * Returns null if the part is not found.
-   * @param CID the ContentID of the desired part
+   * Returns the body part identified by the given Content-ID (CID).
+   * @param CID the Content-ID of the desired part
    */
   public BodyPart getBodyPart(String CID)
     throws MessagingException
@@ -228,21 +178,7 @@ public class MimeMultipart
   }
 
   /**
-   * Update headers.
-   * The default implementation here just calls the <code>updateHeaders</code>
-   * method on each of its children BodyParts.
-   * <p>
-   * Note that the boundary parameter is already set up when a new and empty
-   * MimeMultipart object is created.
-   * <p>
-   * This method is called when the <code>saveChanges</code> method is
-   * invoked on the Message object containing this Multipart.
-   * This is typically done as part of the Message send process,
-   * however note that a client is free to call it any number of times.
-   * So if the header updating process is expensive for a specific 
-   * MimeMultipart subclass, then it might itself want to track whether
-   * its internal state actually did change,
-   * and do the header updating only if necessary.
+   * Updates the headers of this part to be consistent with its content.
    */
   protected void updateHeaders()
     throws MessagingException
@@ -258,9 +194,9 @@ public class MimeMultipart
   }
 
   /**
-   * Iterates through all the parts and outputs each Mime part 
-   * separated by a boundary.
-   * @exception IOException if an IO related exception occurs
+   * Writes this multipart to the specified output stream.
+   * This method iterates through all the component parts, outputting each
+   * part separated by the Content-Type boundary parameter.
    */
   public void writeTo(OutputStream os)
     throws IOException, MessagingException
@@ -296,11 +232,7 @@ public class MimeMultipart
   }
 
   /**
-   * Parse the InputStream from our DataSource, constructing the appropriate
-   * MimeBodyParts.
-   * The parsed flag is set to true, and if true on entry nothing is done.
-   * This method is called by all other methods that need data for the body 
-   * parts, to make sure the data has been parsed.
+   * Parses the body parts from this multipart's data source.
    */
   protected void parse()
     throws MessagingException
@@ -521,13 +453,8 @@ public class MimeMultipart
   }
   
   /**
-   * Create and return an InternetHeaders object that loads the headers 
-   * from the given InputStream.
-   * Subclasses can override this method to return a subclass
-   * of InternetHeaders, if necessary.
-   * This implementation simply constructs and returns an InternetHeaders 
-   * object.
-   * @param is the InputStream to read the headers from
+   * Creates headers from the specified input stream.
+   * @param is the input stream to read the headers from
    */
   protected InternetHeaders createInternetHeaders(InputStream is)
     throws MessagingException
@@ -536,28 +463,20 @@ public class MimeMultipart
   }
   
   /**
-   * Create and return a MimeBodyPart object to represent a body part parsed
-   * from the InputStream.
-   * Subclasses can override this method to return a subclass of 
-   * MimeBodyPart, if necessary. This implementation simply constructs and 
-   * returns a MimeBodyPart object.
-   * @param headers the headers for the body part
-   * @param content the content of the body part
+   * Creates a MIME body part object from the given headers and byte content.
+   * @param headers the part headers
+   * @param content the part content
    */
   protected MimeBodyPart createMimeBodyPart(InternetHeaders headers,
-                                             byte[] content)
+                                            byte[] content)
     throws MessagingException
   {
     return new MimeBodyPart(headers, content);
   }
   
   /**
-   * Create and return a MimeBodyPart object to represent a body part parsed
-   * from the InputStream.
-   * Subclasses can override this method to return a subclass of 
-   * MimeBodyPart, if necessary. This implementation simply constructs and 
-   * returns a MimeBodyPart object.
-   * @param is InputStream containing the body part
+   * Creates a MIME body part from the specified input stream.
+   * @param is the input stream to parse the part from
    */
   protected MimeBodyPart createMimeBodyPart(InputStream is)
     throws MessagingException
@@ -566,3 +485,4 @@ public class MimeMultipart
   }
   
 }
+

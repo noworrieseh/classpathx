@@ -1,13 +1,13 @@
 /*
  * MessageChangedEvent.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.event;
 import javax.mail.Message;
 
 /**
- * This class models Message change events.
+ * A message change event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -45,7 +45,7 @@ public class MessageChangedEvent
   public static final int FLAGS_CHANGED = 1;
 
   /**
-   * The message's envelope(headers, but not body) changed.
+   * The message's envelope (headers, but not content) changed.
    */
   public static final int ENVELOPE_CHANGED = 2;
 
@@ -61,9 +61,9 @@ public class MessageChangedEvent
 
   /**
    * Constructor.
-   * @param source The folder that owns the message
-   * @param type The change type
-   * @param msg The changed message
+   * @param source the owner folder
+   * @param type the type of change (FLAGS_CHANGED or ENVELOPE_CHANGED)
+   * @param msg the changed message
    */
   public MessageChangedEvent(Object source, int type, Message msg)
   {
@@ -73,7 +73,7 @@ public class MessageChangedEvent
   }
 
   /**
-   * Return the type of this event.
+   * Returns the type of this event.
    */
   public int getMessageChangeType()
   {
@@ -81,7 +81,7 @@ public class MessageChangedEvent
   }
 
   /**
-   * Return the changed Message.
+   * Returns the changed message.
    */
   public Message getMessage()
   {
@@ -89,11 +89,12 @@ public class MessageChangedEvent
   }
 
   /**
-   * Invokes the appropriate MessageChangedListener method.
+   * Invokes the appropriate listener method.
    */
   public void dispatch(Object listener)
   {
-   ((MessageChangedListener) listener).messageChanged(this);
+    ((MessageChangedListener) listener).messageChanged(this);
   }
   
 }
+

@@ -1,13 +1,13 @@
 /*
  * FolderEvent.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,17 +30,7 @@ package javax.mail.event;
 import javax.mail.Folder;
 
 /**
- * This class models Folder existence events.
- * FolderEvents are delivered to FolderListeners registered on 
- * the affected Folder as well as the containing Store.
- * <p>
- * Service providers vary widely in their ability to notify clients of these
- * events. At a minimum, service providers must notify listeners registered 
- * on the same Store or Folder object on which the operation occurs.
- * Service providers may also notify listeners when changes are made through 
- * operations on other objects in the same virtual machine, or by other 
- * clients in the same or other hosts. Such notifications are not required 
- * and are typically not supported by mail protocols(including IMAP).
+ * A folder event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -75,15 +65,15 @@ public class FolderEvent
   protected transient Folder folder;
 
   /**
-   * The folder that represents the new name, in case of a RENAMED event.
+   * The folder representing the new name, in the case of a RENAMED event.
    */
   protected transient Folder newFolder;
 
   /**
    * Constructor.
-   * @param source The source of the event
-   * @param folder The affected folder
-   * @param type The event type
+   * @param source the source
+   * @param folder the affected folder
+   * @param type the event type (CREATED or DELETED)
    */
   public FolderEvent(Object source, Folder folder, int type)
   {
@@ -91,14 +81,14 @@ public class FolderEvent
   }
 
   /**
-   * Constructor. Use for RENAMED events.
-   * @param source The source of the event
-   * @param oldFolder The folder that is renamed
-   * @param newFolder The folder that represents the new name
-   * @param type The event type
+   * Constructor for RENAMED events.
+   * @param source the source
+   * @param oldFolder the folder that is renamed
+   * @param newFolder the folder that represents the new name
+   * @param type the event type (RENAMED)
    */
   public FolderEvent(Object source, Folder oldFolder, Folder newFolder, 
-                      int type)
+                     int type)
   {
     super(source);
     folder = oldFolder;
@@ -107,7 +97,7 @@ public class FolderEvent
   }
 
   /**
-   * Return the type of this event.
+   * Returns the type of this event.
    */
   public int getType()
   {
@@ -115,7 +105,7 @@ public class FolderEvent
   }
 
   /**
-   * Return the affected folder.
+   * Returns the affected folder.
    * @see #getNewFolder
    */
   public Folder getFolder()
@@ -124,9 +114,8 @@ public class FolderEvent
   }
 
   /**
-   * If this event indicates that a folder is renamed,(i.e, the event type is
-   * RENAMED), then this method returns the Folder object representing the new
-   * name. The getFolder() method returns the folder that is renamed.
+   * Returns the folder representing the new name, in the case of a RENAMED
+   * event.
    * @see #getFolder
    */
   public Folder getNewFolder()
@@ -135,7 +124,7 @@ public class FolderEvent
   }
 
   /**
-   * Invokes the appropriate FolderListener method.
+   * Invokes the appropriate listener method.
    */
   public void dispatch(Object listener)
   {
@@ -155,3 +144,4 @@ public class FolderEvent
   }
 
 }
+

@@ -1,13 +1,13 @@
 /*
  * MimePartDataSource.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,8 +37,7 @@ import javax.mail.MessageContext;
 import javax.mail.MessagingException;
 
 /**
- * A utility class that implements a DataSource out of a MimePart.
- * This class is primarily meant for service providers.
+ * A data source that manages content for a MIME part.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -59,7 +58,7 @@ public class MimePartDataSource
   private MessageContext context;
 
   /**
-   * Constructor, that constructs a DataSource from a MimePart.
+   * Constructor with a MIME part.
    */
   public MimePartDataSource(MimePart part)
   {
@@ -67,16 +66,10 @@ public class MimePartDataSource
   }
 
   /**
-   * Returns an input stream from this MimePart.
+   * Returns an input stream from the MIME part.
    * <p>
    * This method applies the appropriate transfer-decoding, based on the
-   * Content-Transfer-Encoding attribute of this MimePart. Thus the returned
-   * input stream is a decoded stream of bytes.
-   * <p>
-   * This implementation obtains the raw content from the Part using the
-   * <code>getContentStream()</code> method and decodes it using the 
-   * <code>MimeUtility.decode()</code> method.
-   * @return decoded input stream
+   * Content-Transfer-Encoding header of the MimePart.
    */
   public InputStream getInputStream()
     throws IOException
@@ -106,23 +99,12 @@ public class MimePartDataSource
       }
   }
 
-  /**
-   * DataSource method to return an output stream.
-   * <p>
-   * This implementation throws the UnknownServiceException.
-   */
   public OutputStream getOutputStream()
     throws IOException
   {
     throw new UnknownServiceException();
   }
 
-  /**
-   * Returns the content-type of this DataSource.
-   * <p>
-   * This implementation just invokes the getContentType method on the 
-   * MimePart.
-   */
   public String getContentType()
   {
     try
@@ -135,11 +117,6 @@ public class MimePartDataSource
       }
   }
 
-  /**
-   * DataSource method to return a name.
-   * <p>
-   * This implementation just returns an empty string.
-   */
   public String getName()
   {
     // Shouldn't this return the filename parameter of the
@@ -148,7 +125,7 @@ public class MimePartDataSource
   }
 
   /**
-   * Return the MessageContext for the current part.
+   * Returns the message context for the current part.
    */
   public MessageContext getMessageContext()
   {
@@ -160,3 +137,4 @@ public class MimePartDataSource
   }
   
 }
+

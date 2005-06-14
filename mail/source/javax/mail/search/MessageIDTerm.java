@@ -1,13 +1,13 @@
 /*
  * MessageIDTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,12 +30,8 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This term models the RFC822 "Message-Id" - a message-id for Internet 
- * messages that is supposed to be unique per message.
- * Clients can use this term to search a folder for a message 
- * given its Message-Id.
- * <p>
- * The Message-Id is represented as a String.
+ * A comparison for the RFC822 "Message-Id", a string message identifier
+ * for Internet messages that is supposed to be unique per message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -46,7 +42,7 @@ public final class MessageIDTerm
 
   /**
    * Constructor.
-   * @param msgid the msgid to search for
+   * @param msgid the Message-Id to search for
    */
   public MessageIDTerm(String msgid)
   {
@@ -54,9 +50,8 @@ public final class MessageIDTerm
   }
 
   /**
-   * The match method.
-   * @param msg the match is applied to this Message's Message-ID header
-   * @return true if the match succeeds, otherwise false
+   * Returns true if the given message's Message-Id matches the
+   * Message-Id specified in this term.
    */
   public boolean match(Message msg)
   {
@@ -80,12 +75,10 @@ public final class MessageIDTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof MessageIDTerm && super.equals(other));
   }
   
 }
+

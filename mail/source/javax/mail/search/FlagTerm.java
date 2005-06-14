@@ -1,13 +1,13 @@
 /*
  * FlagTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ import javax.mail.Flags;
 import javax.mail.Message;
 
 /**
- * This class implements comparisons for Message Flags.
+ * A comparison of message flags.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -42,20 +42,21 @@ public final class FlagTerm
 
   /**
    * Indicates whether to test for the presence or absence of the specified
-   * Flag. If true, then test whether all the specified flags are present, 
-   * else test whether all the specified flags are absent.
+   * flag. If true, test whether all the specified flags are present, 
+   * otherwise test whether all the specified flags are absent.
    */
   protected boolean set;
 
   /**
-   * Flags object containing the flags to test.
+   * The flags to test.
    */
   protected Flags flags;
 
   /**
    * Constructor.
-   * @param flags Flags object containing the flags to check for
-   * @param set the flag setting to check for
+   * @param flags the flags to test
+   * @param set whether to test for presence or absence of the specified
+   * flags
    */
   public FlagTerm(Flags flags, boolean set)
   {
@@ -64,7 +65,7 @@ public final class FlagTerm
   }
 
   /**
-   * Return the Flags to test.
+   * Returns the flags to test.
    */
   public Flags getFlags()
   {
@@ -72,7 +73,8 @@ public final class FlagTerm
   }
 
   /**
-   * Return true if testing whether the flags are set.
+   * Indicates whether to test for the presence or the absence of the
+   * specified flags.
    */
   public boolean getTestSet()
   {
@@ -80,9 +82,7 @@ public final class FlagTerm
   }
 
   /**
-   * The comparison method.
-   * @param msg The flag comparison is applied to this Message
-   * @return true if the comparson succeeds, otherwise false.
+   * Returns true if the flags in the specified message match this term.
    */
   public boolean match(Message msg)
   {
@@ -117,9 +117,6 @@ public final class FlagTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof FlagTerm)
@@ -130,12 +127,10 @@ public final class FlagTerm
     return false;
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     return set ?  flags.hashCode() : ~flags.hashCode();
   }
   
 }
+

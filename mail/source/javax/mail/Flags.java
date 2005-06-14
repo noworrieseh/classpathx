@@ -1,13 +1,13 @@
 /*
  * Flags.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,45 +33,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * The Flags class represents the set of flags on a Message.
- * Flags are composed of predefined system flags, and user defined flags.
- *
- * A System flag is represented by the Flags.Flag inner class. 
- * A User defined flag is represented as a String.
- * User flags are case-independent.
- * <p>
- * A set of standard system flags are predefined.
- * Most folder implementations are expected to support these flags.
- * Some implementations may also support arbitrary user-defined flags.
- * The getPermanentFlags method on a Folder returns a Flags object
- * that holds all the flags that are supported by that folder
- * implementation.
- * <p>
- * A Flags object is serializable so that(for example) the use of Flags 
- * objects in search terms can be serialized along with the search terms.
- * <p>
- * The below code sample illustrates how to set, examine and get 
- * the flags for a message.
- * <pre>
- Message m = folder.getMessage(1);
- m.setFlag(Flags.Flag.DELETED, true); // set the DELETED flag
-
- // Check if DELETED flag is set of this message
- if (m.isSet(Flags.Flag.DELETED))
-    System.out.println("DELETED message");
-
- // Examine ALL system flags for this message
- Flags flags = m.getFlags();
- Flags.Flag[] sf = flags.getSystemFlags();
- for (int i = 0; i < sf.length; i++) {
-    if (sf[i]==Flags.Flag.DELETED)
-            System.out.println("DELETED message");
-    else if (sf[i]==Flags.Flag.SEEN)
-            System.out.println("SEEN message");
-      ......
-      ......
- }
- </pre>
+ * The set of flags on a message.
+ * Flags are composed of predefined system flags (Flags.Flag),
+ * and user defined flags (case-independent String).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -81,8 +45,7 @@ public class Flags
 {
 
   /**
-   * This inner class represents an individual system flag.
-   * A set of standard system flag objects are predefined here.
+   * An individual system flag.
    */
   public static final class Flag
   {
@@ -96,61 +59,37 @@ public class Flags
     
     /**
      * This message has been answered.
-     * This flag is set by clients to indicate that this message 
-     * has been answered to.
      */
     public static final Flag ANSWERED = new Flag(0x00000001);
 
     /**
      * This message is marked deleted.
-     * Clients set this flag to mark a message as deleted.
-     * The expunge operation on a folder removes all messages in that
-     * folder that are marked for deletion.
      */
     public static final Flag DELETED = new Flag(0x00000002);
 
     /**
      * This message is a draft.
-     * This flag is set by clients to indicate that the message is
-     * a draft message.
      */
     public static final Flag DRAFT = new Flag(0x00000004);
 
     /**
      * This message is flagged.
-     * No semantic is defined for this flag. Clients alter this flag.
      */
     public static final Flag FLAGGED = new Flag(0x00000008);
 
     /**
      * This message is recent.
-     * Folder implementations set this flag to indicate that this message
-     * is new to this folder, that is, it has arrived since the last time
-     * this folder was opened.
-     * <p>
-     * Clients cannot alter this flag.
      */
     public static final Flag RECENT = new Flag(0x00000010);
 
     /**
      * This message is seen.
-     * This flag is implicitly set by the implementation when this 
-     * Message's content is returned to the client in some form. The
-     * <code>getInputStream</code> and <code>getContent</code> methods 
-     * on Message cause this flag to be set.
-     * <p>
-     * Clients can alter this flag.
      */
     public static final Flag SEEN = new Flag(0x00000020);
 
     /**
-     * A special flag that indicates that this folder supports 
+     * Special flag that indicates whether this folder supports 
      * user defined flags.
-     * <p>
-     * The implementation sets this flag.
-     * Clients cannot alter this flag but can use it to determine if
-     * a folder supports user defined flags by using
-     * <code>folder.getPermanentFlags().contains(Flags.Flag.USER)</code>.
      */
     public static final Flag USER = new Flag(0x80000000);
 
@@ -181,8 +120,7 @@ public class Flags
   }
 
   /**
-   * Construct a Flags object initialized with the given flags.
-   * @param flags the flags for initialization
+   * Construct a Flags object containing the given flags.
    */
   public Flags(Flags flags)
   {
@@ -198,8 +136,7 @@ public class Flags
   }
 
   /**
-   * Construct a Flags object initialized with the given system flag.
-   * @param flag the flag for initialization
+   * Construct a Flags object containing the given system flag.
    */
   public Flags(Flag flag)
   {
@@ -208,8 +145,7 @@ public class Flags
   }
 
   /**
-   * Construct a Flags object initialized with the given user flag.
-   * @param flag the flag for initialization
+   * Construct a Flags object containing the given user flag.
    */
   public Flags(String flag)
   {
@@ -219,8 +155,7 @@ public class Flags
   }
 
   /**
-   * Add the specified system flag to this Flags object.
-   * @param flag the flag to add
+   * Add the specified system flag.
    */
   public void add(Flag flag)
   {
@@ -228,8 +163,7 @@ public class Flags
   }
 
   /**
-   * Add the specified user flag to this Flags object.
-   * @param flag the flag to add
+   * Add the specified user flag.
    */
   public void add(String flag)
   {
@@ -244,8 +178,7 @@ public class Flags
   }
 
   /**
-   * Add all the flags in the given Flags object to this Flags object.
-   * @param flags the Flags object to add flags from
+   * Add all the flags from the specified Flags object.
    */
   public void add(Flags flags)
   {
@@ -270,8 +203,7 @@ public class Flags
   }
 
   /**
-   * Remove the specified system flag from this Flags object.
-   * @param flag the flag to be removed
+   * Remove the specified system flag.
    */
   public void remove(Flag flag)
   {
@@ -279,8 +211,7 @@ public class Flags
   }
 
   /**
-   * Remove the specified user flag from this Flags object.
-   * @param flag the flag to be removed
+   * Remove the specified user flag.
    */
   public void remove(String flag)
   {
@@ -295,7 +226,6 @@ public class Flags
 
   /**
    * Remove all flags in the given Flags object from this Flags object.
-   * @param flags the flags to be removed
    */
   public void remove(Flags flags)
   {
@@ -317,8 +247,7 @@ public class Flags
   }
 
   /**
-   * Indicates whether the specified system flag is present 
-   * in this Flags object.
+   * Indicates whether the specified system flag is set.
    */
   public boolean contains(Flag flag)
   {
@@ -326,8 +255,7 @@ public class Flags
   }
 
   /**
-   * Indicates whether the specified user flag is present 
-   * in this Flags object.
+   * Indicates whether the specified user flag is set.
    */
   public boolean contains(String flag)
   {
@@ -340,7 +268,7 @@ public class Flags
 
   /**
    * Indicates whether all the flags in the specified Flags object 
-   * are present in this Flags object.
+   * are set in this Flags object.
    */
   public boolean contains(Flags flags)
   {
@@ -369,9 +297,6 @@ public class Flags
     return true;
   }
 
-  /**
-   * Indicates whether the two Flags objects are equal.
-   */
   public boolean equals(Object other)
   {
     if (other == this)
@@ -395,9 +320,6 @@ public class Flags
             flags.userFlags.equals(userFlags));
   }
 
-  /**
-   * Returns a hash code for this object.
-   */
   public int hashCode()
   {
     int hashCode = systemFlags;
@@ -409,8 +331,7 @@ public class Flags
   }
 
   /**
-   * Return all the system flags in this Flags object.
-   * Returns an array of size zero if no flags are set.
+   * Returns the system flags.
    */
   public Flag[] getSystemFlags()
   {
@@ -429,8 +350,7 @@ public class Flags
   }
 
   /**
-   * Return all the user flags in this Flags object.
-   * Returns an array of size zero if no flags are set.
+   * Returns the user flags.
    */    
   public String[] getUserFlags()
   {
@@ -453,9 +373,6 @@ public class Flags
       }
   }
 
-  /**
-   * Returns a clone of this Flags object.
-   */
   public Object clone()
   {
     return new Flags(this);

@@ -1,13 +1,13 @@
 /*
  * Service.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,12 +37,7 @@ import javax.mail.event.ConnectionListener;
 import javax.mail.event.MailEvent;
 
 /**
- * An abstract class that contains the functionality common to messaging 
- * services, such as stores and transports.
- * <p>
- * A messaging service is created from a Session and is named using a URLName.
- * A service must be connected before it can be used.
- * Connection events are sent to reflect its connection status.
+ * An abstract messaging service (store or transport).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -51,7 +46,7 @@ public abstract class Service
 {
 
   /**
-   * The session from which this service was created.
+   * The session context for this service.
    */
   protected Session session;
 
@@ -61,8 +56,8 @@ public abstract class Service
   protected URLName url;
 
   /**
-   * Debug flag for this service.
-   * Set from the session's debug flag when this service is created.
+   * The debug flag for this service.
+   * Initialised from the session's debug flag when this service is created.
    */
   protected boolean debug;
 
@@ -75,8 +70,8 @@ public abstract class Service
 
   /**
    * Constructor.
-   * @param session Session object for this service
-   * @param url URLName object to be used for this service
+   * @param session the session context for this service
+   * @param url the URLName of this service
    */
   protected Service(Session session, URLName url)
   {
@@ -86,21 +81,10 @@ public abstract class Service
   }
 
   /**
-   * A generic connect method that takes no parameters. 
-   * Subclasses can implement the appropriate authentication schemes. 
-   * Subclasses that need additional information might want to use 
-   * some properties or might get it interactively using a popup window.
-   * <p>
-   * If the connection is successful, an "open" ConnectionEvent is delivered 
-   * to any ConnectionListeners on this service.
-   * <p>
-   * Most clients should just call this method to connect to the service.
-   * <p>
-   * It is an error to connect to an already connected service.
-   * <p>
-   * The implementation provided here simply calls the following 
-   * <code>connect(String, String, String)</code> method with nulls.
-   * @exception AuthenticationFailedException for authentication failures
+   * Connects to this service.
+   * If additional information is required, the provider can determine them
+   * from session properties or via a callback to the UI.
+   * @exception AuthenticationFailedException on authentication failure
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
@@ -111,42 +95,13 @@ public abstract class Service
   }
 
   /**
-   * Connect to the specified address. 
-   * This method provides a simple authentication scheme 
-   * that requires a username and password.
-   * <p>
-   * If the connection is successful, an "open" ConnectionEvent is delivered 
-   * to any ConnectionListeners on this service.
-   * <p>
-   * It is an error to connect to an already connected service.
-   * <p>
-   * The implementation in the Service class will collect defaults for the 
-   * host, user, and password from the session, from the URLName for this 
-   * service, and from the supplied parameters and then call the 
-   * <code>protocolConnect</code> method. If the <code>protocolConnect</code>
-   * method returns false, the user will be prompted for any missing 
-   * information and the <code>protocolConnect</code> method will be called 
-   * again. The subclass should override the <code>protocolConnect</code>
-   * method. The subclass should also implement the <code>getURLName</code>
-   * method, or use the implementation in this class.
-   * <p>
-   * On a successful connection, the <code>setURLName</code> method is called 
-   * with a URLName that includes the information used to make the connection,
-   * including the password.
-   * <p>
-   * If the password passed in is null and this is the first successful
-   * connection to this service, the user name and the password collected from
-   * the user will be saved as defaults for subsequent connection attempts to
-   * this same service when using other Service object instances(the 
-   * connection information is typically always saved within a particular 
-   * Service object instance). The password is saved using the Session method
-   * <code>setPasswordAuthenticaiton</code>. If the password passed in is not 
-   * null, it is not saved, on the assumption that the application is managing 
-   * passwords explicitly.
+   * Connects to this service using the specified details.
+   * This method provides a simple authentication scheme requiring a
+   * username and password.
    * @param host the host to connect to
-   * @param user the user name
-   * @param password this user's password
-   * @exception AuthenticationFailedException for authentication failures
+   * @param user the username
+   * @param password the password
+   * @exception AuthenticationFailedException on authentication failure
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
@@ -157,13 +112,14 @@ public abstract class Service
   }
 
   /**
-   * Similar to connect(host, user, password) except a specific port can be
-   * specified.
+   * Connects to this service using the specified details.
+   * This method provides a simple authentication scheme requiring a
+   * username and password.
    * @param host the host to connect to
-   * @param port the port to use(-1 means use default port)
-   * @param user the user name
-   * @param password this user's password
-   * @exception AuthenticationFailedException for authentication failures
+   * @param port the port to use (-1 for the default port)
+   * @param user the username
+   * @param password the password
+   * @exception AuthenticationFailedException on authentication failure
    * @exception MessagingException for other failures
    * @exception IllegalStateException if the service is already connected
    */
@@ -308,30 +264,21 @@ public abstract class Service
   }
   
   /**
-   * The service implementation should override this method to perform the
-   * actual protocol-specific connection attempt. 
-   * The default implementation of the <code>connect</code> method calls 
-   * this method as needed.
+   * Provider implementation for a service.
    * <p>
-   * The <code>protocolConnect</code> method should return false if a user 
-   * name or password is required for authentication but the corresponding 
-   * parameter is null; the connect method will prompt the user when needed 
-   * to supply missing information. This method may also return false if 
-   * authentication fails for the supplied user name or password. 
-   * Alternatively, this method may throw an AuthenticationFailedException 
-   * when authentication fails. This exception may include a String message 
-   * with more detail about the failure.
+   * This method should return <code>false</code> if authentication fails,
+   * due to the username or password being unavailable or incorrect, or may
+   * throw <code>AuthenticationFailedException</code> for further details.
    * <p>
-   * The <code>protocolConnect</code> method should throw an exception to 
-   * report failures not related to authentication, such as an invalid host 
-   * name or port number, loss of a connection during the authentication 
-   * process, unavailability of the server, etc.
+   * In the case of failures not related to authentication, such as an
+   * invalid configuration or network error, this method should throw an
+   * appropriate <code>MessagingException</code>.
    * @param host the name of the host to connect to
-   * @param port the port to use(-1 means use default port)
-   * @param user the name of the user to login as
-   * @param password the user's password
-   * @return true if connection successful, false if authentication failed
-   * @exception AuthenticationFailedException for authentication failures
+   * @param port the port to use (-1 for the default port)
+   * @param user the username
+   * @param password the password
+   * @return true on success, false if authentication failed
+   * @exception AuthenticationFailedException on authentication failure
    * @exception MessagingException for non-authentication failures
    */
   protected boolean protocolConnect(String host, int port, 
@@ -342,13 +289,7 @@ public abstract class Service
   }
 
   /**
-   * Is this service currently connected?
-   * <p>
-   * This implementation uses a private boolean field to store the connection
-   * state. This method returns the value of that field.
-   * <p>
-   * Subclasses may want to override this method to verify that any connection
-   * to the message store is still alive.
+   * Indicates whether this service is currently connected.
    */
   public boolean isConnected()
   {
@@ -356,14 +297,7 @@ public abstract class Service
   }
 
   /**
-   * Set the connection state of this service.
-   * The connection state will automatically be set by the service 
-   * implementation during the connect and close methods.
-   * Subclasses will need to call this method to set the state if
-   * the service was automatically disconnected.
-   * <p>
-   * The implementation in this class merely sets the private field 
-   * returned by the <code>isConnected</code> method.
+   * Sets the connection state of this service.
    */
   protected void setConnected(boolean connected)
   {
@@ -371,20 +305,7 @@ public abstract class Service
   }
 
   /**
-   * Close this service and terminate its connection.
-   * A close ConnectionEvent is delivered to any ConnectionListeners.
-   * Any Messaging components(Folders, Messages, etc.) belonging to 
-   * this service are invalid after this service is closed. Note that 
-   * the service is closed even if this method terminates abnormally 
-   * by throwing a MessagingException.
-   * <p>
-   * This implementation uses <code>setConnected(false)</code> to set 
-   * this service's connected state to false. It will then send a close 
-   * ConnectionEvent to any registered ConnectionListeners. Subclasses 
-   * overriding this method to do implementation specific cleanup should 
-   * call this method as a last step to insure event notification, 
-   * probably by including a call to <code>super.close()</code> in
-   * a finally clause.
+   * Closes this service, terminating any underlying connections.
    */
   public synchronized void close()
     throws MessagingException
@@ -394,18 +315,12 @@ public abstract class Service
   }
 
   /**
-   * Return a URLName representing this service.
-   * The returned URLName does not include the password field.
-   * <p>
-   * Subclasses should only override this method if their URLName does not
-   * follow the standard format.
-   * <p>
-   * The implementation in the Service class returns(usually a copy of)
-   * the url field with the password and file information stripped out.
+   * Return a URLName representing this service. The password field will not
+   * be returned.
    */
   public URLName getURLName()
   {
-    if (url != null &&(url.getPassword() != null || url.getFile() != null))
+    if (url != null && (url.getPassword() != null || url.getFile() != null))
       {
         return new URLName(url.getProtocol(), url.getHost(), url.getPort(),
                            null, url.getUsername(), null);
@@ -415,16 +330,7 @@ public abstract class Service
 
   /**
    * Set the URLName representing this service.
-   * Normally used to update the url field after a service has 
-   * successfully connected.
-   * <p>
-   * Subclasses should only override this method if their URL does not 
-   * follow the standard format. In particular, subclasses should override 
-   * this method if their URL does not require all the possible fields 
-   * supported by URLName; a new URLName should be constructed with any 
-   * unneeded fields removed.
-   * <p>
-   * The implementation in the Service class simply sets the url field.
+   * This method is called when the service has successfully connected.
    */
   protected void setURLName(URLName url)
   {
@@ -451,7 +357,7 @@ public abstract class Service
   // -- Connection events --
 
   /**
-   * Add a listener for Connection events on this service.
+   * Adds a listener for connection events on this service.
    */
   public void addConnectionListener(ConnectionListener l)
   {
@@ -466,7 +372,7 @@ public abstract class Service
   }
 
   /**
-   * Remove a Connection event listener.
+   * Removes a connection event listener.
    */
   public void removeConnectionListener(ConnectionListener l)
   {
@@ -480,9 +386,7 @@ public abstract class Service
   }
 
   /**
-   * Notify all ConnectionListeners. 
-   * Service implementations are expected to use this method 
-   * to broadcast connection events.
+   * Notify all connection listeners. 
    */
   protected void notifyConnectionListeners(int type)
   {
@@ -562,8 +466,8 @@ public abstract class Service
   }
 
   /**
-   * Return getURLName.toString() if this service has a URLName,
-   * otherwise it will return the default toString.
+   * Returns <code>getURLName.toString</code> if this service has a URLName,
+   * otherwise returns the default <code>toString</code>.
    */
   public String toString()
   {
@@ -572,7 +476,7 @@ public abstract class Service
   }
 
   /**
-   * Add the event and vector of listeners to be notified.
+   * Adds the event and vector of listeners to be notified.
    */
   protected void queueEvent(MailEvent event, Vector vector)
   {

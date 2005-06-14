@@ -1,13 +1,13 @@
 /*
  * AuthenticationFailedException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +28,8 @@
 package javax.mail;
 
 /**
- * This exception is thrown when the connect method on a Store
- * or Transport object fails due to an authentication failure
- *(e.g., bad user name or password).
+ * An exception thrown to indicate that authentication failed during a
+ * service's <code>connect</code> method.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3

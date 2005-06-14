@@ -1,3 +1,8 @@
+2005-06-06  Chris Burdess  <dog@bluezoo.org>
+
+	* InternetAddress.java: Do not set strict in no-arg constructor.
+	* all: Redocumented all javax.mail classes.
+
 2005-06-08  Archit Shah  <ashah@redhat.com>
 
 	* InternetHeaders.java: Do not wrap header input stream in

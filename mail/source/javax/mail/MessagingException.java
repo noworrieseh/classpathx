@@ -1,13 +1,13 @@
 /*
  * MessagingException.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * The base class for all exceptions thrown by the Messaging classes.
+ * A general messaging exception.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -41,12 +41,12 @@ public class MessagingException
 {
 
   /*
-   * The next exception in the chain.
+   * The next exception in a chain of exceptions.
    */
   private Exception nextException;
 
   /**
-   * Constructs a MessagingException with no detail message.
+   * Constructs a messaging exception with no detail message.
    */
   public MessagingException()
   {
@@ -54,7 +54,7 @@ public class MessagingException
   }
 
   /**
-   * Constructs a MessagingException with the specified detail message.
+   * Constructs a messaging exception with the specified detail message.
    * @param message the detail message
    */
   public MessagingException(String message)
@@ -63,8 +63,8 @@ public class MessagingException
   }
 
   /**
-   * Constructs a MessagingException with the specified Exception and detail
-   * message. The specified exception is chained to this exception.
+   * Constructs a messaging exception with the specified exception and detail
+   * message.
    * @param message the detail message
    * @param exception the embedded exception
    */
@@ -75,8 +75,8 @@ public class MessagingException
   }
 
   /**
-   * Get the next exception chained to this one.
-   * If the next exception is a MessagingException, the chain may extend 
+   * Returns the next exception chained to this one.
+   * If the next exception is a messaging exception, the chain may extend 
    * further.
    */
   public Exception getNextException()
@@ -85,19 +85,19 @@ public class MessagingException
   }
 
   /**
-   * Add an exception to the end of the chain.
-   * If the end is not a MessagingException, this exception cannot be added 
+   * Adds an exception to the end of the chain.
+   * If the end is not a messaging exception, this exception cannot be added 
    * to the end.
-   * @param exception the new end of the Exception chain
-   * @return true if the this Exception was added, false otherwise.
+   * @param exception the new end of the exception chain
+   * @return true if this exception was added, false otherwise.
    */
   public synchronized boolean setNextException(Exception exception)
   {
     Object o;
     for (o = this;
-       (o instanceof MessagingException) && 
-       ((MessagingException) o).nextException != null;
-        o = ((MessagingException) o).nextException);
+         (o instanceof MessagingException) && 
+         ((MessagingException) o).nextException != null;
+         o = ((MessagingException) o).nextException);
     if (o instanceof MessagingException)
       {
        ((MessagingException) o).nextException = exception;
@@ -107,8 +107,7 @@ public class MessagingException
   }
 
   /**
-   * Produce the message, include the message from the nested exception 
-   * if there is one.
+   * Returns the message, including the message from any nested exception.
    */
   public String getMessage()
   {

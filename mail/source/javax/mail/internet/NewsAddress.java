@@ -1,13 +1,13 @@
 /*
  * NewsAddress.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
 import javax.mail.Address;
 
 /**
- * This class models an RFC1036 newsgroup address.
+ * An RFC 1036 newsgroup address.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -42,7 +42,7 @@ public class NewsAddress
 {
 
   /*
-   * The Address type.
+   * The address type.
    */
   private static final String TYPE = "news";
   
@@ -52,19 +52,19 @@ public class NewsAddress
   protected String newsgroup;
 
   /**
-   * The host name of the news server.
+   * The hostname of the news server.
    */
   protected String host;
 
   /**
-   * Default constructor.
+   * Constructor for an empty news address.
    */
   public NewsAddress()
   {
   }
 
   /**
-   * Construct a NewsAddress with the given newsgroup.
+   * Constructor with the given newsgroup.
    * @param newsgroup the newsgroup
    */
   public NewsAddress(String newsgroup)
@@ -73,7 +73,7 @@ public class NewsAddress
   }
 
   /**
-   * Construct a NewsAddress with the given newsgroup and host.
+   * Constructor with the given newsgroup and host.
    * @param newsgroup the newsgroup
    * @param host the host
    */
@@ -84,8 +84,8 @@ public class NewsAddress
   }
 
   /**
-   * Return the type of this address.
-   * The type of a NewsAddress is "news".
+   * Returns the type of this address.
+   * The type of a <code>NewsAddress</code> is "news".
    */
   public String getType()
   {
@@ -93,7 +93,7 @@ public class NewsAddress
   }
 
   /**
-   * Set the newsgroup.
+   * Sets the newsgroup.
    * @param newsgroup the newsgroup
    */
   public void setNewsgroup(String newsgroup)
@@ -102,7 +102,7 @@ public class NewsAddress
   }
 
   /**
-   * Get the newsgroup.
+   * Returns the newsgroup.
    */
   public String getNewsgroup()
   {
@@ -110,8 +110,8 @@ public class NewsAddress
   }
 
   /**
-   * Set the host.
-   * @param host the host
+   * Sets the hostname of the news server.
+   * @param host the host name
    */
   public void setHost(String host)
   {
@@ -119,7 +119,7 @@ public class NewsAddress
   }
 
   /**
-   * Get the host.
+   * Returns the hostname of the news server.
    */
   public String getHost()
   {
@@ -127,16 +127,13 @@ public class NewsAddress
   }
 
   /**
-   * Convert this address into a RFC 1036 address.
+   * Returns an RFC 1036 string representation of this address.
    */
   public String toString()
   {
     return newsgroup;
   }
 
-  /**
-   * The equality operator.
-   */
   public boolean equals(Object a)
   {
     if (a instanceof NewsAddress)
@@ -150,9 +147,6 @@ public class NewsAddress
     return false;
   }
 
-  /**
-   * Compute a hash code for the address.
-   */
   public int hashCode()
   {
     int hashCode = 0;
@@ -168,14 +162,13 @@ public class NewsAddress
   }
 
   /**
-   * Convert the given array of NewsAddress objects into a comma separated
+   * Converts the given array of NewsAddresses into a comma-separated
    * sequence of address strings.
-   * The resulting string contains only US-ASCII characters, and hence 
-   * is mail-safe.
-   * @param addresses array of NewsAddress objects
-   * @return comma separated address strings
-   * @exception ClassCastException if any address object in the given array 
-   * is not a NewsAddress object. Note that this is a RuntimeException.
+   * The resulting string contains only US-ASCII characters, and is
+   * therefore mail-safe.
+   * @param addresses the NewsAddress objects
+   * @exception ClassCastException if any of the specified addresses
+   * is not a NewsAddress
    */
   public static String toString(Address[] addresses)
   {
@@ -198,10 +191,9 @@ public class NewsAddress
   }
 
   /**
-   * Parse the given comma separated sequence of newsgroups into NewsAddress
-   * objects.
-   * @param newsgroups comma separated newsgroup string
-   * @return array of NewsAddress objects
+   * Parses the given comma-separated sequence of newsgroups into
+   * NewsAddresses.
+   * @param newsgroups a comma-separated newsgroup string
    * @exception AddressException if the parse failed
    */
   public static NewsAddress[] parse(String newsgroups)
@@ -219,3 +211,4 @@ public class NewsAddress
   }
   
 }
+

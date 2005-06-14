@@ -1,13 +1,13 @@
 /*
  * AndTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This class implements the logical AND operator on individual SearchTerms.
+ * A logical AND of a number of search terms.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,14 +40,14 @@ public final class AndTerm
 {
 
   /**
-   * The array of terms on which the AND operator should be applied.
+   * The target terms.
    */
   protected SearchTerm[] terms;
 
   /**
-   * Constructor that takes two terms.
-   * @param t1 first term
-   * @param t2 second term
+   * Constructor with two terms.
+   * @param t1 the first term
+   * @param t2 the second term
    */
   public AndTerm(SearchTerm t1, SearchTerm t2)
   {
@@ -57,8 +57,8 @@ public final class AndTerm
   }
 
   /**
-   * Constructor that takes an array of SearchTerms.
-   * @param t array of terms
+   * Constructor with multiple terms.
+   * @param t the terms
    */
   public AndTerm(SearchTerm[] t)
   {
@@ -67,7 +67,7 @@ public final class AndTerm
   }
 
   /**
-   * Return the search terms.
+   * Returns the search terms.
    */
   public SearchTerm[] getTerms()
   {
@@ -75,13 +75,7 @@ public final class AndTerm
   }
 
   /**
-   * The AND operation.
-   * <p>
-   * The terms specified in the constructor are applied to the given object 
-   * and the AND operator is applied to their results.
-   * @param msg The specified SearchTerms are applied to this Message 
-   * and the AND operator is applied to their results.
-   * @return true if the AND succeds, otherwise false
+   * Returns true only if all the terms match the specified message.
    */
   public boolean match(Message message)
   {
@@ -95,9 +89,6 @@ public final class AndTerm
     return true;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof AndTerm)
@@ -119,9 +110,6 @@ public final class AndTerm
     return false;
   }
   
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     int acc = 0;
@@ -133,3 +121,4 @@ public final class AndTerm
   }
   
 }
+

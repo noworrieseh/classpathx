@@ -1,13 +1,13 @@
 /*
  * StoreEvent.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,10 +30,7 @@ package javax.mail.event;
 import javax.mail.Store;
 
 /**
- * This class models notifications from the Store connection. 
- * These notifications can be ALERTS or NOTICES.
- * ALERTS must be presented to the user in a fashion that calls 
- * the user's attention to the message.
+ * A store notification event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -64,7 +61,9 @@ public class StoreEvent
 
   /**
    * Constructor.
-   * @param source The source Store
+   * @param source the store
+   * @param type the type of event (ALERT or NOTICE)
+   * @param message the notification message
    */
   public StoreEvent(Store source, int type, String message)
   {
@@ -74,9 +73,7 @@ public class StoreEvent
   }
 
   /**
-   * Return the type of this event.
-   * @see #ALERT
-   * @see #NOTICE
+   * Returns the type of this event.
    */
   public int getMessageType()
   {
@@ -84,7 +81,7 @@ public class StoreEvent
   }
 
   /**
-   * Get the message from the Store.
+   * Returns the notification message.
    */
   public String getMessage()
   {
@@ -92,7 +89,7 @@ public class StoreEvent
   }
 
   /**
-   * Invokes the appropriate StoreListener method.
+   * Invokes the appropriate listener method.
    */
   public void dispatch(Object listener)
   {

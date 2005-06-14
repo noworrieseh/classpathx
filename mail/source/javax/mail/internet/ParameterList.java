@@ -1,13 +1,13 @@
 /*
  * ParameterList.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,11 +30,12 @@ package javax.mail.internet;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 
 /**
- * This class holds MIME parameters(attribute-value pairs).
+ * A list of MIME parameters. MIME parameters are name-value pairs
+ * associated with a MIME header.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -45,28 +46,24 @@ public class ParameterList
   /*
    * The underlying storage.
    */
-  private HashMap list = new HashMap();
+  private LinkedHashMap list = new LinkedHashMap();
 
   /**
-   * No-arg Constructor.
+   * Constructor for an empty parameter list.
    */
   public ParameterList()
   {
   }
 
   /**
-   * Constructor that takes a parameter-list string.
-   * The String is parsed and the parameters are collected and stored 
-   * internally. A ParseException is thrown if the parse fails.
-   * Note that an empty parameter-list string is valid and will be parsed 
-   * into an empty ParameterList.
-   * @param s the parameter-list string.
-   * @exception ParseException if the parse fails.
+   * Constructor with a parameter-list string.
+   * @param s the parameter-list string
+   * @exception ParseException if the parse fails
    */
   public ParameterList(String s)
     throws ParseException
   {
-    HashMap charsets = new HashMap();
+    LinkedHashMap charsets = new LinkedHashMap();
     HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
     for (int type = 0; type != HeaderTokenizer.Token.EOF; )
       {
@@ -252,7 +249,7 @@ public class ParameterList
   }
 
   /**
-   * Return the number of parameters in this list.
+   * Returns the number of parameters in this list.
    */
   public int size()
   {
@@ -261,10 +258,8 @@ public class ParameterList
 
   /**
    * Returns the value of the specified parameter.
-   * Note that parameter names are case-insensitive.
-   * @param name parameter name.
-   * @return Value of the parameter. 
-   * Returns null if the parameter is not present.
+   * Parameter names are case insensitive.
+   * @param name the parameter name
    */
   public String get(String name)
   {
@@ -272,10 +267,9 @@ public class ParameterList
   }
 
   /**
-   * Set a parameter.
-   * If this parameter already exists, it is replaced by this new value.
-   * @param name name of the parameter.
-   * @param value value of the parameter.
+   * Sets the specified parameter.
+   * @param name the parameter name
+   * @param value the parameter value
    */
   public void set(String name, String value)
   {
@@ -283,9 +277,8 @@ public class ParameterList
   }
 
   /**
-   * Removes the specified parameter from this ParameterList.
-   * This method does nothing if the parameter is not present.
-   * @param name name of the parameter.
+   * Removes the specified parameter from this list.
+   * @param name the parameter name
    */
   public void remove(String name)
   {
@@ -293,7 +286,8 @@ public class ParameterList
   }
 
   /**
-   * Return an enumeration of the names of all parameters in this list.
+   * Returns the names of all parameters in this list.
+   * @return an Enumeration of String
    */
   public Enumeration getNames()
   {
@@ -301,8 +295,7 @@ public class ParameterList
   }
 
   /**
-   * Convert this ParameterList into a MIME String.
-   * If this is an empty list, an empty string is returned.
+   * Returns the MIME string representation of this parameter list.
    */
   public String toString()
   {
@@ -311,14 +304,9 @@ public class ParameterList
   }
 
   /**
-   * Convert this ParameterList into a MIME String.
-   * If this is an empty list, an empty string is returned.
-   * The 'used' parameter specifies the number of character positions 
-   * already taken up in the field into which the resulting parameter 
-   * list is to be inserted. It's used to determine where to fold the
-   * resulting parameter list.
-   * @param used number of character positions already used, in the field into
-   * which the parameter list is to be inserted.
+   * Returns the MIME string representation of this parameter list.
+   * @param used the number of character positions already used in the
+   * field into which the parameter list is to be inserted
    */
   public String toString(int used)
   {
@@ -376,3 +364,4 @@ public class ParameterList
   }
 
 }
+

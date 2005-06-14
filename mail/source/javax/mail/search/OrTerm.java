@@ -1,13 +1,13 @@
 /*
  * OrTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ package javax.mail.search;
 import javax.mail.Message;
 
 /**
- * This class implements the logical OR operator on individual SearchTerms.
+ * A logical OR of a number of search terms.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -40,14 +40,14 @@ public final class OrTerm
 {
 
   /**
-   * The array of terms on which the OR operator should be applied.
+   * The target terms.
    */
   protected SearchTerm[] terms;
 
   /**
-   * Constructor that takes two operands.
-   * @param t1 first term
-   * @param t2 second term
+   * Constructor with two operands.
+   * @param t1 the first term
+   * @param t2 the second term
    */
   public OrTerm(SearchTerm t1, SearchTerm t2)
   {
@@ -57,7 +57,8 @@ public final class OrTerm
   }
 
   /**
-   * Constructor that takes an array of SearchTerms.
+   * Constructor with multiple search terms.
+   * @param t the terms
    */
   public OrTerm(SearchTerm[] t)
   {
@@ -66,7 +67,7 @@ public final class OrTerm
   }
 
   /**
-   * Return the search terms.
+   * Returns the search terms.
    */
   public SearchTerm[] getTerms()
   {
@@ -74,13 +75,8 @@ public final class OrTerm
   }
 
   /**
-   * The OR operation.
-   * <p>
-   * The terms specified in the constructor are applied to the given object 
-   * and the OR operator is applied to their results.
-   * @param msg The specified SearchTerms are applied to this Message 
-   * and the OR operator is applied to their results.
-   * @return true if the OR succeeds, otherwise false
+   * Returns true only if any of the terms specified in this term match
+   * the given message.
    */
   public boolean match(Message msg)
   {
@@ -94,9 +90,6 @@ public final class OrTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     if (other instanceof OrTerm)
@@ -118,9 +111,6 @@ public final class OrTerm
     return false;
   }
 
-  /**
-   * Compute a hashCode for this object.
-   */
   public int hashCode()
   {
     int acc = 0;
@@ -132,3 +122,4 @@ public final class OrTerm
   }
   
 }
+

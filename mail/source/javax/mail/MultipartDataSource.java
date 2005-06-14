@@ -1,13 +1,13 @@
 /*
  * MultipartDataSource.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,16 +30,7 @@ package javax.mail;
 import javax.activation.DataSource;
 
 /**
- * MultipartDataSource is a DataSource that contains body parts.
- * This allows "mail aware" DataContentHandlers to be implemented 
- * more efficiently by being aware of such DataSources and using the 
- * appropriate methods to access BodyParts.
- * <p>
- * Note that the data of a MultipartDataSource is also available as an input
- * stream.
- * <p>
- * This interface will typically be implemented by providers that preparse
- * multipart bodies, for example an IMAP provider.
+ * A data source that contains body parts.
  * 
  * @see DataSource
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
@@ -49,15 +40,15 @@ public interface MultipartDataSource
 {
 
   /**
-   * Return the number of enclosed BodyPart objects.
+   * Returns the number of body parts.
    */
   int getCount();
 
   /**
-   * Get the specified Part.
-   * Parts are numbered starting at 0.
-   * @param index the index of the desired Part
-   * @exception IndexOutOfBoundsException if the given index is out of range.
+   * Returns the specified body part.
+   * Body parts are numbered starting at 0.
+   * @param index the index of the desired body part
+   * @exception IndexOutOfBoundsException if the given index is out of range
    */
   BodyPart getBodyPart(int index)
     throws MessagingException;

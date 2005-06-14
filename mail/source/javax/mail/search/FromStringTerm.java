@@ -1,13 +1,13 @@
 /*
  * FromStringTerm.java
- * Copyright(C) 2002 The Free Software Foundation
+ * Copyright (C) 2002 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,11 +31,7 @@ import javax.mail.Address;
 import javax.mail.Message;
 
 /**
- * This class implements string comparisons for the From Address header.
- * <p>
- * Note that this class differs from the FromTerm class in that this class 
- * does comparisons on address strings rather than Address objects. The 
- * string comparisons are case-insensitive.
+ * A string comparison of the <i>From</i> address header.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.3
@@ -46,7 +42,7 @@ public final class FromStringTerm
 
   /**
    * Constructor.
-   * @param address the address pattern to be compared.
+   * @param address the address pattern for comparison
    */
   public FromStringTerm(String pattern)
   {
@@ -54,10 +50,10 @@ public final class FromStringTerm
   }
 
   /**
-   * Check whether the address string specified in the constructor is a
-   * substring of the From address of this Message.
-   * @param msg The comparison is applied to this Message's From address.
-   * @return true if the match succeeds, otherwise false.
+   * Indicates whether the address pattern specified in the constructor is a
+   * substring of the string representation of the From address in the given
+   * message.
+   * @param msg the message
    */
   public boolean match(Message msg)
   {
@@ -81,12 +77,10 @@ public final class FromStringTerm
     return false;
   }
 
-  /**
-   * Equality comparison.
-   */
   public boolean equals(Object other)
   {
     return (other instanceof FromStringTerm && super.equals(other));
   }
 
 }
+
