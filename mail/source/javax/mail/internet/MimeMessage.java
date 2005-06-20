@@ -1553,16 +1553,10 @@ public class MimeMessage
     os.write(sep);
     os.flush();
 
-    /*
-     * Implement the no-CR-without-LF and len(line)<=998 RFC2822 rules
-     *(section 2.3).
-     * We do this by wrapping in an RFC2822OutputStream.
-     */
-    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
     if (modified || content == null && contentStream == null)
       {
         // use datahandler
-        os = MimeUtility.encode(rfc2822os, getEncoding());
+        os = MimeUtility.encode(os, getEncoding());
         getDataHandler().writeTo(os);
         os.flush();
       }
@@ -1578,15 +1572,15 @@ public class MimeMessage
             byte[] bytes = new byte[len];
             while ((len = is.read(bytes)) > -1) 
               {
-                rfc2822os.write(bytes, 0, len);
+                os.write(bytes, 0, len);
               }
             is.close();
           }
         else
           {
-            rfc2822os.write(content);
+            os.write(content);
           }
-        rfc2822os.flush();
+        os.flush();
       }
   }
 

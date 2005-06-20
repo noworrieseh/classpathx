@@ -801,8 +801,7 @@ public class MimeBodyPart
     os.flush();
 
     // Write the content
-    RFC2822OutputStream rfc2822os = new RFC2822OutputStream(os);
-    os = MimeUtility.encode(rfc2822os, getEncoding());
+    os = MimeUtility.encode(os, getEncoding());
     getDataHandler().writeTo(os);
     os.flush();
   }

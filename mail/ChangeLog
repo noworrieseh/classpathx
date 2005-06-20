@@ -1,3 +1,8 @@
+2005-06-20  Archit Shah  <ashah@redhat.com>
+
+	* MimeMessage.java,MimeBodyPart.java: Remove line wrapping in the
+	bodies of MIME parts.
+
 2005-06-06  Chris Burdess  <dog@bluezoo.org>
 
 	* InternetAddress.java: Do not set strict in no-arg constructor.
