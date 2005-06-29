@@ -107,7 +107,10 @@ class ObjectDataContentHandler
       {
         dch.writeTo(object, mimeType, out);
       }
-    throw new UnsupportedDataTypeException("no object DCH for MIME type " + mimeType);
+    else
+      {
+        throw new UnsupportedDataTypeException("no object DCH for MIME type " + mimeType);
+      }
   }
   
 }

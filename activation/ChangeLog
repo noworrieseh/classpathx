@@ -1,3 +1,7 @@
+2005-06-29  Xavier Poinsard  <xpoinsard@openpricer.com>
+
+	* ObjectDataContentHandler.java: Fixed typo.
+
 2005-05-28  Chris Burdess  <dog@bluezoo.org>
 
 	* CommandMap.java, MailcapCommandMap.java: Updated to JAF 1.1.
