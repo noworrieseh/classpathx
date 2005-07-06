@@ -51,12 +51,7 @@ CONFORMANCE
 	a few implementation shortcuts.  See its package documentation
 	for information about known XML conformance issues in AElfred2.
 
-	The primary issue is using Unicode character tables, rather than
-	those in the XML specification, for determining what names are
-	valid.  Most applications won't notice the difference, and this
-	solution is smaller and faster than the alternative.
-
-	For validation, a secondary issue is that issues relating to
+	For instance, a secondary issue is that issues relating to
 	entity modularity are not validated; they can't all be cleanly
 	layered.  For example, validity constraints related to standalone
 	declarations and PE nesting are not checked.

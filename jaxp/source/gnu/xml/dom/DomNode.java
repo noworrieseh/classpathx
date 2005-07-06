@@ -1,47 +1,45 @@
-/*
- * DomNode.java
- * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
- * 
- * This file is part of GNU JAXP, a library.
- *
- * GNU JAXP is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * GNU JAXP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library.  Thus, the terms and
- * conditions of the GNU General Public License cover the whole
- * combination.
- *
- * As a special exception, the copyright holders of this library give you
- * permission to link this library with independent modules to produce an
- * executable, regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting executable under
- * terms of your choice, provided that you also meet, for each linked
- * independent module, the terms and conditions of the license of that
- * module.  An independent module is a module which is not derived from
- * or based on this library.  If you modify this library, you may extend
- * this exception to your version of the library, but you are not
- * obliged to do so.  If you do not wish to do so, delete this
- * exception statement from your version. 
- */
+/* DomNode.java -- 
+   Copyright (C) 1999,2000,2001,2004 Free Software Foundation, Inc.
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
 
 package gnu.xml.dom;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.XMLConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMException;
@@ -59,7 +57,6 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MutationEvent;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.NodeIterator;
-import org.w3c.dom.traversal.TreeWalker;
 
 /**
  * <p> "Node", "EventTarget", and "DocumentEvent" implementation.
@@ -309,15 +306,16 @@ public abstract class DomNode
   {
     if (readonly && !owner.building)
       {
-        throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
-                        null, this, 0);
+        throw new DomDOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                                  null, this, 0);
       }
     for (DomNode ctx = this; ctx != null; ctx = ctx.parent)
       {
         if (child == ctx)
           {
-            throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                            "can't make ancestor into a child", this, 0);
+            throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                      "can't make ancestor into a child",
+                                      this, 0);
           }
       }
 
@@ -331,8 +329,8 @@ public abstract class DomNode
         // new in DOM L2, this case -- patch it up later, in reparent()
         if (!(childNodeType == DOCUMENT_TYPE_NODE && childOwner == null))
           {
-            throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
-                            null, child, 0);
+            throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
+                                      null, child, 0);
           }
       }
 
@@ -377,10 +375,12 @@ public abstract class DomNode
       }
     if (owner.checkingWellformedness)
       {
-        throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                        "can't append " + nodeTypeToString(childNodeType) +
-                        " to node of type " + nodeTypeToString(nodeType),
-                        this, 0);
+        throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                  "can't append " +
+                                  nodeTypeToString(childNodeType) +
+                                  " to node of type " +
+                                  nodeTypeToString(nodeType),
+                                  this, 0);
       }
   }
   
@@ -579,8 +579,8 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
-                        null, newChild, 0);
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
+                                  null, newChild, 0);
     }
   }
 
@@ -631,12 +631,14 @@ public abstract class DomNode
             checkMisc(child);
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
             if (ref == child)
               {
-                throw new DomEx(DomEx.HIERARCHY_REQUEST_ERR,
-                                "can't insert node before itself", ref, 0);
+                throw new DomDOMException(DOMException.HIERARCHY_REQUEST_ERR,
+                                          "can't insert node before itself",
+                                          ref, 0);
               }
         
             if (child.parent != null)
@@ -673,8 +675,8 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
-                        null, newChild, 0);
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
+                                  null, newChild, 0);
       }
   }
 
@@ -722,7 +724,8 @@ public abstract class DomNode
               }
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
             
             if (reportMutations)
@@ -785,7 +788,8 @@ public abstract class DomNode
             checkMisc(child);
             if (ref == null || ref.parent != this)
               {
-                throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+                throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                          null, ref, 0);
               }
         
             if (reportMutations)
@@ -838,8 +842,8 @@ public abstract class DomNode
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
-                        null, newChild, 0);
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
+                                  null, newChild, 0);
       }
   }
 
@@ -861,12 +865,13 @@ public abstract class DomNode
 
         if (ref == null || ref.parent != this)
           {
-            throw new DomEx(DomEx.NOT_FOUND_ERR, null, ref, 0);
+            throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                      null, ref, 0);
           }
         if (readonly && !owner.building)
           {
-            throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR,
-                            null, this, 0);
+            throw new DomDOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+                                      null, this, 0);
           }
         
         for (DomNode child = first; child != null; child = child.next)
@@ -910,13 +915,13 @@ public abstract class DomNode
                 return ref;
               }
           }
-        throw new DomEx(DomEx.NOT_FOUND_ERR,
-                        "that's no child of mine", refChild, 0);
+        throw new DomDOMException(DOMException.NOT_FOUND_ERR,
+                                  "that's no child of mine", refChild, 0);
       }
     catch (ClassCastException e)
       {
-        throw new DomEx(DomEx.WRONG_DOCUMENT_ERR,
-                        null, refChild, 0);
+        throw new DomDOMException(DOMException.WRONG_DOCUMENT_ERR,
+                                  null, refChild, 0);
       }
   }
 
@@ -1356,7 +1361,7 @@ public abstract class DomNode
       // somewhere after last node
       while (++lastIndex != index)
         current.nextNode ();
-        Node ret =  current.nextNode ();
+        Node ret = current.nextNode ();
         current = null;
         return ret;
     }
@@ -1447,8 +1452,8 @@ public abstract class DomNode
 
     // mouse events 
     
-    throw new DomEx(DomEx.NOT_SUPPORTED_ERR,
-                    eventType, null, 0);
+    throw new DomDOMException(DOMException.NOT_SUPPORTED_ERR,
+                              eventType, null, 0);
   }
 
   /**
@@ -1684,8 +1689,8 @@ public abstract class DomNode
         if (count >= notificationSet.length)
           {
             // very simple growth algorithm
-            ListenerRecord[] tmp =
-              new ListenerRecord[notificationSet.length * 2];
+            int len = Math.max(notificationSet.length, 1);
+            ListenerRecord[] tmp = new ListenerRecord[len * 2];
             System.arraycopy(notificationSet, 0, tmp, 0,
                              notificationSet.length);
             notificationSet = tmp;
@@ -1835,7 +1840,7 @@ public abstract class DomNode
     if (ns1 != null && ns2 != null)
       {
         return ns1.equals(ns2) &&
-          getLocalName().equals(other.getLocalName());
+          equal(getLocalName(), other.getLocalName());
       }
 
     // if neither has a namespace, this is a "no-namespace" name.

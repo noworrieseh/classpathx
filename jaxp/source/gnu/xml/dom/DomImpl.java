@@ -1,40 +1,39 @@
-/*
- * DomImpl.java
- * Copyright (C) 1999,2000,2001,2004 The Free Software Foundation
- * 
- * This file is part of GNU JAXP, a library.
- *
- * GNU JAXP is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * GNU JAXP is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Linking this library statically or dynamically with other modules is
- * making a combined work based on this library.  Thus, the terms and
- * conditions of the GNU General Public License cover the whole
- * combination.
- *
- * As a special exception, the copyright holders of this library give you
- * permission to link this library with independent modules to produce an
- * executable, regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting executable under
- * terms of your choice, provided that you also meet, for each linked
- * independent module, the terms and conditions of the license of that
- * module.  An independent module is a module which is not derived from
- * or based on this library.  If you modify this library, you may extend
- * this exception to your version of the library, but you are not
- * obliged to do so.  If you do not wish to do so, delete this
- * exception statement from your version. 
- */
+/* DomImpl.java -- 
+   Copyright (C) 1999,2000,2001,2004 Free Software Foundation, Inc.
+
+This file is part of GNU Classpath.
+
+GNU Classpath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Classpath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Classpath; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
+
+Linking this library statically or dynamically with other modules is
+making a combined work based on this library.  Thus, the terms and
+conditions of the GNU General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this library give you
+permission to link this library with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module.  An independent module is a module which is not derived from
+or based on this library.  If you modify this library, you may extend
+this exception to your version of the library, but you are not
+obligated to do so.  If you do not wish to do so, delete this
+exception statement from your version. */
 
 package gnu.xml.dom;
 
@@ -48,6 +47,7 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSParser;
 import org.w3c.dom.ls.LSSerializer;
+import gnu.xml.dom.html2.DomHTMLImpl;
 import gnu.xml.dom.ls.DomLSInput;
 import gnu.xml.dom.ls.DomLSOutput;
 import gnu.xml.dom.ls.DomLSParser;
@@ -151,6 +151,12 @@ public class DomImpl
                 "".equals(version) ||
                 "3.0".equals(version));
       }
+    else if ("html".equals(name) || "xhtml".equals(name))
+      {
+        return (version == null ||
+                "".equals(version) ||
+                "2.0".equals(version));
+      }
 
     // views
     // stylesheets
@@ -200,7 +206,7 @@ public class DomImpl
                                  String rootName,
                                  DocumentType doctype)
   {
-    Document doc = new DomDocument(this);
+    Document doc = createDocument();
     Element root = null;
     
     if (rootName != null)
@@ -208,7 +214,8 @@ public class DomImpl
         root = doc.createElementNS(namespaceURI, rootName);
         if (rootName.startsWith("xmlns:"))
           {
-            throw new DomEx(DomEx.NAMESPACE_ERR, "xmlns is reserved", null, 0);
+            throw new DomDOMException(DOMException.NAMESPACE_ERR,
+                                      "xmlns is reserved", null, 0);
           }
       }
     // Bleech -- L2 seemingly _requires_ omission of xmlns attributes.
@@ -223,12 +230,22 @@ public class DomImpl
     return doc;
   }
 
+  protected Document createDocument()
+  {
+    return new DomDocument(this);
+  }
+
   // DOM Level 3
   
   public Object getFeature(String feature, String version)
   {
     if (hasFeature(feature, version))
       {
+        if ("html".equalsIgnoreCase(feature) ||
+            "xhtml".equalsIgnoreCase(feature))
+          {
+            return new DomHTMLImpl();
+          }
         return this;
       }
     return null;

@@ -1,3 +1,7 @@
+2005-07-06  Chris Burdess  <dog@gnu.org>
+
+	* all: Backported changes from Classpath.
+
 2004-12-22  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Generate META-INF/services factory configuration files.

@@ -368,18 +368,9 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/aelfred2/XmlParser.java \
 	source/gnu/xml/aelfred2/XmlReader.java \
 	source/gnu/xml/aelfred2/ContentHandler2.java \
-	source/gnu/xml/dom/ls/DomLSEx.java \
-	source/gnu/xml/dom/ls/DomLSInput.java \
-	source/gnu/xml/dom/ls/DomLSOutput.java \
-	source/gnu/xml/dom/ls/DomLSParser.java \
-	source/gnu/xml/dom/ls/DomLSSerializer.java \
-	source/gnu/xml/dom/ls/FilteredSAXEventSink.java \
-	source/gnu/xml/dom/ls/ReaderInputStream.java \
-	source/gnu/xml/dom/ls/SAXEventSink.java \
-	source/gnu/xml/dom/ls/WriterOutputStream.java \
 	source/gnu/xml/dom/Consumer.java \
 	source/gnu/xml/dom/DomAttr.java \
-	source/gnu/xml/dom/DomCDATA.java \
+	source/gnu/xml/dom/DomCDATASection.java \
 	source/gnu/xml/dom/DomCharacterData.java \
 	source/gnu/xml/dom/DomComment.java \
 	source/gnu/xml/dom/DomDoctype.java \
@@ -387,13 +378,13 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/dom/DomDocumentBuilder.java \
 	source/gnu/xml/dom/DomDocumentBuilderFactory.java \
 	source/gnu/xml/dom/DomDocumentConfiguration.java \
+	source/gnu/xml/dom/DomDocumentFragment.java \
+	source/gnu/xml/dom/DomDOMException.java \
 	source/gnu/xml/dom/DomElement.java \
 	source/gnu/xml/dom/DomEntity.java \
 	source/gnu/xml/dom/DomEntityReference.java \
 	source/gnu/xml/dom/DomEvent.java \
-	source/gnu/xml/dom/DomEx.java \
 	source/gnu/xml/dom/DomExtern.java \
-	source/gnu/xml/dom/DomFragment.java \
 	source/gnu/xml/dom/DomImpl.java \
 	source/gnu/xml/dom/DomIterator.java \
 	source/gnu/xml/dom/DomNamedNodeMap.java \
@@ -402,7 +393,7 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/dom/DomNotation.java \
 	source/gnu/xml/dom/DomNsNode.java \
 	source/gnu/xml/dom/DomNSResolverContext.java \
-	source/gnu/xml/dom/DomPI.java \
+	source/gnu/xml/dom/DomProcessingInstruction.java \
 	source/gnu/xml/dom/DomText.java \
 	source/gnu/xml/dom/DomXPathExpression.java \
 	source/gnu/xml/dom/DomXPathNSResolver.java \
@@ -412,6 +403,72 @@ lib_gnu_xml_la_SOURCES = \
 	source/gnu/xml/dom/ImplementationList.java \
 	source/gnu/xml/dom/ImplementationSource.java \
 	source/gnu/xml/dom/JAXPFactory.java \
+	source/gnu/xml/dom/html2/DomHTMLAnchorElement.java \
+	source/gnu/xml/dom/html2/DomHTMLAppletElement.java \
+	source/gnu/xml/dom/html2/DomHTMLAreaElement.java \
+	source/gnu/xml/dom/html2/DomHTMLBRElement.java \
+	source/gnu/xml/dom/html2/DomHTMLBaseElement.java \
+	source/gnu/xml/dom/html2/DomHTMLBaseFontElement.java \
+	source/gnu/xml/dom/html2/DomHTMLBodyElement.java \
+	source/gnu/xml/dom/html2/DomHTMLButtonElement.java \
+	source/gnu/xml/dom/html2/DomHTMLCollection.java \
+	source/gnu/xml/dom/html2/DomHTMLDListElement.java \
+	source/gnu/xml/dom/html2/DomHTMLDirectoryElement.java \
+	source/gnu/xml/dom/html2/DomHTMLDivElement.java \
+	source/gnu/xml/dom/html2/DomHTMLDocument.java \
+	source/gnu/xml/dom/html2/DomHTMLElement.java \
+	source/gnu/xml/dom/html2/DomHTMLFieldSetElement.java \
+	source/gnu/xml/dom/html2/DomHTMLFontElement.java \
+	source/gnu/xml/dom/html2/DomHTMLFormElement.java \
+	source/gnu/xml/dom/html2/DomHTMLFrameElement.java \
+	source/gnu/xml/dom/html2/DomHTMLFrameSetElement.java \
+	source/gnu/xml/dom/html2/DomHTMLHRElement.java \
+	source/gnu/xml/dom/html2/DomHTMLHeadElement.java \
+	source/gnu/xml/dom/html2/DomHTMLHeadingElement.java \
+	source/gnu/xml/dom/html2/DomHTMLHtmlElement.java \
+	source/gnu/xml/dom/html2/DomHTMLIFrameElement.java \
+	source/gnu/xml/dom/html2/DomHTMLImageElement.java \
+	source/gnu/xml/dom/html2/DomHTMLImpl.java \
+	source/gnu/xml/dom/html2/DomHTMLInputElement.java \
+	source/gnu/xml/dom/html2/DomHTMLIsIndexElement.java \
+	source/gnu/xml/dom/html2/DomHTMLLIElement.java \
+	source/gnu/xml/dom/html2/DomHTMLLabelElement.java \
+	source/gnu/xml/dom/html2/DomHTMLLegendElement.java \
+	source/gnu/xml/dom/html2/DomHTMLLinkElement.java \
+	source/gnu/xml/dom/html2/DomHTMLMapElement.java \
+	source/gnu/xml/dom/html2/DomHTMLMenuElement.java \
+	source/gnu/xml/dom/html2/DomHTMLMetaElement.java \
+	source/gnu/xml/dom/html2/DomHTMLModElement.java \
+	source/gnu/xml/dom/html2/DomHTMLOListElement.java \
+	source/gnu/xml/dom/html2/DomHTMLObjectElement.java \
+	source/gnu/xml/dom/html2/DomHTMLOptGroupElement.java \
+	source/gnu/xml/dom/html2/DomHTMLOptionElement.java \
+	source/gnu/xml/dom/html2/DomHTMLParagraphElement.java \
+	source/gnu/xml/dom/html2/DomHTMLParamElement.java \
+	source/gnu/xml/dom/html2/DomHTMLParser.java \
+	source/gnu/xml/dom/html2/DomHTMLPreElement.java \
+	source/gnu/xml/dom/html2/DomHTMLQuoteElement.java \
+	source/gnu/xml/dom/html2/DomHTMLScriptElement.java \
+	source/gnu/xml/dom/html2/DomHTMLSelectElement.java \
+	source/gnu/xml/dom/html2/DomHTMLStyleElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableCaptionElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableCellElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableColElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableRowElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTableSectionElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTextAreaElement.java \
+	source/gnu/xml/dom/html2/DomHTMLTitleElement.java \
+	source/gnu/xml/dom/html2/DomHTMLUListElement.java \
+	source/gnu/xml/dom/ls/DomLSEx.java \
+	source/gnu/xml/dom/ls/DomLSInput.java \
+	source/gnu/xml/dom/ls/DomLSOutput.java \
+	source/gnu/xml/dom/ls/DomLSParser.java \
+	source/gnu/xml/dom/ls/DomLSSerializer.java \
+	source/gnu/xml/dom/ls/FilteredSAXEventSink.java \
+	source/gnu/xml/dom/ls/ReaderInputStream.java \
+	source/gnu/xml/dom/ls/SAXEventSink.java \
+	source/gnu/xml/dom/ls/WriterOutputStream.java \
 	source/gnu/xml/libxmlj/dom/GnomeAttr.java \
 	source/gnu/xml/libxmlj/dom/GnomeCDATASection.java \
 	source/gnu/xml/libxmlj/dom/GnomeCharacterData.java \
