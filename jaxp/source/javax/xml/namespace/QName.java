@@ -54,6 +54,7 @@ public class QName
   private final String localPart;
   private final String prefix;
   private final String qName;
+  int hashCode = -1;
 
   public QName(String namespaceURI, String localPart)
   {
@@ -127,7 +128,16 @@ public class QName
 
   public final int hashCode()
   {
-    return qName.hashCode();
+    if (hashCode == -1)
+      {
+        StringBuffer buf = new StringBuffer();
+        buf.append('{');
+        buf.append(namespaceURI);
+        buf.append('}');
+        buf.append(localPart);
+        hashCode = buf.toString().hashCode();
+      }
+    return hashCode;
   }
 
   public String toString()

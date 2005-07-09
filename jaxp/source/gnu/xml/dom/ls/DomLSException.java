@@ -1,4 +1,4 @@
-/* CurrentFunction.java -- 
+/* DomLSException.java -- 
    Copyright (C) 2004 Free Software Foundation, Inc.
 
 This file is part of GNU Classpath.
@@ -35,70 +35,23 @@ this exception to your version of the library, but you are not
 obligated to do so.  If you do not wish to do so, delete this
 exception statement from your version. */
 
-package gnu.xml.transform;
+package gnu.xml.dom.ls;
 
-import java.util.Collections;
-import java.util.List;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPathFunction;
-import javax.xml.xpath.XPathFunctionException;
-import org.w3c.dom.Node;
-import gnu.xml.xpath.Expr;
-import gnu.xml.xpath.Function;
+import org.w3c.dom.ls.LSException;
 
 /**
- * The XSLT <code>current()</code>function.
+ * A DOM LS exception incorporating a cause.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-final class CurrentFunction
-  extends Expr
-  implements Function, XPathFunction
+public class DomLSException
+  extends LSException
 {
 
-  final Stylesheet stylesheet;
-
-  CurrentFunction(Stylesheet stylesheet)
+  public DomLSException(short type, Exception cause)
   {
-    this.stylesheet = stylesheet;
-  }
-
-  public Object evaluate(List args)
-    throws XPathFunctionException
-  {
-    // We can't do anything useful here.
-    // So much for the JAXP API...
-    return Collections.EMPTY_SET;
-  }
-
-  public void setArguments(List args)
-  {
-  }
-
-  public Object evaluate(Node context, int pos, int len)
-  {
-    return Collections.singleton(stylesheet.current);
-  }
-
-  public Expr clone(Object context)
-  {
-    Stylesheet s = stylesheet;
-    if (context instanceof Stylesheet)
-      {
-        s = (Stylesheet) context;
-      }
-    return new CurrentFunction(s);
-  }
-
-  public boolean references(QName var)
-  {
-    return false;
-  }
-
-  public String toString()
-  {
-    return "current()";
+    super(type, (cause == null) ? null : cause.getMessage());
+    initCause(cause);
   }
 
 }
-

@@ -730,7 +730,8 @@ function_name:
 variable_reference:
   DOLLAR qname
     {
-      $$ = new VariableReference(variableResolver, (String) $2);
+      String name = (String) $2;
+      $$ = new VariableReference(variableResolver, getQName(name));
     }
   ;
 
