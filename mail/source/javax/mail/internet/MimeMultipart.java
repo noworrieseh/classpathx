@@ -183,6 +183,10 @@ public class MimeMultipart
   protected void updateHeaders()
     throws MessagingException
   {
+    if (parts == null)
+      {
+        return;
+      }
     synchronized (parts)
     {
       int len = parts.size();
