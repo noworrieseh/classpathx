@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # 
-# $Id: configure.ac,v 1.9 2005-04-23 15:06:29 dog Exp $
+# $Id: configure.ac,v 1.10 2005-07-28 17:45:36 dog Exp $
 # Copyright (C) 2003 Nic Ferrier
 # 
 # This file is part of GNU JavaMail.
@@ -22,12 +22,12 @@
 # 02111-1307 USA. 
 #
 
-AC_INIT(gnumail, 0.1)
+AC_INIT(gnumail, 1.1.1)
 AC_CONFIG_SRCDIR(source/gnu/mail/providers/ReadOnlyMessage.java)
 AM_INIT_AUTOMAKE
 
 PACKAGE="mail"
-VERSION="0.1"
+VERSION="1.1.1"
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
