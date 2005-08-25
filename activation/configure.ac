@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 dnl 
-dnl $Id: configure.ac,v 1.5 2005-04-23 14:29:46 dog Exp $
+dnl $Id: configure.ac,v 1.6 2005-08-25 12:30:13 dog Exp $
 dnl Copyright (C) 2003 The Free Software Foundation
 dnl 
 dnl This file is part of GNU classpathx activation.
@@ -18,8 +18,8 @@ dnl General Public License for more details.
 dnl 
 dnl You should have received a copy of the GNU General Public License
 dnl along with GNU JavaMail; see the file COPYING.  If not, write to the
-dnl Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-dnl 02111-1307 USA. 
+dnl Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+dnl 02110-1301 USA. 
 dnl
 
 AC_INIT(activation, 1.0)

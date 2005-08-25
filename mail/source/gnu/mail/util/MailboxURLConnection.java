@@ -1,5 +1,5 @@
 /*
- * $Id: MailboxURLConnection.java,v 1.2 2004-12-09 17:22:12 dog Exp $
+ * $Id: MailboxURLConnection.java,v 1.3 2005-08-25 12:31:15 dog Exp $
  * Copyright(C) 2004 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
@@ -16,7 +16,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * 
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
@@ -58,7 +58,7 @@ import javax.mail.search.SearchTerm;
  * API.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version $Revision: 1.2 $ $Date: 2004-12-09 17:22:12 $
+ * @version $Revision: 1.3 $ $Date: 2005-08-25 12:31:15 $
  */
 public class MailboxURLConnection
 extends URLConnection

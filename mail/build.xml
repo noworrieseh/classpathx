@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.13 2005-04-23 15:06:29 dog Exp $
+$Id: build.xml,v 1.14 2005-08-25 12:31:12 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -16,8 +16,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU JavaMail; see the file COPYING.  If not, write to the
-Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-02111-1307 USA.
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301 USA.
 -->
 
 <project name='mail' default='dist'>
