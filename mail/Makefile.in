@@ -38,7 +38,7 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS TODO config.guess config.sub install-sh \
+	ChangeLog INSTALL NEWS config.guess config.sub install-sh \
 	missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -782,7 +782,7 @@ javadoc:
 
 # Remove jar files and directories
 clean-local:
-	rm javamail.address.map javamail.providers
+	rm -f javamail.address.map javamail.providers
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
 
 install-data-local:

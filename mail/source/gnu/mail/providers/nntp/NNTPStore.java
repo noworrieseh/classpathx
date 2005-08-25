@@ -87,30 +87,42 @@ public class NNTPStore extends Store
       String tn = getProperty("newsrc");
       if (tn != null)
         {
-          // TODO implement independent way to instantiate newsrcs
-          logger.log(NNTP_TRACE, "ERROR: unable to instantiate newsrc");
+          try
+            {
+              ClassLoader l = Thread.currentThread().getContextClassLoader();
+              Class t = l.loadClass(tn);
+              newsrc = (Newsrc) t.newInstance();
+            }
+          catch (Exception e)
+            {
+              logger.log(NNTP_TRACE, "ERROR: unable to instantiate newsrc", e);
+            }
         }
       else
         {
-          // ${HOME}/.newsrc[-${hostname}]
-          String baseFilename = ".newsrc";
-          StringBuffer buffer = new StringBuffer(baseFilename);
-          if (url != null)
+          File file = null;
+          String filename = getProperty("newsrc.file");
+          if (filename == null)
             {
-              buffer.append('-');
-              buffer.append(url.getHost());
-            }
-          String filename = buffer.toString();
-          String home = System.getProperty("user.home");
-          File file = new File(home, filename);
-          if (!file.exists())
-            {
-              // Fall back to base filename iff the file exists
-              File baseFile = new File(home, baseFilename);
-              if (baseFile.exists())
+              String home = System.getProperty("user.home");
+              // ${HOME}/.newsrc[-${hostname}]
+              String baseFilename = ".newsrc";
+              StringBuffer buffer = new StringBuffer(baseFilename);
+              if (url != null)
                 {
-                  file = baseFile;
+                  buffer.append('-');
+                  buffer.append(url.getHost());
                 }
+              file = new File(home, buffer.toString());
+              if (!file.exists())
+                {
+                  // ${HOME}/.newsrc
+                  file = new File(home, baseFilename);
+                }
+            }
+          else
+            {
+              file = new File(filename);
             }
           newsrc = new FileNewsrc(file, session.getDebug());
         }
@@ -120,7 +132,7 @@ public class NNTPStore extends Store
    * Performs the protocol connection.
    */
   protected boolean protocolConnect(String host, int port, String username,
-                                     String password)
+                                    String password)
     throws MessagingException
     {
       if (connection != null)

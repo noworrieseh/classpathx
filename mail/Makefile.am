@@ -422,7 +422,7 @@ javadoc:
 
 # Remove jar files and directories
 clean-local:
-	rm javamail.address.map javamail.providers
+	rm -f javamail.address.map javamail.providers
 	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
 
 install-data-local:
