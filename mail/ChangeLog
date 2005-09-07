@@ -1,3 +1,8 @@
+2005-09-07  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPFolder.java,ACL.java,Rights.java: Simplistic (and deprecated)
+	IMAP ACL implementation for compatibility purposes.
+
 2005-06-20  Archit Shah  <ashah@redhat.com>
 
 	* MimeMessage.java,MimeBodyPart.java: Remove line wrapping in the

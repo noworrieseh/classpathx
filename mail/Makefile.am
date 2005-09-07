@@ -152,6 +152,7 @@ endif
 # The IMAP provider
 if ENABLE_IMAP
 imap_sources = \
+$(src)/gnu/mail/providers/imap/ACL.java \
 $(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
 $(src)/gnu/mail/providers/imap/IMAPFlags.java \
 $(src)/gnu/mail/providers/imap/IMAPFolder.java \
@@ -159,7 +160,8 @@ $(src)/gnu/mail/providers/imap/IMAPMessage.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipart.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
 $(src)/gnu/mail/providers/imap/IMAPStore.java \
-$(src)/gnu/mail/providers/imap/IMAPTest.java
+$(src)/gnu/mail/providers/imap/IMAPTest.java \
+$(src)/gnu/mail/providers/imap/Rights.java
 else
 imap_sources =
 endif

@@ -38,7 +38,7 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS config.guess config.sub install-sh \
+	ChangeLog INSTALL NEWS TODO config.guess config.sub install-sh \
 	missing mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -299,6 +299,7 @@ $(src)/gnu/mail/providers/ReadOnlyMessage.java
 
 # The IMAP provider
 @ENABLE_IMAP_TRUE@imap_sources = \
+@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/ACL.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPFlags.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPFolder.java \
@@ -306,7 +307,8 @@ $(src)/gnu/mail/providers/ReadOnlyMessage.java
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipart.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPStore.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPTest.java
+@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPTest.java \
+@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/Rights.java
 
 @ENABLE_POP3_FALSE@pop3_sources = 
 

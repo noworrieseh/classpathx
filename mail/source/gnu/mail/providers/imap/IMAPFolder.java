@@ -1,13 +1,13 @@
 /*
  * IMAPFolder.java
- * Copyright(C) 2003, 2004 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2004 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.mail.Address;
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
@@ -85,11 +87,10 @@ import gnu.inet.imap.Quota;
  * The folder class implementing the IMAP4rev1 mail protocol.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 0.1
  */
 public class IMAPFolder 
-extends Folder
-implements UIDFolder
+  extends Folder
+  implements UIDFolder
 {
 
   /**
@@ -98,7 +99,7 @@ implements UIDFolder
   protected String path;
 
   /**
-   * The type of this folder(HOLDS_MESSAGES or HOLDS_FOLDERS).
+   * The type of this folder (HOLDS_MESSAGES or HOLDS_FOLDERS).
    */
   protected int type;
 
@@ -1574,6 +1575,209 @@ implements UIDFolder
       }
     
     return ids.length;
+  }
+
+  /**
+   * Returns the access control list for this folder.
+   * This is an array of access control entries.
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public ACL[] getACL()
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return null;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    List acc = new ArrayList();
+    try
+      {
+        Map acl = connection.getacl(path);
+        for (Iterator i = acl.entrySet().iterator(); i.hasNext(); )
+          {
+            Map.Entry entry = (Map.Entry) i.next();
+            String name = (String) entry.getKey();
+            Integer rights = (Integer) entry.getValue();
+            ACL ace = new ACL(name);
+            if (rights != null)
+              {
+                ace.rights = new Rights();
+                ace.rights.rights = rights.intValue();
+              }
+            acc.add(ace);
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    ACL[] ret = new ACL[acc.size()];
+    acc.toArray(ret);
+    return ret;
+  }
+
+  /**
+   * Adds the specified access control entry to this folder.
+   * @param ace the access control entry
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public void addACL(ACL ace)
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    try
+      {
+        Rights aceRights = ace.getRights();
+        if (aceRights != null)
+          {
+            int rights = connection.listrights(path, ace.name);
+            rights |= aceRights.rights;
+            if (!connection.setacl(path, ace.name, rights))
+              {
+                throw new MessagingException("can't set ACL");
+              }
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+  }
+
+  /**
+   * Removes the ACL for the given principal.
+   * @param name the name of the principal
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public void removeACL(String name)
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    try
+      {
+        if (!connection.deleteacl(path, name))
+          {
+            throw new MessagingException("can't delete ACL");
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+  }
+
+  /**
+   * Adds the rights for the specified access control entry.
+   * @param ace the access control entry
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public void addRights(ACL ace)
+    throws MessagingException
+  {
+    addACL(ace);
+  }
+
+  /**
+   * Removes the rights specified in the given access control entry from the
+   * principal.
+   * @param ace the access control entry
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public void removeRights(ACL ace)
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    try
+      {
+        Rights aceRights = ace.getRights();
+        if (aceRights != null)
+          {
+            int rights = connection.listrights(path, ace.name);
+            rights -= aceRights.rights;
+            if (!connection.setacl(path, ace.name, rights))
+              {
+                throw new MessagingException("can't set ACL");
+              }
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+  }
+
+  /**
+   * Returns the rights currently assigned to the given principal.
+   * @param name the name of the principal
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public Rights listRights(String name)
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return null;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    try
+      {
+        Rights rights = new Rights();
+        rights.rights = connection.listrights(path, name);
+        return rights;
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+  }
+  
+  /**
+   * Returns the rights assigned to the currently authenticated principal.
+   * @deprecated this API will probably change incompatibly soon
+   */
+  public Rights myRights()
+    throws MessagingException
+  {
+    if (!isOpen())
+      {
+        return null;
+      }
+    
+    IMAPStore s = (IMAPStore) store;
+    IMAPConnection connection = s.getConnection();
+    try
+      {
+        Rights rights = new Rights();
+        rights.rights = connection.myrights(path);
+        return rights;
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
   
 }
