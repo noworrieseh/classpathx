@@ -386,7 +386,8 @@ public class SMTPTransport
               }
             // MTRK
             String mtrk = getProperty("mtrk");
-            if ("true".equals(mtrk))
+            if ("true".equals(mtrk) && extensions != null &&
+                extensions.contains("MTRK"))
               {
                 int mtrkTimeout = 0;
                 String mt = getProperty("mtrk.timeout");
