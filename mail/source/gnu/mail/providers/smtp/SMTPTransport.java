@@ -23,12 +23,16 @@ package gnu.mail.providers.smtp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.StringTokenizer;
 import javax.mail.Address;
 import javax.mail.Message;
@@ -46,6 +50,7 @@ import javax.net.ssl.TrustManager;
 import gnu.inet.smtp.Parameter;
 import gnu.inet.smtp.ParameterList;
 import gnu.inet.smtp.SMTPConnection;
+import gnu.inet.util.BASE64;
 
 /** 
  * This transport handles communications with an SMTP server.
@@ -374,8 +379,75 @@ public class SMTPTransport
                   }
                 if (value != null)
                   {
-                    params = new ParameterList();
+                    if (params == null)
+                      params = new ParameterList();
                     params.add(new Parameter("RET", value));
+                  }
+              }
+            // MTRK
+            String mtrk = getProperty("mtrk");
+            if ("true".equals(mtrk))
+              {
+                int mtrkTimeout = 0;
+                String mt = getProperty("mtrk.timeout");
+                if (mt != null)
+                  mtrkTimeout = Integer.parseInt(mt);
+                try
+                  {
+                    Random r = new Random();
+                    byte[] a = new byte[256];
+                    r.nextBytes(a);
+                    MessageDigest md = MessageDigest.getInstance("SHA-1");
+                    md.update(a);
+                    byte[] b = md.digest();
+                    byte[] certifier = BASE64.encode(b);
+                    if (params == null)
+                      params = new ParameterList();
+                    String value = new String(certifier, "US-ASCII");
+                    if (mtrkTimeout > 0)
+                      {
+                        value += ":" + mtrkTimeout;
+                      }
+                    params.add(new Parameter("MTRK", value));
+                    String envid = mimeMessage.getMessageID();
+                    if (envid != null)
+                      {
+                        int ai = envid.indexOf('@');
+                        if (ai != -1)
+                          envid = envid.substring(0, ai);
+                      }
+                    else
+                      {
+                        envid = "";
+                      }
+                    envid += Long.toHexString(System.currentTimeMillis());
+                    envid += "@";
+                    String lha = InetAddress.getLocalHost().getHostAddress();
+                    if (envid.length() + lha.length() > 100)
+                      {
+                        b = lha.getBytes("UTF-8");
+                        md.reset();
+                        md.update(b);
+                        b = md.digest();
+                        b = BASE64.encode(b);
+                        lha = new String(b, "US-ASCII");
+                      }
+                    envid += lha;
+                    params.add(new Parameter("ENVID", envid));
+                  }
+                catch (NoSuchAlgorithmException e)
+                  {
+                    MessagingException e2 =
+                      new MessagingException(e.getMessage());
+                    e2.initCause(e);
+                    throw e2;
+                  }
+                catch (UnsupportedEncodingException e)
+                  {
+                    MessagingException e2 =
+                      new MessagingException(e.getMessage());
+                    e2.initCause(e);
+                    throw e2;
                   }
               }
             // MAIL FROM

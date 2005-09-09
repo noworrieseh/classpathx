@@ -13,7 +13,8 @@ mechanism, and transport layer security (TLS) for servers that support it
 
 <p>
 You may also optionally request Delivery Status Notifications (DSN) as
-specified in RFC 3461.
+specified in RFC 3461, and/or message tracking (MTRK) as specified in RFC
+3885.
 </p>
 
 <p>
@@ -109,6 +110,19 @@ details. This feature may not be supported by all servers.</td>
 <td>If set to false, TLS negotiation will not be attempted. Exceptionally,
 you may set this to the special value "required" to throw an exception on
 connect when TLS is not available.</td>
+</tr>
+
+<tr>
+<td>mail.smtp.mtrk</td>
+<td>boolean</td>
+<td>If set to true, sends MTRK and ENVID parameters.</td>
+</tr>
+
+<tr>
+<td>mail.smtp.mtrk.timeout</td>
+<td>integer</td>
+<td>If set, specified the number of seconds to request that the tracking
+information be retained on the server.</td>
 </tr>
 
 <tr>
