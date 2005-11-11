@@ -13,9 +13,9 @@ Classpath project:
 
   http://www.gnu.org/software/classpath/
 
-The latest release at time of writing is version 1.1:
+The latest release at time of writing is version 1.1.1:
 
-  http://ftp.gnu.org/gnu/classpath/inetlib-1.1.tar.gz
+  http://ftp.gnu.org/gnu/classpath/inetlib-1.1.1.tar.gz
 
 The configuration script will search for these jarfiles in some standard
 locations, or you can use the --with-activation-jar and --with-inetlib-jar
@@ -47,7 +47,7 @@ A full list of configuration options is available by entering:
 
 	./configure --help
 
-at the comand prompt.
+at the command prompt.
 
 
 Building
@@ -80,4 +80,4 @@ options available during the standard autotools-based installation.
 
 
 $Author: dog $
-$Date: 2005-04-23 15:06:29 $
+$Date: 2005-11-11 09:31:38 $
