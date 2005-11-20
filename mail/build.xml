@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.14 2005-08-25 12:31:12 dog Exp $
+$Id: build.xml,v 1.15 2005-11-20 09:49:41 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -209,7 +209,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     <mkdir dir='${doc}'/>
     <javadoc destdir='${doc}' use='true' author='true'
       windowtitle='GNU JavaMail API documentation'
-      classpathref='nntp.classpath'>
+      classpathref='provider.classpath'>
       <doctitle><![CDATA[<h3>GNU JavaMail</h3>]]></doctitle>
       <bottom><![CDATA[&copy;]]> Copyright 2003, 2004
             The Free Software Foundation, All rights reserved</bottom>
