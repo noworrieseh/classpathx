@@ -17,7 +17,7 @@ AC_ARG_WITH([activation_jar],
         [found_activation_jar=false])
 if test "x${ACTIVATION_JAR}" = x ; then
         dnl AC_MSG_NOTICE([no value supplied, searching default locations])
-        _GNUMAIL_FIND_ACTIVATION_JAR([/usr/share/java /usr/local/share/java])
+        _GNUMAIL_FIND_ACTIVATION_JAR([/usr/share/java /usr/local/share/java ${prefix}/share/java])
         if test "x${ACTIVATION_JAR}" = x; then
                 AC_MSG_ERROR([can't find activation.jar; use --with-activation-jar])
         fi

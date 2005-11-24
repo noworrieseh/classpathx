@@ -2253,7 +2253,7 @@ if test "x${ACTIVATION_JAR}" = x ; then
 
 echo "$as_me:$LINENO: checking for activation.jar" >&5
 echo $ECHO_N "checking for activation.jar... $ECHO_C" >&6
-for _F in /usr/share/java /usr/local/share/java ;do
+for _F in /usr/share/java /usr/local/share/java ${prefix}/share/java ;do
         if test -r ${_F}/activation.jar ; then
                 ACTIVATION_JAR=${_F}/activation.jar
                 break
@@ -2300,7 +2300,7 @@ if test "x${INETLIB_JAR}" = x ;then
 
 echo "$as_me:$LINENO: checking for inetlib.jar" >&5
 echo $ECHO_N "checking for inetlib.jar... $ECHO_C" >&6
-for _F in /usr/share/java /usr/local/share/java ;do
+for _F in /usr/share/java /usr/local/share/java ${prefix}/share/java ;do
         if test -r ${_F}/inetlib.jar ; then
                 INETLIB_JAR=${_F}/inetlib.jar
                 break

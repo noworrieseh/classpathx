@@ -17,7 +17,7 @@ AC_ARG_WITH([inetlib_jar],
         [found_inetlib_jar=false])
 if test "x${INETLIB_JAR}" = x ;then
         dnl AC_MSG_NOTICE([no value supplied, searching default locations])
-        _GNUMAIL_FIND_INETLIB_JAR([/usr/share/java /usr/local/share/java])
+        _GNUMAIL_FIND_INETLIB_JAR([/usr/share/java /usr/local/share/java ${prefix}/share/java])
         if test "x${INETLIB_JAR}" = x; then
                 AC_MSG_ERROR([can't find inetlib.jar; use --with-inetlib-jar])
         fi
