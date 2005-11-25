@@ -1,3 +1,7 @@
+2005-11-25  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPStore.java: Un-URL-encode file paths from URLNames.
+
 2005-11-24  Chris Burdess  <dog@bluezoo.org>
 
 	* m4/gnumail_with_activation_jar.m4,m4/gnumail_with_inetlib_jar.m4:

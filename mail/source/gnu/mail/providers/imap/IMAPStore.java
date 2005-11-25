@@ -28,8 +28,10 @@
 package gnu.mail.providers.imap;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.net.URLDecoder;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -340,7 +342,15 @@ public class IMAPStore
   public Folder getFolder(URLName urlname)
     throws MessagingException
   {
-    return getFolder(urlname.getFile());
+    try
+      {
+        String file = URLDecoder.decode(urlname.getFile(), "UTF-8");
+        return getFolder(file);
+      }
+    catch (UnsupportedEncodingException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
 
   /**
