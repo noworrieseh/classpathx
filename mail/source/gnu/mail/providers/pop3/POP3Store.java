@@ -1,13 +1,13 @@
 /*
  * POP3Store.java
- * Copyright(C) 1999, 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 1999, 2003, 2005 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,8 +29,10 @@ package gnu.mail.providers.pop3;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -349,7 +351,15 @@ public final class POP3Store
   public Folder getFolder(URLName urlname)
     throws MessagingException
   {
-    return getDefaultFolder().getFolder(urlname.getFile());
+    try
+      {
+        String file = URLDecoder.decode(urlname.getFile(), "UTF-8");
+        return getDefaultFolder().getFolder(file);
+      }
+    catch (UnsupportedEncodingException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
 
   // -- Utility methods --

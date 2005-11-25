@@ -1,6 +1,7 @@
 2005-11-25  Chris Burdess  <dog@bluezoo.org>
 
-	* IMAPStore.java: Un-URL-encode file paths from URLNames.
+	* IMAPStore.java,POP3Store.java,MaildirStore.java: Un-URL-encode
+	file paths from URLNames.
 
 2005-11-24  Chris Burdess  <dog@bluezoo.org>
 

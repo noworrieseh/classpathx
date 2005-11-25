@@ -1,13 +1,13 @@
 /*
  * MaildirStore.java
- * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2005 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU JavaMail, a library.
  * 
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- *(at your option) any later version.
+ * (at your option) any later version.
  * 
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,6 +28,8 @@
 package gnu.mail.providers.maildir;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -205,7 +207,15 @@ public final class MaildirStore
   public Folder getFolder(URLName urlname) 
     throws MessagingException 
   {
-    return getFolder(urlname.getFile());
+    try
+      {
+        String file = URLDecoder.decode(urlname.getFile(), "UTF-8");
+        return getFolder(file);
+      }
+    catch (UnsupportedEncodingException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
 	
   Session getSession() 
