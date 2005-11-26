@@ -33,7 +33,7 @@ import javax.mail.Message;
  * A logical AND of a number of search terms.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public final class AndTerm
   extends SearchTerm

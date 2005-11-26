@@ -1,6 +1,6 @@
 /*
  * MimeUtility.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -58,7 +58,7 @@ import gnu.mail.util.UUOutputStream;
  * This is a utility class providing micellaneous MIME-related functionality.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class MimeUtility
 {
@@ -1174,6 +1174,82 @@ public class MimeUtility
       return (asciiCount <= nonAsciiCount) ? MAJORITY_ASCII : MINORITY_ASCII;
     }
     
+  }
+
+  /**
+   * Folds the specified string such that each line is no longer than 76
+   * characters, whitespace permitting.
+   * @param used the number of characters used in the line already
+   * @param s the string to fold
+   * @since JavaMail 1.4
+   */
+  public static String fold(int used, String s)
+  {
+    int len = s.length();
+    int k = Math.min(76 - used, len);
+    if (k == len)
+      return s;
+    StringBuffer buf = new StringBuffer();
+    int i;
+    do
+      {
+        i = whitespaceIndexOf(s, k, -1, len);
+        if (i == -1)
+          i = whitespaceIndexOf(s, k, 1, len);
+        if (i != -1)
+          {
+            buf.append(s.substring(0, i));
+            buf.append('\n');
+            s = s.substring(i);
+            len -= i;
+          }
+        k = Math.min(76, len);
+      }
+    while (i != -1);
+    buf.append(s);
+    return buf.toString();
+  }
+
+  private static int whitespaceIndexOf(String s, int offset, int step, int len)
+  {
+    for (int i = offset; i > 0 && i < len; i += step)
+      {
+        char c = s.charAt(i);
+        if (c == ' ' || c == '\t')
+          return i;
+      }
+    return -1;
+  }
+
+  /**
+   * Unfolds a folded header.
+   * @param s the header to unfold
+   * @since JavaMail 1.4
+   */
+  public static String unfold(String s)
+  {
+    StringBuffer buf = null;
+    int start = 0, len = s.length();
+    for (int end = start; end < len; end++)
+      {
+        char c = s.charAt(end);
+        if (c == '\n' && end < (len - 1))
+          {
+            char d = s.charAt(end + 1);
+            if (d == ' ' || d == '\t')
+              {
+                String head = s.substring(start, end);
+                if (buf == null)
+                  buf = new StringBuffer();
+                buf.append(head);
+                start = end + 1;
+              }
+          }
+      }
+    if (buf == null)
+      return s;
+    buf.append(s.substring(start));
+    return buf.toString();
   }
 
 }

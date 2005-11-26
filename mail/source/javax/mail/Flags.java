@@ -38,7 +38,7 @@ import java.util.Iterator;
  * and user defined flags (case-independent String).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class Flags
   implements Cloneable, Serializable

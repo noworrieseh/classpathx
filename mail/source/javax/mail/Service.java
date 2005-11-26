@@ -1,6 +1,6 @@
 /*
  * Service.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -40,7 +40,7 @@ import javax.mail.event.MailEvent;
  * An abstract messaging service (store or transport).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public abstract class Service
 {
@@ -92,6 +92,23 @@ public abstract class Service
     throws MessagingException
   {
     connect(null, null, null);
+  }
+
+  /**
+   * Connects to this service.
+   * This method provides a simple authentication scheme requiring a
+   * username and password. The host is determined from the inital URLName.
+   * @param user the username
+   * @param password the password
+   * @exception AuthenticationFailedException on authentication failure
+   * @exception MessagingException for other failures
+   * @exception IllegalStateException if the service is already connected
+   * @since JavaMail 1.4
+   */
+  public void connect(String user, String password)
+    throws MessagingException
+  {
+    connect(null, user, password);
   }
 
   /**

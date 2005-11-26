@@ -1,6 +1,6 @@
 /*
  * MimeMessage.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.util.RFC2822OutputStream;
 
 /**
@@ -66,7 +69,7 @@ import gnu.mail.util.RFC2822OutputStream;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class MimeMessage
   extends Message
@@ -1198,6 +1201,19 @@ public class MimeMessage
             filename = contentType.getParameter("name");
           }
       }
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.decodefilename");
+    if ("true".equals(AccessController.doPrivileged(a)))
+      {
+        try
+          {
+            filename = MimeUtility.decodeText(filename);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
     return filename;
   }
 
@@ -1212,6 +1228,19 @@ public class MimeMessage
   public void setFileName(String filename)
     throws MessagingException
   {
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.encodefilename");
+    if ("true".equals(AccessController.doPrivileged(a)))
+      {
+        try
+          {
+            filename = MimeUtility.encodeText(filename);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
     String header = getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
     if (header == null)
       {
@@ -1343,7 +1372,7 @@ public class MimeMessage
   public void setText(String text)
     throws MessagingException
   {
-    setText(text, null);
+    setText(text, null, "plain");
   }
 
   /**
@@ -1359,6 +1388,24 @@ public class MimeMessage
   public void setText(String text, String charset)
     throws MessagingException
   {
+    setText(text, charset, "plain");
+  }
+  
+  /**
+   * Sets the content of this message using the specified text, and with a
+   * text MIME type of the specified subtype.
+   * <p>
+   * If the string contains non US-ASCII characters, it will be encoded 
+   * using the specified charset.
+   * @param text the text content
+   * @param charset the charset used for any encoding
+   * @param subtype the MIME text subtype (e.g. "plain", "html")
+   * @see MimeBodyPart#setText(String,String,String)
+   * @since JavaMail 1.4
+   */
+  public void setText(String text, String charset, String subtype)
+    throws MessagingException
+  {
     if (charset == null)
       {
         // According to the API doc for getText(String), we may have to scan
@@ -1368,8 +1415,10 @@ public class MimeMessage
         charset =
           MimeUtility.mimeCharset(MimeUtility.getDefaultJavaCharset());
       }
+    if (subtype == null || "".equals(subtype))
+      subtype = "plain";
     StringBuffer buffer = new StringBuffer();
-    buffer.append("text/plain; charset=");
+    buffer.append("text/").append(subtype).append("; charset=");
     buffer.append(MimeUtility.quote(charset, HeaderTokenizer.MIME));
     setContent(text, buffer.toString());
   }
@@ -1401,7 +1450,7 @@ public class MimeMessage
   public Message reply(boolean replyToAll)
     throws MessagingException
   {
-    MimeMessage message = new MimeMessage(session);
+    MimeMessage message = createMimeMessage(session);
     String subject = getHeader(SUBJECT_NAME, null);
     if (subject != null)
       {
@@ -1853,6 +1902,28 @@ public class MimeMessage
     // set mime version
     setHeader("Mime-Version", "1.0");
     // set new message-id if necessary
+    updateMessageId();
+  }
+  
+  /**
+   * Creates the headers from the given input stream.
+   * @param is the input stream to read the headers from
+   */
+  protected InternetHeaders createInternetHeaders(InputStream is)
+    throws MessagingException
+  {
+    return new InternetHeaders(is);
+  }
+
+  /**
+   * Updates the Message-ID header. This method is called by
+   * <code>updateHeaders</code>, and should set the Message-Id header to a
+   * suitably unique value if overridden.
+   * @since JavaMail 1.4
+   */
+  protected void updateMessageId()
+    throws MessagingException
+  {
     String mid = getHeader(MESSAGE_ID_NAME, null);
     if (mid == null)
       {
@@ -1864,15 +1935,17 @@ public class MimeMessage
         setHeader(MESSAGE_ID_NAME, mid);
       }
   }
-  
+
   /**
-   * Creates the headers from the given input stream.
-   * @param is the input stream to read the headers from
+   * Creates a new MIME message.
+   * Used by the <code>reply</code> method to determine the MimeMessage
+   * subclass, if any, to use.
+   * @since JavaMail 1.4
    */
-  protected InternetHeaders createInternetHeaders(InputStream is)
+  protected MimeMessage createMimeMessage(Session session)
     throws MessagingException
   {
-    return new InternetHeaders(is);
+    return new MimeMessage(session);
   }
 
 }

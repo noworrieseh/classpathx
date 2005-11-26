@@ -56,7 +56,7 @@ import javax.mail.search.SearchTerm;
  * a method on it.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public abstract class Folder
 {

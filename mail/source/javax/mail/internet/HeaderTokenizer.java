@@ -31,7 +31,7 @@ package javax.mail.internet;
  * A lexer for RFC 822 and MIME headers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class HeaderTokenizer
 {

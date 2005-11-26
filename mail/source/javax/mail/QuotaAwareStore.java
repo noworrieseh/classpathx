@@ -1,6 +1,6 @@
 /*
- * SearchTerm.java
- * Copyright (C) 2002 The Free Software Foundation
+ * QuotaAwareStore.java
+ * Copyright (C) 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -25,26 +25,33 @@
  * executable file might be covered by the GNU General Public License.
  */
 
-package javax.mail.search;
-
-import java.io.Serializable;
-import javax.mail.Message;
+package javax.mail;
 
 /**
- * A search expression is represented as a tree of search terms. All search
- * terms derive from this class.
+ * Interface implemented by mail stores that support quotas.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @see RFC 2087
  * @version 1.4
+ * @since JavaMail 1.4
  */
-public abstract class SearchTerm
-  implements Serializable
+public interface QuotaAwareStore
 {
 
   /**
-   * Indicates whether the given message matches this search term.
+   * Returns the quotas for the given quota root.
+   * @param root the quota root
+   * @exception MessagingException if the QUOTA extension is not supported
    */
-  public abstract boolean match(Message msg);
+  Quota[] getQuota(String root)
+    throws MessagingException;
 
+  /**
+   * Sets the quotas for the quota root specified in the quota argument.
+   * @param quota the quota
+   * @exception MessagingException if the QUOTA extension is not supported
+   */
+  void setQuota(Quota quota)
+    throws MessagingException;
+  
 }
-

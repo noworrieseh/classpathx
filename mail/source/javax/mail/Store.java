@@ -37,7 +37,7 @@ import javax.mail.event.StoreListener;
  * A message store that can be used to save and retrieve messages.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public abstract class Store 
   extends Service

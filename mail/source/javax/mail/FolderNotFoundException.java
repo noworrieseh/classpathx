@@ -28,10 +28,10 @@
 package javax.mail;
 
 /**
- * An exception thrown when a methods is invoked on a nonexistent folder.
+ * An exception thrown when a method is invoked on a nonexistent folder.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class FolderNotFoundException 
   extends MessagingException

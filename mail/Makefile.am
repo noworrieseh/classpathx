@@ -39,6 +39,8 @@ $(src)/javax/mail/NoSuchProviderException.java \
 $(src)/javax/mail/Part.java \
 $(src)/javax/mail/PasswordAuthentication.java \
 $(src)/javax/mail/Provider.java \
+$(src)/javax/mail/Quota.java \
+$(src)/javax/mail/QuotaAwareStore.java \
 $(src)/javax/mail/ReadOnlyFolderException.java \
 $(src)/javax/mail/SendFailedException.java \
 $(src)/javax/mail/Service.java \
@@ -106,6 +108,9 @@ $(src)/javax/mail/search/SentDateTerm.java \
 $(src)/javax/mail/search/SizeTerm.java \
 $(src)/javax/mail/search/StringTerm.java \
 $(src)/javax/mail/search/SubjectTerm.java \
+$(src)/javax/mail/util/ByteArrayDataSource.java \
+$(src)/javax/mail/util/SharedByteArrayInputStream.java \
+$(src)/javax/mail/util/SharedFileInputStream.java \
 $(src)/gnu/mail/handler/Application.java \
 $(src)/gnu/mail/handler/ApplicationOctetStream.java \
 $(src)/gnu/mail/handler/Message.java \

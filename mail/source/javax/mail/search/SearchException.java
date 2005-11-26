@@ -34,7 +34,7 @@ import javax.mail.MessagingException;
  * handled by the store implementation.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class SearchException
   extends MessagingException

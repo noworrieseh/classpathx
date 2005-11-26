@@ -34,7 +34,7 @@ import javax.mail.Message;
  * A change in the number of messages in a folder.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class MessageCountEvent
   extends MailEvent

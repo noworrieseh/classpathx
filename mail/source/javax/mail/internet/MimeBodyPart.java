@@ -1,6 +1,6 @@
 /*
  * MimeBodyPart.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -30,18 +30,25 @@ package javax.mail.internet;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import javax.activation.DataHandler;
+import javax.activation.FileTypeMap;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.util.RFC2822OutputStream;
 
 /**
@@ -55,7 +62,7 @@ import gnu.mail.util.RFC2822OutputStream;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class MimeBodyPart
   extends BodyPart
@@ -554,6 +561,19 @@ public class MimeBodyPart
               }
           }
       }
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.decodefilename");
+    if ("true".equals(AccessController.doPrivileged(a)))
+      {
+        try
+          {
+            filename = MimeUtility.decodeText(filename);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
     return filename;
   }
 
@@ -567,6 +587,19 @@ public class MimeBodyPart
   public void setFileName(String filename)
     throws MessagingException
   {
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.encodefilename");
+    if ("true".equals(AccessController.doPrivileged(a)))
+      {
+        try
+          {
+            filename = MimeUtility.encodeText(filename);
+          }
+        catch (UnsupportedEncodingException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
     String header = getHeader(CONTENT_DISPOSITION_NAME, null);
     if (header == null)
       {
@@ -702,7 +735,7 @@ public class MimeBodyPart
   public void setText(String text)
     throws MessagingException
   {
-    setText(text, null);
+    setText(text, null, "plain");
   }
 
   /**
@@ -717,6 +750,23 @@ public class MimeBodyPart
   public void setText(String text, String charset)
     throws MessagingException
   {
+    setText(text, charset, "plain");
+  }
+  
+  /**
+   * Sets the content of this part using the specified text, and with a
+   * text MIME type of the specified subtype.
+   * <p>
+   * If the text contains non US-ASCII characters, it will be encoded 
+   * using the specified charset.
+   * @param text the text content
+   * @param charset the charset used for any encoding
+   * @param subtype the MIME text subtype (e.g. "plain", "html")
+   * @since JavaMail 1.4
+   */
+  public void setText(String text, String charset, String subtype)
+    throws MessagingException
+  {
     if (charset == null)
       {
         // According to the API doc for getText(String), we may have to scan
@@ -726,8 +776,10 @@ public class MimeBodyPart
         charset =
           MimeUtility.mimeCharset(MimeUtility.getDefaultJavaCharset());
       }
+    if (subtype == null || "".equals(subtype))
+      subtype = "plain";
     StringBuffer buffer = new StringBuffer();
-    buffer.append("text/plain; charset=");
+    buffer.append("text/").append(subtype).append("; charset=");
     buffer.append(MimeUtility.quote(charset, HeaderTokenizer.MIME));
     setContent(text, buffer.toString());
   }
@@ -1010,5 +1062,64 @@ public class MimeBodyPart
       }
   }
 
+  /**
+   * Use the specified file as the content for this part.
+   * @param file the file
+   * @since JavaMail 1.4
+   */
+  public void attachFile(File file)
+    throws IOException, MessagingException
+  {
+    FileTypeMap map = FileTypeMap.getDefaultFileTypeMap();
+    String contentType = map.getContentType(file);
+    if (contentType == null)
+      throw new MessagingException("Unable to determine MIME type of " + file);
+    setContent(new FileInputStream(file), contentType);
+    setFileName(file.getName());
+  }
+
+  /**
+   * Use the specified file as the content for this part.
+   * @param file the file
+   * @since JavaMail 1.4
+   */
+  public void attachFile(String file)
+    throws IOException, MessagingException
+  {
+    attachFile(new File(file));
+  }
+  
+  /**
+   * Saves the content of this part to the specified file.
+   * @param file the file
+   * @since JavaMail 1.4
+   */
+  public void saveFile(File file)
+    throws IOException, MessagingException
+  {
+    OutputStream out = new FileOutputStream(file);
+    try
+      {
+        out = MimeUtility.encode(out, getEncoding());
+        getDataHandler().writeTo(out);
+        out.flush();
+      }
+    finally
+      {
+        out.close();
+      }
+  }
+  
+  /**
+   * Saves the content of this part to the specified file.
+   * @param file the file
+   * @since JavaMail 1.4
+   */
+  public void saveFile(String file)
+    throws IOException, MessagingException
+  {
+    saveFile(new File(file));
+  }
+  
 }
 

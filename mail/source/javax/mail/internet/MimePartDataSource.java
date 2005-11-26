@@ -1,6 +1,6 @@
 /*
  * MimePartDataSource.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -40,16 +40,17 @@ import javax.mail.MessagingException;
  * A data source that manages content for a MIME part.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class MimePartDataSource
   implements DataSource, MessageAware
 {
 
-  /*
+  /**
    * The part.
+   * @since JavaMail 1.4
    */
-  private MimePart part;
+  protected MimePart part;
 
   /*
    * Manages a MessageContext on behalf of the part.

@@ -1,6 +1,6 @@
 /*
  * Provider.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -32,7 +32,7 @@ package javax.mail;
  * messages.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class Provider
 {
@@ -61,8 +61,17 @@ public class Provider
   private String vendor;
   private String version;
 
-  Provider(Type type, String protocol, String className, String vendor,
-           String version)
+  /**
+   * Creates a new provider of the given type and protocol.
+   * @param type the provider type
+   * @param protocol the protocol URL scheme
+   * @param className the name of the implementing class
+   * @param vendor the implementation vendor
+   * @param version the implementation version
+   * @since JavaMail 1.4
+   */
+  public Provider(Type type, String protocol, String className, String vendor,
+                  String version)
   {
     this.type = type;
     this.protocol = protocol;

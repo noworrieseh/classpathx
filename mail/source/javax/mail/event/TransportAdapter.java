@@ -31,7 +31,7 @@ package javax.mail.event;
  * An adapter for transport events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public abstract class TransportAdapter
   implements TransportListener

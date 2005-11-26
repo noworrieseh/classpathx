@@ -1,6 +1,6 @@
 /*
  * Session.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * @author Andrew Selkirk
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @author <a href="mailto:nferrier@tapsellferrier.co.uk">Nic Ferrier</a>
- * @version 1.3
+ * @version 1.4
  */
 public final class Session
 {
@@ -838,7 +838,7 @@ public final class Session
   {
     if (out == null)
       {
-        out = System.err;
+        out = System.out;
       }
     // TODO
   }
@@ -851,7 +851,35 @@ public final class Session
   public PrintStream getDebugOut()
   {
     // TODO
-    return null;
+    return System.out;
+  }
+
+  /**
+   * Adds the specified provider to the session.
+   * @param provider the new provider
+   * @since JavaMail 1.4
+   */
+  public void addProvider(Provider provider)
+  {
+    String protocol = provider.getProtocol();
+    String className = provider.getClassName();
+    providers.add(provider);
+    providersByClassName.put(className, provider);
+    if (!providersByProtocol.containsKey(protocol))
+      {
+        providersByProtocol.put(protocol, provider);
+      }
+  }
+
+  /**
+   * Sets the default transport protocol for the given address type.
+   * @param addressType the type of address, e.g. "rfc822"
+   * @param protocol the transport protocol to use
+   * @since JavaMail 1.4
+   */
+  public void setProtocolForAddress(String addressType, String protocol)
+  {
+    addressMap.put(addressType, protocol);
   }
 
 }

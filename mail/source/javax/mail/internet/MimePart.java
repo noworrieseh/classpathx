@@ -41,7 +41,7 @@ import javax.mail.Part;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public interface MimePart
   extends Part
@@ -157,6 +157,20 @@ public interface MimePart
    * @param charset the charset to use for any encoding
    */
   void setText(String text, String charset)
+    throws MessagingException;
+  
+  /**
+   * Sets the content of this message using the specified text, and with a
+   * text MIME type of the specified subtype.
+   * <p>
+   * If the string contains non US-ASCII characters, it will be encoded 
+   * using the specified charset.
+   * @param text the text content
+   * @param charset the charset to use for any encoding
+   * @param subtype the MIME text subtype (e.g. "plain", "html")
+   * @since JavaMail 1.4
+   */
+  void setText(String text, String charset, String subtype)
     throws MessagingException;
   
 }

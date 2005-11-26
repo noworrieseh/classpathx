@@ -1,6 +1,6 @@
 /*
  * InternetHeaders.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import javax.mail.Header;
 import javax.mail.MessagingException;
@@ -49,7 +50,7 @@ import gnu.inet.util.LineInputStream;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class InternetHeaders
 {
@@ -63,13 +64,15 @@ public class InternetHeaders
     
     /**
      * The name.
+     * @since JavaMail 1.4
      */
-    String name;
+    protected String name;
 
     /**
      * The value.
+     * @since JavaMail 1.4
      */
-    String line;
+    protected String line;
     
     InternetHeader(String line)
     {
@@ -256,10 +259,11 @@ public class InternetHeaders
   
   }
   
-  /*
+  /**
    * The list of headers.
+   * @since JavaMail 1.4
    */
-  private ArrayList headers = new ArrayList(20);
+  protected List headers = new ArrayList(20);
 
   /**
    * Constructor for an empty InternetHeaders.

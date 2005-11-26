@@ -34,6 +34,7 @@ import javax.activation.DataSource;
  * 
  * @see DataSource
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.4
  */
 public interface MultipartDataSource
   extends DataSource

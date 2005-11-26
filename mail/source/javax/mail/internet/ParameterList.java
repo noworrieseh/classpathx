@@ -1,6 +1,6 @@
 /*
  * ParameterList.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2005 The Free Software Foundation
  * 
  * This file is part of GNU JavaMail, a library.
  * 
@@ -28,17 +28,22 @@
 package javax.mail.internet;
 
 import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import gnu.inet.util.GetSystemPropertyAction;
 
 /**
  * A list of MIME parameters. MIME parameters are name-value pairs
  * associated with a MIME header.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class ParameterList
 {
@@ -63,6 +68,11 @@ public class ParameterList
   public ParameterList(String s)
     throws ParseException
   {
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.decodeparameters");
+    boolean decodeParameters =
+      "true".equals(AccessController.doPrivileged(a));
+    
     LinkedHashMap charsets = new LinkedHashMap();
     HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
     for (int type = 0; type != HeaderTokenizer.Token.EOF; )
@@ -105,7 +115,7 @@ public class ParameterList
             // This will handle out-of-order extended-other-values
             // but the extended-initial-value must precede them
             int si = key.indexOf('*');
-            if (si > 0)
+            if (decodeParameters && si > 0)
               {
                 int len = key.length();
                 if (si == len - 1 ||
@@ -173,7 +183,7 @@ public class ParameterList
               }
             else
               {
-                list.put(key, value);
+                set(key, value, null);
               }
           }
       }
@@ -196,7 +206,8 @@ public class ParameterList
                     buf.append(comp);
                   }
               }
-            list.put(keys[i], buf.toString());
+            String charset = (String) charsets.get(keys[i]);
+            set(keys[i], buf.toString(), charset);
           }
       }
   }
@@ -263,7 +274,8 @@ public class ParameterList
    */
   public String get(String name)
   {
-    return (String) list.get(name.toLowerCase().trim());
+    String[] vc = (String[]) list.get(name.toLowerCase().trim());
+    return (vc != null) ? vc[0] : null;
   }
 
   /**
@@ -273,7 +285,21 @@ public class ParameterList
    */
   public void set(String name, String value)
   {
-    list.put(name.toLowerCase().trim(), value);
+    set(name, value, null);
+  }
+
+  /**
+   * Sets the specified parameter.
+   * @param name the parameter name
+   * @param value the parameter value
+   * @param charset the character set to use to encode the value, if
+   * <code>mail.mime.encodeparameters</code> is true.
+   * @since JavaMail 1.5
+   */
+  public void set(String name, String value, String charset)
+  {
+    String[] vc = new String[] { value, charset };
+    list.put(name.toLowerCase().trim(), vc);
   }
 
   /**
@@ -310,12 +336,33 @@ public class ParameterList
    */
   public String toString(int used)
   {
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.encodeparameters");
+    boolean encodeParameters =
+      "true".equals(AccessController.doPrivileged(a));
+    
     StringBuffer buffer = new StringBuffer();
-    for (Iterator i = list.keySet().iterator(); i.hasNext(); )
+    for (Iterator i = list.entrySet().iterator(); i.hasNext(); )
       {
-        String key = (String) i.next();
-        String value = MimeUtility.quote((String) list.get(key), 
-                                          HeaderTokenizer.MIME);
+        Map.Entry entry = (Map.Entry) i.next();
+        String key = (String) entry.getKey();
+        String[] vc = (String[]) entry.getValue();
+        String value = vc[0];
+        String charset = vc[1];
+        
+        if (encodeParameters)
+          {
+            try
+              {
+                value = MimeUtility.encodeText(value, charset, "Q");
+              }
+            catch (UnsupportedEncodingException e)
+              {
+                // ignore
+              }
+          }
+        
+        value = MimeUtility.quote(value, HeaderTokenizer.MIME);
         
         // delimiter
         buffer.append("; ");

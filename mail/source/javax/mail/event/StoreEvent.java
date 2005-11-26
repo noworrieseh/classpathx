@@ -33,7 +33,7 @@ import javax.mail.Store;
  * A store notification event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.3
+ * @version 1.4
  */
 public class StoreEvent
   extends MailEvent
