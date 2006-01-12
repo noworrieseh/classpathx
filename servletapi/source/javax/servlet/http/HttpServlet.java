@@ -29,6 +29,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 import javax.servlet.GenericServlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
@@ -400,19 +402,23 @@ public abstract class HttpServlet
     throws IOException 
   {
     response.setDateHeader("Date", System.currentTimeMillis());
-    response.setHeader("Server", getServletConfig()
-                       .getServletContext().getServerInfo());
+    ServletConfig config = getServletConfig();
+    if (config != null) // The servlet may have overridden init() incorrectly
+      {
+        ServletContext context = config.getServletContext();
+        response.setHeader("Server", context.getServerInfo());
+      }
     long lastModifiedTime = getLastModified(request);
     if (lastModifiedTime >= 0) 
       {
-	response.setDateHeader("Last-Modified", lastModifiedTime);
-	long requestModifiedTime = request.getDateHeader("If-Modified-Since");
-	if ((requestModifiedTime >= 0)
+        response.setDateHeader("Last-Modified", lastModifiedTime);
+        long requestModifiedTime = request.getDateHeader("If-Modified-Since");
+        if ((requestModifiedTime >= 0)
             &&(requestModifiedTime <= lastModifiedTime)) 
-	  {
-	    response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-	    return false;
-	  }
+          {
+            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+            return false;
+          }
       }
     return true;
   }
