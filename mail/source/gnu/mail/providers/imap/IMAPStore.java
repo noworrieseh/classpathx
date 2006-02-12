@@ -417,6 +417,8 @@ public class IMAPStore
                                                        "command not supported");
               }
             Namespaces.Namespace[] n = ns.getPersonal();
+            if (n == null)
+              return new Folder[0];
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {
@@ -455,6 +457,8 @@ public class IMAPStore
                                                        "command not supported");
               }
             Namespaces.Namespace[] n = ns.getOther();
+            if (n == null)
+              return new Folder[0];
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {
@@ -493,6 +497,8 @@ public class IMAPStore
                                                        "command not supported");
               }
             Namespaces.Namespace[] n = ns.getShared();
+            if (n == null)
+              return new Folder[0];
             Folder[] f = new Folder[n.length];
             for (int i = 0; i < n.length; i++)
               {

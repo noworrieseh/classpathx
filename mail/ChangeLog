@@ -1,3 +1,7 @@
+2006-02-12  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPStore.java: Fix for possible NPE getting namespaces.
+
 2005-11-26  Chris Burdess  <dog@bluezoo.org>
 
 	* (all): Updated JavaMail API to 1.4 (except PreencodedMimeBodyPart
