@@ -266,16 +266,12 @@ public class IMAPFolder
               {
                ((IMAPStore) store).processAlerts();
               }
-            type = 0;
+            type = Folder.HOLDS_FOLDERS;
             if (entries.length > 0)
               {
-                if (entries[0].isNoinferiors())
+                if (!"".equals(path) && entries[0].isNoinferiors())
                   {
                     type |= Folder.HOLDS_MESSAGES;
-                  }
-                if (entries[0].isNoselect())
-                  {
-                    type |= Folder.HOLDS_FOLDERS;
                   }
               }
             else
@@ -1180,6 +1176,9 @@ public class IMAPFolder
   public Folder[] list(String pattern) 
     throws MessagingException 
   {
+    char sep = getSeparator();
+    String spec = ("".equals(path)) ? path : 
+      new StringBuffer(path).append(sep).append(pattern).toString();
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1187,7 +1186,7 @@ public class IMAPFolder
         ListEntry[] entries;
         synchronized (connection)
           {
-            entries = connection.list(path, pattern);
+            entries = connection.list("", spec);
           }
         if (connection.alertsPending())
           {
@@ -1207,6 +1206,9 @@ public class IMAPFolder
   public Folder[] listSubscribed(String pattern) 
     throws MessagingException 
   {
+    char sep = getSeparator();
+    String spec = ("".equals(path)) ? path :
+      new StringBuffer(path).append(sep).append(pattern).toString();
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1214,7 +1216,7 @@ public class IMAPFolder
         ListEntry[] entries = null;
         synchronized (connection)
           {
-            entries = connection.lsub(path, pattern);
+            entries = connection.lsub("", spec);
           }
         if (connection.alertsPending())
           {

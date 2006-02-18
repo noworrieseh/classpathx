@@ -93,7 +93,7 @@ public class Flags
      */
     public static final Flag USER = new Flag(0x80000000);
 
-    private int flag;
+    int flag;
 
     /*
      * Constructor.

@@ -1,3 +1,10 @@
+2006-02-18  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPFolder.java: Always list from
+	  NIL context rather than parent folder.
+	* source/javax/mail/Flags.java: Fix for IllegalAccessError in
+	  libgcj.
+
 2006-02-12  Chris Burdess  <dog@bluezoo.org>
 
 	* IMAPStore.java: Fix for possible NPE getting namespaces.
