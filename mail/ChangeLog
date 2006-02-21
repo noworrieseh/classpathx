@@ -1,3 +1,8 @@
+2006-02-21  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPFolder.java: Permit custom
+	  SearchTerms in IMAP searches.
+
 2006-02-18  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/imap/IMAPFolder.java: Always list from

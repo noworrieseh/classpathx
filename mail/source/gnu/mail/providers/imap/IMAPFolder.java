@@ -859,27 +859,29 @@ public class IMAPFolder
           }
         list.add(buffer.toString());
       }
-    addTerm(term, list);
+    boolean isIMAPSearch = addTerm(term, list);
     String[] criteria = new String[list.size()];
     list.toArray(criteria);
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
       {
-        int[] mn = null;
-        synchronized (connection)
+        Message[] messages;
+        if (isIMAPSearch && criteria.length > 0)
           {
-            mn = connection.search(null, criteria);
+            int[] mn = null;
+            synchronized (connection)
+              {
+                mn = connection.search(null, criteria);
+              }
+            messages = new Message[mn.length];
+            for (int i = 0; i < mn.length; i++)
+              messages[i] = new IMAPMessage(this, mn[i]);
+            if (connection.alertsPending())
+              s.processAlerts();
           }
-        Message[] messages = new Message[mn.length];
-        for (int i = 0; i < mn.length; i++)
-          {
-            messages[i] = new IMAPMessage(this, mn[i]);
-          }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
+        else
+          messages = (msgs != null) ? msgs : getMessages();
         // Enforce final constraints
         return super.search(term, messages);
       }
@@ -894,15 +896,17 @@ public class IMAPFolder
    * Note that this is not sufficient to enforce all the constraints imposed
    * by the SearchTerm structures - this is why we finally call
    * <code>super.search()</code> in the search method.
+   * @return true if all the terms can be represented in IMAP
    */
-  private void addTerm(SearchTerm term, List list)
+  private boolean addTerm(SearchTerm term, List list)
   {
     if (term instanceof AndTerm)
       {
         SearchTerm[] terms = ((AndTerm) term).getTerms();
         for (int i = 0; i < terms.length; i++)
           {
-            addTerm(terms[i], list);
+            if (!addTerm(terms[i], list))
+              return false;
           }
       }
     else if (term instanceof OrTerm)
@@ -911,13 +915,15 @@ public class IMAPFolder
         SearchTerm[] terms = ((OrTerm) term).getTerms();
         for (int i = 0; i < terms.length; i++)
           {
-            addTerm(terms[i], list);
+            if (!addTerm(terms[i], list))
+              return false;
           }
       }
     else if (term instanceof NotTerm)
       {
         list.add(IMAPConstants.SEARCH_NOT);
-        addTerm(((NotTerm) term).getTerm(), list);
+        if (!addTerm(((NotTerm) term).getTerm(), list))
+          return false;
       }
     else if (term instanceof FlagTerm)
       {
@@ -978,34 +984,22 @@ public class IMAPFolder
         Address address = ((AddressTerm) term).getAddress();
         StringBuffer criterion = new StringBuffer();
         if (term instanceof FromTerm)
-          {
-            criterion.append(IMAPConstants.SEARCH_FROM);
-          }
+          criterion.append(IMAPConstants.SEARCH_FROM);
         else if (term instanceof RecipientTerm)
           {
             Message.RecipientType rt =
-             ((RecipientTerm) term).getRecipientType();
+              ((RecipientTerm) term).getRecipientType();
             if (rt == Message.RecipientType.TO)
-              {
-                criterion.append(IMAPConstants.SEARCH_TO);
-              }
+              criterion.append(IMAPConstants.SEARCH_TO);
             else if (rt == Message.RecipientType.CC)
-              {
-                criterion.append(IMAPConstants.SEARCH_CC);
-              }
+              criterion.append(IMAPConstants.SEARCH_CC);
             else if (rt == Message.RecipientType.BCC)
-              {
-                criterion.append(IMAPConstants.SEARCH_BCC);
-              }
+              criterion.append(IMAPConstants.SEARCH_BCC);
             else
-              {
-                criterion = null;
-              }
+              criterion = null;
           }
         else
-          {
-            criterion = null;
-          }
+          criterion = null;
         if (criterion != null)
           {
             criterion.append(' ');
@@ -1014,6 +1008,8 @@ public class IMAPFolder
             criterion.append('"');
             list.add(criterion.toString());
           }
+        else
+          return false;
       }
     else if (term instanceof ComparisonTerm)
       {
@@ -1032,9 +1028,7 @@ public class IMAPFolder
                 criterion.append(' ');
               }
             if (term instanceof SentDateTerm)
-              {
-                criterion.append("SENT");
-              }
+              criterion.append("SENT");
             switch (comparison)
               {
               case ComparisonTerm.EQ:
@@ -1099,6 +1093,8 @@ public class IMAPFolder
                   }
                 list.add(criterion.toString());
               }
+            else
+              return false;
           }
       }
     else if (term instanceof StringTerm)
@@ -1126,9 +1122,7 @@ public class IMAPFolder
             criterion.append("Message-ID");
           }
         else
-          {
-            criterion = null; // TODO StringAddressTerms?
-          }
+          criterion = null; // TODO StringAddressTerms?
         if (criterion != null)
           {
             criterion.append(' ');
@@ -1137,7 +1131,12 @@ public class IMAPFolder
             criterion.append('"');
             list.add(criterion.toString());
           }
+        else
+          return false;
       }
+    else
+      return false;
+    return true;
   }
 
   public boolean isSubscribed()
