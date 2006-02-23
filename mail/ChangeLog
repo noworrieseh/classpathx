@@ -1,3 +1,9 @@
+2006-02-23  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPStore.java,
+	  source/gnu/mail/providers/pop3/POP3Store.java: isConnected method
+	  issues a NOOP to server to ensure that connection is still usable.
+
 2006-02-21  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/imap/IMAPFolder.java: Permit custom

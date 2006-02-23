@@ -51,6 +51,7 @@ import javax.net.ssl.TrustManager;
 
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
+import gnu.inet.imap.MailboxStatus;
 import gnu.inet.imap.Namespaces;
 import gnu.inet.imap.Quota;
 
@@ -354,13 +355,46 @@ public class IMAPStore
   }
 
   /**
+   * Uses a NOOP to ensure that the connection to the IMAP server is still
+   * valid.
+   */
+  public boolean isConnected()
+  {
+    if (!super.isConnected())
+      return false;
+    try
+      {
+        synchronized (this)
+          {
+            MailboxStatus ms = connection.noop();
+            if (selected != null)
+              {
+                try
+                  {
+                    selected.update(ms, true);
+                  }
+                catch (MessagingException e)
+                  {
+                    // Ignore
+                  }
+              }
+          }
+        return true;
+      }
+    catch (IOException e)
+      {
+        return false;
+      }
+  }
+
+  /**
    * Returns the IMAP connection used by this store.
    * @exception StoreClosedException if the store is not currently connected
    */
   protected IMAPConnection getConnection()
     throws StoreClosedException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }
@@ -402,7 +436,7 @@ public class IMAPStore
   public Folder[] getPersonalNamespaces()
     throws MessagingException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }
@@ -442,7 +476,7 @@ public class IMAPStore
   public Folder[] getUserNamespaces()
     throws MessagingException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }
@@ -482,7 +516,7 @@ public class IMAPStore
   public Folder[] getSharedNamespaces()
     throws MessagingException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }
@@ -522,7 +556,7 @@ public class IMAPStore
   public Quota getQuota(String root)
     throws MessagingException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }
@@ -547,7 +581,7 @@ public class IMAPStore
   public void setQuota(String root, Quota.Resource[] resources)
     throws MessagingException
   {
-    if (!isConnected())
+    if (!super.isConnected())
       {
         throw new StoreClosedException(this);
       }

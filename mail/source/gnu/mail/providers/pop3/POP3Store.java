@@ -321,6 +321,28 @@ public final class POP3Store
   }
 
   /**
+   * Issues a NOOP to the POP server to determine whether the connection
+   * is still alive.
+   */
+  public boolean isConnected()
+  {
+    if (!super.isConnected())
+      return false;
+    try
+      {
+        synchronized (connection)
+          {
+            connection.noop();
+          }
+        return true;
+      }
+    catch (IOException e)
+      {
+        return false;
+      }
+  }
+
+  /**
    * Returns the root folder.
    */
   public Folder getDefaultFolder()
