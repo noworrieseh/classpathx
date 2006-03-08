@@ -314,6 +314,10 @@ public class SMTPTransport
   public void sendMessage(Message message, Address[] addresses)
     throws MessagingException, SendFailedException 
   {
+    if (!isConnected())
+      {
+        throw new MessagingException("not connected");
+      }
     if (!(message instanceof MimeMessage))
       {
         throw new SendFailedException("only MimeMessages are supported");
@@ -330,11 +334,6 @@ public class SMTPTransport
     
     synchronized (connection)
       {
-        if (!isConnected())
-          {
-            throw new MessagingException("not connected");
-          }
-        
         try
           {
             // reverse-path
