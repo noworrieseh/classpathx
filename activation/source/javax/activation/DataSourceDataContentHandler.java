@@ -71,8 +71,8 @@ class DataSourceDataContentHandler
       {
         return dch.getTransferData(flavor, ds);
       }
-    DataFlavor[] flavors = getTransferDataFlavors();
-    if (flavors.length > 0 && flavor.equals(flavors[0]))
+    DataFlavor[] tdf = getTransferDataFlavors();
+    if (tdf.length > 0 && flavor.equals(tdf[0]))
       {
         return ds.getInputStream();
       }
