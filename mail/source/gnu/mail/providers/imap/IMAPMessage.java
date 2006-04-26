@@ -83,8 +83,8 @@ extends ReadOnlyMessage
   static final int BS_ENCODING = 5;
   static final int BS_OCTETS = 6;
   static final int BS_LINES = 7;
-  static final int BS_EXT_DISPOSITION = 3;
-  static final int BS_EXT_LANGUAGE = 4;
+  static final int BS_EXT_DISPOSITION = 8;
+  static final int BS_EXT_LANGUAGE = 9;
 
   /**
    * If set, this contains the string value of the received date.
@@ -465,17 +465,16 @@ extends ReadOnlyMessage
         throw new MessagingException("Unexpected number of fields in " +
                                       "[MIME-IMB] structure: " + list);
       }
-    int extensionCount = (len - 8); // number of extension fields
         
     // Basic fields
     String type = parseAtom(list.get(BS_CONTENT_TYPE)).toLowerCase();
     String subtype = parseAtom(list.get(BS_CONTENT_SUBTYPE)).toLowerCase();
     ParameterList params = parseParameterList(list.get(BS_PARAMETERS));
-    String id = parseAtom(list.get(BS_ID + extensionCount));
-    String description = parseAtom(list.get(BS_DESCRIPTION + extensionCount));
-    String encoding = parseAtom(list.get(BS_ENCODING + extensionCount));
-    String sizeVal = parseAtom(list.get(BS_OCTETS + extensionCount));
-    String linesVal = parseAtom(list.get(BS_LINES + extensionCount));
+    String id = parseAtom(list.get(BS_ID));
+    String description = parseAtom(list.get(BS_DESCRIPTION));
+    String encoding = parseAtom(list.get(BS_ENCODING));
+    String sizeVal = parseAtom(list.get(BS_OCTETS));
+    String linesVal = parseAtom(list.get(BS_LINES));
 
     int size = -1;
     int lines = -1;
@@ -515,10 +514,21 @@ extends ReadOnlyMessage
     // Extension fields
     if (len > 8)
       {
-        String disposition = parseAtom(list.get(BS_EXT_DISPOSITION));
+        Object dispositionVal = list.get(BS_EXT_DISPOSITION);
+        String disposition = parseAtom(dispositionVal);
         if (disposition != null)
           {
             h.setHeader("Content-Disposition", disposition);
+          }
+        else if (dispositionVal instanceof List)
+          {
+            List d = (List) dispositionVal;
+            if (d != null && d.size() == 2)
+              {
+                disposition = parseAtom(d.get(0));
+                ParameterList pl = parseParameterList(d.get(1));
+                h.setHeader("Content-Disposition", disposition + pl.toString());
+              }
           }
       }
     if (len > 9)

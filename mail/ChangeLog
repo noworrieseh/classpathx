@@ -1,3 +1,8 @@
+2006-04-26  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPMessage.java: Fix BODYSTRUCTURE
+	  parsing of MIME body parts.
+
 2006-03-08  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/smtp/SMTPTransport.java: Fix NPE in
