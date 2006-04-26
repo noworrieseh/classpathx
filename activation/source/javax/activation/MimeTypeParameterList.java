@@ -220,7 +220,7 @@ public class MimeTypeParameterList
   }
   
   /**
-   * Returns an RFC 2045-complient string representation of this parameter
+   * Returns an RFC 2045-compliant string representation of this parameter
    * list.
    */
   public synchronized String toString()
@@ -231,11 +231,8 @@ public class MimeTypeParameterList
         String name = (String)i.next();
         String value = (String)parameterValues.get(name.toLowerCase());
         
-        if (buffer.length() > 0)
-          {
-            buffer.append(';');
-            buffer.append(' ');
-          }
+        buffer.append(';');
+        buffer.append(' ');
         buffer.append(name);
         buffer.append('=');
         buffer.append(quote(value));
