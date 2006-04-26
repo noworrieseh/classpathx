@@ -16,7 +16,7 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
@@ -220,7 +220,7 @@ public class MimeTypeParameterList
   }
   
   /**
-   * Returns an RFC 2045-complient string representation of this parameter
+   * Returns an RFC 2045-compliant string representation of this parameter
    * list.
    */
   public synchronized String toString()
@@ -231,11 +231,8 @@ public class MimeTypeParameterList
         String name = (String)i.next();
         String value = (String)parameterValues.get(name.toLowerCase());
         
-        if (buffer.length() > 0)
-          {
-            buffer.append(';');
-            buffer.append(' ');
-          }
+        buffer.append(';');
+        buffer.append(' ');
         buffer.append(name);
         buffer.append('=');
         buffer.append(quote(value));

@@ -1,7 +1,0 @@
-New in release 0.1.2 (2003/03/07)
-* Closes a number of memory leaks. Libxml2's memory debug facility now
-  shows zero leaked bytes.
-* Now uses LRU caching for recently accessed DOMs.
-
-New in release 0.1.1 (2003/02/27)
-* First development release
