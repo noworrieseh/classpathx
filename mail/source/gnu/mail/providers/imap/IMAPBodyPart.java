@@ -185,7 +185,29 @@ implements IMAPConstants
                 
                 if (pkey.equals(section))
                   {
-                    content = (byte[]) code.get(i + 1);
+                    Object c = code.get(i + 1);
+                    if (c instanceof byte[])
+                      content = (byte[]) c;
+                    else if (c instanceof String)
+                      {
+                        ContentType ct = new ContentType(getContentType());
+                        String charset = ct.getParameter("charset");
+                        if (charset == null)
+                          charset = "US-ASCII";
+                        try
+                          {
+                            content = ((String) c).getBytes(charset);
+                          }
+                        catch (IOException e)
+                          {
+                            MessagingException e2 = new MessagingException();
+                            e2.initCause(e);
+                            throw e2;
+                          }
+                      }
+                    else
+                      throw new MessagingException("Unexpected MIME body " +
+                                                   "part content: " + c);
                   }
                 else
                   {

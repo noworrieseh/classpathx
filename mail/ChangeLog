@@ -1,3 +1,8 @@
+2006-05-03  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPBodyPart.java: Handle IMAP strings
+	  as content in FETCH BODY MIME body part updates.
+
 2006-04-26  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/imap/IMAPMessage.java: Fix BODYSTRUCTURE
