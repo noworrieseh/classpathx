@@ -184,6 +184,7 @@ endif
 # News protocol
 if ENABLE_NNTP
 nntp_sources = \
+$(src)/gnu/mail/providers/nntp/ListFolderListener.java \
 $(src)/gnu/mail/providers/nntp/NNTPFolder.java \
 $(src)/gnu/mail/providers/nntp/NNTPMessage.java \
 $(src)/gnu/mail/providers/nntp/NNTPRootFolder.java \

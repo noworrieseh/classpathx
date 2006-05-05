@@ -327,6 +327,7 @@ $(src)/gnu/mail/providers/ReadOnlyMessage.java
 
 # News protocol
 @ENABLE_NNTP_TRUE@nntp_sources = \
+@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/ListFolderListener.java \
 @ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPFolder.java \
 @ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPMessage.java \
 @ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPRootFolder.java \

@@ -1,3 +1,9 @@
+2006-05-05  Cedric Hyppolite  <cedric.hyppolite@free.fr>
+
+	* source/gnu/mail/providers/nntp/NNTPRootFolder.java,
+	* source/gnu/mail/providers/nntp/ListFolderListener: Provide
+	  callback interface for receiving group names asynchronously.
+
 2006-05-03  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/imap/IMAPBodyPart.java: Handle IMAP strings
