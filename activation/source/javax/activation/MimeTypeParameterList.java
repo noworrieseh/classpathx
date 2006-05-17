@@ -1,6 +1,6 @@
 /*
  * MimeTypeParameterList.java
- * Copyright (C) 2004 The Free Software Foundation
+ * Copyright (C) 2004, 2006 The Free Software Foundation
  * 
  * This file is part of GNU Java Activation Framework (JAF), a library.
  * 
@@ -208,11 +208,8 @@ public class MimeTypeParameterList
             String name = (String)i.next();
             String value = (String)parameterValues.get(name.toLowerCase());
 
-            if (buffer.length() > 0)
-            {
-                buffer.append(';');
-                buffer.append(' ');
-            }
+            buffer.append(';');
+            buffer.append(' ');
             buffer.append(name);
             buffer.append('=');
             buffer.append(quote(value));

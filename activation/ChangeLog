@@ -1,3 +1,8 @@
+2006-04-25  Archit Shah  <ashah@redhat.com>
+
+	* MimeTypeParameterList.java: Insert ';' separator before parameter
+	  list.
+
 2004-06-09  Chris Burdess  <dog@bluezoo.org>
 
 	* MailcapCommandMap: Fixed bug whereby x-java prefix was not
