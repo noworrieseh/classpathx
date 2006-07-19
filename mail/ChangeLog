@@ -1,3 +1,8 @@
+2006-07-19  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/handler/Application.java: Permit InputStream as a
+	  supported object type.
+
 2006-05-05  Cedric Hyppolite  <cedric.hyppolite@free.fr>
 
 	* source/gnu/mail/providers/nntp/NNTPRootFolder.java,
