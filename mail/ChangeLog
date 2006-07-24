@@ -1,5 +1,11 @@
 2006-07-24  Chris Burdess  <dog@bluezoo.org>
 
+	* source/javax/mail/internet/MimeBodyPart.java,
+	* source/javax/mail/internet/MimeMessage.java: Ensure correct
+	  content-type is applied for new MIME body parts in setFileName.
+
+2006-07-24  Chris Burdess  <dog@bluezoo.org>
+
 	* source/gnu/mail/protocol/pop3/POP3Folder.java: Return null for
 	  getParent if root folder.
 

@@ -1252,7 +1252,15 @@ public class MimeMessage
 
     // We will also set the "name" parameter of the Content-Type field
     // to preserve compatibility with nonconformant MUAs
-    header = getContentType(); // not valid for this to be null
+    header = getHeader(MimeBodyPart.CONTENT_TYPE_NAME, null);
+    if (header == null)
+      {
+        DataHandler dh0 = getDataHandler();
+        if (dh0 != null)
+          header = dh0.getContentType();
+        else
+          header = "text/plain";
+      }
     ContentType contentType = new ContentType(header);
     contentType.setParameter("name", filename);
     setHeader(MimeBodyPart.CONTENT_TYPE_NAME, contentType.toString());
