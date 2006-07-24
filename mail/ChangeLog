@@ -1,3 +1,8 @@
+2006-07-24  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/protocol/pop3/POP3Folder.java: Return null for
+	  getParent if root folder.
+
 2006-07-19  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/handler/Application.java: Permit InputStream as a

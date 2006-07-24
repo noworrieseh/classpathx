@@ -378,7 +378,7 @@ extends Folder
       case HOLDS_MESSAGES:
         return ((POP3Store) store).root;
       default:
-        throw new MessagingException("Root folders can't have a parent");
+        return null;
       }
   }
 
