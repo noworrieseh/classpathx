@@ -1,3 +1,7 @@
+2006-11-17  Chris Burdess  <dog@gnu.org>
+
+	* Makefile.am: Added missing classes to build.
+
 2005-06-09  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Added missing classes to build.
