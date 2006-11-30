@@ -118,6 +118,11 @@ public interface ServletRequest
    */
   String getRemoteHost();
 
+  /**
+   * Returns the IP source port of the client that sent the request.
+   * @since 2.4
+   */
+  int getRemotePort();
 
   /**
    * Translates the given path to the real path on the servers
@@ -146,6 +151,30 @@ public interface ServletRequest
    */
   ServletInputStream getInputStream()
     throws IOException;
+
+  /**
+   * Returns the IP address of the interface on which the request was
+   * received.
+   * @since 2.4
+   */
+  String getLocalAddr()
+      throws IOException;
+
+  /**
+   * Returns the DNS hostname of the IP interface on which the request was
+   * received.
+   * @since 2.4
+   */
+  String getLocalName()
+      throws IOException;
+
+  /**
+   * Returns the port number of the interface on which the request was
+   * received.
+   * @since 2.4
+   */
+  int getLocalPort()
+      throws IOException;
 
   /**
    * Gets the value of a named requestparameter.

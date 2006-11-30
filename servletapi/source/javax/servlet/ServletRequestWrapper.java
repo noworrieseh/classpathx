@@ -132,6 +132,25 @@ public class ServletRequestWrapper
   {
     return _impl.getInputStream();
   }
+  
+  public String getLocalAddr()
+      throws IOException
+  {
+      return _impl.getLocalAddr();
+  }
+
+  public String getLocalName()
+      throws IOException
+  {
+      return _impl.getLocalName();
+  }
+
+  public int getLocalPort()
+      throws IOException
+  {
+      return _impl.getLocalPort();
+  }
+
   /**
    * Calls the underlying request object's method
    */
@@ -213,6 +232,12 @@ public class ServletRequestWrapper
   {
     return _impl.getRemoteHost();
   }
+  
+  public int getRemotePort()
+  {
+      return _impl.getRemotePort();
+  }
+
   /**
    * Calls the underlying request object's method
    */

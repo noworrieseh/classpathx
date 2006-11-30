@@ -1,3 +1,9 @@
+2006-11-30  Chris Burdess  <dog@gnu.org>
+
+	* source/javax/servlet/ServletRequest.java,
+	  source/javax/servlet/ServletRequestWrapper.java: Added methods
+	  introduced in 2.4.
+
 2006-11-17  Chris Burdess  <dog@gnu.org>
 
 	* Makefile.am: Added missing classes to build.
