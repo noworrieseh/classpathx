@@ -1,6 +1,11 @@
 2007-03-27  Chris Burdess  <dog@bluezoo.org>
 
 	* source/javax/mail/internet/InternetHeaders.java: make inner class
+	  InternetHeader constructors public.
+
+2007-03-27  Chris Burdess  <dog@bluezoo.org>
+
+	* source/javax/mail/internet/InternetHeaders.java: make inner class
 	  InternetHeader protected for compatibility with JavaMail 1.4.
 
 2006-07-24  Chris Burdess  <dog@bluezoo.org>

@@ -74,7 +74,7 @@ public class InternetHeaders
      */
     protected String line;
     
-    InternetHeader(String line)
+    public InternetHeader(String line)
     {
       super(null, null);
       int i = line.indexOf(':');
@@ -82,7 +82,7 @@ public class InternetHeaders
       this.line = line;
     }
     
-    InternetHeader(String name, String value)
+    public InternetHeader(String name, String value)
     {
       super(null, null);
       this.name = name;
