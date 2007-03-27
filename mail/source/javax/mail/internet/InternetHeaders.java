@@ -58,7 +58,7 @@ public class InternetHeaders
   /*
    * The header class that stores raw header lines.
    */
-  static class InternetHeader
+  protected static class InternetHeader
     extends Header
   {
     
