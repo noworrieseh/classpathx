@@ -1,3 +1,7 @@
+2007-03-29  Chris Burdess  <dog@bluezoo.org>
+
+	* COPYING: Corrected to use GPL licence text instead of incorrect LGPL.
+
 2006-04-25  Archit Shah  <ashah@redhat.com>
 
 	* MimeTypeParameterList.java: Insert ';' separator before parameter
