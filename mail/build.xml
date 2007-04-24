@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.15 2005-11-20 09:49:41 dog Exp $
+$Id: build.xml,v 1.16 2007-04-24 07:55:01 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -119,34 +119,36 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
   <target name='smtp.ok' unless='disable-smtp'>
     <echo file='${providers}' append='true'>protocol=smtp; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;
-    </echo>
+</echo>
+    <echo file='${providers}' append='true'>protocol=smtps; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;
+</echo>
   </target>
 
   <target name='imap.ok' unless='disable-imap'>
     <echo file='${providers}' append='true'>protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
-    </echo>
+</echo>
   </target>
 
   <target name='pop3.ok' unless='disable-pop3'>
     <echo file='${providers}' append='true'>protocol=pop3; type=store; class=gnu.mail.providers.pop3.POP3Store; vendor=dog@gnu.org;
-    </echo>
+</echo>
   </target>
 
   <target name='nntp.ok' unless='disable-nntp'>
     <echo file='${providers}' append='true'>protocol=nntp; type=store; class=gnu.mail.providers.nntp.NNTPStore; vendor=dog@gnu.org;
-    </echo>
+</echo>
     <echo file='${providers}' append='true'>protocol=nntp-post; type=transport; class=gnu.mail.providers.nntp.NNTPTransport; vendor=dog@gnu.org;
-    </echo>
+</echo>
   </target>
 
   <target name='mbox.ok' unless='disable-mbox'>
     <echo file='${providers}' append='true'>protocol=mbox; type=store; class=gnu.mail.providers.mbox.MboxStore; vendor=dog@gnu.org;
-    </echo>
+</echo>
   </target>
 
   <target name='maildir.ok' unless='disable-maildir'>
     <echo file='${providers}' append='true'>protocol=maildir; type=store; class=gnu.mail.providers.maildir.MaildirStore; vendor=dog@gnu.org;
-    </echo>
+</echo>
   </target>
 
   <target name='meta-inf' depends='init,javamail.address.map,javamail.providers'>

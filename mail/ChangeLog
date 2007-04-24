@@ -1,3 +1,9 @@
+2007-04-24  Arend Freije  <afreije@inn.nl>
+
+	* javamail.providers.in,
+	  source/gnu/mail/providers/smtp/SMTPTransport.java: Complete SMTPS
+	  implementation.
+
 2007-03-29  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/smtp/SMTPTransport.java: updated licence

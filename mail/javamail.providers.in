@@ -22,3 +22,4 @@ protocol=imaps; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@
 
 #the user almost always needs SMTP
 protocol=smtp; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;
+protocol=smtps; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; vendor=nferrier@tapsellferrier.co.uk;

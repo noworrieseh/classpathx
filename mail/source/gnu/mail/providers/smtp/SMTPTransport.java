@@ -64,6 +64,7 @@ import gnu.inet.util.BASE64;
  * @author Andrew Selkirk
  * @author Ben Speakmon
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @author Arend Freije
  * @version 2.0
  */
 public class SMTPTransport
@@ -145,9 +146,15 @@ public class SMTPTransport
           }
         boolean tls = "stmps".equals(url.getProtocol());
         // Locate custom trust manager
-        String tmt = getProperty("trustmanager");
-        connection = new SMTPConnection(host, port,
-                                        connectionTimeout, timeout);
+        TrustManager tm = null;
+        if (tls)
+          {
+            tm = getTrustManager();
+          }
+        
+        connection = new SMTPConnection(host, port, 
+                                        connectionTimeout, timeout,
+                                        tls, tm);
     
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))
@@ -173,22 +180,14 @@ public class SMTPTransport
                   {
                     if (!propertyIsFalse("tls"))
                       {
-                        if (tmt == null)
+                        tm = getTrustManager();
+                        if (tm == null)
                           {
                             tls = connection.starttls();
                           }
                         else
                           {
-                            try
-                              {
-                                Class t = Class.forName(tmt);
-                                TrustManager tm = (TrustManager) t.newInstance();
-                                tls = connection.starttls(tm);
-                              }
-                            catch (Exception e)
-                              {
-                                throw new MessagingException(e.getMessage(), e);
-                              }
+                            tls = connection.starttls(tm);
                           }
                         if (tls)
                           {
@@ -233,7 +232,7 @@ public class SMTPTransport
                     InetAddress addr = InetAddress.getByName(host);
                     pa = session.requestPasswordAuthentication(addr,
                                                                 port,
-                                                                "smtp",
+                                                                url.getProtocol(),
                                                                 null,
                                                                 null);
                   }
@@ -274,9 +273,9 @@ public class SMTPTransport
               {
                 if (session.getDebug())
                   {
-                    System.err.println("smtp: WARNING: server requested " +
-                                        "AUTH, but authentication principal " +
-                                        "and credentials are not available");
+                    debugWarning("server requested AUTH, " +
+                                 "but authentication principal " +
+                                 "and credentials are not available");
                   }
               }
             return false;
@@ -285,9 +284,8 @@ public class SMTPTransport
           {
             if (session.getDebug())
               {
-                System.err.println("smtp: WARNING: server requested " +
-                                    "AUTH, but authentication is not " +
-                                    "enabled");
+                    debugWarning("server requested AUTH, " +
+                                 "but authentication is not enabled");
               }
           }
         return !authRequired;
@@ -296,6 +294,26 @@ public class SMTPTransport
       {
         throw new MessagingException(e.getMessage(), e);
       }
+  }
+
+  private TrustManager getTrustManager() throws MessagingException {
+	String tmt = getProperty("trustmanager");
+    if (tmt != null)
+      {
+        try
+          {
+            Class t = Class.forName(tmt);
+            return (TrustManager) t.newInstance();
+          } catch (Exception e) {
+            throw new MessagingException(e.getMessage(), e);
+          }
+      }
+    return null;
+  }
+
+  private void debugWarning(final String warning)
+  {
+    System.err.println(url.getProtocol() + ": WARNING: " + warning);
   }
 
   /**
@@ -673,7 +691,7 @@ public class SMTPTransport
    */
   private String getProperty(String key)
   {
-    String value = session.getProperty("mail.smtp." + key);
+    String value = session.getProperty("mail." + url.getProtocol() + "." + key);
     if (value == null)
       {
         value = session.getProperty("mail." + key);
