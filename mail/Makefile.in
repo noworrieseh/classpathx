@@ -312,7 +312,6 @@ $(src)/gnu/mail/providers/ReadOnlyMessage.java
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipart.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPStore.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPTest.java \
 @ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/Rights.java
 
 @ENABLE_POP3_FALSE@pop3_sources = 

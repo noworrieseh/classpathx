@@ -71,7 +71,12 @@ public class SharedFileInputStream
    * The number of bytes in this stream.
    */
   protected long datalen;
-
+  
+  /**
+   * The open streams count;
+   */
+  private final int[] openCount;
+  
   /**
    * Constructor with file.
    * @param file the file
@@ -83,6 +88,7 @@ public class SharedFileInputStream
     bufsize = buf.length;
     in = new RandomAccessFile(file, "r");
     datalen = in.length();
+    openCount = new int[]{1};
   }
 
   /**
@@ -96,6 +102,7 @@ public class SharedFileInputStream
     bufsize = buf.length;
     in = new RandomAccessFile(file, "r");
     datalen = in.length();
+    openCount = new int[]{1};
   }
   
   /**
@@ -110,6 +117,7 @@ public class SharedFileInputStream
     bufsize = size;
     in = new RandomAccessFile(file, "r");
     datalen = in.length();
+    openCount = new int[]{1};
   }
 
   /**
@@ -124,14 +132,16 @@ public class SharedFileInputStream
     bufsize = size;
     in = new RandomAccessFile(file, "r");
     datalen = in.length();
+    openCount = new int[]{1};
   }
 
-  private SharedFileInputStream(RandomAccessFile in, int bufsize,
+  private SharedFileInputStream(SharedFileInputStream parent,
                                 long start, long datalen)
   {
-    super(null, bufsize);
-    this.in = in;
-    this.bufsize = bufsize;
+    super(null, parent.bufsize);
+    this.openCount = parent.openCount;
+    this.in = parent.in;
+    this.bufsize = parent.bufsize;
     this.start = start;
     this.datalen = datalen;
     bufpos = start;
@@ -196,8 +206,18 @@ public class SharedFileInputStream
   public void close()
     throws IOException
   {
-    in.close();
-    buf = null;
+    if (in != null) {
+      synchronized(openCount) {
+        if (openCount[0] > 0) {
+          --openCount[0];
+          if (openCount[0] == 0) {
+            in.close();
+          }
+        }
+      }
+      buf = null;
+      in = null;
+    }
   }
 
   public long getPosition()
@@ -207,7 +227,10 @@ public class SharedFileInputStream
 
   public InputStream newStream(long start, long end)
   {
-    return new SharedFileInputStream(in, bufsize, start, end - start);
+    synchronized(openCount) {
+       ++openCount[0];
+    }
+    return new SharedFileInputStream(this, start, end - start);
   }
 
   /**

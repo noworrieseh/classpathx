@@ -1,5 +1,10 @@
 2007-04-24  Arend Freije  <afreije@inn.nl>
 
+	* source/javax/mail/util/SharedFileInputStream.java: Maintain a count of
+	  open streams that share the same file.
+
+2007-04-24  Arend Freije  <afreije@inn.nl>
+
 	* javamail.providers.in,
 	  source/gnu/mail/providers/smtp/SMTPTransport.java: Complete SMTPS
 	  implementation.

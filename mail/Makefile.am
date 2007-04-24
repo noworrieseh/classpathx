@@ -165,7 +165,6 @@ $(src)/gnu/mail/providers/imap/IMAPMessage.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipart.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
 $(src)/gnu/mail/providers/imap/IMAPStore.java \
-$(src)/gnu/mail/providers/imap/IMAPTest.java \
 $(src)/gnu/mail/providers/imap/Rights.java
 else
 imap_sources =
