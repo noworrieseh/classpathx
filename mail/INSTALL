@@ -61,6 +61,8 @@ the javadoc program in your PATH for this):
 
 	make javadoc
 
+GNU JavaMail requires at least version 1.4 of the Java libraries.
+
 
 Installation
 
@@ -80,4 +82,4 @@ options available during the standard autotools-based installation.
 
 
 $Author: dog $
-$Date: 2005-11-11 09:31:38 $
+$Date: 2007-04-26 10:16:51 $

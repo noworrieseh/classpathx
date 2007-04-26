@@ -1348,6 +1348,7 @@ public class MimeMessage
     // recalculated by the new DataHandler - see updateHeaders()
     removeHeader(MimeBodyPart.CONTENT_TYPE_NAME);
     removeHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME);
+    removeHeader(MESSAGE_ID_NAME);
   }
 
   /**

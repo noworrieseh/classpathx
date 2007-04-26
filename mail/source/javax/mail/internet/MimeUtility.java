@@ -945,7 +945,7 @@ public class MimeUtility
       "javamailuser@localhost";
 
     StringBuffer buffer = new StringBuffer();
-    buffer.append(buffer.hashCode());
+    buffer.append(getUniqueBoundaryValue().hashCode());
     buffer.append('.');
     buffer.append(System.currentTimeMillis());
     buffer.append('.');

@@ -507,7 +507,7 @@ public class InternetAddress
                     InetAddress localhost = InetAddress.getLocalHost();
                     if (localhost != null)
                       {
-                        hostname = localhost.getHostName();
+                        hostname = localhost.getCanonicalHostName();
                       }
                   }
               }
