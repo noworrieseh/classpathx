@@ -929,7 +929,7 @@ public class MimeUtility
     buffer.append("----=_Part_");
     buffer.append(part++);
     buffer.append("_");
-    buffer.append(buffer.hashCode());
+    buffer.append(Math.abs(buffer.hashCode()));
     buffer.append('.');
     buffer.append(System.currentTimeMillis());
     return buffer.toString();
@@ -945,7 +945,7 @@ public class MimeUtility
       "javamailuser@localhost";
 
     StringBuffer buffer = new StringBuffer();
-    buffer.append(getUniqueBoundaryValue().hashCode());
+    buffer.append(Math.abs(getUniqueBoundaryValue().hashCode()));
     buffer.append('.');
     buffer.append(System.currentTimeMillis());
     buffer.append('.');
