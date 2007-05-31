@@ -694,7 +694,6 @@ public class IMAPFolder
   {
     FetchProfile fp = new FetchProfile();
     fp.add(IMAPConstants.BODYSTRUCTURE);
-    fp.add(IMAPConstants.RFC822);
     fetch(msgs, fp);
     if (!folder.exists())
       {

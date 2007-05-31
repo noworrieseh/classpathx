@@ -1,5 +1,10 @@
 2007-05-31  Chris Burdess  <dog@bluezoo.org>
 
+	* source/gnu/mail/providers/imap/IMAPFolder.java: don't ask for complete
+	  RFC822 in fetch.
+
+2007-05-31  Chris Burdess  <dog@bluezoo.org>
+
 	* source/gnu/mail/providers/imap/IMAPFolder.java: prefetch message
 	  contents before calling copyMessages.
 
