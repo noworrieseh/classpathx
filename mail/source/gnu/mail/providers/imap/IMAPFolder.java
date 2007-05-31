@@ -683,6 +683,35 @@ public class IMAPFolder
   }
 
   /**
+   * Copies the specified messages into another folder.
+   * <p>
+   * The destination folder does not have to be open.
+   * @param msgs the messages
+   * @param folder the folder to copy the messages to
+   */
+  public void copyMessages(Message[] msgs, Folder folder)
+    throws MessagingException
+  {
+    FetchProfile fp = new FetchProfile();
+    fp.add(IMAPConstants.BODYSTRUCTURE);
+    fp.add(IMAPConstants.RFC822);
+    fetch(msgs, fp);
+    if (!folder.exists())
+      {
+        throw new FolderNotFoundException("Folder does not exist", folder);
+      }
+    if (folder instanceof IMAPFolder &&
+            ((IMAPFolder) folder).store.equals(store))
+      {
+        folder.appendMessages(msgs);
+      }
+    else
+      {
+        super.copyMessages(msgs, folder);
+      }
+  }
+
+  /**
    * Appends the specified set of messages to this folder.
    * Only <code>MimeMessage</code>s are accepted.
    */

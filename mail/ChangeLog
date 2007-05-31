@@ -1,5 +1,10 @@
 2007-05-31  Chris Burdess  <dog@bluezoo.org>
 
+	* source/gnu/mail/providers/imap/IMAPFolder.java: prefetch message
+	  contents before calling copyMessages.
+
+2007-05-31  Chris Burdess  <dog@bluezoo.org>
+
 	* source/gnu/mail/providers/imap/IMAPMultipartDataSource.java: add null
 	  pointer check.
 
