@@ -56,6 +56,8 @@ public class IMAPMultipartDataSource
    */
   protected IMAPMultipartDataSource(IMAPMultipart multipart)
   {
+    if (multipart == null)
+      throw new NullPointerException();
     this.multipart = multipart;
   }
 

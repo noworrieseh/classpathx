@@ -1,3 +1,8 @@
+2007-05-31  Chris Burdess  <dog@bluezoo.org>
+
+	* source/gnu/mail/providers/imap/IMAPMultipartDataSource.java: add null
+	  pointer check.
+
 2007-04-28  Chris Burdess  <dog@bluezoo.org>
 
 	* source/javax/mail/internet/MimeUtility.java: Ensure pseudorandom
