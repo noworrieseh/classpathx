@@ -87,6 +87,8 @@ public final class Session
   private HashMap authTable = new HashMap();
   
   private boolean debug;
+
+  private PrintStream debugOut = System.err;
   
   private ArrayList providers = new ArrayList();
 
@@ -838,9 +840,9 @@ public final class Session
   {
     if (out == null)
       {
-        out = System.out;
+        out = System.err;
       }
-    // TODO
+    debugOut = out;
   }
 
   /**
@@ -850,8 +852,7 @@ public final class Session
    */
   public PrintStream getDebugOut()
   {
-    // TODO
-    return System.out;
+    return debugOut;
   }
 
   /**

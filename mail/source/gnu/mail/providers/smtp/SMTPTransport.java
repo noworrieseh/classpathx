@@ -40,6 +40,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -57,6 +62,7 @@ import gnu.inet.smtp.Parameter;
 import gnu.inet.smtp.ParameterList;
 import gnu.inet.smtp.SMTPConnection;
 import gnu.inet.util.BASE64;
+import gnu.inet.util.LaconicFormatter;
 
 /** 
  * This transport handles communications with an SMTP server.
@@ -140,10 +146,6 @@ public class SMTPTransport
       {	
         int connectionTimeout = getIntProperty("connectiontimeout");
         int timeout = getIntProperty("timeout");
-        if (session.getDebug())
-          {
-            SMTPConnection.logger.setLevel(SMTPConnection.SMTP_TRACE);
-          }
         boolean tls = "stmps".equals(url.getProtocol());
         // Locate custom trust manager
         TrustManager tm = null;
@@ -154,8 +156,20 @@ public class SMTPTransport
         
         connection = new SMTPConnection(host, port, 
                                         connectionTimeout, timeout,
-                                        tls, tm);
-    
+                                        tls, tm, false);
+        if (session.getDebug())
+          {
+            Logger logger = connection.logger;
+            logger.setLevel(SMTPConnection.SMTP_TRACE);
+            Formatter formatter = new LaconicFormatter();
+            Handler handler =
+              new StreamHandler(session.getDebugOut(), formatter);
+            handler.setLevel(Level.ALL);
+            logger.addHandler(handler);
+          }
+
+        connection.init();
+        
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))
           {

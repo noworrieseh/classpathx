@@ -38,6 +38,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
@@ -54,6 +59,7 @@ import gnu.inet.imap.IMAPConstants;
 import gnu.inet.imap.MailboxStatus;
 import gnu.inet.imap.Namespaces;
 import gnu.inet.imap.Quota;
+import gnu.inet.util.LaconicFormatter;
 
 /**
  * The storage class implementing the IMAP4rev1 mail protocol.
@@ -121,16 +127,22 @@ public class IMAPStore
           {
             int connectionTimeout = getIntProperty("connectiontimeout");
             int timeout = getIntProperty("timeout");
-            if (session.getDebug())
-              {
-                IMAPConnection.logger.setLevel(IMAPConnection.IMAP_TRACE);
-              }
             boolean tls = "imaps".equals(url.getProtocol());
             // Locate custom trust manager
             TrustManager tm = getTrustManager();
             connection = new IMAPConnection(host, port,
                                             connectionTimeout, timeout,
                                             tls, tm);
+            if (session.getDebug())
+              {
+                Logger logger = connection.logger;
+                logger.setLevel(IMAPConnection.IMAP_TRACE);
+                Formatter formatter = new LaconicFormatter();
+                Handler handler =
+                  new StreamHandler(session.getDebugOut(), formatter);
+                handler.setLevel(Level.ALL);
+                logger.addHandler(handler);
+              }
             if (propertyIsTrue("debug.ansi"))
               {
                 connection.setAnsiDebug(true);

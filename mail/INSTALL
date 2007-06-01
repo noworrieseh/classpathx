@@ -3,8 +3,8 @@ Installing GNU JavaMail
 
 Dependencies
 
-GNU JavaMail depends on a JAF implementation and GNU inetlib. GNU
-distributes its own JAF implementation as part of the ClasspathX project:
+GNU JavaMail depends on a JAF implementation and GNU inetlib 1.2 or later.
+GNU distributes its own JAF implementation as part of the ClasspathX project:
 
   http://www.gnu.org/software/classpathx/
 
@@ -13,9 +13,9 @@ Classpath project:
 
   http://www.gnu.org/software/classpath/
 
-The latest release at time of writing is version 1.1.1:
+The latest release at time of writing is version 1.2:
 
-  http://ftp.gnu.org/gnu/classpath/inetlib-1.1.1.tar.gz
+  http://ftp.gnu.org/gnu/classpath/inetlib-1.2.tar.gz
 
 The configuration script will search for these jarfiles in some standard
 locations, or you can use the --with-activation-jar and --with-inetlib-jar
@@ -82,4 +82,4 @@ options available during the standard autotools-based installation.
 
 
 $Author: dog $
-$Date: 2007-04-26 10:16:51 $
+$Date: 2007-06-01 17:09:36 $

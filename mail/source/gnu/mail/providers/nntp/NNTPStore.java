@@ -30,8 +30,11 @@ package gnu.mail.providers.nntp;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
@@ -44,6 +47,7 @@ import javax.mail.URLName;
 import gnu.inet.nntp.FileNewsrc;
 import gnu.inet.nntp.Newsrc;
 import gnu.inet.nntp.NNTPConnection;
+import gnu.inet.util.LaconicFormatter;
 
 /**
  * An NNTP store provider.
@@ -163,12 +167,22 @@ public class NNTPStore extends Store
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
+          connection = new NNTPConnection(host, port,
+                                          connectionTimeout, timeout, false);
           if (session.getDebug())
             {
-              NNTPConnection.logger.setLevel(NNTPConnection.NNTP_TRACE);
+              connection.logger.setLevel(NNTPConnection.NNTP_TRACE);
+              Formatter formatter = new LaconicFormatter();
+              Handler handler =
+                new StreamHandler(session.getDebugOut(), formatter);
+              handler.setLevel(Level.ALL);
+              connection.logger.addHandler(handler);
+              logger.setLevel(NNTPConnection.NNTP_TRACE);
+              logger.addHandler(handler);
             }
-          connection = new NNTPConnection(host, port,
-                                          connectionTimeout, timeout);
+          
+          connection.init();
+          
           if (username != null && password != null)
             {
               // TODO decide on authentication method

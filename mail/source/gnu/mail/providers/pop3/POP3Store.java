@@ -39,6 +39,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -49,6 +54,7 @@ import javax.mail.URLName;
 import javax.net.ssl.TrustManager;
 
 import gnu.inet.pop3.POP3Connection;
+import gnu.inet.util.LaconicFormatter;
 
 /**
  * The storage class implementing the POP3 mail protocol.
@@ -123,16 +129,25 @@ public final class POP3Store
           {
             int connectionTimeout = getIntProperty("connectiontimeout");
             int timeout = getIntProperty("timeout");
-            if (session.getDebug())
-              {
-                POP3Connection.logger.setLevel(POP3Connection.POP3_TRACE);
-              }
             boolean tls = "pop3s".equals(url.getProtocol());
             // Locate custom trust manager
             TrustManager tm = getTrustManager();
             connection = new POP3Connection(host, port,
                                             connectionTimeout, timeout,
-                                            tls, tm);
+                                            tls, tm, false);
+            if (session.getDebug())
+              {
+                Logger logger = connection.logger;
+                logger.setLevel(POP3Connection.POP3_TRACE);
+                Formatter formatter = new LaconicFormatter();
+                Handler handler =
+                  new StreamHandler(session.getDebugOut(), formatter);
+                handler.setLevel(Level.ALL);
+                logger.addHandler(handler);
+              }
+            
+            connection.init();
+            
             // Disable APOP if necessary
             if (propertyIsFalse("apop"))
               {
