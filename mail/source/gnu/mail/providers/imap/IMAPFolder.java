@@ -1204,7 +1204,7 @@ public class IMAPFolder
     throws MessagingException 
   {
     char sep = getSeparator();
-    String spec = ("".equals(path)) ? path : 
+    String spec = ("".equals(path)) ? "%" : 
       new StringBuffer(path).append(sep).append(pattern).toString();
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -1234,7 +1234,7 @@ public class IMAPFolder
     throws MessagingException 
   {
     char sep = getSeparator();
-    String spec = ("".equals(path)) ? path :
+    String spec = ("".equals(path)) ? "%" :
       new StringBuffer(path).append(sep).append(pattern).toString();
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();

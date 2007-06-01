@@ -1,5 +1,10 @@
 2007-06-01  Chris Burdess  <dog@bluezoo.org>
 
+	* source/gnu/mail/providers/imap/IMAPFolder.java: Correct
+	  implementation of list() method.
+
+2007-06-01  Chris Burdess  <dog@bluezoo.org>
+
 	* source/gnu/mail/providers/imap/IMAPStore.java,
 	  source/gnu/mail/providers/nntp/NNTPStore.java,
 	  source/gnu/mail/providers/nntp/NNTPTransport.java,
