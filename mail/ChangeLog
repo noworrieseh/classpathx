@@ -1,3 +1,7 @@
+2007-06-30  Chris Burdess  <dog@bluezoo.org>
+
+	* build.xml: Add imaps provider entry.
+
 2007-06-01  Chris Burdess  <dog@bluezoo.org>
 
 	* source/gnu/mail/providers/imap/IMAPFolder.java: Correct

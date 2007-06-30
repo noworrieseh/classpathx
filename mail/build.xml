@@ -1,5 +1,5 @@
 <!--
-$Id: build.xml,v 1.16 2007-04-24 07:55:01 dog Exp $
+$Id: build.xml,v 1.17 2007-06-30 07:42:06 dog Exp $
 (C) Copyright 2003 Chris Burdess dog@gnu.org
 
 This file is part of GNU JavaMail.
@@ -126,6 +126,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
   <target name='imap.ok' unless='disable-imap'>
     <echo file='${providers}' append='true'>protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
+    <echo file='${providers}' append='true'>protocol=imaps; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
 </echo>
   </target>
 
