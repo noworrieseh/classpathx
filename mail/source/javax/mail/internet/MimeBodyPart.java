@@ -1108,7 +1108,6 @@ public class MimeBodyPart
     OutputStream out = new FileOutputStream(file);
     try
       {
-        out = MimeUtility.encode(out, getEncoding());
         getDataHandler().writeTo(out);
         out.flush();
       }

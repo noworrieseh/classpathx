@@ -1,3 +1,8 @@
+2007-07-16  Chris Burdess  <dog@bluezoo.org>
+
+	* source/javax/mail/internet/MimeBodyPart.java: Don't encode file
+	  output in message source encoding.
+
 2007-06-30  Chris Burdess  <dog@bluezoo.org>
 
 	* build.xml: Add imaps provider entry.
