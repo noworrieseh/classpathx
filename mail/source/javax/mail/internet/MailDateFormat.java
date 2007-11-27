@@ -1,19 +1,19 @@
 /*
  * MailDateFormat.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -136,7 +136,7 @@ public class MailDateFormat
     // Get time offset in minutes
     int zoneOffset = (calendar.get(Calendar.ZONE_OFFSET) +
                       calendar.get(Calendar.DST_OFFSET)) / 60000;
-    
+
     // Apply + or - appropriately
     if (zoneOffset < 0)
       {
@@ -147,7 +147,7 @@ public class MailDateFormat
       {
         buf.append('+');
       }
-    
+
     // Set the 2 2-char fields as specified above
     int tzhours = zoneOffset / 60;
     buf.append(Character.forDigit(tzhours / 10, 10));
@@ -229,7 +229,7 @@ public class MailDateFormat
         end = skipNonWhitespace(text, start + 1, len);
         int second = Integer.parseInt(text.substring(start, end));
         calendar.set(Calendar.SECOND, second);
-        
+
         if (end != len)
           {
             start = skipWhitespace(text, end + 1, len);
@@ -265,7 +265,7 @@ public class MailDateFormat
               }
           }
         pos.setIndex(end);
-        
+
         return calendar.getTime();
       }
     catch (NumberFormatException e)
@@ -285,7 +285,7 @@ public class MailDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   private int skipNonWhitespace(final String text, int pos, final int len)
@@ -294,7 +294,7 @@ public class MailDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   private int skipToColon(final String text, int pos, final int len)
@@ -303,7 +303,7 @@ public class MailDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   /**

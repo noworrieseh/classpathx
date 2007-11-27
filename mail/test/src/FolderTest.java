@@ -22,7 +22,7 @@ public class FolderTest
   extends TestCase
   implements ConnectionListener
 {
-	
+
   private Session session;
   private URLName url;
   private Store store;
@@ -30,13 +30,13 @@ public class FolderTest
 
   private ConnectionEvent connectionEvent;
   private FolderEvent folderEvent;
-	
+
   public FolderTest(String name, String url)
   {
     super(name);
     this.url = new URLName(url);
   }
-  
+
   protected void setUp()
     throws Exception
   {
@@ -73,7 +73,7 @@ public class FolderTest
     store = null;
     session = null;
   }
-  
+
   public void testOpen()
     throws Exception
   {
@@ -84,7 +84,7 @@ public class FolderTest
     assertNotNull(connectionEvent);
     assertEquals(connectionEvent.getType(), ConnectionEvent.OPENED);
   }
-  
+
   public void testClose()
     throws Exception
   {
@@ -160,5 +160,5 @@ public class FolderTest
       }
     return suite;
   }
-  
+
 }

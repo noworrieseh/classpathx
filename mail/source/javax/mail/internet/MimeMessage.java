@@ -1,19 +1,19 @@
 /*
  * MimeMessage.java
  * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -95,7 +95,7 @@ public class MimeMessage
       if (type.equals("Newsgroups"))
         {
           return NEWSGROUPS;
-        }  
+        }
       return super.readResolve();
     }
 
@@ -104,7 +104,7 @@ public class MimeMessage
     {
       super(type);
     }
-    
+
   }
 
   /**
@@ -146,9 +146,9 @@ public class MimeMessage
   /**
    * Indicates whether we do not need to call <code>saveChanges</code> on
    * the message.
-   * This flag is set to false by the public constructor and set to true 
+   * This flag is set to false by the public constructor and set to true
    * by the <code>saveChanges</code> method.
-   * The <code>writeTo</code> method checks this flag and calls the 
+   * The <code>writeTo</code> method checks this flag and calls the
    * <code>saveChanges</code> method as necessary.
    */
   protected boolean saved;
@@ -169,7 +169,7 @@ public class MimeMessage
   static final String SUBJECT_NAME = "Subject";
   static final String DATE_NAME = "Date";
   static final String MESSAGE_ID_NAME = "Message-ID";
-  
+
   /**
    * Constructor for an empty message.
    */
@@ -260,7 +260,7 @@ public class MimeMessage
    * @param content the content byte array
    * @param msgnum the message number of this message within the folder
    */
-  protected MimeMessage(Folder folder, InternetHeaders headers, 
+  protected MimeMessage(Folder folder, InternetHeaders headers,
                         byte[] content, int msgnum)
     throws MessagingException
   {
@@ -270,7 +270,7 @@ public class MimeMessage
   }
 
   /**
-   * Parses the given input stream, setting the headers and content fields 
+   * Parses the given input stream, setting the headers and content fields
    * appropriately.
    * This resets the <code>modified</code> flag.
    * @param is the message input stream
@@ -287,7 +287,7 @@ public class MimeMessage
     else
       {
         // buffer it
-        if (!(is instanceof ByteArrayInputStream) && 
+        if (!(is instanceof ByteArrayInputStream) &&
             !(is instanceof BufferedInputStream))
           {
             is = new BufferedInputStream(is);
@@ -309,7 +309,7 @@ public class MimeMessage
               {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(len);
                 byte[] b = new byte[len];
-                for (int l = is.read(b); l != -1; l = is.read(b)) 
+                for (int l = is.read(b); l != -1; l = is.read(b))
                   {
                     bos.write(b, 0, l);
                   }
@@ -325,7 +325,7 @@ public class MimeMessage
   }
 
   // -- From --
-  
+
   /**
    * Returns the value of the RFC 822 From header field.
    * If this header field is absent, the Sender header field is used instead.
@@ -344,9 +344,9 @@ public class MimeMessage
   /**
    * Sets the RFC 822 From header field.
    * @param address the sender of this message
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setFrom(Address address)
@@ -365,15 +365,15 @@ public class MimeMessage
   /**
    * Sets the RFC 822 From header field using the value of the
    * <code>InternetAddress.getLocalAddress</code> method.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setFrom()
     throws MessagingException
   {
-    InternetAddress localAddress = 
+    InternetAddress localAddress =
       InternetAddress.getLocalAddress(session);
     if (localAddress != null)
       {
@@ -388,9 +388,9 @@ public class MimeMessage
   /**
    * Adds the specified addresses to From header field.
    * @param addresses the senders of this message
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void addFrom(Address[] addresses)
@@ -420,9 +420,9 @@ public class MimeMessage
   /**
    * Sets the RFC 822 Sender header field.
    * @param address the sender of this message
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @since JavaMail 1.3
    */
@@ -434,7 +434,7 @@ public class MimeMessage
   }
 
   // -- To --
-  
+
   /**
    * Returns the recipients of the given type.
    * @param type the recipient type
@@ -473,7 +473,7 @@ public class MimeMessage
       {
         Address[] both = new Address[recipients.length + newsgroups.length];
         System.arraycopy(recipients, 0, both, 0, recipients.length);
-        System.arraycopy(newsgroups, 0, both, recipients.length, 
+        System.arraycopy(newsgroups, 0, both, recipients.length,
                           newsgroups.length);
         return both;
       }
@@ -484,9 +484,9 @@ public class MimeMessage
    * @param type the recipient type
    * @param addresses the addresses, or null to remove recipients of this
    * type
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setRecipients(Message.RecipientType type, Address[] addresses)
@@ -514,9 +514,9 @@ public class MimeMessage
    * @param type the recipient type
    * @param addresses the addresses, or null to remove recpients of this
    * type
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setRecipients(Message.RecipientType type, String addresses)
@@ -544,9 +544,9 @@ public class MimeMessage
    * Adds the given addresses to the recipients of the specified type.
    * @param type the recipient type
    * @param addresses the addresses
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void addRecipients(Message.RecipientType type, Address[] addresses)
@@ -570,9 +570,9 @@ public class MimeMessage
    * Adds the given addresses to the recipients of the specified type.
    * @param type the recipient type
    * @param addresses the addresses
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void addRecipients(Message.RecipientType type, String addresses)
@@ -612,9 +612,9 @@ public class MimeMessage
    * Sets the RFC 822 Reply-To header field.
    * @param addresses the addresses, or <code>null</code> to remove this
    * header
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setReplyTo(Address[] addresses)
@@ -690,7 +690,7 @@ public class MimeMessage
   /**
    * Returns the value of the Subject header field.
    * <p>
-   * If the subject is encoded as per RFC 2047, it is decoded and converted 
+   * If the subject is encoded as per RFC 2047, it is decoded and converted
    * into Unicode.
    */
   public String getSubject()
@@ -714,12 +714,12 @@ public class MimeMessage
   /**
    * Sets the Subject header field.
    * <p>
-   * If the subject contains non US-ASCII characters, it will be encoded 
+   * If the subject contains non US-ASCII characters, it will be encoded
    * using the platform default charset.
    * @param subject the subject
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setSubject(String subject)
@@ -731,13 +731,13 @@ public class MimeMessage
   /**
    * Sets the Subject header field.
    * <p>
-   * If the subject contains non US-ASCII characters, it will be encoded 
+   * If the subject contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param subject the subject
    * @param charset the charset used for any encoding
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setSubject(String subject, String charset)
@@ -782,9 +782,9 @@ public class MimeMessage
   /**
    * Sets the RFC 822 Date header field.
    * @param date the sent date, or <code>null</code> to remove this header
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setSentDate(Date date)
@@ -891,7 +891,7 @@ public class MimeMessage
   public String getDisposition()
     throws MessagingException
   {
-    String disposition = 
+    String disposition =
       getHeader(MimeBodyPart.CONTENT_DISPOSITION_NAME, null);
     if (disposition != null)
       {
@@ -903,9 +903,9 @@ public class MimeMessage
   /**
    * Sets the Content-Disposition header field of this message.
    * @param disposition the disposition value to set, or null to remove
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setDisposition
    */
@@ -936,13 +936,13 @@ public class MimeMessage
   public String getEncoding()
     throws MessagingException
   {
-    String encoding = 
+    String encoding =
       getHeader(MimeBodyPart.CONTENT_TRANSFER_ENCODING_NAME, null);
     if (encoding != null)
       {
         encoding = encoding.trim();
-        if (encoding.equalsIgnoreCase("7bit") || 
-            encoding.equalsIgnoreCase("8bit") || 
+        if (encoding.equalsIgnoreCase("7bit") ||
+            encoding.equalsIgnoreCase("8bit") ||
             encoding.equalsIgnoreCase("quoted-printable") ||
             encoding.equalsIgnoreCase("base64"))
           {
@@ -979,9 +979,9 @@ public class MimeMessage
 
   /**
    * Sets the Content-ID header field of this message.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setContentID(String cid)
@@ -1009,9 +1009,9 @@ public class MimeMessage
 
   /**
    * Sets the Content-MD5 header field of this message.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setContentMD5
    */
@@ -1052,9 +1052,9 @@ public class MimeMessage
    * If the description contains non US-ASCII characters, it will be encoded
    * using the platform default charset.
    * @param description the content description
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setDescription
    */
@@ -1071,9 +1071,9 @@ public class MimeMessage
    * using the specified charset.
    * @param description the content description
    * @param charset the charset used for any encoding
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setDescription
    */
@@ -1099,7 +1099,7 @@ public class MimeMessage
   }
 
   /**
-   * Returns the languages specified in the Content-Language header field 
+   * Returns the languages specified in the Content-Language header field
    * of this message, as defined by RFC 1766. This method returns
    * <code>null</code> if this header is not available.
    * @see MimeBodyPart#getContentLanguage
@@ -1124,7 +1124,7 @@ public class MimeMessage
                 acc.add(token.getValue());
                 break;
               }
-          } 
+          }
         if (acc.size() > 0)
           {
             String[] languages = new String[acc.size()];
@@ -1138,9 +1138,9 @@ public class MimeMessage
   /**
    * Sets the Content-Language header of this message.
    * @param languages the array of language tags
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setContentLanguage
    */
@@ -1219,9 +1219,9 @@ public class MimeMessage
 
   /**
    * Sets the filename associated with this part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setFileName
    */
@@ -1334,9 +1334,9 @@ public class MimeMessage
 
   /**
    * Sets the content of this part using the specified data handler.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setDataHandler
    */
@@ -1357,9 +1357,9 @@ public class MimeMessage
    * installed and accept objects of the type given.
    * @param o the content object
    * @param type the MIME type of the object
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setContent
    */
@@ -1373,7 +1373,7 @@ public class MimeMessage
    * Sets the content of this message using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the platform default charset.
    * @param text the text content
    * @see MimeBodyPart#setText(String)
@@ -1388,7 +1388,7 @@ public class MimeMessage
    * Sets the content of this message using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset used for any encoding
@@ -1399,12 +1399,12 @@ public class MimeMessage
   {
     setText(text, charset, "plain");
   }
-  
+
   /**
    * Sets the content of this message using the specified text, and with a
    * text MIME type of the specified subtype.
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset used for any encoding
@@ -1435,9 +1435,9 @@ public class MimeMessage
   /**
    * Sets the content of this message to be the specified multipart.
    * @param mp the multipart content
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#setContent(Multipart)
    */
@@ -1477,7 +1477,7 @@ public class MimeMessage
         // duplication.
         HashSet set = new HashSet();
         set.addAll(Arrays.asList(addresses));
-        
+
         InternetAddress localAddress =
           InternetAddress.getLocalAddress(session);
         if (localAddress != null)
@@ -1490,12 +1490,12 @@ public class MimeMessage
             set.addAll( Arrays.asList( InternetAddress.parse(alternates,
                                                               false)));
           }
-        
+
         set.addAll(Arrays.asList(getRecipients(Message.RecipientType.TO)));
         addresses = new Address[set.size()];
         set.toArray(addresses);
-        
-        boolean replyAllCC = 
+
+        boolean replyAllCC =
           new Boolean(session.getProperty("mail.replyallcc")).booleanValue();
         if (addresses.length > 0)
           {
@@ -1508,24 +1508,24 @@ public class MimeMessage
                 message.addRecipients(Message.RecipientType.TO, addresses);
               }
           }
-      
+
         set.clear();
         set.addAll(Arrays.asList(getRecipients(Message.RecipientType.CC)));
         addresses = new Address[set.size()];
         set.toArray(addresses);
-        
+
         if (addresses != null && addresses.length > 0)
           {
             message.addRecipients(Message.RecipientType.CC, addresses);
           }
-      
+
         addresses = getRecipients(RecipientType.NEWSGROUPS);
         if (addresses != null && addresses.length > 0)
           {
             message.setRecipients(RecipientType.NEWSGROUPS, addresses);
           }
       }
-    
+
     // Set In-Reply-To(will be replaced by References for NNTP)
     String mid = getHeader(MESSAGE_ID_NAME, null);
     if (mid != null)
@@ -1628,7 +1628,7 @@ public class MimeMessage
             // TODO make buffer size configurable
             int len = 8192;
             byte[] bytes = new byte[len];
-            while ((len = is.read(bytes)) > -1) 
+            while ((len = is.read(bytes)) > -1)
               {
                 os.write(bytes, 0, len);
               }
@@ -1646,7 +1646,7 @@ public class MimeMessage
 
   /**
    * Returns all the values for the specified header name.
-   * Note that headers may be encoded as per RFC 2047 if they 
+   * Note that headers may be encoded as per RFC 2047 if they
    * contain non-US-ASCII characters: these should be decoded.
    * @param name the header name
    */
@@ -1674,9 +1674,9 @@ public class MimeMessage
    * Sets the specified header.
    * @param name the header name
    * @param value the header value
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setHeader(String name, String value)
@@ -1689,9 +1689,9 @@ public class MimeMessage
    * Adds the specified header.
    * @param name the header name
    * @param value the header value
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void addHeader(String name, String value)
@@ -1703,9 +1703,9 @@ public class MimeMessage
   /**
    * Removes all headers with the specified name.
    * @param name the header name
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void removeHeader(String name)
@@ -1746,9 +1746,9 @@ public class MimeMessage
 
   /**
    * Adds an RFC 822 header-line to this message.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void addHeaderLine(String line)
@@ -1808,9 +1808,9 @@ public class MimeMessage
 
   /**
    * Sets the flags for this message.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void setFlags(Flags flag, boolean set)
@@ -1830,9 +1830,9 @@ public class MimeMessage
    * Saves any changes to this message.
    * Header fields in the message are updated appropriately to be consistent
    * with the message contents.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    */
   public void saveChanges()
@@ -1845,9 +1845,9 @@ public class MimeMessage
 
   /**
    * Updates the headers of this part, based on the content.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder
    * @see MimeBodyPart#updateHeaders
    */
@@ -1865,7 +1865,7 @@ public class MimeMessage
               {
                 MimeMultipart mmp = (MimeMultipart) dh.getContent();
                 mmp.updateHeaders();
-              } 
+              }
             else if (ct.match("message/rfc822"))
               {
               }
@@ -1906,14 +1906,14 @@ public class MimeMessage
             throw new MessagingException("I/O error", e);
           }
       }
-    
+
     // Below is MimeMessage-specific.
     // set mime version
     setHeader("Mime-Version", "1.0");
     // set new message-id if necessary
     updateMessageId();
   }
-  
+
   /**
    * Creates the headers from the given input stream.
    * @param is the input stream to read the headers from

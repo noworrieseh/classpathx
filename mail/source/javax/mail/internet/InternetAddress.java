@@ -1,19 +1,19 @@
 /*
  * InternetAddress.java
  * Copyright (C) 2002, 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -65,7 +65,7 @@ public class InternetAddress
    * The RFC 2047 encoded version of the personal name.
    */
   protected String encodedPersonal;
-  
+
   /**
    * Constructor for an empty address.
    */
@@ -305,7 +305,7 @@ public class InternetAddress
           {
           }
       }
-    
+
     StringBuffer buffer = new StringBuffer();
     if (encodedPersonal != null)
       {
@@ -391,7 +391,7 @@ public class InternetAddress
     if (other instanceof InternetAddress)
       {
         String otherAddress = ((InternetAddress) other).getAddress();
-        return (this == other || 
+        return (this == other ||
                (address != null && address.equalsIgnoreCase(otherAddress)));
       }
     return false;
@@ -450,7 +450,7 @@ public class InternetAddress
             fl = addressText.length();
           }
         int ll = addressText.lastIndexOf(crlf); // pos of last crlf
-        
+
         if ((used + fl) > 76)
           {
             buffer.append("\r\n\t");
@@ -538,7 +538,7 @@ public class InternetAddress
   }
 
   /**
-   * Parses the given comma-separated sequence of RFC 822 addresses into 
+   * Parses the given comma-separated sequence of RFC 822 addresses into
    * InternetAddresses.
    * @param addresslist the comma-separated addresses
    * @exception AddressException if the parse failed
@@ -552,7 +552,7 @@ public class InternetAddress
   /**
    * Parses the given comma-separated sequence of RFC 822 addresses into
    * InternetAddresses.
-   * If <code>strict</code> is false, simple email addresses separated by 
+   * If <code>strict</code> is false, simple email addresses separated by
    * spaces are also allowed. If <code>strict</code> is true, many (but not
    * all) of the RFC 822 syntax rules are enforced.
    * Even if <code>strict</code> is true, addresses composed of simple
@@ -570,7 +570,7 @@ public class InternetAddress
   /**
    * Parses the given comma-separated sequence of RFC 822 addresses into
    * InternetAddresses.
-   * If <code>strict</code> is false, simple email addresses separated by 
+   * If <code>strict</code> is false, simple email addresses separated by
    * spaces are also allowed. If <code>strict</code> is true, many (but not
    * all) of the RFC 822 syntax rules are enforced.
    * @param addresslist the comma-separated addresses
@@ -633,7 +633,7 @@ public class InternetAddress
           case '\r':
           case ' ':
             break;
-            
+
           case '<': // bra-ket delimited address
             inAddress = true;
             if (gotDelimiter)
@@ -688,7 +688,7 @@ public class InternetAddress
             break;
           case '>':
             throw new AddressException("Unmatched '>'", addresslist, pos);
-            
+
           case '(': // paren delimited personal
             inAddress = true;
             if (pStart >= 0 && pEnd == -1)
@@ -730,7 +730,7 @@ public class InternetAddress
             break;
           case ')':
             throw new AddressException("Unmatched ')'", addresslist, pos);
-            
+
           case '"': // quote delimited personal
             inAddress = true;
             if (pStart == -1)
@@ -760,7 +760,7 @@ public class InternetAddress
                                             addresslist, pos);
               }
             break;
-            
+
           case '[':
             inAddress = true;
             pos++;
@@ -786,7 +786,7 @@ public class InternetAddress
                                             addresslist, pos);
               }
             break;
-            
+
           case ',': // address delimiter
             if (pStart == -1)
               {
@@ -841,7 +841,7 @@ public class InternetAddress
             pStart = -1;
             pEnd = -1;
             break;
-            
+
           case ':': // group indicator
             inAddress = true;
             if (inGroup)
@@ -869,7 +869,7 @@ public class InternetAddress
             gotDelimiter = false;
             pStart = pEnd = -1;
             break;
-            
+
           default:
             if (pStart == -1)
               {
@@ -878,7 +878,7 @@ public class InternetAddress
             break;
           }
       }
-    
+
     if (pStart > -1)
       {
         if (pEnd == -1)
@@ -916,7 +916,7 @@ public class InternetAddress
               }
           }
       }
-    
+
     InternetAddress[] addresses = new InternetAddress[acc.size()];
     acc.toArray(addresses);
     return addresses;
@@ -956,7 +956,7 @@ public class InternetAddress
             }
         }
     }
-    
+
     // Get atomic parts
     String localName = address;
     String domain = null;
@@ -978,7 +978,7 @@ public class InternetAddress
       {
         throw new AddressException("Missing final @domain", address);
       }
-    
+
     // Check atomic parts
     String illegalWS = "\t\n\r ";
     int len = 4; // illegalWS.length()
@@ -1048,7 +1048,7 @@ public class InternetAddress
             needsQuotes = true;
           }
       }
-    
+
     if (needsQuotes)
       {
         StringBuffer buffer = new StringBuffer(len + 2);

@@ -1,19 +1,19 @@
 /*
  * Part.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -46,7 +46,7 @@ import javax.activation.DataHandler;
  * <li>As a Java object, using the <code>getContent</code> method.
  * </ul>
  * The <code>writeTo</code> method can be used to write the part to a
- * byte stream in mail-safe form suitable for transmission. 
+ * byte stream in mail-safe form suitable for transmission.
  * <p>
  * In MIME terms, Part models an Entity (RFC 2045, Section 2.4).
  *
@@ -71,7 +71,7 @@ public interface Part
    * size cannot be determined.
    * <p>
    * Note that the size may not be an exact measure of the content size,
-   * but will be suitable for display in a user interface to give the 
+   * but will be suitable for display in a user interface to give the
    * user an idea of the size of this part.
    */
   int getSize()
@@ -79,7 +79,7 @@ public interface Part
 
   /**
    * Returns the number of lines in the content of this part, or -1 if the
-   * number cannot be determined. 
+   * number cannot be determined.
    * Note that this number may not be an exact measure.
    */
   int getLineCount()
@@ -99,7 +99,7 @@ public interface Part
    * This method compares only the primary type and subtype.
    * The parameters of the content types are ignored.
    * <p>
-   * If the subtype of <code>mimeType</code> is the special character '*', 
+   * If the subtype of <code>mimeType</code> is the special character '*',
    * then the subtype is ignored during the comparison.
    */
   boolean isMimeType(String mimeType)
@@ -117,9 +117,9 @@ public interface Part
   /**
    * Sets the disposition of this part.
    * @param disposition the disposition of this part
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setDisposition(String disposition)
@@ -134,9 +134,9 @@ public interface Part
   /**
    * Sets the description of this part.
    * @param description the description of this part
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this Part is obtained from
    * a READ_ONLY folder
    */
   void setDescription(String description)
@@ -151,9 +151,9 @@ public interface Part
   /**
    * Sets the filename associated with this part.
    * @param filename the filename to associate with this part
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this Part is obtained from 
+   * @exception IllegalStateException if this Part is obtained from
    * a READ_ONLY folder
    */
   void setFileName(String filename)
@@ -169,17 +169,17 @@ public interface Part
     throws IOException, MessagingException;
 
   /**
-   * Returns a data handler for the content of this part. 
+   * Returns a data handler for the content of this part.
    */
   DataHandler getDataHandler()
     throws MessagingException;
 
   /**
    * Returns the content of this part as a Java object.
-   * The type of the returned object is of course dependent on the content 
-   * itself. For instance, the object returned for "text/plain" content 
+   * The type of the returned object is of course dependent on the content
+   * itself. For instance, the object returned for "text/plain" content
    * is usually a String object. The object returned for a "multipart"
-   * content is always a Multipart subclass. For content-types that are 
+   * content is always a Multipart subclass. For content-types that are
    * unknown to the data handler system, an input stream is returned.
    * @exception IOException when a data handler error occurs
    */
@@ -189,9 +189,9 @@ public interface Part
   /**
    * Sets the content of this part using the specified data handler.
    * @param dh the data handler for the content
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setDataHandler(DataHandler dh)
@@ -202,9 +202,9 @@ public interface Part
    * the supplied argument must be known to the data handler system.
    * @param obj a Java object
    * @param type the MIME content-type of this object
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setContent(Object obj, String type)
@@ -214,9 +214,9 @@ public interface Part
    * Sets the textual content of this part, using a MIME type of
    * <code>text/plain</code>.
    * @param text the textual content
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setText(String text)
@@ -225,9 +225,9 @@ public interface Part
   /**
    * Sets the multipart content of this part.
    * @param mp the multipart content
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setContent(Multipart mp)
@@ -235,9 +235,9 @@ public interface Part
 
   /**
    * Writes this part to the specified byte stream.
-   * @exception IOException if an error occurs writing to the stream 
+   * @exception IOException if an error occurs writing to the stream
    * or if an error occurs in the data handler system.
-   * @exception MessagingException if an error occurs fetching the data 
+   * @exception MessagingException if an error occurs fetching the data
    * to be written
    */
   void writeTo(OutputStream os)
@@ -255,9 +255,9 @@ public interface Part
    * Sets the value for the specified header name.
    * @param name the header name
    * @param value the new value
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void setHeader(String name, String value)
@@ -267,9 +267,9 @@ public interface Part
    * Adds the specified value to the existing values for this header name.
    * @param name the header name
    * @param value the value to add
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void addHeader(String name, String value)
@@ -278,9 +278,9 @@ public interface Part
   /**
    * Removes all headers of the specified name.
    * @param name the header name
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of this header
-   * @exception IllegalStateException if this part is obtained from 
+   * @exception IllegalStateException if this part is obtained from
    * a READ_ONLY folder
    */
   void removeHeader(String name)
@@ -308,5 +308,5 @@ public interface Part
    */
   Enumeration getNonMatchingHeaders(String[] names)
     throws MessagingException;
-  
+
 }

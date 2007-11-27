@@ -1,19 +1,19 @@
 /*
  * MimePart.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -96,7 +96,7 @@ public interface MimePart
     throws MessagingException;
 
   /**
-   * Returns the value of the Content-ID header field of this part. 
+   * Returns the value of the Content-ID header field of this part.
    */
   String getContentID()
     throws MessagingException;
@@ -111,7 +111,7 @@ public interface MimePart
    * Sets the Content-MD5 header value for this part.
    * @exception IllegalWriteException if the underlying implementation does not
    * support modification
-   * @param IllegalStateException if this part is obtained from a READ_ONLY 
+   * @param IllegalStateException if this part is obtained from a READ_ONLY
    * folder
    */
   void setContentMD5(String md5)
@@ -140,7 +140,7 @@ public interface MimePart
    * Sets the content of this message using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the platform default charset.
    * @param text the text content
    */
@@ -151,19 +151,19 @@ public interface MimePart
    * Sets the content of this message using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset to use for any encoding
    */
   void setText(String text, String charset)
     throws MessagingException;
-  
+
   /**
    * Sets the content of this message using the specified text, and with a
    * text MIME type of the specified subtype.
    * <p>
-   * If the string contains non US-ASCII characters, it will be encoded 
+   * If the string contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset to use for any encoding
@@ -172,6 +172,6 @@ public interface MimePart
    */
   void setText(String text, String charset, String subtype)
     throws MessagingException;
-  
+
 }
 

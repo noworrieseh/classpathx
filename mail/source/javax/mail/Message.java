@@ -1,19 +1,19 @@
 /*
  * Message.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -87,7 +87,7 @@ public abstract class Message
     {
       this.type = type;
     }
-    
+
     protected Object readResolve()
       throws ObjectStreamException
     {
@@ -115,7 +115,7 @@ public abstract class Message
   }
 
   /**
-   * The number of this message within its folder, starting from 1, 
+   * The number of this message within its folder, starting from 1,
    * or 0 if the message was not retrieved from a folder.
    */
   protected int msgnum = 0;
@@ -181,9 +181,9 @@ public abstract class Message
    * Sets the identity of the person sending this message, as obtained
    * from the property "mail.user".
    * If this property is absent, the system property "user.name" is used.
-   * @exception IllegalWriteException if the underlying implementation does 
+   * @exception IllegalWriteException if the underlying implementation does
    * not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from a 
+   * @exception IllegalStateException if this message is obtained from a
    * READ_ONLY folder
    */
   public abstract void setFrom()
@@ -192,9 +192,9 @@ public abstract class Message
   /**
    * Sets the identity of the person sending this message.
    * @param address the sender
-   * @exception IllegalWriteException if the underlying implementation does 
+   * @exception IllegalWriteException if the underlying implementation does
    * not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from a 
+   * @exception IllegalStateException if this message is obtained from a
    * READ_ONLY folder.
    */
   public abstract void setFrom(Address address)
@@ -203,9 +203,9 @@ public abstract class Message
   /**
    * Adds addresses to the identity of the person sending this message.
    * @param addresses the senders
-   * @exception IllegalWriteException if the underlying implementation does 
+   * @exception IllegalWriteException if the underlying implementation does
    * not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from a 
+   * @exception IllegalStateException if this message is obtained from a
    * READ_ONLY folder.
    */
   public abstract void addFrom(Address[] addresses)
@@ -219,7 +219,7 @@ public abstract class Message
     throws MessagingException;
 
   /**
-   * Returns all the recipient addresses in the message. 
+   * Returns all the recipient addresses in the message.
    */
   public Address[] getAllRecipients()
     throws MessagingException
@@ -227,10 +227,10 @@ public abstract class Message
     Address[] to = getRecipients(RecipientType.TO);
     Address[] cc = getRecipients(RecipientType.CC);
     Address[] bcc = getRecipients(RecipientType.BCC);
-   
+
     if (cc == null && bcc == null)
       return to;
-    
+
     int count = (to == null ? 0 : to.length) +
       (cc == null ? 0 : cc.length) +
       (bcc == null ? 0 : bcc.length);
@@ -258,9 +258,9 @@ public abstract class Message
    * Sets the recipient addresses of the specified type.
    * @param type the recipient type
    * @param addresses the addresses
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void setRecipients(RecipientType type, Address[] addresses)
@@ -268,7 +268,7 @@ public abstract class Message
 
   /**
    * Sets the recipient address of the specified type.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public void setRecipient(RecipientType type, Address address)
@@ -281,9 +281,9 @@ public abstract class Message
    * Adds the recipient addresses of the given type.
    * @param type the recipient type
    * @param addresses the addresses
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void addRecipients(RecipientType type, Address[] addresses)
@@ -291,7 +291,7 @@ public abstract class Message
 
   /**
    * Adds the recipient address of the given type.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public void addRecipient(RecipientType type, Address address)
@@ -328,9 +328,9 @@ public abstract class Message
   /**
    * Sets the subject of this message.
    * @param subject the subject
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void setSubject(String subject)
@@ -345,9 +345,9 @@ public abstract class Message
   /**
    * Sets the date this message was sent.
    * @param date the sent date of this message
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void setSentDate(Date date)
@@ -384,9 +384,9 @@ public abstract class Message
    * are unaffected.
    * @param flag the flags to be set
    * @param set the value to be set
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void setFlags(Flags flag, boolean set)
@@ -396,9 +396,9 @@ public abstract class Message
    * Sets the specified flag on this message to the given value.
    * @param flag the flag to be set
    * @param set the value to be set
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public void setFlag(Flags.Flag flag, boolean set)
@@ -409,7 +409,7 @@ public abstract class Message
 
   /**
    * Returns the message number for this message within its folder.
-   * @see #msgnum 
+   * @see #msgnum
    */
   public int getMessageNumber()
   {
@@ -417,7 +417,7 @@ public abstract class Message
   }
 
   /**
-   * Sets the message number for this message. 
+   * Sets the message number for this message.
    * @see #msgnum
    */
   protected void setMessageNumber(int msgnum)
@@ -470,9 +470,9 @@ public abstract class Message
    * <p>
    * This method ensures that any header fields are consistent with the
    * changed message contents.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
-   * @exception IllegalStateException if this message is obtained from 
+   * @exception IllegalStateException if this message is obtained from
    * a READ_ONLY folder.
    */
   public abstract void saveChanges()

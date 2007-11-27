@@ -1,19 +1,19 @@
 /*
  * QPOutputStream.java
  * Copyright(C) 2000 Andrew Selkirk
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -81,7 +81,7 @@ extends FilterOutputStream
    * @param stream Output stream
    * @param length Number of bytes per line
    */
-  public QPOutputStream(OutputStream stream, int length) 
+  public QPOutputStream(OutputStream stream, int length)
   {
     super(stream);
     this.bytesPerLine = length;
@@ -95,7 +95,7 @@ extends FilterOutputStream
    * the default 76 bytes per line.
    * @param stream Output stream
    */
-  public QPOutputStream(OutputStream stream) 
+  public QPOutputStream(OutputStream stream)
   {
     this(stream, 76);
   } // QPEWncoderStream()
@@ -109,7 +109,7 @@ extends FilterOutputStream
    * Flush encoding buffer.
    * @exception IOException IO Exception occurred
    */
-  public void flush() throws IOException 
+  public void flush() throws IOException
   {
     if (gotSpace)
     {
@@ -127,14 +127,14 @@ extends FilterOutputStream
    * @exception IOException IO Exception occurred
    */
   public void write(byte[] bytes, int offset, int length)
-  throws IOException 
+  throws IOException
   {
 
     // Variables
     int index;
 
     // Process Each Byte
-    for (index = offset; index < length; index++) 
+    for (index = offset; index < length; index++)
     {
       write(bytes[index]);
     } // for
@@ -146,7 +146,7 @@ extends FilterOutputStream
    * @param bytes Byte array to write to stream
    * @exception IOException IO Exception occurred
    */
-  public void write(byte[] bytes) throws IOException 
+  public void write(byte[] bytes) throws IOException
   {
     write(bytes, 0, bytes.length);
   } // write()
@@ -156,7 +156,7 @@ extends FilterOutputStream
    * @param b Byte to write to the stream
    * @exception IOException IO Exception occurred
    */
-  public void write(int b) throws IOException 
+  public void write(int b) throws IOException
   {
     b &= 0xff;
     if (gotSpace)
@@ -194,7 +194,7 @@ extends FilterOutputStream
    * Close stream.
    * @exception IOException IO Exception occurred
    */
-  public void close() throws IOException 
+  public void close() throws IOException
   {
     out.close();
   } // close()
@@ -206,7 +206,7 @@ extends FilterOutputStream
    * @exception IOException IO Exception occurred
    */
   protected void output(int b, boolean value)
-    throws IOException 
+    throws IOException
   {
     if (value)
     {
@@ -238,7 +238,7 @@ extends FilterOutputStream
    * Write CRLF byte series to stream.
    * @exception IOException IO Exception occurred
    */
-  private void outputCRLF() throws IOException 
+  private void outputCRLF() throws IOException
   {
     out.write('\r');
     out.write('\n');

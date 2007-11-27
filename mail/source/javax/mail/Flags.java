@@ -1,19 +1,19 @@
 /*
  * Flags.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -56,7 +56,7 @@ public class Flags
      * It is used internally by the Flags class.
      */
     private static final HashMap flag2flag = new HashMap(7);
-    
+
     /**
      * This message has been answered.
      */
@@ -88,7 +88,7 @@ public class Flags
     public static final Flag SEEN = new Flag(0x00000020);
 
     /**
-     * Special flag that indicates whether this folder supports 
+     * Special flag that indicates whether this folder supports
      * user defined flags.
      */
     public static final Flag USER = new Flag(0x80000000);
@@ -103,13 +103,13 @@ public class Flags
       this.flag = flag;
       flag2flag.put(new Integer(flag), this);
     }
-    
+
   }
 
   private int systemFlags;
 
   private HashMap userFlags;
-  
+
   /**
    * Construct an empty Flags object.
    */
@@ -267,7 +267,7 @@ public class Flags
   }
 
   /**
-   * Indicates whether all the flags in the specified Flags object 
+   * Indicates whether all the flags in the specified Flags object
    * are set in this Flags object.
    */
   public boolean contains(Flags flags)
@@ -351,7 +351,7 @@ public class Flags
 
   /**
    * Returns the user flags.
-   */    
+   */
   public String[] getUserFlags()
   {
     if (userFlags == null)

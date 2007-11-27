@@ -1,23 +1,23 @@
 /*
  * IMAPMessage.java
  * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -114,15 +114,15 @@ extends ReadOnlyMessage
    */
   private IMAPMultipart multipart = null;
 
-  IMAPMessage(IMAPFolder folder, InputStream in, int msgnum) 
-    throws MessagingException 
+  IMAPMessage(IMAPFolder folder, InputStream in, int msgnum)
+    throws MessagingException
   {
     super(folder, in, msgnum);
     flags = null;
   }
 
-  IMAPMessage(IMAPFolder folder, int msgnum) 
-    throws MessagingException 
+  IMAPMessage(IMAPFolder folder, int msgnum)
+    throws MessagingException
   {
     super(folder, msgnum);
     flags = null;
@@ -241,7 +241,7 @@ extends ReadOnlyMessage
           {
             throw new MessagingException("Unexpected status item: " + item);
           }
-      
+
         if (key == IMAPConstants.BODY || key == IMAPConstants.RFC822)
           {
             byte[] literal = (byte[]) code.get(i + 1);
@@ -266,7 +266,7 @@ extends ReadOnlyMessage
                         throw new MessagingException("Unexpected status item: " +
                                                       pitem);
                       }
-                    
+
                     if (pkey == IMAPConstants.HEADER)
                       {
                         InputStream in = new ByteArrayInputStream(literal);
@@ -406,7 +406,7 @@ extends ReadOnlyMessage
         // Last 2 are disposition and language
         String disposition = parseAtom(list.get(len - 2));
         String language = parseAtom(list.get(len - 1));
-        
+
         if (disposition != null)
           {
             parentHeaders.setHeader("Content-Disposition", disposition);
@@ -415,7 +415,7 @@ extends ReadOnlyMessage
           {
             parentHeaders.setHeader("Content-Language", language);
           }
-        
+
         // Next any parameters
         // Note that there should only be 1 slot containing a list,
         // but servers sometimes return multiple lists
@@ -459,13 +459,13 @@ extends ReadOnlyMessage
         part.multipart = m;
         return part;
       }
-    
+
     if (len < 8)
       {
         throw new MessagingException("Unexpected number of fields in " +
                                       "[MIME-IMB] structure: " + list);
       }
-        
+
     // Basic fields
     String type = parseAtom(list.get(BS_CONTENT_TYPE)).toLowerCase();
     String subtype = parseAtom(list.get(BS_CONTENT_SUBTYPE)).toLowerCase();
@@ -494,7 +494,7 @@ extends ReadOnlyMessage
         throw new MessagingException("Expecting number in [MIME-IMB] " +
                                       "structure: " + list);
       }
-    
+
     ContentType ct = new ContentType(type, subtype, params);
     InternetHeaders h = new InternetHeaders();
     h.setHeader("Content-Type", ct.toString());
@@ -510,7 +510,7 @@ extends ReadOnlyMessage
       {
         h.setHeader("Content-Transfer-Encoding", encoding);
       }
-    
+
     // Extension fields
     if (len > 8)
       {
@@ -604,7 +604,7 @@ extends ReadOnlyMessage
   /**
    * Returns a data handler for this message's content.
    */
-  public DataHandler getDataHandler() 
+  public DataHandler getDataHandler()
     throws MessagingException
   {
     // Hook into BODYSTRUCTURE method
@@ -643,8 +643,8 @@ extends ReadOnlyMessage
   /**
    * Returns the raw content stream.
    */
-  protected InputStream getContentStream() 
-    throws MessagingException 
+  protected InputStream getContentStream()
+    throws MessagingException
   {
     if (content == null)
       {
@@ -654,12 +654,12 @@ extends ReadOnlyMessage
   }
 
   // -- Header access --
-  
+
   /**
    * Returns the specified header field.
    */
-  public String[] getHeader(String name) 
-    throws MessagingException 
+  public String[] getHeader(String name)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -677,8 +677,8 @@ extends ReadOnlyMessage
   /**
    * Returns the specified header field.
    */
-  public String getHeader(String name, String delimiter) 
-    throws MessagingException 
+  public String getHeader(String name, String delimiter)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -693,8 +693,8 @@ extends ReadOnlyMessage
     return header;
   }
 
-  public Enumeration getAllHeaders() 
-    throws MessagingException 
+  public Enumeration getAllHeaders()
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -703,8 +703,8 @@ extends ReadOnlyMessage
     return super.getAllHeaders();
   }
 
-  public Enumeration getAllHeaderLines() 
-    throws MessagingException 
+  public Enumeration getAllHeaderLines()
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -713,8 +713,8 @@ extends ReadOnlyMessage
     return super.getAllHeaderLines();
   }
 
-  public Enumeration getMatchingHeaders(String[] names) 
-    throws MessagingException 
+  public Enumeration getMatchingHeaders(String[] names)
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -723,8 +723,8 @@ extends ReadOnlyMessage
     return super.getMatchingHeaders(names);
   }
 
-  public Enumeration getMatchingHeaderLines(String[] names) 
-    throws MessagingException 
+  public Enumeration getMatchingHeaderLines(String[] names)
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -733,8 +733,8 @@ extends ReadOnlyMessage
     return super.getMatchingHeaderLines(names);
   }
 
-  public Enumeration getNonMatchingHeaders(String[] names) 
-    throws MessagingException 
+  public Enumeration getNonMatchingHeaders(String[] names)
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -743,8 +743,8 @@ extends ReadOnlyMessage
     return super.getNonMatchingHeaders(names);
   }
 
-  public Enumeration getNonMatchingHeaderLines(String[] names) 
-    throws MessagingException 
+  public Enumeration getNonMatchingHeaderLines(String[] names)
+    throws MessagingException
   {
     if (!headersComplete)
       {
@@ -795,7 +795,7 @@ extends ReadOnlyMessage
           {
             flags.remove(flag);
           }
-        
+
         // Create lists of flags to send to the server
         IMAPFlags iflags = (IMAPFlags) flags;
         List aflagList = iflags.getAddedFlags();
@@ -804,7 +804,7 @@ extends ReadOnlyMessage
         List rflagList = iflags.getRemovedFlags();
         String[] rflags = new String[rflagList.size()];
         rflagList.toArray(rflags);
-        
+
         // Perform store
         if (aflags.length > 0 || rflags.length > 0)
           {
@@ -828,11 +828,11 @@ extends ReadOnlyMessage
         throw new MessagingException(e.getMessage(), e);
       }
   }
-  
+
   // -- Utility --
 
-  public void writeTo(OutputStream msgStream) 
-    throws IOException, MessagingException 
+  public void writeTo(OutputStream msgStream)
+    throws IOException, MessagingException
   {
     if (headers == null)
       {
@@ -845,8 +845,8 @@ extends ReadOnlyMessage
     super.writeTo(msgStream);
   }
 
-  public void writeTo(OutputStream msgStream, String[] ignoreList) 
-    throws IOException, MessagingException 
+  public void writeTo(OutputStream msgStream, String[] ignoreList)
+    throws IOException, MessagingException
   {
     if (headers == null)
       {

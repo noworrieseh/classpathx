@@ -31,7 +31,7 @@ public class NonFolderTest
   extends TestCase
   implements FolderListener, MessageCountListener
 {
-	
+
 	private Session session;
   private URLName url;
   private Store store;
@@ -39,7 +39,7 @@ public class NonFolderTest
 
   private FolderEvent folderEvent;
   private MessageCountEvent countEvent;
-	
+
 	public NonFolderTest(String name, String url)
 	{
     super(name);
@@ -237,5 +237,5 @@ public class NonFolderTest
     }
     return suite;
 	}
-	
+
 }

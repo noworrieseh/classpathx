@@ -1,19 +1,19 @@
 /*
  * UUOutputStream.java
  * Copyright(C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -75,7 +75,7 @@ public class UUOutputStream
   {
     this(out, filename, 0600);
   }
-  
+
   /**
    * Constructor with filename and mode.
    * @param filename the filename to encode into the UU file.
@@ -96,7 +96,7 @@ public class UUOutputStream
 
   void writeBeginLine()
     throws IOException
-  { 
+  {
     // Output begin line
     String beginLine = "begin " + Integer.toString(mode, 8) +
       " " + filename + "\n";
@@ -128,7 +128,7 @@ public class UUOutputStream
   {
     write(buf, 0, buf.length);
   }
-	
+
   public void write(byte[] buf, int off, int len)
     throws IOException
   {
@@ -137,7 +137,7 @@ public class UUOutputStream
     System.arraycopy(line, 0, tmp, 0, line.length);
     System.arraycopy(buf, off, tmp, line.length, len - off);
     line = tmp;
-    
+
     // Flush line in chunks of MAX_LINE_LENGTH
     int loff = 0;
     for (; (line.length - loff) > MAX_LINE_LENGTH; loff += MAX_LINE_LENGTH)
@@ -179,7 +179,7 @@ public class UUOutputStream
           {
             c2 = buf[off + 1];
           }
-        
+
         out.write(encode(c1 >> 2));
         out.write(encode(((c1 << 4) & 060) |
                          ((c2 >> 4) & 017)));
@@ -214,6 +214,6 @@ public class UUOutputStream
       }
     return TABLE[c2 & 077];
   }
-	
+
 }
 

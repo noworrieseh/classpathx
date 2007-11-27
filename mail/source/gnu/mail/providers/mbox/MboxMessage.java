@@ -1,23 +1,23 @@
 /*
  * MboxMessage.java
  * Copyright(C) 1999 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -39,8 +39,8 @@ import gnu.mail.providers.ReadOnlyMessage;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class MboxMessage 
-  extends ReadOnlyMessage 
+public class MboxMessage
+  extends ReadOnlyMessage
 {
 
   /**
@@ -48,7 +48,7 @@ public class MboxMessage
    * This keeps the mbox flags.
    */
   protected static final String STATUS = "Status";
-  
+
   /**
    * The From_ line associated with this message.
    * We will preserve this if possible.
@@ -59,11 +59,11 @@ public class MboxMessage
    * Creates a Mbox message.
    * This is called by the MboxStore.
    */
-  protected MboxMessage(MboxFolder folder, 
+  protected MboxMessage(MboxFolder folder,
                         String fromLine,
                         InputStream in,
                         int msgnum)
-    throws MessagingException 
+    throws MessagingException
   {
     super(folder, in, msgnum);
     this.fromLine = fromLine;
@@ -77,8 +77,8 @@ public class MboxMessage
    */
   protected MboxMessage(MboxFolder folder,
                         MimeMessage message,
-                        int msgnum) 
-    throws MessagingException 
+                        int msgnum)
+    throws MessagingException
   {
     super(message);
     this.folder = folder;
@@ -93,12 +93,12 @@ public class MboxMessage
   {
     super.setExpunged(expunged);
   }
-	
-  /** 
+
+  /**
    * Set the specified flags(reflected in the <code>Status</code> header).
    */
   public synchronized void setFlags(Flags flag, boolean set)
-    throws MessagingException 
+    throws MessagingException
   {
     if (set)
       {
@@ -109,12 +109,12 @@ public class MboxMessage
         flags.remove(flag);
       }
   }
-    
+
   /**
    * Updates the status header from the current flags.
    */
-  protected void updateHeaders() 
-    throws MessagingException 
+  protected void updateHeaders()
+    throws MessagingException
   {
     super.updateHeaders();
 
@@ -151,11 +151,11 @@ public class MboxMessage
   /**
    * Reads the associated flags from the status header.
    */
-  private void readStatusHeader() 
-    throws MessagingException 
+  private void readStatusHeader()
+    throws MessagingException
   {
     String[] currentStatus = this.getHeader(STATUS);
-    if (currentStatus != null && currentStatus.length > 0) 
+    if (currentStatus != null && currentStatus.length > 0)
       {
         flags = new Flags();
         if (currentStatus[0].indexOf('R') >= 0)
@@ -179,9 +179,9 @@ public class MboxMessage
 
   // -- Utility methods --
 
-  public boolean equals(Object other) 
+  public boolean equals(Object other)
   {
-    if (other instanceof MimeMessage) 
+    if (other instanceof MimeMessage)
       {
         MimeMessage message = (MimeMessage) other;
         return (message.getFolder() == getFolder() &&

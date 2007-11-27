@@ -1,23 +1,23 @@
 /*
  * NNTPRootFolder.java
  * Copyright(C) 2002, 2006 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -72,28 +72,28 @@ final public class NNTPRootFolder
     NNTPStore ns = (NNTPStore) store;
     return ns.connection.getWelcome();
   }
-  
+
   /**
    * Returns the list of folders matching the specified pattern.
    * @param pattern the JavaMail pattern
    */
-  public Folder[] list(String pattern) 
-    throws MessagingException 
+  public Folder[] list(String pattern)
+    throws MessagingException
   {
     return list(pattern, null);
   }
-  
+
   /**
    * Returns the list of folders matching the specified pattern.
    * @param listener the listener to be called as soon as a new folder is
    * listed
    */
-  public Folder[] list(ListFolderListener listener) 
-    throws MessagingException 
-  {	     
+  public Folder[] list(ListFolderListener listener)
+    throws MessagingException
+  {
     return list("%",  listener);
   }
-  
+
   /**
    * Returns the list of folders matching the specified pattern.
    * @param pattern the JavaMail pattern
@@ -109,7 +109,7 @@ final public class NNTPRootFolder
         NNTPStore ns = (NNTPStore) store;
         // Indicates whether to *really* list all folders.
         boolean listAll = ns.isListAll();
-        
+
         List acc = new LinkedList();
         synchronized (ns.connection)
           {
@@ -160,7 +160,7 @@ final public class NNTPRootFolder
     boolean hasWildcard = pattern.indexOf('*') >- 1;
     // Does the pattern contain only a wildcard?
     boolean onlyWildcard = hasWildcard &&(pattern.length() == 0);
-    
+
     NNTPStore ns = (NNTPStore) store;
     List acc = new LinkedList();
     Iterator i = ns.newsrc.list();
@@ -181,7 +181,7 @@ final public class NNTPRootFolder
     acc.toArray(folders);
     return folders;
   }
-  
+
   /**
    * Implements a subset of wildmat matching on the client side.
    * This is necessary for newsgroup matching from newsrc lists.
@@ -231,7 +231,7 @@ final public class NNTPRootFolder
       }
     return true;
   }
-  
+
   /**
    * Returns a new Folder object associated with the specified name.
    */
@@ -247,7 +247,7 @@ final public class NNTPRootFolder
   {
     return null;
   }
-  
+
   public boolean exists()
     throws MessagingException
   {
@@ -271,7 +271,7 @@ final public class NNTPRootFolder
   {
     return HOLDS_FOLDERS;
   }
-  
+
   public void open(int mode)
     throws MessagingException
   {
@@ -298,7 +298,7 @@ final public class NNTPRootFolder
   {
     return false;
   }
-  
+
   public Flags getPermanentFlags()
   {
     return new Flags();
@@ -339,13 +339,13 @@ final public class NNTPRootFolder
   {
     throw new IllegalWriteException("Folder is read-only");
   }
-  
+
   public boolean create(int type)
     throws MessagingException
   {
     throw new MessagingException("Folder already exists");
   }
-  
+
   public boolean delete(boolean flag)
     throws MessagingException
   {

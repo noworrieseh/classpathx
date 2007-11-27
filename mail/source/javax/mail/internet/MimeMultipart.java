@@ -1,19 +1,19 @@
 /*
  * MimeMultipart.java
  * Copyright (C) 2002, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -221,7 +221,7 @@ public class MimeMultipart
   {
     final String charset = "US-ASCII";
     final byte[] sep = { 0x0d, 0x0a };
-    
+
     parse();
     ContentType ct = new ContentType(contentType);
     String boundaryParam = ct.getParameter("boundary");
@@ -234,10 +234,10 @@ public class MimeMultipart
           throw new MessagingException("Missing boundary parameter");
       }
     byte[] boundary = ("--" + boundaryParam).getBytes(charset);
-    
+
     if (preamble != null)
       os.write(preamble.getBytes(charset));
-    
+
     synchronized (parts)
       {
         int len = parts.size();
@@ -279,7 +279,7 @@ public class MimeMultipart
                 sis = (SharedInputStream) is;
               }
             // buffer it
-            if (!(is instanceof ByteArrayInputStream) && 
+            if (!(is instanceof ByteArrayInputStream) &&
                 !(is instanceof BufferedInputStream))
               {
                 is = new BufferedInputStream(is);
@@ -296,7 +296,7 @@ public class MimeMultipart
               }
             String boundary = (boundaryParam == null) ? null :
               "--" + boundaryParam;
-            
+
             LineInputStream lis = new LineInputStream(is);
             String line;
             StringBuffer preambleBuf = null;
@@ -324,10 +324,10 @@ public class MimeMultipart
               {
                 throw new MessagingException("No start boundary");
               }
-            
+
             byte[] bbytes = boundary.getBytes();
             int blen = bbytes.length;
-            
+
             long start = 0L, end = 0L;
             for (boolean done = false; !done;)
               {
@@ -354,7 +354,7 @@ public class MimeMultipart
                   {
                     bos = new ByteArrayOutputStream();
                   }
-                
+
                 // NB this routine uses the InputStream.mark() method
                 // if it is not supported by the underlying stream
                 // we will run into problems
@@ -383,7 +383,7 @@ public class MimeMultipart
                               }
                             pos++;
                           }
-                        
+
                         if (pos == blen)
                           {
                             c = is.read();
@@ -458,7 +458,7 @@ public class MimeMultipart
                           }
                       }
                   }
-                
+
                 // Create a body part from the stream
                 MimeBodyPart bp;
                 if (sis != null)
@@ -471,7 +471,7 @@ public class MimeMultipart
                   }
                 addBodyPart(bp);
               }
-            
+
           }
         catch (IOException e)
           {
@@ -538,7 +538,7 @@ public class MimeMultipart
       }
     return line;
   }
-  
+
   /**
    * Creates headers from the specified input stream.
    * @param is the input stream to read the headers from
@@ -548,7 +548,7 @@ public class MimeMultipart
   {
     return new InternetHeaders(is);
   }
-  
+
   /**
    * Creates a MIME body part object from the given headers and byte content.
    * @param headers the part headers
@@ -560,7 +560,7 @@ public class MimeMultipart
   {
     return new MimeBodyPart(headers, content);
   }
-  
+
   /**
    * Creates a MIME body part from the specified input stream.
    * @param is the input stream to parse the part from
@@ -570,6 +570,6 @@ public class MimeMultipart
   {
     return new MimeBodyPart(is);
   }
-  
+
 }
 

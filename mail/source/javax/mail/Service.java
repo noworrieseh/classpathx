@@ -1,19 +1,19 @@
 /*
  * Service.java
  * Copyright (C) 2002, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -147,7 +147,7 @@ public abstract class Service
       {
         throw new MessagingException("already connected");
       }
-    
+
     boolean success = false;
     boolean authenticated = false;
     String protocol = null;
@@ -213,7 +213,7 @@ public abstract class Service
     if (password == null && url != null)
       {
         setURLName(new URLName(protocol, host, port, file, user, password));
-        PasswordAuthentication auth = 
+        PasswordAuthentication auth =
           session.getPasswordAuthentication(getURLName());
         if (auth != null)
           {
@@ -251,7 +251,7 @@ public abstract class Service
         catch (UnknownHostException e)
           {
           }
-        PasswordAuthentication auth = 
+        PasswordAuthentication auth =
           session.requestPasswordAuthentication(address, port, protocol,
                                                  null, user);
         if (auth != null)
@@ -279,7 +279,7 @@ public abstract class Service
     setConnected(true);
     notifyConnectionListeners(ConnectionEvent.OPENED);
   }
-  
+
   /**
    * Provider implementation for a service.
    * <p>
@@ -298,7 +298,7 @@ public abstract class Service
    * @exception AuthenticationFailedException on authentication failure
    * @exception MessagingException for non-authentication failures
    */
-  protected boolean protocolConnect(String host, int port, 
+  protected boolean protocolConnect(String host, int port,
                                      String user, String password)
     throws MessagingException
   {
@@ -367,7 +367,7 @@ public abstract class Service
    *
    * Note that all events are currently delivered synchronously, where in
    * Sun's implementation a different thread is used for event delivery.
-   * 
+   *
    * TODO Examine the impact of this.
    */
 
@@ -403,7 +403,7 @@ public abstract class Service
   }
 
   /**
-   * Notify all connection listeners. 
+   * Notify all connection listeners.
    */
   protected void notifyConnectionListeners(int type)
   {

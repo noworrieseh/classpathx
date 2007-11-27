@@ -1,23 +1,23 @@
 /*
  * POP3Folder.java
  * Copyright (C) 1999, 2003 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -50,8 +50,8 @@ import gnu.inet.pop3.POP3Connection;
  * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
  * @version 1.3
  */
-public final class POP3Folder 
-extends Folder 
+public final class POP3Folder
+extends Folder
 {
 
   boolean readonly = false, open = false;
@@ -60,11 +60,11 @@ extends Folder
   Folder inbox;
 
   List deleted;
-  
+
   /**
    * Constructor.
    */
-  protected POP3Folder(Store store, int type) 
+  protected POP3Folder(Store store, int type)
   {
     super(store);
     this.type = type;
@@ -73,9 +73,9 @@ extends Folder
   /**
    * Returns the name of this folder.
    */
-  public String getName() 
+  public String getName()
   {
-    switch (type) 
+    switch (type)
       {
       case HOLDS_FOLDERS:
         return "/";
@@ -89,7 +89,7 @@ extends Folder
   /**
    * Returns the full name of this folder.
    */
-  public String getFullName() 
+  public String getFullName()
   {
     return getName();
   }
@@ -98,8 +98,8 @@ extends Folder
    * Returns the type of this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getType() 
-    throws MessagingException 
+  public int getType()
+    throws MessagingException
   {
     return type;
   }
@@ -108,8 +108,8 @@ extends Folder
    * Indicates whether this folder exists.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean exists() 
-    throws MessagingException 
+  public boolean exists()
+    throws MessagingException
   {
     return (type == HOLDS_MESSAGES);
   }
@@ -118,8 +118,8 @@ extends Folder
    * Indicates whether this folder contains new messages.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean hasNewMessages() 
-    throws MessagingException 
+  public boolean hasNewMessages()
+    throws MessagingException
   {
     return getNewMessageCount() > 0;
   }
@@ -128,8 +128,8 @@ extends Folder
    * Opens this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public void open(int mode) 
-    throws MessagingException 
+  public void open(int mode)
+    throws MessagingException
   {
     switch (mode)
       {
@@ -151,8 +151,8 @@ extends Folder
    * @param expunge if the folder is to be expunged before it is closed
    * @exception MessagingException if a messaging error occurred
    */
-  public void close(boolean expunge) 
-    throws MessagingException 
+  public void close(boolean expunge)
+    throws MessagingException
   {
     if (!open)
       {
@@ -172,8 +172,8 @@ extends Folder
    * This deletes all the messages marked as deleted.
    * @exception MessagingException if a messaging error occurred
    */
-  public Message[] expunge() 
-    throws MessagingException 
+  public Message[] expunge()
+    throws MessagingException
   {
     if (!open)
       {
@@ -209,7 +209,7 @@ extends Folder
   /**
    * Indicates whether this folder is open.
    */
-  public boolean isOpen() 
+  public boolean isOpen()
   {
     return open;
   }
@@ -217,7 +217,7 @@ extends Folder
   /**
    * Returns the permanent flags for this folder.
    */
-  public Flags getPermanentFlags() 
+  public Flags getPermanentFlags()
   {
     return new Flags();
   }
@@ -228,8 +228,8 @@ extends Folder
    * count is always delivered.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getMessageCount() 
-    throws MessagingException 
+  public int getMessageCount()
+    throws MessagingException
   {
     POP3Connection connection = ((POP3Store) store).connection;
     synchronized (connection)
@@ -250,8 +250,8 @@ extends Folder
    * @param msgnum the message number
    * @exception MessagingException if a messaging error occurred
    */
-  public Message getMessage(int msgnum) 
-    throws MessagingException 
+  public Message getMessage(int msgnum)
+    throws MessagingException
   {
     if (!open)
       {
@@ -275,8 +275,8 @@ extends Folder
   /**
    * You can't append messages to a POP3 folder.
    */
-  public void appendMessages(Message[] messages) 
-    throws MessagingException 
+  public void appendMessages(Message[] messages)
+    throws MessagingException
   {
     throw new IllegalWriteException();
   }
@@ -285,8 +285,8 @@ extends Folder
    * Fetches headers and/or content for the specified messages.
    * @exception MessagingException ignore
    */
-  public void fetch(Message[] messages, FetchProfile fp) 
-    throws MessagingException 
+  public void fetch(Message[] messages, FetchProfile fp)
+    throws MessagingException
   {
     // Determine whether to fetch headers or content
     boolean fetchHeaders = false;
@@ -341,8 +341,8 @@ extends Folder
   /**
    * Returns the subfolders for this folder.
    */
-  public Folder[] list() 
-    throws MessagingException 
+  public Folder[] list()
+    throws MessagingException
   {
     switch (type)
       {
@@ -361,8 +361,8 @@ extends Folder
   /**
    * Returns the subfolders for this folder.
    */
-  public Folder[] list(String pattern) 
-    throws MessagingException 
+  public Folder[] list(String pattern)
+    throws MessagingException
   {
     return list();
   }
@@ -370,8 +370,8 @@ extends Folder
   /**
    * POP3 folders can't have parents.
    */
-  public Folder getParent() 
-    throws MessagingException 
+  public Folder getParent()
+    throws MessagingException
   {
     switch (type)
       {
@@ -385,8 +385,8 @@ extends Folder
   /**
    * POP3 folders can't contain subfolders.
    */
-  public Folder getFolder(String s) 
-    throws MessagingException 
+  public Folder getFolder(String s)
+    throws MessagingException
   {
     switch (type)
       {
@@ -404,8 +404,8 @@ extends Folder
   /**
    * Returns the path separator charcter.
    */
-  public char getSeparator() 
-    throws MessagingException 
+  public char getSeparator()
+    throws MessagingException
   {
     return '\u0000';
   }
@@ -415,8 +415,8 @@ extends Folder
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean create(int i) 
-    throws MessagingException 
+  public boolean create(int i)
+    throws MessagingException
   {
     throw new IllegalWriteException();
   }
@@ -424,8 +424,8 @@ extends Folder
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean delete(boolean flag) 
-    throws MessagingException 
+  public boolean delete(boolean flag)
+    throws MessagingException
   {
     throw new IllegalWriteException("Folder can't be deleted");
   }
@@ -433,8 +433,8 @@ extends Folder
   /**
    * POP3 folders can't be created, deleted, or renamed.
    */
-  public boolean renameTo(Folder folder) 
-    throws MessagingException 
+  public boolean renameTo(Folder folder)
+    throws MessagingException
   {
     throw new IllegalWriteException("Folder can't be renamed");
   }

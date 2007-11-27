@@ -1,23 +1,23 @@
 /*
  * SMTPTransport.java
  * Copyright(C) 2001 Benjamin A. Speakmon
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -64,7 +64,7 @@ import gnu.inet.smtp.SMTPConnection;
 import gnu.inet.util.BASE64;
 import gnu.inet.util.LaconicFormatter;
 
-/** 
+/**
  * This transport handles communications with an SMTP server.
  *
  * @author Andrew Selkirk
@@ -81,9 +81,9 @@ public class SMTPTransport
    * The connection used to communicate with the server.
    */
   protected SMTPConnection connection;
-  
+
   protected String localHostName;
-  
+
   private List extensions = null;
   private List authenticationMechanisms = null;
 
@@ -93,10 +93,10 @@ public class SMTPTransport
    * @param session a <code>Session</code> value
    * @param urlName an <code>URLName</code> value
    */
-  public SMTPTransport(Session session, URLName urlName) 
+  public SMTPTransport(Session session, URLName urlName)
   {
     super(session, urlName);
-   
+
     // Check for mail.smtp.localhost property
     localHostName = getProperty("localhost");
     if (localHostName == null)
@@ -117,7 +117,7 @@ public class SMTPTransport
    */
   protected boolean protocolConnect(String host, int port, String username,
                                      String password)
-    throws MessagingException 
+    throws MessagingException
   {
     if (connection != null)
       {
@@ -135,15 +135,15 @@ public class SMTPTransport
       {
         username = getProperty("user");
       }
-    
+
     // Check host
     if (host == null)
       {
         host = "localhost";
       }
-    
+
     try
-      {	
+      {
         int connectionTimeout = getIntProperty("connectiontimeout");
         int timeout = getIntProperty("timeout");
         boolean tls = "stmps".equals(url.getProtocol());
@@ -153,8 +153,8 @@ public class SMTPTransport
           {
             tm = getTrustManager();
           }
-        
-        connection = new SMTPConnection(host, port, 
+
+        connection = new SMTPConnection(host, port,
                                         connectionTimeout, timeout,
                                         tls, tm, false);
         if (session.getDebug())
@@ -169,7 +169,7 @@ public class SMTPTransport
           }
 
         connection.init();
-        
+
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))
           {
@@ -226,7 +226,7 @@ public class SMTPTransport
                   }
               }
           }
-        
+
         // User authentication
         String auth = getProperty("auth");
         boolean authRequired = "required".equals(auth);
@@ -350,7 +350,7 @@ public class SMTPTransport
    * Send the specified message to the server.
    */
   public void sendMessage(Message message, Address[] addresses)
-    throws MessagingException, SendFailedException 
+    throws MessagingException, SendFailedException
   {
     if (!isConnected())
       {
@@ -362,14 +362,14 @@ public class SMTPTransport
       }
     // Cast message
     MimeMessage mimeMessage = (MimeMessage) message;
-      
+
     int len = addresses.length;
     List sent = new ArrayList(len);
     List unsent = new ArrayList(len);
     List invalid = new ArrayList(len);
     int deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
     ParameterList params = null; // ESMTP parameters
-    
+
     synchronized (connection)
       {
         try
@@ -494,7 +494,7 @@ public class SMTPTransport
                 throw new SendFailedException(connection.getLastResponse());
               }
             params = null;
-            
+
             // DSN NOTIFY
             String dsnNotify = getProperty("dsn.notify");
             if (dsnNotify != null && extensions != null &&
@@ -586,11 +586,11 @@ public class SMTPTransport
               }
             throw new SendFailedException(e.getMessage());
           }
-        
+
         if (sent.size() > 0)
           {
             try
-              {  
+              {
                 // DATA
                 OutputStream dataStream = connection.data();
                 if (dataStream == null)
@@ -606,7 +606,7 @@ public class SMTPTransport
                     sent.clear();
                     deliveryStatus = TransportEvent.MESSAGE_NOT_DELIVERED;
                   }
-                else 
+                else
                   {
                     deliveryStatus = invalid.isEmpty() ?
                       TransportEvent.MESSAGE_DELIVERED :
@@ -631,7 +631,7 @@ public class SMTPTransport
               }
           }
       }
-  
+
     // Notify transport listeners
     Address[] a_sent = new Address[sent.size()];
     sent.toArray(a_sent);
@@ -639,7 +639,7 @@ public class SMTPTransport
     unsent.toArray(a_unsent);
     Address[] a_invalid = new Address[invalid.size()];
     invalid.toArray(a_invalid);
-    
+
     notifyTransportListeners(deliveryStatus, a_sent, a_unsent, a_invalid,
                               mimeMessage);
   }
@@ -648,17 +648,17 @@ public class SMTPTransport
    * Close this transport.
    */
   public void close()
-    throws MessagingException 
+    throws MessagingException
   {
-    if (isConnected()) 
+    if (isConnected())
       {
         synchronized (connection)
           {
-            try 
+            try
               {
                 connection.quit();
               }
-            catch (IOException e) 
+            catch (IOException e)
               {
                 throw new MessagingException(e.getMessage(), e);
               }
@@ -670,7 +670,7 @@ public class SMTPTransport
       }
     super.close();
   }
-  
+
   // -- Utility methods --
 
   private int getIntProperty(String key)
@@ -688,17 +688,17 @@ public class SMTPTransport
       }
     return -1;
   }
-  
+
   private boolean propertyIsFalse(String key)
   {
     return "false".equals(getProperty(key));
   }
-  
+
   private boolean propertyIsTrue(String key)
   {
     return "true".equals(getProperty(key));
   }
-  
+
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
@@ -712,5 +712,5 @@ public class SMTPTransport
       }
     return value;
   }
-  
+
 }

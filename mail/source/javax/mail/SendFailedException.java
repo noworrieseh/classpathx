@@ -1,19 +1,19 @@
 /*
  * SendFailedException.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -30,14 +30,14 @@ package javax.mail;
 /**
  * An exception thrown when a message cannot be sent.
  * <p>
- * It includes those addresses to which the message could not be 
- * sent as well as the valid addresses to which the message was sent 
+ * It includes those addresses to which the message could not be
+ * sent as well as the valid addresses to which the message was sent
  * and valid addresses to which the message was not sent.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.4
  */
-public class SendFailedException 
+public class SendFailedException
   extends MessagingException
 {
 

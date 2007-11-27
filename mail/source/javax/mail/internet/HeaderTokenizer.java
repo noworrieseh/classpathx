@@ -1,19 +1,19 @@
 /*
  * HeaderTokenizer.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -56,7 +56,7 @@ public class HeaderTokenizer
 
     /**
      * A comment.
-     * The value of this token is the comment string without the comment 
+     * The value of this token is the comment string without the comment
      * start and end symbols.
      */
     public static final int COMMENT = -3;
@@ -87,14 +87,14 @@ public class HeaderTokenizer
       this.type = type;
       this.value = value;
     }
-    
+
     /**
      * Returns the token type.
      * If the token is a delimiter or a control character,
      * the type is the integer value of that character.
      * Otherwise, its value is one of the following:
      * <ul>
-     * <li>ATOM: a sequence of ASCII characters delimited by either 
+     * <li>ATOM: a sequence of ASCII characters delimited by either
      * SPACE, CTL, '(', '"' or the specified SPECIALS
      * <li>QUOTEDSTRING: a sequence of ASCII characters within quotes
      * <li>COMMENT: a sequence of ASCII characters within '(' and ')'
@@ -125,7 +125,7 @@ public class HeaderTokenizer
    * MIME specials.
    */
   public static final String MIME = "()<>@,;:\\\"\t []/?=";
-  
+
   /*
    * The EOF token.
    */
@@ -163,7 +163,7 @@ public class HeaderTokenizer
    * peek().
    */
   private int peek = 0;
-  
+
   private int maxPos;
 
   /**
@@ -256,10 +256,10 @@ public class HeaderTokenizer
       {
         return EOF;
       }
-    
+
     boolean needsFilter = false;
     char c;
-    
+
     // comment
     for (c = header.charAt(pos); c == '('; c = header.charAt(pos))
       {
@@ -287,12 +287,12 @@ public class HeaderTokenizer
               }
             pos++;
           }
-        
+
         if (parenCount != 0)
           {
             throw new ParseException("Illegal comment");
           }
-        
+
         if (!skipComments)
           {
             String ret = needsFilter ?
@@ -300,13 +300,13 @@ public class HeaderTokenizer
               header.substring(start, pos - 1);
             return new Token(Token.COMMENT, ret);
           }
-        
+
         if (skipWhitespace() == Token.EOF)
           {
             return EOF;
           }
       }
-    
+
     // quotedstring
     if (c == '"')
       {
@@ -335,7 +335,7 @@ public class HeaderTokenizer
           }
         throw new ParseException("Illegal quoted string");
       }
-    
+
     // delimiter
     if (c < ' ' || c >= '\177' || delimiters.indexOf(c) >= 0)
       {
@@ -343,13 +343,13 @@ public class HeaderTokenizer
         char[] chars = new char[] { c };
         return new Token(c, new String(chars));
       }
-    
+
     // atom
     int start = pos;
     while (pos < maxPos)
       {
         c = header.charAt(pos);
-        if (c < ' ' || c >= '\177' || c == '(' || c == ' ' || c == '"' || 
+        if (c < ' ' || c >= '\177' || c == '(' || c == ' ' || c == '"' ||
             delimiters.indexOf(c) >= 0)
           {
             break;
@@ -358,7 +358,7 @@ public class HeaderTokenizer
       }
     return new Token(Token.ATOM, header.substring(start, pos));
   }
-  
+
   /*
    * Advance pos over any whitespace delimiters.
    */

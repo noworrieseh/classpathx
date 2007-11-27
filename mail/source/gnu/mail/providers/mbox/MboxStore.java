@@ -1,23 +1,23 @@
 /*
  * MboxStore.java
  * Copyright(C) 1999,2005 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -54,8 +54,8 @@ import gnu.mail.treeutil.StatusSource;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public final class MboxStore 
-  extends Store 
+public final class MboxStore
+  extends Store
   implements StatusSource
 {
 
@@ -65,24 +65,24 @@ public final class MboxStore
   static final Level MBOX_TRACE = new TraceLevel("mbox");
 
   private static final char separatorChar = '/';
-  
+
   static boolean attemptFallback = true;
 
   /**
    * File representing the root of this store's hierarchy.
    */
   File root;
-  
+
   private List statusListeners = new ArrayList();
-	
+
   /**
    * Constructor.
    */
-  public MboxStore(Session session, URLName urlname) 
+  public MboxStore(Session session, URLName urlname)
   {
     super(session, urlname);
     String af = session.getProperty("mail.mbox.attemptfallback");
-    if (af != null) 
+    if (af != null)
       {
         attemptFallback = Boolean.valueOf(af).booleanValue();
       }
@@ -91,15 +91,15 @@ public final class MboxStore
         logger.setLevel(MBOX_TRACE);
       }
   }
-  
+
   /**
    * There isn't a protocol to implement, so this method just returns.
    */
-  protected boolean protocolConnect(String host, 
-                                    int port, 
+  protected boolean protocolConnect(String host,
+                                    int port,
                                     String username,
-                                    String password) 
-    throws MessagingException 
+                                    String password)
+    throws MessagingException
   {
     if (url != null)
       {
@@ -107,7 +107,7 @@ public final class MboxStore
         if (path != null && !"".equals(path))
           {
             path = decodeUrlPath(path);
-            
+
             // Relative or Windows absolute path
             if (File.separatorChar != '/')
               {
@@ -154,7 +154,7 @@ public final class MboxStore
     url = new URLName(url.getProtocol(), null, -1, url.getFile(), null, null);
     super.setURLName(url);
   }
-  
+
   /**
    * Returns the default folder.
    */
@@ -176,8 +176,8 @@ public final class MboxStore
   /**
    * Returns the folder specified by the filename of the URLName.
    */
-  public Folder getFolder(URLName urlname) 
-    throws MessagingException 
+  public Folder getFolder(URLName urlname)
+    throws MessagingException
   {
     String path = urlname.getFile();
     if (path != null)
@@ -186,7 +186,7 @@ public final class MboxStore
       }
     return getFolder(path, true);
   }
-  
+
   private Folder getFolder(String name, boolean tryPrepend)
     throws MessagingException
   {
@@ -238,7 +238,7 @@ public final class MboxStore
                 inbox = new File(inboxname);
               }
           }
-        if (!inbox.exists() && attemptFallback && File.separatorChar == '/') 
+        if (!inbox.exists() && attemptFallback && File.separatorChar == '/')
           {
             PrivilegedAction a;
             if (File.separatorChar == '/')
@@ -265,7 +265,7 @@ public final class MboxStore
     return new MboxFolder(this, file, false);
   }
 
-  Session getSession() 
+  Session getSession()
   {
     return session;
   }
@@ -287,22 +287,22 @@ public final class MboxStore
    * @param l the status listener
    * @see #removeStatusListener
    */
-  public void addStatusListener(StatusListener l) 
+  public void addStatusListener(StatusListener l)
   {
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
       {
         statusListeners.add(l);
       }
   }
-			
+
   /**
    * Removes a status listener from this store.
    * @param l the status listener
    * @see #addStatusListener
    */
-  public void removeStatusListener(StatusListener l) 
+  public void removeStatusListener(StatusListener l)
   {
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
       {
         statusListeners.remove(l);
       }
@@ -313,15 +313,15 @@ public final class MboxStore
    * This dispatches the event to all the registered listeners.
    * @param event the status event
    */
-  protected void processStatusEvent(StatusEvent event) 
+  protected void processStatusEvent(StatusEvent event)
   {
     StatusListener[] listeners;
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
       {
         listeners = new StatusListener[statusListeners.size()];
         statusListeners.toArray(listeners);
       }
-    switch (event.getType()) 
+    switch (event.getType())
       {
       case StatusEvent.OPERATION_START:
         for (int i = 0; i < listeners.length; i++)

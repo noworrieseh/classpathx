@@ -1,19 +1,19 @@
 /*
  * URLName.java
  * Copyright(C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -59,14 +59,14 @@ public class URLName
 
   private InetAddress hostAddress;
   private boolean gotHostAddress = false;
-  
-  
+
+
   private int hashCode;
 
   /**
    * Creates a URLName object from the specified protocol, host,
    * port number, file, username, and password.
-   * Specifying a port number of -1 indicates that the URL should 
+   * Specifying a port number of -1 indicates that the URL should
    * use the default port for the protocol.
    */
   public URLName(String protocol, String host, int port,
@@ -116,7 +116,7 @@ public class URLName
   }
 
   /**
-   * Returns the protocol of this URLName. 
+   * Returns the protocol of this URLName.
    * Returns null if this URLName has no protocol.
    */
   public String getProtocol()
@@ -233,7 +233,7 @@ public class URLName
       }
     return fullURL;
   }
-  
+
   /**
    * Compares two URLNames. The result is true if and only if the argument is
    * not null and is a URLName object that represents the same URLName as this
@@ -274,7 +274,7 @@ public class URLName
             return false;
           }
       }
-    if (username != url.username && 
+    if (username != url.username &&
        (username==null || !username.equals(url.username)))
       {
         return false;
@@ -377,7 +377,7 @@ public class URLName
           {
             hostPart = url.substring(colonIndex + 3);
           }
-        
+
         // user:password@host?
         int atIndex = hostPart.lastIndexOf('@');
         if (atIndex != -1)
@@ -395,7 +395,7 @@ public class URLName
                 username = userPart;
               }
           }
-        
+
         // host:port?
         if (hostPart.length() > 0 && hostPart.charAt(0) == '[')
           {
@@ -430,7 +430,7 @@ public class URLName
       {
         file = url.substring(colonIndex + 1);
       }
-    
+
     int hashIndex = (file != null) ? file.indexOf('#') : -1;
     if (hashIndex != -1)
       {
@@ -438,5 +438,5 @@ public class URLName
         file = file.substring(0, hashIndex);
       }
   }
-  
+
 }

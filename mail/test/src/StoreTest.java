@@ -19,13 +19,13 @@ public class StoreTest
   extends TestCase
   implements ConnectionListener
 {
-	
+
 	private Session session;
   private URLName url;
   private Store store;
 
   private ConnectionEvent event;
-	
+
 	public StoreTest(String name, String url)
 	{
     super(name);
@@ -162,5 +162,5 @@ public class StoreTest
     }
     return suite;
 	}
-	
+
 }

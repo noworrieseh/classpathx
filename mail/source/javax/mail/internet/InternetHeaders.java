@@ -1,19 +1,19 @@
 /*
  * InternetHeaders.java
  * Copyright (C) 2002, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -61,7 +61,7 @@ public class InternetHeaders
   protected static class InternetHeader
     extends Header
   {
-    
+
     /**
      * The name.
      * @since JavaMail 1.4
@@ -73,7 +73,7 @@ public class InternetHeaders
      * @since JavaMail 1.4
      */
     protected String line;
-    
+
     public InternetHeader(String line)
     {
       super(null, null);
@@ -81,7 +81,7 @@ public class InternetHeaders
       name = (i < 0) ? line.trim() : line.substring(0, i).trim();
       this.line = line;
     }
-    
+
     public InternetHeader(String name, String value)
     {
       super(null, null);
@@ -109,7 +109,7 @@ public class InternetHeaders
         {
           return line;
         }
-      
+
       int pos, len = line.length();
       for (pos = i + 1; pos < len; pos++)
         {
@@ -119,7 +119,7 @@ public class InternetHeaders
               break;
             }
         }
-      
+
       return line.substring(pos);
     }
 
@@ -137,7 +137,7 @@ public class InternetHeaders
     {
       return name.equalsIgnoreCase(other);
     }
-    
+
   }
 
   /*
@@ -152,7 +152,7 @@ public class InternetHeaders
     private boolean stringForm;
     private boolean matching;
     private InternetHeader nextHeader;
-    
+
     HeaderEnumeration(Iterator source, String[] names,
                        boolean stringForm, boolean matching)
     {
@@ -161,7 +161,7 @@ public class InternetHeaders
       this.stringForm = stringForm;
       this.matching = matching;
     }
-    
+
     /**
      * Enumeration syntax
      */
@@ -181,7 +181,7 @@ public class InternetHeaders
         }
       return (nextHeader != null);
     }
-    
+
     /**
      * Enumeration syntax
      */
@@ -203,10 +203,10 @@ public class InternetHeaders
         {
           throw new NoSuchElementException();
         }
-      
+
       InternetHeader header = nextHeader;
       nextHeader = null;
-      
+
       if (stringForm)
         {
           return header.line;
@@ -218,37 +218,37 @@ public class InternetHeaders
     {
       throw new UnsupportedOperationException();
     }
-    
+
     private InternetHeader getNext()
     {
-      while (source.hasNext()) 
+      while (source.hasNext())
         {
           InternetHeader header = (InternetHeader) source.next();
           if (header.line == null)
             {
               continue;
             }
-          
+
           if (names == null)
             {
               return (matching) ? null : header;
             }
-          
+
           for (int i = 0; i < names.length; i++)
             {
               if (!header.nameEquals(names[i]))
                 {
                   continue;
                 }
-              
+
               if (matching)
                 {
                   return header;
                 }
-              
+
               return getNext();
             }
-          
+
           if (!matching)
             {
               return header;
@@ -256,9 +256,9 @@ public class InternetHeaders
         }
       return null;
     }
-  
+
   }
-  
+
   /**
    * The list of headers.
    * @since JavaMail 1.4
@@ -319,7 +319,7 @@ public class InternetHeaders
     LineInputStream in = new LineInputStream(is);
     try
       {
-        for (String line = in.readLine(); line != null; line = in.readLine()) 
+        for (String line = in.readLine(); line != null; line = in.readLine())
           {
             line = trim(line);
             if (line.length() == 0)
@@ -342,7 +342,7 @@ public class InternetHeaders
   public String[] getHeader(String name)
   {
     ArrayList acc = new ArrayList(headers.size());
-    for (Iterator i = headers.iterator(); i.hasNext(); ) 
+    for (Iterator i = headers.iterator(); i.hasNext(); )
       {
         InternetHeader header = (InternetHeader) i.next();
         if (header.nameEquals(name) && header.line != null)
@@ -374,7 +374,7 @@ public class InternetHeaders
       {
         return null;
       }
-    
+
     if (delimiter == null || h.length == 1)
       {
         return h[0];
@@ -574,6 +574,6 @@ public class InternetHeaders
       }
     return line;
   }
-  
+
 }
 

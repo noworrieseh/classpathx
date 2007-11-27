@@ -1,19 +1,19 @@
 /*
  * MessagingException.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -36,7 +36,7 @@ import java.io.PrintWriter;
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.4
  */
-public class MessagingException 
+public class MessagingException
   extends Exception
 {
 
@@ -76,7 +76,7 @@ public class MessagingException
 
   /**
    * Returns the next exception chained to this one.
-   * If the next exception is a messaging exception, the chain may extend 
+   * If the next exception is a messaging exception, the chain may extend
    * further.
    */
   public Exception getNextException()
@@ -86,7 +86,7 @@ public class MessagingException
 
   /**
    * Adds an exception to the end of the chain.
-   * If the end is not a messaging exception, this exception cannot be added 
+   * If the end is not a messaging exception, this exception cannot be added
    * to the end.
    * @param exception the new end of the exception chain
    * @return true if this exception was added, false otherwise.
@@ -95,7 +95,7 @@ public class MessagingException
   {
     Object o;
     for (o = this;
-         (o instanceof MessagingException) && 
+         (o instanceof MessagingException) &&
          ((MessagingException) o).nextException != null;
          o = ((MessagingException) o).nextException);
     if (o instanceof MessagingException)
@@ -132,7 +132,7 @@ public class MessagingException
         nextException.printStackTrace(out);
       }
   }
-  
+
   public void printStackTrace(PrintWriter out)
   {
     super.printStackTrace(out);
@@ -142,5 +142,5 @@ public class MessagingException
         nextException.printStackTrace(out);
       }
   }
-  
+
 }

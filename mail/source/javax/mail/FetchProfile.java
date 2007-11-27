@@ -1,19 +1,19 @@
 /*
  * FetchProfile.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -54,7 +54,7 @@ public class FetchProfile
 
     /**
      * The message content metadata, e.g.:
-     * ContentType, ContentDisposition, ContentDescription, Size and LineCount. 
+     * ContentType, ContentDisposition, ContentDescription, Size and LineCount.
      * Further items may be included as required.
      */
     public static final Item CONTENT_INFO = new Item("CONTENT_INFO");
@@ -63,7 +63,7 @@ public class FetchProfile
      * The message flags.
      */
     public static final Item FLAGS = new Item("FLAGS");
-    
+
     private String name;
 
     protected Item(String name)
@@ -163,5 +163,5 @@ public class FetchProfile
         return h;
       }
   }
-  
+
 }

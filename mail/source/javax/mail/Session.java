@@ -1,19 +1,19 @@
 /*
  * Session.java
  * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -51,45 +51,45 @@ public final class Session
 {
 
   // Constant definitions of property locations.
-  
+
   private static final String SYSTEM_PROVIDERS =
      (System.getProperty("java.home")
 			+ File.separator
 			+ "lib"
 			+ File.separator
 			+ "javamail.providers");
-      
+
   private static final String CUSTOM_PROVIDERS =
       "META-INF/javamail.providers";
-  
+
   private static final String DEFAULT_PROVIDERS =
       "META-INF/javamail.default.providers";
-  
+
   private static final String SYSTEM_ADDRESS_MAP =
      (System.getProperty("java.home")
 			+ File.separator
 			+ "lib"
 			+ File.separator
 			+ "javamail.address.map");
-  
+
   private static final String CUSTOM_ADDRESS_MAP =
       "META-INF/javamail.address.map";
-  
+
   private static final String DEFAULT_ADDRESS_MAP =
       "META-INF/javamail.default.address.map";
 
   // Class data.
 
   private Properties props;
-  
+
   private Authenticator authenticator;
 
   private HashMap authTable = new HashMap();
-  
+
   private boolean debug;
 
   private PrintStream debugOut = System.err;
-  
+
   private ArrayList providers = new ArrayList();
 
   private HashMap providersByProtocol = new HashMap();
@@ -185,7 +185,7 @@ public final class Session
       }
     return in;
   }
-  
+
   /**
    * Loads the provider database description.
    */
@@ -201,7 +201,7 @@ public final class Session
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         for (String line = reader.readLine();
             line != null;
-            line = reader.readLine()) 
+            line = reader.readLine())
           {
             line = line.trim();
             if (!line.startsWith("#") && line.length() > 0)
@@ -211,7 +211,7 @@ public final class Session
                 String className = null;
                 String vendor = null;
                 String version = null;
-                for (StringTokenizer st = new StringTokenizer(line, ";"); 
+                for (StringTokenizer st = new StringTokenizer(line, ";");
                      st.hasMoreTokens(); )
                   {
                     String token = st.nextToken().trim();
@@ -246,7 +246,7 @@ public final class Session
                         version = token.substring(equalsIndex + 1);
                       }
                   }
-                
+
                 if (type == null || protocol == null || className == null)
                   {
                     logger.warning("Invalid provider: " + line);
@@ -277,7 +277,7 @@ public final class Session
                    " providers", e);
       }
   }
-  
+
   private void loadAddressMap(InputStream in, String description)
   {
     if (in == null)
@@ -301,13 +301,13 @@ public final class Session
                    " address map", e);
       }
   }
-  
+
   /**
    * Returns a new session.
    * @param props a properties object holding relevant properties.
    * It is expected that the client supplies values for the properties
    * listed in Appendix A of the JavaMail spec (particularly
-   * <code>mail.store.protocol</code>, 
+   * <code>mail.store.protocol</code>,
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
    * <code>mail.user</code>,
@@ -316,7 +316,7 @@ public final class Session
    * @param authenticator an authenticator used to call back to the
    * application when a user name and password is needed.
    */
-  public static Session getInstance(Properties props, 
+  public static Session getInstance(Properties props,
       Authenticator authenticator)
   {
     return new Session(props, authenticator);
@@ -327,7 +327,7 @@ public final class Session
    * @param props a properties object holding relevant properties.
    * It is expected that the client supplies values for the properties
    * listed in Appendix A of the JavaMail spec (particularly
-   * <code>mail.store.protocol</code>, 
+   * <code>mail.store.protocol</code>,
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
    * <code>mail.user</code>,
@@ -341,15 +341,15 @@ public final class Session
 
   /**
    * Returns the default session.
-   * If a default has not yet been setup, a new session is created 
+   * If a default has not yet been setup, a new session is created
    * and installed as the default.
    * <p>
-   * Since the default session is potentially available to all code 
-   * executing in the same Java virtual machine, and the session can 
-   * contain security sensitive information such as user names and 
-   * passwords, access to the default session is restricted. 
-   * The Authenticator object, which must be created by the caller, 
-   * is used indirectly to check access permission. The Authenticator 
+   * Since the default session is potentially available to all code
+   * executing in the same Java virtual machine, and the session can
+   * contain security sensitive information such as user names and
+   * passwords, access to the default session is restricted.
+   * The Authenticator object, which must be created by the caller,
+   * is used indirectly to check access permission. The Authenticator
    * object passed in when the session is created is compared with
    * the Authenticator object passed in to subsequent requests to get the
    * default session. If both objects are the same, or are from the same
@@ -363,7 +363,7 @@ public final class Session
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
    * listed in Appendix A of the JavaMail spec (particularly
-   * <code>mail.store.protocol</code>, 
+   * <code>mail.store.protocol</code>,
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
    * <code>mail.user</code>,
@@ -389,20 +389,20 @@ public final class Session
       }
     return defaultSession;
   }
-  
+
   /**
    * Get the default Session object.
-   * If a default has not yet been setup, a new Session object is created 
+   * If a default has not yet been setup, a new Session object is created
    * and installed as the default.
    * <p>
-   * Note that a default session created with no Authenticator is available 
-   * to all code executing in the same Java virtual machine, and the session 
-   * can contain security sensitive information such as user names and 
+   * Note that a default session created with no Authenticator is available
+   * to all code executing in the same Java virtual machine, and the session
+   * can contain security sensitive information such as user names and
    * passwords.
    * @param props Properties object that hold relevant properties.
    * It is expected that the client supplies values for the properties
    * listed in Appendix A of the JavaMail spec(particularly
-   * <code>mail.store.protocol</code>, 
+   * <code>mail.store.protocol</code>,
    * <code>mail.transport.protocol</code>,
    * <code>mail.host</code>,
    * <code>mail.user</code>,
@@ -419,10 +419,10 @@ public final class Session
    * <p>
    * Since the debug setting can be turned on only after the Session has been
    * created, to turn on debugging in the Session constructor, set the property
-   * <code>mail.debug</code> in the Properties object passed in to the 
-   * constructor to true. The value of the <code>mail.debug</code> property 
-   * is used to initialize the per-Session debugging flag. Subsequent calls 
-   * to the <code>setDebug</code> method manipulate the per-Session debugging 
+   * <code>mail.debug</code> in the Properties object passed in to the
+   * constructor to true. The value of the <code>mail.debug</code> property
+   * is used to initialize the per-Session debugging flag. Subsequent calls
+   * to the <code>setDebug</code> method manipulate the per-Session debugging
    * flag and have no affect on the <code>mail.debug</code> property.
    */
   public void setDebug(boolean debug)
@@ -439,8 +439,8 @@ public final class Session
   }
 
   /**
-   * This method returns an array of all the implementations installed 
-   * via the javamail.[default.]providers files that can be loaded 
+   * This method returns an array of all the implementations installed
+   * via the javamail.[default.]providers files that can be loaded
    * using the ClassLoader available to this application.
    */
   public Provider[] getProviders()
@@ -452,14 +452,14 @@ public final class Session
 
   /**
    * Returns the default Provider for the protocol specified.
-   * Checks <code>mail.&lt;protocol&gt;.class</code> property first 
-   * and if it exists, returns the Provider associated with 
-   * this implementation. If it doesn't exist, returns the Provider that 
-   * appeared first in the configuration files. 
-   * If an implementation for the protocol isn't found, 
+   * Checks <code>mail.&lt;protocol&gt;.class</code> property first
+   * and if it exists, returns the Provider associated with
+   * this implementation. If it doesn't exist, returns the Provider that
+   * appeared first in the configuration files.
+   * If an implementation for the protocol isn't found,
    * throws NoSuchProviderException
    * @param protocol Configured protocol(i.e. smtp, imap, etc)
-   * @param NoSuchProviderException If a provider for the given protocol 
+   * @param NoSuchProviderException If a provider for the given protocol
    * is not found.
    */
   public Provider getProvider(String protocol)
@@ -512,7 +512,7 @@ public final class Session
 
   /**
    * Get a Store object that implements this user's desired Store protocol.
-   * The <code>mail.store.protocol</code> property specifies the desired 
+   * The <code>mail.store.protocol</code> property specifies the desired
    * protocol. If an appropriate Store object is not obtained,
    * NoSuchProviderException is thrown
    */
@@ -536,8 +536,8 @@ public final class Session
   /**
    * Get a Store object for the given URLName.
    * If the requested Store object cannot be obtained,
-   * NoSuchProviderException is thrown. 
-   * The "scheme" part of the URL string(Refer RFC 1738) is used to 
+   * NoSuchProviderException is thrown.
+   * The "scheme" part of the URL string(Refer RFC 1738) is used to
    * locate the Store protocol.
    * @param url URLName that represents the desired Store
    */
@@ -576,7 +576,7 @@ public final class Session
         throw new NoSuchProviderException("not a store");
       }
   }
-  
+
   /**
    * Get a Transport object that implements this user's desired Transport
    * protocol.
@@ -605,7 +605,7 @@ public final class Session
   /**
    * Get a Transport object for the given URLName.
    * If the requested Transport object cannot be obtained,
-   * NoSuchProviderException is thrown. The "scheme" part of the URL 
+   * NoSuchProviderException is thrown. The "scheme" part of the URL
    * string(Refer RFC 1738) is used to locate the Transport protocol.
    * @param url URLName that represents the desired Transport
    * @exception NoSuchProviderException If the provider is not found.
@@ -667,16 +667,16 @@ public final class Session
    * Get a closed Folder object for the given URLName.
    * If the requested Folder object cannot be obtained, null is returned.
    * <p>
-   * The "scheme" part of the URL string(Refer RFC 1738) is used to locate 
+   * The "scheme" part of the URL string(Refer RFC 1738) is used to locate
    * the Store protocol. The rest of the URL string(that is, the
-   * "schemepart", as per RFC 1738) is used by that Store in a protocol 
+   * "schemepart", as per RFC 1738) is used by that Store in a protocol
    * dependent manner to locate and instantiate the appropriate Folder object.
    * <p>
    * Note that RFC 1738 also specifies the syntax for the "schemepart" for
    * IP-based protocols(IMAP4, POP3, etc.). Providers of IP-based mail Stores
    * should implement that syntax for referring to Folders.
    * @param url URLName that represents the desired folder
-   * @exception NoSuchProviderException If a provider for the given URLName 
+   * @exception NoSuchProviderException If a provider for the given URLName
    * is not found.
    * @param MessagingException if the Folder could not be located or created.
    */
@@ -700,7 +700,7 @@ public final class Session
         url = new URLName(provider.getProtocol(), null, -1, null, null,
                            null);
       }
-    
+
     Class providerClass = null;
     ClassLoader loader;
     if (authenticator != null)
@@ -753,7 +753,7 @@ public final class Session
 
   /**
    * Save a PasswordAuthentication for this(store or transport) URLName.
-   * If <code>pw</code> is null the entry corresponding to the URLName 
+   * If <code>pw</code> is null the entry corresponding to the URLName
    * is removed.
    * <p>
    * This is normally used only by the store or transport implementations to
@@ -788,7 +788,7 @@ public final class Session
    * <pre>
    Connecting to <protocol> mail service on host <addr>, port <port>.
    <prompt>
-   
+
    User Name: <defaultUserName>
    Password:
    * @param addr InetAddress of the host. may be null.
@@ -803,13 +803,13 @@ public final class Session
   {
     if (authenticator != null)
       {
-        return authenticator.requestPasswordAuthentication(address, port, 
+        return authenticator.requestPasswordAuthentication(address, port,
                                                            protocol, prompt,
                                                            defaultUserName);
       }
     return null;
   }
-  
+
   /**
    * Returns the Properties object associated with this Session.
    */
@@ -817,7 +817,7 @@ public final class Session
   {
     return props;
   }
-  
+
   /**
    * Returns the value of the specified property.
    * Returns null if this property does not exist.

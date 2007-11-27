@@ -1,23 +1,23 @@
 /*
- * $Id: MailboxURLConnection.java,v 1.3 2005-08-25 12:31:15 dog Exp $
+ * $Id: MailboxURLConnection.java,v 1.4 2007-11-27 22:03:56 conradpino Exp $
  * Copyright(C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -58,7 +58,7 @@ import javax.mail.search.SearchTerm;
  * API.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version $Revision: 1.3 $ $Date: 2005-08-25 12:31:15 $
+ * @version $Revision: 1.4 $ $Date: 2007-11-27 22:03:56 $
  */
 public class MailboxURLConnection
 extends URLConnection
@@ -123,16 +123,16 @@ extends URLConnection
         {
           String comp = path.substring(0, si);
           path = path.substring(si + 1);
-          
+
           folder = folder.getFolder(comp);
         }
       }
 
       if (!folder.exists())
         throw new FileNotFoundException(path);
-      
+
       folder.open(Folder.READ_ONLY);
-      
+
       // Find message if requested
       String ref = url.getRef();
       if (ref != null)
@@ -143,7 +143,7 @@ extends URLConnection
           message = messages[0];
         else
           throw new FileNotFoundException(ref);
-        
+
         headers = new HashMap();
         headerKeys = new ArrayList();
 
@@ -274,9 +274,9 @@ extends URLConnection
         // ?
       }
     }
-    
+
   }
-  
+
   static class FolderWriter
     implements Runnable
   {
@@ -294,7 +294,7 @@ extends URLConnection
     {
       // TODO
     }
-    
+
   }
-  
+
 }

@@ -1,19 +1,19 @@
 /*
  * MimeBodyPart.java
  * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -102,7 +102,7 @@ public class MimeBodyPart
   static final String CONTENT_MD5_NAME = "Content-MD5";
   static final String CONTENT_LANGUAGE_NAME = "Content-Language";
   static final String CONTENT_DESCRIPTION_NAME = "Content-Description";
-  
+
   static final String TEXT_PLAIN = "text/plain";
 
   /**
@@ -130,17 +130,17 @@ public class MimeBodyPart
         contentStream = sis.newStream(sis.getPosition(), -1L);
         return;
       }
-    
+
     // Buffer the stream if necessary
     if (!(is instanceof ByteArrayInputStream) &&
         !(is instanceof BufferedInputStream))
       {
         is = new BufferedInputStream(is);
       }
-    
+
     // Read the headers
     headers = new InternetHeaders(is);
-    
+
     // Read stream into byte array(see MimeMessage.parse())
     try
       {
@@ -277,9 +277,9 @@ public class MimeBodyPart
 
   /**
    * Sets the Content-Disposition header field of this part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setDisposition(String disposition)
@@ -312,8 +312,8 @@ public class MimeBodyPart
     if (encoding != null)
       {
         encoding = encoding.trim();
-        if (encoding.equalsIgnoreCase("7bit") || 
-            encoding.equalsIgnoreCase("8bit") || 
+        if (encoding.equalsIgnoreCase("7bit") ||
+            encoding.equalsIgnoreCase("8bit") ||
             encoding.equalsIgnoreCase("quoted-printable") ||
             encoding.equalsIgnoreCase("base64"))
           {
@@ -349,9 +349,9 @@ public class MimeBodyPart
 
   /**
    * Sets the Content-ID header field of this part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    * @since JavaMail 1.3
    */
@@ -379,9 +379,9 @@ public class MimeBodyPart
 
   /**
    * Sets the Content-MD5 header field of this part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setContentMD5(String md5)
@@ -392,7 +392,7 @@ public class MimeBodyPart
 
   /**
    * Returns the languages specified in the Content-Language header of this
-   * part, as defined by RFC 1766. This method returns <code>null</code> if 
+   * part, as defined by RFC 1766. This method returns <code>null</code> if
    * this header is not available.
    */
   public String[] getContentLanguage()
@@ -415,7 +415,7 @@ public class MimeBodyPart
                 acc.add(token.getValue());
                 break;
               }
-          } 
+          }
         if (acc.size() > 0)
           {
             String[] languages = new String[acc.size()];
@@ -429,9 +429,9 @@ public class MimeBodyPart
   /**
    * Sets the Content-Language header of this part.
    * @param languages the array of language tags
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setContentLanguage(String[] languages)
@@ -484,9 +484,9 @@ public class MimeBodyPart
    * If <code>description</code> contains non US-ASCII characters, it will
    * be encoded using the platform default charset.
    * @param description the content description
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setDescription(String description)
@@ -502,9 +502,9 @@ public class MimeBodyPart
    * be encoded using the specified charset.
    * @param description the content description
    * @param charset the charset used for encoding
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setDescription(String description, String charset)
@@ -579,9 +579,9 @@ public class MimeBodyPart
 
   /**
    * Sets the filename associated with this body part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setFileName(String filename)
@@ -642,7 +642,7 @@ public class MimeBodyPart
   }
 
   /**
-   * Returns the unencoded bytes of the content. 
+   * Returns the unencoded bytes of the content.
    */
   protected InputStream getContentStream()
     throws MessagingException
@@ -693,9 +693,9 @@ public class MimeBodyPart
 
   /**
    * Sets the content of this part using the specified data handler.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setDataHandler(DataHandler dh)
@@ -714,9 +714,9 @@ public class MimeBodyPart
    * installed and accept objects of the type given.
    * @param o the content object
    * @param type the MIME type of the object
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setContent(Object o, String type)
@@ -736,7 +736,7 @@ public class MimeBodyPart
    * Sets the content of this part using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the text contains non US-ASCII characters, it will be encoded 
+   * If the text contains non US-ASCII characters, it will be encoded
    * using the platform default charset.
    * @param text the text content
    */
@@ -750,7 +750,7 @@ public class MimeBodyPart
    * Sets the content of this part using the specified text, and with a
    * MIME type of "text/plain".
    * <p>
-   * If the text contains non US-ASCII characters, it will be encoded 
+   * If the text contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset used for any encoding
@@ -760,12 +760,12 @@ public class MimeBodyPart
   {
     setText(text, charset, "plain");
   }
-  
+
   /**
    * Sets the content of this part using the specified text, and with a
    * text MIME type of the specified subtype.
    * <p>
-   * If the text contains non US-ASCII characters, it will be encoded 
+   * If the text contains non US-ASCII characters, it will be encoded
    * using the specified charset.
    * @param text the text content
    * @param charset the charset used for any encoding
@@ -795,9 +795,9 @@ public class MimeBodyPart
   /**
    * Sets the content of this part to be the specified multipart.
    * @param mp the multipart content
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setContent(Multipart mp)
@@ -818,7 +818,7 @@ public class MimeBodyPart
   {
     final String charset = "US-ASCII";
     final byte[] sep = { 0x0d, 0x0a };
-    
+
     // Write the headers
     for (Enumeration e = getAllHeaderLines();
          e.hasMoreElements(); )
@@ -896,9 +896,9 @@ public class MimeBodyPart
    * Sets the specified header.
    * @param name the header name
    * @param value the header value
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void setHeader(String name, String value)
@@ -911,9 +911,9 @@ public class MimeBodyPart
    * Adds the specified header.
    * @param name the header name
    * @param value the header value
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void addHeader(String name, String value)
@@ -925,9 +925,9 @@ public class MimeBodyPart
   /**
    * Removes all headers with the specified name.
    * @param name the header name
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void removeHeader(String name)
@@ -968,9 +968,9 @@ public class MimeBodyPart
 
   /**
    * Adds an RFC 822 header-line to this part.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   public void addHeaderLine(String line)
@@ -1011,9 +1011,9 @@ public class MimeBodyPart
 
   /**
    * Updates the headers of this part, based on the content.
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification
-   * @exception IllegalStateException if this body part is obtained 
+   * @exception IllegalStateException if this body part is obtained
    * from a READ_ONLY folder
    */
   protected void updateHeaders()
@@ -1029,7 +1029,7 @@ public class MimeBodyPart
               {
                 MimeMultipart mmp = (MimeMultipart) dh.getContent();
                 mmp.updateHeaders();
-              } 
+              }
             else if (ct.match("message/rfc822"))
               {
               }
@@ -1042,7 +1042,7 @@ public class MimeBodyPart
                                MimeUtility.getEncoding(dh));
                   }
               }
-            
+
             // Update Content-Type if nonexistent,
             // and Content-Type "name" with Content-Disposition "filename"
             // parameter(see setFilename())
@@ -1096,7 +1096,7 @@ public class MimeBodyPart
   {
     attachFile(new File(file));
   }
-  
+
   /**
    * Saves the content of this part to the specified file.
    * @param file the file
@@ -1116,7 +1116,7 @@ public class MimeBodyPart
         out.close();
       }
   }
-  
+
   /**
    * Saves the content of this part to the specified file.
    * @param file the file
@@ -1127,6 +1127,6 @@ public class MimeBodyPart
   {
     saveFile(new File(file));
   }
-  
+
 }
 

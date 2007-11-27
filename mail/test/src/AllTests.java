@@ -18,7 +18,7 @@ public class AllTests
     addTest(NonFolderTest.suite());
     addTest(MimeMessageTest.suite());
   }
-  
+
   public static void main(String[] args)
   {
     try
@@ -33,5 +33,5 @@ public class AllTests
         System.exit(1);
       }
   }
-	
+
 }

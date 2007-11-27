@@ -1,19 +1,19 @@
 /*
  * Store.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -39,7 +39,7 @@ import javax.mail.event.StoreListener;
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.4
  */
-public abstract class Store 
+public abstract class Store
   extends Service
 {
 
@@ -117,7 +117,7 @@ public abstract class Store
   }
 
   // -- Event management --
-  
+
   /*
    * Because the propagation of events of different kinds in the JavaMail
    * API is so haphazard, I have here sacrificed a small time advantage for
@@ -129,10 +129,10 @@ public abstract class Store
    *
    * Note that all events are currently delivered synchronously, where in
    * Sun's implementation a different thread is used for event delivery.
-   * 
+   *
    * TODO Examine the impact of this.
    */
-  
+
   // -- Store events --
 
   /**
@@ -245,10 +245,10 @@ public abstract class Store
   /**
    * Notifies all folder listeners about the renaming of a folder.
    */
-  protected void notifyFolderRenamedListeners(Folder oldFolder, 
+  protected void notifyFolderRenamedListeners(Folder oldFolder,
                                                Folder newFolder)
   {
-    FolderEvent event = new FolderEvent(this, oldFolder, newFolder, 
+    FolderEvent event = new FolderEvent(this, oldFolder, newFolder,
                                          FolderEvent.RENAMED);
     fireFolderRenamed(event);
   }

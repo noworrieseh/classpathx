@@ -1,23 +1,23 @@
 /*
  * POP3Message.java
  * Copyright(C) 1999, 2003 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -48,8 +48,8 @@ import gnu.mail.providers.ReadOnlyMessage;
  * @author <a href='mailto:nferrier@tapsellferrier.co.uk'>Nic Ferrier</a>
  * @version 1.2
  */
-public final class POP3Message 
-extends ReadOnlyMessage 
+public final class POP3Message
+extends ReadOnlyMessage
 {
 
   /*
@@ -68,8 +68,8 @@ extends ReadOnlyMessage
    * @param msgnum the message number
    * @param size the size of the entire message
    */
-  POP3Message(POP3Folder folder, int msgnum, int size) 
-    throws MessagingException 
+  POP3Message(POP3Folder folder, int msgnum, int size)
+    throws MessagingException
   {
     super(folder, msgnum);
     this.size = size;
@@ -77,12 +77,12 @@ extends ReadOnlyMessage
 
   // -- Content --
 
-  /** 
+  /**
    * Retrieves the content of the message.
    * This uses the POP3Store to do the retrieval.
    */
-  void fetchContent() 
-    throws MessagingException 
+  void fetchContent()
+    throws MessagingException
   {
     if (content != null)
       {
@@ -108,11 +108,11 @@ extends ReadOnlyMessage
           }
       }
   }
-  
-  /** 
+
+  /**
    * Causes the content to be read in.
    */
-  public DataHandler getDataHandler() 
+  public DataHandler getDataHandler()
     throws MessagingException
   {
     if (content == null)
@@ -122,11 +122,11 @@ extends ReadOnlyMessage
     return super.getDataHandler();
   }
 
-  /** 
+  /**
    * Causes the content to be read in.
    */
-  protected InputStream getContentStream() 
-    throws MessagingException 
+  protected InputStream getContentStream()
+    throws MessagingException
   {
     if (content == null)
       {
@@ -135,12 +135,12 @@ extends ReadOnlyMessage
     return super.getContentStream();
   }
 
-  /** 
+  /**
    * Gets the size of the message.
    * Uses the cached size if it's available to us.
    */
-  public int getSize() 
-    throws MessagingException 
+  public int getSize()
+    throws MessagingException
   {
     if (size > -1)
       {
@@ -155,11 +155,11 @@ extends ReadOnlyMessage
 
   // -- Headers --
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  void fetchHeaders() 
-    throws MessagingException 
+  void fetchHeaders()
+    throws MessagingException
   {
     if (headers != null)
       {
@@ -185,12 +185,12 @@ extends ReadOnlyMessage
           }
       }
   }
-  
+
   /**
    * Causes the headers to be read.
    */
-  public String[] getHeader(String name) 
-    throws MessagingException 
+  public String[] getHeader(String name)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -198,12 +198,12 @@ extends ReadOnlyMessage
       }
     return super.getHeader(name);
   }
-  
+
   /**
    * Causes the headers to be read.
    */
-  public String getHeader(String name, String delimiter) 
-    throws MessagingException 
+  public String getHeader(String name, String delimiter)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -212,11 +212,11 @@ extends ReadOnlyMessage
     return super.getHeader(name, delimiter);
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getAllHeaders() 
-    throws MessagingException 
+  public Enumeration getAllHeaders()
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -225,11 +225,11 @@ extends ReadOnlyMessage
     return super.getAllHeaders();
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getAllHeaderLines() 
-    throws MessagingException 
+  public Enumeration getAllHeaderLines()
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -238,11 +238,11 @@ extends ReadOnlyMessage
     return super.getAllHeaderLines();
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getMatchingHeaders(String[] names) 
-    throws MessagingException 
+  public Enumeration getMatchingHeaders(String[] names)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -251,11 +251,11 @@ extends ReadOnlyMessage
     return super.getMatchingHeaders(names);
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getMatchingHeaderLines(String[] names) 
-    throws MessagingException 
+  public Enumeration getMatchingHeaderLines(String[] names)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -264,11 +264,11 @@ extends ReadOnlyMessage
     return super.getMatchingHeaderLines(names);
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getNonMatchingHeaders(String[] names) 
-    throws MessagingException 
+  public Enumeration getNonMatchingHeaders(String[] names)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -277,11 +277,11 @@ extends ReadOnlyMessage
     return super.getNonMatchingHeaders(names);
   }
 
-  /** 
+  /**
    * Causes the headers to be read.
    */
-  public Enumeration getNonMatchingHeaderLines(String[] names) 
-    throws MessagingException 
+  public Enumeration getNonMatchingHeaderLines(String[] names)
+    throws MessagingException
   {
     if (headers == null)
       {
@@ -292,8 +292,8 @@ extends ReadOnlyMessage
 
   // -- Utility --
 
-  public void writeTo(OutputStream msgStream) 
-    throws IOException, MessagingException 
+  public void writeTo(OutputStream msgStream)
+    throws IOException, MessagingException
   {
     if (headers == null)
       {
@@ -306,8 +306,8 @@ extends ReadOnlyMessage
     super.writeTo(msgStream);
   }
 
-  public void writeTo(OutputStream msgStream, String[] ignoreList) 
-    throws IOException, MessagingException 
+  public void writeTo(OutputStream msgStream, String[] ignoreList)
+    throws IOException, MessagingException
   {
     if (headers == null)
       {
@@ -322,11 +322,11 @@ extends ReadOnlyMessage
 
   // -- UIDL --
 
-  /** 
+  /**
    * Causes the UID to be fetched.
    */
-  void fetchUid() 
-    throws MessagingException 
+  void fetchUid()
+    throws MessagingException
   {
     if (headers != null)
       {
@@ -358,7 +358,7 @@ extends ReadOnlyMessage
       }
     return uid;
   }
-  
+
   /**
    * Set flags (but only DELETED is supported)
    * add or remove the message from the folder deleted message list.
@@ -396,5 +396,5 @@ extends ReadOnlyMessage
           }
       }
   }
-  
+
 }

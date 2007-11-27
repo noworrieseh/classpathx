@@ -1,19 +1,19 @@
 /*
  * Transport.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -40,7 +40,7 @@ import javax.mail.event.TransportListener;
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.4
  */
-public abstract class Transport 
+public abstract class Transport
   extends Service
 {
 
@@ -61,11 +61,11 @@ public abstract class Transport
 
   /**
    * Sends the specified message.
-   * The message will be sent to all recipient addresses specified in the 
+   * The message will be sent to all recipient addresses specified in the
    * message, using transports appropriate to each address (specified by the
    * <code>javamail.address.map</code> resource).
    * @param msg the message to send
-   * @exception SendFailedException if the message could not be sent to 
+   * @exception SendFailedException if the message could not be sent to
    * some or any of the recipients
    */
   public static void send(Message msg)
@@ -80,7 +80,7 @@ public abstract class Transport
    * specified in the message itself.
    * @param msg the message to send
    * @param addresses the addresses to which to send the message
-   * @exception SendFailedException if the message could not be sent to 
+   * @exception SendFailedException if the message could not be sent to
    * some or any of the recipients
    */
   public static void send(Message msg, Address[] addresses)
@@ -116,15 +116,15 @@ public abstract class Transport
             addressesByType.put(type, addressList);
           }
       }
-    
+
     int size = addressesByType.size();
     if (size == 0)
       {
         throw new SendFailedException("No recipient addresses");
       }
-    
+
     Session session = msg.session;
-    if (session == null) 
+    if (session == null)
       {
         session = Session.getDefaultInstance(System.getProperties(), null);
       }
@@ -134,18 +134,18 @@ public abstract class Transport
     ArrayList validSent = new ArrayList();
     ArrayList validUnsent = new ArrayList();
     ArrayList invalid = new ArrayList();
-    
+
     for (Iterator i = addressesByType.values().iterator(); i.hasNext(); )
       {
         ArrayList addressList = (ArrayList) i.next();
         Address[] addressArray = new Address[addressList.size()];
         addressList.toArray(addressArray);
-        
+
         if (addressArray.length < 1)
           {
             break;
           }
-        
+
         Transport transport = session.getTransport(addressArray[0]);
         if (transport == null)
           {
@@ -169,9 +169,9 @@ public abstract class Transport
                   {
                     ex.setNextException(sfex);
                   }
-                
+
                 Address[] a;
-                
+
                 a = sfex.getValidSentAddresses();
                 if (a != null)
                   {
@@ -206,13 +206,13 @@ public abstract class Transport
               }
           }
       }
-    
+
     if (error || invalid.size() != 0 || validSent.size() != 0)
       {
         Address[] validSentAddresses = null;
         Address[] validUnsentAddresses = null;
         Address[] invalidAddresses = null;
-        
+
         if (validSent.size() > 0)
           {
             validSentAddresses = new Address[validSent.size()];
@@ -239,7 +239,7 @@ public abstract class Transport
    * Sends the message to the specified list of addresses.
    * @param msg the message to be sent
    * @param addresses the addresses to send this message to
-   * @exception SendFailedException if the send failed because of 
+   * @exception SendFailedException if the send failed because of
    * invalid addresses
    * @exception MessagingException if the transport is not connected
    */
@@ -247,7 +247,7 @@ public abstract class Transport
     throws MessagingException;
 
   // -- Event management --
-  
+
   /*
    * Because the propagation of events of different kinds in the JavaMail
    * API is so haphazard, I have here sacrificed a small time advantage for
@@ -259,10 +259,10 @@ public abstract class Transport
    *
    * Note that all events are currently delivered synchronously, where in
    * Sun's implementation a different thread is used for event delivery.
-   * 
+   *
    * TODO Examine the impact of this.
    */
-  
+
   // -- Transport events --
 
   /**
@@ -297,13 +297,13 @@ public abstract class Transport
   /**
    * Notifies all transport listeners.
    */
-  protected void notifyTransportListeners(int type, 
+  protected void notifyTransportListeners(int type,
                                            Address[] validSent,
                                            Address[] validUnsent,
                                            Address[] invalid,
                                            Message msg)
   {
-    TransportEvent event = 
+    TransportEvent event =
       new TransportEvent(this, type, validSent, validUnsent, invalid, msg);
     switch (type)
       {
@@ -320,7 +320,7 @@ public abstract class Transport
   }
 
   /*
-   * Propagates a MESSAGE_DELIVERED TransportEvent 
+   * Propagates a MESSAGE_DELIVERED TransportEvent
    * to all registered listeners.
    */
   void fireMessageDelivered(TransportEvent event)
@@ -339,9 +339,9 @@ public abstract class Transport
           }
       }
   }
-  
+
   /*
-   * Propagates a MESSAGE_NOT_DELIVERED TransportEvent 
+   * Propagates a MESSAGE_NOT_DELIVERED TransportEvent
    * to all registered listeners.
    */
   void fireMessageNotDelivered(TransportEvent event)
@@ -360,9 +360,9 @@ public abstract class Transport
           }
       }
   }
-  
+
   /*
-   * Propagates a MESSAGE_PARTIALLY_DELIVERED TransportEvent 
+   * Propagates a MESSAGE_PARTIALLY_DELIVERED TransportEvent
    * to all registered listeners.
    */
   void fireMessagePartiallyDelivered(TransportEvent event)
@@ -381,6 +381,6 @@ public abstract class Transport
           }
       }
   }
-  
+
 }
 

@@ -1,23 +1,23 @@
 /*
  * IMAPFolder.java
  * Copyright (C) 2003, 2004 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -88,7 +88,7 @@ import gnu.inet.imap.Quota;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class IMAPFolder 
+public class IMAPFolder
   extends Folder
   implements UIDFolder
 {
@@ -120,23 +120,23 @@ public class IMAPFolder
   /**
    * Constructor.
    */
-  protected IMAPFolder(Store store, String path) 
+  protected IMAPFolder(Store store, String path)
   {
     this(store, path, -1, '\u0000');
   }
-  
+
   /**
    * Constructor.
    */
-  protected IMAPFolder(Store store, String path, char delimiter) 
+  protected IMAPFolder(Store store, String path, char delimiter)
   {
     this(store, path, -1, delimiter);
   }
-  
+
   /**
    * Constructor.
    */
-  protected IMAPFolder(Store store, String path, int type, char delimiter) 
+  protected IMAPFolder(Store store, String path, int type, char delimiter)
   {
     super(store);
     this.path = path;
@@ -228,7 +228,7 @@ public class IMAPFolder
   /**
    * Returns the name of this folder.
    */
-  public String getName() 
+  public String getName()
   {
     int di = path.lastIndexOf(delimiter);
     return (di == -1) ? path : path.substring(di + 1);
@@ -246,8 +246,8 @@ public class IMAPFolder
    * Returns the type of this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getType() 
-    throws MessagingException 
+  public int getType()
+    throws MessagingException
   {
     if (type == -1)
       {
@@ -291,8 +291,8 @@ public class IMAPFolder
    * Indicates whether this folder exists.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean exists() 
-    throws MessagingException 
+  public boolean exists()
+    throws MessagingException
   {
     try
       {
@@ -309,8 +309,8 @@ public class IMAPFolder
    * Indicates whether this folder contains new messages.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean hasNewMessages() 
-    throws MessagingException 
+  public boolean hasNewMessages()
+    throws MessagingException
   {
     return getNewMessageCount() > 0; // TODO
   }
@@ -319,8 +319,8 @@ public class IMAPFolder
    * Opens this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public void open(int mode) 
-    throws MessagingException 
+  public void open(int mode)
+    throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -358,8 +358,8 @@ public class IMAPFolder
   /**
    * Create this folder.
    */
-  public boolean create(int type) 
-    throws MessagingException 
+  public boolean create(int type)
+    throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -402,8 +402,8 @@ public class IMAPFolder
   /**
    * Delete this folder.
    */
-  public boolean delete(boolean flag) 
-    throws MessagingException 
+  public boolean delete(boolean flag)
+    throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -434,8 +434,8 @@ public class IMAPFolder
   /**
    * Rename this folder.
    */
-  public boolean renameTo(Folder folder) 
-    throws MessagingException 
+  public boolean renameTo(Folder folder)
+    throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -468,8 +468,8 @@ public class IMAPFolder
    * @param expunge if the folder is to be expunged before it is closed
    * @exception MessagingException if a messaging error occurred
    */
-  public void close(boolean expunge) 
-    throws MessagingException 
+  public void close(boolean expunge)
+    throws MessagingException
   {
     if (mode == -1)
       {
@@ -518,8 +518,8 @@ public class IMAPFolder
    * This deletes all the messages marked as deleted.
    * @exception MessagingException if a messaging error occurred
    */
-  public Message[] expunge() 
-    throws MessagingException 
+  public Message[] expunge()
+    throws MessagingException
   {
     if (!isOpen())
       {
@@ -561,7 +561,7 @@ public class IMAPFolder
   /**
    * Indicates whether this folder is open.
    */
-  public boolean isOpen() 
+  public boolean isOpen()
   {
     return (mode != -1);
   }
@@ -569,7 +569,7 @@ public class IMAPFolder
   /**
    * Returns the permanent flags for this folder.
    */
-  public Flags getPermanentFlags() 
+  public Flags getPermanentFlags()
   {
     return permanentFlags;
   }
@@ -578,8 +578,8 @@ public class IMAPFolder
    * Returns the number of messages in this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getMessageCount() 
-    throws MessagingException 
+  public int getMessageCount()
+    throws MessagingException
   {
     MailboxStatus ms = null;
     IMAPStore s = (IMAPStore) store;
@@ -623,8 +623,8 @@ public class IMAPFolder
    * Returns the number of new messages in this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getNewMessageCount() 
-    throws MessagingException 
+  public int getNewMessageCount()
+    throws MessagingException
   {
     MailboxStatus ms = null;
     IMAPStore s = (IMAPStore) store;
@@ -672,8 +672,8 @@ public class IMAPFolder
    * the message(headers, etc), the entire message is retrieved.
    * @exception MessagingException if a messaging error occurred
    */
-  public Message getMessage(int msgnum) 
-    throws MessagingException 
+  public Message getMessage(int msgnum)
+    throws MessagingException
   {
     if (mode == -1)
       {
@@ -714,8 +714,8 @@ public class IMAPFolder
    * Appends the specified set of messages to this folder.
    * Only <code>MimeMessage</code>s are accepted.
    */
-  public void appendMessages(Message[] messages) 
-    throws MessagingException 
+  public void appendMessages(Message[] messages)
+    throws MessagingException
   {
     MimeMessage[] m = new MimeMessage[messages.length];
     try
@@ -762,8 +762,8 @@ public class IMAPFolder
    * This executes the fetch for the specified message numbers
    * and updates the messages according to the message statuses returned.
    */
-  public void fetch(Message[] messages, FetchProfile fp) 
-    throws MessagingException 
+  public void fetch(Message[] messages, FetchProfile fp)
+    throws MessagingException
   {
     if (!isOpen())
       {
@@ -1196,15 +1196,15 @@ public class IMAPFolder
         throw new MessagingException(e.getMessage(), e);
       }
   }
-  
+
   /**
    * Returns the subfolders for this folder.
    */
-  public Folder[] list(String pattern) 
-    throws MessagingException 
+  public Folder[] list(String pattern)
+    throws MessagingException
   {
     char sep = getSeparator();
-    String spec = ("".equals(path)) ? "%" : 
+    String spec = ("".equals(path)) ? "%" :
       new StringBuffer(path).append(sep).append(pattern).toString();
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -1226,12 +1226,12 @@ public class IMAPFolder
         throw new MessagingException(e.getMessage(), e);
       }
   }
-  
+
   /**
    * Returns the subscribed subfolders for this folder.
    */
-  public Folder[] listSubscribed(String pattern) 
-    throws MessagingException 
+  public Folder[] listSubscribed(String pattern)
+    throws MessagingException
   {
     char sep = getSeparator();
     String spec = ("".equals(path)) ? "%" :
@@ -1289,8 +1289,8 @@ public class IMAPFolder
   /**
    * Returns the parent folder of this folder.
    */
-  public Folder getParent() 
-    throws MessagingException 
+  public Folder getParent()
+    throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
@@ -1306,8 +1306,8 @@ public class IMAPFolder
   /**
    * Returns a subfolder with the specified name.
    */
-  public Folder getFolder(String name) 
-    throws MessagingException 
+  public Folder getFolder(String name)
+    throws MessagingException
   {
     StringBuffer buf = new StringBuffer();
     if (path != null && path.length() > 0)
@@ -1322,8 +1322,8 @@ public class IMAPFolder
   /**
    * Returns the path separator charcter.
    */
-  public char getSeparator() 
-    throws MessagingException 
+  public char getSeparator()
+    throws MessagingException
   {
     if (delimiter == '\u0000')
       {
@@ -1346,7 +1346,7 @@ public class IMAPFolder
               }
             else
               {
-                throw new FolderNotFoundException(this); 
+                throw new FolderNotFoundException(this);
               }
           }
         catch (IOException e)
@@ -1588,21 +1588,21 @@ public class IMAPFolder
       {
         return -1;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     String[] criterias = new String[] { criteria };
-    
+
     int[] ids = null;
     try
-      { 
+      {
         ids = connection.search(null, criterias);
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-    
+
     return ids.length;
   }
 
@@ -1618,7 +1618,7 @@ public class IMAPFolder
       {
         return null;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     List acc = new ArrayList();
@@ -1660,7 +1660,7 @@ public class IMAPFolder
       {
         return;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1694,7 +1694,7 @@ public class IMAPFolder
       {
         return;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1734,7 +1734,7 @@ public class IMAPFolder
       {
         return;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1768,7 +1768,7 @@ public class IMAPFolder
       {
         return null;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1782,7 +1782,7 @@ public class IMAPFolder
         throw new MessagingException(e.getMessage(), e);
       }
   }
-  
+
   /**
    * Returns the rights assigned to the currently authenticated principal.
    * @deprecated this API will probably change incompatibly soon
@@ -1794,7 +1794,7 @@ public class IMAPFolder
       {
         return null;
       }
-    
+
     IMAPStore s = (IMAPStore) store;
     IMAPConnection connection = s.getConnection();
     try
@@ -1808,5 +1808,5 @@ public class IMAPFolder
         throw new MessagingException(e.getMessage(), e);
       }
   }
-  
+
 }

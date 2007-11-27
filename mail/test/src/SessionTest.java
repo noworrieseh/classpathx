@@ -12,29 +12,29 @@ import junit.textui.TestRunner;
 public class SessionTest
   extends TestCase
 {
-	
+
   private Session session;
-  
+
   public SessionTest(String name)
   {
     super(name);
   }
-  
+
   protected void setUp()
   {
     session = Session.getInstance(System.getProperties());
   }
-  
+
   protected void tearDown()
   {
     session = null;
   }
-  
+
   public void testGetInstance()
   {
     assertNotNull(session);
   }
-  
+
   public void testGetProvider()
   {
     Provider[] pp = session.getProviders();
@@ -77,10 +77,10 @@ public class SessionTest
         fail(e.getMessage());
       }
   }
-  
+
   public static Test suite()
   {
     return new TestSuite(SessionTest.class);
   }
-  
+
 }

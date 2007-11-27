@@ -1,23 +1,23 @@
 /*
  * MaildirFolder.java
  * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -60,8 +60,8 @@ import gnu.inet.util.LineInputStream;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public final class MaildirFolder 
-  extends Folder 
+public final class MaildirFolder
+  extends Folder
 {
 
   /**
@@ -93,33 +93,33 @@ public final class MaildirFolder
 
   int type;
   boolean inbox;
-  
+
   static Flags permanentFlags = new Flags();
 
   static long deliveryCount = 0;
-		
+
   /**
    * Constructor.
    */
   protected MaildirFolder(Store store, String filename, boolean root,
-      boolean inbox) 
+      boolean inbox)
   {
     super(store);
-    
+
     maildir = new File(filename);
     tmpdir = new File(maildir, "tmp");
     newdir = new MaildirTuple(new File(maildir, "new"));
     curdir =  new MaildirTuple(new File(maildir, "cur"));
-    
+
     mode = -1;
     type = root ? HOLDS_FOLDERS : HOLDS_MESSAGES;
     this.inbox = inbox;
   }
-	
+
   /**
    * Constructor.
    */
-  protected MaildirFolder(Store store, String filename) 
+  protected MaildirFolder(Store store, String filename)
   {
     this(store, filename, false, false);
   }
@@ -127,17 +127,17 @@ public final class MaildirFolder
   /**
    * Returns the name of this folder.
    */
-  public String getName() 
+  public String getName()
   {
     if (inbox)
       return INBOX;
     return maildir.getName();
   }
-	
+
   /**
    * Returns the full name of this folder.
    */
-  public String getFullName() 
+  public String getFullName()
   {
     if (inbox)
       return INBOX;
@@ -151,7 +151,7 @@ public final class MaildirFolder
     throws MessagingException
   {
     URLName url = super.getURLName();
-    return new URLName(url.getProtocol(), 
+    return new URLName(url.getProtocol(),
         null, -1, url.getFile(),
         null, null);
   }
@@ -160,8 +160,8 @@ public final class MaildirFolder
    * Returns the type of this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public int getType() 
-    throws MessagingException 
+  public int getType()
+    throws MessagingException
   {
     return type;
   }
@@ -170,8 +170,8 @@ public final class MaildirFolder
    * Indicates whether this folder exists.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean exists() 
-    throws MessagingException 
+  public boolean exists()
+    throws MessagingException
   {
     return maildir.exists();
   }
@@ -180,8 +180,8 @@ public final class MaildirFolder
    * Indicates whether this folder contains new messages.
    * @exception MessagingException if a messaging error occurred
    */
-  public boolean hasNewMessages() 
-    throws MessagingException 
+  public boolean hasNewMessages()
+    throws MessagingException
   {
     return getNewMessageCount()>0;
   }
@@ -192,8 +192,8 @@ public final class MaildirFolder
    * mbox. If this fails a MessagingException is thrown.
    * @exception MessagingException if a messaging error occurred
    */
-  public void open(int mode) 
-    throws MessagingException 
+  public void open(int mode)
+    throws MessagingException
   {
     if (this.mode!=-1)
       throw new IllegalStateException("Folder is open");
@@ -209,7 +209,7 @@ public final class MaildirFolder
       success = success && curdir.dir.mkdirs();
     if (!success)
       throw new MessagingException("Unable to create directories");
-    if (mode==READ_WRITE) 
+    if (mode==READ_WRITE)
     {
       if (!maildir.canWrite())
         throw new MessagingException("Folder is read-only");
@@ -224,8 +224,8 @@ public final class MaildirFolder
    * @param expunge if the folder is to be expunged before it is closed
    * @exception MessagingException if a messaging error occurred
    */
-  public void close(boolean expunge) 
-    throws MessagingException 
+  public void close(boolean expunge)
+    throws MessagingException
   {
     if (mode==-1)
       throw new IllegalStateException("Folder is closed");
@@ -240,8 +240,8 @@ public final class MaildirFolder
    * This deletes all the messages marked as deleted.
    * @exception MessagingException if a messaging error occurred
    */
-  public Message[] expunge() 
-    throws MessagingException 
+  public Message[] expunge()
+    throws MessagingException
   {
     if (mode==-1)
       throw new IllegalStateException("Folder is closed");
@@ -295,19 +295,19 @@ public final class MaildirFolder
       notifyMessageRemovedListeners(true, expunged);
     return expunged;
   }
-  
+
   /**
    * Indicates whether this folder is open.
    */
-  public boolean isOpen() 
+  public boolean isOpen()
   {
     return (mode!=-1);
   }
-	
+
   /**
    * Returns the permanent flags for this folder.
    */
-  public Flags getPermanentFlags() 
+  public Flags getPermanentFlags()
   {
     return permanentFlags;
   }
@@ -316,8 +316,8 @@ public final class MaildirFolder
    * Returns the number of messages in this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public synchronized int getMessageCount() 
-    throws MessagingException 
+  public synchronized int getMessageCount()
+    throws MessagingException
   {
     statDir(curdir);
     statDir(newdir);
@@ -339,8 +339,8 @@ public final class MaildirFolder
    * Returns the specified message number from this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public synchronized Message getMessage(int msgnum) 
-    throws MessagingException 
+  public synchronized Message getMessage(int msgnum)
+    throws MessagingException
   {
     statDir(curdir);
     statDir(newdir);
@@ -354,13 +354,13 @@ public final class MaildirFolder
     else
       return newdir.messages[index-clen];
   }
-	
+
   /**
    * Returns the messages in this folder.
    * @exception MessagingException if a messaging error occurred
    */
-  public synchronized Message[] getMessages() 
-    throws MessagingException 
+  public synchronized Message[] getMessages()
+    throws MessagingException
   {
     statDir(curdir);
     statDir(newdir);
@@ -432,8 +432,8 @@ public final class MaildirFolder
    * how to retrieve internet content for other kinds.
    * @param m an array of messages to be appended
    */
-  public synchronized void appendMessages(Message[] m) 
-    throws MessagingException 
+  public synchronized void appendMessages(Message[] m)
+    throws MessagingException
   {
     MaildirMessage[] n;
     synchronized (this)
@@ -443,11 +443,11 @@ public final class MaildirFolder
       statDir(curdir);
       int nlen = newdir.messages.length;
       int clen = curdir.messages.length;
-      
+
       List appended = new ArrayList(m.length);
-      for (int i=0; i<m.length; i++) 
+      for (int i=0; i<m.length; i++)
       {
-        if (m[i] instanceof MimeMessage) 
+        if (m[i] instanceof MimeMessage)
         {
           MimeMessage src = (MimeMessage)m[i];
           Flags flags = src.getFlags();
@@ -476,7 +476,7 @@ public final class MaildirFolder
                try
                {
                  wait(2000); // sleep for 2s
-               } 
+               }
                catch (InterruptedException e)
                {
                }
@@ -506,7 +506,7 @@ public final class MaildirFolder
         }
       }
       n = new MaildirMessage[appended.size()];
-      if (n.length>0) 
+      if (n.length>0)
         appended.toArray(n);
     }
     // propagate event
@@ -550,8 +550,8 @@ public final class MaildirFolder
   /**
    * Returns the parent folder.
    */
-  public Folder getParent() 
-    throws MessagingException 
+  public Folder getParent()
+    throws MessagingException
   {
     return store.getFolder(maildir.getParent());
   }
@@ -559,12 +559,12 @@ public final class MaildirFolder
   /**
    * Returns the subfolders of this folder.
    */
-  public Folder[] list() 
-    throws MessagingException 
+  public Folder[] list()
+    throws MessagingException
   {
     if (type!=HOLDS_FOLDERS)
       throw new MessagingException("This folder can't contain subfolders");
-    try 
+    try
     {
       String[] files = maildir.list();
       Folder[] folders = new Folder[files.length];
@@ -573,7 +573,7 @@ public final class MaildirFolder
         store.getFolder(maildir.getAbsolutePath()+File.separator+files[i]);
       return folders;
     }
-    catch (SecurityException e) 
+    catch (SecurityException e)
     {
       throw new MessagingException("Access denied", e);
     }
@@ -582,12 +582,12 @@ public final class MaildirFolder
   /**
    * Returns the subfolders of this folder matching the specified pattern.
    */
-  public Folder[] list(String pattern) 
-    throws MessagingException 
+  public Folder[] list(String pattern)
+    throws MessagingException
   {
     if (type!=HOLDS_FOLDERS)
       throw new MessagingException("This folder can't contain subfolders");
-    try 
+    try
     {
       String[] files = maildir.list(new MaildirListFilter(pattern));
       Folder[] folders = new Folder[files.length];
@@ -595,8 +595,8 @@ public final class MaildirFolder
       folders[i] =
         store.getFolder(maildir.getAbsolutePath()+File.separator+files[i]);
       return folders;
-    } 
-    catch (SecurityException e) 
+    }
+    catch (SecurityException e)
     {
       throw new MessagingException("Access denied", e);
     }
@@ -605,8 +605,8 @@ public final class MaildirFolder
   /**
    * Returns the separator character.
    */
-  public char getSeparator() 
-    throws MessagingException 
+  public char getSeparator()
+    throws MessagingException
   {
     return File.separatorChar;
   }
@@ -614,15 +614,15 @@ public final class MaildirFolder
   /**
    * Creates this folder in the store.
    */
-  public boolean create(int type) 
-    throws MessagingException 
+  public boolean create(int type)
+    throws MessagingException
   {
     if (maildir.exists())
       throw new MessagingException("Folder already exists");
-    switch (type) 
+    switch (type)
     {
       case HOLDS_FOLDERS:
-        try 
+        try
         {
           if (!maildir.mkdirs())
             return false;
@@ -630,15 +630,15 @@ public final class MaildirFolder
           notifyFolderListeners(FolderEvent.CREATED);
           return true;
         }
-        catch (SecurityException e) 
+        catch (SecurityException e)
         {
           throw new MessagingException("Access denied", e);
         }
       case HOLDS_MESSAGES:
-        try 
+        try
         {
           boolean success = true;
-          synchronized (this) 
+          synchronized (this)
           {
             success = success && maildir.mkdirs();
             success = success && tmpdir.mkdirs();
@@ -650,8 +650,8 @@ public final class MaildirFolder
           this.type = type;
           notifyFolderListeners(FolderEvent.CREATED);
           return true;
-        } 
-        catch (SecurityException e) 
+        }
+        catch (SecurityException e)
         {
           throw new MessagingException("Access denied", e);
         }
@@ -662,14 +662,14 @@ public final class MaildirFolder
   /**
    * Deletes this folder.
    */
-  public boolean delete(boolean recurse) 
-    throws MessagingException 
+  public boolean delete(boolean recurse)
+    throws MessagingException
   {
-    if (recurse) 
+    if (recurse)
     {
-      try 
+      try
       {
-        if (type==HOLDS_FOLDERS) 
+        if (type==HOLDS_FOLDERS)
         {
           Folder[] folders = list();
           for (int i=0; i<folders.length; i++)
@@ -680,17 +680,17 @@ public final class MaildirFolder
           return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
-      } 
-      catch (SecurityException e) 
+      }
+      catch (SecurityException e)
       {
         throw new MessagingException("Access denied", e);
       }
-    } 
-    else 
+    }
+    else
     {
-      try 
+      try
       {
-        if (type==HOLDS_FOLDERS) 
+        if (type==HOLDS_FOLDERS)
         {
           Folder[] folders = list();
           if (folders.length>0)
@@ -700,8 +700,8 @@ public final class MaildirFolder
           return false;
         notifyFolderListeners(FolderEvent.DELETED);
         return true;
-      } 
-      catch (SecurityException e) 
+      }
+      catch (SecurityException e)
       {
         throw new MessagingException("Access denied", e);
       }
@@ -729,23 +729,23 @@ public final class MaildirFolder
   /**
    * Renames this folder.
    */
-  public boolean renameTo(Folder folder) 
-    throws MessagingException 
+  public boolean renameTo(Folder folder)
+    throws MessagingException
   {
-    try 
+    try
     {
       String filename = folder.getFullName();
-      if (filename!=null) 
+      if (filename!=null)
       {
         if (!maildir.renameTo(new File(filename)))
           return false;
         notifyFolderRenamedListeners(folder);
         return true;
-      } 
+      }
       else
         throw new MessagingException("Illegal filename: null");
-    } 
-    catch (SecurityException e) 
+    }
+    catch (SecurityException e)
     {
       throw new MessagingException("Access denied", e);
     }
@@ -754,8 +754,8 @@ public final class MaildirFolder
   /**
    * Returns the subfolder of this folder with the specified name.
    */
-  public Folder getFolder(String filename) 
-    throws MessagingException 
+  public Folder getFolder(String filename)
+    throws MessagingException
   {
     if (INBOX.equalsIgnoreCase(filename))
     {
@@ -782,7 +782,7 @@ public final class MaildirFolder
     {
       return name.length()>0 && name.charAt(0)!=0x2e;
     }
-    
+
   }
 
   /**
@@ -790,7 +790,7 @@ public final class MaildirFolder
    */
   static class MaildirTuple
   {
-    
+
     File dir;
     long timestamp = 0L;
     MaildirMessage[] messages = null;
@@ -799,36 +799,36 @@ public final class MaildirFolder
     {
       this.dir = dir;
     }
-    
+
   }
 
   /**
    * Filename filter for listing subfolders.
    */
-  class MaildirListFilter 
-    implements FilenameFilter 
+  class MaildirListFilter
+    implements FilenameFilter
   {
 
     String pattern;
     int asteriskIndex, percentIndex;
-	   
-    MaildirListFilter(String pattern) 
+
+    MaildirListFilter(String pattern)
     {
       this.pattern = pattern;
       asteriskIndex = pattern.indexOf('*');
       percentIndex = pattern.indexOf('%');
     }
-	   
-    public boolean accept(File directory, String name) 
+
+    public boolean accept(File directory, String name)
     {
-      if (asteriskIndex>-1) 
+      if (asteriskIndex>-1)
       {
         String start = pattern.substring(0, asteriskIndex);
         String end = pattern.substring(asteriskIndex+1, pattern.length());
         return (name.startsWith(start) &&
             name.endsWith(end));
-      } 
-      else if (percentIndex>-1) 
+      }
+      else if (percentIndex>-1)
       {
         String start = pattern.substring(0, percentIndex);
         String end = pattern.substring(percentIndex+1, pattern.length());
@@ -839,5 +839,5 @@ public final class MaildirFolder
       return name.equals(pattern);
     }
   }
-    
+
 }

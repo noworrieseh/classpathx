@@ -1,19 +1,19 @@
 /*
  * Multipart.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -33,10 +33,10 @@ import java.util.Vector;
 import javax.activation.DataSource;
 
 /**
- * A multipart is a container for multiple body parts. 
+ * A multipart is a container for multiple body parts.
  * <p>
  * Some messaging systems provide different subtypes of multiparts.
- * For example, MIME specifies a set of subtypes that include 
+ * For example, MIME specifies a set of subtypes that include
  * "alternative", "mixed", "related", "parallel", "signed", etc.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
@@ -126,7 +126,7 @@ public abstract class Multipart
    * @param part the body part to remove
    * @return true if a body part was removed, false otherwise
    * @exception MessagingException if the multipart has not been configured
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public boolean removeBodyPart(BodyPart part)
@@ -152,7 +152,7 @@ public abstract class Multipart
    * The body parts in this container are numbered starting at 0.
    * @param index index of the part to remove
    * @exception IndexOutOfBoundsException if the given index is out of range
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public void removeBodyPart(int index)
@@ -171,9 +171,9 @@ public abstract class Multipart
   }
 
   /**
-   * Adds a body part to this multipart. 
+   * Adds a body part to this multipart.
    * @param part the body part to be appended
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public synchronized void addBodyPart(BodyPart part)
@@ -195,7 +195,7 @@ public abstract class Multipart
    * The body parts in this container are numbered starting at 0.
    * @param part the body part to be inserted
    * @param index where to insert the part
-   * @exception IllegalWriteException if the underlying implementation 
+   * @exception IllegalWriteException if the underlying implementation
    * does not support modification of existing values
    */
   public synchronized void addBodyPart(BodyPart part, int index)
@@ -234,5 +234,5 @@ public abstract class Multipart
   {
     parent = part;
   }
-  
+
 }

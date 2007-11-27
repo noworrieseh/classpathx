@@ -1,19 +1,19 @@
 /*
  * UIDFolder.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -38,7 +38,7 @@ import java.util.NoSuchElementException;
  * fashion; that is, if the message number of message <i>x</i> is greater
  * than the message number of message <i>y</i>, its UID will also be greater
  * than that of <i>y</i>.
- * 
+ *
  * @see RFC 2060 http://www.ietf.org/rfc/rfc2060.txt
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @version 1.4
@@ -47,9 +47,9 @@ public interface UIDFolder
 {
 
   /**
-   * A fetch profile item for fetching UIDs. 
+   * A fetch profile item for fetching UIDs.
    */
-  static class FetchProfileItem 
+  static class FetchProfileItem
     extends FetchProfile.Item
   {
 
@@ -62,12 +62,12 @@ public interface UIDFolder
     {
       super(name);
     }
-    
+
   }
 
   /**
    * This special value can be used as the end parameter in
-   * <code>getMessages(start, end)</code> to denote the last UID 
+   * <code>getMessages(start, end)</code> to denote the last UID
    * in this folder.
    */
   long LASTUID = -1L;
@@ -75,7 +75,7 @@ public interface UIDFolder
   /**
    * Returns the UIDValidity value associated with this folder.
    * <p>
-   * A client should compare this value against a UIDValidity value 
+   * A client should compare this value against a UIDValidity value
    * saved from a previous session to ensure that any cached UIDs are valid.
    */
   long getUIDValidity()
@@ -91,7 +91,7 @@ public interface UIDFolder
 
   /**
    * Returns the messages in the given range.
-   * The special value LASTUID can be used as the <code>end</code> parameter 
+   * The special value LASTUID can be used as the <code>end</code> parameter
    * to indicate the last available UID.
    * @param start the start UID
    * @param end the end UID
@@ -110,13 +110,13 @@ public interface UIDFolder
     throws MessagingException;
 
   /**
-   * Returns the UID for the specified message. 
+   * Returns the UID for the specified message.
    * @param message a message in this folder
    * @exception NoSuchElementException if the given message is not in this
    * folder
    */
   long getUID(Message message)
     throws MessagingException;
-  
+
 }
 

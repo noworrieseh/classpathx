@@ -1,19 +1,19 @@
 /*
  * ParameterList.java
  * Copyright (C) 2002, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -72,21 +72,21 @@ public class ParameterList
       new GetSystemPropertyAction("mail.mime.decodeparameters");
     boolean decodeParameters =
       "true".equals(AccessController.doPrivileged(a));
-    
+
     LinkedHashMap charsets = new LinkedHashMap();
     HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
     for (int type = 0; type != HeaderTokenizer.Token.EOF; )
       {
         HeaderTokenizer.Token token = ht.next();
         type = token.getType();
-        
+
         if (type != HeaderTokenizer.Token.EOF)
           {
             if (type != 0x3b) // ';'
               {
                 throw new ParseException("expected ';': " + s);
               }
-            
+
             token = ht.next();
             type = token.getType();
             if (type != HeaderTokenizer.Token.ATOM)
@@ -94,17 +94,17 @@ public class ParameterList
                 throw new ParseException("expected parameter name: " + s);
               }
             String key = token.getValue().toLowerCase();
-            
+
             token = ht.next();
             type = token.getType();
             if (type != 0x3d) // '='
               {
                 throw new ParseException("expected '=': " + s);
               }
-            
+
             token = ht.next();
             type = token.getType();
-            if (type != HeaderTokenizer.Token.ATOM && 
+            if (type != HeaderTokenizer.Token.ATOM &&
                 type != HeaderTokenizer.Token.QUOTEDSTRING)
               {
                 throw new ParseException("expected parameter value: " + s);
@@ -340,7 +340,7 @@ public class ParameterList
       new GetSystemPropertyAction("mail.mime.encodeparameters");
     boolean encodeParameters =
       "true".equals(AccessController.doPrivileged(a));
-    
+
     StringBuffer buffer = new StringBuffer();
     for (Iterator i = list.entrySet().iterator(); i.hasNext(); )
       {
@@ -349,7 +349,7 @@ public class ParameterList
         String[] vc = (String[]) entry.getValue();
         String value = vc[0];
         String charset = vc[1];
-        
+
         if (encodeParameters)
           {
             try
@@ -361,13 +361,13 @@ public class ParameterList
                 // ignore
               }
           }
-        
+
         value = MimeUtility.quote(value, HeaderTokenizer.MIME);
-        
+
         // delimiter
         buffer.append("; ");
         used += 2;
-        
+
         // wrap to next line if necessary
         int len = key.length() + value.length() + 1;
         if ((used + len) > 76)
@@ -375,7 +375,7 @@ public class ParameterList
             buffer.append("\r\n\t");
             used = 8;
           }
-        
+
         // append key=value
         buffer.append(key);
         buffer.append('=');
@@ -383,7 +383,7 @@ public class ParameterList
       }
     return buffer.toString();
   }
-  
+
   /*
    * Needed to provide an enumeration interface for the key iterator.
    */
@@ -407,7 +407,7 @@ public class ParameterList
     {
       return source.next();
     }
-    
+
   }
 
 }

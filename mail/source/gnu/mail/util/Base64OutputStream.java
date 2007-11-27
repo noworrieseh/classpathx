@@ -1,19 +1,19 @@
 /*
  * Base64OutputStream.java
  * Copyright(C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -50,20 +50,20 @@ public class Base64OutputStream
   private int buflen;
   private int count;
   private int lineLength;
-  
+
   private static final char src[] =
   {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
-    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
-    'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 
-    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 
-    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
-    'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', 
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+    'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
     '8', '9', '+', '/'
   };
-  
+
   private static final int LF = 10, CR = 13, EQ = 61;
-  
+
   /**
    * Default constructor.
    * This constructs a Base64OutputStream with a line length of 76.
@@ -72,7 +72,7 @@ public class Base64OutputStream
   {
     this(out, 76);
   }
-  
+
   /**
    * Constructor.
    * @param out the underlying output stream to encode
@@ -97,9 +97,9 @@ public class Base64OutputStream
       buflen = 0;
     }
   }
-  
+
   /**
-   * Writes <code>b.length</code> bytes from the specified byte array 
+   * Writes <code>b.length</code> bytes from the specified byte array
    * to this output stream.
    */
   public void write(byte b[])
@@ -107,9 +107,9 @@ public class Base64OutputStream
   {
     write(b, 0, b.length);
   }
-  
+
   /**
-   * Writes <code>len</code> bytes from the specified byte array 
+   * Writes <code>len</code> bytes from the specified byte array
    * starting at offset <code>off</code> to this output stream.
    */
   public void write(byte b[], int off, int len)
@@ -118,7 +118,7 @@ public class Base64OutputStream
     for (int i=0; i<len; i++)
       write(b[off+i]);
   }
-  
+
   /**
    * Flushes this output stream and forces any buffered output bytes to be
    * written out.
@@ -132,9 +132,9 @@ public class Base64OutputStream
     }
     out.flush();
   }
-  
+
   /**
-   * Closes this output stream and releases any system resources 
+   * Closes this output stream and releases any system resources
    * associated with this stream.
    */
   public void close()
@@ -143,7 +143,7 @@ public class Base64OutputStream
     flush();
     out.close();
   }
-  
+
   private void encode()
     throws IOException
   {

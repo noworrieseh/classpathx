@@ -1,23 +1,23 @@
 /*
  * MaildirStore.java
  * Copyright (C) 2003, 2005 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -51,8 +51,8 @@ import gnu.mail.treeutil.StatusSource;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public final class MaildirStore 
-  extends Store 
+public final class MaildirStore
+  extends Store
   implements StatusSource
 {
 
@@ -62,13 +62,13 @@ public final class MaildirStore
   static final Level MAILDIR_TRACE = new TraceLevel("maildir");
 
   private static final char separatorChar = '/';
-  
+
   private List statusListeners = new ArrayList();
-	
+
   /**
    * Constructor.
    */
-  public MaildirStore(Session session, URLName urlname) 
+  public MaildirStore(Session session, URLName urlname)
   {
     super(session, urlname);
     if (session.getDebug())
@@ -76,16 +76,16 @@ public final class MaildirStore
         logger.setLevel(MAILDIR_TRACE);
       }
   }
-	
+
   /**
    * There isn't a protocol to implement, so this method just returns.
    */
   protected boolean protocolConnect(
-      String host, 
-      int port, 
+      String host,
+      int port,
       String username,
-      String password) 
-    throws MessagingException 
+      String password)
+    throws MessagingException
   {
     return true;
   }
@@ -93,15 +93,15 @@ public final class MaildirStore
   /**
    * Returns the default folder.
    */
-  public Folder getDefaultFolder() 
-    throws MessagingException 
+  public Folder getDefaultFolder()
+    throws MessagingException
   {
     // If the url used to contruct the store references a file directly,
     // return this file.
-    if (url!=null) 
+    if (url!=null)
     {
       String file = url.getFile();
-      if (file!=null && file.length()>0) 
+      if (file!=null && file.length()>0)
         return getFolder(file);
     }
     // Otherwise attempt to return a sensible root folder.
@@ -113,8 +113,8 @@ public final class MaildirStore
         home = System.getProperty("user.home");
         if (!exists(home))
           home = null;
-      } 
-      catch (SecurityException e) 
+      }
+      catch (SecurityException e)
       {
         log("access denied reading system properties");
       }
@@ -126,25 +126,25 @@ public final class MaildirStore
   /**
    * Returns the folder with the specified filename.
    */
-  public Folder getFolder(String filename) 
+  public Folder getFolder(String filename)
     throws MessagingException
   {
     boolean inbox = false;
-    if ("inbox".equalsIgnoreCase(filename)) 
+    if ("inbox".equalsIgnoreCase(filename))
     {
       // First try the session property mail.mbox.inbox.
       String maildir = session.getProperty("mail.maildir.maildir");
       if (!isMaildir(maildir))
       {
         // Try some common(UNIX) locations.
-        try 
+        try
         {
           String userhome = System.getProperty("user.home");
           maildir = userhome+"/Maildir";
           if (!isMaildir(maildir))
             maildir = null;
-        } 
-        catch (SecurityException e) 
+        }
+        catch (SecurityException e)
         {
           // not allowed to read system properties
           log("unable to access system properties");
@@ -204,8 +204,8 @@ public final class MaildirStore
   /**
    * Returns the folder specified by the filename of the URLName.
    */
-  public Folder getFolder(URLName urlname) 
-    throws MessagingException 
+  public Folder getFolder(URLName urlname)
+    throws MessagingException
   {
     try
       {
@@ -217,8 +217,8 @@ public final class MaildirStore
         throw new MessagingException(e.getMessage(), e);
       }
   }
-	
-  Session getSession() 
+
+  Session getSession()
   {
     return session;
   }
@@ -240,22 +240,22 @@ public final class MaildirStore
    * @param l the status listener
    * @see #removeStatusListener
    */
-  public void addStatusListener(StatusListener l) 
+  public void addStatusListener(StatusListener l)
   {
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
     {
       statusListeners.add(l);
     }
   }
-			
+
   /**
    * Removes a status listener from this store.
    * @param l the status listener
    * @see #addStatusListener
    */
-  public void removeStatusListener(StatusListener l) 
+  public void removeStatusListener(StatusListener l)
   {
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
     {
       statusListeners.remove(l);
     }
@@ -266,15 +266,15 @@ public final class MaildirStore
    * This dispatches the event to all the registered listeners.
    * @param event the status event
    */
-  protected void processStatusEvent(StatusEvent event) 
+  protected void processStatusEvent(StatusEvent event)
   {
     StatusListener[] listeners;
-    synchronized (statusListeners) 
+    synchronized (statusListeners)
     {
       listeners = new StatusListener[statusListeners.size()];
       statusListeners.toArray(listeners);
     }
-    switch (event.getType()) 
+    switch (event.getType())
     {
       case StatusEvent.OPERATION_START:
         for (int i=0; i<listeners.length; i++)

@@ -1,19 +1,19 @@
 /*
  * Folder.java
  * Copyright (C) 2002, 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -49,7 +49,7 @@ import javax.mail.search.SearchTerm;
  * delimiter characters.
  * <p>
  * The special (case-insensitive) folder name INBOX is reserved to mean the
- * primary folder for the authenticated user in the store. Not all stores 
+ * primary folder for the authenticated user in the store. Not all stores
  * support INBOX folders, and not all users will have an INBOX folder.
  * <p>
  * Unless documented otherwise, a folder must be opened in order to invoke
@@ -80,12 +80,12 @@ public abstract class Folder
    * This folder can be modified.
    */
   public static final int READ_WRITE = 2;
-  
+
   /**
    * The parent store.
    */
   protected Store store;
-  
+
   /**
    * The folder mode: Folder.READ_ONLY, Folder.READ_WRITE, or -1 if not known.
    */
@@ -136,7 +136,7 @@ public abstract class Folder
   {
     URLName url = getStore().getURLName();
     String name = getFullName();
-    return new URLName(url.getProtocol(), 
+    return new URLName(url.getProtocol(),
                        url.getHost(), url.getPort(), name,
                        url.getUsername(), null);
   }
@@ -180,7 +180,7 @@ public abstract class Folder
     throws MessagingException;
 
   /**
-   * Returns a list of subscribed subfolders matching the specified pattern. 
+   * Returns a list of subscribed subfolders matching the specified pattern.
    * If the folder does not support subscription, returns the same as the
    * <code>list</code> method.
    * The pattern can contain wildcards.
@@ -238,10 +238,10 @@ public abstract class Folder
 
   /**
    * Create this folder in the store.
-   * When this folder is created, any folders in its path 
+   * When this folder is created, any folders in its path
    * that do not exist are also created.
    * <p>
-   * If the creation is successful, a CREATED FolderEvent is delivered 
+   * If the creation is successful, a CREATED FolderEvent is delivered
    * to any FolderListeners registered on this Folder and this Store.
    * @param type the desired type of the folder
    */
@@ -283,8 +283,8 @@ public abstract class Folder
    * Return a folder corresponding to the given name.
    * Note that the folder does not have to exist in the store.
    * <p>
-   * In some stores, <code>name</code> can be an absolute path if it starts 
-   * with the hierarchy delimiter. Otherwise, it is interpreted relative to 
+   * In some stores, <code>name</code> can be an absolute path if it starts
+   * with the hierarchy delimiter. Otherwise, it is interpreted relative to
    * this folder.
    * <p>
    * This method can be invoked on a closed folder.
@@ -299,7 +299,7 @@ public abstract class Folder
    * @param recurse delete any subfolders
    * @return true if the folder is deleted successfully, false otherwise
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not closed 
+   * @exception IllegalStateException if this folder is not closed
    */
   public abstract boolean delete(boolean recurse)
     throws MessagingException;
@@ -310,7 +310,7 @@ public abstract class Folder
    * @param folder a folder representing the new name for this folder
    * @return true if the folder is renamed successfully, false otherwise
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not closed 
+   * @exception IllegalStateException if this folder is not closed
    */
   public abstract boolean renameTo(Folder folder)
     throws MessagingException;
@@ -321,7 +321,7 @@ public abstract class Folder
    * messages.
    * @param mode open the Folder READ_ONLY or READ_WRITE
    * @exception FolderNotFoundException if this folder does not exist
-   * @exception IllegalStateException if this folder is not closed 
+   * @exception IllegalStateException if this folder is not closed
    */
   public abstract void open(int mode)
     throws MessagingException;
@@ -480,13 +480,13 @@ public abstract class Folder
    * The message number is the relative position of a message in its
    * folder, starting at 1.
    * <p>
-   * Note that message numbers can change within a session if the folder is 
+   * Note that message numbers can change within a session if the folder is
    * expunged, therefore the use of message numbers as references to
    * messages is inadvisable.
    * @param msgnum the message number
    * @exception FolderNotFoundException if this folder does not exist
    * @exception IllegalStateException if this folder is closed
-   * @exception IndexOutOfBoundsException if the message number is out of 
+   * @exception IndexOutOfBoundsException if the message number is out of
    * range
    */
   public abstract Message getMessage(int msgnum)
@@ -498,7 +498,7 @@ public abstract class Folder
    * @param end the number of the last message
    * @exception FolderNotFoundException if this folder does not exist
    * @exception IllegalStateException if this folder is closed
-   * @exception IndexOutOfBoundsException if the start or end message 
+   * @exception IndexOutOfBoundsException if the start or end message
    * numbers are out of range.
    */
   public synchronized Message[] getMessages(int start, int end)
@@ -517,7 +517,7 @@ public abstract class Folder
    * @param msgnums the array of message numbers
    * @exception FolderNotFoundException if this folder does not exist
    * @exception IllegalStateException if this folder is closed
-   * @exception IndexOutOfBoundsException if any message number in the 
+   * @exception IndexOutOfBoundsException if any message number in the
    * given array is out of range
    */
   public synchronized Message[] getMessages(int msgnums[])
@@ -604,10 +604,10 @@ public abstract class Folder
    * @param flag the flags to be set
    * @param value set the flags to this value
    * @exception IllegalStateException if this folder is closed or READ_ONLY
-   * @exception IndexOutOfBoundsException if the start or end message 
+   * @exception IndexOutOfBoundsException if the start or end message
    * numbers are out of range
    */
-  public synchronized void setFlags(int start, int end, Flags flag, 
+  public synchronized void setFlags(int start, int end, Flags flag,
                                      boolean value)
     throws MessagingException
   {
@@ -629,7 +629,7 @@ public abstract class Folder
    * @param flag the flags to be set
    * @param value set the flags to this value
    * @exception IllegalStateException if this folder is closed or READ_ONLY
-   * @exception IndexOutOfBoundsException if any message number in the 
+   * @exception IndexOutOfBoundsException if any message number in the
    * given array is out of range
    */
   public synchronized void setFlags(int[] msgnums, Flags flag, boolean value)
@@ -680,9 +680,9 @@ public abstract class Folder
    * Expunge causes the renumbering of any messages with numbers higher than
    * the message number of the lowest-numbered expunged message.
    * <p>
-   * After a message has been expunged, only the <code>isExpunged</code> and 
-   * <code>getMessageNumber</code> methods are still valid on the 
-   * corresponding Message object; other methods may throw 
+   * After a message has been expunged, only the <code>isExpunged</code> and
+   * <code>getMessageNumber</code> methods are still valid on the
+   * corresponding Message object; other methods may throw
    * <code>MessageRemovedException</code>.
    * @exception FolderNotFoundException if this folder does not exist
    * @exception IllegalStateException if this folder is closed
@@ -736,7 +736,7 @@ public abstract class Folder
   }
 
   // -- Event management --
-  
+
   /*
    * Because the propagation of events of different kinds in the JavaMail
    * API is so haphazard, I have here sacrificed a small time advantage for
@@ -748,7 +748,7 @@ public abstract class Folder
    *
    * Note that all events are currently delivered synchronously, where in
    * Sun's implementation a different thread is used for event delivery.
-   * 
+   *
    * TODO Examine the impact of this.
    */
 
@@ -919,7 +919,7 @@ public abstract class Folder
    */
   protected void notifyFolderRenamedListeners(Folder folder)
   {
-    FolderEvent event = new FolderEvent(this, this, folder, 
+    FolderEvent event = new FolderEvent(this, this, folder,
                                         FolderEvent.RENAMED);
     fireFolderRenamed(event);
     store.notifyFolderRenamedListeners(this, folder);
@@ -964,7 +964,7 @@ public abstract class Folder
           }
       }
   }
-  
+
   /*
    * Propagates a RENAMED FolderEvent to all registered listeners.
    */
@@ -1149,5 +1149,5 @@ public abstract class Folder
     String name = getFullName();
     return (name != null) ? name : super.toString();
   }
-  
+
 }

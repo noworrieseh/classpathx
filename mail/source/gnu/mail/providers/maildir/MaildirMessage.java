@@ -1,23 +1,23 @@
 /*
  * MaildirMessage.java
  * Copyright(C) 2003 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU JavaMail, a library.
- * 
+ *
  * GNU JavaMail is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  *(at your option) any later version.
- * 
+ *
  * GNU JavaMail is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- * 
+ *
  * As a special exception, if you link this library with other files to
  * produce an executable, this library does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
@@ -44,8 +44,8 @@ import gnu.mail.providers.ReadOnlyMessage;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public final class MaildirMessage 
-  extends ReadOnlyMessage 
+public final class MaildirMessage
+  extends ReadOnlyMessage
 {
 
   /**
@@ -67,12 +67,12 @@ public final class MaildirMessage
    * Creates a Maildir message.
    * This is called by the MaildirFolder.
    */
-  MaildirMessage(MaildirFolder folder, 
+  MaildirMessage(MaildirFolder folder,
       File file,
       String uniq,
       String info,
       int msgnum)
-    throws MessagingException 
+    throws MessagingException
   {
     super(folder, msgnum);
     this.file = file;
@@ -115,8 +115,8 @@ public final class MaildirMessage
    */
   MaildirMessage(MaildirFolder folder,
       MimeMessage message,
-      int msgnum) 
-    throws MessagingException 
+      int msgnum)
+    throws MessagingException
   {
     super(message);
     this.folder = folder;
@@ -130,12 +130,12 @@ public final class MaildirMessage
   {
     super.setExpunged(expunged);
   }
-	
-  /** 
+
+  /**
    * Set the specified flags(reflected in the <code>info</code> field).
    */
   public synchronized void setFlags(Flags flag, boolean set)
-    throws MessagingException 
+    throws MessagingException
   {
     if (set)
       flags.add(flag);
@@ -152,12 +152,12 @@ public final class MaildirMessage
   {
     return uniq;
   }
-    
+
   /**
    * Returns an <code>info</code> field based on the current flags.
    */
-  String getInfo() 
-    throws MessagingException 
+  String getInfo()
+    throws MessagingException
   {
     return getInfo(flags);
   }
@@ -249,7 +249,7 @@ public final class MaildirMessage
       fetchHeaders();
     return super.getAllHeaders();
   }
-  
+
   public Enumeration getAllHeaderLines()
     throws MessagingException
   {
@@ -257,7 +257,7 @@ public final class MaildirMessage
       fetchHeaders();
     return super.getAllHeaderLines();
   }
-  
+
   public Enumeration getMatchingHeaders(String[] names)
     throws MessagingException
   {
@@ -265,7 +265,7 @@ public final class MaildirMessage
       fetchHeaders();
     return super.getMatchingHeaders(names);
   }
-  
+
   public Enumeration getMatchingHeaderLines(String[] names)
     throws MessagingException
   {
@@ -273,7 +273,7 @@ public final class MaildirMessage
       fetchHeaders();
     return super.getMatchingHeaderLines(names);
   }
-  
+
   public Enumeration getNonMatchingHeaders(String[] names)
     throws MessagingException
   {
@@ -310,9 +310,9 @@ public final class MaildirMessage
 
   // -- Utility methods --
 
-  public boolean equals(Object other) 
+  public boolean equals(Object other)
   {
-    if (other instanceof MimeMessage) 
+    if (other instanceof MimeMessage)
     {
       MimeMessage message = (MimeMessage)other;
       return (message.getFolder()==getFolder() &&
