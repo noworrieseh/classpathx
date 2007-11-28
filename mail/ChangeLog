@@ -1,3 +1,9 @@
+2007-11-28  Conrad T. Pino  <Conrad@Pino.com>
+
+	* source/gnu/mail/providers/mbox/MboxStore.java: Stop warnings; replace
+	  '/' and "/" with private static final char separatorChar; remove unused
+	  import java.io.IOException;
+
 2007-11-27  Conrad T. Pino  <Conrad@Pino.com>
 
 	* ChangeLog,

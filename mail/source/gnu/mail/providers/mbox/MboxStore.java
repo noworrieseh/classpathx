@@ -28,7 +28,6 @@
 package gnu.mail.providers.mbox;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,15 +108,15 @@ public final class MboxStore
             path = decodeUrlPath(path);
 
             // Relative or Windows absolute path
-            if (File.separatorChar != '/')
+            if (File.separatorChar != separatorChar)
               {
-                path = path.replace('/', File.separatorChar);
+                path = path.replace(separatorChar, File.separatorChar);
               }
             root = new File(path);
-            if (!root.exists() && File.separatorChar == '/')
+            if (!root.exists() && File.separatorChar == separatorChar)
               {
                 // Absolute path on POSIX platform
-                root = new File("/" + path);
+                root = new File(separatorChar + path);
               }
           }
       }
@@ -204,9 +203,9 @@ public final class MboxStore
       }
     File file = null;
     // Convert any slashes to platform path separator
-    if (File.separatorChar != '/')
+    if (File.separatorChar != separatorChar)
       {
-        name = name.replace('/', File.separatorChar);
+        name = name.replace(separatorChar, File.separatorChar);
       }
     if (root != null && root.isDirectory())
       {
@@ -238,10 +237,10 @@ public final class MboxStore
                 inbox = new File(inboxname);
               }
           }
-        if (!inbox.exists() && attemptFallback && File.separatorChar == '/')
+        if (!inbox.exists() && attemptFallback && File.separatorChar == separatorChar)
           {
             PrivilegedAction a;
-            if (File.separatorChar == '/')
+            if (File.separatorChar == separatorChar)
               {
                 // Try some common (UNIX) locations.
                 a = new GetSystemPropertyAction("user.name");
@@ -449,7 +448,7 @@ public final class MboxStore
   {
     return (c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) ||
       (c >= 0x30 && c <= 0x39) || c == '-' || c == '.' || c == '_' ||
-      c == '~' || c == '/';
+      c == '~' || c == separatorChar;
   }
 
 }
