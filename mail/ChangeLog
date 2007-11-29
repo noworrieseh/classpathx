@@ -1,5 +1,10 @@
 2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
 
+	* source/javax/mail/Provider.java: Conform to API, add missing method
+	  Provider.Type.toString; stop Provider.Type.type unused field warnings.
+
+2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/mail/providers/nntp/NNTPStore.java,
 	  source/gnu/mail/providers/nntp/NNTPTransport.java: Remove unused
 	  private methods.

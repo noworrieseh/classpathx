@@ -43,14 +43,19 @@ public class Provider
   public static class Type
   {
 
-    public static final Type STORE = new Type("Store");
-    public static final Type TRANSPORT = new Type("Transport");
+    public static final Type STORE = new Type("STORE");
+    public static final Type TRANSPORT = new Type("TRANSPORT");
 
     private String type;
 
     private Type(String type)
     {
       this.type = type;
+    }
+
+    public String toString()
+    {
+      return type;
     }
 
   }
@@ -124,13 +129,10 @@ public class Provider
   {
     StringBuffer buffer = new StringBuffer();
     buffer.append("javax.mail.Provider[");
-    if (type == Type.STORE)
+    if (type != null)
       {
-        buffer.append("STORE,");
-      }
-    else if (type == Type.TRANSPORT)
-      {
-        buffer.append("TRANSPORT,");
+        buffer.append(type);
+        buffer.append(',');
       }
     buffer.append(protocol);
     buffer.append(',');
