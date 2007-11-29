@@ -37,7 +37,6 @@ import java.util.NoSuchElementException;
 import javax.mail.Header;
 import javax.mail.MessagingException;
 
-import gnu.inet.util.CRLFInputStream;
 import gnu.inet.util.LineInputStream;
 
 /**

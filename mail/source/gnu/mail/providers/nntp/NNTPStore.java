@@ -29,14 +29,12 @@ package gnu.mail.providers.nntp;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
-import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.MessagingException;

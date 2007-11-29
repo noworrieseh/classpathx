@@ -37,7 +37,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +54,6 @@ import javax.mail.Multipart;
 import javax.mail.Session;
 
 import gnu.inet.util.GetSystemPropertyAction;
-import gnu.mail.util.RFC2822OutputStream;
 
 /**
  * A MIME mail message.

@@ -1,3 +1,39 @@
+2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
+
+	* source/gnu/mail/handler/Application.java,
+	  source/gnu/mail/handler/Message.java,
+	  source/gnu/mail/handler/Multipart.java,
+	  source/gnu/mail/handler/Text.java,
+	  source/gnu/mail/providers/imap/IMAPFolder.java,
+	  source/gnu/mail/providers/imap/IMAPMessage.java,
+	  source/gnu/mail/providers/imap/IMAPMultipart.java,
+	  source/gnu/mail/providers/maildir/MaildirFolder.java,
+	  source/gnu/mail/providers/mbox/MboxMessage.java,
+	  source/gnu/mail/providers/nntp/NNTPStore.java,
+	  source/gnu/mail/providers/nntp/NNTPTransport.java,
+	  source/gnu/mail/providers/pop3/POP3Message.java,
+	  source/gnu/mail/providers/pop3/POP3Store.java,
+	  source/gnu/mail/providers/ReadOnlyMessage.java,
+	  source/gnu/mail/treeutil/StatusEvent.java,
+	  source/gnu/mail/treeutil/StatusListener.java,
+	  source/gnu/mail/util/Base64InputStream.java,
+	  source/gnu/mail/util/Base64OutputStream.java,
+	  source/gnu/mail/util/QInputStream.java,
+	  source/gnu/mail/util/QPInputStream.java,
+	  source.java,x/mail/Folder.java,
+	  source.java,x/mail/internet/InternetHeaders.java,
+	  source.java,x/mail/internet/MailDateFormat.java,
+	  source.java,x/mail/internet/MimeBodyPart.java,
+	  source.java,x/mail/internet/MimeMessage.java,
+	  source.java,x/mail/internet/MimeMultipart.java,
+	  source.java,x/mail/Message.java,
+	  source.java,x/mail/Multipart.java,
+	  source.java,x/mail/Session.java,
+	  source.java,x/mail/UIDFolder.java,
+	  source.java,x/mail/URLName.java,
+	  source.java,x/mail/util/SharedByteArrayInputStream.java: Stop unused
+	  import warnings; replace package imports with package member inports.
+
 2007-11-28  Conrad T. Pino  <Conrad@Pino.com>
 
 	* source/gnu/mail/providers/mbox/MboxStore.java: Stop warnings; replace

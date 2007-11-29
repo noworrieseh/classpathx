@@ -31,7 +31,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Enumeration;
 import javax.mail.search.SearchTerm;
 
 /**

@@ -27,7 +27,6 @@
 
 package gnu.mail.providers.pop3;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -45,7 +44,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;

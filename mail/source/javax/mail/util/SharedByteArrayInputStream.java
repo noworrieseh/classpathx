@@ -29,7 +29,6 @@ package javax.mail.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.IOException;
 import javax.mail.internet.SharedInputStream;
 
 /**

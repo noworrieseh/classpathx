@@ -27,7 +27,9 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A Base64 content transfer encoding filter stream.

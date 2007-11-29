@@ -32,7 +32,6 @@ import javax.mail.event.ConnectionEvent;
 import javax.mail.event.ConnectionListener;
 import javax.mail.event.FolderEvent;
 import javax.mail.event.FolderListener;
-import javax.mail.event.MailEvent;
 import javax.mail.event.MessageChangedEvent;
 import javax.mail.event.MessageChangedListener;
 import javax.mail.event.MessageCountEvent;

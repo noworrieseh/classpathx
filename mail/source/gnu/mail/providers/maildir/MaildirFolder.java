@@ -37,10 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.FolderNotFoundException;
@@ -52,8 +49,6 @@ import javax.mail.URLName;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.FolderEvent;
 import javax.mail.internet.MimeMessage;
-
-import gnu.inet.util.LineInputStream;
 
 /**
  * The folder class implementing a Maildir-format mailbox.

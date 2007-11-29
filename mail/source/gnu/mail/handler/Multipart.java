@@ -29,8 +29,12 @@ package gnu.mail.handler;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.*;
-import javax.activation.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import javax.activation.ActivationDataFlavor;
+import javax.activation.DataContentHandler;
+import javax.activation.DataSource;
+import javax.activation.UnsupportedDataTypeException;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 

@@ -27,7 +27,7 @@
 
 package gnu.mail.treeutil;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * A callback interface for passing status messages.

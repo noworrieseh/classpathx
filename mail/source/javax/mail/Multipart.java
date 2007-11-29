@@ -30,7 +30,6 @@ package javax.mail;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Vector;
-import javax.activation.DataSource;
 
 /**
  * A multipart is a container for multiple body parts.

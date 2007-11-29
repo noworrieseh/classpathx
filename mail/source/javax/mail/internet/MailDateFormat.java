@@ -27,7 +27,6 @@
 
 package javax.mail.internet;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;

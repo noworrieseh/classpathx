@@ -43,7 +43,6 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.MultipartDataSource;
 
-import gnu.inet.util.CRLFOutputStream;
 import gnu.inet.util.GetSystemPropertyAction;
 import gnu.inet.util.LineInputStream;
 

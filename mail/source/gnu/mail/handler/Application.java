@@ -29,11 +29,13 @@ package gnu.mail.handler;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.*;
-import javax.activation.*;
-import javax.mail.internet.ContentType;
-import javax.mail.internet.MimeUtility;
-import javax.mail.internet.ParseException;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import javax.activation.ActivationDataFlavor;
+import javax.activation.DataContentHandler;
+import javax.activation.DataSource;
 
 /**
  * A JAF data content handler for the application/* family of MIME content

@@ -33,7 +33,6 @@ import java.net.SocketException;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 import javax.mail.Address;
 import javax.mail.AuthenticationFailedException;

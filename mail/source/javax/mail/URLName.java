@@ -27,8 +27,10 @@
 
 package javax.mail;
 
-import java.io.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.net.URL;
 
 /**
  * The name of a URL.

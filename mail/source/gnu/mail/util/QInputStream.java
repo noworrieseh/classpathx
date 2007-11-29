@@ -27,7 +27,8 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * Provides RFC 2047 "B" transfer encoding.

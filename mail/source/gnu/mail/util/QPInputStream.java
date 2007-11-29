@@ -27,7 +27,10 @@
 
 package gnu.mail.util;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.PushbackInputStream;
 
 /**
  * A Quoted-Printable decoder stream.

@@ -49,7 +49,6 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 
 import gnu.inet.util.GetSystemPropertyAction;
-import gnu.mail.util.RFC2822OutputStream;
 
 /**
  * A MIME body part.

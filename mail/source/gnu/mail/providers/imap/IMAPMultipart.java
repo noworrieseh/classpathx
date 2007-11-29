@@ -27,11 +27,6 @@
 
 package gnu.mail.providers.imap;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.ProtocolException;
-import javax.mail.MultipartDataSource;
 import javax.mail.Part;
 import javax.mail.internet.MimeMultipart;
 

@@ -27,8 +27,6 @@
 
 package javax.mail;
 
-import java.util.NoSuchElementException;
-
 /**
  * A folder that supports permanent references to messages in the form of a
  * long integer (i.e. an IMAP folder). These UIDs survive the closure and

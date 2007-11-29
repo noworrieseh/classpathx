@@ -27,7 +27,7 @@
 
 package gnu.mail.treeutil;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * A status message.

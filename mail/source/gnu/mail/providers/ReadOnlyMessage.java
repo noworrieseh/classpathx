@@ -31,7 +31,6 @@ import java.io.InputStream;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.IllegalWriteException;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.InternetHeaders;

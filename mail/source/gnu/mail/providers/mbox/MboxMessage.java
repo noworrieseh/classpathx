@@ -28,7 +28,6 @@
 package gnu.mail.providers.mbox;
 
 import java.io.InputStream;
-import javax.activation.DataHandler;
 import javax.mail.Flags;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
