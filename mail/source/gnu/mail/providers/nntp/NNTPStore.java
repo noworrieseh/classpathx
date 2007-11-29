@@ -280,11 +280,6 @@ public class NNTPStore extends Store
       return -1;
     }
 
-  private boolean propertyIsFalse(String key)
-    {
-      return "false".equals(getProperty(key));
-    }
-
   private boolean propertyIsTrue(String key)
     {
       return "true".equals(getProperty(key));

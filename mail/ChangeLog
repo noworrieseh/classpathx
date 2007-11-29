@@ -1,5 +1,11 @@
 2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
 
+	* source/gnu/mail/providers/nntp/NNTPStore.java,
+	  source/gnu/mail/providers/nntp/NNTPTransport.java: Remove unused
+	  private methods.
+
+2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/mail/providers/imap/IMAPFolder.java,
 	  source/gnu/mail/util/Base64OutputStream.java,
 	  source/javax/mail/search/RecipientTerm.java: Stop unused local

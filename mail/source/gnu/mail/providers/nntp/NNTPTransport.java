@@ -239,16 +239,6 @@ public class NNTPTransport extends Transport
       return -1;
     }
 
-  private boolean propertyIsFalse(String key)
-    {
-      return "false".equals(getProperty(key));
-    }
-
-  private boolean propertyIsTrue(String key)
-    {
-      return "true".equals(getProperty(key));
-    }
-
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
