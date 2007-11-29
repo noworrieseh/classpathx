@@ -1,5 +1,12 @@
 2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
 
+	* source/gnu/mail/providers/imap/IMAPFolder.java,
+	  source/gnu/mail/util/Base64OutputStream.java,
+	  source/javax/mail/search/RecipientTerm.java: Stop unused local
+	  variable warnings.
+
+2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/mail/handler/Application.java,
 	  source/gnu/mail/handler/Message.java,
 	  source/gnu/mail/handler/Multipart.java,

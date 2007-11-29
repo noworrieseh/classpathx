@@ -159,7 +159,6 @@ public class Base64OutputStream
     {
       byte b = buffer[0];
       int i = 0;
-      boolean flag = false;
       out.write(src[b>>>2 & 0x3f]);
       out.write(src[(b<<4 & 0x30) +(i>>>4 & 0xf)]);
       out.write(EQ);

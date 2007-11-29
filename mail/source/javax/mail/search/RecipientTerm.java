@@ -70,7 +70,6 @@ public final class RecipientTerm
    */
   public boolean match(Message msg)
   {
-    Address aaddress[];
     try
       {
         Address[] addresses = msg.getRecipients(type);

@@ -1288,7 +1288,7 @@ public class IMAPFolder
     throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    s.getConnection();
     getSeparator();
     int di = path.lastIndexOf(delimiter);
     if (di == -1)
