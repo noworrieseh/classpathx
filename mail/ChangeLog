@@ -1,3 +1,9 @@
+2009-02-12  Jan Michalico  <jan.michalica@centire.com>
+
+	* source/gnu/mail/providers/nntp/NNTPStore.java,
+	  source/gnu/mail/providers/nntp/NNTPTransport.java,
+	  source/gnu/mail/providers/nntp/package.html: Add NNTPS support.
+
 2007-11-29  Conrad T. Pino  <Conrad@Pino.com>
 
 	* source/javax/mail/Provider.java: Conform to API, add missing method

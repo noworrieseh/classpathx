@@ -23,6 +23,14 @@ MimeMessage.RecipientType.NEWSGROUPS, of which the address is a NewsAddress.
 </p>
 
 <p>
+This provider supports secured connections via TLS. However, you should use
+"nntps" (resp. "nntps-post") in order to create encrypted connections, as the
+setting "tls" to "true" triggers use of the STARTTLS command whose
+support on the server side cannot be verified without implementation of RFC 3977.
+</p>
+
+
+<p>
 This provider supports the following properties:
 
 <table summary='properties'>
@@ -56,11 +64,25 @@ This provider supports the following properties:
 <td>Socket connection timeout, in milliseconds. Default is no timeout.</td>
 </tr>
 
-<!--tr>
+<tr>
 <td>mail.nntp.timeout</td>
 <td>integer (&gt;=1)</td>
 <td>Socket I/O timeout, in milliseconds. Default is no timeout.</td>
-</tr-->
+</tr>
+
+<tr>
+<td>mail.nntp.tls</td>
+<td>boolean</td>
+<td>If set to false, TLS negotiation will not be attempted.</td>
+</tr>
+
+<tr>
+<td>mail.nntp.trustmanager</td>
+<td>String</td>
+<td>The name of a class implementing the
+<code>javax.net.ssl.TrustManager</code> interface, which will be used to
+determine trust in TLS negotiation.</td>
+</tr>
 
 <tr>
 <td>mail.nntp.newsrc</td>

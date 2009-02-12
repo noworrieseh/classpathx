@@ -44,6 +44,7 @@ import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.NewsAddress;
+import javax.net.ssl.TrustManager;
 
 import gnu.inet.nntp.NNTPConnection;
 import gnu.inet.util.LaconicFormatter;
@@ -103,12 +104,27 @@ public class NNTPTransport extends Transport
         {
           int connectionTimeout = getIntProperty("connectiontimeout");
           int timeout = getIntProperty("timeout");
+          
+          boolean tls = "nntps-post".equals(url.getProtocol());
+          
+          if (port < 0)
+            {
+              port = tls ? NNTPConnection.DEFAULT_SSL_PORT : NNTPConnection.DEFAULT_PORT;
+            }
+          // Locate custom TrustManager
+          TrustManager tm = null;
+          if (tls)
+            {
+              tm = getTrustManager();
+            }
           if (port < 0)
             {
               port = NNTPConnection.DEFAULT_PORT;
             }
+          
           connection = new NNTPConnection(host, port,
-                                          connectionTimeout, timeout);
+                                          connectionTimeout, timeout,
+                                          tls, tm, false);
           if (session.getDebug())
             {
               connection.logger.setLevel(NNTPConnection.NNTP_TRACE);
@@ -121,6 +137,25 @@ public class NNTPTransport extends Transport
 
           connection.init();
 
+          /*
+           * FIXME First of all, capability list should be retrieved
+           * in order to verify STARTTLS availability. However, capabilities
+           * are matter of RFC 3977, which is not implemented yet.
+           */
+          if (!tls && propertyIsTrue("tls")) {
+        	  tm = getTrustManager();
+        	  
+        	  if (tm == null) {
+        		  tls = connection.starttls();
+        	  } else {
+        		  tls = connection.starttls(tm);
+        	  }
+          }
+          
+          /*
+           * FIXME After STARTTLS, capabilities list should be refreshed.
+           */
+          
           if (username != null && password != null)
             {
               // TODO decide on authentication method
@@ -148,6 +183,21 @@ public class NNTPTransport extends Transport
             }
         }
     }
+  
+  private TrustManager getTrustManager() throws MessagingException {
+		String tmt = getProperty("trustmanager");
+	    if (tmt != null)
+	      {
+	        try
+	          {
+	            Class t = Class.forName(tmt);
+	            return (TrustManager) t.newInstance();
+	          } catch (Exception e) {
+	            throw new MessagingException(e.getMessage(), e);
+	          }
+	      }
+	    return null;
+	  }
 
   /**
    * Close the connection.
@@ -253,4 +303,8 @@ public class NNTPTransport extends Transport
       return value;
     }
 
+  private boolean propertyIsTrue(String key)
+  {
+    return "true".equals(getProperty(key));
+  }
 }

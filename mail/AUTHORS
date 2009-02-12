@@ -4,3 +4,7 @@ provider.
 Nic Ferrier wrote the IMAP provider based on Kawa.
 
 Chris Burdess wrote the IMAP4, POP3, mbox, Maildir, and NNTP providers.
+
+Conrad Pino helped with resolving bugs.
+
+Jan Michalico added NNTPS support.

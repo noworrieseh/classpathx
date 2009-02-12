@@ -41,6 +41,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
+import javax.net.ssl.TrustManager;
 
 import gnu.inet.nntp.FileNewsrc;
 import gnu.inet.nntp.Newsrc;
@@ -161,12 +162,17 @@ public class NNTPStore extends Store
         {
           int connectionTimeout = getIntProperty("connectiontimeout");
           int timeout = getIntProperty("timeout");
+          boolean tls = "nntps".equals(url.getProtocol());
           if (port < 0)
             {
-              port = NNTPConnection.DEFAULT_PORT;
+        	  port = tls ? NNTPConnection.DEFAULT_SSL_PORT : NNTPConnection.DEFAULT_PORT;
             }
+       // Locate custom trust manager
+          TrustManager tm = getTrustManager();
+          
           connection = new NNTPConnection(host, port,
-                                          connectionTimeout, timeout, false);
+                                          connectionTimeout, timeout,
+                                          tls, tm, false);
           if (session.getDebug())
             {
               connection.logger.setLevel(NNTPConnection.NNTP_TRACE);
@@ -181,6 +187,25 @@ public class NNTPStore extends Store
 
           connection.init();
 
+          /*
+           * FIXME First of all, capability list should be retrieved
+           * in order to verify STARTTLS availability. However, capabilities
+           * are matter of RFC 3977, which is not implemented yet.
+           */
+          if (!tls && propertyIsTrue("tls")) {
+        	  tm = getTrustManager();
+        	  
+        	  if (tm == null) {
+        		  tls = connection.starttls();
+        	  } else {
+        		  tls = connection.starttls(tm);
+        	  }
+          }
+          
+          /*
+           * FIXME After STARTTLS, capabilities list should be refreshed.
+           */
+          
           if (username != null && password != null)
             {
               // TODO decide on authentication method
@@ -197,6 +222,23 @@ public class NNTPStore extends Store
             throw new MessagingException(e.getMessage(), e);
           }
     }
+  
+    private TrustManager getTrustManager()
+        throws MessagingException
+        {
+		String tmt = getProperty("trustmanager");
+	    if (tmt != null)
+	      {
+	        try
+	          {
+	            Class t = Class.forName(tmt);
+	            return (TrustManager) t.newInstance();
+	          } catch (Exception e) {
+	            throw new MessagingException(e.getMessage(), e);
+	          }
+	      }
+	    return null;
+	  }
 
   /**
    * Close the connection.
