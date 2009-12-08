@@ -149,7 +149,10 @@ public class IMAPFolder
       {
         throw new FolderNotFoundException(this);
       }
-    mode = status.readWrite ? Folder.READ_WRITE : Folder.READ_ONLY;
+    if (status.select)
+      {
+        mode = status.readWrite ? Folder.READ_WRITE : Folder.READ_ONLY;
+      }
     if (status.permanentFlags != null)
       {
         permanentFlags = readFlags(status.permanentFlags);

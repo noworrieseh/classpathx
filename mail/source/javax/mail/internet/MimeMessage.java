@@ -1861,8 +1861,12 @@ public class MimeMessage
             ContentType ct = new ContentType(contentType);
             if (ct.match("multipart/*"))
               {
-                MimeMultipart mmp = (MimeMultipart) dh.getContent();
-                mmp.updateHeaders();
+                Object content = dh.getContent();
+                if (content instanceof MimeMultipart)
+                  {
+                    MimeMultipart mmp = (MimeMultipart) content;
+                    mmp.updateHeaders();
+                  }
               }
             else if (ct.match("message/rfc822"))
               {
