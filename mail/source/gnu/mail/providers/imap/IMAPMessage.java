@@ -79,7 +79,8 @@ extends ReadOnlyMessage
   static final int BS_DESCRIPTION = 4;
   static final int BS_ENCODING = 5;
   static final int BS_OCTETS = 6;
-  static final int BS_LINES = 7;
+  static final int BS_TEXT_LINES = 7;
+  static final int BS_EXT_MD5 = 7;
   static final int BS_EXT_DISPOSITION = 8;
   static final int BS_EXT_LANGUAGE = 9;
 
@@ -471,7 +472,7 @@ extends ReadOnlyMessage
     String description = parseAtom(list.get(BS_DESCRIPTION));
     String encoding = parseAtom(list.get(BS_ENCODING));
     String sizeVal = parseAtom(list.get(BS_OCTETS));
-    String linesVal = parseAtom(list.get(BS_LINES));
+    String linesVal = parseAtom(list.get(BS_TEXT_LINES));
 
     int size = -1;
     int lines = -1;
@@ -481,7 +482,7 @@ extends ReadOnlyMessage
           {
             size = Integer.parseInt(sizeVal);
           }
-        if (linesVal != null)
+        if ("text".equalsIgnoreCase(type) && linesVal != null)
           {
             lines = Integer.parseInt(linesVal);
           }
@@ -509,6 +510,14 @@ extends ReadOnlyMessage
       }
 
     // Extension fields
+    if (!"text".equalsIgnoreCase(type))
+      {
+        String md5 = parseAtom(list.get(BS_EXT_MD5));
+        if (md5 != null)
+          {
+            h.setHeader("Content-MD5", md5);
+          }
+      }
     if (len > 8)
       {
         Object dispositionVal = list.get(BS_EXT_DISPOSITION);
@@ -524,7 +533,11 @@ extends ReadOnlyMessage
               {
                 disposition = parseAtom(d.get(0));
                 ParameterList pl = parseParameterList(d.get(1));
-                h.setHeader("Content-Disposition", disposition + pl.toString());
+                if (pl != null)
+                  {
+                    disposition += pl.toString();
+                  }
+                h.setHeader("Content-Disposition", disposition);
               }
           }
       }
