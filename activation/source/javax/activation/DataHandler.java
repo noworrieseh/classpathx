@@ -158,9 +158,10 @@ public class DataHandler
     PipedOutputStream pos = new PipedOutputStream();
     DataContentHandlerWriter dchw =
       new DataContentHandlerWriter(dch, object, objectMimeType, pos);
+    InputStream ret = new PipedInputStream(pos);
     Thread thread = new Thread(dchw, "DataHandler.getInputStream");
     thread.start();
-    return new PipedInputStream(pos);
+    return ret;
   }
   
   static class DataContentHandlerWriter
