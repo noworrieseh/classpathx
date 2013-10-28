@@ -52,20 +52,5 @@ public class MimeTypeParseException
     super(message);
   }
 
-  /**
-   * Constructs a MimeTypeParseException with the specified detail message
-   * and token in error.
-   * @param message the exception message
-   * @param token the token in error
-   */
-  MimeTypeParseException(String message, String token)
-  {
-    this(new StringBuffer(message)
-         .append(':')
-         .append(' ')
-         .append(token)
-         .toString());
-  }
-  
 }
 

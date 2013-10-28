@@ -259,14 +259,14 @@ public class MimeType
     int len = token.length();
     if (len == 0)
       {
-        throw new MimeTypeParseException(message, token);
+        throw new MimeTypeParseException(message);
       }
     for (int i = 0; i < len; i++)
       {
         char c = token.charAt(i);
         if (!isValidChar(c))
           {
-            throw new MimeTypeParseException(message, token);
+            throw new MimeTypeParseException(message);
           }
       }
   }
