@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>TypeInfo (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.w3c.dom.TypeInfo class"/><meta name="keywords" content="DERIVATION_RESTRICTION"/><meta name="keywords" content="DERIVATION_EXTENSION"/><meta name="keywords" content="DERIVATION_UNION"/><meta name="keywords" content="DERIVATION_LIST"/><meta name="keywords" content="getTypeName()"/><meta name="keywords" content="getTypeNamespace()"/><meta name="keywords" content="isDerivedFrom()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../org/w3c/dom/Text.html">Prev Class</a> | <a href="../../../org/w3c/dom/UserDataHandler.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="TypeInfo.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | <a href="#summary-fields">Field</a> | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | <a href="#detail-fields">Field</a> | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.w3c.dom</h3><h1 class="class title-class">Interface TypeInfo</h1></div><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">TypeInfo</b></code></div></div><hr/><div class="class description">  The <code>TypeInfo</code> interface represents a type referenced from 
+ <code>Element</code> or <code>Attr</code> nodes, specified in the schemas 
+ associated with the document. The type is a pair of a namespace URI and 
+ name properties, and depends on the document's schema. 
+ <p/> If the document's schema is an XML DTD [<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>], the values 
+ are computed as follows: 
+ <ul>
+ <li> If this type is referenced from an 
+ <code>Attr</code> node, <code>typeNamespace</code> is 
+ <code>"http://www.w3.org/TR/REC-xml"</code> and <code>typeName</code> 
+ represents the <b>[attribute type]</b> property in the [<a href="http://www.w3.org/TR/2004/REC-xml-infoset-20040204/">XML Information Set</a>]
+ . If there is no declaration for the attribute, <code>typeNamespace</code>
+  and <code>typeName</code> are <code>null</code>. 
+ </li>
+ <li> If this type is 
+ referenced from an <code>Element</code> node, <code>typeNamespace</code> 
+ and <code>typeName</code> are <code>null</code>. 
+ </li>
+ </ul>
+ <p/> If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , the values are computed as follows using the post-schema-validation 
+ infoset contributions (also called PSVI contributions): 
+ <ul>
+ <li> If the <b>[validity]</b> property exists AND is <em>"invalid"</em> or <em>"notKnown"</em>: the {target namespace} and {name} properties of the declared type if 
+ available, otherwise <code>null</code>. 
+ <p/><b>Note:</b>  At the time of writing, the XML Schema specification does 
+ not require exposing the declared type. Thus, DOM implementations might 
+ choose not to provide type information if validity is not valid. 
+ </li>
+ <li> If the <b>[validity]</b> property exists and is <em>"valid"</em>: 
+ <ol>
+ </ol></li><li> If <b>[member type definition]</b> exists: 
+ <ol>
+ </ol></li><li>If {name} is not absent, then expose {name} and {target 
+ namespace} properties of the <b>[member type definition]</b> property;
+ </li>
+ <li>Otherwise, expose the namespace and local name of the 
+ corresponding anonymous type name.
+ </li>
+ 
+ 
+ <li> If the <b>[type definition]</b> property exists: 
+ <ol>
+ </ol></li><li>If {name} is not absent, then expose {name} and {target 
+ namespace} properties of the <b>[type definition]</b> property;
+ </li>
+ <li>Otherwise, expose the namespace and local name of the 
+ corresponding anonymous type name.
+ </li>
+  
+ 
+ <li> If the <b>[member type definition anonymous]</b> exists: 
+ <ol>
+ </ol></li><li>If it is false, then expose <b>[member type definition name]</b> and <b>[member type definition namespace]</b> properties;
+ </li>
+ <li>Otherwise, expose the namespace and local name of the 
+ corresponding anonymous type name.
+ </li>
+  
+ 
+ <li> If the <b>[type definition anonymous]</b> exists: 
+ <ol>
+ </ol></li><li>If it is false, then expose <b>[type definition name]</b> and <b>[type definition namespace]</b> properties;
+ </li>
+ <li>Otherwise, expose the namespace and local name of the 
+ corresponding anonymous type name.
+ </li>
+  
+ 
+ 
+ 
+ </ul>
+ <p/><b>Note:</b>  Other schema languages are outside the scope of the W3C 
+ and therefore should define how to represent their type systems using 
+ <code>TypeInfo</code>. 
+ <p/>See also the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407">Document Object Model (DOM) Level 3 Core Specification</a>.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-fields"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Field Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#DERIVATION_EXTENSION">DERIVATION_EXTENSION</a></code></dt><dd class="description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the derivation by <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#key-typeExtension">
+ extension</a>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#DERIVATION_LIST">DERIVATION_LIST</a></code></dt><dd class="description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-list">list</a>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#DERIVATION_RESTRICTION">DERIVATION_RESTRICTION</a></code></dt><dd class="description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the derivation by <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#key-typeRestriction">
+ restriction</a> if complex types are involved, or a <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-restriction">
+ restriction</a> if simple types are involved.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#DERIVATION_UNION">DERIVATION_UNION</a></code></dt><dd class="description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-union">
+ union</a> if simple types are involved.</dd></dl></td></tr></table></dl><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getTypeName()">getTypeName</a>()</code></dt><dd class="description">  The name of a type declared for the associated element or attribute, 
+ or <code>null</code> if unknown.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getTypeNamespace()">getTypeNamespace</a>()</code></dt><dd class="description">  The namespace of the type declared for the associated element or 
+ attribute or <code>null</code> if the element does not have 
+ declaration or if no namespace information is available.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#isDerivedFrom(String,String,int)">isDerivedFrom</a>(String&nbsp;typeNamespaceArg, String&nbsp;typeNameArg, int&nbsp;derivationMethod)</code></dt><dd class="description">  This method returns if there is a derivation between the reference 
+ type definition, i.e.</dd></dl></td></tr></table></dl><a name="detail-fields"/><h2 class="section header">Field Details</h2><div class="section"><a name="DERIVATION_EXTENSION"/><div class="member detail outer"><h3 class="member detail name">DERIVATION_EXTENSION</h3><pre class="member detail synopsis">public static final int DERIVATION_EXTENSION</pre><blockquote class="member detail name"><div class="member detail description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the derivation by <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#key-typeExtension">
+ extension</a>. 
+ <br/>  The reference type definition is derived by extension from the 
+ other type definition if the other type definition can be reached 
+ recursively following the {base type definition} property from the 
+ reference type definition, and at least one of the <em>derivation methods</em> involved is an extension. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">2</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="DERIVATION_LIST"/><div class="member detail outer"><h3 class="member detail name">DERIVATION_LIST</h3><pre class="member detail synopsis">public static final int DERIVATION_LIST</pre><blockquote class="member detail name"><div class="member detail description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-list">list</a>. 
+ <br/> The reference type definition is derived by list from the other 
+ type definition if there exists two type definitions T1 and T2 such 
+ as the reference type definition is derived from T1 by 
+ <code>DERIVATION_RESTRICTION</code> or 
+ <code>DERIVATION_EXTENSION</code>, T2 is derived from the other type 
+ definition by <code>DERIVATION_RESTRICTION</code>, T1 has {variety} <em>list</em>, and T2 is the {item type definition}. Note that T1 could be the same as 
+ the reference type definition, and T2 could be the same as the other 
+ type definition. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">8</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="DERIVATION_RESTRICTION"/><div class="member detail outer"><h3 class="member detail name">DERIVATION_RESTRICTION</h3><pre class="member detail synopsis">public static final int DERIVATION_RESTRICTION</pre><blockquote class="member detail name"><div class="member detail description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the derivation by <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#key-typeRestriction">
+ restriction</a> if complex types are involved, or a <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-restriction">
+ restriction</a> if simple types are involved. 
+ <br/>  The reference type definition is derived by restriction from the 
+ other type definition if the other type definition is the same as the 
+ reference type definition, or if the other type definition can be 
+ reached recursively following the {base type definition} property 
+ from the reference type definition, and all the <em>derivation methods</em> involved are restriction. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">1</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="DERIVATION_UNION"/><div class="member detail outer"><h3 class="member detail name">DERIVATION_UNION</h3><pre class="member detail synopsis">public static final int DERIVATION_UNION</pre><blockquote class="member detail name"><div class="member detail description">  If the document's schema is an XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+ , this constant represents the <a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#element-union">
+ union</a> if simple types are involved. 
+ <br/> The reference type definition is derived by union from the other 
+ type definition if there exists two type definitions T1 and T2 such 
+ as the reference type definition is derived from T1 by 
+ <code>DERIVATION_RESTRICTION</code> or 
+ <code>DERIVATION_EXTENSION</code>, T2 is derived from the other type 
+ definition by <code>DERIVATION_RESTRICTION</code>, T1 has {variety} <em>union</em>, and one of the {member type definitions} is T2. Note that T1 could be 
+ the same as the reference type definition, and T2 could be the same 
+ as the other type definition. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">4</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="getTypeName()"/><div class="member detail outer"><h3 class="member detail name">getTypeName</h3><pre class="member detail synopsis">public String getTypeName()</pre><blockquote class="member detail name"><div class="member detail description">  The name of a type declared for the associated element or attribute, 
+ or <code>null</code> if unknown. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getTypeNamespace()"/><div class="member detail outer"><h3 class="member detail name">getTypeNamespace</h3><pre class="member detail synopsis">public String getTypeNamespace()</pre><blockquote class="member detail name"><div class="member detail description">  The namespace of the type declared for the associated element or 
+ attribute or <code>null</code> if the element does not have 
+ declaration or if no namespace information is available. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="isDerivedFrom(String,String,int)"/><div class="member detail outer"><h3 class="member detail name">isDerivedFrom</h3><pre class="member detail synopsis">public boolean isDerivedFrom(String typeNamespaceArg,
+                             String typeNameArg,
+                             int derivationMethod)</pre><blockquote class="member detail name"><div class="member detail description">  This method returns if there is a derivation between the reference 
+ type definition, i.e. the <code>TypeInfo</code> on which the method 
+ is being called, and the other type definition, i.e. the one passed 
+ as parameters. 
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">typeNamespaceArg</code><span class="separator"> - </span><span class="description">the namespace of the other type definition.</span></dd><dd class="item"><code class="name">typeNameArg</code><span class="separator"> - </span><span class="description">the name of the other type definition.</span></dd><dd class="item"><code class="name">derivationMethod</code><span class="separator"> - </span><span class="description">the type of derivation and conditions applied 
+between two types, as described in the list of constants provided 
+in this interface.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">If the document's schema is a DTD or no schema is associated 
+with the document, this method will always return <code>false</code>
+.  If the document's schema is an XML Schema, the method will 
+<code>true</code> if the reference type definition is derived from 
+the other type definition according to the derivation parameter. If 
+the value of the parameter is <code>0</code> (no bit is set to 
+<code>1</code> for the <code>derivationMethod</code> parameter), 
+the method will return <code>true</code> if the other type 
+definition can be reached by recursing any combination of {base 
+type definition}, {item type definition}, or {member type 
+definitions} from the reference type definition.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

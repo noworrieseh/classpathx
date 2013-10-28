@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>ParserFactory (GNU JAXP Library)</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.helpers.ParserFactory class"/><meta name="keywords" content="makeParser()"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../org/xml/sax/helpers/ParserAdapter.html">Prev Class</a> | <a href="../../../../org/xml/sax/helpers/XMLFilterImpl.html">Next Class</a></td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="ParserFactory.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax.helpers</h3><h1 class="class title-class">Class ParserFactory</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>org.xml.sax.helpers.ParserFactory</code></li></ul></ul></div><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public class <b class="class synopsis name">ParserFactory</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div></div><hr/><div class="class description"> Java-specific class for dynamically loading SAX parsers.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/><strong>Note:</strong> This class is designed to work with the now-deprecated
+ SAX1 <a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a> class.  SAX2 applications should use
+<a href="../../../../org/xml/sax/helpers/XMLReaderFactory.html"><code>XMLReaderFactory</code></a> instead.
+ 
+ <p/>ParserFactory is not part of the platform-independent definition
+ of SAX; it is an additional convenience class designed
+ specifically for Java XML application writers.  SAX applications
+ can use the static methods in this class to allocate a SAX parser
+ dynamically at run-time based either on the value of the
+ `org.xml.sax.parser' system property or on a string containing the class
+ name.
+
+ <p/>Note that the application still requires an XML parser that
+ implements SAX1.
+<a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a>
+             interface.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 1.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../../org/xml/sax/Parser.html" title="Interface in org.xml.sax">Parser</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#makeParser()">makeParser</a>()</code></dt><dd class="description"> Create a new SAX parser using the `org.xml.sax.parser' system property.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../../org/xml/sax/Parser.html" title="Interface in org.xml.sax">Parser</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#makeParser(String)">makeParser</a>(String&nbsp;className)</code></dt><dd class="description"> Create a new SAX parser object using the class name provided.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="makeParser()"/><div class="member detail outer"><h3 class="member detail name">makeParser</h3><pre class="member detail synopsis">public static <a href="../../../../org/xml/sax/Parser.html" title="Interface in org.xml.sax">Parser</a> makeParser()
+            throws ClassNotFoundException,
+                   IllegalAccessException,
+                   InstantiationException,
+                   NullPointerException,
+                   ClassCastException</pre><blockquote class="member detail name"><div class="member detail description"> Create a new SAX parser using the `org.xml.sax.parser' system property.
+
+ <p/>The named class must exist and must implement the
+<a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a> interface.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><code>makeParser(java.lang.String)</code>, <a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="makeParser(String)"/><div class="member detail outer"><h3 class="member detail name">makeParser</h3><pre class="member detail synopsis">public static <a href="../../../../org/xml/sax/Parser.html" title="Interface in org.xml.sax">Parser</a> makeParser(String className)
+            throws ClassNotFoundException,
+                   IllegalAccessException,
+                   InstantiationException,
+                   ClassCastException</pre><blockquote class="member detail name"><div class="member detail description"> Create a new SAX parser object using the class name provided.
+
+ <p/>The named class must exist and must implement the
+<a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a> interface.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">className</code><span class="separator"> - </span><span class="description">A string containing the name of the
+SAX parser class.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/ParserFactory.html#makeParser()"><code>makeParser()</code></a>, <a href="../../../../org/xml/sax/Parser.html"><code>Parser</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

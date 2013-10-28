@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<title>GNU JAF - GNU Project - Free Software Foundation (FSF)</title>
+<link rel='stylesheet' href='../main.css' type='text/css'/>
+<link rel="made" href="mailto:dog@gnu.org">
+</head>
+<body>
+
+<div class='logo'>
+<img src='../classpathx-logo-small.jpg' alt='[ gnu -classpath ext:ens:ions ]'/>
+</div>
+
+<h1>GNU JAF: JavaBeans&trade; Activation Framework</h1>
+
+<p class='toc'>
+  <a href='#introduction'>Introduction</a>
+| <a href='#download'>Download</a>
+| <a href='#javadoc'>API documentation</a>
+| <a href='#help-wanted'>Help wanted</a>
+| <a href='#mailing-lists'>Mailing lists</a>
+| <a href='#acknowledgements'>Acknowledgements</a>
+</p>
+
+<p>
+<hr />
+
+<h3><a name='introduction'>Introduction</a></h3>
+
+<p>
+GNU JAF is a framework for declaring what beans operate on what MIME
+type data. Content handler beans can be defined to handle particular
+MIME content. The JAF unites internet standards for declaring content
+with JavaBeans&trade;.
+</p>
+
+<p>
+The JAF defines two mechanisms within the framework. The first, the file
+type map, specifies the MIME content type for a given file. The default
+implementation of this uses the UNIX <code>mime.types</code> format to map
+filename extensions to MIME types. The second mechanism, the command map,
+specifies the actions that can be applied to a given MIME content type. The
+default implementation of this uses the <a
+href='http://www.rfc-editor.org/rfc/1524.txt'>standard</a>
+<code>mailcap</code> format to map actions to JavaBean&trade; classes. These
+beans can then view, edit, print, or perform whatever other action is
+required on the underlying resource.
+</p>
+
+<h3><a name='download'>Download</a></h3>
+
+<p>
+The current stable release of GNU JAF is version 1.1.1, available
+<a href='http://ftp.gnu.org/gnu/classpathx/activation-1.1.1.tar.gz'>here</a>.
+</p>
+
+<p>
+Alternatively, you can download the current source from CVS
+<a href='https://savannah.gnu.org/cvs/?group_id=139'>here</a>,
+module <b>activation</b>.
+</p>
+
+<h3><a name='javadoc'>API documentation</h3>
+
+<p>
+You can build the API documentation yourself or browse it online
+<a href="javadoc/index.html">here</a>
+(<a href='javadoc/index-noframes.html'>no frames</a>).
+</p>
+
+<h3><a name='help-wanted'>We need help</a></h3>
+
+<p>
+Development of the JAF is finished but we'd still like your feedback on what
+content beans should be included. We currently supply only:
+<ul>
+<li>an image viewer,</li>
+<li>a text viewer, and</li>
+<li>a text editor.</li>
+</ul>
+However, ideally we'd like to build a large
+repository of beans that could be accessed over the internet.
+If you have any ideas about content type handlers please contact 
+<a href="mailto:dog@gnu.org">Chris Burdess</a>.
+</p>
+
+<p>
+If you're a programmer and you're interested in JavaBeans&trade; why not
+help us out with building the content handlers? See the 
+<a href="http://savannah.gnu.org/projects/classpathx">classpathx
+project page</a> for more information.
+</p>
+
+<h3><a name='mailing-lists'>Discussing the JAF</a></h3>
+
+<p>
+If you want to talk with other developers about JAF you can use the
+<a href="http://mail.gnu.org/pipermail/classpathx-discuss/">classpathx 
+discussion list</a>. If you're not subscribed to this list you
+can do so by sending a mail with the subject <code>subscribe</code> to:
+<a href="mailto:classpathx-discuss-request@gnu.org">classpathx-discuss-request@gnu.org</a>.
+</p>
+
+<h3><a name='acknowledgements'>Acknowledgements</></h3>
+
+<p>
+Andrew Selkirk set up the project initially. The current 1.0.2
+implementation was written by Chris Burdess.
+</p>
+
+<!-- Begin standard GNU footer -->
+<hr/>
+
+<p>
+Return to <a href='/home.html'>GNU's home page</a>.
+<p>
+
+<p>
+Please send FSF and GNU inquiries and questions to <a
+href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>. There are also <a
+href="http://www.fsf.org/about/contact.html">other ways to contact </a>the FSF.
+</p>
+
+<p>
+Please send comments on these web pages to <a
+href='webmasters@gnu.org'><em>webmasters@gnu.org</em></a>, send other
+questions to <a href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>.
+</p>
+
+<p>
+Copyright &copy; 1999, 2001, 2004, 2005, 2006 Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+</p>
+
+<p>
+Verbatim copying and distribution of this entire article is permitted in any
+medium, provided this notice is preserved.
+</p>
+
+<p>
+Updated:
+$Date: 2007/06/01 09:19:04 $ $Author: dog $
+
+<p>
+<hr/>
+<!-- End standard GNU footer -->
+
+</body>
+</html>

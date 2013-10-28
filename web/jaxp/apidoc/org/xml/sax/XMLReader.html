@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>XMLReader (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.XMLReader class"/><meta name="keywords" content="getFeature()"/><meta name="keywords" content="setFeature()"/><meta name="keywords" content="getProperty()"/><meta name="keywords" content="setProperty()"/><meta name="keywords" content="setEntityResolver()"/><meta name="keywords" content="getEntityResolver()"/><meta name="keywords" content="setDTDHandler()"/><meta name="keywords" content="getDTDHandler()"/><meta name="keywords" content="setContentHandler()"/><meta name="keywords" content="getContentHandler()"/><meta name="keywords" content="setErrorHandler()"/><meta name="keywords" content="getErrorHandler()"/><meta name="keywords" content="parse()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../org/xml/sax/XMLFilter.html">Prev Class</a> | Next Class</td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="XMLReader.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax</h3><h1 class="class title-class">Interface XMLReader</h1></div><dl class="class knownimplementing"><dt class="header"><b>Known Subinterfaces:</b></dt><dd class="item"><a href="../../../org/xml/sax/XMLFilter.html" title="Interface in org.xml.sax">XMLFilter</a></dd></dl><dl class="class knownimplementing"><dt class="header"><b>Known Implementing Classes:</b></dt><dd class="item"><a href="../../../gnu/xml/util/DomParser.html" title="Class in gnu.xml.util">DomParser</a>, <a href="../../../gnu/xml/libxmlj/sax/GnomeXMLReader.html" title="Class in gnu.xml.libxmlj.sax">GnomeXMLReader</a>, <a href="../../../org/xml/sax/helpers/ParserAdapter.html" title="Class in org.xml.sax.helpers">ParserAdapter</a>, <a href="../../../gnu/xml/aelfred2/SAXDriver.html" title="Class in gnu.xml.aelfred2">SAXDriver</a>, <a href="../../../gnu/xml/aelfred2/XmlReader.html" title="Class in gnu.xml.aelfred2">XmlReader</a>, <a href="../../../org/xml/sax/helpers/XMLFilterImpl.html" title="Class in org.xml.sax.helpers">XMLFilterImpl</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">XMLReader</b></code></div></div><hr/><div class="class description"> Interface for reading an XML document using callbacks.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/><strong>Note:</strong> despite its name, this interface does 
+ <em>not</em> extend the standard Java <code>Reader</code> 
+ interface, because reading XML is a fundamentally different activity 
+ than reading character data.
+
+ <p/>XMLReader is the interface that an XML parser's SAX2 driver must
+ implement.  This interface allows an application to set and
+ query features and properties in the parser, to register
+ event handlers for document processing, and to initiate
+ a document parse.
+
+ <p/>All SAX interfaces are assumed to be synchronous: the
+<code>parse</code> methods must not return until parsing
+  is complete, and readers must wait for an event-handler callback
+ to return before reporting the next event.
+
+ <p/>This interface replaces the (now deprecated) SAX 1.0 <a href="../../../org/xml/sax/Parser.html"><code>Parser</code></a> interface.  The XMLReader interface
+ contains two important enhancements over the old Parser
+ interface (as well as some minor ones):
+
+ <ol>
+ <li>it adds a standard way to query and set features and 
+  properties; and</li>
+ <li>it adds Namespace support, which is required for many
+  higher-level XML standards.</li>
+ </ol>
+
+ <p/>There are adapters available to convert a SAX1 Parser to
+ a SAX2 XMLReader and vice-versa.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLFilter.html"><code>XMLFilter</code></a>, <a href="../../../org/xml/sax/helpers/ParserAdapter.html"><code>ParserAdapter</code></a>, <a href="../../../org/xml/sax/helpers/XMLReaderAdapter.html"><code>XMLReaderAdapter</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/ContentHandler.html" title="Interface in org.xml.sax">ContentHandler</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getContentHandler()">getContentHandler</a>()</code></dt><dd class="description"> Return the current content handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getDTDHandler()">getDTDHandler</a>()</code></dt><dd class="description"> Return the current DTD handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getEntityResolver()">getEntityResolver</a>()</code></dt><dd class="description"> Return the current entity resolver.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getErrorHandler()">getErrorHandler</a>()</code></dt><dd class="description"> Return the current error handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getFeature(String)">getFeature</a>(String&nbsp;name)</code></dt><dd class="description"> Look up the value of a feature flag.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Object</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getProperty(String)">getProperty</a>(String&nbsp;name)</code></dt><dd class="description"> Look up the value of a property.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#parse(String)">parse</a>(String&nbsp;systemId)</code></dt><dd class="description"> Parse an XML document from a system identifier (URI).</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#parse(org.xml.sax.InputSource)">parse</a>(<a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a>&nbsp;input)</code></dt><dd class="description"> Parse an XML document.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setContentHandler(org.xml.sax.ContentHandler)">setContentHandler</a>(<a href="../../../org/xml/sax/ContentHandler.html" title="Interface in org.xml.sax">ContentHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register a content event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setDTDHandler(org.xml.sax.DTDHandler)">setDTDHandler</a>(<a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register a DTD event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setEntityResolver(org.xml.sax.EntityResolver)">setEntityResolver</a>(<a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a>&nbsp;resolver)</code></dt><dd class="description"> Allow an application to register an entity resolver.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setErrorHandler(org.xml.sax.ErrorHandler)">setErrorHandler</a>(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register an error event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setFeature(String,boolean)">setFeature</a>(String&nbsp;name, boolean&nbsp;value)</code></dt><dd class="description"> Set the value of a feature flag.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setProperty(String,Object)">setProperty</a>(String&nbsp;name, Object&nbsp;value)</code></dt><dd class="description"> Set the value of a property.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="getContentHandler()"/><div class="member detail outer"><h3 class="member detail name">getContentHandler</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/ContentHandler.html" title="Interface in org.xml.sax">ContentHandler</a> getContentHandler()</pre><blockquote class="member detail name"><div class="member detail description"> Return the current content handler.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current content handler, or null if none
+has been registered.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setContentHandler(org.xml.sax.ContentHandler)"><code>setContentHandler(ContentHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getDTDHandler()"/><div class="member detail outer"><h3 class="member detail name">getDTDHandler</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a> getDTDHandler()</pre><blockquote class="member detail name"><div class="member detail description"> Return the current DTD handler.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current DTD handler, or null if none
+has been registered.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setDTDHandler(org.xml.sax.DTDHandler)"><code>setDTDHandler(DTDHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getEntityResolver()"/><div class="member detail outer"><h3 class="member detail name">getEntityResolver</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a> getEntityResolver()</pre><blockquote class="member detail name"><div class="member detail description"> Return the current entity resolver.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current entity resolver, or null if none
+has been registered.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setEntityResolver(org.xml.sax.EntityResolver)"><code>setEntityResolver(EntityResolver)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getErrorHandler()"/><div class="member detail outer"><h3 class="member detail name">getErrorHandler</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a> getErrorHandler()</pre><blockquote class="member detail name"><div class="member detail description"> Return the current error handler.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current error handler, or null if none
+has been registered.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler(ErrorHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getFeature(String)"/><div class="member detail outer"><h3 class="member detail name">getFeature</h3><pre class="member detail synopsis">public boolean getFeature(String name)
+            throws <a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a>,
+                   <a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></pre><blockquote class="member detail name"><div class="member detail description"> Look up the value of a feature flag.
+
+ <p/>The feature name is any fully-qualified URI.  It is
+ possible for an XMLReader to recognize a feature name but
+ temporarily be unable to return its value.
+ Some feature values may be available only in specific
+ contexts, such as before, during, or after a parse.
+ Also, some feature values may not be programmatically accessible.
+ (In the case of an adapter for SAX1 <a href="../../../org/xml/sax/Parser.html"><code>Parser</code></a>, there is no
+ implementation-independent way to expose whether the underlying
+ parser is performing validation, expanding external entities,
+ and so forth.) 
+
+ <p/>All XMLReaders are required to recognize the
+ http://xml.org/sax/features/namespaces and the
+ http://xml.org/sax/features/namespace-prefixes feature names.
+
+ <p/>Typical usage is something like this:
+
+ <pre>
+ XMLReader r = new MySAXDriver();
+
+                         // try to activate validation
+ try {
+   r.setFeature("http://xml.org/sax/features/validation", true);
+ } catch (SAXException e) {
+   System.err.println("Cannot activate validation."); 
+ }
+
+                         // register event handlers
+ r.setContentHandler(new MyContentHandler());
+ r.setErrorHandler(new MyErrorHandler());
+
+                         // parse the first document
+ try {
+   r.parse("http://www.foo.com/mydoc.xml");
+ } catch (IOException e) {
+   System.err.println("I/O exception reading XML document");
+ } catch (SAXException e) {
+   System.err.println("XML exception reading document.");
+ }
+ </pre>
+
+ <p/>Implementors are free (and encouraged) to invent their own features,
+ using names built on their own URIs.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">The feature name, which is a fully-qualified URI.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current value of the feature (true or false).</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a></code><span class="separator"> - </span><span class="description">If the feature
+value can't be assigned or retrieved.</span></dd><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></code><span class="separator"> - </span><span class="description">When the
+XMLReader recognizes the feature name but 
+cannot determine its value at this time.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setFeature(String,boolean)"><code>setFeature(String,boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getProperty(String)"/><div class="member detail outer"><h3 class="member detail name">getProperty</h3><pre class="member detail synopsis">public Object getProperty(String name)
+            throws <a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a>,
+                   <a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></pre><blockquote class="member detail name"><div class="member detail description"> Look up the value of a property.
+
+ <p/>The property name is any fully-qualified URI.  It is
+ possible for an XMLReader to recognize a property name but
+ temporarily be unable to return its value.
+ Some property values may be available only in specific
+ contexts, such as before, during, or after a parse.
+
+ <p/>XMLReaders are not required to recognize any specific
+ property names, though an initial core set is documented for
+ SAX2.
+
+ <p/>Implementors are free (and encouraged) to invent their own properties,
+ using names built on their own URIs.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">The property name, which is a fully-qualified URI.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The current value of the property.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a></code><span class="separator"> - </span><span class="description">If the property
+value can't be assigned or retrieved.</span></dd><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></code><span class="separator"> - </span><span class="description">When the
+XMLReader recognizes the property name but 
+cannot determine its value at this time.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#setProperty(String,Object)"><code>setProperty(String,Object)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="parse(String)"/><div class="member detail outer"><h3 class="member detail name">parse</h3><pre class="member detail synopsis">public void parse(String systemId)
+            throws IOException,
+                   <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></pre><blockquote class="member detail name"><div class="member detail description"> Parse an XML document from a system identifier (URI).
+
+ <p/>This method is a shortcut for the common case of reading a
+ document from a system identifier.  It is the exact
+ equivalent of the following:
+
+ <pre>
+ parse(new InputSource(systemId));
+ </pre>
+
+ <p/>If the system identifier is a URL, it must be fully resolved
+ by the application before it is passed to the parser.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">systemId</code><span class="separator"> - </span><span class="description">The system identifier (URI).</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">Any SAX exception, possibly
+wrapping another exception.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#parse(org.xml.sax.InputSource)"><code>parse(InputSource)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="parse(org.xml.sax.InputSource)"/><div class="member detail outer"><h3 class="member detail name">parse</h3><pre class="member detail synopsis">public void parse(<a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> input)
+            throws IOException,
+                   <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></pre><blockquote class="member detail name"><div class="member detail description"> Parse an XML document.
+
+ <p/>The application can use this method to instruct the XML
+ reader to begin parsing an XML document from any valid input
+ source (a character stream, a byte stream, or a URI).
+
+ <p/>Applications may not invoke this method while a parse is in
+ progress (they should create a new XMLReader instead for each
+ nested XML document).  Once a parse is complete, an
+ application may reuse the same XMLReader object, possibly with a
+ different input source.
+ Configuration of the XMLReader object (such as handler bindings and
+ values established for feature flags and properties) is unchanged
+ by completion of a parse, unless the definition of that aspect of
+ the configuration explicitly specifies other behavior.
+ (For example, feature flags or properties exposing
+ characteristics of the document being parsed.)
+ 
+
+ <p/>During the parse, the XMLReader will provide information
+ about the XML document through the registered event
+ handlers.
+
+ <p/>This method is synchronous: it will not return until parsing
+ has ended.  If a client application wants to terminate 
+ parsing early, it should throw an exception.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">input</code><span class="separator"> - </span><span class="description">The input source for the top-level of the
+XML document.</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">Any SAX exception, possibly
+wrapping another exception.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/InputSource.html"><code>InputSource</code></a>, <code>parse(java.lang.String)</code>, <a href="../../../org/xml/sax/XMLReader.html#setEntityResolver(org.xml.sax.EntityResolver)"><code>setEntityResolver(EntityResolver)</code></a>, <a href="../../../org/xml/sax/XMLReader.html#setDTDHandler(org.xml.sax.DTDHandler)"><code>setDTDHandler(DTDHandler)</code></a>, <a href="../../../org/xml/sax/XMLReader.html#setContentHandler(org.xml.sax.ContentHandler)"><code>setContentHandler(ContentHandler)</code></a>, <a href="../../../org/xml/sax/XMLReader.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler(ErrorHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setContentHandler(org.xml.sax.ContentHandler)"/><div class="member detail outer"><h3 class="member detail name">setContentHandler</h3><pre class="member detail synopsis">public void setContentHandler(<a href="../../../org/xml/sax/ContentHandler.html" title="Interface in org.xml.sax">ContentHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register a content event handler.
+
+ <p/>If the application does not register a content handler, all
+ content events reported by the SAX parser will be silently
+ ignored.
+
+ <p/>Applications may register a new or different handler in the
+ middle of a parse, and the SAX parser must begin using the new
+ handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The content handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#getContentHandler()"><code>getContentHandler()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setDTDHandler(org.xml.sax.DTDHandler)"/><div class="member detail outer"><h3 class="member detail name">setDTDHandler</h3><pre class="member detail synopsis">public void setDTDHandler(<a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register a DTD event handler.
+
+ <p/>If the application does not register a DTD handler, all DTD
+ events reported by the SAX parser will be silently ignored.
+
+ <p/>Applications may register a new or different handler in the
+ middle of a parse, and the SAX parser must begin using the new
+ handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The DTD handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#getDTDHandler()"><code>getDTDHandler()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setEntityResolver(org.xml.sax.EntityResolver)"/><div class="member detail outer"><h3 class="member detail name">setEntityResolver</h3><pre class="member detail synopsis">public void setEntityResolver(<a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a> resolver)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register an entity resolver.
+
+ <p/>If the application does not register an entity resolver,
+ the XMLReader will perform its own default resolution.
+
+ <p/>Applications may register a new or different resolver in the
+ middle of a parse, and the SAX parser must begin using the new
+ resolver immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">resolver</code><span class="separator"> - </span><span class="description">The entity resolver.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#getEntityResolver()"><code>getEntityResolver()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setErrorHandler(org.xml.sax.ErrorHandler)"/><div class="member detail outer"><h3 class="member detail name">setErrorHandler</h3><pre class="member detail synopsis">public void setErrorHandler(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register an error event handler.
+
+ <p/>If the application does not register an error handler, all
+ error events reported by the SAX parser will be silently
+ ignored; however, normal processing may not continue.  It is
+ highly recommended that all SAX applications implement an
+ error handler to avoid unexpected bugs.
+
+ <p/>Applications may register a new or different handler in the
+ middle of a parse, and the SAX parser must begin using the new
+ handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The error handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#getErrorHandler()"><code>getErrorHandler()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setFeature(String,boolean)"/><div class="member detail outer"><h3 class="member detail name">setFeature</h3><pre class="member detail synopsis">public void setFeature(String name,
+                       boolean value)
+            throws <a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a>,
+                   <a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></pre><blockquote class="member detail name"><div class="member detail description"> Set the value of a feature flag.
+
+ <p/>The feature name is any fully-qualified URI.  It is
+ possible for an XMLReader to expose a feature value but
+ to be unable to change the current value.
+ Some feature values may be immutable or mutable only 
+ in specific contexts, such as before, during, or after 
+ a parse.
+
+ <p/>All XMLReaders are required to support setting
+ http://xml.org/sax/features/namespaces to true and
+ http://xml.org/sax/features/namespace-prefixes to false.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">The feature name, which is a fully-qualified URI.</span></dd><dd class="item"><code class="name">value</code><span class="separator"> - </span><span class="description">The requested value of the feature (true or false).</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a></code><span class="separator"> - </span><span class="description">If the feature
+value can't be assigned or retrieved.</span></dd><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></code><span class="separator"> - </span><span class="description">When the
+XMLReader recognizes the feature name but 
+cannot set the requested value.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/XMLReader.html#getFeature(String)"><code>getFeature(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setProperty(String,Object)"/><div class="member detail outer"><h3 class="member detail name">setProperty</h3><pre class="member detail synopsis">public void setProperty(String name,
+                        Object value)
+            throws <a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a>,
+                   <a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></pre><blockquote class="member detail name"><div class="member detail description"> Set the value of a property.
+
+ <p/>The property name is any fully-qualified URI.  It is
+ possible for an XMLReader to recognize a property name but
+ to be unable to change the current value.
+ Some property values may be immutable or mutable only 
+ in specific contexts, such as before, during, or after 
+ a parse.
+
+ <p/>XMLReaders are not required to recognize setting
+ any specific property names, though a core set is defined by 
+ SAX2.
+
+ <p/>This method is also the standard mechanism for setting
+ extended handlers.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">The property name, which is a fully-qualified URI.</span></dd><dd class="item"><code class="name">value</code><span class="separator"> - </span><span class="description">The requested value for the property.</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotRecognizedException.html" title="Class in org.xml.sax">SAXNotRecognizedException</a></code><span class="separator"> - </span><span class="description">If the property
+value can't be assigned or retrieved.</span></dd><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXNotSupportedException.html" title="Class in org.xml.sax">SAXNotSupportedException</a></code><span class="separator"> - </span><span class="description">When the
+XMLReader recognizes the property name but 
+cannot set the requested value.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

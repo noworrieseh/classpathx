@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>XMLReaderFactory (GNU JAXP Library)</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.helpers.XMLReaderFactory class"/><meta name="keywords" content="createXMLReader()"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../org/xml/sax/helpers/XMLReaderAdapter.html">Prev Class</a> | Next Class</td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="XMLReaderFactory.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax.helpers</h3><h1 class="class title-class">Class XMLReaderFactory</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>org.xml.sax.helpers.XMLReaderFactory</code></li></ul></ul></div><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public final class <b class="class synopsis name">XMLReaderFactory</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div></div><hr/><div class="class description"> Factory for creating an XML reader.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/>This class contains static methods for creating an XML reader
+ from an explicit class name, or based on runtime defaults:
+
+ <pre>
+ try {
+   XMLReader myReader = XMLReaderFactory.createXMLReader();
+ } catch (SAXException e) {
+   System.err.println(e.getMessage());
+ }
+ </pre>
+
+ <p/><strong>Note to Distributions bundled with parsers:</strong>
+ You should modify the implementation of the no-arguments
+ <em>createXMLReader</em> to handle cases where the external
+ configuration mechanisms aren't set up.  That method should do its
+ best to return a parser when one is in the class path, even when
+ nothing bound its class name to <code>org.xml.sax.driver</code> so
+ those configuration mechanisms would see it.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../../org/xml/sax/XMLReader.html" title="Interface in org.xml.sax">XMLReader</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createXMLReader()">createXMLReader</a>()</code></dt><dd class="description"> Attempt to create an XMLReader from system defaults.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../../org/xml/sax/XMLReader.html" title="Interface in org.xml.sax">XMLReader</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createXMLReader(String)">createXMLReader</a>(String&nbsp;className)</code></dt><dd class="description"> Attempt to create an XML reader from a class name.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="createXMLReader()"/><div class="member detail outer"><h3 class="member detail name">createXMLReader</h3><pre class="member detail synopsis">public static <a href="../../../../org/xml/sax/XMLReader.html" title="Interface in org.xml.sax">XMLReader</a> createXMLReader()
+            throws <a href="../../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></pre><blockquote class="member detail name"><div class="member detail description"> Attempt to create an XMLReader from system defaults.
+ In environments which can support it, the name of the XMLReader
+ class is determined by trying each these options in order, and
+ using the first one which succeeds: <ul>
+
+ <li>If the system property <code>org.xml.sax.driver</code>
+ has a value, that is used as an XMLReader class name. </li>
+
+ <li>The JAR "Services API" is used to look for a class name
+ in the <em>META-INF/services/org.xml.sax.driver</em> file in
+ jarfiles available to the runtime.</li>
+
+ <li> SAX parser distributions are strongly encouraged to provide
+ a default XMLReader class name that will take effect only when
+ previous options (on this list) are not successful.</li>
+
+ <li>Finally, if <a href="../../../../org/xml/sax/helpers/ParserFactory.html#makeParser()"><code>ParserFactory.makeParser()</code></a> can
+ return a system default SAX1 parser, that parser is wrapped in
+ a <a href="../../../../org/xml/sax/helpers/ParserAdapter.html"><code>ParserAdapter</code></a>.  (This is a migration aid for SAX1
+ environments, where the <code>org.xml.sax.parser</code> system
+ property will often be usable.) </li>
+
+ </ul>
+
+ <p/> In environments such as small embedded systems, which can not
+ support that flexibility, other mechanisms to determine the default
+ may be used. 
+
+ <p/>Note that many Java environments allow system properties to be
+ initialized on a command line.  This means that <em>in most cases</em>
+ setting a good value for that property ensures that calls to this
+ method will succeed, except when security policies intervene.
+ This will also maximize application portability to older SAX
+ environments, with less robust implementations of this method.
+ 
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A new XMLReader.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">If no default XMLReader class
+can be identified and instantiated.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><code>createXMLReader(java.lang.String)</code><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createXMLReader(String)"/><div class="member detail outer"><h3 class="member detail name">createXMLReader</h3><pre class="member detail synopsis">public static <a href="../../../../org/xml/sax/XMLReader.html" title="Interface in org.xml.sax">XMLReader</a> createXMLReader(String className)
+            throws <a href="../../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></pre><blockquote class="member detail name"><div class="member detail description"> Attempt to create an XML reader from a class name.
+
+ <p/>Given a class name, this method attempts to load
+ and instantiate the class as an XML reader.
+
+ <p/>Note that this method will not be usable in environments where
+ the caller (perhaps an applet) is not permitted to load classes
+ dynamically.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A new XML reader.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">If the class cannot be
+loaded, instantiated, and cast to XMLReader.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/XMLReaderFactory.html#createXMLReader()"><code>createXMLReader()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

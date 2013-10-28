@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>Parser (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.Parser class"/><meta name="keywords" content="setLocale()"/><meta name="keywords" content="setEntityResolver()"/><meta name="keywords" content="setDTDHandler()"/><meta name="keywords" content="setDocumentHandler()"/><meta name="keywords" content="setErrorHandler()"/><meta name="keywords" content="parse()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../org/xml/sax/Locator.html">Prev Class</a> | <a href="../../../org/xml/sax/SAXException.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="Parser.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax</h3><h1 class="class title-class">Interface Parser</h1></div><dl class="class knownimplementing"><dt class="header"><b>Known Implementing Classes:</b></dt><dd class="item"><a href="../../../gnu/xml/aelfred2/SAXDriver.html" title="Class in gnu.xml.aelfred2">SAXDriver</a>, <a href="../../../org/xml/sax/helpers/XMLReaderAdapter.html" title="Class in org.xml.sax.helpers">XMLReaderAdapter</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">Parser</b></code></div></div><hr/><div class="class description"> Basic interface for SAX (Simple API for XML) parsers.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/>This was the main event supplier interface for SAX1; it has
+ been replaced in SAX2 by <a href="../../../org/xml/sax/XMLReader.html"><code>XMLReader</code></a>,
+ which includes Namespace support and sophisticated configurability
+ and extensibility.
+
+ <p/>All SAX1 parsers must implement this basic interface: it allows
+ applications to register handlers for different types of events
+ and to initiate a parse from a URI, or a character stream.
+
+ <p/>All SAX1 parsers must also implement a zero-argument constructor
+ (though other constructors are also allowed).
+
+ <p/>SAX1 parsers are reusable but not re-entrant: the application
+ may reuse a parser object (possibly with a different input source)
+ once the first parse has completed successfully, but it may not
+ invoke the parse() methods recursively within a parse.
+<a href="../../../org/xml/sax/XMLReader.html"><code>XMLReader</code></a>
+             interface, which includes Namespace support.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 1.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/EntityResolver.html"><code>EntityResolver</code></a>, <a href="../../../org/xml/sax/DTDHandler.html"><code>DTDHandler</code></a>, <a href="../../../org/xml/sax/DocumentHandler.html"><code>DocumentHandler</code></a>, <a href="../../../org/xml/sax/ErrorHandler.html"><code>ErrorHandler</code></a>, <a href="../../../org/xml/sax/HandlerBase.html"><code>HandlerBase</code></a>, <a href="../../../org/xml/sax/InputSource.html"><code>InputSource</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#parse(String)">parse</a>(String&nbsp;systemId)</code></dt><dd class="description"> Parse an XML document from a system identifier (URI).</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#parse(org.xml.sax.InputSource)">parse</a>(<a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a>&nbsp;source)</code></dt><dd class="description"> Parse an XML document.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setDTDHandler(org.xml.sax.DTDHandler)">setDTDHandler</a>(<a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register a DTD event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setDocumentHandler(org.xml.sax.DocumentHandler)">setDocumentHandler</a>(<a href="../../../org/xml/sax/DocumentHandler.html" title="Interface in org.xml.sax">DocumentHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register a document event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setEntityResolver(org.xml.sax.EntityResolver)">setEntityResolver</a>(<a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a>&nbsp;resolver)</code></dt><dd class="description"> Allow an application to register a custom entity resolver.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setErrorHandler(org.xml.sax.ErrorHandler)">setErrorHandler</a>(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a>&nbsp;handler)</code></dt><dd class="description"> Allow an application to register an error event handler.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setLocale(Locale)">setLocale</a>(Locale&nbsp;locale)</code></dt><dd class="description"> Allow an application to request a locale for errors and warnings.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="parse(String)"/><div class="member detail outer"><h3 class="member detail name">parse</h3><pre class="member detail synopsis">public void parse(String systemId)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> Parse an XML document from a system identifier (URI).
+
+ <p/>This method is a shortcut for the common case of reading a
+ document from a system identifier.  It is the exact
+ equivalent of the following:
+
+ <pre>
+ parse(new InputSource(systemId));
+ </pre>
+
+ <p/>If the system identifier is a URL, it must be fully resolved
+ by the application before it is passed to the parser.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">systemId</code><span class="separator"> - </span><span class="description">The system identifier (URI).</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">Any SAX exception, possibly
+wrapping another exception.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/Parser.html#parse(org.xml.sax.InputSource)"><code>parse(InputSource)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="parse(org.xml.sax.InputSource)"/><div class="member detail outer"><h3 class="member detail name">parse</h3><pre class="member detail synopsis">public void parse(<a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> source)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> Parse an XML document.
+
+ <p/>The application can use this method to instruct the SAX parser
+ to begin parsing an XML document from any valid input
+ source (a character stream, a byte stream, or a URI).
+
+ <p/>Applications may not invoke this method while a parse is in
+ progress (they should create a new Parser instead for each
+ additional XML document).  Once a parse is complete, an
+ application may reuse the same Parser object, possibly with a
+ different input source.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">source</code><span class="separator"> - </span><span class="description">The input source for the top-level of the
+XML document.</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">Any SAX exception, possibly
+wrapping another exception.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/InputSource.html"><code>InputSource</code></a>, <code>parse(java.lang.String)</code>, <a href="../../../org/xml/sax/Parser.html#setEntityResolver(org.xml.sax.EntityResolver)"><code>setEntityResolver(EntityResolver)</code></a>, <a href="../../../org/xml/sax/Parser.html#setDTDHandler(org.xml.sax.DTDHandler)"><code>setDTDHandler(DTDHandler)</code></a>, <a href="../../../org/xml/sax/Parser.html#setDocumentHandler(org.xml.sax.DocumentHandler)"><code>setDocumentHandler(DocumentHandler)</code></a>, <a href="../../../org/xml/sax/Parser.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler(ErrorHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setDTDHandler(org.xml.sax.DTDHandler)"/><div class="member detail outer"><h3 class="member detail name">setDTDHandler</h3><pre class="member detail synopsis">public void setDTDHandler(<a href="../../../org/xml/sax/DTDHandler.html" title="Interface in org.xml.sax">DTDHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register a DTD event handler.
+
+ <p/>If the application does not register a DTD handler, all DTD
+ events reported by the SAX parser will be silently
+ ignored (this is the default behaviour implemented by
+ HandlerBase).
+
+ <p/>Applications may register a new or different
+ handler in the middle of a parse, and the SAX parser must
+ begin using the new handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The DTD handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/DTDHandler.html"><code>DTDHandler</code></a>, <a href="../../../org/xml/sax/HandlerBase.html"><code>HandlerBase</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setDocumentHandler(org.xml.sax.DocumentHandler)"/><div class="member detail outer"><h3 class="member detail name">setDocumentHandler</h3><pre class="member detail synopsis">public void setDocumentHandler(<a href="../../../org/xml/sax/DocumentHandler.html" title="Interface in org.xml.sax">DocumentHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register a document event handler.
+
+ <p/>If the application does not register a document handler, all
+ document events reported by the SAX parser will be silently
+ ignored (this is the default behaviour implemented by
+ HandlerBase).
+
+ <p/>Applications may register a new or different handler in the
+ middle of a parse, and the SAX parser must begin using the new
+ handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The document handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/DocumentHandler.html"><code>DocumentHandler</code></a>, <a href="../../../org/xml/sax/HandlerBase.html"><code>HandlerBase</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setEntityResolver(org.xml.sax.EntityResolver)"/><div class="member detail outer"><h3 class="member detail name">setEntityResolver</h3><pre class="member detail synopsis">public void setEntityResolver(<a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a> resolver)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register a custom entity resolver.
+
+ <p/>If the application does not register an entity resolver, the
+ SAX parser will resolve system identifiers and open connections
+ to entities itself (this is the default behaviour implemented in
+ HandlerBase).
+
+ <p/>Applications may register a new or different entity resolver
+ in the middle of a parse, and the SAX parser must begin using
+ the new resolver immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">resolver</code><span class="separator"> - </span><span class="description">The object for resolving entities.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/EntityResolver.html"><code>EntityResolver</code></a>, <a href="../../../org/xml/sax/HandlerBase.html"><code>HandlerBase</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setErrorHandler(org.xml.sax.ErrorHandler)"/><div class="member detail outer"><h3 class="member detail name">setErrorHandler</h3><pre class="member detail synopsis">public void setErrorHandler(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to register an error event handler.
+
+ <p/>If the application does not register an error event handler,
+ all error events reported by the SAX parser will be silently
+ ignored, except for fatalError, which will throw a SAXException
+ (this is the default behaviour implemented by HandlerBase).
+
+ <p/>Applications may register a new or different handler in the
+ middle of a parse, and the SAX parser must begin using the new
+ handler immediately.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">handler</code><span class="separator"> - </span><span class="description">The error handler.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/ErrorHandler.html"><code>ErrorHandler</code></a>, <a href="../../../org/xml/sax/SAXException.html"><code>SAXException</code></a>, <a href="../../../org/xml/sax/HandlerBase.html"><code>HandlerBase</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setLocale(Locale)"/><div class="member detail outer"><h3 class="member detail name">setLocale</h3><pre class="member detail synopsis">public void setLocale(Locale locale)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></pre><blockquote class="member detail name"><div class="member detail description"> Allow an application to request a locale for errors and warnings.
+
+ <p/>SAX parsers are not required to provide localisation for errors
+ and warnings; if they cannot support the requested locale,
+ however, they must throw a SAX exception.  Applications may
+ not request a locale change in the middle of a parse.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">locale</code><span class="separator"> - </span><span class="description">A Java Locale object.</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">Throws an exception
+(using the previous or default locale) if the 
+requested locale is not supported.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/SAXException.html"><code>SAXException</code></a>, <a href="../../../org/xml/sax/SAXParseException.html"><code>SAXParseException</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

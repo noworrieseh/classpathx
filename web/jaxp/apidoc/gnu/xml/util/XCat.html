@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>XCat (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="gnu.xml.util.XCat class"/><meta name="keywords" content="loadCatalog()"/><meta name="keywords" content="resolveEntity()"/><meta name="keywords" content="getExternalSubset()"/><meta name="keywords" content="resolveURI()"/><meta name="keywords" content="disableLoading()"/><meta name="keywords" content="getErrorHandler()"/><meta name="keywords" content="setErrorHandler()"/><meta name="keywords" content="getParserClass()"/><meta name="keywords" content="setParserClass()"/><meta name="keywords" content="isUnified()"/><meta name="keywords" content="setUnified()"/><meta name="keywords" content="isUsingPublic()"/><meta name="keywords" content="setUsingPublic()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../gnu/xml/util/SAXNullTransformerFactory.html">Prev Class</a> | <a href="../../../gnu/xml/util/XHTMLWriter.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="XCat.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | <a href="#summary-constructors">Constr</a></td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | <a href="#detail-constructors">Constr</a></td></tr></table><div class="class title outer"><h3 class="class title-package">gnu.xml.util</h3><h1 class="class title-class">Class XCat</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>gnu.xml.util.XCat</code></li></ul></ul></div><dl class="class knownimplementing"><dt class="header"><b>Implemented Interfaces:</b></dt><dd class="item"><a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a>, <a href="../../../org/xml/sax/ext/EntityResolver2.html" title="Interface in org.xml.sax.ext">EntityResolver2</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public class <b class="class synopsis name">XCat</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div><div class="class synopsis implements"><code>implements <a href="../../../org/xml/sax/ext/EntityResolver2.html" title="Interface in org.xml.sax.ext">EntityResolver2</a></code></div></div><hr/><div class="class description"> Packages <a href="http://www.oasis-open.org/committees/entity/spec-2001-08-06.html">OASIS XML Catalogs</a>,
+ primarily for entity resolution by parsers.
+ That specification defines an XML syntax for mappings between
+ identifiers declared in DTDs (particularly PUBLIC identifiers) and
+ locations.  SAX has always supported such mappings, but conventions for
+ an XML file syntax to maintain them have previously been lacking.
+
+ <p/> This has three main operational modes.  The primary intended mode is
+ to create a resolver, then preloading it with one or more site-standard
+ catalogs before using it with one or more SAX parsers: <pre>
+	XCat	catalog = new XCat ();
+	catalog.setErrorHandler (diagnosticErrorHandler);
+	catalog.loadCatalog ("file:/local/catalogs/catalog.cat");
+	catalog.loadCatalog ("http://shared/catalog.cat");
+	...
+	catalog.disableLoading ();
+	parser1.setEntityResolver (catalog);
+	parser2.setEntityResolver (catalog);
+	...</pre>
+
+ <p/>A second mode is to arrange that your application uses instances of
+ this class as its entity resolver, and automatically loads catalogs
+ referenced by <em>&lt;?oasis-xml-catalog...?&gt;</em> processing
+ instructions found before the DTD in documents it parses.
+ It would then discard the resolver after each parse.
+
+ <p/> A third mode applies catalogs in contexts other than entity
+ resolution for parsers.
+ The <a href="../../../gnu/xml/util/XCat.html#resolveURI(String,String)"><code>resolveURI()</code></a> method supports resolving URIs
+ stored in XML application data, rather than inside DTDs.
+ Catalogs would be loaded as shown above, and the catalog could
+ be used concurrently for parser entity resolution and for
+ application URI resolution.
+ 
+
+ <center><hr width="70%"/></center>
+
+ <p/>Errors in catalogs implicitly loaded (during resolution) are ignored
+ beyond being reported through any <em>ErrorHandler</em> assigned using
+<a href="../../../gnu/xml/util/XCat.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler()</code></a>.  SAX exceptions
+  thrown from such a handler won't abort resolution, although throwing a
+ <em>RuntimeException</em> or <em>Error</em> will normally abort both
+ resolution and parsing.  Useful diagnostic information is available to
+ any <em>ErrorHandler</em> used to report problems, or from any exception
+ thrown from an explicit <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a> invocation.
+ Applications can use that information as troubleshooting aids.
+
+ <p/>While this class requires <em>SAX2 Extensions 1.1</em> classes in
+ its class path, basic functionality does not require using a SAX2
+ parser that supports the extended entity resolution functionality.
+ See the original SAX1
+<code>resolveEntity()</code>
+  method for a list of restrictions which apply when it is used with
+ older SAX parsers.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/ext/EntityResolver2.html"><code>EntityResolver2</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p><a name="summary-constructors"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Constructor Summary</h2></td></tr><tr><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#XCat()">XCat</a>()</code></dt><dd class="description"> Initializes without preloading a catalog.</dd></dl></td></tr><tr><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#XCat(String)">XCat</a>(String&nbsp;uri)</code></dt><dd class="description"> Initializes, and preloads a catalog using the default SAX parser.</dd></dl></td></tr></table></dl><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#disableLoading()">disableLoading</a>()</code></dt><dd class="description"> Records that catalog loading is no longer permitted.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getErrorHandler()">getErrorHandler</a>()</code></dt><dd class="description"> Returns the error handler used to report catalog errors.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getExternalSubset(String,String)">getExternalSubset</a>(String&nbsp;name, String&nbsp;baseURI)</code></dt><dd class="description"> "New Style" parser callback to add an external subset.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getParserClass()">getParserClass</a>()</code></dt><dd class="description"> Returns the name of the SAX2 parser class used to parse catalogs.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#isUnified()">isUnified</a>()</code></dt><dd class="description"> Returns true (the default) if all methods resolve
+ a given URI in the same way.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#isUsingPublic()">isUsingPublic</a>()</code></dt><dd class="description"> Returns true (the default) if a catalog's public identifier
+ mappings will be used.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#loadCatalog(String)">loadCatalog</a>(String&nbsp;uri)</code></dt><dd class="description"> Loads an OASIS XML Catalog.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#resolveEntity(String,String)">resolveEntity</a>(String&nbsp;publicId, String&nbsp;systemId)</code></dt><dd class="description"> "Old Style" external entity resolution for parsers.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#resolveEntity(String,String,String,String)">resolveEntity</a>(String&nbsp;name, String&nbsp;publicId, String&nbsp;baseURI, String&nbsp;systemId)</code></dt><dd class="description"> "New Style" external entity resolution for parsers.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#resolveURI(String,String)">resolveURI</a>(String&nbsp;baseURI, String&nbsp;uri)</code></dt><dd class="description"> Resolves a URI reference that's not defined to the DTD.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setErrorHandler(org.xml.sax.ErrorHandler)">setErrorHandler</a>(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a>&nbsp;handler)</code></dt><dd class="description"> Assigns the error handler used to report catalog errors.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setParserClass(String)">setParserClass</a>(String&nbsp;parser)</code></dt><dd class="description"> Names the SAX2 parser class used to parse catalogs.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setUnified(boolean)">setUnified</a>(boolean&nbsp;value)</code></dt><dd class="description"> Assigns the value of the flag returned by <a href="../../../gnu/xml/util/XCat.html#isUnified()"><code>isUnified()</code></a>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setUsingPublic(boolean)">setUsingPublic</a>(boolean&nbsp;value)</code></dt><dd class="description"> Specifies which catalog search mode is used.</dd></dl></td></tr></table></dl><a name="detail-constructors"/><h2 class="section header">Constructor Details</h2><div class="section"><a name="XCat()"/><div class="member detail outer"><h3 class="member detail name">XCat</h3><pre class="member detail synopsis">public XCat()</pre><blockquote class="member detail name"><div class="member detail description"> Initializes without preloading a catalog.
+ This API is convenient when you may want to arrange that catalogs
+ are automatically loaded when explicitly referenced in documents,
+ using the <em>oasis-xml-catalog</em> processing instruction.
+ In such cases you won't usually be able to preload catalogs.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="XCat(String)"/><div class="member detail outer"><h3 class="member detail name">XCat</h3><pre class="member detail synopsis">public XCat(String uri)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> Initializes, and preloads a catalog using the default SAX parser.
+ This API is convenient when you operate with one or more standard
+ catalogs.
+
+ <p/> This just delegates to <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a>;
+ see it for exception information.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">absolute URI for the catalog file.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="disableLoading()"/><div class="member detail outer"><h3 class="member detail name">disableLoading</h3><pre class="member detail synopsis">public void disableLoading()</pre><blockquote class="member detail name"><div class="member detail description"> Records that catalog loading is no longer permitted.
+ Loading is automatically disabled when lookups are performed,
+ and should be manually disabled when <em>startDTD()</em> (or
+ any other DTD declaration callback) is invoked, or at the latest
+ when the document root element is seen.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getErrorHandler()"/><div class="member detail outer"><h3 class="member detail name">getErrorHandler</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a> getErrorHandler()</pre><blockquote class="member detail name"><div class="member detail description"> Returns the error handler used to report catalog errors.
+ Null is returned if the parser's default error handling
+ will be used.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler(ErrorHandler)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getExternalSubset(String,String)"/><div class="member detail outer"><h3 class="member detail name">getExternalSubset</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> getExternalSubset(String name,
+                                     String baseURI)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> "New Style" parser callback to add an external subset.
+ For documents that don't include an external subset, this may
+ return one according to <em>doctype</em> catalog entries.
+ (This functionality is not a core part of the OASIS XML Catalog
+ specification, though it's presented in an appendix.)
+ If no such entry is defined, this returns null to indicate that
+ this document will not be modified to include such a subset.
+ Calls to this method prevent explicit loading of additional catalogs
+ using <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a>.
+
+ <p/><em>Warning:</em> That catalog functionality can be dangerous.
+ It can provide definitions of general entities, and thereby mask
+ certain well formedess errors.
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/xml/sax/ext/EntityResolver2.html#getExternalSubset(String,String)">getExternalSubset</a> in interface <a href="../../../org/xml/sax/ext/EntityResolver2.html" title="Interface in org.xml.sax.ext">EntityResolver2</a></dd></dl><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">Name of the document element, either as declared in
+a DOCTYPE declaration or as observed in the text.</span></dd><dd class="item"><code class="name">baseURI</code><span class="separator"> - </span><span class="description">Document's base URI (absolute).</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Input source for accessing the external subset, or null
+if no mapping was found.  The input source may have opened
+the stream, and will have a fully resolved URI.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getParserClass()"/><div class="member detail outer"><h3 class="member detail name">getParserClass</h3><pre class="member detail synopsis">public String getParserClass()</pre><blockquote class="member detail name"><div class="member detail description"> Returns the name of the SAX2 parser class used to parse catalogs.
+ Null is returned if the system default is used.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#setParserClass(String)"><code>setParserClass(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="isUnified()"/><div class="member detail outer"><h3 class="member detail name">isUnified</h3><pre class="member detail synopsis">public boolean isUnified()</pre><blockquote class="member detail name"><div class="member detail description"> Returns true (the default) if all methods resolve
+ a given URI in the same way.
+ Returns false if calls resolving URIs as entities (such as
+<code>resolveEntity()</code>) use different catalog entries
+  than those resolving them as URIs (<a href="../../../gnu/xml/util/XCat.html#resolveURI(String,String)"><code>resolveURI()</code></a>),
+ which will generally produce different results.
+
+ <p/>The OASIS XML Catalog specification defines two related schemes
+ to map URIs "as URIs" or "as system IDs".
+ URIs use <em>uri</em>, <em>rewriteURI</em>, and <em>delegateURI</em>
+ elements.  System IDs do the same things with <em>systemId</em>,
+ <em>rewriteSystemId</em>, and <em>delegateSystemId</em>.
+ It's confusing and error prone to maintain two parallel copies of
+ such data.  Accordingly, this class makes that behavior optional.
+ The <em>unified</em> interpretation of URI mappings is preferred,
+ since it prevents surprises where one URI gets mapped to different
+ contents depending on whether the reference happens to have come
+ from a DTD (or not).
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#setUnified(boolean)"><code>setUnified(boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="isUsingPublic()"/><div class="member detail outer"><h3 class="member detail name">isUsingPublic</h3><pre class="member detail synopsis">public boolean isUsingPublic()</pre><blockquote class="member detail name"><div class="member detail description"> Returns true (the default) if a catalog's public identifier
+ mappings will be used.
+ When false is returned, such mappings are ignored except when
+ system IDs are discarded, such as for
+ entities using the <em>urn:publicid:</em> URI scheme in their
+ system identifiers.  (See RFC 3151 for information about that
+ URI scheme.  Using it in system identifiers may not work well
+ with many SAX parsers unless the <em>resolve-dtd-uris</em>
+ feature flag is set to false.)
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#setUsingPublic(boolean)"><code>setUsingPublic(boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="loadCatalog(String)"/><div class="member detail outer"><h3 class="member detail name">loadCatalog</h3><pre class="member detail synopsis">public void loadCatalog(String uri)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> Loads an OASIS XML Catalog.
+ It is appended to the list of currently active catalogs, or
+ reloaded if a catalog with the same URI was already loaded.
+ Callers have control over what parser is used, how catalog parsing
+ errors are reported, and whether URIs will be resolved consistently.
+
+ <p/> The OASIS specification says that errors detected when loading
+ catalogs "must recover by ignoring the catalog entry file that
+ failed, and proceeding."  In this API, that action can be the
+ responsibility of applications, when they explicitly load any
+ catalog using this method.
+
+ <p/>Note that catalogs referenced by this one will not be loaded
+ at this time.  Catalogs referenced through <em>nextCatalog</em>
+ or <em>delegate*</em> elements are normally loaded only if needed. 
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">absolute URI for the catalog file.</span></dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a></code><span class="separator"> - </span><span class="description">As thrown by the parser, typically to
+indicate problems parsing data from that URI.  It may also
+be thrown if the parser doesn't support necessary handlers.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#setErrorHandler(org.xml.sax.ErrorHandler)"><code>setErrorHandler(ErrorHandler)</code></a>, <a href="../../../gnu/xml/util/XCat.html#setParserClass(String)"><code>setParserClass(String)</code></a>, <a href="../../../gnu/xml/util/XCat.html#setUnified(boolean)"><code>setUnified(boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="resolveEntity(String,String)"/><div class="member detail outer"><h3 class="member detail name">resolveEntity</h3><pre class="member detail synopsis">public final <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> resolveEntity(String publicId,
+                                       String systemId)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> "Old Style" external entity resolution for parsers.
+ This API provides only core functionality.
+ Calls to this method prevent explicit loading of additional catalogs
+ using <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a>.
+
+ <p/>The functional limitations of this interface include:<ul>
+
+	<li>Since system IDs will be absolutized before the resolver
+	sees them, matching against relative URIs won't work.
+	This may affect <em>system</em>, <em>rewriteSystem</em>,
+	and <em>delegateSystem</em> catalog entries.
+
+	</li><li>Because of that absolutization, documents declaring entities
+	with system IDs using URI schemes that the JVM does not recognize
+	may be unparsable.  URI schemes such as <em>file:/</em>,
+	<em>http://</em>, <em>https://</em>, and <em>ftp://</em>
+	will usually work reliably.
+
+	</li><li>Because missing external subsets can't be provided, the
+	<em>doctype</em> catalog entries will be ignored.
+	(The <a href="../../../gnu/xml/util/XCat.html#getExternalSubset(String,String)"><code>getExternalSubset()</code></a> method is
+	a "New Style" resolution option.)
+
+	</li></ul>
+
+ <p/>Applications can tell whether this limited functionality will be
+ used: if the feature flag associated with the <a href="../../../org/xml/sax/ext/EntityResolver2.html"><code>EntityResolver2</code></a>
+ interface is not <em>true</em>, the limitations apply.  Applications
+ can't usually know whether a given document and catalog will trigger
+ those limitations.  The issue can only be bypassed by operational
+ procedures such as not using catalogs or documents which involve
+ those features.
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/xml/sax/EntityResolver.html#resolveEntity(String,String)">resolveEntity</a> in interface <a href="../../../org/xml/sax/EntityResolver.html" title="Interface in org.xml.sax">EntityResolver</a></dd></dl><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">publicId</code><span class="separator"> - </span><span class="description">Either a normalized public ID, or null</span></dd><dd class="item"><code class="name">systemId</code><span class="separator"> - </span><span class="description">Always an absolute URI.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Input source for accessing the external entity, or null
+if no mapping was found.  The input source may have opened
+the stream, and will have a fully resolved URI.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="resolveEntity(String,String,String,String)"/><div class="member detail outer"><h3 class="member detail name">resolveEntity</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> resolveEntity(String name,
+                                 String publicId,
+                                 String baseURI,
+                                 String systemId)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> "New Style" external entity resolution for parsers.
+ Calls to this method prevent explicit loading of additional catalogs
+ using <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a>.
+
+ <p/>This supports the full core catalog functionality for locating
+ (and relocating) parsed entities that have been declared in a
+ document's DTD.
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/xml/sax/ext/EntityResolver2.html#resolveEntity(String,String,String,String)">resolveEntity</a> in interface <a href="../../../org/xml/sax/ext/EntityResolver2.html" title="Interface in org.xml.sax.ext">EntityResolver2</a></dd></dl><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">name</code><span class="separator"> - </span><span class="description">Entity name, such as "dudley", "%nell", or "[dtd]".</span></dd><dd class="item"><code class="name">publicId</code><span class="separator"> - </span><span class="description">Either a normalized public ID, or null.</span></dd><dd class="item"><code class="name">baseURI</code><span class="separator"> - </span><span class="description">Absolute base URI associated with systemId.</span></dd><dd class="item"><code class="name">systemId</code><span class="separator"> - </span><span class="description">URI found in entity declaration (may be
+relative to baseURI).</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Input source for accessing the external entity, or null
+if no mapping was found.  The input source may have opened
+the stream, and will have a fully resolved URI.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#getExternalSubset(String,String)"><code>getExternalSubset(String,String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="resolveURI(String,String)"/><div class="member detail outer"><h3 class="member detail name">resolveURI</h3><pre class="member detail synopsis">public <a href="../../../org/xml/sax/InputSource.html" title="Class in org.xml.sax">InputSource</a> resolveURI(String baseURI,
+                              String uri)
+            throws <a href="../../../org/xml/sax/SAXException.html" title="Class in org.xml.sax">SAXException</a>,
+                   IOException</pre><blockquote class="member detail name"><div class="member detail description"> Resolves a URI reference that's not defined to the DTD.
+ This is intended for use with URIs found in document text, such as
+ <em>xml-stylesheet</em> processing instructions and in attribute
+ values, where they are not recognized as URIs by XML parsers.
+ Calls to this method prevent explicit loading of additional catalogs
+ using <a href="../../../gnu/xml/util/XCat.html#loadCatalog(String)"><code>loadCatalog()</code></a>.
+
+ <p/>This functionality is supported by the OASIS XML Catalog
+ specification, but will never be invoked by an XML parser.
+ It corresponds closely to functionality for mapping system
+ identifiers for entities declared in DTDs; closely enough that
+ this implementation's default behavior is that they be
+ identical, to minimize potential confusion.
+
+ <p/>This method could be useful when implementing the
+<a href="../../../javax/xml/transform/URIResolver.html"><code>URIResolver</code></a> interface, wrapping the
+  input source in a <a href="../../../javax/xml/transform/sax/SAXSource.html"><code>SAXSource</code></a>.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">baseURI</code><span class="separator"> - </span><span class="description">The relevant base URI as specified by the XML Base
+specification.  This recognizes <em>xml:base</em> attributes
+as overriding the actual (physical) base URI.</span></dd><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">Either an absolute URI, or one relative to baseURI</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Input source for accessing the mapped URI, or null
+if no mapping was found.  The input source may have opened
+the stream, and will have a fully resolved URI.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#isUnified()"><code>isUnified()</code></a>, <a href="../../../gnu/xml/util/XCat.html#setUnified(boolean)"><code>setUnified(boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setErrorHandler(org.xml.sax.ErrorHandler)"/><div class="member detail outer"><h3 class="member detail name">setErrorHandler</h3><pre class="member detail synopsis">public void setErrorHandler(<a href="../../../org/xml/sax/ErrorHandler.html" title="Interface in org.xml.sax">ErrorHandler</a> handler)</pre><blockquote class="member detail name"><div class="member detail description"> Assigns the error handler used to report catalog errors.
+ These errors may come either from the SAX2 parser or
+ from the catalog parsing code driven by the parser. 
+
+ <p/> If you're sharing the resolver between parsers, don't
+ change this once lookups have begun.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#getErrorHandler()"><code>getErrorHandler()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setParserClass(String)"/><div class="member detail outer"><h3 class="member detail name">setParserClass</h3><pre class="member detail synopsis">public void setParserClass(String parser)</pre><blockquote class="member detail name"><div class="member detail description"> Names the SAX2 parser class used to parse catalogs.
+
+ <p/> If you're sharing the resolver between parsers, don't change
+ this once lookups have begun.
+
+ <p/> Note that in order to properly support the <em>xml:base</em>
+ attribute and relative URI resolution, the SAX parser used to parse
+ the catalog must provide a <a href="../../../org/xml/sax/Locator.html"><code>Locator</code></a> and support the optional
+ declaration and lexical handlers.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">parser</code><span class="separator"> - </span><span class="description">The parser class name, or null saying to use the
+system default SAX2 parser.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#getParserClass()"><code>getParserClass()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setUnified(boolean)"/><div class="member detail outer"><h3 class="member detail name">setUnified</h3><pre class="member detail synopsis">public void setUnified(boolean value)</pre><blockquote class="member detail name"><div class="member detail description"> Assigns the value of the flag returned by <a href="../../../gnu/xml/util/XCat.html#isUnified()"><code>isUnified()</code></a>.
+ Set it to false to be strictly conformant with the OASIS XML Catalog
+ specification.  Set it to true to make all mappings for a given URI
+ give the same result, regardless of the reason for the mapping.
+
+ <p/>Don't change this once you've loaded the first catalog.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">value</code><span class="separator"> - </span><span class="description">new flag setting</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setUsingPublic(boolean)"/><div class="member detail outer"><h3 class="member detail name">setUsingPublic</h3><pre class="member detail synopsis">public void setUsingPublic(boolean value)</pre><blockquote class="member detail name"><div class="member detail description"> Specifies which catalog search mode is used.
+ By default, public identifier mappings are able to override system
+ identifiers when both are available.
+ Applications may choose to ignore public
+ identifier mappings in such cases, so that system identifiers
+ declared in DTDs will only be overridden by an explicit catalog
+ match for that system ID.
+
+ <p/> If you're sharing the resolver between parsers, don't
+ change this once lookups have begun.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">value</code><span class="separator"> - </span><span class="description">true to always use public identifier mappings,
+false to only use them for system ids using the <em>urn:publicid:</em>
+URI scheme.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../gnu/xml/util/XCat.html#isUsingPublic()"><code>isUsingPublic()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

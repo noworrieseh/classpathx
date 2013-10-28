@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="MacRoman"?>
+<!DOCTYPE html PUBLIC "-//gnu.org///DTD XHTML 1.1 plus Target 1.0//EN" "../../../../resources/xhtml11-target10.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>gnu.mail.providers.pop3</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=MacRoman"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="gnu.mail.providers.pop3 packages"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content package" onload="if(parent.contentPageLoaded)parent.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top"><div class="navbar div top"><span class="navbar item enabled"><a href="../../../../overview-summary.html">Overview</a></span> <span class="navbar item active">Package</span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../gnu/mail/providers/nntp/package-summary.html">Prev Package</a> | <a href="../../../../gnu/mail/providers/smtp/package-summary.html">Next Package</a></td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="package-summary.html" title="Show without frames" target="_top">No Frames</a> </td></tr></table><h1 class="package title">Package gnu.mail.providers.pop3</h1><div class="package description top">
+This is a provider for the Internet Post Office Protocol, version 3 (POP3),
+as detailed in RFC 1939.</div><dl class="table container"><dd><table class="package summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Class Summary</h2></td></tr><tr><td class="left"><a href="../../../../gnu/mail/providers/pop3/POP3Folder.html" title="Class in gnu.mail.providers.pop3">POP3Folder</a></td><td class="right"> The folder class implementing the POP3 mail protocol.</td></tr><tr><td class="left"><a href="../../../../gnu/mail/providers/pop3/POP3Message.html" title="Class in gnu.mail.providers.pop3">POP3Message</a></td><td class="right"> The message class implementing the POP3 mail protocol.</td></tr><tr><td class="left"><a href="../../../../gnu/mail/providers/pop3/POP3Store.html" title="Class in gnu.mail.providers.pop3">POP3Store</a></td><td class="right"> The storage class implementing the POP3 mail protocol.</td></tr></table></dd></dl>
+<a name="description" id="description"/><div class="package description full">
+This is a provider for the Internet Post Office Protocol, version 3 (POP3),
+as detailed in RFC 1939.
+
+<p/>
+This provider supports transport layer security (TLS), as described in RFC
+2595, and uses APOP authentication if the server advertises this capability.
+
+<p/>
+The POP3 store provides access to a single folder named "INBOX". Folder
+management operations are not supported by POP3; nor are permanent flags.
+
+<p/>
+This store does not provide a local cache of messages. You can implement
+such a cache yourself using the <code>mbox</code> or <code>Maildir</code>
+providers in this distribution.
+
+<p/>
+POP3 does not support the <code>expunge</code> method according to the
+JavaMail specification. Messages deleted using <code>expunge</code> will
+only be removed from the folder when the <code>close</code> method is
+called.
+
+&lt;!-- TODO UIDL --&gt;
+<p/>
+This provider supports the following properties:
+<table summary="properties"><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>mail.pop3.host</td><td>IP address or hostname</td><td>The POP3 server to connect to.</td></tr><tr><td>mail.pop3.port</td><td>integer (&gt;=1)</td><td>The port to connect to, if not the default.</td></tr><tr><td>mail.pop3.user</td><td>username</td><td>The default username for POP3.</td></tr><tr><td>mail.pop3.connectiontimeout</td><td>integer (&gt;=1)</td><td>Socket connection timeout, in milliseconds. Default is no timeout.</td></tr><tr><td>mail.pop3.timeout</td><td>integer (&gt;=1)</td><td>Socket I/O timeout, in milliseconds. Default is no timeout.</td></tr><tr><td>mail.pop3.tls</td><td>boolean</td><td>If set to false, TLS negotiation will not be attempted. Exceptionally,
+you may set this to <code>required</code> to throw an exception on
+connect when TLS is not available.</td></tr><tr><td>mail.pop3.trustmanager</td><td>String</td><td>The name of a class implementing the
+<code>javax.net.ssl.TrustManager</code> interface, which will be used to
+determine trust in TLS negotiation.</td></tr><tr><td>mail.pop3.auth.mechanisms</td><td>comma-delimited list of SASL mechanisms</td><td>If set, only the specified SASL mechanisms will be attempted during
+authentication, in the given order. If not present, the SASL mechanisms
+advertised by the server will be used.</td></tr><tr><td>mail.pop3.apop</td><td>boolean</td><td>If set to false, APOP authentication will not be attempted.</td></tr><tr><td>mail.pop3.rsetbeforequit</td><td>boolean</td><td>If set to true, an RSET command will be issued before QUIT. This is
+useful for broken servers that implicitly mark read messages as deleted.</td></tr></table>
+</div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top"><span class="navbar item enabled"><a href="../../../../overview-summary.html">Overview</a></span> <span class="navbar item active">Package</span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

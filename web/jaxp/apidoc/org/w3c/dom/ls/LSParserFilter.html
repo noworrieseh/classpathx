@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>LSParserFilter (GNU JAXP Library)</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.w3c.dom.ls.LSParserFilter class"/><meta name="keywords" content="FILTER_ACCEPT"/><meta name="keywords" content="FILTER_REJECT"/><meta name="keywords" content="FILTER_SKIP"/><meta name="keywords" content="FILTER_INTERRUPT"/><meta name="keywords" content="startElement()"/><meta name="keywords" content="acceptNode()"/><meta name="keywords" content="getWhatToShow()"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../org/w3c/dom/ls/LSParser.html">Prev Class</a> | <a href="../../../../org/w3c/dom/ls/LSProgressEvent.html">Next Class</a></td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="LSParserFilter.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | <a href="#summary-fields">Field</a> | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | <a href="#detail-fields">Field</a> | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.w3c.dom.ls</h3><h1 class="class title-class">Interface LSParserFilter</h1></div><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">LSParserFilter</b></code></div></div><hr/><div class="class description">  <code>LSParserFilter</code>s provide applications the ability to examine 
+ nodes as they are being constructed while parsing. As each node is 
+ examined, it may be modified or removed, or the entire parse may be 
+ terminated early. 
+ <p/> At the time any of the filter methods are called by the parser, the 
+ owner Document and DOMImplementation objects exist and are accessible. 
+ The document element is never passed to the <code>LSParserFilter</code> 
+ methods, i.e. it is not possible to filter out the document element. 
+ <code>Document</code>, <code>DocumentType</code>, <code>Notation</code>, 
+ <code>Entity</code>, and <code>Attr</code> nodes are never passed to the 
+ <code>acceptNode</code> method on the filter. The child nodes of an 
+ <code>EntityReference</code> node are passed to the filter if the 
+ parameter "<a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#parameter-entities">
+ entities</a>" is set to <code>false</code>. Note that, as described by the parameter "<a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#parameter-entities">
+ entities</a>", unexpanded entity reference nodes are never discarded and are always 
+ passed to the filter. 
+ <p/> All validity checking while parsing a document occurs on the source 
+ document as it appears on the input stream, not on the DOM document as it 
+ is built in memory. With filters, the document in memory may be a subset 
+ of the document on the stream, and its validity may have been affected by 
+ the filtering. 
+ <p/> All default attributes must be present on elements when the elements 
+ are passed to the filter methods. All other default content must be 
+ passed to the filter methods. 
+ <p/> DOM applications must not raise exceptions in a filter. The effect of 
+ throwing exceptions from a filter is DOM implementation dependent. 
+ <p/>See also the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407">Document Object Model (DOM) Level 3 Load
+and Save Specification</a>.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-fields"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Field Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#FILTER_ACCEPT">FILTER_ACCEPT</a></code></dt><dd class="description"> Accept the node.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#FILTER_INTERRUPT">FILTER_INTERRUPT</a></code></dt><dd class="description">  Interrupt the normal processing of the document.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#FILTER_REJECT">FILTER_REJECT</a></code></dt><dd class="description"> Reject the node and its children.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#FILTER_SKIP">FILTER_SKIP</a></code></dt><dd class="description"> Skip this single node.</dd></dl></td></tr></table></dl><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#acceptNode(org.w3c.dom.Node)">acceptNode</a>(<a href="../../../../org/w3c/dom/Node.html" title="Interface in org.w3c.dom">Node</a>&nbsp;nodeArg)</code></dt><dd class="description"> This method will be called by the parser at the completion of the 
+ parsing of each node.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getWhatToShow()">getWhatToShow</a>()</code></dt><dd class="description">  Tells the <code>LSParser</code> what types of nodes to show to the 
+ method <code>LSParserFilter.acceptNode</code>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> short</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#startElement(org.w3c.dom.Element)">startElement</a>(<a href="../../../../org/w3c/dom/Element.html" title="Interface in org.w3c.dom">Element</a>&nbsp;elementArg)</code></dt><dd class="description">  The parser will call this method after each <code>Element</code> start 
+ tag has been scanned, but before the remainder of the 
+ <code>Element</code> is processed.</dd></dl></td></tr></table></dl><a name="detail-fields"/><h2 class="section header">Field Details</h2><div class="section"><a name="FILTER_ACCEPT"/><div class="member detail outer"><h3 class="member detail name">FILTER_ACCEPT</h3><pre class="member detail synopsis">public static final short FILTER_ACCEPT</pre><blockquote class="member detail name"><div class="member detail description"> Accept the node.
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">1</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="FILTER_INTERRUPT"/><div class="member detail outer"><h3 class="member detail name">FILTER_INTERRUPT</h3><pre class="member detail synopsis">public static final short FILTER_INTERRUPT</pre><blockquote class="member detail name"><div class="member detail description">  Interrupt the normal processing of the document. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">4</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="FILTER_REJECT"/><div class="member detail outer"><h3 class="member detail name">FILTER_REJECT</h3><pre class="member detail synopsis">public static final short FILTER_REJECT</pre><blockquote class="member detail name"><div class="member detail description"> Reject the node and its children.
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">2</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="FILTER_SKIP"/><div class="member detail outer"><h3 class="member detail name">FILTER_SKIP</h3><pre class="member detail synopsis">public static final short FILTER_SKIP</pre><blockquote class="member detail name"><div class="member detail description"> Skip this single node. The children of this node will still be 
+ considered. 
+</div><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Field Value:</b></dt><dd class="member detail thrown item">3</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="acceptNode(org.w3c.dom.Node)"/><div class="member detail outer"><h3 class="member detail name">acceptNode</h3><pre class="member detail synopsis">public short acceptNode(<a href="../../../../org/w3c/dom/Node.html" title="Interface in org.w3c.dom">Node</a> nodeArg)</pre><blockquote class="member detail name"><div class="member detail description"> This method will be called by the parser at the completion of the 
+ parsing of each node. The node and all of its descendants will exist 
+ and be complete. The parent node will also exist, although it may be 
+ incomplete, i.e. it may have additional children that have not yet 
+ been parsed. Attribute nodes are never passed to this function.
+ <br/>From within this method, the new node may be freely modified - 
+ children may be added or removed, text nodes modified, etc. The state 
+ of the rest of the document outside this node is not defined, and the 
+ affect of any attempt to navigate to, or to modify any other part of 
+ the document is undefined. 
+ <br/>For validating parsers, the checks are made on the original 
+ document, before any modification by the filter. No validity checks 
+ are made on any document modifications made by the filter.
+ <br/>If this new node is rejected, the parser might reuse the new node 
+ and any of its descendants.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">nodeArg</code><span class="separator"> - </span><span class="description">The newly constructed element. At the time this method 
+is called, the element is complete - it has all of its children 
+(and their children, recursively) and attributes, and is attached 
+as a child to its parent.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item"><ul>
+<li> <code>FILTER_ACCEPT</code> if this <code>Node</code> should 
+be included in the DOM document being built. 
+</li>
+<li> 
+<code>FILTER_REJECT</code> if the <code>Node</code> and all of its 
+children should be rejected. 
+</li>
+<li> <code>FILTER_SKIP</code> if the 
+<code>Node</code> should be skipped and the <code>Node</code> 
+should be replaced by all the children of the <code>Node</code>. 
+</li>
+<li> 
+<code>FILTER_INTERRUPT</code> if the filter wants to stop the 
+processing of the document. Interrupting the processing of the 
+document does no longer guarantee that the resulting DOM tree is 
+XML well-formed. The <code>Node</code> is accepted and will be the 
+last completely parsed node. 
+</li>
+</ul></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getWhatToShow()"/><div class="member detail outer"><h3 class="member detail name">getWhatToShow</h3><pre class="member detail synopsis">public int getWhatToShow()</pre><blockquote class="member detail name"><div class="member detail description">  Tells the <code>LSParser</code> what types of nodes to show to the 
+ method <code>LSParserFilter.acceptNode</code>. If a node is not shown 
+ to the filter using this attribute, it is automatically included in 
+ the DOM document being built. See <code>NodeFilter</code> for 
+ definition of the constants. The constants <code>SHOW_ATTRIBUTE</code>
+ , <code>SHOW_DOCUMENT</code>, <code>SHOW_DOCUMENT_TYPE</code>, 
+ <code>SHOW_NOTATION</code>, <code>SHOW_ENTITY</code>, and 
+ <code>SHOW_DOCUMENT_FRAGMENT</code> are meaningless here. Those nodes 
+ will never be passed to <code>LSParserFilter.acceptNode</code>. 
+ <br/> The constants used here are defined in [<a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113">DOM Level 2 Traversal and      Range</a>]
+ . 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="startElement(org.w3c.dom.Element)"/><div class="member detail outer"><h3 class="member detail name">startElement</h3><pre class="member detail synopsis">public short startElement(<a href="../../../../org/w3c/dom/Element.html" title="Interface in org.w3c.dom">Element</a> elementArg)</pre><blockquote class="member detail name"><div class="member detail description">  The parser will call this method after each <code>Element</code> start 
+ tag has been scanned, but before the remainder of the 
+ <code>Element</code> is processed. The intent is to allow the 
+ element, including any children, to be efficiently skipped. Note that 
+ only element nodes are passed to the <code>startElement</code> 
+ function. 
+ <br/>The element node passed to <code>startElement</code> for filtering 
+ will include all of the Element's attributes, but none of the 
+ children nodes. The Element may not yet be in place in the document 
+ being constructed (it may not have a parent node.) 
+ <br/>A <code>startElement</code> filter function may access or change 
+ the attributes for the Element. Changing Namespace declarations will 
+ have no effect on namespace resolution by the parser.
+ <br/>For efficiency, the Element node passed to the filter may not be 
+ the same one as is actually placed in the tree if the node is 
+ accepted. And the actual node (node object identity) may be reused 
+ during the process of reading in and filtering a document.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">elementArg</code><span class="separator"> - </span><span class="description">The newly encountered element. At the time this 
+method is called, the element is incomplete - it will have its 
+attributes, but no children.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item"><ul>
+<li> <code>FILTER_ACCEPT</code> if the <code>Element</code> should 
+be included in the DOM document being built. 
+</li>
+<li> 
+<code>FILTER_REJECT</code> if the <code>Element</code> and all of 
+its children should be rejected. 
+</li>
+<li> <code>FILTER_SKIP</code> if the 
+<code>Element</code> should be skipped. All of its children are 
+inserted in place of the skipped <code>Element</code> node. 
+</li>
+<li> 
+<code>FILTER_INTERRUPT</code> if the filter wants to stop the 
+processing of the document. Interrupting the processing of the 
+document does no longer guarantee that the resulting DOM tree is 
+XML well-formed. The <code>Element</code> is rejected. 
+</li>
+</ul> Returning 
+any other values will result in unspecified behavior.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

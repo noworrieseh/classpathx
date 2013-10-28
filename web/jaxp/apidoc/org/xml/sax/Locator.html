@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>Locator (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.Locator class"/><meta name="keywords" content="getPublicId()"/><meta name="keywords" content="getSystemId()"/><meta name="keywords" content="getLineNumber()"/><meta name="keywords" content="getColumnNumber()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../org/xml/sax/InputSource.html">Prev Class</a> | <a href="../../../org/xml/sax/Parser.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="Locator.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax</h3><h1 class="class title-class">Interface Locator</h1></div><dl class="class knownimplementing"><dt class="header"><b>Known Subinterfaces:</b></dt><dd class="item"><a href="../../../org/xml/sax/ext/Locator2.html" title="Interface in org.xml.sax.ext">Locator2</a></dd></dl><dl class="class knownimplementing"><dt class="header"><b>Known Implementing Classes:</b></dt><dd class="item"><a href="../../../org/xml/sax/ext/Locator2Impl.html" title="Class in org.xml.sax.ext">Locator2Impl</a>, <a href="../../../org/xml/sax/helpers/LocatorImpl.html" title="Class in org.xml.sax.helpers">LocatorImpl</a>, <a href="../../../gnu/xml/aelfred2/SAXDriver.html" title="Class in gnu.xml.aelfred2">SAXDriver</a>, <a href="../../../gnu/xml/pipeline/XIncludeFilter.html" title="Class in gnu.xml.pipeline">XIncludeFilter</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">Locator</b></code></div></div><hr/><div class="class description"> Interface for associating a SAX event with a document location.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/>If a SAX parser provides location information to the SAX
+ application, it does so by implementing this interface and then
+ passing an instance to the application using the content
+ handler's <a href="../../../org/xml/sax/ContentHandler.html#setDocumentLocator(org.xml.sax.Locator)"><code>setDocumentLocator</code></a> method.  The application can use the
+ object to obtain the location of any other SAX event
+ in the XML source document.
+
+ <p/>Note that the results returned by the object will be valid only
+ during the scope of each callback method: the application
+ will receive unpredictable results if it attempts to use the
+ locator at any other time, or after parsing completes.
+
+ <p/>SAX parsers are not required to supply a locator, but they are
+ very strongly encouraged to do so.  If the parser supplies a
+ locator, it must do so before reporting any other document events.
+ If no locator has been set by the time the application receives
+ the <a href="../../../org/xml/sax/ContentHandler.html#startDocument()"><code>startDocument</code></a>
+ event, the application should assume that a locator is not 
+ available.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 1.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/ContentHandler.html#setDocumentLocator(org.xml.sax.Locator)"><code>ContentHandler.setDocumentLocator(Locator)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getColumnNumber()">getColumnNumber</a>()</code></dt><dd class="description"> Return the column number where the current document event ends.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> int</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getLineNumber()">getLineNumber</a>()</code></dt><dd class="description"> Return the line number where the current document event ends.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getPublicId()">getPublicId</a>()</code></dt><dd class="description"> Return the public identifier for the current document event.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getSystemId()">getSystemId</a>()</code></dt><dd class="description"> Return the system identifier for the current document event.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="getColumnNumber()"/><div class="member detail outer"><h3 class="member detail name">getColumnNumber</h3><pre class="member detail synopsis">public int getColumnNumber()</pre><blockquote class="member detail name"><div class="member detail description"> Return the column number where the current document event ends.
+ This is one-based number of Java <code>char</code> values since
+ the last line end.
+
+ <p/><strong>Warning:</strong> The return value from the method
+ is intended only as an approximation for the sake of diagnostics;
+ it is not intended to provide sufficient information
+ to edit the character content of the original XML document.
+ For example, when lines contain combining character sequences, wide
+ characters, surrogate pairs, or bi-directional text, the value may
+ not correspond to the column in a text editor's display. 
+
+ <p/>The return value is an approximation of the column number
+ in the document entity or external parsed entity where the
+ markup triggering the event appears.
+
+ <p/>If possible, the SAX driver should provide the line position 
+ of the first character after the text associated with the document 
+ event.  The first column in each line is column 1.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The column number, or -1 if none is available.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/Locator.html#getLineNumber()"><code>getLineNumber()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getLineNumber()"/><div class="member detail outer"><h3 class="member detail name">getLineNumber</h3><pre class="member detail synopsis">public int getLineNumber()</pre><blockquote class="member detail name"><div class="member detail description"> Return the line number where the current document event ends.
+ Lines are delimited by line ends, which are defined in
+ the XML specification.
+
+ <p/><strong>Warning:</strong> The return value from the method
+ is intended only as an approximation for the sake of diagnostics;
+ it is not intended to provide sufficient information
+ to edit the character content of the original XML document.
+ In some cases, these "line" numbers match what would be displayed
+ as columns, and in others they may not match the source text
+ due to internal entity expansion.  
+
+ <p/>The return value is an approximation of the line number
+ in the document entity or external parsed entity where the
+ markup triggering the event appears.
+
+ <p/>If possible, the SAX driver should provide the line position 
+ of the first character after the text associated with the document 
+ event.  The first line is line 1.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The line number, or -1 if none is available.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/Locator.html#getColumnNumber()"><code>getColumnNumber()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getPublicId()"/><div class="member detail outer"><h3 class="member detail name">getPublicId</h3><pre class="member detail synopsis">public String getPublicId()</pre><blockquote class="member detail name"><div class="member detail description"> Return the public identifier for the current document event.
+
+ <p/>The return value is the public identifier of the document
+ entity or of the external parsed entity in which the markup
+ triggering the event appears.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A string containing the public identifier, or
+null if none is available.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/Locator.html#getSystemId()"><code>getSystemId()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getSystemId()"/><div class="member detail outer"><h3 class="member detail name">getSystemId</h3><pre class="member detail synopsis">public String getSystemId()</pre><blockquote class="member detail name"><div class="member detail description"> Return the system identifier for the current document event.
+
+ <p/>The return value is the system identifier of the document
+ entity or of the external parsed entity in which the markup
+ triggering the event appears.
+
+ <p/>If the system identifier is a URL, the parser must resolve it
+ fully before passing it to the application.  For example, a file
+ name must always be provided as a <em>file:...</em> URL, and other
+ kinds of relative URI are also resolved against their bases.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A string containing the system identifier, or null
+if none is available.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../org/xml/sax/Locator.html#getPublicId()"><code>getPublicId()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

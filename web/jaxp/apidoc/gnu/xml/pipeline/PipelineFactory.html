@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>PipelineFactory (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="gnu.xml.pipeline.PipelineFactory class"/><meta name="keywords" content="createPipeline()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../gnu/xml/pipeline/NSFilter.html">Prev Class</a> | <a href="../../../gnu/xml/pipeline/TeeConsumer.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="PipelineFactory.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">gnu.xml.pipeline</h3><h1 class="class title-class">Class PipelineFactory</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>gnu.xml.pipeline.PipelineFactory</code></li></ul></ul></div><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public class <b class="class synopsis name">PipelineFactory</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div></div><hr/><div class="class description"> This provides static factory methods for creating simple event pipelines.
+ These pipelines are specified by strings, suitable for passing on
+ command lines or embedding in element attributes.  For example, one way
+ to write a pipeline that restores namespace syntax, validates (stopping
+ the pipeline on validity errors) and then writes valid data to standard
+ output is this: <pre>
+      nsfix | validate | write ( stdout )</pre>
+
+ <p/> In this syntax, the tokens are always separated by whitespace, and each
+ stage of the pipeline may optionally have a parameter (which can be a
+ pipeline) in parentheses.  Interior stages are called filters, and the
+ rightmost end of a pipeline is called a terminus.
+
+ <p/> Stages are usually implemented by a single class, which may not be
+ able to act as both a filter and a terminus; but any terminus can be
+ automatically turned into a filter, through use of a <a href="../../../gnu/xml/pipeline/TeeConsumer.html"><code>TeeConsumer</code></a>.
+ The stage identifiers are either class names, or are one of the following
+ short identifiers built into this class.  (Most of these identifiers are
+ no more than aliases for classes.)  The built-in identifiers include:
+<table border="1" cellpadding="3" cellspacing="0">
+<tr bgcolor="#ccccff" class="TableHeadingColor">
+<th align="center" width="5%">Stage</th>
+<th align="center" width="9%">Parameter</th>
+<th align="center" width="1%">Terminus</th>
+<th align="center">Description</th>
+</tr>
+<tr valign="top" align="center">
+<td><a href="../dom/Consumer.html">dom</a></td>
+<td><em>none</em></td>
+<td> yes </td>
+<td align="left"> Applications code can access a DOM Document built
+from the input event stream.  When used as a filter, this buffers
+data up to an <em>endDocument</em> call, and then uses a DOM parser
+to report everything that has been recorded (which can easily be
+less than what was reported to it).  </td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="NSFilter.html">nsfix</a></td>
+<td><em>none</em></td>
+<td>no</td>
+<td align="left">This stage ensures that the XML element and attribute
+names in its output use namespace prefixes and declarations correctly.
+That is, so that they match the "Namespace plus LocalName" naming data
+with which each XML element and attribute is already associated.  </td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="EventFilter.html">null</a></td>
+<td><em>none</em></td>
+<td>yes</td>
+<td align="left">This stage ignores all input event data.</td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="CallFilter.html">server</a></td>
+<td><em>required</em><br/> server URL </td>
+<td>no</td>
+<td align="left">Sends its input as XML request to a remote server,
+normally a web application server using the HTTP or HTTPS protocols.
+The output of this stage is the parsed response from that server.</td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="TeeConsumer.html">tee</a></td>
+<td><em>required</em><br/> first pipeline</td>
+<td>no</td>
+<td align="left">This sends its events down two paths; its parameter
+is a pipeline descriptor for the first path, and the second path
+is the output of this stage.</td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="ValidationConsumer.html">validate</a></td>
+<td><em>none</em></td>
+<td>yes</td>
+<td align="left">This checks for validity errors, and reports them
+through its error handler.  The input must include declaration events
+and some lexical events.  </td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="WellFormednessFilter.html">wf</a></td>
+<td><em>none</em></td>
+<td>yes</td>
+<td align="left"> This class provides some basic "well formedness"
+tests on the input event stream, and reports a fatal error if any
+of them fail.  One example: start/end calls for elements must match.
+No SAX parser is permitted to produce malformed output, but other
+components can easily do so.</td>
+</tr>
+<tr valign="top" align="center">
+<td>write</td>
+<td><em>required</em><br/> "stdout", "stderr", or filename</td>
+<td>yes</td>
+<td align="left"> Writes its input to the specified output, as pretty
+printed XML text encoded using UTF-8.  Input events must be well
+formed and "namespace fixed", else the output won't be XML (or possibly
+namespace) conformant.  The symbolic names represent
+<em>System.out</em> and <em>System.err</em> respectively; names must
+correspond to files which don't yet exist.</td>
+</tr>
+<tr valign="top" align="center">
+<td>xhtml</td>
+<td><em>required</em><br/> "stdout", "stderr", or filename</td>
+<td>yes</td>
+<td align="left"> Like <em>write</em> (above), except that XHTML rules
+are followed.  The XHTML 1.0 Transitional document type is declared,
+and only ASCII characters are written (for interoperability).  Other
+characters are written as entity or character references; the text is
+pretty printed.</td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="XIncludeFilter.html">xinclude</a></td>
+<td><em>none</em></td>
+<td>no</td>
+<td align="left">This stage handles XInclude processing.
+This is like entity inclusion, except that the included content
+is declared in-line rather than in the DTD at the beginning of
+a document.
+</td>
+</tr>
+<tr valign="top" align="center">
+<td><a href="XsltFilter.html">xslt</a></td>
+<td><em>required</em><br/> XSLT stylesheet URI</td>
+<td>no</td>
+<td align="left">This stage handles XSLT transformation
+according to a stylesheet.
+The implementation of the transformation may not actually
+stream data, although if such an XSLT engine is in use
+then that can happen.
+</td>
+</tr>
+</table>
+ <p/> Note that <a href="../../../gnu/xml/pipeline/EventFilter.html#bind(org.xml.sax.XMLReader,gnu.xml.pipeline.EventConsumer)"><code>EventFilter.bind(XMLReader,EventConsumer)</code></a> can automatically eliminate
+ some filters by setting SAX2 parser features appropriately.  This means
+ that you can routinely put filters like "nsfix", "validate", or "wf" at the
+ front of a pipeline (for components that need inputs conditioned to match
+ that level of correctness), and know that it won't actually be used unless
+ it's absolutely necessary.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createPipeline(String)">createPipeline</a>(String&nbsp;description)</code></dt><dd class="description"> Creates a simple pipeline according to the description string passed in.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createPipeline(String,gnu.xml.pipeline.EventConsumer)">createPipeline</a>(String&nbsp;description, <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a>&nbsp;next)</code></dt><dd class="description"> Extends an existing pipeline by prepending the filter pipeline to the
+ specified consumer.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createPipeline(tokens[],gnu.xml.pipeline.EventConsumer)">createPipeline</a>(tokens[]&nbsp;, <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a>&nbsp;next)</code></dt><dd class="description"> Extends an existing pipeline by prepending a pre-tokenized filter
+ pipeline to the specified consumer.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="createPipeline(String)"/><div class="member detail outer"><h3 class="member detail name">createPipeline</h3><pre class="member detail synopsis">public static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a> createPipeline(String description)
+            throws IOException</pre><blockquote class="member detail name"><div class="member detail description"> Creates a simple pipeline according to the description string passed in.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createPipeline(String,gnu.xml.pipeline.EventConsumer)"/><div class="member detail outer"><h3 class="member detail name">createPipeline</h3><pre class="member detail synopsis">public static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a> createPipeline(String description,
+                                           <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a> next)
+            throws IOException</pre><blockquote class="member detail name"><div class="member detail description"> Extends an existing pipeline by prepending the filter pipeline to the
+ specified consumer.  Some pipelines need more customization than can
+ be done through this simplified syntax.  When they are set up with
+ direct API calls, use this method to merge more complex pipeline
+ segments with easily configured ones.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createPipeline(tokens[],gnu.xml.pipeline.EventConsumer)"/><div class="member detail outer"><h3 class="member detail name">createPipeline</h3><pre class="member detail synopsis">public static <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a> createPipeline(tokens[] ,
+                                           <a href="../../../gnu/xml/pipeline/EventConsumer.html" title="Interface in gnu.xml.pipeline">EventConsumer</a> next)
+            throws IOException</pre><blockquote class="member detail name"><div class="member detail description"> Extends an existing pipeline by prepending a pre-tokenized filter
+ pipeline to the specified consumer.  Tokens are class names (or the
+ predefined aliases) left and right parenthesis, and the vertical bar.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

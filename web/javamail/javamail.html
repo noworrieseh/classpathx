@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<link rel='stylesheet' href='../main.css' type='text/css'/>
+<link rel='made' href='mailto:dog@gnu.org'/>
+<title>GNU JavaMail - GNU Project - Free Software Foundation (FSF)</title>
+</head>
+<body>
+
+<div class='logo'>
+<img src='../classpathx-logo-small.jpg' alt='[ gnu -classpath ext:ens:ions ]'/>
+</div>
+
+<h1>GNU JavaMail</h1>
+
+<p class='toc'>
+  <a href='#introduction'>Introduction</a>
+| <a href='#download'>Download</a>
+| <a href='#javadoc'>API and provider documentation</a>
+| <a href='#help-wanted'>Help wanted</a>
+| <a href='#mailing-lists'>Mailing lists</a>
+</p>
+
+<p>
+<hr />
+
+<h3><a name='introduction'>Introduction</a></h3>
+
+<p>
+GNU JavaMail is a <a href='/philosophy/free-sw.html'>free</a> implementation
+of the JavaMail API specification, version 1.3. All the code has been
+written from scratch without reference to Sun's code, which allows GNU
+JavaMail to be used on a completely free operating system such as GNU/Linux
+or the Hurd. The code is optimized to work with <a
+href='/software/java/java.html'>free Java implementations</a>, nothing
+prevents it from being used with any compliant JVM.
+</p>
+
+<p>
+GNU JavaMail provides a protocol-independent framework for building mail
+client applications in Java. The API itself provides a complete MIME
+implementation, and drivers for individual messaging protocols,
+known as <i>providers</i>, can be plugged into the JavaMail framework
+dynamically. Several providers, implementing Internet standard protocols,
+are included with GNU JavaMail. These include:
+<ul>
+<li><a href='javadoc/gnu/mail/providers/smtp/package-summary.html'>SMTP</a></li>
+<li><a href='javadoc/gnu/mail/providers/imap/package-summary.html'>IMAP</a></li>
+<li><a href='javadoc/gnu/mail/providers/pop3/package-summary.html'>POP3</a></li>
+<li><a href='javadoc/gnu/mail/providers/nntp/package-summary.html'>NNTP</a>
+including posting to news servers</li>
+<li>The UNIX <a href='javadoc/gnu/mail/providers/mbox/package-summary.html'>mbox</a> format</li>
+<li>Dan Bernstein's <a href='javadoc/gnu/mail/providers/maildir/package-summary.html'>Maildir</a>
+format</li>
+</ul>
+All these providers are feature-complete, and provide cryptographically
+secure access where relevant. However, if you don't see the provider or
+feature you need, <a href='#help-wanted'>sign up</a> and help us develop it!.
+</p>
+
+<h3><a name='download'>Download</a></h3>
+
+<p>
+The current stable release of GNU JavaMail is version 1.1.2, available
+<a href='http://ftp.gnu.org/gnu/classpathx/mail-1.1.2.tar.gz'>here</a>.
+</p>
+
+<p>
+You also need the current versions of <a href='http://ftp.gnu.org/gnu/classpathx/activation-1.1.1.tar.gz'>GNU JAF</a> and <a href='http://ftp.gnu.org/gnu/classpath/inetlib-1.1.1.tar.gz'>GNU inetlib</a> to build it.
+</p>
+
+<p>
+Alternatively you can retrieve the current sources via CVS
+<a href='https://savannah.gnu.org/cvs/?group_id=139'>here</a>, module
+<b>mail</b>.
+</p>
+
+<h3><a name='javadoc'>API and provider documentation</a></h3>
+
+<p>
+You can build the API and provider documentation yourself or browse it
+online <a href='javadoc/index.html'>here</a>
+(<a href='javadoc/index-noframes.html'>no frames</a>).
+</p>
+
+<h3><a name='help-wanted'>Help wanted</a></h3>
+
+<p>
+Development of GNU JavaMail is a volunteer effort, and you can also
+contribute. We need help to test the current code and manage future
+developments. Please contact <a href='mailto:dog@gnu.org'>Chris Burdess</a> if
+you're interested in contributing.
+</p>
+
+<p>
+If you have ever seen Sun's source code for any of the APIs under development
+in GNU JavaMail or any other classpathx project, you unfortunately can't
+contribute code. However, any help you can provide in the form of testing
+and documentation would be greatly appreciated.
+</p>
+
+<h3><a name='mailing-lists'>Mailing lists</a></h3>
+
+<p>
+The main discussion list is <a
+href='mailto:classpathx-javamail@gnu.org'>&lt;classpathx-javamail@gnu.org&gt;</a>,
+which is used to discuss all aspects of GNU JavaMail including development
+and porting. Please send any bugs reports to this list. Announcements about
+all ClasspathX projects are made on the <a
+href='mailto:classpathx-announce@gnu.org'>&lt;classpathx-announce@gnu.org&gt;</a>
+mailing list.
+</p>
+
+<p>
+To subscribe to any GNU mailing list, please send an empty mail with a
+subject header of just "subscribe" to the relevant -request address.
+</p>
+
+<!-- Begin standard GNU footer -->
+<hr/>
+
+<p>
+Return to <a href='/home.html'>GNU's home page</a>.
+<p>
+
+<p>
+Please send FSF and GNU inquiries and questions to <a
+href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>. There are also <a
+href="http://www.fsf.org/about/contact.html">other ways to contact </a>the FSF.
+</p>
+
+<p>
+Please send comments on these web pages to <a
+href='webmasters@gnu.org'><em>webmasters@gnu.org</em></a>, send other
+questions to <a href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>.
+</p>
+
+<p>
+Copyright &copy; 1999, 2001, 2004, 2005, 2006 Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+</p>
+
+<p>
+Verbatim copying and distribution of this entire article is permitted in any
+medium, provided this notice is preserved.
+</p>
+
+<p>
+Updated:
+$Date: 2007/06/01 09:18:18 $ $Author: dog $
+
+<p>
+<hr/>
+<!-- End standard GNU footer -->
+
+</body>
+</html>

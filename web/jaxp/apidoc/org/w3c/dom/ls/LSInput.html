@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>LSInput (GNU JAXP Library)</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.w3c.dom.ls.LSInput class"/><meta name="keywords" content="getCharacterStream()"/><meta name="keywords" content="setCharacterStream()"/><meta name="keywords" content="getByteStream()"/><meta name="keywords" content="setByteStream()"/><meta name="keywords" content="getStringData()"/><meta name="keywords" content="setStringData()"/><meta name="keywords" content="getSystemId()"/><meta name="keywords" content="setSystemId()"/><meta name="keywords" content="getPublicId()"/><meta name="keywords" content="setPublicId()"/><meta name="keywords" content="getBaseURI()"/><meta name="keywords" content="setBaseURI()"/><meta name="keywords" content="getEncoding()"/><meta name="keywords" content="setEncoding()"/><meta name="keywords" content="getCertifiedText()"/><meta name="keywords" content="setCertifiedText()"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../org/w3c/dom/ls/LSException.html">Prev Class</a> | <a href="../../../../org/w3c/dom/ls/LSLoadEvent.html">Next Class</a></td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="LSInput.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.w3c.dom.ls</h3><h1 class="class title-class">Interface LSInput</h1></div><dl class="class knownimplementing"><dt class="header"><b>Known Implementing Classes:</b></dt><dd class="item"><a href="../../../../gnu/xml/dom/ls/DomLSInput.html" title="Class in gnu.xml.dom.ls">DomLSInput</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">LSInput</b></code></div></div><hr/><div class="class description">  This interface represents an input source for data. 
+ <p/> This interface allows an application to encapsulate information about 
+ an input source in a single object, which may include a public 
+ identifier, a system identifier, a byte stream (possibly with a specified 
+ encoding), a base URI, and/or a character stream. 
+ <p/> The exact definitions of a byte stream and a character stream are 
+ binding dependent. 
+ <p/> The application is expected to provide objects that implement this 
+ interface whenever such objects are needed. The application can either 
+ provide its own objects that implement this interface, or it can use the 
+ generic factory method <code>DOMImplementationLS.createLSInput()</code> 
+ to create objects that implement this interface. 
+ <p/> The <code>LSParser</code> will use the <code>LSInput</code> object to 
+ determine how to read data. The <code>LSParser</code> will look at the 
+ different inputs specified in the <code>LSInput</code> in the following 
+ order to know which one to read from, the first one that is not null and 
+ not an empty string will be used: 
+ <ol>
+ <li> <code>LSInput.characterStream</code> 
+ </li>
+ <li> 
+ <code>LSInput.byteStream</code> 
+ </li>
+ <li> <code>LSInput.stringData</code> 
+ </li>
+ <li> 
+ <code>LSInput.systemId</code> 
+ </li>
+ <li> <code>LSInput.publicId</code> 
+ </li>
+ </ol> 
+ <p/> If all inputs are null, the <code>LSParser</code> will report a 
+ <code>DOMError</code> with its <code>DOMError.type</code> set to 
+ <code>"no-input-specified"</code> and its <code>DOMError.severity</code> 
+ set to <code>DOMError.SEVERITY_FATAL_ERROR</code>. 
+ <p/> <code>LSInput</code> objects belong to the application. The DOM 
+ implementation will never modify them (though it may make copies and 
+ modify the copies, if necessary). 
+ <p/>See also the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407">Document Object Model (DOM) Level 3 Load
+and Save Specification</a>.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getBaseURI()">getBaseURI</a>()</code></dt><dd class="description">  The base URI to be used (see section 5.1.4 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]) for 
+ resolving a relative <code>systemId</code> to an absolute URI.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> java.io.InputStream</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getByteStream()">getByteStream</a>()</code></dt><dd class="description">  An attribute of a language and binding dependent type that represents 
+ a stream of bytes.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getCertifiedText()">getCertifiedText</a>()</code></dt><dd class="description">  If set to true, assume that the input is certified (see section 2.13 
+ in [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]) when 
+ parsing [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>].</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> java.io.Reader</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getCharacterStream()">getCharacterStream</a>()</code></dt><dd class="description">  An attribute of a language and binding dependent type that represents 
+ a stream of 16-bit units.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getEncoding()">getEncoding</a>()</code></dt><dd class="description">  The character encoding, if known.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getPublicId()">getPublicId</a>()</code></dt><dd class="description">  The public identifier for this input source.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getStringData()">getStringData</a>()</code></dt><dd class="description">  String data to parse.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getSystemId()">getSystemId</a>()</code></dt><dd class="description">  The system identifier, a URI reference [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>], for this 
+ input source.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setBaseURI(String)">setBaseURI</a>(String&nbsp;baseURI)</code></dt><dd class="description">  The base URI to be used (see section 5.1.4 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]) for 
+ resolving a relative <code>systemId</code> to an absolute URI.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setByteStream(java.io.InputStream)">setByteStream</a>(java.io.InputStream&nbsp;byteStream)</code></dt><dd class="description">  An attribute of a language and binding dependent type that represents 
+ a stream of bytes.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setCertifiedText(boolean)">setCertifiedText</a>(boolean&nbsp;certifiedText)</code></dt><dd class="description">  If set to true, assume that the input is certified (see section 2.13 
+ in [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]) when 
+ parsing [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>].</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setCharacterStream(java.io.Reader)">setCharacterStream</a>(java.io.Reader&nbsp;characterStream)</code></dt><dd class="description">  An attribute of a language and binding dependent type that represents 
+ a stream of 16-bit units.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setEncoding(String)">setEncoding</a>(String&nbsp;encoding)</code></dt><dd class="description">  The character encoding, if known.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setPublicId(String)">setPublicId</a>(String&nbsp;publicId)</code></dt><dd class="description">  The public identifier for this input source.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setStringData(String)">setStringData</a>(String&nbsp;stringData)</code></dt><dd class="description">  String data to parse.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setSystemId(String)">setSystemId</a>(String&nbsp;systemId)</code></dt><dd class="description">  The system identifier, a URI reference [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>], for this 
+ input source.</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="getBaseURI()"/><div class="member detail outer"><h3 class="member detail name">getBaseURI</h3><pre class="member detail synopsis">public String getBaseURI()</pre><blockquote class="member detail name"><div class="member detail description">  The base URI to be used (see section 5.1.4 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]) for 
+ resolving a relative <code>systemId</code> to an absolute URI. 
+ <br/> If, when used, the base URI is itself a relative URI, an empty 
+ string, or null, the behavior is implementation dependent. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getByteStream()"/><div class="member detail outer"><h3 class="member detail name">getByteStream</h3><pre class="member detail synopsis">public java.io.InputStream getByteStream()</pre><blockquote class="member detail name"><div class="member detail description">  An attribute of a language and binding dependent type that represents 
+ a stream of bytes. 
+ <br/> If the application knows the character encoding of the byte 
+ stream, it should set the encoding attribute. Setting the encoding in 
+ this way will override any encoding specified in an XML declaration 
+ in the data. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getCertifiedText()"/><div class="member detail outer"><h3 class="member detail name">getCertifiedText</h3><pre class="member detail synopsis">public boolean getCertifiedText()</pre><blockquote class="member detail name"><div class="member detail description">  If set to true, assume that the input is certified (see section 2.13 
+ in [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]) when 
+ parsing [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getCharacterStream()"/><div class="member detail outer"><h3 class="member detail name">getCharacterStream</h3><pre class="member detail synopsis">public java.io.Reader getCharacterStream()</pre><blockquote class="member detail name"><div class="member detail description">  An attribute of a language and binding dependent type that represents 
+ a stream of 16-bit units. The application must encode the stream 
+ using UTF-16 (defined in [Unicode] and in [ISO/IEC 10646]). It is not a requirement to have an XML declaration when 
+ using character streams. If an XML declaration is present, the value 
+ of the encoding attribute will be ignored. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getEncoding()"/><div class="member detail outer"><h3 class="member detail name">getEncoding</h3><pre class="member detail synopsis">public String getEncoding()</pre><blockquote class="member detail name"><div class="member detail description">  The character encoding, if known. The encoding must be a string 
+ acceptable for an XML encoding declaration ([<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>] section 
+ 4.3.3 "Character Encoding in Entities"). 
+ <br/> This attribute has no effect when the application provides a 
+ character stream or string data. For other sources of input, an 
+ encoding specified by means of this attribute will override any 
+ encoding specified in the XML declaration or the Text declaration, or 
+ an encoding obtained from a higher level protocol, such as HTTP [<a href="http://www.ietf.org/rfc/rfc2616.txt">IETF RFC 2616</a>]. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getPublicId()"/><div class="member detail outer"><h3 class="member detail name">getPublicId</h3><pre class="member detail synopsis">public String getPublicId()</pre><blockquote class="member detail name"><div class="member detail description">  The public identifier for this input source. This may be mapped to an 
+ input source using an implementation dependent mechanism (such as 
+ catalogues or other mappings). The public identifier, if specified, 
+ may also be reported as part of the location information when errors 
+ are reported. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getStringData()"/><div class="member detail outer"><h3 class="member detail name">getStringData</h3><pre class="member detail synopsis">public String getStringData()</pre><blockquote class="member detail name"><div class="member detail description">  String data to parse. If provided, this will always be treated as a 
+ sequence of 16-bit units (UTF-16 encoded characters). It is not a 
+ requirement to have an XML declaration when using 
+ <code>stringData</code>. If an XML declaration is present, the value 
+ of the encoding attribute will be ignored. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getSystemId()"/><div class="member detail outer"><h3 class="member detail name">getSystemId</h3><pre class="member detail synopsis">public String getSystemId()</pre><blockquote class="member detail name"><div class="member detail description">  The system identifier, a URI reference [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>], for this 
+ input source. The system identifier is optional if there is a byte 
+ stream, a character stream, or string data. It is still useful to 
+ provide one, since the application will use it to resolve any 
+ relative URIs and can include it in error messages and warnings. (The 
+ LSParser will only attempt to fetch the resource identified by the 
+ URI reference if there is no other input available in the input 
+ source.) 
+ <br/> If the application knows the character encoding of the object 
+ pointed to by the system identifier, it can set the encoding using 
+ the <code>encoding</code> attribute. 
+ <br/> If the specified system ID is a relative URI reference (see 
+ section 5 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]), the DOM 
+ implementation will attempt to resolve the relative URI with the 
+ <code>baseURI</code> as the base, if that fails, the behavior is 
+ implementation dependent. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setBaseURI(String)"/><div class="member detail outer"><h3 class="member detail name">setBaseURI</h3><pre class="member detail synopsis">public void setBaseURI(String baseURI)</pre><blockquote class="member detail name"><div class="member detail description">  The base URI to be used (see section 5.1.4 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]) for 
+ resolving a relative <code>systemId</code> to an absolute URI. 
+ <br/> If, when used, the base URI is itself a relative URI, an empty 
+ string, or null, the behavior is implementation dependent. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setByteStream(java.io.InputStream)"/><div class="member detail outer"><h3 class="member detail name">setByteStream</h3><pre class="member detail synopsis">public void setByteStream(java.io.InputStream byteStream)</pre><blockquote class="member detail name"><div class="member detail description">  An attribute of a language and binding dependent type that represents 
+ a stream of bytes. 
+ <br/> If the application knows the character encoding of the byte 
+ stream, it should set the encoding attribute. Setting the encoding in 
+ this way will override any encoding specified in an XML declaration 
+ in the data. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setCertifiedText(boolean)"/><div class="member detail outer"><h3 class="member detail name">setCertifiedText</h3><pre class="member detail synopsis">public void setCertifiedText(boolean certifiedText)</pre><blockquote class="member detail name"><div class="member detail description">  If set to true, assume that the input is certified (see section 2.13 
+ in [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]) when 
+ parsing [<a href="http://www.w3.org/TR/2004/REC-xml11-20040204/">XML 1.1</a>]. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setCharacterStream(java.io.Reader)"/><div class="member detail outer"><h3 class="member detail name">setCharacterStream</h3><pre class="member detail synopsis">public void setCharacterStream(java.io.Reader characterStream)</pre><blockquote class="member detail name"><div class="member detail description">  An attribute of a language and binding dependent type that represents 
+ a stream of 16-bit units. The application must encode the stream 
+ using UTF-16 (defined in [Unicode] and in [ISO/IEC 10646]). It is not a requirement to have an XML declaration when 
+ using character streams. If an XML declaration is present, the value 
+ of the encoding attribute will be ignored. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setEncoding(String)"/><div class="member detail outer"><h3 class="member detail name">setEncoding</h3><pre class="member detail synopsis">public void setEncoding(String encoding)</pre><blockquote class="member detail name"><div class="member detail description">  The character encoding, if known. The encoding must be a string 
+ acceptable for an XML encoding declaration ([<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>] section 
+ 4.3.3 "Character Encoding in Entities"). 
+ <br/> This attribute has no effect when the application provides a 
+ character stream or string data. For other sources of input, an 
+ encoding specified by means of this attribute will override any 
+ encoding specified in the XML declaration or the Text declaration, or 
+ an encoding obtained from a higher level protocol, such as HTTP [<a href="http://www.ietf.org/rfc/rfc2616.txt">IETF RFC 2616</a>]. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setPublicId(String)"/><div class="member detail outer"><h3 class="member detail name">setPublicId</h3><pre class="member detail synopsis">public void setPublicId(String publicId)</pre><blockquote class="member detail name"><div class="member detail description">  The public identifier for this input source. This may be mapped to an 
+ input source using an implementation dependent mechanism (such as 
+ catalogues or other mappings). The public identifier, if specified, 
+ may also be reported as part of the location information when errors 
+ are reported. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setStringData(String)"/><div class="member detail outer"><h3 class="member detail name">setStringData</h3><pre class="member detail synopsis">public void setStringData(String stringData)</pre><blockquote class="member detail name"><div class="member detail description">  String data to parse. If provided, this will always be treated as a 
+ sequence of 16-bit units (UTF-16 encoded characters). It is not a 
+ requirement to have an XML declaration when using 
+ <code>stringData</code>. If an XML declaration is present, the value 
+ of the encoding attribute will be ignored. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setSystemId(String)"/><div class="member detail outer"><h3 class="member detail name">setSystemId</h3><pre class="member detail synopsis">public void setSystemId(String systemId)</pre><blockquote class="member detail name"><div class="member detail description">  The system identifier, a URI reference [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>], for this 
+ input source. The system identifier is optional if there is a byte 
+ stream, a character stream, or string data. It is still useful to 
+ provide one, since the application will use it to resolve any 
+ relative URIs and can include it in error messages and warnings. (The 
+ LSParser will only attempt to fetch the resource identified by the 
+ URI reference if there is no other input available in the input 
+ source.) 
+ <br/> If the application knows the character encoding of the object 
+ pointed to by the system identifier, it can set the encoding using 
+ the <code>encoding</code> attribute. 
+ <br/> If the specified system ID is a relative URI reference (see 
+ section 5 in [<a href="http://www.ietf.org/rfc/rfc2396.txt">IETF RFC 2396</a>]), the DOM 
+ implementation will attempt to resolve the relative URI with the 
+ <code>baseURI</code> as the base, if that fails, the behavior is 
+ implementation dependent. 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

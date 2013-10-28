@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<link rel='stylesheet' href='../main.css' type='text/css'/>
+<link rel='made' href='mailto:dog@gnu.org'/>
+<title>GNU JAXP - GNU Project - Free Software Foundation (FSF)</title>
+</head>
+<body>
+
+<div class='logo'>
+<img src='../classpathx-logo-small.jpg' alt='[ gnu -classpath ext:ens:ions
+]'/>
+</div>
+
+<h1>The GNU JAXP Project</h1>
+
+<p class='toc'>
+  <a href='#introduction'>Introduction</a>
+| <a href='#status'>Status</a>
+| <a href='#docs'>Documentation</a>
+| <a href='#help-wanted'>Help wanted</a>
+| <a href='#mailing-lists'>Mailing lists</a>
+| <a href='#download'>Download</a>
+| <a href='#bugs'>Bugs</a>
+</p>
+
+<p>
+<hr />
+
+<h3><a name="introduction">Introduction</a></h3>
+
+<p>
+GNU JAXP, originally part of the
+<a href='../index.html'>GNU Classpath Extensions</a>
+project, and now part of
+<a href='../../classpath/index.html'>GNU Classpath</a>,
+is a <a href='/philosophy/free-sw.html'>free</a> implementation of
+the standard XML processing APIs for Java:
+<ul>
+<li><a href='http://www.saxproject.org/'>SAX</a> 2.0, the Streaming API for
+XML parsing,</li>
+<li><a href='http://www.w3c.org/DOM'>DOM</a> Level 3, the web standard API
+for processing XML, and</li>
+<li>Sun's <a href='http://java.sun.com/xml/xml_jaxp.html'>JAXP</a> 1.3</li>
+</ul>
+</p>
+
+<p>
+Please note that GNU JAXP is <i>no longer maintained as a separate project</i>.
+It is now completely integrated into GNU Classpath, therefore please refer
+to the Classpath sources.
+</p>
+
+<h3><a name="status">Project status</a></h3>
+
+<p>
+GNU JAXP provides the &AElig;lfred2 SAX2 parser, and is configured to use
+its optionally validating module by default. It includes an implementation
+of the DOM Level 3 interfaces provided by the World Wide Web Consortium.
+There is also a (fast!) XPath 1.0 and XSLT 1.0 implementation which supports
+all options for input (source) and output (result).
+These are accessible through the JAXP 1.3 and W3C DOM bootstrapping APIs.
+</p>
+
+<p>
+The following W3C DOM APIs are supported:
+<ul>
+<li>DOM Level 3 Core</li>
+<li>DOM Level 3 Load &amp; Save</li>
+<li>DOM Level 3 XPath</li>
+<li>DOM Level 2 Events</li>
+<li>DOM Level 2 Traversal</li>
+</ul>
+<p>
+
+<p>
+GNU JAXP additionally provides a mostly-complete alternative implementation of
+DOM Level 3 Core and XPath, a SAX2 parser, and a JAXP XSLT transformer that
+use the Gnome <a href='http://www.xmlsoft.org/'>libxml2</a> and
+<a href='http://www.xmlsoft.org/XSLT/'>libxslt</a> libraries. These
+libraries, implemented in C, provide very fast parsing and transformation.
+The libxmlj library, a JNI wrapper for the Gnome libraries, allows you to
+leverage this speed via the JAXP interfaces. However, libxmlj is still
+experimental and does not conform as well to the published SAX and DOM
+conformance tests, and JNI deployment may be a barrier to entry.
+</p>
+
+<p>
+At the current time, libxmlj does not support the JAXP XPath interface,
+only the W3C DOM one.
+</p>
+
+<p>
+GNU JAXP is not a complete implementation of JAXP 1.3. It does not currently
+provide support for tree validation: the only validation available is XML
+(DTD) validation by the SAX parser. We are still working on W3C XML Schema
+and RELAX NG validators and the integration of the PSVI into the DOM.
+</p>
+
+<h3><a name="docs">Documentation</a></h3>
+
+<p>
+You can browse the API documentation for GNU JAXP online
+<a href="apidoc/index.html">here</a>
+(<a href="apidoc/index-noframes.html">no frames</a>).
+</p>
+
+<p>
+GNU JAXP requires JDK 1.4 or later.
+The <code>gnujaxp.jar</code> file is most easily installed in
+<code>$JAVA_HOME/jre/lib/ext</code>;
+otherwise you may prefer to modify your CLASSPATH.
+If you have other JAXP parsers installed you may also wish to set up
+<code>$JAVA_HOME/jre/lib/jaxp.properties</code>
+so the GNU JAXP drivers are used by default:
+</p>
+
+<pre class='config'>
+# make JAXP clients prefer the GNU implementations
+javax.xml.parsers.SAXParserFactory=gnu.xml.aelfred2.JAXPFactory
+javax.xml.parsers.DocumentBuilderFactory=gnu.xml.dom.DomDocumentBuilderFactory
+javax.xml.transform.TransformerFactory=gnu.xml.transform.TransformerFactoryImpl
+javax.xml.xpath.XPathFactory=gnu.xml.xpath.XPathFactoryImpl
+</pre>
+
+<p>
+Alternatively, you may specify the use of the experimental libxmlj
+implementations, as follows:
+</p>
+
+<pre class='config'>
+javax.xml.parsers.SAXParserFactory=gnu.xml.libxmlj.sax.GnomeSAXParserFactory
+javax.xml.parsers.DocumentBuilderFactory=gnu.xml.libxmlj.dom.GnomeDocumentBuilderFactory
+javax.xml.transform.TransformerFactory=gnu.xml.libxmlj.transform.GnomeTransformerFactory
+</pre>
+
+<p>
+If you are using the portable SAX2 bootstrapping APIs, you may want
+to set the <code>org.xml.sax.driver</code> system property on each
+JVM invocation to be
+<code>gnu.xml.aelfred2.SAXDriver</code> (non-validating) or
+<code>gnu.xml.aelfred2.XmlReader</code> (optionally validating).
+Otherwise the <code>org.xml.sax.helpers.XMLReaderFactory</code>
+may not return the parser you expect.
+</p>
+
+<p>
+If using GNU JAXP as part of GNU Classpath, no configuration should be
+necessary.
+</p>
+
+<h3><a name="help-wanted">Help wanted!</a></h3>
+
+<p>
+<b>Development of GNU JAXP is a volunteer effort, and
+you can also contribute!</b> We need lots of help to finish the
+current APIs and to keep track of future enhancements. There are also
+opportunities for testers, web authors, and documentors. Please post
+to one of the classpathx or classpath mailing lists if you're
+interested in helping.
+</p>
+
+<h3><a name="mailing-lists">Mailing lists</a></h3>
+
+<p>
+The main discussion list is 
+<a href="mailto:classpathx-xml@gnu.org">&lt;classpathx-xml@gnu.org&gt;</a>,
+which is used to discuss all aspects of GNU JAXP.
+</p>
+
+<p>
+Announcements about GNU JAXP are made on the low-volume
+<a href="mailto:classpathx-announce@gnu.org"
+>&lt;classpathx-announce@gnu.org&gt;</a> mailing list.
+</p>
+
+<p>
+For subscription information, see the mailing list info from
+the <a href="http://savannah.gnu.org/mail/?group_id=139"
+>ClasspathX project page</a>.
+</p>
+
+<h3><a name="download">Get the Software</a></h3>
+
+<p>
+You can download the latest software as part of the Classpath project at
+<a href="ftp://ftp.gnu.org/pub/gnu/classpath">
+ftp://ftp.gnu.org/pub/gnu/classpath</a>.
+You'll probably want to use one of the
+<a href="http://www.gnu.org/order/ftp.html">FTP mirror sites</a>,
+although the mirrors may not be current.
+</p>
+
+<p>
+Interested parties can view the current JAXP code
+<a href='http://savannah.gnu.org/cgi-bin/viewcvs/classpath/classpath'>through CVS</a>.
+</p>
+
+<h3><a name="bugs">Report a bug</a></h3>
+
+<p>
+If you think you have found a bug in GNU JAXP, then you
+should send as complete a report as possible to
+<a href="mailto:classpathx-xml@gnu.org">&lt;classpathx-xml@gnu.org&gt;</a>.
+</p>
+
+<!-- Begin standard GNU footer -->
+<hr/>
+
+<p>
+Return to <a href='/home.html'>GNU's home page</a>.
+<p>
+
+<p>
+Please send FSF and GNU inquiries and questions to <a
+href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>. There are also <a
+href="http://www.fsf.org/about/contact.html">other ways to contact </a>the FSF.
+</p>
+
+<p>
+Please send comments on these web pages to <a
+href='webmasters@gnu.org'><em>webmasters@gnu.org</em></a>, send other
+questions to <a href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>.
+</p>
+
+<p>
+Copyright &copy; 1999, 2001, 2004, 2005, 2006 Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+</p>
+
+<p>
+Verbatim copying and distribution of this entire article is permitted in any
+medium, provided this notice is preserved.
+</p>
+
+<p>
+Updated:
+$Date: 2007/09/18 09:07:00 $ $Author: dog $
+
+<p>
+<hr/>
+<!-- End standard GNU footer -->
+
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+<TITLE>GNU and Java - GNU Project - Free Software Foundation (FSF)</TITLE>
+<link rel='stylesheet' href='main.css' type='text/css'/>
+<link rel='made' href='mailto:dog@gnu.org'/>
+</head>
+<body>
+
+<div class='logo'>
+<img src='classpathx-logo.jpg' ALT=' [ gnu -classpath ext:ens:ions ] '/>
+</div>
+
+<p>
+The <i>GNU Classpath Extensions</i> project builds free versions of Sun's
+Java extension libraries, the packages in the <code>javax</code>
+namespace. It is a companion project of the 
+<a href='/software/classpath/'>GNU Classpath</a> project.
+</p>
+
+<p>
+ClasspathX produces vendor neutral Java code: it should work with
+any VM. However, we particularly want the code to work with free VMs
+such as <a href='http://gcc.gnu.org/java'>gij</a> and
+<a href='http://www.kaffe.org/'>kaffe</a>.
+</p>
+
+
+<h3><a name='help-wanted'>We need help</a></h3>
+
+<p>
+Attempting to build free versions of ALL of Sun's Java extensions
+is a big job and we need your help to get everything done. If you are
+a Java programmer and you want to work on building free Java
+extensions then get in touch with either
+<a href='mailto:dog@gnu.org'>Chris Burdess</a> or <a
+href='mailto:arnaud.vandyck@ulg.ac.be'>Arnaud Vandyck</a>
+who will be happy to give you something interesting to do!
+</p>
+
+<p>
+If you want to write code you must assure us that you
+have not seen the source code for the API you want to work on. If you
+have seen Sun's source code we can't accept your contributions as they
+would put the entire project at risk from legal action.
+</p>
+
+<p>
+If you can't contribute code, either because you don't think you're
+qualified or you've seen Sun's source code, you can still be of
+tremendous help to us. We need testers and people to write
+documentation as well as hackers!
+</p>
+
+
+<h3><a name='mailing-lists'>Keep in touch</a></h3>
+
+<p>
+To know what's going on with the project you can subscribe to our
+very low volume <i>announcements</i> mailing list by sending a mail with the
+subject line:
+<pre>
+  subscribe
+</pre>
+to the address 
+<a href='mailto:classpathx-annouce-request@gnu.org'>classpathx-announce-request@gnu.org</a>.
+</p>
+
+<p>
+If you are interested in becomming a developer it may be useful to
+track one of the development mailing lists. There is a mailing list
+for each major project. Check the individual project pages (or the
+savannah system) for more info. There is a general discussion list for
+classpathx developers which you can join by sending a mail with the
+subject:
+<pre>
+  subscribe
+</pre>
+to the address
+<a href='mailto:classpathx-discuss-request@gnu.org'>classpathx-discuss-request@gnu.org</a>.
+</p>
+
+<h3>Packages currently under development</h3>
+
+<ul>
+
+<li>
+<a name='activation' href='jaf/jaf.html'>JavaBeans&trade; Activation
+Framework</a>
+<p>
+GPL + library exception.
+</p>
+<p>
+JAF provides a means to type data and locate components suitable for
+performing various kinds of action on it. It extends the UNIX standard
+<code>mime.types</code> and <code>mailcap</code> mechanisms for Java.
+</p>
+<p>
+We have a complete implementation of JAF 1.0.2.
+</p>
+</li>
+
+<li>
+<a name='infobus'>JavaBean infobus</a>
+<p>
+LGPL.
+</p>
+<p>
+The infobus is a bean-to-bean communication system.
+</p>
+<p>
+We have the API classes but no implementations yet.
+</p>
+</li>
+
+<li>
+<a name='crypto'>Java cryptography</a>
+<p>
+GPL + library exception.
+</p>
+<p>
+This project has moved to become the <a
+href='/software/gnu-crypto/'>GNU-Crypto</a> project.
+</p>
+</li>
+
+<li>
+<a name='mail' href='javamail/javamail.html'>JavaMail</a>
+<p>
+GPL + library exception.
+</p>
+<p>
+JavaMail provides a complete internet mail system, including MIME.
+</p>
+<p>
+We have a complete implementation of JavaMail 1.3, and a broad range of
+providers including the only JavaMail NNTP provider.
+</p>
+</li>
+
+<li>
+<a name='jaxp' href='jaxp/jaxp.html'>JAXP</a>,
+the <em>Java API for XML Processing</em>.
+<p>
+GPL + library exception.
+</p>
+<p>
+We have JAXP 1.1 interfaces, and current SAX2 and DOM Level 2
+interfaces from their maintainers.
+</p>
+<p>
+The SAX2 implementation uses the &AElig;lfred2 parser,
+including modular validation.
+</p>
+<p>
+The DOM Level 2 implementation is "DOM2".
+</p>
+<p>
+There are related <code>gnu.xml.*</code> packages.
+</p>
+</li>
+
+<li>
+<a name="net">net extensions</a>
+<p>
+GPL.
+</p>
+<p>
+The extended net API which provides certain extensions to java.net.
+</p>
+<p>
+We have some of the API including a default implementation relying on
+<code>java.net</code> code.
+</p>
+</li>
+
+<li>
+<a name="servlet">servlet API</a>
+<p>
+LGPL licenced.
+</p>
+<p>
+The abstract definition of how to plug executable content into
+HTTP.
+</p>
+<p>
+We have the servlet classes for version 2.3 of the API (we'd like to
+produce the previous versions of these as well).
+</p>
+<p>
+There is also a GNU servlet container called 
+<a href="/software/paperclips">Paperclips</a>.
+</p>
+</li>
+
+</ul>
+
+
+<h3><a name='releases'>Releases</a></h3>
+
+<p>
+Releases for each separate part of the ClasspathX project are
+maintained, well, seperately. Check each project's page for details.
+</p>
+
+<p>
+We do not plan to offer a full ClasspathX download, but if you'd be
+interested in having one you should maybe let 
+<a href="mailto: classpathx-discuss@gnu.org">us</a> know.
+</p>
+
+
+<h3><a name='development'>Development</a></h3>
+
+<p>
+Development for ClasspathX occurs on the 
+<a href="http://savannah.gnu.org/projects/classpathx">savannah</a>
+free software collaboration system. You can view our code in CVS from
+there. If you want to help us you will need to become a savannah user.
+</p>
+
+
+<h3><a name='acknowledgements'>Acknowledgements</a></h3>
+
+<p>
+Andrew Selkirk started this project as an open source effort in
+2000. He did all of the hard work creating the free versions of the various
+javax APIs listed above. He was also gracious enough to hand on the
+work to the GNU project when he found himself too busy to
+continue. Andrew stays in touch with the project and we'd like to give a 
+a <b>very</b> big thank you to Andrew for his effort, vision 
+and magnanimity.
+</p>
+
+<p>
+David Brownell contributed the JAXP, SAX and DOM code.
+With another hat, he's a maintainer for the SAX2 interfaces.
+Thanks for the help David!
+</p>
+
+<p>
+Chris Burdess (aka dog) wrote the JavaMail and JAF implementations and
+providers.
+</p>
+
+<p>
+Paul Siegmann, who wrote the original free version of the servlet API 
+and trailblazed the legalities of the GNU project clean rooming javax
+source code. Paul spent many days typing in code worked out from
+javadoc. He deserves a lot of thanks, so...<br>
+Lots of thanks Paul!
+</p>
+
+<!-- Begin standard GNU footer -->
+<hr/>
+<p>
+Return to <a href='/home.html'>GNU's home page</a>.<p>
+
+<p>
+Please send FSF and GNU inquiries and questions to <a
+href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>. There are also <a
+href="http://www.fsf.org/about/contact.html">other ways to contact</a> the FSF.
+</p>
+
+<p>
+Please send comments on these web pages to <a
+href='webmasters@gnu.org'><em>webmasters@gnu.org</em></a>, send other
+questions to <a href='mailto:gnu@gnu.org'><em>gnu@gnu.org</em></a>.
+</p>
+
+<p>
+Copyright &copy; 1999, 2001, 2002, 2004, 2006 Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+</p>
+
+<p>
+Verbatim copying and distribution of this entire article is permitted in any
+medium, provided this notice is preserved.
+</p>
+
+<p>
+Updated:
+$Date: 2006/11/23 09:22:28 $ $Author: ramprasadb $
+
+<p>
+<hr/>
+<!-- End standard GNU footer -->
+
+</body>
+</html>
+

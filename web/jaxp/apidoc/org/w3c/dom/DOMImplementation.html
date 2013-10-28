@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>DOMImplementation (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.w3c.dom.DOMImplementation class"/><meta name="keywords" content="hasFeature()"/><meta name="keywords" content="createDocumentType()"/><meta name="keywords" content="createDocument()"/><meta name="keywords" content="getFeature()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../org/w3c/dom/DOMException.html">Prev Class</a> | <a href="../../../org/w3c/dom/DOMImplementationList.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="DOMImplementation.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | Constr</td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | Constr</td></tr></table><div class="class title outer"><h3 class="class title-package">org.w3c.dom</h3><h1 class="class title-class">Interface DOMImplementation</h1></div><dl class="class knownimplementing"><dt class="header"><b>Known Subinterfaces:</b></dt><dd class="item"><a href="../../../org/w3c/dom/css/DOMImplementationCSS.html" title="Interface in org.w3c.dom.css">DOMImplementationCSS</a></dd></dl><dl class="class knownimplementing"><dt class="header"><b>Known Implementing Classes:</b></dt><dd class="item"><a href="../../../gnu/xml/dom/DomImpl.html" title="Class in gnu.xml.dom">DomImpl</a>, <a href="../../../gnu/xml/libxmlj/dom/GnomeDocumentBuilder.html" title="Class in gnu.xml.libxmlj.dom">GnomeDocumentBuilder</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public interface <b class="class synopsis name">DOMImplementation</b></code></div></div><hr/><div class="class description"> The <code>DOMImplementation</code> interface provides a number of methods 
+ for performing operations that are independent of any particular instance 
+ of the document object model.
+ <p/>See also the <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407">Document Object Model (DOM) Level 3 Core Specification</a>.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/Document.html" title="Interface in org.w3c.dom">Document</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createDocument(String,String,org.w3c.dom.DocumentType)">createDocument</a>(String&nbsp;namespaceURI, String&nbsp;qualifiedName, <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a>&nbsp;doctype)</code></dt><dd class="description"> Creates a DOM Document object of the specified type with its document 
+ element.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createDocumentType(String,String,String)">createDocumentType</a>(String&nbsp;qualifiedName, String&nbsp;publicId, String&nbsp;systemId)</code></dt><dd class="description"> Creates an empty <code>DocumentType</code> node.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Object</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getFeature(String,String)">getFeature</a>(String&nbsp;feature, String&nbsp;version)</code></dt><dd class="description">  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in .</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#hasFeature(String,String)">hasFeature</a>(String&nbsp;feature, String&nbsp;version)</code></dt><dd class="description"> Test if the DOM implementation implements a specific feature and 
+ version, as specified in .</dd></dl></td></tr></table></dl><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="createDocument(String,String,org.w3c.dom.DocumentType)"/><div class="member detail outer"><h3 class="member detail name">createDocument</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/Document.html" title="Interface in org.w3c.dom">Document</a> createDocument(String namespaceURI,
+                               String qualifiedName,
+                               <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a> doctype)
+            throws <a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></pre><blockquote class="member detail name"><div class="member detail description"> Creates a DOM Document object of the specified type with its document 
+ element.
+ <br/>Note that based on the <code>DocumentType</code> given to create 
+ the document, the implementation may instantiate specialized 
+ <code>Document</code> objects that support additional features than 
+ the "Core", such as "HTML" [<a href="http://www.w3.org/TR/2003/REC-DOM-Level-2-HTML-20030109">DOM Level 2 HTML</a>]
+ . On the other hand, setting the <code>DocumentType</code> after the 
+ document was created makes this very unlikely to happen. 
+ Alternatively, specialized <code>Document</code> creation methods, 
+ such as <code>createHTMLDocument</code> [<a href="http://www.w3.org/TR/2003/REC-DOM-Level-2-HTML-20030109">DOM Level 2 HTML</a>]
+ , can be used to obtain specific types of <code>Document</code> 
+ objects.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">namespaceURI</code><span class="separator"> - </span><span class="description">The namespace URI of the document element to 
+create or <code>null</code>.</span></dd><dd class="item"><code class="name">qualifiedName</code><span class="separator"> - </span><span class="description">The qualified name of the document element to be 
+created or <code>null</code>.</span></dd><dd class="item"><code class="name">doctype</code><span class="separator"> - </span><span class="description">The type of document to be created or <code>null</code>.
+When <code>doctype</code> is not <code>null</code>, its 
+<code>Node.ownerDocument</code> attribute is set to the document 
+being created.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A new <code>Document</code> object with its document element. 
+If the <code>NamespaceURI</code>, <code>qualifiedName</code>, and 
+<code>doctype</code> are <code>null</code>, the returned 
+<code>Document</code> is empty with no document element.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></code><span class="separator"> - </span><span class="description">INVALID_CHARACTER_ERR: Raised if the specified qualified name is not 
+an XML name according to [<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>].
+<br/>NAMESPACE_ERR: Raised if the <code>qualifiedName</code> is 
+malformed, if the <code>qualifiedName</code> has a prefix and the 
+<code>namespaceURI</code> is <code>null</code>, or if the 
+<code>qualifiedName</code> is <code>null</code> and the 
+<code>namespaceURI</code> is different from <code>null</code>, or 
+if the <code>qualifiedName</code> has a prefix that is "xml" and 
+the <code>namespaceURI</code> is different from "<a href="http://www.w3.org/XML/1998/namespace">
+http://www.w3.org/XML/1998/namespace</a>" [<a href="http://www.w3.org/TR/1999/REC-xml-names-19990114/">XML Namespaces</a>]
+, or if the DOM implementation does not support the 
+<code>"XML"</code> feature but a non-null namespace URI was 
+provided, since namespaces were defined by XML.
+<br/>WRONG_DOCUMENT_ERR: Raised if <code>doctype</code> has already 
+been used with a different document or was created from a different 
+implementation.
+<br/>NOT_SUPPORTED_ERR: May be raised if the implementation does not 
+support the feature "XML" and the language exposed through the 
+Document does not support XML Namespaces (such as [<a href="http://www.w3.org/TR/1999/REC-html401-19991224/">HTML 4.01</a>]).</span></dd></dl></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createDocumentType(String,String,String)"/><div class="member detail outer"><h3 class="member detail name">createDocumentType</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a> createDocumentType(String qualifiedName,
+                                       String publicId,
+                                       String systemId)
+            throws <a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></pre><blockquote class="member detail name"><div class="member detail description"> Creates an empty <code>DocumentType</code> node. Entity declarations 
+ and notations are not made available. Entity reference expansions and 
+ default attribute additions do not occur..
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">qualifiedName</code><span class="separator"> - </span><span class="description">The qualified name of the document type to be 
+created.</span></dd><dd class="item"><code class="name">publicId</code><span class="separator"> - </span><span class="description">The external subset public identifier.</span></dd><dd class="item"><code class="name">systemId</code><span class="separator"> - </span><span class="description">The external subset system identifier.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">A new <code>DocumentType</code> node with 
+<code>Node.ownerDocument</code> set to <code>null</code>.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></code><span class="separator"> - </span><span class="description">INVALID_CHARACTER_ERR: Raised if the specified qualified name is not 
+an XML name according to [<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>].
+<br/>NAMESPACE_ERR: Raised if the <code>qualifiedName</code> is 
+malformed.
+<br/>NOT_SUPPORTED_ERR: May be raised if the implementation does not 
+support the feature "XML" and the language exposed through the 
+Document does not support XML Namespaces (such as [<a href="http://www.w3.org/TR/1999/REC-html401-19991224/">HTML 4.01</a>]).</span></dd></dl></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getFeature(String,String)"/><div class="member detail outer"><h3 class="member detail name">getFeature</h3><pre class="member detail synopsis">public Object getFeature(String feature,
+                         String version)</pre><blockquote class="member detail name"><div class="member detail description">  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in . The specialized object may also be obtained by using 
+ binding-specific casting methods but is not necessarily expected to, 
+ as discussed in . This method also allow the implementation to 
+ provide specialized objects which do not support the 
+ <code>DOMImplementation</code> interface. 
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">feature</code><span class="separator"> - </span><span class="description">The name of the feature requested. Note that any plus 
+sign "+" prepended to the name of the feature will be ignored since 
+it is not significant in the context of this method.</span></dd><dd class="item"><code class="name">version</code><span class="separator"> - </span><span class="description">This is the version number of the feature to test.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Returns an object which implements the specialized APIs of 
+the specified feature and version, if any, or <code>null</code> if 
+there is no object which implements interfaces associated with that 
+feature. If the <code>DOMObject</code> returned by this method 
+implements the <code>DOMImplementation</code> interface, it must 
+delegate to the primary core <code>DOMImplementation</code> and not 
+return results inconsistent with the primary core 
+<code>DOMImplementation</code> such as <code>hasFeature</code>, 
+<code>getFeature</code>, etc.</dd></dl></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="hasFeature(String,String)"/><div class="member detail outer"><h3 class="member detail name">hasFeature</h3><pre class="member detail synopsis">public boolean hasFeature(String feature,
+                          String version)</pre><blockquote class="member detail name"><div class="member detail description"> Test if the DOM implementation implements a specific feature and 
+ version, as specified in .
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">feature</code><span class="separator"> - </span><span class="description">The name of the feature to test.</span></dd><dd class="item"><code class="name">version</code><span class="separator"> - </span><span class="description">This is the version number of the feature to test.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item"><code>true</code> if the feature is implemented in the 
+specified version, <code>false</code> otherwise.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

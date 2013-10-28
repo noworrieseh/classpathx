@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>NamespaceSupport (GNU JAXP Library)</title><script src="../../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="org.xml.sax.helpers.NamespaceSupport class"/><meta name="keywords" content="XMLNS"/><meta name="keywords" content="NSDECL"/><meta name="keywords" content="reset()"/><meta name="keywords" content="pushContext()"/><meta name="keywords" content="popContext()"/><meta name="keywords" content="declarePrefix()"/><meta name="keywords" content="processName()"/><meta name="keywords" content="getURI()"/><meta name="keywords" content="getPrefixes()"/><meta name="keywords" content="getPrefix()"/><meta name="keywords" content="getDeclaredPrefixes()"/><meta name="keywords" content="setNamespaceDeclUris()"/><meta name="keywords" content="isNamespaceDeclUris()"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../../org/xml/sax/helpers/LocatorImpl.html">Prev Class</a> | <a href="../../../../org/xml/sax/helpers/ParserAdapter.html">Next Class</a></td><td class="navi"><a href="../../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="NamespaceSupport.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | <a href="#summary-fields">Field</a> | <a href="#summary-methods">Method</a> | <a href="#summary-constructors">Constr</a></td><td class="navi">Detail: Nested | <a href="#detail-fields">Field</a> | <a href="#detail-methods">Method</a> | <a href="#detail-constructors">Constr</a></td></tr></table><div class="class title outer"><h3 class="class title-package">org.xml.sax.helpers</h3><h1 class="class title-class">Class NamespaceSupport</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>org.xml.sax.helpers.NamespaceSupport</code></li></ul></ul></div><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public class <b class="class synopsis name">NamespaceSupport</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div></div><hr/><div class="class description"> Encapsulate Namespace logic for use by applications using SAX,
+ or internally by SAX drivers.
+
+ <blockquote>
+ <em>This module, both source code and documentation, is in the
+ Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ See <a href="http://www.saxproject.org">http://www.saxproject.org</a>
+ for further information.
+ </blockquote>
+
+ <p/>This class encapsulates the logic of Namespace processing: it
+ tracks the declarations currently in force for each context and
+ automatically processes qualified XML names into their Namespace
+ parts; it can also be used in reverse for generating XML qnames
+ from Namespaces.
+
+ <p/>Namespace support objects are reusable, but the reset method
+ must be invoked between each session.
+
+ <p/>Here is a simple session:
+
+ <pre>
+ String parts[] = new String[3];
+ NamespaceSupport support = new NamespaceSupport();
+
+ support.pushContext();
+ support.declarePrefix("", "http://www.w3.org/1999/xhtml");
+ support.declarePrefix("dc", "http://www.purl.org/dc#");
+
+ parts = support.processName("p", parts, false);
+ System.out.println("Namespace URI: " + parts[0]);
+ System.out.println("Local name: " + parts[1]);
+ System.out.println("Raw name: " + parts[2]);
+
+ parts = support.processName("dc:title", parts, false);
+ System.out.println("Namespace URI: " + parts[0]);
+ System.out.println("Local name: " + parts[1]);
+ System.out.println("Raw name: " + parts[2]);
+
+ support.popContext();
+ </pre>
+
+ <p/>Note that this class is optimized for the use case where most
+ elements do not contain Namespace declarations: if the same
+ prefix/URI mapping is repeated for each context (for example), this
+ class will be somewhat less efficient.
+
+ <p/>Although SAX drivers (parsers) may choose to use this class to
+ implement namespace handling, they are not required to do so.
+ Applications must track namespace information themselves if they
+ want to use namespace information.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.0</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><a name="summary-fields"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Field Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis">static String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#NSDECL">NSDECL</a></code></dt><dd class="description"> The namespace declaration URI as a constant.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis">static String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#XMLNS">XMLNS</a></code></dt><dd class="description"> The XML Namespace URI as a constant.</dd></dl></td></tr></table></dl><a name="summary-constructors"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Constructor Summary</h2></td></tr><tr><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#NamespaceSupport()">NamespaceSupport</a>()</code></dt><dd class="description"> Create a new Namespace support object.</dd></dl></td></tr></table></dl><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#declarePrefix(String,String)">declarePrefix</a>(String&nbsp;prefix, String&nbsp;uri)</code></dt><dd class="description"> Declare a Namespace prefix.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Enumeration</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getDeclaredPrefixes()">getDeclaredPrefixes</a>()</code></dt><dd class="description"> Return an enumeration of all prefixes declared in this context.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getPrefix(String)">getPrefix</a>(String&nbsp;uri)</code></dt><dd class="description"> Return one of the prefixes mapped to a Namespace URI.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Enumeration</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getPrefixes()">getPrefixes</a>()</code></dt><dd class="description"> Return an enumeration of all prefixes whose declarations are
+ active in the current context.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Enumeration</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getPrefixes(String)">getPrefixes</a>(String&nbsp;uri)</code></dt><dd class="description"> Return an enumeration of all prefixes for a given URI whose
+ declarations are active in the current context.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getURI(String)">getURI</a>(String&nbsp;prefix)</code></dt><dd class="description"> Look up a prefix and get the currently-mapped Namespace URI.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#isNamespaceDeclUris()">isNamespaceDeclUris</a>()</code></dt><dd class="description"> Returns true if namespace declaration attributes are placed into
+ a namespace.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#popContext()">popContext</a>()</code></dt><dd class="description"> Revert to the previous Namespace context.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> String[]</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#processName(String,parts[],boolean)">processName</a>(String&nbsp;qName, parts[]&nbsp;, boolean&nbsp;isAttribute)</code></dt><dd class="description"> Process a raw XML qualified name, after all declarations in the
+ current context have been handled by <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#declarePrefix(String,String)"><code>declarePrefix()</code></a>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#pushContext()">pushContext</a>()</code></dt><dd class="description"> Start a new Namespace context.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#reset()">reset</a>()</code></dt><dd class="description"> Reset this Namespace support object for reuse.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> void</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#setNamespaceDeclUris(boolean)">setNamespaceDeclUris</a>(boolean&nbsp;value)</code></dt><dd class="description"> Controls whether namespace declaration attributes are placed
+ into the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#NSDECL"><code>NSDECL</code></a> namespace
+ by <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#processName(String,parts[],boolean)"><code>processName()</code></a>.</dd></dl></td></tr></table></dl><a name="detail-fields"/><h2 class="section header">Field Details</h2><div class="section"><a name="NSDECL"/><div class="member detail outer"><h3 class="member detail name">NSDECL</h3><pre class="member detail synopsis">public static final String NSDECL</pre><blockquote class="member detail name"><div class="member detail description"> The namespace declaration URI as a constant.
+ The value is <code>http://www.w3.org/xmlns/2000/</code>, as defined
+ in a backwards-incompatible erratum to the "Namespaces in XML"
+ recommendation.  Because that erratum postdated SAX2, SAX2 defaults 
+ to the original recommendation, and does not normally use this URI.
+ 
+
+ <p/>This is the Namespace URI that is optionally applied to
+ <em>xmlns</em> and <em>xmlns:*</em> attributes, which are used to
+ declare namespaces.  
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.1alpha</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#setNamespaceDeclUris(boolean)"><code>setNamespaceDeclUris(boolean)</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#isNamespaceDeclUris()"><code>isNamespaceDeclUris()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="XMLNS"/><div class="member detail outer"><h3 class="member detail name">XMLNS</h3><pre class="member detail synopsis">public static final String XMLNS</pre><blockquote class="member detail name"><div class="member detail description"> The XML Namespace URI as a constant.
+ The value is <code>http://www.w3.org/XML/1998/namespace</code>
+ as defined in the "Namespaces in XML" * recommendation.
+
+ <p/>This is the Namespace URI that is automatically mapped
+ to the "xml" prefix.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-constructors"/><h2 class="section header">Constructor Details</h2><div class="section"><a name="NamespaceSupport()"/><div class="member detail outer"><h3 class="member detail name">NamespaceSupport</h3><pre class="member detail synopsis">public NamespaceSupport()</pre><blockquote class="member detail name"><div class="member detail description"> Create a new Namespace support object.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="declarePrefix(String,String)"/><div class="member detail outer"><h3 class="member detail name">declarePrefix</h3><pre class="member detail synopsis">public boolean declarePrefix(String prefix,
+                             String uri)</pre><blockquote class="member detail name"><div class="member detail description"> Declare a Namespace prefix.  All prefixes must be declared
+ before they are referenced.  For example, a SAX driver (parser)
+ would scan an element's attributes
+ in two passes:  first for namespace declarations,
+ then a second pass using <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#processName(String,parts[],boolean)"><code>processName()</code></a> to
+ interpret prefixes against (potentially redefined) prefixes.
+
+ <p/>This method declares a prefix in the current Namespace
+ context; the prefix will remain in force until this context
+ is popped, unless it is shadowed in a descendant context.
+
+ <p/>To declare the default element Namespace, use the empty string as
+ the prefix.
+
+ <p/>Note that you must <em>not</em> declare a prefix after
+ you've pushed and popped another Namespace context, or
+ treated the declarations phase as complete by processing
+ a prefixed name.
+
+ <p/>Note that there is an asymmetry in this library: <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix</code></a> will not return the "" prefix,
+ even if you have declared a default element namespace.
+ To check for a default namespace,
+ you have to look it up explicitly using <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI</code></a>.
+ This asymmetry exists to make it easier to look up prefixes
+ for attribute names, where the default prefix is not allowed.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">prefix</code><span class="separator"> - </span><span class="description">The prefix to declare, or the empty string to
+indicate the default element namespace.  This may never have
+the value "xml" or "xmlns".</span></dd><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">The Namespace URI to associate with the prefix.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">true if the prefix was legal, false otherwise</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#processName(String,parts[],boolean)"><code>processName(String,parts[],boolean)</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI(String)</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getDeclaredPrefixes()"/><div class="member detail outer"><h3 class="member detail name">getDeclaredPrefixes</h3><pre class="member detail synopsis">public Enumeration getDeclaredPrefixes()</pre><blockquote class="member detail name"><div class="member detail description"> Return an enumeration of all prefixes declared in this context.
+
+ <p/>The empty (default) prefix will be included in this 
+ enumeration; note that this behaviour differs from that of
+<a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix(String)</code></a> and <code>getPrefixes</code>.
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">An enumeration of all prefixes declared in this
+context.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><code>getPrefixes</code>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getPrefix(String)"/><div class="member detail outer"><h3 class="member detail name">getPrefix</h3><pre class="member detail synopsis">public String getPrefix(String uri)</pre><blockquote class="member detail name"><div class="member detail description"> Return one of the prefixes mapped to a Namespace URI.
+
+ <p/>If more than one prefix is currently mapped to the same
+ URI, this method will make an arbitrary selection; if you
+ want all of the prefixes, use the <code>getPrefixes</code>
+ method instead.
+
+ <p/><strong>Note:</strong> this will never return the empty (default) prefix;
+ to check for a default prefix, use the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI</code></a>
+ method with an argument of "".
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">the namespace URI</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">one of the prefixes currently mapped to the URI supplied,
+or null if none is mapped or if the URI is assigned to
+the default namespace</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><code>getPrefixes(java.lang.String)</code>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getPrefixes()"/><div class="member detail outer"><h3 class="member detail name">getPrefixes</h3><pre class="member detail synopsis">public Enumeration getPrefixes()</pre><blockquote class="member detail name"><div class="member detail description"> Return an enumeration of all prefixes whose declarations are
+ active in the current context.
+ This includes declarations from parent contexts that have
+ not been overridden.
+
+ <p/><strong>Note:</strong> if there is a default prefix, it will not be
+ returned in this enumeration; check for the default prefix
+ using the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI</code></a> with an argument of "".
+</div><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">An enumeration of prefixes (never empty).</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getDeclaredPrefixes()"><code>getDeclaredPrefixes()</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getPrefixes(String)"/><div class="member detail outer"><h3 class="member detail name">getPrefixes</h3><pre class="member detail synopsis">public Enumeration getPrefixes(String uri)</pre><blockquote class="member detail name"><div class="member detail description"> Return an enumeration of all prefixes for a given URI whose
+ declarations are active in the current context.
+ This includes declarations from parent contexts that have
+ not been overridden.
+
+ <p/>This method returns prefixes mapped to a specific Namespace
+ URI.  The xml: prefix will be included.  If you want only one
+ prefix that's mapped to the Namespace URI, and you don't care 
+ which one you get, use the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix</code></a>
+  method instead.
+
+ <p/><strong>Note:</strong> the empty (default) prefix is <em>never</em> included
+ in this enumeration; to check for the presence of a default
+ Namespace, use the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI</code></a> method with an
+ argument of "".
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">uri</code><span class="separator"> - </span><span class="description">The Namespace URI.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">An enumeration of prefixes (never empty).</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix(String)</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getDeclaredPrefixes()"><code>getDeclaredPrefixes()</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getURI(String)"><code>getURI(String)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getURI(String)"/><div class="member detail outer"><h3 class="member detail name">getURI</h3><pre class="member detail synopsis">public String getURI(String prefix)</pre><blockquote class="member detail name"><div class="member detail description"> Look up a prefix and get the currently-mapped Namespace URI.
+
+ <p/>This method looks up the prefix in the current context.
+ Use the empty string ("") for the default Namespace.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">prefix</code><span class="separator"> - </span><span class="description">The prefix to look up.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The associated Namespace URI, or null if the prefix
+is undeclared in this context.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#getPrefix(String)"><code>getPrefix(String)</code></a>, <code>getPrefixes</code><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="isNamespaceDeclUris()"/><div class="member detail outer"><h3 class="member detail name">isNamespaceDeclUris</h3><pre class="member detail synopsis">public boolean isNamespaceDeclUris()</pre><blockquote class="member detail name"><div class="member detail description"> Returns true if namespace declaration attributes are placed into
+ a namespace.  This behavior is not the default.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.1alpha</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="popContext()"/><div class="member detail outer"><h3 class="member detail name">popContext</h3><pre class="member detail synopsis">public void popContext()</pre><blockquote class="member detail name"><div class="member detail description"> Revert to the previous Namespace context.
+
+ <p/>Normally, you should pop the context at the end of each
+ XML element.  After popping the context, all Namespace prefix
+ mappings that were previously in force are restored.
+
+ <p/>You must not attempt to declare additional Namespace
+ prefixes after popping a context, unless you push another
+ context first.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#pushContext()"><code>pushContext()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="processName(String,parts[],boolean)"/><div class="member detail outer"><h3 class="member detail name">processName</h3><pre class="member detail synopsis">public String[] processName(String qName,
+                            parts[] ,
+                            boolean isAttribute)</pre><blockquote class="member detail name"><div class="member detail description"> Process a raw XML qualified name, after all declarations in the
+ current context have been handled by <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#declarePrefix(String,String)"><code>declarePrefix()</code></a>.
+
+ <p/>This method processes a raw XML qualified name in the
+ current context by removing the prefix and looking it up among
+ the prefixes currently declared.  The return value will be the
+ array supplied by the caller, filled in as follows:
+
+ <dl>
+ <dt>parts[0]</dt>
+ <dd>The Namespace URI, or an empty string if none is
+  in use.</dd>
+ <dt>parts[1]</dt>
+ <dd>The local name (without prefix).</dd>
+ <dt>parts[2]</dt>
+ <dd>The original raw name.</dd>
+ </dl>
+
+ <p/>All of the strings in the array will be internalized.  If
+ the raw name has a prefix that has not been declared, then
+ the return value will be null.
+
+ <p/>Note that attribute names are processed differently than
+ element names: an unprefixed element name will receive the
+ default Namespace (if any), while an unprefixed attribute name
+ will not.
+</div><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">qName</code><span class="separator"> - </span><span class="description">The XML qualified name to be processed.</span></dd><dd class="item"><code class="name">isAttribute</code><span class="separator"> - </span><span class="description">A flag indicating whether this is an
+attribute name (true) or an element name (false).</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The supplied array holding three internalized strings 
+representing the Namespace URI (or empty string), the
+local name, and the XML qualified name; or null if there
+is an undeclared prefix.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#declarePrefix(String,String)"><code>declarePrefix(String,String)</code></a>, <code>java.lang.String.intern</code><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="pushContext()"/><div class="member detail outer"><h3 class="member detail name">pushContext</h3><pre class="member detail synopsis">public void pushContext()</pre><blockquote class="member detail name"><div class="member detail description"> Start a new Namespace context.
+ The new context will automatically inherit
+ the declarations of its parent context, but it will also keep
+ track of which declarations were made within this context.
+
+ <p/>Event callback code should start a new context once per element.
+ This means being ready to call this in either of two places.
+ For elements that don't include namespace declarations, the
+ <em>ContentHandler.startElement()</em> callback is the right place.
+ For elements with such a declaration, it'd done in the first
+ <em>ContentHandler.startPrefixMapping()</em> callback.
+ A boolean flag can be used to
+ track whether a context has been started yet.  When either of
+ those methods is called, it checks the flag to see if a new context
+ needs to be started.  If so, it starts the context and sets the
+ flag.  After <em>ContentHandler.startElement()</em>
+ does that, it always clears the flag.
+
+ <p/>Normally, SAX drivers would push a new context at the beginning
+ of each XML element.  Then they perform a first pass over the
+ attributes to process all namespace declarations, making
+ <em>ContentHandler.startPrefixMapping()</em> callbacks.
+ Then a second pass is made, to determine the namespace-qualified
+ names for all attributes and for the element name.
+ Finally all the information for the
+ <em>ContentHandler.startElement()</em> callback is available,
+ so it can then be made.
+
+ <p/>The Namespace support object always starts with a base context
+ already in force: in this context, only the "xml" prefix is
+ declared.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/ContentHandler.html"><code>ContentHandler</code></a>, <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#popContext()"><code>popContext()</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="reset()"/><div class="member detail outer"><h3 class="member detail name">reset</h3><pre class="member detail synopsis">public void reset()</pre><blockquote class="member detail name"><div class="member detail description"> Reset this Namespace support object for reuse.
+
+ <p/>It is necessary to invoke this method before reusing the
+ Namespace support object for a new session.  If namespace
+ declaration URIs are to be supported, that flag must also
+ be set to a non-default value.
+ 
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>See Also:</b></dt><dd><a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#setNamespaceDeclUris(boolean)"><code>setNamespaceDeclUris(boolean)</code></a><dd></dl></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="setNamespaceDeclUris(boolean)"/><div class="member detail outer"><h3 class="member detail name">setNamespaceDeclUris</h3><pre class="member detail synopsis">public void setNamespaceDeclUris(boolean value)</pre><blockquote class="member detail name"><div class="member detail description"> Controls whether namespace declaration attributes are placed
+ into the <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#NSDECL"><code>NSDECL</code></a> namespace
+ by <a href="../../../../org/xml/sax/helpers/NamespaceSupport.html#processName(String,parts[],boolean)"><code>processName()</code></a>.  This may only be
+ changed before any contexts have been pushed.
+</div><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>SAX 2.1alpha</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../../about.html">About</a></span></div></td></tr></table></body></html>

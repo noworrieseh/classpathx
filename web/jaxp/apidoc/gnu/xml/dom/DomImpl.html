@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>DomImpl (GNU JAXP Library)</title><script src="../../../resources/gjdoc.js" type="text/javascript"><!-- this comment required for konqueror 3.2.2 --></script><meta http-equiv="Content-Type" content="text/html; charset=null"/><meta name="generator" content="GNU Gjdoc Standard Doclet"/><meta name="keywords" content="gnu.xml.dom.DomImpl class"/><meta name="keywords" content="hasFeature()"/><meta name="keywords" content="createDocumentType()"/><meta name="keywords" content="createDocument()"/><meta name="keywords" content="getFeature()"/><meta name="keywords" content="createLSParser()"/><meta name="keywords" content="createLSSerializer()"/><meta name="keywords" content="createLSInput()"/><meta name="keywords" content="createLSOutput()"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-layout.css" title="GNU Clean"/><link rel="stylesheet" type="text/css" href="../../../resources/gjdochtml-clean-color1.css" title="GNU Clean"/></head><body class="content class" onload="top.contentPageLoaded(document.title)"><table class="navbar div top"><tr><td class="navbar div top" colspan="2"><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr><tr><td class="navi"><a href="../../../gnu/xml/dom/DomFragment.html">Prev Class</a> | <a href="../../../gnu/xml/dom/DomIterator.html">Next Class</a></td><td class="navi"><a href="../../../index.html" title="Show in a frameset" target="_top">Frames</a> | <a href="DomImpl.html" title="Show without frames" target="_top">No Frames</a> </td></tr><tr><td class="navi">Summary: Nested | Field | <a href="#summary-methods">Method</a> | <a href="#summary-constructors">Constr</a></td><td class="navi">Detail: Nested | Field | <a href="#detail-methods">Method</a> | <a href="#detail-constructors">Constr</a></td></tr></table><div class="class title outer"><h3 class="class title-package">gnu.xml.dom</h3><h1 class="class title-class">Class DomImpl</h1></div><div class="class inheritance-tree"><ul class="inheritance 0"><li class="inheritance 0"><code>java.lang.Object</code></li><ul class="inheritance 1"><li class="inheritance 1"><code>gnu.xml.dom.DomImpl</code></li></ul></ul></div><dl class="class knownimplementing"><dt class="header"><b>Implemented Interfaces:</b></dt><dd class="item"><a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a>, <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></dd></dl><hr/><div class="class synopsis outer"><div class="class synopsis declaration"><code>public class <b class="class synopsis name">DomImpl</b></code></div><div class="class synopsis superclass"><code>extends java.lang.Object</code></div><div class="class synopsis implements"><code>implements <a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a>, <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></code></div></div><hr/><div class="class description">  "DOMImplementation" implementation. 
+
+ <p/> At this writing, the following features are supported:
+ "XML" (L1, L2, L3),
+ "Events" (L2), "MutationEvents" (L2), "USER-Events" (a conformant extension),
+ "HTMLEvents" (L2), "UIEvents" (L2), "Traversal" (L2), "XPath" (L3),
+ "LS" (L3) "LS-Async" (L3).
+ It is possible to compile the package so it doesn't support some of these
+ features (notably, Traversal).
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table sub header"><td colspan="2"><h3 class="table sub header">Fields inherited from interface org.w3c.dom.ls.<a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></h3></td></tr><tr><td class="inherited"><a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#MODE_ASYNCHRONOUS"><code class="member">MODE_ASYNCHRONOUS</code></a>, <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#MODE_SYNCHRONOUS"><code class="member">MODE_SYNCHRONOUS</code></a></td></tr></table></dl><a name="summary-constructors"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Constructor Summary</h2></td></tr><tr><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#DomImpl()">DomImpl</a>()</code></dt><dd class="description"> Constructs a DOMImplementation object which supports
+ "XML" and other DOM Level 2 features.</dd></dl></td></tr></table></dl><a name="summary-methods"/><dl class="table container"><table class="class summary" border="1" width="100%"><tr class="table header"><td colspan="2"><h2 class="table header">Method Summary</h2></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/Document.html" title="Interface in org.w3c.dom">Document</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createDocument(String,String,org.w3c.dom.DocumentType)">createDocument</a>(String&nbsp;namespaceURI, String&nbsp;rootName, <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a>&nbsp;doctype)</code></dt><dd class="description"> <b>DOM L2</b>
+ Creates and returns a Document, populated only with a root element and
+ optionally a document type(if that was provided).</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createDocumentType(String,String,String)">createDocumentType</a>(String&nbsp;rootName, String&nbsp;publicId, String&nbsp;systemId)</code></dt><dd class="description"> <b>DOM L2</b>
+ Creates and returns a DocumentType, associated with this
+ implementation.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/ls/LSInput.html" title="Interface in org.w3c.dom.ls">LSInput</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createLSInput()">createLSInput</a>()</code></dt><dd class="description">  Create a new empty input source object where 
+ <code>LSInput.characterStream</code>, <code>LSInput.byteStream</code>
+ , <code>LSInput.stringData</code> <code>LSInput.systemId</code>, 
+ <code>LSInput.publicId</code>, <code>LSInput.baseURI</code>, and 
+ <code>LSInput.encoding</code> are null, and 
+ <code>LSInput.certifiedText</code> is false.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/ls/LSOutput.html" title="Interface in org.w3c.dom.ls">LSOutput</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createLSOutput()">createLSOutput</a>()</code></dt><dd class="description">  Create a new empty output destination object where 
+ <code>LSOutput.characterStream</code>, 
+ <code>LSOutput.byteStream</code>, <code>LSOutput.systemId</code>, 
+ <code>LSOutput.encoding</code> are null.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/ls/LSParser.html" title="Interface in org.w3c.dom.ls">LSParser</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createLSParser(short,String)">createLSParser</a>(short&nbsp;mode, String&nbsp;schemaType)</code></dt><dd class="description"> Create a new <code>LSParser</code>.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> <a href="../../../org/w3c/dom/ls/LSSerializer.html" title="Interface in org.w3c.dom.ls">LSSerializer</a></code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#createLSSerializer()">createLSSerializer</a>()</code></dt><dd class="description">  Create a new <code>LSSerializer</code> object.</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> Object</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#getFeature(String,String)">getFeature</a>(String&nbsp;feature, String&nbsp;version)</code></dt><dd class="description">  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in .</dd></dl></td></tr><tr><td class="left" valign="top"><code class="synopsis"> boolean</code></td><td class="right"><dl class="list"><dt class="synopsis"><code><a href="#hasFeature(String,String)">hasFeature</a>(String&nbsp;name, String&nbsp;version)</code></dt><dd class="description"> <b>DOM L1</b>
+ Returns true if the specified feature and version are
+ supported.</dd></dl></td></tr></table></dl><a name="detail-constructors"/><h2 class="section header">Constructor Details</h2><div class="section"><a name="DomImpl()"/><div class="member detail outer"><h3 class="member detail name">DomImpl</h3><pre class="member detail synopsis">public DomImpl()</pre><blockquote class="member detail name"><div class="member detail description"> Constructs a DOMImplementation object which supports
+ "XML" and other DOM Level 2 features.
+</div><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><a name="detail-methods"/><h2 class="section header">Method Details</h2><div class="section"><a name="createDocument(String,String,org.w3c.dom.DocumentType)"/><div class="member detail outer"><h3 class="member detail name">createDocument</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/Document.html" title="Interface in org.w3c.dom">Document</a> createDocument(String namespaceURI,
+                               String rootName,
+                               <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a> doctype)</pre><blockquote class="member detail name"><div class="member detail description"> <b>DOM L2</b>
+ Creates and returns a Document, populated only with a root element and
+ optionally a document type(if that was provided).
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/DOMImplementation.html#createDocument(String,String,org.w3c.dom.DocumentType)">createDocument</a> in interface <a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a></dd></dl><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createDocumentType(String,String,String)"/><div class="member detail outer"><h3 class="member detail name">createDocumentType</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/DocumentType.html" title="Interface in org.w3c.dom">DocumentType</a> createDocumentType(String rootName,
+                                       String publicId,
+                                       String systemId)</pre><blockquote class="member detail name"><div class="member detail description"> <b>DOM L2</b>
+ Creates and returns a DocumentType, associated with this
+ implementation.  This DocumentType can have no associated
+ objects(notations, entities) until the DocumentType is
+ first associated with a document.
+
+ <p/> Note that there is no implication that this DTD will
+ be parsed by the DOM, or ever have contents.  Moreover, the
+ DocumentType created here can only be added to a document by
+ the createDocument method(below).  <em>That means that the only
+ portable way to create a Document object is to start parsing,
+ queue comment and processing instruction (PI) nodes, and then only
+ create a DOM Document after <b>(a)</b> it's known if a DocumentType
+ object is needed, and <b>(b) the name and namespace of the root
+ element is known.  Queued comment and PI nodes would then be
+ inserted appropriately in the document prologue, both before and
+ after the DTD node, and additional attributes assigned to the
+ root element.</b></em>
+(One hopes that the final DOM REC fixes this serious botch.)
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/DOMImplementation.html#createDocumentType(String,String,String)">createDocumentType</a> in interface <a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a></dd></dl><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createLSInput()"/><div class="member detail outer"><h3 class="member detail name">createLSInput</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/ls/LSInput.html" title="Interface in org.w3c.dom.ls">LSInput</a> createLSInput()</pre><blockquote class="member detail name"><div class="member detail description">  Create a new empty input source object where 
+ <code>LSInput.characterStream</code>, <code>LSInput.byteStream</code>
+ , <code>LSInput.stringData</code> <code>LSInput.systemId</code>, 
+ <code>LSInput.publicId</code>, <code>LSInput.baseURI</code>, and 
+ <code>LSInput.encoding</code> are null, and 
+ <code>LSInput.certifiedText</code> is false. 
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#createLSInput()">createLSInput</a> in interface <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></dd></dl><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The newly created input object.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createLSOutput()"/><div class="member detail outer"><h3 class="member detail name">createLSOutput</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/ls/LSOutput.html" title="Interface in org.w3c.dom.ls">LSOutput</a> createLSOutput()</pre><blockquote class="member detail name"><div class="member detail description">  Create a new empty output destination object where 
+ <code>LSOutput.characterStream</code>, 
+ <code>LSOutput.byteStream</code>, <code>LSOutput.systemId</code>, 
+ <code>LSOutput.encoding</code> are null. 
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#createLSOutput()">createLSOutput</a> in interface <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></dd></dl><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The newly created output object.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createLSParser(short,String)"/><div class="member detail outer"><h3 class="member detail name">createLSParser</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/ls/LSParser.html" title="Interface in org.w3c.dom.ls">LSParser</a> createLSParser(short mode,
+                               String schemaType)
+            throws <a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></pre><blockquote class="member detail name"><div class="member detail description"> Create a new <code>LSParser</code>. The newly constructed parser may 
+ then be configured by means of its <code>DOMConfiguration</code> 
+ object, and used to parse documents by means of its <code>parse</code>
+  method. 
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#createLSParser(short,String)">createLSParser</a> in interface <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></dd></dl><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">mode</code><span class="separator"> - </span><span class="description">The <code>mode</code> argument is either 
+<code>MODE_SYNCHRONOUS</code> or <code>MODE_ASYNCHRONOUS</code>, if 
+<code>mode</code> is <code>MODE_SYNCHRONOUS</code> then the 
+<code>LSParser</code> that is created will operate in synchronous 
+mode, if it's <code>MODE_ASYNCHRONOUS</code> then the 
+<code>LSParser</code> that is created will operate in asynchronous 
+mode.</span></dd><dd class="item"><code class="name">schemaType</code><span class="separator"> - </span><span class="description">An absolute URI representing the type of the schema 
+language used during the load of a <code>Document</code> using the 
+newly created <code>LSParser</code>. Note that no lexical checking 
+is done on the absolute URI. In order to create a 
+<code>LSParser</code> for any kind of schema types (i.e. the 
+LSParser will be free to use any schema found), use the value 
+<code>null</code>. 
+<p/><b>Note:</b>    For W3C XML Schema [<a href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/">XML Schema Part 1</a>]
+, applications must use the value 
+<code>"http://www.w3.org/2001/XMLSchema"</code>. For XML DTD [<a href="http://www.w3.org/TR/2004/REC-xml-20040204">XML 1.0</a>], 
+applications must use the value 
+<code>"http://www.w3.org/TR/REC-xml"</code>. Other Schema languages 
+are outside the scope of the W3C and therefore should recommend an 
+absolute URI in order to use this method.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The newly created <code>LSParser</code> object. This 
+<code>LSParser</code> is either synchronous or asynchronous 
+depending on the value of the <code>mode</code> argument. 
+<p/><b>Note:</b>    By default, the newly created <code>LSParser</code> 
+does not contain a <code>DOMErrorHandler</code>, i.e. the value of 
+the "<a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#parameter-error-handler">
+error-handler</a>" configuration parameter is <code>null</code>. However, implementations 
+may provide a default error handler at creation time. In that case, 
+the initial value of the <code>"error-handler"</code> configuration 
+parameter on the new <code>LSParser</code> object contains a 
+reference to the default error handler.</dd></dl></p><p class="member detail thrown list"><dl><dt class="member detail thrown header"><b>Throws:</b></dt><dd class="member detail thrown item"><code class="name"><a href="../../../org/w3c/dom/DOMException.html" title="Class in org.w3c.dom">DOMException</a></code><span class="separator"> - </span><span class="description">NOT_SUPPORTED_ERR: Raised if the requested mode or schema type is 
+not supported.</span></dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="createLSSerializer()"/><div class="member detail outer"><h3 class="member detail name">createLSSerializer</h3><pre class="member detail synopsis">public <a href="../../../org/w3c/dom/ls/LSSerializer.html" title="Interface in org.w3c.dom.ls">LSSerializer</a> createLSSerializer()</pre><blockquote class="member detail name"><div class="member detail description">  Create a new <code>LSSerializer</code> object. 
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/ls/DOMImplementationLS.html#createLSSerializer()">createLSSerializer</a> in interface <a href="../../../org/w3c/dom/ls/DOMImplementationLS.html" title="Interface in org.w3c.dom.ls">DOMImplementationLS</a></dd></dl><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">The newly created <code>LSSerializer</code> object.
+<p/><b>Note:</b>    By default, the newly created 
+<code>LSSerializer</code> has no <code>DOMErrorHandler</code>, i.e. 
+the value of the <code>"error-handler"</code> configuration 
+parameter is <code>null</code>. However, implementations may 
+provide a default error handler at creation time. In that case, the 
+initial value of the <code>"error-handler"</code> configuration 
+parameter on the new <code>LSSerializer</code> object contains a 
+reference to the default error handler.</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="getFeature(String,String)"/><div class="member detail outer"><h3 class="member detail name">getFeature</h3><pre class="member detail synopsis">public Object getFeature(String feature,
+                         String version)</pre><blockquote class="member detail name"><div class="member detail description">  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in . The specialized object may also be obtained by using 
+ binding-specific casting methods but is not necessarily expected to, 
+ as discussed in . This method also allow the implementation to 
+ provide specialized objects which do not support the 
+ <code>DOMImplementation</code> interface. 
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/DOMImplementation.html#getFeature(String,String)">getFeature</a> in interface <a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a></dd></dl><p class="parameter"><dl><dt class="header"><b>Parameters:</b></dt><dd class="item"><code class="name">feature</code><span class="separator"> - </span><span class="description">The name of the feature requested. Note that any plus 
+sign "+" prepended to the name of the feature will be ignored since 
+it is not significant in the context of this method.</span></dd><dd class="item"><code class="name">version</code><span class="separator"> - </span><span class="description">This is the version number of the feature to test.</span></dd></dl></p><p class="member detail return list"><dl><dt class="member detail return header"><b>Returns:</b></dt><dd class="member detail return item">Returns an object which implements the specialized APIs of 
+the specified feature and version, if any, or <code>null</code> if 
+there is no object which implements interfaces associated with that 
+feature. If the <code>DOMObject</code> returned by this method 
+implements the <code>DOMImplementation</code> interface, it must 
+delegate to the primary core <code>DOMImplementation</code> and not 
+return results inconsistent with the primary core 
+<code>DOMImplementation</code> such as <code>hasFeature</code>, 
+<code>getFeature</code>, etc.</dd></dl></p><p class="taglet"><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dd></dl></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div><hr/><a name="hasFeature(String,String)"/><div class="member detail outer"><h3 class="member detail name">hasFeature</h3><pre class="member detail synopsis">public boolean hasFeature(String name,
+                          String version)</pre><blockquote class="member detail name"><div class="member detail description"> <b>DOM L1</b>
+ Returns true if the specified feature and version are
+ supported.  Note that the case of the feature name is ignored.
+</div><dl class="member detail specified by list"><dt class="member detail specified by header"><b>Specified by:</b></dt><dd class="member detail specified by item"><a href="../../../org/w3c/dom/DOMImplementation.html#hasFeature(String,String)">hasFeature</a> in interface <a href="../../../org/w3c/dom/DOMImplementation.html" title="Interface in org.w3c.dom">DOMImplementation</a></dd></dl><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p><p class="taglet"></p></blockquote></div></div><p class="navbar bottom spacer"> </p><table class="navbar div bottom"><tr><td><div class="navbar div top" colspan="2"><span class="navbar item enabled"><a href="../../../index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <span class="navbar item enabled"><a href="../../../alphaindex.html">Index</a></span> <span class="navbar item enabled"><a href="../../../deprecated.html">Deprecated</a></span> <span class="navbar item enabled"><a href="../../../about.html">About</a></span></div></td></tr></table></body></html>

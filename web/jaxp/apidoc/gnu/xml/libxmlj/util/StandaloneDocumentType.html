@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>StandaloneDocumentType</title><meta http-equiv="Content-Type" content="text/html; charset=null"/></head><body><table class="navbar div top"><tr><td><div><span class="navbar item enabled"><a href="../../../..//index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <a href="../../../..//alphaindex.html">Index</a> <a href="../../../..//deprecated.html">Deprecated</a> <a href="../../../..//help.html">Help</a> <a href="../../../..//about.html">About</a></div></td></tr></table><div><h3>gnu.xml.libxmlj.util</h3><h1>Class StandaloneDocumentType</h1><hr/><div><div>public final class StandaloneDocumentType</div><div>extends java.lang.Object</div><div>implements <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div><hr/><div> A "standalone" document type, i.e. one that isn't attached to a document
+ node.
+ This can be used to create new documents.
+</div><table class="class summary"><tr><td colspan="2"><h4>Constructor Summary</h4></td></tr><tr><td class="class summary left">public </td><td class="class summary right"> <a href="#StandaloneDocumentType(String,String,String)">StandaloneDocumentType</a>(String name, String publicId, String systemId)</td></tr><tr><td></td><td></td></tr></table><table class="class summary"><tr><td colspan="2"><h4>Method Summary</h4></td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#appendChild(org.w3c.dom.Node)">appendChild</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</td></tr><tr><td></td><td> Adds the node <code>newChild</code> to the end of the list of children 
+ of this node.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#cloneNode(boolean)">cloneNode</a>(boolean deep)</td></tr><tr><td></td><td> Returns a duplicate of this node, i.e., serves as a generic copy 
+ constructor for nodes.</td></tr><tr><td class="class summary left">public short</td><td class="class summary right"> <a href="#compareDocumentPosition(org.w3c.dom.Node)">compareDocumentPosition</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> node)</td></tr><tr><td></td><td> Compares the reference node, i.e.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a></td><td class="class summary right"> <a href="#getAttributes()">getAttributes</a>()</td></tr><tr><td></td><td> A <code>NamedNodeMap</code> containing the attributes of this node (if 
+ it is an <code>Element</code>) or <code>null</code> otherwise.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getBaseURI()">getBaseURI</a>()</td></tr><tr><td></td><td> The absolute base URI of this node or <code>null</code> if the 
+ implementation wasn't able to obtain an absolute URI.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/NodeList.html">NodeList</a></td><td class="class summary right"> <a href="#getChildNodes()">getChildNodes</a>()</td></tr><tr><td></td><td> A <code>NodeList</code> that contains all children of this node.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a></td><td class="class summary right"> <a href="#getEntities()">getEntities</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public Object</td><td class="class summary right"> <a href="#getFeature(String,String)">getFeature</a>(String feature, String version)</td></tr><tr><td></td><td>  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in .</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#getFirstChild()">getFirstChild</a>()</td></tr><tr><td></td><td> The first child of this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getInternalSubset()">getInternalSubset</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#getLastChild()">getLastChild</a>()</td></tr><tr><td></td><td> The last child of this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getLocalName()">getLocalName</a>()</td></tr><tr><td></td><td> Returns the local part of the qualified name of this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getName()">getName</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getNamespaceURI()">getNamespaceURI</a>()</td></tr><tr><td></td><td> The namespace URI of this node, or <code>null</code> if it is 
+ unspecified (see ).</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#getNextSibling()">getNextSibling</a>()</td></tr><tr><td></td><td> The node immediately following this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getNodeName()">getNodeName</a>()</td></tr><tr><td></td><td> The name of this node, depending on its type; see the table above.</td></tr><tr><td class="class summary left">public short</td><td class="class summary right"> <a href="#getNodeType()">getNodeType</a>()</td></tr><tr><td></td><td> A code representing the type of the underlying object, as defined above.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getNodeValue()">getNodeValue</a>()</td></tr><tr><td></td><td> The value of this node, depending on its type; see the table above.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a></td><td class="class summary right"> <a href="#getNotations()">getNotations</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Document.html">Document</a></td><td class="class summary right"> <a href="#getOwnerDocument()">getOwnerDocument</a>()</td></tr><tr><td></td><td> The <code>Document</code> object associated with this node.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#getParentNode()">getParentNode</a>()</td></tr><tr><td></td><td> The parent of this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getPrefix()">getPrefix</a>()</td></tr><tr><td></td><td> The namespace prefix of this node, or <code>null</code> if it is 
+ unspecified.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#getPreviousSibling()">getPreviousSibling</a>()</td></tr><tr><td></td><td> The node immediately preceding this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getPublicId()">getPublicId</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getSystemId()">getSystemId</a>()</td></tr><tr><td></td><td></td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getTextContent()">getTextContent</a>()</td></tr><tr><td></td><td> This attribute returns the text content of this node and its 
+ descendants.</td></tr><tr><td class="class summary left">public Object</td><td class="class summary right"> <a href="#getUserData(String)">getUserData</a>(String name)</td></tr><tr><td></td><td> Retrieves the object associated to a key on a this node.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#hasAttributes()">hasAttributes</a>()</td></tr><tr><td></td><td> Returns whether this node (if it is an element) has any attributes.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#hasChildNodes()">hasChildNodes</a>()</td></tr><tr><td></td><td> Returns whether this node has any children.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#insertBefore(org.w3c.dom.Node,org.w3c.dom.Node)">insertBefore</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> newChild, <a href="../../../..//org/w3c/dom/Node.html">Node</a> refChild)</td></tr><tr><td></td><td> Inserts the node <code>newChild</code> before the existing child node 
+ <code>refChild</code>.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#isDefaultNamespace(String)">isDefaultNamespace</a>(String namespace)</td></tr><tr><td></td><td>  This method checks if the specified <code>namespaceURI</code> is the 
+ default namespace or not.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#isEqualNode(org.w3c.dom.Node)">isEqualNode</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> other)</td></tr><tr><td></td><td> Tests whether two nodes are equal.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#isSameNode(org.w3c.dom.Node)">isSameNode</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> other)</td></tr><tr><td></td><td> Returns whether this node is the same node as the given one.</td></tr><tr><td class="class summary left">public boolean</td><td class="class summary right"> <a href="#isSupported(String,String)">isSupported</a>(String feature, String version)</td></tr><tr><td></td><td>  Tests whether the DOM implementation implements a specific feature and 
+ that feature is supported by this node, as specified in .</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#lookupNamespaceURI(String)">lookupNamespaceURI</a>(String prefix)</td></tr><tr><td></td><td> Look up the namespace URI associated to the given prefix, starting from 
+ this node.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#lookupPrefix(String)">lookupPrefix</a>(String namespace)</td></tr><tr><td></td><td> Look up the prefix associated to the given namespace URI, starting from 
+ this node.</td></tr><tr><td class="class summary left">public void</td><td class="class summary right"> <a href="#normalize()">normalize</a>()</td></tr><tr><td></td><td>  Puts all <code>Text</code> nodes in the full depth of the sub-tree 
+ underneath this <code>Node</code>, including attribute nodes, into a 
+ "normal" form where only structure (e.g., elements, comments, 
+ processing instructions, CDATA sections, and entity references) 
+ separates <code>Text</code> nodes, i.e., there are neither adjacent 
+ <code>Text</code> nodes nor empty <code>Text</code> nodes.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#removeChild(org.w3c.dom.Node)">removeChild</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</td></tr><tr><td></td><td> Removes the child node indicated by <code>oldChild</code> from the list 
+ of children, and returns it.</td></tr><tr><td class="class summary left">public <a href="../../../..//org/w3c/dom/Node.html">Node</a></td><td class="class summary right"> <a href="#replaceChild(org.w3c.dom.Node,org.w3c.dom.Node)">replaceChild</a>(<a href="../../../..//org/w3c/dom/Node.html">Node</a> newChild, <a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</td></tr><tr><td></td><td> Replaces the child node <code>oldChild</code> with <code>newChild</code>
+  in the list of children, and returns the <code>oldChild</code> node.</td></tr><tr><td class="class summary left">public void</td><td class="class summary right"> <a href="#setNodeValue(String)">setNodeValue</a>(String nodeValue)</td></tr><tr><td></td><td> The value of this node, depending on its type; see the table above.</td></tr><tr><td class="class summary left">public void</td><td class="class summary right"> <a href="#setPrefix(String)">setPrefix</a>(String prefix)</td></tr><tr><td></td><td> The namespace prefix of this node, or <code>null</code> if it is 
+ unspecified.</td></tr><tr><td class="class summary left">public void</td><td class="class summary right"> <a href="#setTextContent(String)">setTextContent</a>(String content)</td></tr><tr><td></td><td> This attribute returns the text content of this node and its 
+ descendants.</td></tr><tr><td class="class summary left">public Object</td><td class="class summary right"> <a href="#setUserData(String,Object,org.w3c.dom.UserDataHandler)">setUserData</a>(String name, Object value, <a href="../../../..//org/w3c/dom/UserDataHandler.html">UserDataHandler</a> handler)</td></tr><tr><td></td><td> Associate an object to a key on this node.</td></tr></table><h4>Constructor Details</h4><a name="StandaloneDocumentType(String,String,String)"/><div><h3>StandaloneDocumentType</h3><p>public StandaloneDocumentType(String name, String publicId, String systemId)</p><div></div><div><h4>Parameters:</h4><div>name</div><div>publicId</div><div>systemId</div></div></div><h4>Method Details</h4><a name="appendChild(org.w3c.dom.Node)"/><div><h3>appendChild</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> appendChild(<a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</p><div> Adds the node <code>newChild</code> to the end of the list of children 
+ of this node. If the <code>newChild</code> is already in the tree, it 
+ is first removed.
+</div><div><h4>Specified by:</h4><div>appendChild in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>oldChild</div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not 
+allow children of the type of the <code>newChild</code> node, or if 
+the node to append is one of this node's ancestors or this node 
+itself, or if this node is of type <code>Document</code> and the 
+DOM application attempts to append a second 
+<code>DocumentType</code> or <code>Element</code> node.
+<br/>WRONG_DOCUMENT_ERR: Raised if <code>newChild</code> was created 
+from a different document than the one that created this node.
+<br/>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly or 
+if the previous parent of the node being inserted is readonly.
+<br/>NOT_SUPPORTED_ERR: if the <code>newChild</code> node is a child 
+of the <code>Document</code> node, this exception might be raised 
+if the DOM implementation doesn't support the removal of the 
+<code>DocumentType</code> child or <code>Element</code> child.</div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 3</dt></dl></div><hr/><a name="cloneNode(boolean)"/><div><h3>cloneNode</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> cloneNode(boolean deep)</p><div> Returns a duplicate of this node, i.e., serves as a generic copy 
+ constructor for nodes. The duplicate node has no parent (
+ <code>parentNode</code> is <code>null</code>) and no user data. User 
+ data associated to the imported node is not carried over. However, if 
+ any <code>UserDataHandlers</code> has been specified along with the 
+ associated data these handlers will be called with the appropriate 
+ parameters before this method returns.
+ <br/>Cloning an <code>Element</code> copies all attributes and their 
+ values, including those generated by the XML processor to represent 
+ defaulted attributes, but this method does not copy any children it 
+ contains unless it is a deep clone. This includes text contained in 
+ an the <code>Element</code> since the text is contained in a child 
+ <code>Text</code> node. Cloning an <code>Attr</code> directly, as 
+ opposed to be cloned as part of an <code>Element</code> cloning 
+ operation, returns a specified attribute (<code>specified</code> is 
+ <code>true</code>). Cloning an <code>Attr</code> always clones its 
+ children, since they represent its value, no matter whether this is a 
+ deep clone or not. Cloning an <code>EntityReference</code> 
+ automatically constructs its subtree if a corresponding 
+ <code>Entity</code> is available, no matter whether this is a deep 
+ clone or not. Cloning any other type of node simply returns a copy of 
+ this node.
+ <br/>Note that cloning an immutable subtree results in a mutable copy, 
+ but the children of an <code>EntityReference</code> clone are readonly
+ . In addition, clones of unspecified <code>Attr</code> nodes are 
+ specified. And, cloning <code>Document</code>, 
+ <code>DocumentType</code>, <code>Entity</code>, and 
+ <code>Notation</code> nodes is implementation dependent.
+</div><div><h4>Specified by:</h4><div>cloneNode in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>deep - If <code>true</code>, recursively clone the subtree under 
+the specified node; if <code>false</code>, clone only the node 
+itself (and its attributes, if it is an <code>Element</code>).</div></div></div><hr/><a name="compareDocumentPosition(org.w3c.dom.Node)"/><div><h3>compareDocumentPosition</h3><p>public short compareDocumentPosition(<a href="../../../..//org/w3c/dom/Node.html">Node</a> node)</p><div> Compares the reference node, i.e. the node on which this method is 
+ being called, with a node, i.e. the one passed as a parameter, with 
+ regard to their position in the document and according to the 
+ document order.
+</div><div><h4>Specified by:</h4><div>compareDocumentPosition in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>node</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="getAttributes()"/><div><h3>getAttributes</h3><p>public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a> getAttributes()</p><div> A <code>NamedNodeMap</code> containing the attributes of this node (if 
+ it is an <code>Element</code>) or <code>null</code> otherwise.
+</div><div><h4>Specified by:</h4><div>getAttributes in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getBaseURI()"/><div><h3>getBaseURI</h3><p>public String getBaseURI()</p><div> The absolute base URI of this node or <code>null</code> if the 
+ implementation wasn't able to obtain an absolute URI. This value is 
+ computed as described in . However, when the <code>Document</code> 
+ supports the feature "HTML" [<a href="http://www.w3.org/TR/2003/REC-DOM-Level-2-HTML-20030109">DOM Level 2 HTML</a>]
+ , the base URI is computed using first the value of the href 
+ attribute of the HTML BASE element if any, and the value of the 
+ <code>documentURI</code> attribute from the <code>Document</code> 
+ interface otherwise.
+</div><div><h4>Specified by:</h4><div>getBaseURI in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="getChildNodes()"/><div><h3>getChildNodes</h3><p>public <a href="../../../..//org/w3c/dom/NodeList.html">NodeList</a> getChildNodes()</p><div> A <code>NodeList</code> that contains all children of this node. If 
+ there are no children, this is a <code>NodeList</code> containing no 
+ nodes.
+</div><div><h4>Specified by:</h4><div>getChildNodes in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getEntities()"/><div><h3>getEntities</h3><p>public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a> getEntities()</p><div></div><div><h4>Specified by:</h4><div>getEntities in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getFeature(String,String)"/><div><h3>getFeature</h3><p>public Object getFeature(String feature, String version)</p><div>  This method returns a specialized object which implements the 
+ specialized APIs of the specified feature and version, as specified 
+ in . The specialized object may also be obtained by using 
+ binding-specific casting methods but is not necessarily expected to, 
+ as discussed in . This method also allow the implementation to 
+ provide specialized objects which do not support the <code>Node</code>
+  interface. 
+</div><div><h4>Specified by:</h4><div>getFeature in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>feature - The name of the feature requested. Note that any plus 
+sign "+" prepended to the name of the feature will be ignored since 
+it is not significant in the context of this method.</div><div>version - This is the version number of the feature to test.</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="getFirstChild()"/><div><h3>getFirstChild</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> getFirstChild()</p><div> The first child of this node. If there is no such node, this returns 
+ <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getFirstChild in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getInternalSubset()"/><div><h3>getInternalSubset</h3><p>public String getInternalSubset()</p><div></div><div><h4>Specified by:</h4><div>getInternalSubset in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getLastChild()"/><div><h3>getLastChild</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> getLastChild()</p><div> The last child of this node. If there is no such node, this returns 
+ <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getLastChild in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getLocalName()"/><div><h3>getLocalName</h3><p>public String getLocalName()</p><div> Returns the local part of the qualified name of this node.
+ <br/>For nodes of any type other than <code>ELEMENT_NODE</code> and 
+ <code>ATTRIBUTE_NODE</code> and nodes created with a DOM Level 1 
+ method, such as <code>Document.createElement()</code>, this is always 
+ <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getLocalName in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="getName()"/><div><h3>getName</h3><p>public String getName()</p><div></div><div><h4>Specified by:</h4><div>getName in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getNamespaceURI()"/><div><h3>getNamespaceURI</h3><p>public String getNamespaceURI()</p><div> The namespace URI of this node, or <code>null</code> if it is 
+ unspecified (see ).
+ <br/>This is not a computed value that is the result of a namespace 
+ lookup based on an examination of the namespace declarations in 
+ scope. It is merely the namespace URI given at creation time.
+ <br/>For nodes of any type other than <code>ELEMENT_NODE</code> and 
+ <code>ATTRIBUTE_NODE</code> and nodes created with a DOM Level 1 
+ method, such as <code>Document.createElement()</code>, this is always 
+ <code>null</code>.
+ <p/><b>Note:</b> Per the <em>Namespaces in XML</em> Specification [<a href="http://www.w3.org/TR/1999/REC-xml-names-19990114/">XML Namespaces</a>]
+  an attribute does not inherit its namespace from the element it is 
+ attached to. If an attribute is not explicitly given a namespace, it 
+ simply has no namespace.
+</div><div><h4>Specified by:</h4><div>getNamespaceURI in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="getNextSibling()"/><div><h3>getNextSibling</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> getNextSibling()</p><div> The node immediately following this node. If there is no such node, 
+ this returns <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getNextSibling in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getNodeName()"/><div><h3>getNodeName</h3><p>public String getNodeName()</p><div> The name of this node, depending on its type; see the table above.
+</div><div><h4>Specified by:</h4><div>getNodeName in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getNodeType()"/><div><h3>getNodeType</h3><p>public short getNodeType()</p><div> A code representing the type of the underlying object, as defined above.
+</div><div><h4>Specified by:</h4><div>getNodeType in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getNodeValue()"/><div><h3>getNodeValue</h3><p>public String getNodeValue()</p><div> The value of this node, depending on its type; see the table above. 
+ When it is defined to be <code>null</code>, setting it has no effect, 
+ including if the node is read-only.
+</div><div><h4>Specified by:</h4><div>getNodeValue in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - DOMSTRING_SIZE_ERR: Raised when it would return more characters than 
+fit in a <code>DOMString</code> variable on the implementation 
+platform.</div></div></div><hr/><a name="getNotations()"/><div><h3>getNotations</h3><p>public <a href="../../../..//org/w3c/dom/NamedNodeMap.html">NamedNodeMap</a> getNotations()</p><div></div><div><h4>Specified by:</h4><div>getNotations in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getOwnerDocument()"/><div><h3>getOwnerDocument</h3><p>public <a href="../../../..//org/w3c/dom/Document.html">Document</a> getOwnerDocument()</p><div> The <code>Document</code> object associated with this node. This is 
+ also the <code>Document</code> object used to create new nodes. When 
+ this node is a <code>Document</code> or a <code>DocumentType</code> 
+ which is not used with any <code>Document</code> yet, this is 
+ <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getOwnerDocument in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 2</dt></dl></div><hr/><a name="getParentNode()"/><div><h3>getParentNode</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> getParentNode()</p><div> The parent of this node. All nodes, except <code>Attr</code>, 
+ <code>Document</code>, <code>DocumentFragment</code>, 
+ <code>Entity</code>, and <code>Notation</code> may have a parent. 
+ However, if a node has just been created and not yet added to the 
+ tree, or if it has been removed from the tree, this is 
+ <code>null</code>. 
+</div><div><h4>Specified by:</h4><div>getParentNode in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getPrefix()"/><div><h3>getPrefix</h3><p>public String getPrefix()</p><div> The namespace prefix of this node, or <code>null</code> if it is 
+ unspecified. When it is defined to be <code>null</code>, setting it 
+ has no effect, including if the node is read-only.
+ <br/>Note that setting this attribute, when permitted, changes the 
+ <code>nodeName</code> attribute, which holds the qualified name, as 
+ well as the <code>tagName</code> and <code>name</code> attributes of 
+ the <code>Element</code> and <code>Attr</code> interfaces, when 
+ applicable.
+ <br/>Setting the prefix to <code>null</code> makes it unspecified, 
+ setting it to an empty string is implementation dependent.
+ <br/>Note also that changing the prefix of an attribute that is known to 
+ have a default value, does not make a new attribute with the default 
+ value and the original prefix appear, since the 
+ <code>namespaceURI</code> and <code>localName</code> do not change.
+ <br/>For nodes of any type other than <code>ELEMENT_NODE</code> and 
+ <code>ATTRIBUTE_NODE</code> and nodes created with a DOM Level 1 
+ method, such as <code>createElement</code> from the 
+ <code>Document</code> interface, this is always <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getPrefix in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="getPreviousSibling()"/><div><h3>getPreviousSibling</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> getPreviousSibling()</p><div> The node immediately preceding this node. If there is no such node, 
+ this returns <code>null</code>.
+</div><div><h4>Specified by:</h4><div>getPreviousSibling in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="getPublicId()"/><div><h3>getPublicId</h3><p>public String getPublicId()</p><div></div><div><h4>Specified by:</h4><div>getPublicId in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getSystemId()"/><div><h3>getSystemId</h3><p>public String getSystemId()</p><div></div><div><h4>Specified by:</h4><div>getSystemId in interface <a href="../../../..//org/w3c/dom/DocumentType.html">DocumentType</a></div></div></div><hr/><a name="getTextContent()"/><div><h3>getTextContent</h3><p>public String getTextContent()</p><div> This attribute returns the text content of this node and its 
+ descendants. When it is defined to be <code>null</code>, setting it 
+ has no effect. On setting, any possible children this node may have 
+ are removed and, if it the new string is not empty or 
+ <code>null</code>, replaced by a single <code>Text</code> node 
+ containing the string this attribute is set to. 
+ <br/> On getting, no serialization is performed, the returned string 
+ does not contain any markup. No whitespace normalization is performed 
+ and the returned string does not contain the white spaces in element 
+ content (see the attribute 
+ <code>Text.isElementContentWhitespace</code>). Similarly, on setting, 
+ no parsing is performed either, the input string is taken as pure 
+ textual content. 
+ <br/>The string returned is made of the text content of this node 
+ depending on its type, as defined below: 
+ <table border="1" cellpadding="3">
+ <tr>
+ <th>Node type</th>
+ <th>Content</th>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">
+ ELEMENT_NODE, ATTRIBUTE_NODE, ENTITY_NODE, ENTITY_REFERENCE_NODE, 
+ DOCUMENT_FRAGMENT_NODE</td>
+ <td valign="top" rowspan="1" colspan="1">concatenation of the <code>textContent</code> 
+ attribute value of every child node, excluding COMMENT_NODE and 
+ PROCESSING_INSTRUCTION_NODE nodes. This is the empty string if the 
+ node has no children.</td>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">TEXT_NODE, CDATA_SECTION_NODE, COMMENT_NODE, 
+ PROCESSING_INSTRUCTION_NODE</td>
+ <td valign="top" rowspan="1" colspan="1"><code>nodeValue</code></td>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">DOCUMENT_NODE, 
+ DOCUMENT_TYPE_NODE, NOTATION_NODE</td>
+ <td valign="top" rowspan="1" colspan="1"><em>null</em></td>
+ </tr>
+ </table>
+</div><div><h4>Specified by:</h4><div>getTextContent in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="getUserData(String)"/><div><h3>getUserData</h3><p>public Object getUserData(String name)</p><div> Retrieves the object associated to a key on a this node. The object 
+ must first have been set to this node by calling 
+ <code>setUserData</code> with the same key.
+</div><div><h4>Specified by:</h4><div>getUserData in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>name</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="hasAttributes()"/><div><h3>hasAttributes</h3><p>public boolean hasAttributes()</p><div> Returns whether this node (if it is an element) has any attributes.
+</div><div><h4>Specified by:</h4><div>hasAttributes in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="hasChildNodes()"/><div><h3>hasChildNodes</h3><p>public boolean hasChildNodes()</p><div> Returns whether this node has any children.
+</div><div><h4>Specified by:</h4><div>hasChildNodes in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div></div><hr/><a name="insertBefore(org.w3c.dom.Node,org.w3c.dom.Node)"/><div><h3>insertBefore</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> insertBefore(<a href="../../../..//org/w3c/dom/Node.html">Node</a> newChild, <a href="../../../..//org/w3c/dom/Node.html">Node</a> refChild)</p><div> Inserts the node <code>newChild</code> before the existing child node 
+ <code>refChild</code>. If <code>refChild</code> is <code>null</code>, 
+ insert <code>newChild</code> at the end of the list of children.
+ <br/>If <code>newChild</code> is a <code>DocumentFragment</code> object, 
+ all of its children are inserted, in the same order, before 
+ <code>refChild</code>. If the <code>newChild</code> is already in the 
+ tree, it is first removed.
+ <p/><b>Note:</b>  Inserting a node before itself is implementation 
+ dependent. 
+</div><div><h4>Specified by:</h4><div>insertBefore in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>newChild - The node to insert.</div><div>refChild - The reference node, i.e., the node before which the 
+new node must be inserted.</div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not 
+allow children of the type of the <code>newChild</code> node, or if 
+the node to insert is one of this node's ancestors or this node 
+itself, or if this node is of type <code>Document</code> and the 
+DOM application attempts to insert a second 
+<code>DocumentType</code> or <code>Element</code> node.
+<br/>WRONG_DOCUMENT_ERR: Raised if <code>newChild</code> was created 
+from a different document than the one that created this node.
+<br/>NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly or 
+if the parent of the node being inserted is readonly.
+<br/>NOT_FOUND_ERR: Raised if <code>refChild</code> is not a child of 
+this node.
+<br/>NOT_SUPPORTED_ERR: if this node is of type <code>Document</code>, 
+this exception might be raised if the DOM implementation doesn't 
+support the insertion of a <code>DocumentType</code> or 
+<code>Element</code> node.</div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 3</dt></dl></div><hr/><a name="isDefaultNamespace(String)"/><div><h3>isDefaultNamespace</h3><p>public boolean isDefaultNamespace(String namespace)</p><div>  This method checks if the specified <code>namespaceURI</code> is the 
+ default namespace or not. 
+</div><div><h4>Specified by:</h4><div>isDefaultNamespace in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>namespace</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="isEqualNode(org.w3c.dom.Node)"/><div><h3>isEqualNode</h3><p>public boolean isEqualNode(<a href="../../../..//org/w3c/dom/Node.html">Node</a> other)</p><div> Tests whether two nodes are equal.
+ <br/>This method tests for equality of nodes, not sameness (i.e., 
+ whether the two nodes are references to the same object) which can be 
+ tested with <code>Node.isSameNode()</code>. All nodes that are the 
+ same will also be equal, though the reverse may not be true.
+ <br/>Two nodes are equal if and only if the following conditions are 
+ satisfied: 
+ <ul>
+ <li>The two nodes are of the same type.
+ </li>
+ <li>The following string 
+ attributes are equal: <code>nodeName</code>, <code>localName</code>, 
+ <code>namespaceURI</code>, <code>prefix</code>, <code>nodeValue</code>
+ . This is: they are both <code>null</code>, or they have the same 
+ length and are character for character identical.
+ </li>
+ <li>The 
+ <code>attributes</code> <code>NamedNodeMaps</code> are equal. This 
+ is: they are both <code>null</code>, or they have the same length and 
+ for each node that exists in one map there is a node that exists in 
+ the other map and is equal, although not necessarily at the same 
+ index.
+ </li>
+ <li>The <code>childNodes</code> <code>NodeLists</code> are equal. 
+ This is: they are both <code>null</code>, or they have the same 
+ length and contain equal nodes at the same index. Note that 
+ normalization can affect equality; to avoid this, nodes should be 
+ normalized before being compared.
+ </li>
+ </ul> 
+ <br/>For two <code>DocumentType</code> nodes to be equal, the following 
+ conditions must also be satisfied: 
+ <ul>
+ <li>The following string attributes 
+ are equal: <code>publicId</code>, <code>systemId</code>, 
+ <code>internalSubset</code>.
+ </li>
+ <li>The <code>entities</code> 
+ <code>NamedNodeMaps</code> are equal.
+ </li>
+ <li>The <code>notations</code> 
+ <code>NamedNodeMaps</code> are equal.
+ </li>
+ </ul> 
+ <br/>On the other hand, the following do not affect equality: the 
+ <code>ownerDocument</code>, <code>baseURI</code>, and 
+ <code>parentNode</code> attributes, the <code>specified</code> 
+ attribute for <code>Attr</code> nodes, the <code>schemaTypeInfo</code>
+  attribute for <code>Attr</code> and <code>Element</code> nodes, the 
+ <code>Text.isElementContentWhitespace</code> attribute for 
+ <code>Text</code> nodes, as well as any user data or event listeners 
+ registered on the nodes. 
+ <p/><b>Note:</b>  As a general rule, anything not mentioned in the 
+ description above is not significant in consideration of equality 
+ checking. Note that future versions of this specification may take 
+ into account more attributes and implementations conform to this 
+ specification are expected to be updated accordingly. 
+</div><div><h4>Specified by:</h4><div>isEqualNode in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>other</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="isSameNode(org.w3c.dom.Node)"/><div><h3>isSameNode</h3><p>public boolean isSameNode(<a href="../../../..//org/w3c/dom/Node.html">Node</a> other)</p><div> Returns whether this node is the same node as the given one.
+ <br/>This method provides a way to determine whether two 
+ <code>Node</code> references returned by the implementation reference 
+ the same object. When two <code>Node</code> references are references 
+ to the same object, even if through a proxy, the references may be 
+ used completely interchangeably, such that all attributes have the 
+ same values and calling the same DOM method on either reference 
+ always has exactly the same effect.
+</div><div><h4>Specified by:</h4><div>isSameNode in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>other - The node to test against.</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="isSupported(String,String)"/><div><h3>isSupported</h3><p>public boolean isSupported(String feature, String version)</p><div>  Tests whether the DOM implementation implements a specific feature and 
+ that feature is supported by this node, as specified in . 
+</div><div><h4>Specified by:</h4><div>isSupported in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>feature - The name of the feature to test.</div><div>version - This is the version number of the feature to test.</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="lookupNamespaceURI(String)"/><div><h3>lookupNamespaceURI</h3><p>public String lookupNamespaceURI(String prefix)</p><div> Look up the namespace URI associated to the given prefix, starting from 
+ this node.
+ <br/>See  for details on the algorithm used by this method.
+</div><div><h4>Specified by:</h4><div>lookupNamespaceURI in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>prefix - The prefix to look for. If this parameter is 
+<code>null</code>, the method will return the default namespace URI 
+if any.</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="lookupPrefix(String)"/><div><h3>lookupPrefix</h3><p>public String lookupPrefix(String namespace)</p><div> Look up the prefix associated to the given namespace URI, starting from 
+ this node. The default namespace declarations are ignored by this 
+ method.
+ <br/>See  for details on the algorithm used by this method.
+</div><div><h4>Specified by:</h4><div>lookupPrefix in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>namespace</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="normalize()"/><div><h3>normalize</h3><p>public void normalize()</p><div>  Puts all <code>Text</code> nodes in the full depth of the sub-tree 
+ underneath this <code>Node</code>, including attribute nodes, into a 
+ "normal" form where only structure (e.g., elements, comments, 
+ processing instructions, CDATA sections, and entity references) 
+ separates <code>Text</code> nodes, i.e., there are neither adjacent 
+ <code>Text</code> nodes nor empty <code>Text</code> nodes. This can 
+ be used to ensure that the DOM view of a document is the same as if 
+ it were saved and re-loaded, and is useful when operations (such as 
+ XPointer [<a href="http://www.w3.org/TR/2003/REC-xptr-framework-20030325/">XPointer</a>]
+  lookups) that depend on a particular document tree structure are to 
+ be used. If the parameter "normalize-characters" of the 
+ <code>DOMConfiguration</code> object attached to the 
+ <code>Node.ownerDocument</code> is <code>true</code>, this method 
+ will also fully normalize the characters of the <code>Text</code> 
+ nodes. 
+ <p/><b>Note:</b> In cases where the document contains 
+ <code>CDATASections</code>, the normalize operation alone may not be 
+ sufficient, since XPointers do not differentiate between 
+ <code>Text</code> nodes and <code>CDATASection</code> nodes.
+</div><div><h4>Specified by:</h4><div>normalize in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 3</dt></dl></div><hr/><a name="removeChild(org.w3c.dom.Node)"/><div><h3>removeChild</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> removeChild(<a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</p><div> Removes the child node indicated by <code>oldChild</code> from the list 
+ of children, and returns it.
+</div><div><h4>Specified by:</h4><div>removeChild in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>oldChild - The node being removed.</div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
+<br/>NOT_FOUND_ERR: Raised if <code>oldChild</code> is not a child of 
+this node.
+<br/>NOT_SUPPORTED_ERR: if this node is of type <code>Document</code>, 
+this exception might be raised if the DOM implementation doesn't 
+support the removal of the <code>DocumentType</code> child or the 
+<code>Element</code> child.</div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 3</dt></dl></div><hr/><a name="replaceChild(org.w3c.dom.Node,org.w3c.dom.Node)"/><div><h3>replaceChild</h3><p>public <a href="../../../..//org/w3c/dom/Node.html">Node</a> replaceChild(<a href="../../../..//org/w3c/dom/Node.html">Node</a> newChild, <a href="../../../..//org/w3c/dom/Node.html">Node</a> oldChild)</p><div> Replaces the child node <code>oldChild</code> with <code>newChild</code>
+  in the list of children, and returns the <code>oldChild</code> node.
+ <br/>If <code>newChild</code> is a <code>DocumentFragment</code> object, 
+ <code>oldChild</code> is replaced by all of the 
+ <code>DocumentFragment</code> children, which are inserted in the 
+ same order. If the <code>newChild</code> is already in the tree, it 
+ is first removed.
+ <p/><b>Note:</b>  Replacing a node with itself is implementation 
+ dependent. 
+</div><div><h4>Specified by:</h4><div>replaceChild in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>newChild - The new node to put in the child list.</div><div>oldChild - The node being replaced in the list.</div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not 
+allow children of the type of the <code>newChild</code> node, or if 
+the node to put in is one of this node's ancestors or this node 
+itself, or if this node is of type <code>Document</code> and the 
+result of the replacement operation would add a second 
+<code>DocumentType</code> or <code>Element</code> on the 
+<code>Document</code> node.
+<br/>WRONG_DOCUMENT_ERR: Raised if <code>newChild</code> was created 
+from a different document than the one that created this node.
+<br/>NO_MODIFICATION_ALLOWED_ERR: Raised if this node or the parent of 
+the new node is readonly.
+<br/>NOT_FOUND_ERR: Raised if <code>oldChild</code> is not a child of 
+this node.
+<br/>NOT_SUPPORTED_ERR: if this node is of type <code>Document</code>, 
+this exception might be raised if the DOM implementation doesn't 
+support the replacement of the <code>DocumentType</code> child or 
+<code>Element</code> child.</div></div><div class="classdoc-tag-section-header">Version:</div><dl class="classdoc-list"><dt>DOM Level 3</dt></dl></div><hr/><a name="setNodeValue(String)"/><div><h3>setNodeValue</h3><p>public void setNodeValue(String nodeValue)</p><div> The value of this node, depending on its type; see the table above. 
+ When it is defined to be <code>null</code>, setting it has no effect, 
+ including if the node is read-only.
+</div><div><h4>Specified by:</h4><div>setNodeValue in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>nodeValue</div></div><div><h4>Throws:</h4><div><a href="../../../..//org/w3c/dom/DOMException.html">DOMException</a> - NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly and if 
+it is not defined to be <code>null</code>.</div></div></div><hr/><a name="setPrefix(String)"/><div><h3>setPrefix</h3><p>public void setPrefix(String prefix)</p><div> The namespace prefix of this node, or <code>null</code> if it is 
+ unspecified. When it is defined to be <code>null</code>, setting it 
+ has no effect, including if the node is read-only.
+ <br/>Note that setting this attribute, when permitted, changes the 
+ <code>nodeName</code> attribute, which holds the qualified name, as 
+ well as the <code>tagName</code> and <code>name</code> attributes of 
+ the <code>Element</code> and <code>Attr</code> interfaces, when 
+ applicable.
+ <br/>Setting the prefix to <code>null</code> makes it unspecified, 
+ setting it to an empty string is implementation dependent.
+ <br/>Note also that changing the prefix of an attribute that is known to 
+ have a default value, does not make a new attribute with the default 
+ value and the original prefix appear, since the 
+ <code>namespaceURI</code> and <code>localName</code> do not change.
+ <br/>For nodes of any type other than <code>ELEMENT_NODE</code> and 
+ <code>ATTRIBUTE_NODE</code> and nodes created with a DOM Level 1 
+ method, such as <code>createElement</code> from the 
+ <code>Document</code> interface, this is always <code>null</code>.
+</div><div><h4>Specified by:</h4><div>setPrefix in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>prefix</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 2</dt></dl></div><hr/><a name="setTextContent(String)"/><div><h3>setTextContent</h3><p>public void setTextContent(String content)</p><div> This attribute returns the text content of this node and its 
+ descendants. When it is defined to be <code>null</code>, setting it 
+ has no effect. On setting, any possible children this node may have 
+ are removed and, if it the new string is not empty or 
+ <code>null</code>, replaced by a single <code>Text</code> node 
+ containing the string this attribute is set to. 
+ <br/> On getting, no serialization is performed, the returned string 
+ does not contain any markup. No whitespace normalization is performed 
+ and the returned string does not contain the white spaces in element 
+ content (see the attribute 
+ <code>Text.isElementContentWhitespace</code>). Similarly, on setting, 
+ no parsing is performed either, the input string is taken as pure 
+ textual content. 
+ <br/>The string returned is made of the text content of this node 
+ depending on its type, as defined below: 
+ <table border="1" cellpadding="3">
+ <tr>
+ <th>Node type</th>
+ <th>Content</th>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">
+ ELEMENT_NODE, ATTRIBUTE_NODE, ENTITY_NODE, ENTITY_REFERENCE_NODE, 
+ DOCUMENT_FRAGMENT_NODE</td>
+ <td valign="top" rowspan="1" colspan="1">concatenation of the <code>textContent</code> 
+ attribute value of every child node, excluding COMMENT_NODE and 
+ PROCESSING_INSTRUCTION_NODE nodes. This is the empty string if the 
+ node has no children.</td>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">TEXT_NODE, CDATA_SECTION_NODE, COMMENT_NODE, 
+ PROCESSING_INSTRUCTION_NODE</td>
+ <td valign="top" rowspan="1" colspan="1"><code>nodeValue</code></td>
+ </tr>
+ <tr>
+ <td valign="top" rowspan="1" colspan="1">DOCUMENT_NODE, 
+ DOCUMENT_TYPE_NODE, NOTATION_NODE</td>
+ <td valign="top" rowspan="1" colspan="1"><em>null</em></td>
+ </tr>
+ </table>
+</div><div><h4>Specified by:</h4><div>setTextContent in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>content</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><hr/><a name="setUserData(String,Object,org.w3c.dom.UserDataHandler)"/><div><h3>setUserData</h3><p>public Object setUserData(String name, Object value, <a href="../../../..//org/w3c/dom/UserDataHandler.html">UserDataHandler</a> handler)</p><div> Associate an object to a key on this node. The object can later be 
+ retrieved from this node by calling <code>getUserData</code> with the 
+ same key.
+</div><div><h4>Specified by:</h4><div>setUserData in interface <a href="../../../..//org/w3c/dom/Node.html">Node</a></div></div><div><h4>Parameters:</h4><div>name</div><div>value</div><div>handler - The handler to associate to that key, or 
+<code>null</code>.</div></div><dl class="tag list"><dt class="tag section header"><b>Since:</b></dt><dd>DOM Level 3</dt></dl></div><p> </p><table class="navbar div bottom"><tr><td><div><span class="navbar item enabled"><a href="../../../..//index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <a href="../../../..//alphaindex.html">Index</a> <a href="../../../..//deprecated.html">Deprecated</a> <a href="../../../..//help.html">Help</a> <a href="../../../..//about.html">About</a></div></td></tr></table></body></html>

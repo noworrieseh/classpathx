@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="null"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title>StandaloneLocator</title><meta http-equiv="Content-Type" content="text/html; charset=null"/></head><body><table class="navbar div top"><tr><td><div><span class="navbar item enabled"><a href="../../../..//index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <a href="../../../..//alphaindex.html">Index</a> <a href="../../../..//deprecated.html">Deprecated</a> <a href="../../../..//help.html">Help</a> <a href="../../../..//about.html">About</a></div></td></tr></table><div><h3>gnu.xml.libxmlj.util</h3><h1>Class StandaloneLocator</h1><hr/><div><div>public final class StandaloneLocator</div><div>extends java.lang.Object</div><div>implements <a href="../../../..//org/xml/sax/Locator.html">Locator</a>, <a href="../../../..//javax/xml/transform/SourceLocator.html">SourceLocator</a></div></div><hr/><div> SAX Locator implementation that uses the specified values.
+</div><dl class="tag list"><dt class="tag section header"><b>Author:</b></dt><dd class="tag item"><a href='mailto:dog@gnu.org'>Chris Burdess</a></dd></dl><table class="class summary"><tr><td colspan="2"><h4>Constructor Summary</h4></td></tr><tr><td class="class summary left">public </td><td class="class summary right"> <a href="#StandaloneLocator(int,int,String,String)">StandaloneLocator</a>(int lineNumber, int columnNumber, String publicId, String systemId)</td></tr><tr><td></td><td></td></tr></table><table class="class summary"><tr><td colspan="2"><h4>Method Summary</h4></td></tr><tr><td class="class summary left">public int</td><td class="class summary right"> <a href="#getColumnNumber()">getColumnNumber</a>()</td></tr><tr><td></td><td> Return the column number where the current document event ends.</td></tr><tr><td class="class summary left">public int</td><td class="class summary right"> <a href="#getLineNumber()">getLineNumber</a>()</td></tr><tr><td></td><td> Return the line number where the current document event ends.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getPublicId()">getPublicId</a>()</td></tr><tr><td></td><td> Return the public identifier for the current document event.</td></tr><tr><td class="class summary left">public String</td><td class="class summary right"> <a href="#getSystemId()">getSystemId</a>()</td></tr><tr><td></td><td> Return the system identifier for the current document event.</td></tr></table><h4>Constructor Details</h4><a name="StandaloneLocator(int,int,String,String)"/><div><h3>StandaloneLocator</h3><p>public StandaloneLocator(int lineNumber, int columnNumber, String publicId, String systemId)</p><div></div><div><h4>Parameters:</h4><div>lineNumber</div><div>columnNumber</div><div>publicId</div><div>systemId</div></div></div><h4>Method Details</h4><a name="getColumnNumber()"/><div><h3>getColumnNumber</h3><p>public int getColumnNumber()</p><div> Return the column number where the current document event ends.
+ This is one-based number of Java <code>char</code> values since
+ the last line end.
+
+ <p/><strong>Warning:</strong> The return value from the method
+ is intended only as an approximation for the sake of diagnostics;
+ it is not intended to provide sufficient information
+ to edit the character content of the original XML document.
+ For example, when lines contain combining character sequences, wide
+ characters, surrogate pairs, or bi-directional text, the value may
+ not correspond to the column in a text editor's display. 
+
+ <p/>The return value is an approximation of the column number
+ in the document entity or external parsed entity where the
+ markup triggering the event appears.
+
+ <p/>If possible, the SAX driver should provide the line position 
+ of the first character after the text associated with the document 
+ event.  The first column in each line is column 1.
+</div><div><h4>Specified by:</h4><div>getColumnNumber in interface <a href="../../../..//org/xml/sax/Locator.html">Locator</a></div><div>getColumnNumber in interface <a href="../../../..//javax/xml/transform/SourceLocator.html">SourceLocator</a></div></div></div><hr/><a name="getLineNumber()"/><div><h3>getLineNumber</h3><p>public int getLineNumber()</p><div> Return the line number where the current document event ends.
+ Lines are delimited by line ends, which are defined in
+ the XML specification.
+
+ <p/><strong>Warning:</strong> The return value from the method
+ is intended only as an approximation for the sake of diagnostics;
+ it is not intended to provide sufficient information
+ to edit the character content of the original XML document.
+ In some cases, these "line" numbers match what would be displayed
+ as columns, and in others they may not match the source text
+ due to internal entity expansion.  
+
+ <p/>The return value is an approximation of the line number
+ in the document entity or external parsed entity where the
+ markup triggering the event appears.
+
+ <p/>If possible, the SAX driver should provide the line position 
+ of the first character after the text associated with the document 
+ event.  The first line is line 1.
+</div><div><h4>Specified by:</h4><div>getLineNumber in interface <a href="../../../..//org/xml/sax/Locator.html">Locator</a></div><div>getLineNumber in interface <a href="../../../..//javax/xml/transform/SourceLocator.html">SourceLocator</a></div></div></div><hr/><a name="getPublicId()"/><div><h3>getPublicId</h3><p>public String getPublicId()</p><div> Return the public identifier for the current document event.
+
+ <p/>The return value is the public identifier of the document
+ entity or of the external parsed entity in which the markup
+ triggering the event appears.
+</div><div><h4>Specified by:</h4><div>getPublicId in interface <a href="../../../..//org/xml/sax/Locator.html">Locator</a></div><div>getPublicId in interface <a href="../../../..//javax/xml/transform/SourceLocator.html">SourceLocator</a></div></div></div><hr/><a name="getSystemId()"/><div><h3>getSystemId</h3><p>public String getSystemId()</p><div> Return the system identifier for the current document event.
+
+ <p/>The return value is the system identifier of the document
+ entity or of the external parsed entity in which the markup
+ triggering the event appears.
+
+ <p/>If the system identifier is a URL, the parser must resolve it
+ fully before passing it to the application.  For example, a file
+ name must always be provided as a <em>file:...</em> URL, and other
+ kinds of relative URI are also resolved against their bases.
+</div><div><h4>Specified by:</h4><div>getSystemId in interface <a href="../../../..//org/xml/sax/Locator.html">Locator</a></div><div>getSystemId in interface <a href="../../../..//javax/xml/transform/SourceLocator.html">SourceLocator</a></div></div></div><p> </p><table class="navbar div bottom"><tr><td><div><span class="navbar item enabled"><a href="../../../..//index-noframes.html">Overview</a></span> <span class="navbar item enabled"><a href="package-summary.html">Package</a></span> <span class="navbar item enabled"><a href="tree.html">Tree</a></span> <a href="../../../..//alphaindex.html">Index</a> <a href="../../../..//deprecated.html">Deprecated</a> <a href="../../../..//help.html">Help</a> <a href="../../../..//about.html">About</a></div></td></tr></table></body></html>
