@@ -1,0 +1,65 @@
+2004-06-08  Chris Burdess  <dog@bluezoo.org>
+
+	* PostStream.java: Ensure final dot appears on a line by itself.
+
+2004-06-08  Chris Burdess  <dog@bluezoo.org>
+
+	* imap,pop3,smtp: Fixed STARTTLS.
+	* all: Use strict GNU style.
+
+2004-06-07  Chris Burdess  <dog@bluezoo.org>
+
+	* PostStream.java: Fixed stream close bug.
+	* finger: Added finger implementation.
+
+2004-05-25  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPConnection.java: capability command accepts more response
+	    variants.
+
+2004-05-20  Chris Burdess  <dog@bluezoo.org>
+
+	* NNTPConnection.java: Unexpected server responses are now reported as
+	    protocol exceptions.
+
+2004-05-03  Chris Burdess  <dog@bluezoo.org>
+
+	* ftp,gopher: Changed names of handler classes to allow automatic lookup.
+
+2004-05-02  Chris Burdess  <dog@bluezoo.org>
+
+	* NNTPConnection.java: Fixed handling of LISTGROUP command.
+
+2004-04-26  Chris Burdess  <dog@bluezoo.org>
+
+	* POP3Connection.java: Fixed APOP bug (#8657).
+
+2004-04-01  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPConnection.java: Fixed bug determining path delimiter.
+
+2004-03-28  Chris Burdess  <dog@bluezoo.org>
+
+	* configure.ac: Remove AC_PROG_JAVADOC.
+	* Makefile.am: Added install targets.
+
+2004-03-15  Chris Burdess  <dog@bluezoo.org>
+
+	* acinclude.m4: Added macros to search for jarfile dependencies.
+	* configure.ac: Check for jarfiles.
+	* Makefile.am: Enable building in a separate directory.
+
+2004-03-02  Chris Burdess  <dog@bluezoo.org>
+
+	* IMAPConnection.java: Throw IOException on EOF from server.
+
+2004-01-12  Chris Burdess  <dog@bluezoo.org>
+
+	* DTPInputStream.java: Removed abstract methods so that subclasses can
+	    call super implementation.
+	* DTPOutputStream.java: See above.
+
+2004-01-08  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Correct problem with infinite recursion during build.
+

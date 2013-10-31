@@ -1,0 +1,73 @@
+Installing GNU inetlib
+
+
+Dependencies
+
+GNU inetlib depends on a JSSE implementation and the
+javax.security.auth.callback and javax.security.sasl libraries. The
+GNU-Crypto project distributes the latter two libraries:
+
+  http://www.gnu.org/software/gnu-crypto/
+
+A free JSSE implementation (jsse.jar) is available from the Jessie project:
+
+	http://www.nongnu.org/jessie/
+
+The configuration script will search for these jarfiles in some standard
+locations, or you can use the --with-activation-jar and --with-inetlib-jar
+configuration options to specify your own locations. At runtime, you will
+need to reference these libraries and their implementations (e.g.
+gnu-crypto.jar, jessie.jar) in your classpath along with the inetlib
+jarfile.
+
+
+Configuration
+
+The configure program configures GNU inetlib for your system. The various
+programs required to build GNU inetlib should be automatically identified.
+If they aren't, or you wish to override the default programs found, you can
+do so here. Set the environment variable corresponding to the program you
+wish to change befre running configure, e.g.:
+
+	JAVAC=/my/special/javac ./configure
+
+The default should work for most environments:
+
+	./configure
+
+You can exclude specific protocol clients from being built if you want to
+save space. Set the corresponding configuration option to "no", e.g.:
+
+	./configure --enable-nntp=no --enable-gopher=no
+
+A full list of configuration options is available by entering:
+
+	./configure --help
+
+at the comand prompt.
+
+
+Building
+
+To build GNU inetlib, type the following at the command prompt:
+
+	make
+
+You may additionally build the API documentation in Javadoc format (you need
+the javadoc program in your PATH for this):
+
+	make javadoc
+
+
+Installation
+
+To install, simply type:
+
+	make install
+
+This installs inetlib.jar in $(prefix)/share/java (see the configuration
+options to change the prefix variable).
+
+
+$Author: dog $
+$Date: 2004-03-28 18:55:44 $
