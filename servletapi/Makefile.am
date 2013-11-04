@@ -151,6 +151,11 @@ sources = \
 	$(src)/javax/servlet/jsp/tagext/ValidationMessage.java \
 	$(src)/javax/servlet/jsp/tagext/VariableInfo.java
 
+src_l10n = \
+	$(src)/javax/el/L10N.properties \
+	$(src)/javax/servlet/L10N.properties \
+	$(src)/javax/servlet/http/L10N.properties
+
 package_names = \
 	javax.el \
 	javax.servlet \
@@ -168,17 +173,26 @@ classpath = $(src)
 BUILT_SOURCES = $(servlet_jar)
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
+dst_l10n = $(patsubst $(src)/%, $(dst)/%, $(src_l10n))
+dst_license = $(dst)/META-INF/LICENSE
 
 $(dst):
 	mkdir -p $(dst)
 
 # Jar
-$(servlet_jar): $(classes)
-	$(JAR) cf $(servlet_jar) -C $(dst) .
+$(servlet_jar): $(classes) $(dst_l10n) $(dst_license)
+	$(JAR) cfm $(servlet_jar) MANIFEST.MF -C $(dst) .
 
 # Compilation
 $(classes): $(dst)/%.class: $(src)/%.java $(dst)
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
+
+$(dst_l10n): $(dst)/%: $(src)/% $(dst)
+	cp $< $@
+
+$(dst_license):
+	mkdir -p $(dst)/META-INF
+	cp COPYING $@
 
 # Javadoc
 javadoc:
