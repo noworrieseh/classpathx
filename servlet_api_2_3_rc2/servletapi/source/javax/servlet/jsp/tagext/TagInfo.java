@@ -1,0 +1,350 @@
+/*
+ * TagInfo.java -- XXX
+ * 
+ * Copyright (c) 2003 by Free Software Foundation, Inc.
+ * Written by Arnaud Vandyck (arnaud.vandyck@ulg.ac.be)
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Library General Public License as published
+ * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation  
+ * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
+package javax.servlet.jsp.tagext;
+
+/**
+ * 
+ *
+ * @author Arnaud Vandyck - arnaud.vandyck@ulg.ac.be
+ */
+public class TagInfo
+{
+  /** static content for getBodyContent() when it's a JSP. */
+  public static final String BODY_CONTENT_JSP = "JSP";
+
+  /** static content for getBodyContent() when it's Tag dependent. */
+  public static final String BODY_CONTENT_TAG_DEPENDENT = "TAGDEPENDENT";
+
+  /** static content for getBodyContent() when it's empty. */
+  public static final String BODY_CONTENT_EMPTY = "EMPTY";
+
+  /** static content for getBodyContent() when it's scriptless. */
+  public static final String BODY_CONTENT_SCRIPTLESS = "SCRIPTLESS";
+
+  private String tagName;
+
+  private String tagClassName;
+
+  private String bodycontent;
+
+  private String infoString;
+  
+  private TagLibraryInfo taglib;
+
+  private TagExtraInfo tagExtraInfo;
+
+  private TagAttributeInfo[] attributeInfo;
+
+  private String displayName;
+  
+  private String smallIcon;
+
+  private String largeIcon;
+
+  private TagVariableInfo[] tvi;
+
+  private boolean dynamicAttributes;
+
+  /**
+   * Constructor for TagInfo from data in the JSP 2.0 format for
+   * TLD.
+   * 
+   * @param tagName
+   * @param tagClassName
+   * @param bodycontent
+   * @param infoString
+   * @param taglib
+   * @param tagExtraInfo
+   * @param attributeInfo
+   */
+  public TagInfo(String tagName,
+                 String tagClassName,
+                 String bodycontent,
+                 String infoString,
+                 TagLibraryInfo taglib,
+                 TagExtraInfo tagExtraInfo,
+                 TagAttributeInfo[] attributeInfo)
+  {
+    this.tagName = tagName;
+    this.tagClassName = tagClassName;
+    this.bodycontent = bodycontent;
+    this.infoString = infoString;
+    this.taglib = taglib;
+    this.tagExtraInfo = tagExtraInfo;
+    this.attributeInfo = attributeInfo;
+  }
+
+  /** 
+   * Constructor for TagInfo from data in the JSP 1.2 format for
+   * TLD.
+   * 
+   * @param tagName
+   * @param tagClassName
+   * @param bodycontent
+   * @param infoString
+   * @param taglib
+   * @param tagExtraInfo
+   * @param attributeInfo
+   * @param displayName
+   * @param smallIcon
+   * @param largeIcon
+   * @param tvi
+   */
+  public TagInfo(String tagName,
+                 String tagClassName,
+                 String bodycontent,
+                 String infoString,
+                 TagLibraryInfo taglib,
+                 TagExtraInfo tagExtraInfo,
+                 TagAttributeInfo[] attributeInfo,
+                 String displayName,
+                 String smallIcon,
+                 String largeIcon,
+                 TagVariableInfo[] tvi)
+  {
+    this.tagName = tagName;
+    this.tagClassName = tagClassName;
+    this.bodycontent = bodycontent;
+    this.infoString = infoString;
+    this.taglib = taglib;
+    this.tagExtraInfo = tagExtraInfo;
+    this.attributeInfo = attributeInfo;
+    this.displayName = displayName;
+    this.smallIcon = smallIcon;
+    this.largeIcon = largeIcon;
+    this.tvi = tvi;
+  }
+
+  /**
+   * Constructor for TagInfo from data in the JSP 2.0 format for
+   * TLD.
+   *
+   * @param tagName
+   * @param tagClassName
+   * @param bodycontent
+   * @param infoString
+   * @param taglib
+   * @param tagExtraInfo
+   * @param attributeInfo
+   * @param displayName
+   * @param smallIcon
+   * @param largeIcon
+   * @param tvi
+   * @param dynamicAttributes
+   * @since 2.0
+   */
+  public TagInfo(String tagName,
+                 String tagClassName,
+                 String bodycontent,
+                 String infoString,
+                 TagLibraryInfo taglib,
+                 TagExtraInfo tagExtraInfo,
+                 TagAttributeInfo[] attributeInfo,
+                 String displayName,
+                 String smallIcon,
+                 String largeIcon,
+                 TagVariableInfo[] tvi,
+                 boolean dynamicAttributes)
+  {
+    this.tagName = tagName;
+    this.tagClassName = tagClassName;
+    this.bodycontent = bodycontent;
+    this.infoString = infoString;
+    this.taglib = taglib;
+    this.tagExtraInfo = tagExtraInfo;
+    this.attributeInfo = attributeInfo;
+    this.displayName = displayName;
+    this.smallIcon = smallIcon;
+    this.largeIcon = largeIcon;
+    this.tvi = tvi;
+    this.dynamicAttributes = dynamicAttributes;
+  }
+
+  /**
+   * The name of the Tag.
+   * @return  the name of the tag.
+   */
+  public String getTagName()
+  {
+    return this.tagName;
+  }
+
+  /**
+   * Attribute information (in the TLD) on this tag.
+   * 
+   * @return the array of TagAttributeInfo for this tag, or a
+   * zero-length array if the tag has no attributes.  
+   */
+  public TagAttributeInfo[] getAttributes()
+  {
+    return this.attributeInfo;
+  }
+
+  /**
+   * Information on the scripting objects created by this tag at
+   * runtime.
+   * @param data TagData describing this action.
+   * @return if a TagExtraInfo object is associated with this TagInfo,
+   * the result of getTagExtraInfo().getVariableInfo( data ), otherwise
+   * null if the tag has no "id" attribute or new VariableInfo[] { new
+   * VariableInfo( data.getId(), "java.lang.Object", true,
+   * VariableInfo.NESTED ) } if an "id" attribute is present.
+   */
+  public VariableInfo[] getVariableInfo(TagData data)
+  {
+    return this.tagExtraInfo.getVariableInfo(data);
+  }
+   
+  /**
+   * Translation-time validation of the attributes.
+   * @param data The translation-time TagData instance.
+   * @return Whether the data is valid.
+   */
+  public boolean isValid(TagData data)
+  {
+    return this.tagExtraInfo.isValid(data);
+  }
+
+  /**
+   * Translation-time validation of the attributes.
+   * @param data The translation-time TagData instance.
+   * @return A null object, or zero length array if no errors, an array
+   * of ValidationMessages otherwise.
+   * @since 2.0
+   */
+  public ValidationMessage[] validate(TagData data)
+  {
+    return this.tagExtraInfo.validate(data);
+  }
+
+  /**
+   * Set the instance for extra tag information.
+   * @param tei TagExtraInfo instance
+   */
+  public void setTagExtraInfo(TagExtraInfo tei)
+  {
+    this.tagExtraInfo = tei;
+  }
+
+  /**
+   * The instance for extra tag information.
+   * @return the TagExtraInfo instance, if any.
+   */
+  public TagExtraInfo getTagExtraInfo()
+  {
+    return this.tagExtraInfo;
+  }
+
+  /**
+   * Name of the class that provides the handler for this tag.
+   * @return name of the tag handler class.
+   */
+  public String getTagClassName()
+  {
+    return this.tagClassName;
+  }
+
+  /**
+   * bodycontent information for this tag.
+   * @return the body content string.
+   */
+  public String getBodyContent()
+  {
+    return this.bodycontent;
+  }
+
+  /**
+   * The information string for the tag.
+   * @return the info string, or null if not defined.
+   */
+  public String getInfoString()
+  {
+    return this.infoString;
+  }
+
+  /**
+   * Set the TagLibraryInfo property.
+   * 
+   * @param tl the TagLibraryInfo.
+   */
+  public void setTagLibrary(TagLibraryInfo tl)
+  {
+    this.taglib = tl;
+  }
+
+  /**
+   * The instance of TabLibraryInfo we belong to.
+   * @return the tag library instance we belong to.
+   */
+  public TagLibraryInfo getTagLibrary()
+  {
+    return this.taglib;
+  }
+
+  /**
+   * Get the displayName.
+   * @return a short name to be displayed by tools, or null if not defined
+   */
+  public String getDisplayName()
+  {
+    return this.displayName;
+  }
+
+  /**
+   * Get the path to the small icon.
+   * @return path to a small icon to be displayed by tools, or null if not defined
+   */
+  public String getSmallIcon()
+  {
+    return this.smallIcon;
+  }
+
+  /**
+   * Get the path to the large icon.
+   * @return path to a large icon to be displayed by tools, or null if not defined
+   */
+  public String getLargeIcon()
+  {
+    return this.largeIcon;
+  }
+
+  /**
+   * Get TagVariableInfo objects associated with this TagInfo.
+   * @return Array of TagVariableInfo objects corresponding to variables
+   * declared by this tag, or a zero length array if no variables have
+   * been declared
+   */
+  public TagVariableInfo[] getTagVariableInfos()
+  {
+    return this.tvi;
+  }
+  
+  /**
+   * Get dynamicAttributes associated with this TagInfo.
+   * @return true if tag handler supports dynamic attributes
+   * @since 2.0
+   */
+  public boolean hasDynamicAttributes()
+  {
+    return this.dynamicAttributes;
+  }
+
+}

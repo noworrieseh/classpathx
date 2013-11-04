@@ -1,0 +1,2 @@
+AC_INIT(source/javax/servlet/Servlet.java)
+AC_OUTPUT(Makefile)
