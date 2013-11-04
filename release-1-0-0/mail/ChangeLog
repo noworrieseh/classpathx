@@ -1,0 +1,75 @@
+2004-06-07  Chris Burdess  <dog@bluezoo.org>
+
+	* NNTPTransport.java: Implemented transport events.
+
+2004-06-01  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Applied patch #3105.
+
+2004-05-27  Chris Burdess  <dog@bluezoo.org>
+
+	* MessagingException.java: Print embedded stack trace.	
+	* MailboxURLConnection.java: Stream handler for mailboxes.
+
+2004-05-24  Chris Burdess  <dog@bluezoo.org>
+
+	* MimeUtility.java: Fixed MIME-Java character conversion (#8658)
+	* SMTPTransport.java: Fixed typo propagating wrong delivery event
+	    type.
+
+2004-03-28  Chris Burdess  <dog@bluezoo.org>
+
+	* Updated all required files for JavaMail 1.3
+	* configure.ac: Removed AC_PROG_JAVADOC.
+	* Makefile.am: Added install targets.
+
+2004-03-13  Chris Burdess  <dog@bluezoo.org>
+
+	* acinclude.m4: Added macros to find activation.jar and inetlib.jar.
+	* configure.ac: Search for jarfiles.
+	* Makefile.am: Allow builds in other directories.
+
+2004-02-10  Chris Burdess  <dog@bluezoo.org>
+
+	* javamail.charset.map: Added some missing Java charsets.
+	* MimeUtility.java: Corrected a charset detection bug.
+
+2004-02-05  Chris Burdess  <dog@bluezoo.org>
+
+	* NNTPStore.java: Corrected retrieval of "listall" property.
+
+2004-01-29  Chris Burdess  <dog@bluezoo.org>
+
+	* QPOutputStream.java: Applied O/yvind Harboe's patch to correct output of
+	    space character.
+
+2004-01-26  Chris Burdess  <dog@bluezoo.org>
+
+    * build.xml: Updated ant build script to match new build system.
+
+2004-01-25  Chris Burdess  <dog@bluezoo.org>
+
+	* SMTPTransport.java: Incorporated code to recover the connection to
+	    control state on an I/O error during message transmission.
+
+2004-01-23  Chris Burdess  <dog@bluezoo.org>
+
+	* RFC2822OutputStream.java: Applied O/yvind Harboe's patch to correct
+	    UTF-8 encoding problem in gcj runtime.
+
+2004-01-19  Chris Burdess  <dog@bluezoo.org>
+
+    * Makefile.am: Workarounds to avoid recursion.
+    * configure.ac: Added PACKAGE and VERSION for compatibility with different
+        versions of automake.
+
+2004-01-11  Chris Burdess  <dog@bluezoo.org>
+
+	* Makefile.am: Major rework, dropping jarcompiler.
+	    Incremental builds are now supported.
+	    2 jars are generated: gnumail.jar (API) and providers.jar.
+	    javamail.default.providers lists only providers selected in configure.
+	    New target `javadoc' generates API documentation in docs subdirectory.
+	* configure.ac: Added javadoc program.
+	* imap/package.html: Corrected typos.
+
