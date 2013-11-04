@@ -1,0 +1,24 @@
+Name: javax/servlet
+Specification-Title: Java API for Servlets
+Specification-Version: 3.0
+Specification-Vendor: Sun Microsystems
+Implementation-Title: javax.servlet
+Implementation-Version: 3.0
+Implementation-Vendor: The Free Software Foundation, Inc.
+
+Name: javax/servlet/jsp
+Specification-Title: Java API for JavaServer Pages
+Specification-Version: 2.1
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Title: javax.servlet.jsp
+Implementation-Version: 2.1
+Implementation-Vendor: The Free Software Foundation, Inc.
+
+Name: javax/el
+Specification-Title: Expression Language
+Specification-Version: 2.1
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Title: javax.el
+Implementation-Version: 2.1
+Implementation-Vendor: The Free Software Foundation, Inc.
+
