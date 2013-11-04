@@ -1,23 +1,23 @@
 /*
- * JspFactory.java -- XXX
- * 
- * Copyright (c) 1999 by Free Software Foundation, Inc.
- * Written by Mark Wielaard (mark@klomp.org)
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published
- * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ * Copyright (C) 1999, 2013 Free Software Foundation, Inc.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
+ *
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation  
- * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package javax.servlet.jsp;
 
 import javax.servlet.Servlet;
@@ -25,70 +25,53 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
- * XXX
+ * Access to various static resources available to the page.
  */
 public abstract class JspFactory 
 {
 
-  //  Class variables
+    //  Holds the default JspFactory
+    //  set with setDefaultFactory()
+    //  returned by getDefaultFactory() 
+    private static JspFactory defaultFactory;
 
-  //  Holds the default JspFactory
-  //  set with setDefaultFactory()
-  //  returned by getDefaultFactory() 
-  private static JspFactory defaultFactory;
+    /**
+     * Sets the default factory to use.
+     * @param factory the new default factory
+     */
+    public static void setDefaultFactory(JspFactory factory) 
+    {
+        defaultFactory = factory;
+    }
 
-  //  Constructors
+    /**
+     * Returns the default factory.
+     */
+    public static JspFactory getDefaultFactory() 
+    {
+        return defaultFactory;
+    }
 
-  /**
-   * XXX [mjw] Why is this public, shouldn't it be protected?
-   */
-  public JspFactory() {}
+    /**
+     * Get a PageContext object associated with a request/response.
+     */
+    public abstract PageContext getPageContext(Servlet servlet,
+            ServletRequest request,
+            ServletResponse response,
+            String errorPageURL,
+            boolean needsSession,
+            int buffer,
+            boolean autoflush);
 
+    /**
+     * Release a PageContext obtained via a previous call to
+     * {@link #getPageContext}.
+     */
+    public abstract void releasePageContext (PageContext ctx);
 
-  //  Methods
-
-  /**
-   * Get a PageContext object associated with a request/response.
-   */
-  public abstract PageContext getPageContext(Servlet servlet,
-					     ServletRequest request,
-					     ServletResponse response,
-					     String errorPageURL,
-					     boolean needsSession,
-					     int buffer,
-					     boolean autoflush);
-
-
-  /**
-   * Release a PageContext.
-   */
-  public abstract void releasePageContext (PageContext ctx);
-
-  /**
-   * XXX
-   *
-   * @return XXX
-   */
-  public static JspFactory getDefaultFactory() 
-  {
-    return defaultFactory;
-  }
-	
-
-  /**
-   * XXX
-   *
-   * @param fac XXX
-   */
-  public static void setDefaultFactory(JspFactory fac) 
-  {
-    defaultFactory = fac;
-  }
-
-  /**
-   * 
-   * @return 
-   */
-  public abstract JspEngineInfo getEngineInfo();
+    /**
+     * Returns implementation-dependent information on the JSP engine.
+     */
+    public abstract JspEngineInfo getEngineInfo();
 
 }

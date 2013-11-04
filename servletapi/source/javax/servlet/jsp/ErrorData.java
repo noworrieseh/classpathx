@@ -1,86 +1,83 @@
 /*
- * ErrorData.java -- XXX
+ * Copyright (C) 2003, 2013 Free Software Foundation, Inc.
  *
- * Copyright (c) 2003 by Free Software Foundation, Inc.
- * Written by Arnaud Vandyck (arnaud.vandyck@ulg.ac.be)
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published
- * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation
- * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package javax.servlet.jsp;
 
 /**
  * Informations for error pages.
  *
  * @author Arnaud Vandyck - arnaud.vandyck@ulg.ac.be
- * @version JSP 2.0
- * @since JSP 2.0
+ * @version 2.1
+ * @since 2.0
  * @see PageContext#getErrorData()
  */
 public final class ErrorData 
 {
-  private String requestURI = null;
-  private String servletName = null;
-  private int statusCode = -1;
-  private Throwable throwable = null;
 
-  /**
-   * Constructor.
-   * @param throwable
-   * @param statusCode
-   * @param uri
-   * @param servletName
-   */
-  public ErrorData(Throwable throwable, int statusCode,
-                   String uri, String servletName)
-  {
-    this.throwable = throwable;
-    this.statusCode = statusCode;
-    this.requestURI = uri;
-    this.servletName = servletName;
-  }
+    private String requestURI = null;
+    private String servletName = null;
+    private int statusCode = -1;
+    private Throwable throwable = null;
 
-  /**
-   * Get the RequestURI value.
-   * @return the RequestURI value.
-   */
-  public String getRequestURI() {
-    return requestURI;
-  }
+    /**
+     * Constructor.
+     * @param throwable
+     * @param statusCode
+     * @param uri
+     * @param servletName
+     */
+    public ErrorData(Throwable throwable, int statusCode,
+            String uri, String servletName)
+    {
+        this.throwable = throwable;
+        this.statusCode = statusCode;
+        this.requestURI = uri;
+        this.servletName = servletName;
+    }
 
-  /**
-   * Get the ServletName value.
-   * @return the ServletName value.
-   */
-  public String getServletName() {
-    return servletName;
-  }
+    /**
+     * Returns the request URI.
+     */
+    public String getRequestURI() {
+        return requestURI;
+    }
 
-  /**
-   * Get the StatusCode value.
-   * @return the StatusCode value.
-   */
-  public int getStatusCode() {
-    return statusCode;
-  }
+    /**
+     * Returns the servlet name.
+     */
+    public String getServletName() {
+        return servletName;
+    }
 
-  /**
-   * Get the Throwable value.
-   * @return the Throwable value.
-   */
-  public Throwable getThrowable() {
-    return throwable;
-  }
+    /**
+     * Returns the status code of the error.
+     */
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    /**
+     * Returns the Throwable that caused the error.
+     */
+    public Throwable getThrowable() {
+        return throwable;
+    }
 
 }

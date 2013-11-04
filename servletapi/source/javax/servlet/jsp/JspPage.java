@@ -1,41 +1,44 @@
 /*
- * JspPage.java -- XXX
+ * Copyright (C) 1999, 2013 Free Software Foundation, Inc.
  *
- * Copyright (c) 1999 by Free Software Foundation, Inc.
- * Written by Mark Wielaard (mark@klomp.org)
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published
- * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation
- * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package javax.servlet.jsp;
 
 import javax.servlet.Servlet;
 
 /**
- * XXX
+ * Base interface for a JSP page.
+ * @version 2.1
+ * @author Chris Burdess
  */
-public interface JspPage extends Servlet 
+public interface JspPage
+    extends Servlet 
 {
-	
-  /**
-   * XXX
-   */
-  void jspInit();
-	
-  /**
-   * XXX
-   */
-  void jspDestroy();
+
+    /**
+     * Notification that the JSP page is being initialized.
+     */
+    void jspInit();
+
+    /**
+     * Notification that the JSP page is about to be destroyed.
+     */
+    void jspDestroy();
 
 }

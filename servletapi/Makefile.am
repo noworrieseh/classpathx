@@ -16,13 +16,44 @@ servlet_jar = servlet.jar
 
 # The files that make up the servlet API.
 sources = \
+	$(src)/javax/el/ArrayELResolver.java \
+	$(src)/javax/el/BeanELResolver.java \
+	$(src)/javax/el/CompositeELResolver.java \
+	$(src)/javax/el/ELContext.java \
+	$(src)/javax/el/ELContextEvent.java \
+	$(src)/javax/el/ELContextListener.java \
+	$(src)/javax/el/ELException.java \
+	$(src)/javax/el/ELResolver.java \
+	$(src)/javax/el/Expression.java \
+	$(src)/javax/el/ExpressionFactory.java \
+	$(src)/javax/el/FunctionMapper.java \
+	$(src)/javax/el/ListELResolver.java \
+	$(src)/javax/el/MapELResolver.java \
+	$(src)/javax/el/MethodExpression.java \
+	$(src)/javax/el/MethodInfo.java \
+	$(src)/javax/el/MethodNotFoundException.java \
+	$(src)/javax/el/PropertyNotFoundException.java \
+	$(src)/javax/el/PropertyNotWritableException.java \
+	$(src)/javax/el/ResourceBundleELResolver.java \
+	$(src)/javax/el/ValueExpression.java \
+	$(src)/javax/el/VariableMapper.java \
+	$(src)/javax/servlet/AsyncContext.java \
+	$(src)/javax/servlet/AsyncEvent.java \
+	$(src)/javax/servlet/AsyncListener.java \
+	$(src)/javax/servlet/DispatcherType.java \
 	$(src)/javax/servlet/Filter.java \
 	$(src)/javax/servlet/FilterChain.java \
 	$(src)/javax/servlet/FilterConfig.java \
+	$(src)/javax/servlet/FilterRegistration.java \
 	$(src)/javax/servlet/GenericServlet.java \
+	$(src)/javax/servlet/HttpConstraintElement.java \
+	$(src)/javax/servlet/HttpMethodConstraintElement.java \
+	$(src)/javax/servlet/MultipartConfigElement.java \
+	$(src)/javax/servlet/Registration.java \
 	$(src)/javax/servlet/RequestDispatcher.java \
 	$(src)/javax/servlet/Servlet.java \
 	$(src)/javax/servlet/ServletConfig.java \
+	$(src)/javax/servlet/ServletContainerInitializer.java \
 	$(src)/javax/servlet/ServletContext.java \
 	$(src)/javax/servlet/ServletContextAttributeEvent.java \
 	$(src)/javax/servlet/ServletContextAttributeListener.java \
@@ -31,6 +62,7 @@ sources = \
 	$(src)/javax/servlet/ServletException.java \
 	$(src)/javax/servlet/ServletInputStream.java \
 	$(src)/javax/servlet/ServletOutputStream.java \
+	$(src)/javax/servlet/ServletRegistration.java \
 	${src}/javax/servlet/ServletRequest.java \
 	${src}/javax/servlet/ServletRequestAttributeEvent.java \
 	${src}/javax/servlet/ServletRequestAttributeListener.java \
@@ -39,8 +71,23 @@ sources = \
 	${src}/javax/servlet/ServletRequestWrapper.java \
 	${src}/javax/servlet/ServletResponse.java \
 	${src}/javax/servlet/ServletResponseWrapper.java \
+	$(src)/javax/servlet/ServletSecurityElement.java \
+	$(src)/javax/servlet/SessionCookieConfig.java \
+	$(src)/javax/servlet/SessionTrackingMode.java \
 	${src}/javax/servlet/SingleThreadModel.java \
 	$(src)/javax/servlet/UnavailableException.java \
+	$(src)/javax/servlet/annotation/HandlesTypes.java \
+	$(src)/javax/servlet/annotation/HttpConstraint.java \
+	$(src)/javax/servlet/annotation/HttpMethodConstraint.java \
+	$(src)/javax/servlet/annotation/MultipartConfig.java \
+	$(src)/javax/servlet/annotation/ServletSecurity.java \
+	$(src)/javax/servlet/annotation/WebFilter.java \
+	$(src)/javax/servlet/annotation/WebInitParam.java \
+	$(src)/javax/servlet/annotation/WebListener.java \
+	$(src)/javax/servlet/annotation/WebServlet.java \
+	$(src)/javax/servlet/descriptor/JspConfigDescriptor.java \
+	$(src)/javax/servlet/descriptor/JspPropertyGroupDescriptor.java \
+	$(src)/javax/servlet/descriptor/TaglibDescriptor.java \
 	$(src)/javax/servlet/http/Cookie.java \
 	$(src)/javax/servlet/http/HttpServlet.java \
 	$(src)/javax/servlet/http/HttpServletRequest.java \
@@ -56,8 +103,10 @@ sources = \
 	$(src)/javax/servlet/http/HttpSessionEvent.java \
 	$(src)/javax/servlet/http/HttpSessionListener.java \
 	$(src)/javax/servlet/http/HttpUtils.java \
+	$(src)/javax/servlet/http/Part.java \
 	$(src)/javax/servlet/jsp/ErrorData.java \
 	$(src)/javax/servlet/jsp/HttpJspPage.java \
+	$(src)/javax/servlet/jsp/JspApplicationContext.java \
 	$(src)/javax/servlet/jsp/JspContext.java \
 	$(src)/javax/servlet/jsp/JspEngineInfo.java \
 	$(src)/javax/servlet/jsp/JspException.java \
@@ -72,6 +121,8 @@ sources = \
 	$(src)/javax/servlet/jsp/el/Expression.java \
 	$(src)/javax/servlet/jsp/el/ExpressionEvaluator.java \
 	$(src)/javax/servlet/jsp/el/FunctionMapper.java \
+	$(src)/javax/servlet/jsp/el/ImplicitObjectELResolver.java \
+	$(src)/javax/servlet/jsp/el/ScopedAttributeELResolver.java \
 	$(src)/javax/servlet/jsp/el/VariableResolver.java \
 	$(src)/javax/servlet/jsp/tagext/BodyContent.java \
 	$(src)/javax/servlet/jsp/tagext/BodyTag.java \
@@ -80,6 +131,7 @@ sources = \
 	$(src)/javax/servlet/jsp/tagext/FunctionInfo.java \
 	$(src)/javax/servlet/jsp/tagext/IterationTag.java \
 	$(src)/javax/servlet/jsp/tagext/JspFragment.java \
+	$(src)/javax/servlet/jsp/tagext/JspIdConsumer.java \
 	$(src)/javax/servlet/jsp/tagext/JspTag.java \
 	$(src)/javax/servlet/jsp/tagext/PageData.java \
 	$(src)/javax/servlet/jsp/tagext/SimpleTag.java \
@@ -100,7 +152,10 @@ sources = \
 	$(src)/javax/servlet/jsp/tagext/VariableInfo.java
 
 package_names = \
+	javax.el \
 	javax.servlet \
+	javax.servlet.annotation \
+	javax.servlet.descriptor \
 	javax.servlet.http \
 	javax.servlet.jsp \
 	javax.servlet.jsp.el \

@@ -1,32 +1,30 @@
 /*
-  GNU-Classpath Extensions: Servlet API
-  Copyright (C) 1998, 1999, 2001   Free Software Foundation, Inc.
-
-  For more information on the classpathx please mail: classpathx-discuss@gnu.org
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ * Copyright (C) 1998, 1999, 2001, 2013 Free Software Foundation, Inc.
+ *
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
+ *
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 package javax.servlet;
-
 
 import java.io.IOException;
 
-
 /** a request/response filter.
  * Filters are classes that allow you to change the request and
- * response that a target servlet recieves.
+ * response that a target servlet receives.
  *
  * <h4>Lifecycle</h4>
  * <p>Developers must implement this interface for filtering code and
@@ -52,36 +50,36 @@ import java.io.IOException;
  * specification.</p>
  *
  * @see FilterChain for more information on how the chains work
- * @version Servlet API 2.4
- * @since Servlet API 2.3
+ * @version 3.0
+ * @since 2.3
  * @author Nic Ferrier - Tapsell-Ferrier Limited, nferrier@tfltd.net
  * @author Charles Lowell - cowboyd@pobox.com
 */
 public interface Filter
 {
 
-  /** initialize a filter.
-   *
-   * @param init the filter's configuration information (including init params)
-   */
-  public void init(FilterConfig init)
-    throws ServletException;
+    /** initialize a filter.
+     *
+     * @param init the filter's configuration information (including init params)
+     */
+    public void init(FilterConfig init)
+        throws ServletException;
 
-  /** destroy a filter.
-   */
-  public void destroy();
+    /** filter the request/response.
+     *
+     * @param request the request to be filtered
+     * @param response the response to be filtered
+     * @param chain the remaining filters (and the target servlet) in the request chain
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void doFilter(ServletRequest request,
+            ServletResponse response,
+            FilterChain chain)
+        throws ServletException, IOException;
 
-  /** filter the request/response.
-   *
-   * @param request the request to be filtered
-   * @param response the response to be filtered
-   * @param chain the remaining filters (and the target servlet) in the request chain
-   * @throws ServletException
-   * @throws IOException
-   */
-  public void doFilter(ServletRequest request,
-                       ServletResponse response,
-                       FilterChain chain)
-    throws ServletException, IOException;
+    /** destroy a filter.
+     */
+    public void destroy();
 
 }

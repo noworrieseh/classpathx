@@ -1,23 +1,23 @@
 /*
- * pageContext.java -- XXX
+ * Copyright (C) 1999, 2013 Free Software Foundation, Inc.
  *
- * Copyright (c) 1999 by Free Software Foundation, Inc.
- * Written by Mark Wielaard (mark@klomp.org)
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published
- * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation
- * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package javax.servlet.jsp;
 
 import java.io.IOException;
@@ -36,281 +36,193 @@ import javax.servlet.jsp.tagext.BodyContent;
 
 /**
  * The definition of a page.
- *
+ * @version 2.1
  * @author Mark Wielaard
- * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
+ * @author Nic Ferrier (nferrier@tapsellferrier.co.uk)
+ * @author Chris Burdess
  */
 public abstract class PageContext 
-extends JspContext
+    extends JspContext
 {
 
-  //  static final strings used in attribute name table
-  //  [mjw] We don't know what the real values are XXX!!!
+    /**
+     * Denotes page scope.
+     */
+    public static final int PAGE_SCOPE = 1;
 
-  /**
-   * Used as the key for application stuff in the PageContext table.
-   */
-  public static final String APPLICATION = "javax.servlet.jsp.APPLICATION";
+    /**
+     * Denotes request scope.
+     */
+    public static final int REQUEST_SCOPE = 2;
 
-  /**
-   * XXX
-   */
-  public static final String PAGECONTEXT = "javax.servlet.jsp.PAGECONTEXT";
+    /**
+     * Denotes session scope.
+     */
+    public static final int SESSION_SCOPE = 3;
 
-  /**
-   * XXX
-   */
-  public static final String CONFIG = "javax.servlet.jsp.CONFIG";
+    /**
+     * Denotes application scope.
+     */
+    public static final int APPLICATION_SCOPE = 4;
 
-  /**
-   * XXX
-   */
-  public static final String EXCEPTION = "javax.servlet.jsp.Exception";
+    /**
+     * Key for the servlet in the name table.
+     */
+    public static final String PAGE = "javax.servlet.jsp.jspPage";
 
-  /**
-   * XXX
-   */
-  public static final String OUT = "javax.servlet.jsp.OUT";
+    /**
+     * Key for the page context itself in the name table.
+     */
+    public static final String PAGECONTEXT = "javax.servlet.jsp.jspPageContext";
 
-  /**
-   * XXX
-   */
-  public static final String PAGE = "javax.servlet.jsp.PAGE";
+    /**
+     * Key for the servlet request in the name table.
+     */
+    public static final String REQUEST = "javax.servlet.jsp.jspRequest";
 
-  /**
-   * XXX
-   */
-  public static final String REQUEST = "javax.servlet.jsp.REQUEST";
+    /**
+     * Key for the servlet response in the name table.
+     */
+    public static final String RESPONSE = "javax.servlet.jsp.jspResponse";
 
-  /**
-   * XXX
-   */
-  public static final String RESPONSE = "javax.servlet.jsp.RESPONSE";
+    /**
+     * Key for the ServletConfig in the name table.
+     */
+    public static final String CONFIG = "javax.servlet.jsp.jspConfig";
 
-  /**
-   * XXX
-   */
-  public static final String SESSION = "javax.servlet.jsp.SESSION";
+    /**
+     * Key for the HttpSession in the name table.
+     */
+    public static final String SESSION = "javax.servlet.jsp.jspSession";
 
+    /**
+     * Key for the current JspWriter in the name table.
+     */
+    public static final String OUT = "javax.servlet.jsp.jspOut";
 
-  /**
-   * Denotes application scope.
-   */
-  public static final int APPLICATION_SCOPE = -1;
+    /**
+     * Key for the servlet context in the name table.
+     */
+    public static final String APPLICATION = "javax.servlet.jsp.jspApplication";
 
-  /**
-   * Denotes page scope.
-   */
-  public static final int PAGE_SCOPE = -2;
+    /**
+     * Key for an uncaught exception in the name table.
+     */
+    public static final String EXCEPTION = "javax.servlet.jsp.jspException";
 
-  /**
-   * Denotes request scope.
-   */
-  public static final int REQUEST_SCOPE = -3;
+    /**
+     * Initialize the JSP page context.
+     */
+    public abstract void initialize(Servlet servlet,
+            ServletRequest request,
+            ServletResponse response,
+            String errorPageURL,
+            boolean needsSession,
+            int bufferSize,
+            boolean autoFlush)
+        throws IOException, IllegalStateException, IllegalArgumentException;
 
-  /**
-   * Denotes session scope.
-   */
-  public static final int SESSION_SCOPE = -4;
+    /**
+     * Release this page context.
+     */
+    public abstract void release();
 
-  //  static final ints
-  //  [mjw] We also do not know these values XXX!!!
+    /**
+     * Returns the current session object.
+     */
+    public abstract HttpSession getSession();
 
-  /**
-   * XXX
-   */
-  public static final int DEFAULT_BUFFER = -1; //  XXX
+    /**
+     * Returns the current page (a servlet).
+     */
+    public abstract Object getPage();
 
-  /**
-   * XXX
-   */
-  public static final int NO_BUFFER = 0; //  XXX
+    /**
+     * Returns the current servlet request object
+     */
+    public abstract ServletRequest getRequest();
 
-  //  protected instance variables
+    /**
+     * Returns the current servlet response object
+     */
+    public abstract ServletResponse getResponse();
 
-  /**
-   * XXX [mjw] Why transient?
-   */
-  protected transient Hashtable attributes;
+    /**
+     * Returns the current unhandled exception.
+     */
+    public abstract Exception getException();
 
-  //  Private Instance Variables
+    /**
+     * Returns the ServletConfig associated with the page.
+     */
+    public abstract ServletConfig getServletConfig();
 
-  //  XXX [mjw] Do we really need this?
-  private JspWriter initialOut;
+    /**
+     * Returns the servlet context.
+     */
+    public abstract ServletContext getServletContext();
 
-  //  Constructor
+    /**
+     * Forwards the current request/response pair to another servlet for
+     * all further processing.
+     * This page will not subsequently modify the response.
+     * @param relativeUrlPath the URL path to the target resource relative
+     * to this page
+     */
+    public abstract void forward(String relativeUrlPath)
+        throws IOException, ServletException;
 
-  /**
-   * The JSP API constructor.
-   */
-  public PageContext ()
-  {
-  }
+    /**
+     * Process the request/response pair using another resource.
+     * This page may subsequently modify the response.
+     * @param relativeUrlPath the URL path to the target resource relative
+     * to this page
+     */
+    public abstract void include(String urlPath)
+        throws IOException, ServletException;
 
-  //  Instance Methods
+    /**
+     * Process the request/response pair using another resource.
+     * This page may subsequently modify the response.
+     * If <code>flush</code> is true, the current <code>out</code> for this
+     * page is flushed prior to include processing.
+     * @param relativeUrlPath the URL path to the target resource relative
+     * to this page
+     * @since 2.0
+     */
+    public abstract void include(String urlPath, boolean flush)
+        throws IOException, ServletException;
 
-  /**
-   * XXX
-   *
-   * @param name XXX
-   * @param scope XXX
-   * @exception IllegalArgumentException
-   */
-  protected void _checkForNameCollision(String name, int scope)
-    throws IllegalArgumentException 
-  {
-    //  XXX [mjw] What should the default behaviour be?
-  }
+    /**
+     * Handle an exception created by the page.
+     */
+    public abstract void handlePageException(Exception e)
+        throws ServletException, IOException;
 
-  public abstract Exception getException();
+    /**
+     * Handle an exception created by the page.
+     */
+    public abstract void handlePageException(Throwable t)
+        throws ServletException, IOException;
 
-  public abstract ServletConfig getServletConfig();
+    /**
+     * Calls {@link javax.servlet.jsp.JspContext#pushBody} with the current
+     * value of <code>out</code>, and returns a new BodyContent.
+     */
+    public BodyContent pushBody()
+    {
+        JspWriter out = (JspWriter) getAttribute(OUT);
+        pushBody(out);
+        return (BodyContent) out; // FIXME work out what to return
+    }
 
-  public abstract ServletContext getServletContext();
-
-  public abstract HttpSession getSession();
-
-  /**
-   * XXX
-   *
-   * @param bufferSize XXX
-   * @param autoflush XXX
-   * @exception IOException XXX
-   * @exception IllegalArgumentException XXX
-   */
-  //protected abstract JspWriter createInitialOut(int bufferSize,
-  //					boolean autoflush)
-  //throws IOException, IllegalArgumentException;
-
-  /**
-   * Initialize the JSP page context.
-   */
-  public abstract void initialize (Servlet servlet,
-				   ServletRequest request,
-				   ServletResponse response,
-				   String errorPageURL,
-				   boolean needsSession,
-				   int bufferSize,
-				   boolean autoFlush)
-    throws IOException, IllegalStateException, IllegalArgumentException;
-
-  /**
-   * XXX
-   *
-   * @param urlPath
-   *
-   * @exception IOException
-   * @exception ServletException
-   * @exception IllegalArgumentException
-   * @exception IllegalStateException
-   * @exception SecurityException
-   */
-  public abstract void forward(String urlPath)
-    throws IOException, ServletException;
-
-  /**
-   * XXX
-   *
-   * @param urlPath
-   *
-   * @exception IOException
-   * @exception ServletException
-   * @exception IllegalArgumentException
-   * @exception SecurityException
-   */
-  public abstract void include(String urlPath)
-    throws IOException, ServletException;
-
-  /**
-   * XXX
-   *
-   * @param urlPath
-   * @param flush 
-   *
-   * @since JSP 2.0
-   * 
-   * @exception IOException
-   * @exception ServletException
-   * @exception IllegalArgumentException
-   * @exception SecurityException
-   */
-  public abstract void include(String urlPath, boolean flush)
-    throws IOException, ServletException;
-
-  /**
-   * Handle an exception created by the page.
-   * @param e
-   * @exception ServletException
-   * @exception IOException
-   * @exception NullPointerException
-   * @exception SecurityException
-   */
-  public abstract void handlePageException (Exception e)
-    throws ServletException, IOException;
-
-  /**
-   * Handle an exception created by the page.
-   * @param t
-   * @exception ServletException
-   * @exception IOException
-   * @exception NullPointerException
-   * @exception SecurityException
-   */
-  public abstract void handlePageException (Throwable t)
-    throws ServletException, IOException;
-
-  /**
-   * Release this page context.
-   */
-  public abstract void release ();
-
-  /**
-   * get the current page (a servlet)
-   * 
-   * @return XXX
-   */
-  public abstract Object getPage();
-
-  /**
-   * get the current servlet request object
-   * 
-   * @return the request
-   */
-  public abstract ServletRequest getRequest();
-
-  /**
-   * get the current servlet response object
-   * 
-   * @return the response
-   */
-  public abstract ServletResponse getResponse();
-
-  /**
-   * XXX
-   * @return a BodyContent
-   */
-  public BodyContent pushBody()
-  {
-    return null; // BAD! XXX
-  }
-
-  /**
-   * 
-   * @return a JspWriter
-   */
-  public JspWriter popBody()
-  {
-    return (JspWriter) this.attributes.get( PageContext.OUT );
-  }
-
-  /**
-   * 
-   * @return an ErrorData
-   * @since JSP 2.0
-   */
-  public ErrorData getErrorData()
-  {
-    return null;
-  }
+    /**
+     * Returns error data from the request attributes.
+     * @since 2.0
+     */
+    public ErrorData getErrorData()
+    {
+        return null;
+    }
 
 }

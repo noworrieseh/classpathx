@@ -1,23 +1,23 @@
 /*
- * TagData.java -- XXX
- * 
- * Copyright (c) 2003 by Free Software Foundation, Inc.
- * Written by Arnaud Vandyck (arnaud.vandyck@ulg.ac.be)
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Library General Public License as published
- * by the Free Software Foundation, version 2. (see COPYING.LIB)
+ * Copyright (C) 2003, 2013 Free Software Foundation, Inc.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This file is part of GNU Classpath Extensions (classpathx).
+ * For more information please visit https://www.gnu.org/software/classpathx/
+ *
+ * classpathx is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * classpathx is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation  
- * Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with classpathx.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package javax.servlet.jsp.tagext;
 
 import java.util.Hashtable;
@@ -25,136 +25,102 @@ import java.util.Enumeration;
 
 /**
  * Translation-time only attribute/value information for a tag instance.
- *
+ * @version 2.1
  * @author Arnaud Vandyck - arnaud.vandyck@ulg.ac.be
+ * @author Chris Burdess
  */
-public class TagData implements Cloneable
+public class TagData
+    implements Cloneable
 {
-  
-  /** Should this field be static?
-   * 
-   */
-  private Hashtable attrs = new Hashtable();
 
-  /**
-   * 
-   */
-  public static final Object REQUEST_TIME_VALUE = new Object();
+    private Hashtable<String,Object> attrs;
 
-  /**
-   * Constructor for TagData.
-   * 
-   * @param atts the static attributes and values. May be null.
-   */
-  public TagData(Object[][] atts)
-  {
-    if (atts!=null)
-    {
-      this.attrs = new Hashtable(atts.length);
-      for ( int loop=0; loop<atts.length; loop++ )
-      {
-        Object attName = null;
-        Object value = null;
-        // avoid ArrayOutOfBoundException
-        if ( atts[loop].length==2 )
-        {
-          attName=atts[loop][0];
-          value=atts[loop][1];
-        }
-        this.setAttribute( attName.toString(), value );
-      }
-    }
-  }
-  
-  /**
-   * Constructor for TagData.
-   * 
-   * @param attrs a hashtable to get the values from.
-   */
-  public TagData(Hashtable attrs)
-  {
-    this.attrs = attrs;
-  }
+    /**
+     * 
+     */
+    public static final Object REQUEST_TIME_VALUE = new Object();
 
-  /**
-   * The value of the ID if available
-   * @return the value of the id or null
-   */
-  public String getId()
-  {
-    String value = null;
-    if (this.attrs!=null)
+    /**
+     * Constructor for TagData.
+     * 
+     * @param attrs the static attributes and values. May be null.
+     */
+    public TagData(Object[][] attrs)
     {
-      if (this.attrs.get(TagAttributeInfo.ID)!=null)
-      {
-        value = this.attrs.get(TagAttributeInfo.ID).toString();
-      }
+        if (attrs == null)
+          {
+            this.attrs = new Hashtable<String,Object>();
+          }
+        else
+          {
+            this.attrs = new Hashtable<String,Object>(attrs.length);
+            for (int i = 0; i<attrs.length; i++)
+              {
+                Object attName = attrs[i][0];
+                Object value = attrs[i][1];
+                this.attrs.put(attName.toString(), value);
+              }
+          }
     }
-    return value;
-  }
 
-  /**
-   * The value of the attribute.
-   * @param attName the name of the attribute.
-   * @return the attribute's value object.
-   */
-  public Object getAttribute(String attName)
-  {
-    Object value = null;
-    if (attName != null && this.attrs!=null)
+    /**
+     * Constructor for TagData.
+     * 
+     * @param attrs a hashtable to get the values from.
+     */
+    public TagData(Hashtable<String,Object> attrs)
     {
-      value =  this.attrs.get(attName);
+        this.attrs = new Hashtable<String,Object>(attrs.size());
+        this.attrs.putAll(attrs);
     }
-    return value;
-  }
 
-  /**
-   * Set the value of an attribute.
-   * @param attName the name of the attribute
-   * @param value the value.
-   */
-  public void setAttribute(String attName,
-                           Object value)
-  {
-    if (this.attrs==null)
+    /**
+     * The value of the ID if available
+     * @return the value of the id or null
+     */
+    public String getId()
     {
-      this.attrs = new Hashtable();
+        return getAttributeString(TagAttributeInfo.ID);
     }
-    // avoid NullPointerException
-    if (attName!=null && value!=null)
-    {
-      this.attrs.put( attName, value );
-    }
-  }
 
-  /**
-   * Get the value for a given attribute.
-   * @param attName the name of the attribute.
-   * @return the value
-   * @throws ClassCastException if attribute value is not a String
-   */
-  public String getAttributeString(String attName)
-  {
-    String result = null;
-    if (this.attrs!=null)
+    /**
+     * The value of the attribute.
+     * @param attName the name of the attribute.
+     * @return the attribute's value object.
+     */
+    public Object getAttribute(String attName)
     {
-      result = (String)this.attrs.get( attName );
+        return attrs.get(attName);
     }
-    return result;
-  }
 
-  /**
-   * Enumerates the attributes.
-   * @return an Enumeration of the attributes in the TagData.
-   */
-  public Enumeration getAttributes()
-  {
-    Enumeration result = null;
-    if (this.attrs!=null)
+    /**
+     * Set the value of an attribute.
+     * @param attName the name of the attribute
+     * @param value the value.
+     */
+    public void setAttribute(String attName, Object value)
     {
-      result = this.attrs.keys();
+        attrs.put(attName, value);
     }
-    return result;
-  }
+
+    /**
+     * Get the value for a given attribute.
+     * @param attName the name of the attribute.
+     * @return the value
+     * @throws ClassCastException if attribute value is not a String
+     */
+    public String getAttributeString(String attName)
+    {
+        return (String) attrs.get(attName);
+    }
+
+    /**
+     * Enumerates the attributes.
+     * @return an Enumeration of the attributes in the TagData.
+     */
+    public Enumeration getAttributes()
+    {
+        return attrs.keys();
+    }
 
 }
