@@ -1,5 +1,6 @@
 This is the GNU servlet API distribution, part of the ClasspathX project.
 
-The current version of the API is 2.3.
+The current version of the servlet API is 3.0.
+The current version of the Java ServerPages API is 2.1.
 
 Please read the file INSTALL for installation instructions.
