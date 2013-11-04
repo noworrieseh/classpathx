@@ -1,0 +1,118 @@
+Installation procedure for GCJ (GNU Compiler for Java)
+---------------------------------------------------------
+
+This installation requires a recent gcj compiler, at least version
+3.1. It does not depend on any other java tools (javac, jikes...).
+
+The build creates the folowing files:
+
+  gnu-crypto.jar      .class files compiled with gcj.
+  lib-gnu-crypto.so   a native shared library equivalent of the jar file.
+
+Ideally, the files in this directory should go to the root of the
+project, however it is difficult to create Automake makefiles that 
+accomodate both byte code compilation with jikes or javac and native 
+compilation with gcj. In any case, such a makefile does not follow 
+the current ClasspathX standard and it is simpler for me to keep it 
+separated.
+
+
+First a few conventions:
+This build does not allow the compilation in the source tree. You must 
+build the software in a temporary directory.
+Lets assume that you have installed the crypto sources under 
+$HOME/crypto and created a tmp directory: $HOME/crypto_tmp.
+
+Let's define the two variables:
+
+  GCJ_CRYPTO_ROOT=$HOME/crypto/gcj   (root of the distribution)
+  CRYPTO_TMP=$HOME/crypto_tmp        (tmp directory)
+
+
+The installation is as follow:
+
+  cd $GCJ_CRYPTO_ROOT
+  /bin/sh admin.sh links
+
+These first two commands change to the gcj sub-directory and add
+symbolic links pointing to files in the crypto source directory. 
+It also sets the executable flag on all shell scripts, for some reason 
+cvs remove them when checking out!
+
+then
+
+  cd $CRYPTO_TMP
+  $GCJ_CRYPTO_ROOT/configure --prefix=/usr/local/gnu_crypto
+  make
+  make install
+
+the standard "GNU configure" steps: change to the tmp
+directory, configure the software (with installation directory set to 
+/usr/local/gnu_crypto in this example), run "make" and finally install
+the resulting files (make install). You may need to be "root" for the
+installation step.
+
+Running the test suite
+----------------------
+
+Gnu-crypto comes with a minimal, self sufficient, test suite and a 
+more complete JUnit test suite.
+
+The minimal test suite does not require extra software. To run it:
+
+  make check
+  make test-vectors
+
+All tests should execute. The output goes in the subdirectory "tv".
+
+JUnit test suite
+----------------
+
+In order to compile and run the JUnit tests you must have a JUnit
+shared library compiled with GCJ. Instructions to compile
+such a library can be found at 
+http://www.zipworld.com.au/~olivier/gcj.html
+
+Once you have it, add the path of the junit "lib" directory to your
+LD_LIBRARY_PATH environment variable and reconfigure the build with
+the extra flag: --with-junit-jar=/path/to/junit.jar as follow:
+
+   LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/junit/lib
+   export  LD_LIBRARY_PATH
+
+   $GCJ_CRYPTO_ROOT/configure --prefix=/usr/local/gnu_crypto --with-junit-jar=/path/to/junit.jar
+
+  make
+  make check
+
+This time you should have the extra executable "source/junitTest". To
+run the JUnit test suite:
+
+  source/junitTest
+
+
+Good luck!
+
+Note: currently the gcj compilation seems to produce a buggy crypto
+library. At least the Anubis cipher does not pass its self test!
+The GCJ build is provided to you in the hope it will be useful but 
+be aware that it may not be of much use as yet.
+
+
+
+
+If you have any problem with the GCJ build please send an email to the 
+gnu-crypto mailing list: classpathx-crypto@gnu.org.
+
+Olivier LF
+
+
+
+
+-------------------------------------------------------------------------------
+Maintainer documentation.
+
+Following are a few instructions for regenerating the gcj tool chain.
+
+[   TODO   ]
+- Files to check in.

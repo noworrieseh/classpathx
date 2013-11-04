@@ -1,0 +1,522 @@
+<?xml version="1.0"?>
+
+<!--
+   $Id: build.xml,v 1.20 2002-08-31 10:50:01 raif Exp $
+
+   Copyright (C) 2001-2002, Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation; either version 2 of the License or (at your option) any
+   later version.
+
+   This program is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+   more details.
+
+   You should have received a copy of the GNU General Public License along with
+   this program; see the file COPYING.  If not, write to the
+
+      Free Software Foundation Inc.,
+      59 Temple Place - Suite 330,
+      Boston, MA 02111-1307
+      USA
+
+   As a special exception, if you link this library with other files to produce
+   an executable, this library does not by itself cause the resulting
+   executable to be covered by the GNU General Public License.  This exception
+   does not however invalidate any other reasons why the executable file might
+   be covered by the GNU General Public License.
+-->
+
+<project name="gnu-crypto" default="jar" basedir=".">
+
+   <!--
+   global properties ..........................................................
+   -->
+
+   <!-- give user a chance to override with personal settings -->
+   <property file=".ant.properties"/>
+   <property file="${user.home}/.ant.properties"/>
+
+   <property name="debug" value="true"/>
+   <property name="optimize" value="false"/>
+
+   <!-- standard directories -->
+   <property name="classes.dir" value="classes"/>
+   <property name="docs.dir" value="docs"/>
+   <property name="etc.dir" value="etc"/>
+   <property name="lib.dir" value="lib"/>
+   <property name="src.dir" value="source"/>
+
+   <property name="package.name" value="${package}-${version}"/>
+   <property name="main.jar" value="${lib.dir}/${package}.jar"/>
+   <property name="test.jar" value="${lib.dir}/${package}-test.jar"/>
+
+   <property name="junit.version" value="3.7"/>
+   <property name="junit.url" value="http://download.sourceforge.net/junit"/>
+   <property name="junit.jar" value="${lib.dir}/junit.jar"/>
+
+   <!--
+   default targets ............................................................
+   -->
+   <target name="configure"
+           depends="config-junit"
+           description="Create temporary directories for a build">
+      <tstamp/>
+      <mkdir dir="${classes.dir}"/>
+      <mkdir dir="${lib.dir}"/>
+      <mkdir dir="tv"/>
+   </target>
+
+   <patternset id="toplevel_files">
+      <include name="AUTHORS"/>
+      <include name="ChangeLog"/>
+      <include name="COPYING"/>
+      <include name="LICENSE"/>
+      <include name="NEWS"/>
+      <include name="README"/>
+      <include name="THANKS"/>
+   </patternset>
+
+   <target name="jar" depends="configure,compile"
+           description="Build the project's main .jar file">
+      <jar jarfile="${main.jar}" manifest="${etc.dir}/gnu-crypto.mf">
+         <fileset dir="${classes.dir}" includes="gnu/**" excludes="test/**"/>
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+         </fileset>
+      </jar>
+   </target>
+
+   <target name="compile" depends="configure">
+      <javac destdir="${classes.dir}"
+             debug="${debug}"
+             optimize="${optimize}"
+             srcdir="${src.dir}"
+             includes="gnu/crypto/**/*.java"/>
+   </target>
+
+   <!--
+   Minimal tests to pass before release .......................................
+   -->
+   <target name="test" depends="jar,jar-test"
+           description="Run built-in tests to ensure correctness of .jar file">
+      <java classname="test.AllTests"
+            fork="yes" taskname="junit" failonerror="true">
+         <classpath>
+            <pathelement location="${test.jar}"/>
+            <pathelement location="${main.jar}"/>
+            <pathelement location="${junit.jar}"/>
+         </classpath>
+      </java>
+   </target>
+
+   <target name="jar-test" depends="compile-test">
+      <jar jarfile="${test.jar}">
+         <fileset dir="${classes.dir}" includes="test/**" excludes="gnu/**"/>
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+         </fileset>
+      </jar>
+   </target>
+
+   <target name="compile-test" depends="jar">
+      <javac destdir="${classes.dir}" debug="${debug}" optimize="${optimize}">
+         <classpath>
+            <pathelement location="${junit.jar}"/>
+            <pathelement location="${main.jar}"/>
+         </classpath>
+         <src path="${src.dir}"/>
+         <include name="test/**"/>
+      </javac>
+   </target>
+
+   <!--
+   Exercise block cipher and hash algorithms to measure their performance .....
+   -->
+   <target name="speed" depends="jar"
+           description="Exercise hash and block ciphers to measure their performance">
+      <java classname="gnu.crypto.tool.CipherSpeed"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+      <java classname="gnu.crypto.tool.HashSpeed"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+   </target>
+
+   <!--
+   Exercise PRNG algorithms to measure their randomness .......................
+   -->
+   <target name="ent" depends="jar"
+           description="Test randomness of PRNG algorithms">
+      <java classname="gnu.crypto.tool.Ent"
+            fork="yes" failonerror="true" classpath="${main.jar}"/>
+   </target>
+
+   <!--
+   Test vectors ...............................................................
+   -->
+   <target name="tv" depends="kat,mct,nessie"
+           description="Output NIST and NESSIE compliant test vectors"/>
+   <!--
+   Generating test vectors and exercising algorithms the NESSIE way ...........
+
+   NOTE: To fully generate the tests, including those that take _hours_,
+   invoke the call like so:
+
+      ant -DTORTURE=true nessie
+
+   or any of its sub-tasks.
+   -->
+   <target name="nessie" depends="jar"
+           description="Output NESSIE-compliant test vectors">
+      <parallel>
+         <antcall target="ra"/>
+         <antcall target="doum"/>
+         <antcall target="pool"/>
+      </parallel>
+   </target>
+
+   <target name="ra" depends="jar">
+      <antcall target="amoun-ra">
+         <param name="keysize" value="128"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="160"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="192"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="224"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="256"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="288"/>
+      </antcall>
+      <antcall target="amoun-ra">
+         <param name="keysize" value="320"/>
+      </antcall>
+   </target>
+
+   <target name="amoun-ra">
+      <echo message="Computing test vectors for Anubis (${keysize}-bit key)"/>
+      <java classname="gnu.crypto.tool.NessieCipherTVEmitter"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nessie/anubis-${keysize}-tv.txt">
+         <arg value="anubis"/>
+         <arg value="${keysize}"/>
+      </java>
+   </target>
+
+   <target name="doum" depends="jar">
+      <echo message="Computing test vectors for Khazad"/>
+      <java classname="gnu.crypto.tool.NessieCipherTVEmitter"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nessie/khazad-tv.txt">
+         <arg value="khazad"/>
+      </java>
+   </target>
+
+   <target name="pool" depends="jar">
+      <echo message="Computing test vectors for Whirlpool"/>
+      <java classname="gnu.crypto.tool.NessieHashTVEmitter"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nessie/whirlpool-tv.txt">
+         <arg value="whirlpool"/>
+      </java>
+   </target>
+
+   <!--
+   Generating test vectors and exercising algorithms the NIST way .............
+   -->
+   <target name="kat" depends="jar"
+           description="Output NIST-compliant KAT vectors">
+      <parallel>
+         <antcall target="nist-kat">
+            <param name="cipher" value="anubis"/>
+            <param name="keysize" value=""/>
+         </antcall>
+         <antcall target="nist-kat">
+            <param name="cipher" value="rijndael"/>
+            <param name="keysize" value=""/>
+         </antcall>
+         <antcall target="nist-kat">
+            <param name="cipher" value="serpent"/>
+            <param name="keysize" value=""/>
+         </antcall>
+         <antcall target="nist-kat">
+            <param name="cipher" value="twofish"/>
+            <param name="keysize" value=""/>
+         </antcall>
+         <!-- KAT can be applied to non NIST ciphers for 128-bit keys only -->
+         <antcall target="nist-kat">
+            <param name="cipher" value="khazad"/>
+            <param name="keysize" value="128"/>
+         </antcall>
+         <antcall target="nist-kat">
+            <param name="cipher" value="square"/>
+            <param name="keysize" value="128"/>
+         </antcall>
+      </parallel>
+   </target>
+
+   <target name="nist-kat">
+      <mkdir dir="tv/nist/${cipher}"/>
+      <echo message="Generating NIST Variable Key KAT vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistKat"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_vk.txt">
+         <arg value="-k"/>
+         <arg value="${cipher}"/>
+         <arg value="${keysize}"/>
+      </java>
+      <echo message="Generating NIST Variable Text KAT vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistKat"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_vt.txt">
+         <arg value="-t"/>
+         <arg value="${cipher}"/>
+         <arg value="${keysize}"/>
+      </java>
+   </target>
+
+   <target name="mct" depends="jar"
+           description="Output NIST-compliant MCT vectors">
+      <parallel>
+         <antcall target="nist-mct">
+            <param name="cipher" value="anubis"/>
+         </antcall>
+         <antcall target="nist-mct">
+            <param name="cipher" value="rijndael"/>
+         </antcall>
+         <antcall target="nist-mct">
+            <param name="cipher" value="serpent"/>
+         </antcall>
+         <antcall target="nist-mct">
+            <param name="cipher" value="twofish"/>
+         </antcall>
+      </parallel>
+   </target>
+
+   <target name="nist-mct">
+      <mkdir dir="tv/${cipher}"/>
+      <echo message="Generating NIST MCT ECB Encryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_e_m.txt">
+         <arg value="-E"/>
+         <arg value="-e"/>
+         <arg value="${cipher}"/>
+      </java>
+      <echo message="Generating NIST MCT ECB Decryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/ecb_d_m.txt">
+         <arg value="-E"/>
+         <arg value="-d"/>
+         <arg value="${cipher}"/>
+      </java>
+      <echo message="Generating NIST MCT CBC Encryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/cbc_e_m.txt">
+         <arg value="-C"/>
+         <arg value="-e"/>
+         <arg value="${cipher}"/>
+      </java>
+      <echo message="Generating NIST MCT CBC Decryption vectors for ${cipher}"/>
+      <java classname="gnu.crypto.tool.NistMCT"
+            fork="yes" failonerror="true" classpath="${main.jar}"
+            output="tv/nist/${cipher}/cbc_d_m.txt">
+         <arg value="-C"/>
+         <arg value="-d"/>
+         <arg value="${cipher}"/>
+      </java>
+   </target>
+
+   <!--
+   Generating Javadoc API in HTML format ......................................
+   -->
+   <target name="docs" depends="jar,check-jdk,javadoc,javadoc2"
+           description="Generate programmer's documentation in Javadoc HTML format">
+   </target>
+
+   <target name="check-jdk">
+      <condition property="jdk2">
+         <equals arg1="${ant.java.version}" arg2="1.4"/>
+      </condition>
+   </target>
+
+   <target name="javadoc" unless="jdk2">
+      <mkdir dir="${docs.dir}/api"/>
+      <antcall target="make-docs">
+         <param name="javadoc.opts" value=""/>
+      </antcall>
+   </target>
+
+   <target name="javadoc2" if="jdk2">
+      <mkdir dir="${docs.dir}/api"/>
+      <antcall target="make-docs">
+         <param name="javadoc.opts" value="-breakiterator"/>
+      </antcall>
+   </target>
+
+   <target name="make-docs">
+      <javadoc packagenames="gnu.crypto.*"
+               sourcepath="${src.dir}"
+               destdir="${docs.dir}/api"
+               package="true"
+               version="true"
+               windowtitle="${oneliner}, version ${version}"
+               additionalparam="${javadoc.opts}">
+         <doctitle>
+            <![CDATA[<H1>${oneliner}<BR>Programmer's Documentation</H1>]]>
+         </doctitle>
+         <header>
+            <![CDATA[For the latest news and information visit<BR>
+            <A HREF="http://www.gnu.org/software/classpathx/crypto">The GNU Crypto project</A>]]>
+         </header>
+         <bottom>
+            <![CDATA[Copyright &copy;2001-2002 <A HREF="mailto:classpathx-crypto@gnu.org">
+            Free Software Foundation, Inc..</A> All Rights Reserved.]]>
+         </bottom>
+         <classpath>
+            <pathelement location="${main.jar}"/>
+         </classpath>
+         <group title="GNU Crypto Algorithms"
+                packages="gnu.crypto.cipher*,gnu.crypto.hash*,gnu.crypto.mac*,gnu.crypto.mode*,gnu.crypto.pad*,gnu.crypto.prng*"/>
+         <group title="GNU Crypto Signature Schemes" packages="gnu.crypto.sig*"/>
+         <group title="GNU Crypto JCE Adapters" packages="gnu.crypto.jce*"/>
+         <group title="GNU Crypto Experimental Algorithms" packages="gnu.crypto.exp.ust*"/>
+         <group title="GNU Crypto Tools" packages="gnu.crypto.tool*"/>
+         <group title="GNU Crypto Utilities" packages="gnu.crypto.util*"/>
+      </javadoc>
+   </target>
+
+   <!--
+   Make distribution ..........................................................
+   -->
+   <target name="release" depends="test,dist-library,dist-tv,compute-checksum"
+           description="Package the library's Software and generated Test Vectors">
+   </target>
+
+   <target name="dist-library" depends="jar,docs">
+      <property name="build.dir" value="build/${package}-${version}"/>
+      <copy todir="${build.dir}">
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+            <include name=".ant.properties"/>
+            <include name="build.xml"/>
+            <include name="configure"/>
+            <include name="configure.in"/>
+            <include name="Makefile.in"/>
+         </fileset>
+      </copy>
+      <copy todir="${build.dir}/${docs.dir}">
+         <fileset dir="${docs.dir}" includes="api/**/*"/>
+      </copy>
+      <copy todir="${build.dir}/${etc.dir}">
+         <fileset dir="${etc.dir}"/>
+      </copy>
+      <copy todir="${build.dir}/${lib.dir}" file="${main.jar}"/>
+      <copy todir="${build.dir}/${lib.dir}" file="${test.jar}"/>
+      <copy todir="${build.dir}/${src.dir}">
+         <fileset dir="${src.dir}">
+            <include name="**/*.java"/>
+         </fileset>
+      </copy>
+
+      <property name="deliverable1" value="${package}-${version}"/>
+      <zip basedir="build" zipfile="${deliverable1}.zip"/>
+      <tar basedir="build" tarfile="${deliverable1}.tar"/>
+      <gzip src="${deliverable1}.tar" zipfile="${deliverable1}.tar.gz"/>
+      <bzip2 src="${deliverable1}.tar" zipfile="${deliverable1}.tar.bz2"/>
+      <delete file="${deliverable1}.tar"/>
+      <delete dir="build"/>
+   </target>
+
+   <target name="dist-tv" depends="tv">
+      <property name="build.dir" value="build/${package}-${version}"/>
+      <copy todir="${build.dir}">
+         <fileset dir="${basedir}">
+            <patternset refid="toplevel_files"/>
+            <include name=".ant.properties"/>
+            <include name="build.xml"/>
+            <include name="configure"/>
+            <include name="configure.in"/>
+            <include name="Makefile.in"/>
+         </fileset>
+      </copy>
+      <copy todir="${build.dir}/tv">
+         <fileset dir="tv" includes="**/*"/>
+      </copy>
+
+      <property name="deliverable2" value="${package}-${version}-tv"/>
+      <zip basedir="build" zipfile="${deliverable2}.zip"/>
+      <tar basedir="build" tarfile="${deliverable2}.tar"/>
+      <gzip src="${deliverable2}.tar" zipfile="${deliverable2}.tar.gz"/>
+      <bzip2 src="${deliverable2}.tar" zipfile="${deliverable2}.tar.bz2"/>
+      <delete file="${deliverable2}.tar"/>
+      <delete dir="build"/>
+   </target>
+
+   <target name="compute-checksum" depends="dist-library,dist-tv">
+      <property name="deliverable1" value="${package}-${version}"/>
+      <property name="deliverable2" value="${package}-${version}-tv"/>
+      <checksum file="${deliverable1}.zip" algorithm="md5" property="zip1.md5"/>
+      <checksum file="${deliverable1}.tar.gz" algorithm="md5" property="tar1.gz.md5"/>
+      <checksum file="${deliverable1}.tar.bz2" algorithm="md5" property="tar1.bz2.md5"/>
+      <checksum file="${deliverable2}.zip" algorithm="md5" property="zip2.md5"/>
+      <checksum file="${deliverable2}.tar.gz" algorithm="md5" property="tar2.gz.md5"/>
+      <checksum file="${deliverable2}.tar.bz2" algorithm="md5" property="tar2.bz2.md5"/>
+      <echo file="${deliverable1}.md5" append="false">${zip1.md5} *${deliverable1}.zip
+${tar1.gz.md5} *${deliverable1}.tar.gz
+${tar1.bz2.md5} *${deliverable1}.tar.bz2
+${zip2.md5} *${deliverable2}.zip
+${tar2.gz.md5} *${deliverable2}.tar.gz
+${tar2.bz2.md5} *${deliverable2}.tar.bz2
+      </echo>
+   </target>
+
+   <!--
+   Cleanup ....................................................................
+   -->
+   <target name="distclean" depends="clean"
+           description="Remove all generated files including deliverables">
+      <delete file="${main.jar}"/>
+      <delete file="${test.jar}"/>
+      <delete dir="${docs.dir}/api"/>
+   </target>
+
+   <target name="clean" description="Remove object files">
+      <delete dir="${classes.dir}"/>
+   </target>
+
+   <!--
+   junit distribution .........................................................
+   -->
+   <target name="config-junit" depends="check-junit-ready,get-junit"
+           unless="junit.ready">
+      <unzip src="junit${junit.version}.zip" dest="${basedir}"/>
+      <copy file="junit${junit.version}/junit.jar" todir="${lib.dir}"/>
+      <delete dir="junit${junit.version}"/>
+   </target>
+
+   <target name="check-junit-ready">
+      <available property="junit.ready" file="${junit.jar}"/>
+   </target>
+
+   <target name="get-junit" depends="check-junit-available"
+           unless="junit.available">
+      <get src="${junit.url}/junit${junit.version}.zip"
+           dest="junit${junit.version}.zip"/>
+   </target>
+
+   <target name="check-junit-available">
+      <available property="junit.available" file="junit${junit.version}.zip"/>
+   </target>
+
+</project>
