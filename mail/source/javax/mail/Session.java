@@ -1,6 +1,6 @@
 /*
  * Session.java
- * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -33,9 +33,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +53,9 @@ import java.util.logging.Logger;
  */
 public final class Session
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.L10N");
 
   // Constant definitions of property locations.
 
@@ -387,7 +392,8 @@ public final class Session
                 (defaultSession.authenticator.getClass().getClassLoader()
                  != authenticator.getClass().getClassLoader())))
       {
-        throw new SecurityException("Access denied");
+        String m = L10N.getString("err.access_denied");
+        throw new SecurityException(m);
       }
     return defaultSession;
   }
@@ -469,7 +475,9 @@ public final class Session
   {
     if (protocol == null || protocol.length() <= 0)
       {
-        throw new NoSuchProviderException("Invalid protocol: " + protocol);
+        String m = L10N.getString("err.bad_protocol");
+        Object[] args = new Object[] { protocol };
+        throw new NoSuchProviderException(MessageFormat.format(m, args));
       }
     Provider provider = null;
     String providerClassKey = "mail." + protocol + ".class";
@@ -487,7 +495,9 @@ public final class Session
       }
     if (provider == null)
       {
-        throw new NoSuchProviderException("No provider for " + protocol);
+        String m = L10N.getString("err.no_provider_for_protocol");
+        Object[] args = new Object[] { protocol };
+        throw new NoSuchProviderException(MessageFormat.format(m, args));
       }
     return provider;
   }
@@ -501,7 +511,8 @@ public final class Session
   {
     if (provider == null)
       {
-        throw new NoSuchProviderException("Can't set null provider");
+        String m = L10N.getString("err.null_provider");
+        throw new NoSuchProviderException(m);
       }
     synchronized (providers)
       {
@@ -567,7 +578,8 @@ public final class Session
   {
     if (provider == null || provider.getType() != Provider.Type.STORE)
       {
-        throw new NoSuchProviderException("invalid provider");
+        String m = L10N.getString("err.provider_not_store");
+        throw new NoSuchProviderException(m);
       }
     try
       {
@@ -575,7 +587,8 @@ public final class Session
       }
     catch (ClassCastException e)
       {
-        throw new NoSuchProviderException("not a store");
+        String m = L10N.getString("err.provider_not_store");
+        throw new NoSuchProviderException(m);
       }
   }
 
@@ -642,8 +655,9 @@ public final class Session
     String provider = (String) addressMap.get(address.getType());
     if (provider == null)
       {
-        throw new NoSuchProviderException("No provider for address: "+
-                                           address.getType());
+        String m = L10N.getString("err.no_provider_for_address");
+        Object[] args = new Object[] { address.getType() };
+        throw new NoSuchProviderException(MessageFormat.format(m, args));
       }
     return getTransport(provider);
   }
@@ -653,7 +667,8 @@ public final class Session
   {
     if (provider == null || provider.getType() != Provider.Type.TRANSPORT)
       {
-        throw new NoSuchProviderException("invalid provider");
+        String m = L10N.getString("err.provider_not_transport");
+        throw new NoSuchProviderException(m);
       }
     try
       {
@@ -661,7 +676,8 @@ public final class Session
       }
     catch (ClassCastException _ex)
       {
-        throw new NoSuchProviderException("incorrect class");
+        String m = L10N.getString("err.provider_not_transport");
+        throw new NoSuchProviderException(m);
       }
   }
 
@@ -695,7 +711,8 @@ public final class Session
   {
     if (provider == null)
       {
-        throw new NoSuchProviderException("null");
+        String m = L10N.getString("err.null_provider");
+        throw new NoSuchProviderException(m);
       }
     if (url == null)
       {

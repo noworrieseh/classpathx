@@ -1,6 +1,6 @@
 /*
  * MimeMessage.java
- * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import javax.activation.DataHandler;
 import javax.mail.Address;
@@ -68,6 +69,9 @@ public class MimeMessage
   extends Message
   implements MimePart
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /**
    * Additional recipient types specific to internet messages.
@@ -164,6 +168,13 @@ public class MimeMessage
   static final String MESSAGE_ID_NAME = "Message-ID";
 
   /**
+   * Cached return value from {@link #getContent}.
+   * This field is cleared by {@link #getDataHandler}.
+   * @since JavaMail 1.5
+   */
+  protected Object cachedContent;
+
+  /**
    * Constructor for an empty message.
    */
   public MimeMessage(Session session)
@@ -213,7 +224,7 @@ public class MimeMessage
       }
     catch (IOException e)
       {
-        throw new MessagingException("I/O error", e);
+        throw new MessagingException(null, e);
       }
   }
 
@@ -311,7 +322,7 @@ public class MimeMessage
           }
         catch (IOException e)
           {
-            throw new MessagingException("I/O error", e);
+            throw new MessagingException(null, e);
           }
       }
     modified = false;
@@ -374,7 +385,8 @@ public class MimeMessage
       }
     else
       {
-        throw new MessagingException("No local address");
+        String m = L10N.getString("err.no_local_address");
+        throw new MessagingException(m);
       }
   }
 
@@ -700,7 +712,8 @@ public class MimeMessage
       {
         return NEWSGROUPS_NAME;
       }
-    throw new MessagingException("Invalid recipient type");
+    String m = L10N.getString("err.bad_recipient_type");
+    throw new MessagingException(m);
   }
 
   /**
@@ -770,7 +783,7 @@ public class MimeMessage
       }
     catch (UnsupportedEncodingException e)
       {
-        throw new MessagingException("Encoding error", e);
+        throw new MessagingException(null, e);
       }
   }
 
@@ -1105,7 +1118,7 @@ public class MimeMessage
           }
         catch (UnsupportedEncodingException e)
           {
-            throw new MessagingException("Encode error", e);
+            throw new MessagingException(null, e);
           }
       }
     else
@@ -1310,7 +1323,8 @@ public class MimeMessage
       }
     else
       {
-        throw new MessagingException("No content");
+        String m = L10N.getString("err.no_content");
+        throw new MessagingException(m);
       }
   }
 
@@ -1331,6 +1345,7 @@ public class MimeMessage
   public synchronized DataHandler getDataHandler()
     throws MessagingException
   {
+    cachedContent = null;
     if (dh == null)
       {
         dh = new DataHandler(new MimePartDataSource(this));
@@ -1345,7 +1360,11 @@ public class MimeMessage
   public Object getContent()
     throws IOException, MessagingException
   {
-    return getDataHandler().getContent();
+    if (cachedContent == null)
+      {
+        cachedContent = getDataHandler().getContent();
+      }
+    return cachedContent;
   }
 
   /**
@@ -1941,7 +1960,7 @@ public class MimeMessage
           }
         catch (IOException e)
           {
-            throw new MessagingException("I/O error", e);
+            throw new MessagingException(null, e);
           }
       }
 

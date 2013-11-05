@@ -1,6 +1,6 @@
 /*
  * InternetAddress.java
- * Copyright (C) 2002, 2004 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -25,7 +25,9 @@ package javax.mail.internet;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import javax.mail.Address;
 import javax.mail.Session;
@@ -40,6 +42,9 @@ public class InternetAddress
   extends Address
   implements Cloneable
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /*
    * The type of address.
@@ -95,7 +100,8 @@ public class InternetAddress
     InternetAddress[] addresses = parseHeader(address, strict);
     if (addresses.length != 1)
       {
-        throw new AddressException("Illegal address", address);
+        String m = L10N.getString("err.bad_address");
+        throw new AddressException(m, address);
       }
     this.address = addresses[0].address;
     this.personal = addresses[0].personal;
@@ -616,6 +622,8 @@ public class InternetAddress
     int start = -1;
     int end = -1;
     ArrayList acc = new ArrayList();
+    String m;
+    Object[] args;
 
     int pos;
     for (pos = 0; pos < len; pos++)
@@ -633,8 +641,8 @@ public class InternetAddress
             inAddress = true;
             if (gotDelimiter)
               {
-                throw new AddressException("Too many route-addr",
-                                            addresslist, pos);
+                m = L10N.getString("err.too_many_route_addr");
+                throw new AddressException(m, addresslist, pos);
               }
             if (!inGroup)
               {
@@ -671,18 +679,25 @@ public class InternetAddress
               }
             if (!gotKet && pos >= len)
               {
+                m = L10N.getString("err.unmatched");
                 if (inQuote)
                   {
-                    throw new AddressException("Unmatched '\"'",
-                                                addresslist, pos);
+                    args = new Object[] { "\"" };
+                    m = MessageFormat.format(m, args);
+                    throw new AddressException(m, addresslist, pos);
                   }
-                throw new AddressException("Unmatched '<'", addresslist, pos);
+                args = new Object[] { "<" };
+                m = MessageFormat.format(m, args);
+                throw new AddressException(m, addresslist, pos);
               }
             gotDelimiter = true;
             pEnd = pos;
             break;
           case '>':
-            throw new AddressException("Unmatched '>'", addresslist, pos);
+            m = L10N.getString("err.unmatched");
+            args = new Object[] { ">" };
+            m = MessageFormat.format(m, args);
+            throw new AddressException(m, addresslist, pos);
 
           case '(': // paren delimited personal
             inAddress = true;
@@ -715,7 +730,10 @@ public class InternetAddress
               }
             if (parenCount > 0)
               {
-                throw new AddressException("Unmatched '('", addresslist, pos);
+                m = L10N.getString("err.unmatched");
+                args = new Object[] { "(" };
+                m = MessageFormat.format(m, args);
+                throw new AddressException(m, addresslist, pos);
               }
             pos--;
             if (end == -1)
@@ -724,7 +742,10 @@ public class InternetAddress
               }
             break;
           case ')':
-            throw new AddressException("Unmatched ')'", addresslist, pos);
+            m = L10N.getString("err.unmatched");
+            args = new Object[] { ")" };
+            m = MessageFormat.format(m, args);
+            throw new AddressException(m, addresslist, pos);
 
           case '"': // quote delimited personal
             inAddress = true;
@@ -751,8 +772,10 @@ public class InternetAddress
               }
             if (pos >= len)
               {
-                throw new AddressException("Unmatched '\"'",
-                                            addresslist, pos);
+                m = L10N.getString("err.unmatched");
+                args = new Object[] { "\"" };
+                m = MessageFormat.format(m, args);
+                throw new AddressException(m, addresslist, pos);
               }
             break;
 
@@ -777,8 +800,10 @@ public class InternetAddress
               }
             if (pos >= len)
               {
-                throw new AddressException("Unmatched '['",
-                                            addresslist, pos);
+                m = L10N.getString("err.unmatched");
+                args = new Object[] { "[" };
+                m = MessageFormat.format(m, args);
+                throw new AddressException(m, addresslist, pos);
               }
             break;
 
@@ -841,16 +866,18 @@ public class InternetAddress
             inAddress = true;
             if (inGroup)
               {
-                throw new AddressException("Cannot have nested group",
-                                            addresslist, pos);
+                m = L10N.getString("err.nested_group");
+                throw new AddressException(m, addresslist, pos);
               }
             inGroup = true;
             break;
           case ';': // group delimiter
             if (!inGroup)
               {
-                throw new AddressException("Unexpected ';'",
-                                            addresslist, pos);
+                m = L10N.getString("err.unmatched");
+                args = new Object[] { ";" };
+                m = MessageFormat.format(m, args);
+                throw new AddressException(m, addresslist, pos);
               }
             inGroup = false;
             pEnd = pos + 1;
@@ -923,6 +950,7 @@ public class InternetAddress
   {
     // TODO What happens about addresses with quoted strings?
     int pos = 0;
+    String m;
     if (!strict || gotDelimiter)
     {
       int i = address.indexOf(',', pos);
@@ -934,7 +962,8 @@ public class InternetAddress
         {
           if (address.charAt(pos) != '@')
             {
-              throw new AddressException("Illegal route-addr", address);
+              m = L10N.getString("err.bad_route_addr");
+              throw new AddressException(m, address);
             }
           if (address.charAt(i) != ':')
             {
@@ -960,18 +989,21 @@ public class InternetAddress
       {
         if (atIndex == pos)
           {
-            throw new AddressException("Missing local name", address);
+            m = L10N.getString("err.missing_local_name");
+            throw new AddressException(m, address);
           }
         if (atIndex == address.length() - 1)
           {
-            throw new AddressException("Missing domain", address);
+            m = L10N.getString("err.missing_domain");
+            throw new AddressException(m, address);
           }
         localName = address.substring(pos, atIndex);
         domain = address.substring(atIndex + 1);
       }
     else if (strict)
       {
-        throw new AddressException("Missing final @domain", address);
+        m = L10N.getString("err.missing_final_domain");
+        throw new AddressException(m, address);
       }
 
     // Check atomic parts
@@ -981,7 +1013,8 @@ public class InternetAddress
       {
         if (address.indexOf(illegalWS.charAt(i)) > -1)
           {
-            throw new AddressException("Illegal whitespace", address);
+            m = L10N.getString("err.bad_whitespace");
+            throw new AddressException(m, address);
           }
       }
     String illegalName = "\"(),:;<>@[\\]";
@@ -990,7 +1023,8 @@ public class InternetAddress
       {
         if (localName.indexOf(illegalName.charAt(i)) > -1)
           {
-            throw new AddressException("Illegal local name", address);
+            m = L10N.getString("err.bad_local_name");
+            throw new AddressException(m, address);
           }
       }
     if (domain != null)
@@ -999,7 +1033,8 @@ public class InternetAddress
           {
             if (domain.indexOf(illegalName.charAt(i)) > -1)
               {
-                throw new AddressException("Illegal domain", address);
+                m = L10N.getString("err.bad_domain");
+                throw new AddressException(m, address);
               }
           }
       }

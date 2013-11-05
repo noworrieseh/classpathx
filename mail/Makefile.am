@@ -20,6 +20,7 @@ $(src)/javax/mail/Address.java \
 $(src)/javax/mail/AuthenticationFailedException.java \
 $(src)/javax/mail/Authenticator.java \
 $(src)/javax/mail/BodyPart.java \
+$(src)/javax/mail/EncodingAware.java \
 $(src)/javax/mail/FetchProfile.java \
 $(src)/javax/mail/Flags.java \
 $(src)/javax/mail/Folder.java \
@@ -27,6 +28,8 @@ $(src)/javax/mail/FolderClosedException.java \
 $(src)/javax/mail/FolderNotFoundException.java \
 $(src)/javax/mail/Header.java \
 $(src)/javax/mail/IllegalWriteException.java \
+$(src)/javax/mail/MailSessionDefinition.java \
+$(src)/javax/mail/MailSessionDefinitions.java \
 $(src)/javax/mail/Message.java \
 $(src)/javax/mail/MessageAware.java \
 $(src)/javax/mail/MessageContext.java \

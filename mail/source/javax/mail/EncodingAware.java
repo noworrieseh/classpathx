@@ -1,6 +1,6 @@
 /*
- * MethodNotSupportedException.java
- * Copyright (C) 2002, 2013 The Free Software Foundation
+ * EncodingAware.java
+ * Copyright (C) 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -23,31 +23,19 @@
 package javax.mail;
 
 /**
- * An exception thrown when an operation is not supported by the
- * implementation.
- *
- * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * Interface for a {@link javax.activation.DataSource} that can specify the
+ * Content-Transfer-Encoding to use for its data.
  * @version 1.5
+ * @since JavaMail 1.5
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class MethodNotSupportedException
-  extends MessagingException
+public interface EncodingAware
 {
 
-  public MethodNotSupportedException()
-  {
-  }
-
-  public MethodNotSupportedException(String message)
-  {
-    super(message);
-  }
-
   /**
-   * @since JavaMail 1.5
+   * Returns the Content-Transfer-Encoding to use for the data, or null if a
+   * suitable encoding should be chosen automatically.
    */
-  public MethodNotSupportedException(String message, Exception e)
-  {
-    super(message, e);
-  }
+  String getEncoding();
 
 }

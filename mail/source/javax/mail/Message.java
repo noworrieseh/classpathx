@@ -1,6 +1,6 @@
 /*
  * Message.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -25,7 +25,9 @@ package javax.mail;
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Date;
+import java.util.ResourceBundle;
 import javax.mail.search.SearchTerm;
 
 /**
@@ -46,6 +48,9 @@ import javax.mail.search.SearchTerm;
 public abstract class Message
   implements Part
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.L10N");
 
   /**
    * The types of recipients to which a message can be sent.
@@ -97,7 +102,9 @@ public abstract class Message
         {
           return BCC;
         }
-      throw new InvalidObjectException("Unknown RecipientType: " + type);
+      String m = L10N.getString("err.bad_recipient_type");
+      Object[] args = new Object[] { type };
+      throw new InvalidObjectException(MessageFormat.format(m, args));
     }
 
     public String toString()

@@ -1,6 +1,6 @@
 /*
  * Transport.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 
@@ -38,6 +39,9 @@ import javax.mail.event.TransportListener;
 public abstract class Transport
   extends Service
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.L10N");
 
   /*
    * Transport listener list.
@@ -132,7 +136,8 @@ public abstract class Transport
   {
     if (addresses == null || addresses.length == 0)
       {
-        throw new SendFailedException("No recipient addresses");
+        String m = L10N.getString("err.no_recipient_addresses");
+        throw new SendFailedException(m);
       }
 
     HashMap addressesByType = new HashMap();
@@ -154,7 +159,8 @@ public abstract class Transport
     int size = addressesByType.size();
     if (size == 0)
       {
-        throw new SendFailedException("No recipient addresses");
+        String m = L10N.getString("err.no_recipient_addresses");
+        throw new SendFailedException(m);
       }
 
     Session session = msg.session;
@@ -278,10 +284,11 @@ public abstract class Transport
             invalidAddresses = new Address[invalid.size()];
             invalid.toArray(invalidAddresses);
           }
-        throw new SendFailedException("Send failed", ex,
-                                       validSentAddresses,
-                                       validUnsentAddresses,
-                                       invalidAddresses);
+        String m = L10N.getString("err.send_failed");
+        throw new SendFailedException(m, ex,
+                                      validSentAddresses,
+                                      validUnsentAddresses,
+                                      invalidAddresses);
       }
   }
 

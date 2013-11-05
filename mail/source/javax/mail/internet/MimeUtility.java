@@ -1,6 +1,6 @@
 /*
  * MimeUtility.java
- * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -30,7 +30,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
 import javax.activation.DataHandler;
@@ -57,6 +59,9 @@ import gnu.mail.util.UUOutputStream;
  */
 public class MimeUtility
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /*
    * Uninstantiable.
@@ -194,7 +199,9 @@ public class MimeUtility
       {
         return is;
       }
-    throw new MessagingException("Unknown encoding: " + encoding);
+    String m = L10N.getString("err.bad_encoding");
+    Object[] args = new Object[] { encoding };
+    throw new MessagingException(MessageFormat.format(m, args));
   }
 
   /**
@@ -232,7 +239,9 @@ public class MimeUtility
       {
         return os;
       }
-    throw new MessagingException("Unknown encoding: " + encoding);
+    String m = L10N.getString("err.bad_encoding");
+    Object[] args = new Object[] { encoding };
+    throw new MessagingException(MessageFormat.format(m, args));
   }
 
   /**
@@ -273,7 +282,9 @@ public class MimeUtility
       {
         return os;
       }
-    throw new MessagingException("Unknown encoding: " + encoding);
+    String m = L10N.getString("err.bad_encoding");
+    Object[] args = new Object[] { encoding };
+    throw new MessagingException(MessageFormat.format(m, args));
   }
 
   /**
@@ -424,8 +435,9 @@ public class MimeUtility
       }
     else
       {
-        throw new UnsupportedEncodingException("Unknown transfer encoding: " +
-                                                encoding);
+        String m = L10N.getString("err.bad_transfer_encoding");
+        Object[] args = new Object[] { encoding };
+        throw new UnsupportedEncodingException(MessageFormat.format(m, args));
       }
 
     StringBuffer encodingBuffer = new StringBuffer();

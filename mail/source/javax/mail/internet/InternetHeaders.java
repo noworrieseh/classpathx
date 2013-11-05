@@ -1,6 +1,6 @@
 /*
  * InternetHeaders.java
- * Copyright (C) 2002, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -325,7 +325,7 @@ public class InternetHeaders
       }
     catch (IOException e)
       {
-        throw new MessagingException("I/O error", e);
+        throw new MessagingException(null, e);
       }
   }
 

@@ -1,6 +1,6 @@
 /*
- * MethodNotSupportedException.java
- * Copyright (C) 2002, 2013 The Free Software Foundation
+ * MailSessionDefinitions.java
+ * Copyright (C) 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -22,32 +22,25 @@
 
 package javax.mail;
 
+import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+
 /**
- * An exception thrown when an operation is not supported by the
- * implementation.
- *
- * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * J2EE annotation to declare multiple session definitions.
  * @version 1.5
+ * @since 1.5
+ * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class MethodNotSupportedException
-  extends MessagingException
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MailSessionDefinitions
 {
 
-  public MethodNotSupportedException()
-  {
-  }
-
-  public MethodNotSupportedException(String message)
-  {
-    super(message);
-  }
-
   /**
-   * @since JavaMail 1.5
+   * The definitions.
    */
-  public MethodNotSupportedException(String message, Exception e)
-  {
-    super(message, e);
-  }
+  MailSessionDefinition[] value();
 
 }

@@ -1,6 +1,6 @@
 /*
  * MimeMultipart.java
- * Copyright (C) 2002, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javax.activation.DataSource;
 import javax.mail.BodyPart;
 import javax.mail.MessageAware;
@@ -55,6 +57,9 @@ public class MimeMultipart
   extends Multipart
 {
 
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
+
   /**
    * The data source supplying the multipart data.
    */
@@ -68,13 +73,51 @@ public class MimeMultipart
   /**
    * Indicates whether the final boundary line of the multipart has been
    * seen.
+   * @since JavaMail 1.5
    */
-  private boolean complete;
+  protected boolean complete;
 
   /**
    * The preamble text before the first boundary line.
+   * @since JavaMail 1.5
    */
-  private String preamble;
+  protected String preamble;
+
+  /**
+   * Flag corresponding to the
+   * <code>mail.mime.multipart.ignoremissingendboundary</code>
+   * property, set in {@link #initializeProperties} which is called from
+   * constructors and the parse method.
+   * @since JavaMail 1.5
+   */
+  protected boolean ignoreMissingEndBoundary = true;
+
+  /**
+   * Flag corresponding to the
+   * <code>mail.mime.multipart.ignoremissingboundaryparameter</code>
+   * property, set in {@link #initializeProperties} which is called from
+   * constructors and the parse method.
+   * @since JavaMail 1.5
+   */
+  protected boolean ignoreMissingBoundaryParameter = true;
+
+  /**
+   * Flag corresponding to the
+   * <code>mail.mime.multipart.ignoreexistingboundaryparameter</code>
+   * property, set in {@link #initializeProperties} which is called from
+   * constructors and the parse method.
+   * @since JavaMail 1.5
+   */
+  protected boolean ignoreExistingBoundaryParameter = false;
+
+  /**
+   * Flag corresponding to the
+   * <code>mail.mime.multipart.allowempty</code>
+   * property, set in {@link #initializeProperties} which is called from
+   * constructors and the parse method.
+   * @since JavaMail 1.5
+   */
+  protected boolean allowEmpty = false;
 
   /**
    * Constructor for an empty MIME multipart of type "multipart/mixed".
@@ -89,6 +132,7 @@ public class MimeMultipart
    */
   public MimeMultipart(String subtype)
   {
+    initializeProperties();
     String boundary = MimeUtility.getUniqueBoundaryValue();
     ContentType ct = new ContentType("multipart", subtype, null);
     ct.setParameter("boundary", boundary);
@@ -103,6 +147,7 @@ public class MimeMultipart
   public MimeMultipart(DataSource ds)
     throws MessagingException
   {
+    initializeProperties();
     if (ds instanceof MessageAware)
       {
         MessageContext mc = ((MessageAware) ds).getMessageContext();
@@ -144,6 +189,29 @@ public class MimeMultipart
       {
         addBodyPart(parts[i]);
       }
+  }
+
+  /**
+   * Initialize various flags that control parsing behavior.
+   * @since JavaMail 1.5
+   */
+  protected void initializeProperties()
+  {
+    PrivilegedAction a;
+    a = new GetSystemPropertyAction("mail.mime.multipart." +
+                                    "ignoremissingendboundary");
+    ignoreMissingEndBoundary =
+      !"false".equals(AccessController.doPrivileged(a));
+    a = new GetSystemPropertyAction("mail.mime.multipart." +
+                                    "ignoremissingboundaryparameter");
+    ignoreMissingBoundaryParameter =
+      !"false".equals(AccessController.doPrivileged(a));
+    a = new GetSystemPropertyAction("mail.mime.multipart." +
+                                    "ignoreexistingboundaryparameter");
+    ignoreExistingBoundaryParameter =
+      "true".equals(AccessController.doPrivileged(a));
+    a = new GetSystemPropertyAction("mail.mime.multipart.allowempty");
+    allowEmpty = "true".equals(AccessController.doPrivileged(a));
   }
 
   /**
@@ -246,11 +314,11 @@ public class MimeMultipart
     String boundaryParam = ct.getParameter("boundary");
     if (boundaryParam == null)
       {
-        PrivilegedAction a =
-          new GetSystemPropertyAction("mail.mime.multipart.ignore"+
-                                      "missingboundaryparameter");
-        if ("false".equals(AccessController.doPrivileged(a)))
-          throw new MessagingException("Missing boundary parameter");
+        if (!ignoreMissingBoundaryParameter)
+          {
+            String m = L10N.getString("err.missing_boundary_parameter");
+            throw new MessagingException(m);
+          }
       }
     byte[] boundary = ("--" + boundaryParam).getBytes(charset);
 
@@ -288,6 +356,7 @@ public class MimeMultipart
       }
     synchronized (this)
       {
+        initializeProperties();
         InputStream is = null;
         SharedInputStream sis = null;
         try
@@ -305,20 +374,22 @@ public class MimeMultipart
               }
             ContentType ct = new ContentType(contentType);
             String boundaryParam = ct.getParameter("boundary");
-            if (boundaryParam == null)
+            String boundary = null;
+            if (!ignoreExistingBoundaryParameter && boundaryParam != null)
               {
-                PrivilegedAction a =
-                  new GetSystemPropertyAction("mail.mime.multipart.ignore"+
-                                              "missingboundaryparameter");
-                if ("false".equals(AccessController.doPrivileged(a)))
-                  throw new MessagingException("Missing boundary parameter");
+                boundary = "--" + boundaryParam;
               }
-            String boundary = (boundaryParam == null) ? null :
-              "--" + boundaryParam;
+            if (boundary == null &&
+                !ignoreMissingBoundaryParameter &&
+                !ignoreExistingBoundaryParameter)
+              {
+                String m = L10N.getString("err.missing_boundary_parameter");
+                throw new MessagingException(m);
+              }
 
             LineInputStream lis = new LineInputStream(is);
             String line;
-            StringBuffer preambleBuf = null;
+            StringBuilder preambleBuf = null;
             while ((line = lis.readLine()) != null)
               {
                 String l = trim(line);
@@ -333,20 +404,23 @@ public class MimeMultipart
                     break;
                   }
                 if (preambleBuf == null)
-                  preambleBuf = new StringBuffer();
+                  {
+                    preambleBuf = new StringBuilder();
+                  }
                 preambleBuf.append(line);
                 preambleBuf.append('\n');
               }
             if (preambleBuf != null)
-              preamble = preambleBuf.toString();
-            if (line == null)
               {
-                throw new MessagingException("No start boundary");
+                preamble = preambleBuf.toString();
+              }
+            if (line == null && !allowEmpty)
+              {
+                String m = L10N.getString("err.missing_start_boundary");
+                throw new MessagingException(m);
               }
 
-            byte[] bbytes = boundary.getBytes();
-            int blen = bbytes.length;
-
+            byte[] bbytes = boundary.getBytes("US-ASCII");
             long start = 0L, end = 0L;
             for (boolean done = false; !done;)
               {
@@ -361,7 +435,13 @@ public class MimeMultipart
                     while (line != null && line.length() > 0);
                     if (line == null)
                       {
-                        throw new IOException("EOF before content body");
+                        if (!ignoreMissingEndBoundary)
+                          {
+                            String m =
+                              L10N.getString("err.missing_end_boundary");
+                            throw new MessagingException(m);
+                          }
+                        break;
                       }
                   }
                 else
@@ -379,10 +459,10 @@ public class MimeMultipart
                 // we will run into problems
                 if (!is.markSupported())
                   {
-                    String cn = is.getClass().getName();
-                    throw new MessagingException("FIXME: mark not supported" +
-                                                  " on underlying input stre" +
-                                                  "am: " + cn);
+                    String m = L10N.getString("err.mark_not_supported");
+                    Object[] args = new Object[] { is.getClass().getName() };
+                    m = MessageFormat.format(m, args);
+                    throw new MessagingException(m);
                   }
                 boolean eol = true;
                 int last = -1;
@@ -392,9 +472,9 @@ public class MimeMultipart
                     int c;
                     if (eol)
                       {
-                        is.mark(blen + 1024);
+                        is.mark(bbytes.length + 1024);
                         int pos = 0;
-                        while (pos < blen)
+                        while (pos < bbytes.length)
                           {
                             if (is.read() != bbytes[pos])
                               {
@@ -403,7 +483,7 @@ public class MimeMultipart
                             pos++;
                           }
 
-                        if (pos == blen)
+                        if (pos == bbytes.length)
                           {
                             c = is.read();
                             if (c == '-' && is.read() == '-')
@@ -494,15 +574,16 @@ public class MimeMultipart
           }
         catch (IOException e)
           {
-            throw new MessagingException("I/O error", e);
+            throw new MessagingException(null, e);
           }
         parsed = true;
         if (!complete)
           {
-            PrivilegedAction a =
-              new GetSystemPropertyAction("mail.mime.multipart.ignoremissingendboundary");
-            if ("false".equals(AccessController.doPrivileged(a)))
-              throw new MessagingException("Missing end boundary");
+            if (!ignoreMissingEndBoundary)
+              {
+                String m = L10N.getString("err.missing_end_boundary");
+                throw new MessagingException(m);
+              }
           }
       }
   }

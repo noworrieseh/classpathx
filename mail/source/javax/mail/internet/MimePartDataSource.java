@@ -1,6 +1,6 @@
 /*
  * MimePartDataSource.java
- * Copyright (C) 2002, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.UnknownServiceException;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javax.activation.DataSource;
 import javax.mail.MessageAware;
 import javax.mail.MessageContext;
@@ -40,6 +42,9 @@ import javax.mail.MessagingException;
 public class MimePartDataSource
   implements DataSource, MessageAware
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /**
    * The part.
@@ -83,7 +88,9 @@ public class MimePartDataSource
           }
         else
           {
-            throw new MessagingException("Unknown part type");
+            String m = L10N.getString("err.unknown_part_type");
+            Object[] args = new Object[] { part.getClass().getName() };
+            throw new IOException(MessageFormat.format(m, args));
           }
 
         String encoding = part.getEncoding();
@@ -91,7 +98,7 @@ public class MimePartDataSource
       }
     catch (MessagingException e)
       {
-        throw new IOException(e.getMessage());
+        throw (IOException) new IOException().initCause(e);
       }
   }
 

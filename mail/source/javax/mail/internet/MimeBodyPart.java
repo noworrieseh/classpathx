@@ -1,6 +1,6 @@
 /*
  * MimeBodyPart.java
- * Copyright (C) 2002, 2004, 2005 The Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -36,10 +36,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.activation.FileTypeMap;
 import javax.mail.BodyPart;
+import javax.mail.EncodingAware;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -63,6 +67,9 @@ public class MimeBodyPart
   extends BodyPart
   implements MimePart
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /**
    * The data handler managing this part's content.
@@ -99,6 +106,13 @@ public class MimeBodyPart
   static final String CONTENT_DESCRIPTION_NAME = "Content-Description";
 
   static final String TEXT_PLAIN = "text/plain";
+
+  /**
+   * Cached return value from {@link #getContent}.
+   * This field is cleared by {@link #getDataHandler}.
+   * @since JavaMail 1.5
+   */
+  protected Object cachedContent;
 
   /**
    * Constructor for an empty MIME body part.
@@ -160,7 +174,7 @@ public class MimeBodyPart
       }
     catch (IOException e)
       {
-        throw new MessagingException("I/O error", e);
+        throw new MessagingException(null, e);
       }
   }
 
@@ -514,7 +528,7 @@ public class MimeBodyPart
           }
         catch (UnsupportedEncodingException e)
           {
-            throw new MessagingException("Encode error", e);
+            throw new MessagingException(null, e);
           }
       }
     else
@@ -566,7 +580,7 @@ public class MimeBodyPart
           }
         catch (UnsupportedEncodingException e)
           {
-            throw new MessagingException(e.getMessage(), e);
+            throw new MessagingException(null, e);
           }
       }
     return filename;
@@ -592,7 +606,7 @@ public class MimeBodyPart
           }
         catch (UnsupportedEncodingException e)
           {
-            throw new MessagingException(e.getMessage(), e);
+            throw new MessagingException(null, e);
           }
       }
     String header = getHeader(CONTENT_DISPOSITION_NAME, null);
@@ -650,7 +664,8 @@ public class MimeBodyPart
       {
         return new ByteArrayInputStream(content);
       }
-    throw new MessagingException("No content");
+    String m = L10N.getString("err.no_content");
+    throw new MessagingException(m);
   }
 
   /**
@@ -669,6 +684,7 @@ public class MimeBodyPart
   public DataHandler getDataHandler()
     throws MessagingException
   {
+    cachedContent = null;
     if (dh == null)
       {
         dh = new DataHandler(new MimePartDataSource(this));
@@ -683,7 +699,11 @@ public class MimeBodyPart
   public Object getContent()
     throws IOException, MessagingException
   {
-    return getDataHandler().getContent();
+    if (cachedContent == null)
+      {
+        cachedContent = getDataHandler().getContent();
+      }
+    return cachedContent;
   }
 
   /**
@@ -1060,7 +1080,7 @@ public class MimeBodyPart
           }
         catch (IOException e)
           {
-            throw new MessagingException("I/O error", e);
+            throw new MessagingException(null, e);
           }
       }
   }
@@ -1073,11 +1093,26 @@ public class MimeBodyPart
   public void attachFile(File file)
     throws IOException, MessagingException
   {
-    FileTypeMap map = FileTypeMap.getDefaultFileTypeMap();
-    String contentType = map.getContentType(file);
-    if (contentType == null)
-      throw new MessagingException("Unable to determine MIME type of " + file);
-    setContent(new FileInputStream(file), contentType);
+    DataSource source = new FileDataSource(file);
+    setDataHandler(new DataHandler(source));
+    setFileName(file.getName());
+    setDisposition(Part.ATTACHMENT);
+  }
+
+  /**
+   * Use the specified file as the content for this part, with the specified
+   * content type and encoding.
+   * @param file the file
+   * @param contentType the Content-Type
+   * @param encoding the Content-Transfer-Encoding
+   * @since JavaMail 1.5
+   */
+  public void attachFile(File file, String contentType, String encoding)
+    throws IOException, MessagingException
+  {
+    DataSource source =
+      new EncodedFileDataSource(file, contentType, encoding);
+    setDataHandler(new DataHandler(source));
     setFileName(file.getName());
     setDisposition(Part.ATTACHMENT);
   }
@@ -1090,7 +1125,28 @@ public class MimeBodyPart
   public void attachFile(String file)
     throws IOException, MessagingException
   {
-    attachFile(new File(file));
+    DataSource source = new FileDataSource(file);
+    setDataHandler(new DataHandler(source));
+    setFileName(file);
+    setDisposition(Part.ATTACHMENT);
+  }
+
+  /**
+   * Use the specified file as the content for this part, with the specified
+   * content type and encoding.
+   * @param file the file
+   * @param contentType the Content-Type
+   * @param encoding the Content-Transfer-Encoding
+   * @since JavaMail 1.5
+   */
+  public void attachFile(String file, String contentType, String encoding)
+    throws IOException, MessagingException
+  {
+    DataSource source =
+      new EncodedFileDataSource(file, contentType, encoding);
+    setDataHandler(new DataHandler(source));
+    setFileName(file);
+    setDisposition(Part.ATTACHMENT);
   }
 
   /**
@@ -1122,6 +1178,40 @@ public class MimeBodyPart
     throws IOException, MessagingException
   {
     saveFile(new File(file));
+  }
+
+  private static final class EncodedFileDataSource
+    extends FileDataSource
+    implements EncodingAware
+  {
+
+    private final String contentType;
+    private final String encoding;
+
+    EncodedFileDataSource(File file, String contentType, String encoding)
+    {
+      super(file);
+      this.contentType = contentType;
+      this.encoding = encoding;
+    }
+    
+    EncodedFileDataSource(String name, String contentType, String encoding)
+    {
+      super(name);
+      this.contentType = contentType;
+      this.encoding = encoding;
+    }
+
+    public String getContentType()
+    {
+      return (contentType == null) ? super.getContentType() : contentType;
+    }
+
+    public String getEncoding()
+    {
+      return encoding;
+    }
+
   }
 
 }

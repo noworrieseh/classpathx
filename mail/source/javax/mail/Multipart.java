@@ -1,6 +1,6 @@
 /*
  * Multipart.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -24,6 +24,7 @@ package javax.mail;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ResourceBundle;
 import java.util.Vector;
 
 /**
@@ -38,6 +39,9 @@ import java.util.Vector;
  */
 public abstract class Multipart
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.L10N");
 
   /**
    * Vector of body parts.
@@ -128,7 +132,8 @@ public abstract class Multipart
   {
     if (parts == null)
       {
-        throw new MessagingException("No such BodyPart");
+        String m = L10N.getString("err.no_body_part");
+        throw new MessagingException(m);
       }
     synchronized (parts)
       {
@@ -154,7 +159,8 @@ public abstract class Multipart
   {
     if (parts == null)
       {
-        throw new IndexOutOfBoundsException("No such BodyPart");
+        String m = L10N.getString("err.no_body_part");
+        throw new IndexOutOfBoundsException(m);
       }
     synchronized (parts)
       {

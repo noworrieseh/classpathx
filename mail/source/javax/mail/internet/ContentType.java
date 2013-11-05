@@ -1,6 +1,6 @@
 /*
  * ContentType.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -22,6 +22,9 @@
 
 package javax.mail.internet;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 /**
  * A MIME Content-Type value.
  *
@@ -30,6 +33,9 @@ package javax.mail.internet;
  */
 public class ContentType
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /*
    * The primary type.
@@ -79,18 +85,24 @@ public class ContentType
     HeaderTokenizer.Token token = ht.next();
     if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException("expected primary type: " + s);
+        String m = L10N.getString("err.expected_primary_type");
+        Object[] args = new Object[] { s };
+        throw new ParseException(MessageFormat.format(m, args));
       }
     primaryType = token.getValue();
     token = ht.next();
     if (token.getType() != 0x2f) // '/'
       {
-        throw new ParseException("expected '/': " + s);
+        String m = L10N.getString("err.expected_slash");
+        Object[] args = new Object[] { s };
+        throw new ParseException(MessageFormat.format(m, args));
       }
     token = ht.next();
     if (token.getType() != HeaderTokenizer.Token.ATOM)
       {
-        throw new ParseException("expected subtype: " + s);
+        String m = L10N.getString("err.expected_subtype");
+        Object[] args = new Object[] { s };
+        throw new ParseException(MessageFormat.format(m, args));
       }
     subType = token.getValue();
     s = ht.getRemainder();

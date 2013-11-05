@@ -1,6 +1,6 @@
 /*
  * ByteArrayDataSource.java
- * Copyright (C) 2005 The Free Software Foundation
+ * Copyright (C) 2005, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javax.activation.DataSource;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeUtility;
@@ -43,6 +45,9 @@ import javax.mail.internet.ParseException;
 public class ByteArrayDataSource
   implements DataSource
 {
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.util.L10N");
 
   private byte[] data;
 
@@ -101,7 +106,9 @@ public class ByteArrayDataSource
       }
     catch (ParseException e)
       {
-        IOException e2 = new IOException("can't parse MIME type");
+        String m = L10N.getString("err.parse_type");
+        Object[] args = new Object[] { type };
+        IOException e2 = new IOException(MessageFormat.format(m, args));
         e2.initCause(e);
         throw e2;
       }
@@ -158,13 +165,15 @@ public class ByteArrayDataSource
     public void write(int c)
       throws IOException
     {
-      throw new IOException("writing to this stream is not allowed");
+      String m = L10N.getString("err.write_not_allowed");
+      throw new IOException(m);
     }
 
     public void write(byte[] b, int off, int len)
       throws IOException
     {
-      throw new IOException("writing to this stream is not allowed");
+      String m = L10N.getString("err.write_not_allowed");
+      throw new IOException(m);
     }
 
   }
