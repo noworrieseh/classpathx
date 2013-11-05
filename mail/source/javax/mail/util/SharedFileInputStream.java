@@ -34,7 +34,7 @@ import javax.mail.internet.SharedInputStream;
  * shareable between multiple readers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  * @since JavaMail 1.4
  */
 public class SharedFileInputStream

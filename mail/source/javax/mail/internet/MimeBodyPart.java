@@ -42,6 +42,7 @@ import javax.activation.FileTypeMap;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Part;
 
 import gnu.inet.util.GetSystemPropertyAction;
 
@@ -56,7 +57,7 @@ import gnu.inet.util.GetSystemPropertyAction;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MimeBodyPart
   extends BodyPart
@@ -1078,6 +1079,7 @@ public class MimeBodyPart
       throw new MessagingException("Unable to determine MIME type of " + file);
     setContent(new FileInputStream(file), contentType);
     setFileName(file.getName());
+    setDisposition(Part.ATTACHMENT);
   }
 
   /**

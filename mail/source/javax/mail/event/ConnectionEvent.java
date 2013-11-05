@@ -26,7 +26,7 @@ package javax.mail.event;
  * A connection event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class ConnectionEvent
   extends MailEvent

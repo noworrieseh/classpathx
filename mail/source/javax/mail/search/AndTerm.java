@@ -28,7 +28,7 @@ import javax.mail.Message;
  * A logical AND of a number of search terms.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public final class AndTerm
   extends SearchTerm
@@ -37,7 +37,7 @@ public final class AndTerm
   /**
    * The target terms.
    */
-  protected SearchTerm[] terms;
+  private SearchTerm[] terms;
 
   /**
    * Constructor with two terms.

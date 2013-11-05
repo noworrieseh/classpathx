@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * @author Andrew Selkirk
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @author <a href="mailto:nferrier@tapsellferrier.co.uk">Nic Ferrier</a>
- * @version 1.4
+ * @version 1.5
  */
 public final class Session
 {

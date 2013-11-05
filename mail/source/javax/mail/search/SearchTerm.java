@@ -30,7 +30,7 @@ import javax.mail.Message;
  * terms derive from this class.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public abstract class SearchTerm
   implements Serializable

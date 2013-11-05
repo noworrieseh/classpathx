@@ -27,7 +27,7 @@ package javax.mail;
  * implementation.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MethodNotSupportedException
   extends MessagingException
@@ -40,6 +40,14 @@ public class MethodNotSupportedException
   public MethodNotSupportedException(String message)
   {
     super(message);
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public MethodNotSupportedException(String message, Exception e)
+  {
+    super(message, e);
   }
 
 }

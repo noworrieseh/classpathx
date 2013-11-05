@@ -53,7 +53,7 @@ import gnu.mail.util.UUOutputStream;
  * This is a utility class providing micellaneous MIME-related functionality.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MimeUtility
 {

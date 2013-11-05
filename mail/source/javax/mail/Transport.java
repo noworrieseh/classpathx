@@ -33,7 +33,7 @@ import javax.mail.event.TransportListener;
  * A message transport mechanism that can be used to deliver messages.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public abstract class Transport
   extends Service
@@ -67,7 +67,26 @@ public abstract class Transport
     throws MessagingException
   {
     msg.saveChanges();
-    doSend(msg, msg.getAllRecipients());
+    doSend(msg, msg.getAllRecipients(), null, null);
+  }
+
+  /**
+   * Sends the specified message.
+   * The message will be sent to all recipient addresses specified in the
+   * message, using transports appropriate to each address (specified by the
+   * <code>javamail.address.map</code> resource).
+   * @param msg the message to send
+   * @param username the name of the user to authenticate as
+   * @param password the password of the user to authenticate as
+   * @exception SendFailedException if the message could not be sent to
+   * some or any of the recipients
+   * @since JavaMail 1.5
+   */
+  public static void send(Message msg, String username, String password)
+    throws MessagingException
+  {
+    msg.saveChanges();
+    doSend(msg, msg.getAllRecipients(), username, password);
   }
 
   /**
@@ -82,13 +101,33 @@ public abstract class Transport
     throws MessagingException
   {
     msg.saveChanges();
-    doSend(msg, addresses);
+    doSend(msg, addresses, null, null);
+  }
+
+  /**
+   * Sends the message to the specified addresses, ignoring any recipients
+   * specified in the message itself.
+   * @param msg the message to send
+   * @param addresses the addresses to which to send the message
+   * @param username the name of the user to authenticate as
+   * @param password the password of the user to authenticate as
+   * @exception SendFailedException if the message could not be sent to
+   * some or any of the recipients
+   * @since JavaMail 1.5
+   */
+  public static void send(Message msg, Address[] addresses,
+                          String username, String password)
+    throws MessagingException
+  {
+    msg.saveChanges();
+    doSend(msg, addresses, username, password);
   }
 
   /*
    * Performs the send after saveChanges() has been called.
    */
-  private static void doSend(Message msg, Address[] addresses)
+  private static void doSend(Message msg, Address[] addresses,
+                             String username, String password)
     throws MessagingException
   {
     if (addresses == null || addresses.length == 0)
@@ -148,56 +187,72 @@ public abstract class Transport
           }
         else
           {
-            try
+            synchronized (transport)
               {
-                transport.connect();
-                transport.sendMessage(msg, addressArray);
-              }
-            catch (SendFailedException sfex)
-              {
-                error = true;
-                if (ex == null)
+                URLName urlname = transport.getURLName();
+                PasswordAuthentication oldpw =
+                  session.getPasswordAuthentication(urlname);
+                try
                   {
-                    ex = sfex;
+                    if (username != null)
+                      {
+                        PasswordAuthentication pw =
+                          new PasswordAuthentication(username, password);
+                        session.setPasswordAuthentication(urlname, pw);
+                      }
+                    transport.connect();
+                    transport.sendMessage(msg, addressArray);
                   }
-                else
+                catch (SendFailedException sfex)
                   {
-                    ex.setNextException(sfex);
-                  }
+                    error = true;
+                    if (ex == null)
+                      {
+                        ex = sfex;
+                      }
+                    else
+                      {
+                        ex.setNextException(sfex);
+                      }
 
-                Address[] a;
+                    Address[] a;
 
-                a = sfex.getValidSentAddresses();
-                if (a != null)
-                  {
-                    validSent.addAll(Arrays.asList(a));
+                    a = sfex.getValidSentAddresses();
+                    if (a != null)
+                      {
+                        validSent.addAll(Arrays.asList(a));
+                      }
+                    a = sfex.getValidUnsentAddresses();
+                    if (a != null)
+                      {
+                        validUnsent.addAll(Arrays.asList(a));
+                      }
+                    a = sfex.getInvalidAddresses();
+                    if (a != null)
+                      {
+                        invalid.addAll(Arrays.asList(a));
+                      }
                   }
-                a = sfex.getValidUnsentAddresses();
-                if (a != null)
+                catch (MessagingException mex)
                   {
-                    validUnsent.addAll(Arrays.asList(a));
+                    error = true;
+                    if (ex == null)
+                      {
+                        ex = mex;
+                      }
+                    else
+                      {
+                        ex.setNextException(mex);
+                      }
                   }
-                a = sfex.getInvalidAddresses();
-                if (a != null)
+                finally
                   {
-                    invalid.addAll(Arrays.asList(a));
+                    transport.close();
+                    if (username != null)
+                      {
+                        session.setPasswordAuthentication(urlname, oldpw);
+                      }
                   }
-              }
-            catch (MessagingException mex)
-              {
-                error = true;
-                if (ex == null)
-                  {
-                    ex = mex;
-                  }
-                else
-                  {
-                    ex.setNextException(mex);
-                  }
-              }
-            finally
-              {
-                transport.close();
               }
           }
       }

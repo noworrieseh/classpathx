@@ -26,7 +26,7 @@ package javax.mail.internet;
  * A MIME Content-Disposition value.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class ContentDisposition
 {
@@ -150,11 +150,11 @@ public class ContentDisposition
   {
     if (disposition == null)
       {
-        return null;
+        return "";
       }
     if (list == null)
       {
-        return disposition;
+        return (disposition == null) ? "" : disposition;
       }
     else
       {

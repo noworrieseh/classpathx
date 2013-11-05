@@ -30,7 +30,7 @@ import javax.mail.Address;
  * An RFC 1036 newsgroup address.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class NewsAddress
   extends Address

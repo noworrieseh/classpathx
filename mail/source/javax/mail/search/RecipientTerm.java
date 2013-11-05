@@ -29,7 +29,7 @@ import javax.mail.Message;
  * A comparison of recipient headers in a message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public final class RecipientTerm
   extends AddressTerm
@@ -38,7 +38,7 @@ public final class RecipientTerm
   /**
    * The recipient type.
    */
-  protected Message.RecipientType type;
+  private Message.RecipientType type;
 
   /**
    * Constructor.

@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Subclasses of this class should normally be serializable.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public abstract class Address
   implements Serializable

@@ -36,7 +36,7 @@ import java.net.URL;
  * represents the name of a URL, it does not model the connection to a URL.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class URLName
 {

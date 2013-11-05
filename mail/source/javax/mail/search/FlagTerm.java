@@ -29,7 +29,7 @@ import javax.mail.Message;
  * A comparison of message flags.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public final class FlagTerm
   extends SearchTerm
@@ -40,12 +40,12 @@ public final class FlagTerm
    * flag. If true, test whether all the specified flags are present,
    * otherwise test whether all the specified flags are absent.
    */
-  protected boolean set;
+  private boolean set;
 
   /**
    * The flags to test.
    */
-  protected Flags flags;
+  private Flags flags;
 
   /**
    * Constructor.

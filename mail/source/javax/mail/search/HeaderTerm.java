@@ -28,7 +28,7 @@ import javax.mail.Message;
  * A case-insensitive string comparison of message header values.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public final class HeaderTerm
   extends StringTerm
@@ -37,7 +37,7 @@ public final class HeaderTerm
   /**
    * The header name.
    */
-  protected String headerName;
+  private String headerName;
 
   /**
    * Constructor.

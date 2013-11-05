@@ -25,11 +25,18 @@ package javax.mail.internet;
 import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import gnu.inet.util.GetSystemPropertyAction;
 
@@ -38,15 +45,34 @@ import gnu.inet.util.GetSystemPropertyAction;
  * associated with a MIME header.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class ParameterList
 {
 
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("javax.mail.internet.L10N");
+
+  private static final boolean decodeParameters;
+  private static final boolean encodeParameters;
+  static
+  {
+    PrivilegedAction a;
+    a = new GetSystemPropertyAction("mail.mime.decodeparameters");
+    decodeParameters = "true".equals(AccessController.doPrivileged(a));
+    a = new GetSystemPropertyAction("mail.mime.encodeparameters");
+    encodeParameters = "true".equals(AccessController.doPrivileged(a));
+  }
+
   /*
-   * The underlying storage.
+   * Names to values.
    */
-  private LinkedHashMap list = new LinkedHashMap();
+  private Map<String,String> list = new LinkedHashMap<String,String>();
+
+  /*
+   * Names to MIME charsets.
+   */
+  private Map<String,String> charsets = new HashMap<String,String>();
 
   /**
    * Constructor for an empty parameter list.
@@ -63,159 +89,196 @@ public class ParameterList
   public ParameterList(String s)
     throws ParseException
   {
-    PrivilegedAction a =
-      new GetSystemPropertyAction("mail.mime.decodeparameters");
-    boolean decodeParameters =
-      "true".equals(AccessController.doPrivileged(a));
-
-    LinkedHashMap charsets = new LinkedHashMap();
     HeaderTokenizer ht = new HeaderTokenizer(s, HeaderTokenizer.MIME);
-    for (int type = 0; type != HeaderTokenizer.Token.EOF; )
+    HeaderTokenizer.Token token = ht.next();
+    int type = token.getType();
+    while (type != HeaderTokenizer.Token.EOF)
       {
-        HeaderTokenizer.Token token = ht.next();
-        type = token.getType();
-
-        if (type != HeaderTokenizer.Token.EOF)
+        if (type != 0x3b) // ';'
           {
-            if (type != 0x3b) // ';'
-              {
-                throw new ParseException("expected ';': " + s);
-              }
+            String m = L10N.getString("err.expected_semicolon");
+            Object[] args = new Object[] { s };
+            throw new ParseException(MessageFormat.format(m, args));
+          }
+        token = ht.next();
+        type = token.getType();
+        if (type != HeaderTokenizer.Token.ATOM)
+          {
+            String m = L10N.getString("err.expected_parameter_name");
+            Object[] args = new Object[] { s };
+            throw new ParseException(MessageFormat.format(m, args));
+          }
+        String key = token.getValue().toLowerCase();
+        token = ht.next();
+        type = token.getType();
+        if (type != 0x3d) // '='
+          {
+            String m = L10N.getString("err.expected_equals");
+            Object[] args = new Object[] { s };
+            throw new ParseException(MessageFormat.format(m, args));
+          }
+        token = ht.next();
+        type = token.getType();
+        if (type != HeaderTokenizer.Token.ATOM &&
+            type != HeaderTokenizer.Token.QUOTEDSTRING)
+          {
+            String m = L10N.getString("err.expected_parameter_value");
+            Object[] args = new Object[] { s };
+            throw new ParseException(MessageFormat.format(m, args));
+          }
+        list.put(key, token.getValue());
+        token = ht.next();
+        type = token.getType();
+      }
+    doCombineSegments(true);
+  }
 
-            token = ht.next();
-            type = token.getType();
-            if (type != HeaderTokenizer.Token.ATOM)
-              {
-                throw new ParseException("expected parameter name: " + s);
-              }
-            String key = token.getValue().toLowerCase();
+  /**
+   * Combines individual segments of multi-segment names.
+   * @see RFC 2231
+   * @since JavaMail 1.5
+   */
+  public void combineSegments()
+  {
+    try
+      {
+        doCombineSegments(false);
+      }
+    catch (ParseException e)
+      {
+        // NOOP
+      }
+  }
 
-            token = ht.next();
-            type = token.getType();
-            if (type != 0x3d) // '='
+  private void doCombineSegments(boolean fussy)
+    throws ParseException
+  {
+    if (!decodeParameters)
+      {
+        return;
+      }
+    List<String> names = new ArrayList<String>(list.keySet());
+    Collections.sort(names); // To get segments in ascending order
+    int len = names.size();
+    Map<String,List<String>> segments = new HashMap<String,List<String>>();
+    try
+      {
+        for (int i = 0; i < len; i++)
+          {
+            String key = names.get(i);
+            String value = list.get(key);
+            int si = key.lastIndexOf('*');
+            if (si == key.length() - 1)
               {
-                throw new ParseException("expected '=': " + s);
-              }
-
-            token = ht.next();
-            type = token.getType();
-            if (type != HeaderTokenizer.Token.ATOM &&
-                type != HeaderTokenizer.Token.QUOTEDSTRING)
-              {
-                throw new ParseException("expected parameter value: " + s);
-              }
-            String value = token.getValue();
-
-            // Handle RFC 2231 encoding and continuations
-            // This will handle out-of-order extended-other-values
-            // but the extended-initial-value must precede them
-            int si = key.indexOf('*');
-            if (decodeParameters && si > 0)
-              {
-                int len = key.length();
-                if (si == len - 1 ||
-                   (si == len - 3 &&
-                     key.charAt(si + 1) == '0' &&
-                     key.charAt(si + 2) == '*'))
+                // Parameter is encoded, replace with decoded version
+                int ai = value.indexOf('\'');
+                if (ai == -1)
                   {
-                    // extended-initial-name
-                    key = key.substring(0, si);
-                    // extended-initial-value
-                    int ai = value.indexOf('\'');
-                    if (ai == -1)
+                    if (fussy)
                       {
-                        throw new ParseException("no charset specified: " +
-                                                  value);
+                        String m = L10N.getString("err.no_charset");
+                        Object[] args = new Object[] { key, value };
+                        m = MessageFormat.format(m, args);
+                        throw new ParseException(m);
                       }
-                    String charset = value.substring(0, ai);
-                    charset = MimeUtility.javaCharset(charset);
-                    charsets.put(key, charset);
-                    // advance to last apostrophe
-                    for (int i = value.indexOf('\'', ai + 1); i != -1; )
-                      {
-                        ai = i;
-                        i = value.indexOf('\'', ai + 1);
-                      }
-                    value = decode(value.substring(ai + 1), charset);
-                    ArrayList values = new ArrayList();
-                    set(values, 0, value);
-                    list.put(key, values);
                   }
                 else
                   {
-                    // extended-other-name
-                    int end = (key.charAt(len - 1) == '*') ? len - 1 : len;
-                    int section = -1;
-                    try
+                    String charset = value.substring(0, ai);
+                    ai = value.indexOf('\'', ai + 1); // skip language
+                    if (ai == -1)
                       {
-                        section =
-                          Integer.parseInt(key.substring(si + 1, end));
-                        if (section < 1)
+                        if (fussy)
                           {
-                            throw new NumberFormatException();
+                            String m = L10N.getString("err.no_language");
+                            Object[] args = new Object[] { key, value };
+                            m = MessageFormat.format(m, args);
+                            throw new ParseException(m);
                           }
                       }
-                    catch (NumberFormatException e)
+                    else
                       {
-                        throw new ParseException("invalid section: " + key);
+                        value = decode(value.substring(ai + 1), charset);
+                        list.remove(key); // Remove encoded version
+                        String newkey = key.substring(0, si);
+                        list.put(newkey, value); // Put decoded version
+                        charsets.put(newkey, charset);
                       }
-                    key = key.substring(0, si);
-                    // extended-other-value
-                    String charset = (String) charsets.get(key);
-                    ArrayList values = (ArrayList) list.get(key);
-                    if (charset == null || values == null)
-                      {
-                        throw new ParseException("no initial extended " +
-                                                  "parameter for '" + key +
-                                                  "'");
-                      }
-                    if (type == HeaderTokenizer.Token.ATOM)
-                      {
-                        value = decode(value, charset);
-                      }
-                    set(values, section, value);
                   }
+                key = key.substring(0, si);
+                si = key.lastIndexOf('*');
               }
-            else
+            if (si > 0 && si < key.length() - 1)
               {
-                set(key, value, null);
+                // This is a segment
+                int segmentIndex = Integer.parseInt(key.substring(si + 1));
+                list.remove(key); // Remove segment from list
+                String charset = charsets.get(key);
+                key = key.substring(0, si);
+                charsets.put(key, charset); // Won't handle multiple charsets
+                List<String> values = segments.get(key);
+                if (values == null)
+                  {
+                    values = new ArrayList<String>();
+                    segments.put(key, values);
+                  }
+                values.add(unquote(value));
               }
           }
       }
-    // Replace list values by string concatenations of their components
-    int len = list.size();
-    String[] keys = new String[len];
-    list.keySet().toArray(keys);
-    for (int i = 0; i < len; i++)
+    finally
       {
-        Object value = list.get(keys[i]);
-        if (value instanceof ArrayList)
+        // Concatenate the segments and put into lookup table
+        Map<String,String> lookup = new HashMap<String,String>();
+        for (Iterator<String> i = segments.keySet().iterator(); i.hasNext(); )
           {
-            ArrayList values = (ArrayList) value;
-            StringBuffer buf = new StringBuffer();
-            for (Iterator j = values.iterator(); j.hasNext(); )
+            String key = i.next();
+            List<String> values = segments.get(key);
+            int vlen = values.size();
+            StringBuilder buf = new StringBuilder();
+            for (int j = 0; j < vlen; j++)
               {
-                String comp = (String) j.next();
-                if (comp != null)
-                  {
-                    buf.append(comp);
-                  }
+                buf.append(values.get(j));
               }
-            String charset = (String) charsets.get(keys[i]);
-            set(keys[i], buf.toString(), charset);
+            lookup.put(key, buf.toString());
+          }
+        // Now work out whether the keys in the lookup table correspond to a
+        // parameter value or a key in the list
+        // Damn your eyes RFC2231 for not making this explicit
+        Set<String> isValue = new HashSet<String>();
+        for (Iterator<String> i = list.keySet().iterator(); i.hasNext(); )
+          {
+            String key = i.next();
+            String value = list.get(key);
+            if (lookup.containsKey(value))
+              {
+                list.put(key, lookup.get(value));
+                isValue.add(value);
+              }
+          }
+        // Anything else has got to be a key
+        // although values might also be keys, who knows?
+        for (Iterator<String> i = lookup.keySet().iterator(); i.hasNext(); )
+          {
+            String key = i.next();
+            if (!isValue.contains(key))
+              {
+                list.put(key, lookup.get(key));
+              }
           }
       }
   }
 
-  private void set(ArrayList list, int index, Object value)
+  private static String unquote(String value)
   {
-    int len = list.size();
-    while (index > len - 1)
+    int len = value.length();
+    if (len > 1 &&
+        value.charAt(0) == '"' &&
+        value.charAt(len - 1) == '"')
       {
-        list.add(null);
-        len++;
+        value = value.substring(1, len - 1);
       }
-    list.set(index, value);
+    return value;
   }
 
   private String decode(String text, String charset)
@@ -232,10 +295,13 @@ public class ParameterList
           {
             if (i + 3 > slen)
               {
-                throw new ParseException("malformed: " + text);
+                String m = L10N.getString("err.bad_rfc2231_encoding");
+                Object[] args = new Object[] { text };
+                m = MessageFormat.format(m, args);
+                throw new ParseException(m);
               }
-            int val = Character.digit(schars[i + 2], 16) +
-              Character.digit(schars[i + 1], 16) * 16;
+            int val = Character.digit(schars[i + 1], 16) << 4 +
+              Character.digit(schars[i + 2], 16);
             dchars[dlen++] = ((byte) val);
             i += 2;
           }
@@ -244,13 +310,17 @@ public class ParameterList
             dchars[dlen++] = ((byte) c);
           }
       }
+    String javaCharset = MimeUtility.javaCharset(charset);
     try
       {
-        return new String(dchars, 0, dlen, charset);
+        return new String(dchars, 0, dlen, javaCharset);
       }
     catch (UnsupportedEncodingException e)
       {
-        throw new ParseException("Unsupported encoding: " + charset);
+        String m = L10N.getString("err.bad_encoding");
+        Object[] args = new Object[] { javaCharset };
+        m = MessageFormat.format(m, args);
+        throw new ParseException(m);
       }
   }
 
@@ -269,8 +339,7 @@ public class ParameterList
    */
   public String get(String name)
   {
-    String[] vc = (String[]) list.get(name.toLowerCase().trim());
-    return (vc != null) ? vc[0] : null;
+    return list.get(name.toLowerCase().trim());
   }
 
   /**
@@ -280,7 +349,7 @@ public class ParameterList
    */
   public void set(String name, String value)
   {
-    set(name, value, null);
+    list.put(name.toLowerCase().trim(), name);
   }
 
   /**
@@ -293,8 +362,9 @@ public class ParameterList
    */
   public void set(String name, String value, String charset)
   {
-    String[] vc = new String[] { value, charset };
-    list.put(name.toLowerCase().trim(), vc);
+    String key = name.toLowerCase().trim();
+    list.put(key, value);
+    charsets.put(key, charset);
   }
 
   /**
@@ -331,52 +401,166 @@ public class ParameterList
    */
   public String toString(int used)
   {
-    PrivilegedAction a =
-      new GetSystemPropertyAction("mail.mime.encodeparameters");
-    boolean encodeParameters =
-      "true".equals(AccessController.doPrivileged(a));
-
-    StringBuffer buffer = new StringBuffer();
-    for (Iterator i = list.entrySet().iterator(); i.hasNext(); )
+    // NB this is a bloody complicated implementation
+    // because we need to wrap the whole line, and we also need to generate
+    // multiple segments for individual values that don't fit on the current
+    // line.
+    // The spec doesn't handle wrapping parameter names so stuff might still
+    // flow over the line boundary but we should be compliant.
+    StringBuilder buf = new StringBuilder();
+    for (Iterator<String> i = list.keySet().iterator(); i.hasNext(); )
       {
-        Map.Entry entry = (Map.Entry) i.next();
-        String key = (String) entry.getKey();
-        String[] vc = (String[]) entry.getValue();
-        String value = vc[0];
-        String charset = vc[1];
+        String key = i.next();
+        String value = list.get(key);
+        String charset = charsets.get(key);
 
-        if (encodeParameters)
+        // delimiter
+        buf.append("; ");
+        used += 2;
+
+        // handle wrap after delimiter
+        if (used > 76)
           {
+            buf.append("\r\n\t");
+            used = 8;
+          }
+
+        boolean handled = false;
+        int klen = key.length();
+        int segmentIndex = 0;
+        if (encodeParameters && needsEncoding(value))
+          {
+            // RFC 2231 encoding
             try
               {
-                value = MimeUtility.encodeText(value, charset, "Q");
+                if (charset == null || "".equals(charset))
+                  {
+                    charset = "UTF-8";
+                  }
+                byte[] b = value.getBytes(MimeUtility.javaCharset(charset));
+                StringBuilder vb = new StringBuilder(charset).append("''");
+                for (int j = 0; j < b.length; j++)
+                  {
+                    String segmentIndexString = Integer.toString(segmentIndex);
+                    int len = klen + segmentIndexString.length() +
+                      vb.length() + 4;
+                    char c = (char) (b[j] & 255);
+                    boolean needsEncoding =
+                      (c <= 32 ||
+                       c >= 127 ||
+                       c == '%' ||
+                       c == '\'' ||
+                       c == '*' ||
+                       HeaderTokenizer.MIME.indexOf(c) != -1);
+                    int clen = needsEncoding ? 3 : 1;
+                    if (used + len + clen > 76)
+                      {
+                        buf.append(key);
+                        buf.append('*');
+                        buf.append(segmentIndexString);
+                        buf.append('*');
+                        buf.append('=');
+                        buf.append(vb.toString());
+                        buf.append(";\r\n\t");
+                        used = 8;
+                        segmentIndex++;
+                        vb = new StringBuilder(charset).append("''");
+                      }
+                    if (needsEncoding)
+                      {
+                        vb.append('%');
+                        vb.append(Character.forDigit((c >> 4) & 0xf, 16));
+                        vb.append(Character.forDigit(c & 0xf, 16));
+                      }
+                    else 
+                      {
+                        vb.append(c);
+                      }
+                  }
+                buf.append(key);
+                if (segmentIndex > 0)
+                  {
+                    String segmentIndexString = Integer.toString(segmentIndex);
+                    buf.append('*');
+                    buf.append(segmentIndexString);
+                    used += segmentIndexString.length() + 1;
+                  }
+                buf.append('*');
+                buf.append('=');
+                buf.append(vb.toString());
+                used += klen + vb.length() + 2;
+                handled = true;
               }
             catch (UnsupportedEncodingException e)
               {
                 // ignore
               }
           }
-
-        value = MimeUtility.quote(value, HeaderTokenizer.MIME);
-
-        // delimiter
-        buffer.append("; ");
-        used += 2;
-
-        // wrap to next line if necessary
-        int len = key.length() + value.length() + 1;
-        if ((used + len) > 76)
+        if (!handled)
           {
-            buffer.append("\r\n\t");
-            used = 8;
+            int vlen = value.length();
+            if (used + klen + 1 + vlen > 76)
+              {
+                StringBuilder vb = new StringBuilder();
+                for (int j = 0; j < vlen; j++)
+                  {
+                    String segmentIndexString = Integer.toString(segmentIndex);
+                    int len = klen + segmentIndexString.length() +
+                      vb.length() + 3;
+                    if (used + len + 1 > 76)
+                      {
+                        buf.append(key);
+                        buf.append('*');
+                        buf.append(segmentIndexString);
+                        buf.append('=');
+                        buf.append(vb.toString());
+                        buf.append(";\r\n\t");
+                        used = 8;
+                        segmentIndex++;
+                        vb = new StringBuilder();
+                      }
+                    char c = value.charAt(j);
+                    vb.append(c);
+                  }
+                buf.append(key);
+                if (segmentIndex > 0)
+                  {
+                    String segmentIndexString = Integer.toString(segmentIndex);
+                    buf.append('*');
+                    buf.append(segmentIndexString);
+                    used += segmentIndexString.length() + 1;
+                  }
+                buf.append('=');
+                buf.append(vb.toString());
+                used += klen + vb.length() + 1;
+              }
+            else
+              {
+                buf.append(key);
+                buf.append('=');
+                buf.append(value);
+                used += klen + 1 + vlen;
+              }
           }
-
-        // append key=value
-        buffer.append(key);
-        buffer.append('=');
-        buffer.append(value);
       }
-    return buffer.toString();
+    return buf.toString();
+  }
+
+  /**
+   * If a value is all ASCII it doesn't need encoding.
+   */
+  private static boolean needsEncoding(String value)
+  {
+    int len = value.length();
+    for (int i = 0; i < len; i++)
+      {
+        char c = value.charAt(i);
+        if (c < 32 || c > 126)
+          {
+            return true;
+          }
+      }
+    return false;
   }
 
   /*
@@ -386,7 +570,7 @@ public class ParameterList
     implements Enumeration
   {
 
-    Iterator source;
+    private final Iterator source;
 
     ParameterEnumeration(Iterator source)
     {

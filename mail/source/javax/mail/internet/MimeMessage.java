@@ -62,7 +62,7 @@ import gnu.inet.util.GetSystemPropertyAction;
  * values are correctly encoded.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MimeMessage
   extends Message
@@ -375,6 +375,29 @@ public class MimeMessage
     else
       {
         throw new MessagingException("No local address");
+      }
+  }
+
+  /**
+   * Utility method to set the From header field using a String.
+   * @param address the message sender
+   * @exception IllegalWriteException if the underlying implementation
+   * does not support modification of existing values
+   * @exception IllegalStateException if this message is obtained from
+   * a READ_ONLY folder
+   * @since JavaMail 1.5
+   */
+  public void setFrom(String address)
+    throws MessagingException
+  {
+    if (address == null)
+      {
+        removeHeader(FROM_NAME);
+      }
+    else
+      {
+        InternetAddress ia = new InternetAddress(address);
+        setHeader(FROM_NAME, ia.toString());
       }
   }
 
@@ -1452,6 +1475,21 @@ public class MimeMessage
   public Message reply(boolean replyToAll)
     throws MessagingException
   {
+    return reply(replyToAll, true);
+  }
+
+  /**
+   * Returns a new message suitable for a reply to this message.
+   * The new message will have its headers set appropriately for sending,
+   * but no content.
+   * @param replyToAll the reply should be sent to all the recipients of
+   * this message
+   * @param setAnswered if true, sets the ANSWERED flag in this message
+   * @since JavaMail 1.5
+   */
+  public Message reply(boolean replyToAll, boolean setAnswered)
+    throws MessagingException
+  {
     MimeMessage message = createMimeMessage(session);
     String subject = getHeader(SUBJECT_NAME, null);
     if (subject != null)
@@ -1525,12 +1563,15 @@ public class MimeMessage
       {
         message.setHeader("In-Reply-To", mid);
       }
-    try
+    if (setAnswered)
       {
-        setFlag(Flags.Flag.ANSWERED, true);
-      }
-    catch (MessagingException e)
-      {
+        try
+          {
+            setFlag(Flags.Flag.ANSWERED, true);
+          }
+        catch (MessagingException e)
+          {
+          }
       }
     return message;
   }

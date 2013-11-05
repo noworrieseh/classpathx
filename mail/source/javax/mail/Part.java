@@ -46,7 +46,7 @@ import javax.activation.DataHandler;
  * In MIME terms, Part models an Entity (RFC 2045, Section 2.4).
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public interface Part
 {

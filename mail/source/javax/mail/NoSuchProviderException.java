@@ -27,7 +27,7 @@ package javax.mail;
  * doesn't exist.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class NoSuchProviderException
   extends MessagingException
@@ -40,6 +40,14 @@ public class NoSuchProviderException
   public NoSuchProviderException(String message)
   {
     super(message);
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public NoSuchProviderException(String message, Exception e)
+  {
+    super(message, e);
   }
 
 }

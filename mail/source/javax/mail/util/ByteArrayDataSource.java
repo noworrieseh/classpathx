@@ -37,7 +37,7 @@ import javax.mail.internet.ParseException;
  * Data source backed by a byte array.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  * @since JavaMail 1.4
  */
 public class ByteArrayDataSource

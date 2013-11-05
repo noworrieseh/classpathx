@@ -30,7 +30,7 @@ import javax.mail.Transport;
  * A transport event.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class TransportEvent
   extends MailEvent

@@ -28,7 +28,7 @@ import java.util.EventListener;
  * A listener for transport events.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public interface TransportListener
   extends EventListener

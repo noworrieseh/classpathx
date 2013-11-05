@@ -26,16 +26,17 @@ package javax.mail;
  * An exception thrown when a method is invoked on a nonexistent folder.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class FolderNotFoundException
   extends MessagingException
 {
 
-  private Folder folder;
+  private final Folder folder;
 
   public FolderNotFoundException()
   {
+    this.folder = null;
   }
 
   public FolderNotFoundException(Folder folder)
@@ -52,6 +53,15 @@ public class FolderNotFoundException
   public FolderNotFoundException(String message, Folder folder)
   {
     this(folder, message);
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public FolderNotFoundException(Folder folder, String message, Exception e)
+  {
+    super(message, e);
+    this.folder = folder;
   }
 
   /**

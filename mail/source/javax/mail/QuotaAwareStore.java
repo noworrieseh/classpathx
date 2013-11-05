@@ -27,7 +27,7 @@ package javax.mail;
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  * @see RFC 2087
- * @version 1.4
+ * @version 1.5
  * @since JavaMail 1.4
  */
 public interface QuotaAwareStore

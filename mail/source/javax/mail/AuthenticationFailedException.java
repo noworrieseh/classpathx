@@ -27,7 +27,7 @@ package javax.mail;
  * service's <code>connect</code> method.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class AuthenticationFailedException
   extends MessagingException
@@ -40,6 +40,14 @@ public class AuthenticationFailedException
   public AuthenticationFailedException(String message)
   {
     super(message);
+  }
+  
+  /**
+   * @since JavaMail 1.5
+   */
+  public AuthenticationFailedException(String message, Exception e)
+  {
+    super(message, e);
   }
 
 }

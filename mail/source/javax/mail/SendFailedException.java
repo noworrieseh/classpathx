@@ -30,7 +30,7 @@ package javax.mail;
  * and valid addresses to which the message was not sent.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class SendFailedException
   extends MessagingException

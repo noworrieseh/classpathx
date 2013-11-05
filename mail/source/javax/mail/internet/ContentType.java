@@ -26,7 +26,7 @@ package javax.mail.internet;
  * A MIME Content-Type value.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class ContentType
 {
@@ -194,7 +194,7 @@ public class ContentType
   {
     if (primaryType == null || subType == null)
       {
-        return null;
+        return "";
       }
 
     StringBuffer buffer = new StringBuffer();

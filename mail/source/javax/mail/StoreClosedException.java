@@ -31,7 +31,7 @@ package javax.mail;
  * considered invalid.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class StoreClosedException
   extends MessagingException
@@ -40,7 +40,7 @@ public class StoreClosedException
   /*
    * The store.
    */
-  private Store store;
+  private final Store store;
 
   public StoreClosedException(Store store)
   {
@@ -50,6 +50,15 @@ public class StoreClosedException
   public StoreClosedException(Store store, String message)
   {
     super(message);
+    this.store = store;
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public StoreClosedException(Store store, String message, Exception e)
+  {
+    super(message, e);
     this.store = store;
   }
 

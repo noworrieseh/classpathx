@@ -61,6 +61,7 @@ public class FetchProfile
 
     /**
      * The size of the message.
+     * @since JavaMail 1.5
      */
     public static final Item SIZE = new Item("SIZE");
 

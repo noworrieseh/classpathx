@@ -29,15 +29,12 @@ import java.io.PrintWriter;
  * A general messaging exception.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MessagingException
   extends Exception
 {
 
-  /*
-   * The next exception in a chain of exceptions.
-   */
   private Exception nextException;
 
   /**
@@ -66,6 +63,7 @@ public class MessagingException
   public MessagingException(String message, Exception exception)
   {
     super(message);
+    initCause(null);
     nextException = exception;
   }
 
@@ -79,6 +77,11 @@ public class MessagingException
     return nextException;
   }
 
+  public Throwable getCause()
+  {
+    return nextException;
+  }
+
   /**
    * Adds an exception to the end of the chain.
    * If the end is not a messaging exception, this exception cannot be added
@@ -88,54 +91,50 @@ public class MessagingException
    */
   public synchronized boolean setNextException(Exception exception)
   {
-    Object o;
-    for (o = this;
-         (o instanceof MessagingException) &&
-         ((MessagingException) o).nextException != null;
-         o = ((MessagingException) o).nextException);
-    if (o instanceof MessagingException)
+    Exception e = this;
+    while (e instanceof MessagingException &&
+           ((MessagingException) e).nextException != null)
       {
-       ((MessagingException) o).nextException = exception;
+         e = ((MessagingException) e).nextException;
+      }
+    if (e instanceof MessagingException)
+      {
+        ((MessagingException) e).nextException = exception;
         return true;
       }
     return false;
   }
 
-  /**
-   * Returns the message, including the message from any nested exception.
-   */
-  public String getMessage()
+  public String toString()
   {
-    String message = super.getMessage();
-    if (nextException != null)
+    String s = super.toString();
+    Exception next = nextException;
+    if (next == null)
       {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(message);
-        buffer.append(";\n  nested exception is: \n\t");
-        buffer.append(nextException.toString());
-        message = buffer.toString();
+        return s;
       }
-    return message;
+    StringBuilder buf = new StringBuilder(s);
+    while (next != null)
+      {
+        buf.append(";\n  nested exception is: \n\t");
+        if (next instanceof MessagingException)
+          {
+            MessagingException e = (MessagingException) next;
+            buf.append(e.stringForm());
+            next = e.nextException;
+          }
+        else
+          {
+            buf.append(next.toString());
+            next = null;
+          }
+      }
+    return buf.toString();
   }
 
-  public void printStackTrace(PrintStream out)
+  private final String stringForm()
   {
-    super.printStackTrace(out);
-    if (nextException != null)
-      {
-        out.println("nested exception is:");
-        nextException.printStackTrace(out);
-      }
-  }
-
-  public void printStackTrace(PrintWriter out)
-  {
-    super.printStackTrace(out);
-    if (nextException != null)
-      {
-        out.println("nested exception is:");
-        nextException.printStackTrace(out);
-      }
+    return super.toString();
   }
 
 }

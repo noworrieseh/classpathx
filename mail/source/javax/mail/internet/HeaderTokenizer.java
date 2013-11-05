@@ -22,11 +22,14 @@
 
 package javax.mail.internet;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 /**
  * A lexer for RFC 822 and MIME headers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class HeaderTokenizer
 {
@@ -110,6 +113,9 @@ public class HeaderTokenizer
     }
 
   }
+
+  private static final ResourceBundle L10N
+    = ResourceBundle.getBundle("javax.mail.internet.L10N");
 
   /**
    * RFC 822 specials.
@@ -206,8 +212,35 @@ public class HeaderTokenizer
   public Token next()
     throws ParseException
   {
+    return next('\0', false);
+  }
+
+  /**
+   * Returns the next token.
+   * @param endOfAtom if not NUL, character marking the end of an atom
+   * @return the next token
+   * @exception ParseException if the parse fails
+   * @since JavaMail 1.5
+   */
+  public Token next(char endOfAtom)
+    throws ParseException
+  {
+    return next(endOfAtom, false);
+  }
+
+  /**
+   * Returns the next token.
+   * @param endOfAtom if not NUL, character marking the end of an atom
+   * @param keepEscapes if true, keep backslashes
+   * @return the next token
+   * @exception ParseException if the parse fails
+   * @since JavaMail 1.5
+   */
+  public Token next(char endOfAtom, boolean keepEscapes)
+    throws ParseException
+  {
     pos = next;
-    Token token = token();
+    Token token = token(endOfAtom, keepEscapes);
     next = pos;
     peek = next;
     return token;
@@ -224,7 +257,7 @@ public class HeaderTokenizer
     throws ParseException
   {
     pos = peek;
-    Token token = token();
+    Token token = token('\0', false);
     peek = pos;
     return token;
   }
@@ -240,100 +273,48 @@ public class HeaderTokenizer
   /*
    * Returns the next token.
    */
-  private Token token()
+  private Token token(char endOfAtom, boolean keepEscapes)
     throws ParseException
   {
+    skipWhitespace();
     if (pos >= maxPos)
       {
         return EOF;
       }
-    if (skipWhitespace() == Token.EOF)
-      {
-        return EOF;
-      }
 
-    boolean needsFilter = false;
-    char c;
+    char c = header.charAt(pos);
 
     // comment
-    for (c = header.charAt(pos); c == '('; c = header.charAt(pos))
+    while (c == '(')
       {
-        int start = ++pos;
-        int parenCount = 1;
-        while (parenCount > 0 && pos < maxPos)
-          {
-            c = header.charAt(pos);
-            if (c == '\\')
-              {
-                pos++;
-                needsFilter = true;
-              }
-            else if (c == '\r')
-              {
-                needsFilter = true;
-              }
-            else if (c == '(')
-              {
-                parenCount++;
-              }
-            else if (c == ')')
-              {
-                parenCount--;
-              }
-            pos++;
-          }
-
-        if (parenCount != 0)
-          {
-            throw new ParseException("Illegal comment");
-          }
-
+        pos++;
+        Token comment = parseComment(keepEscapes);
         if (!skipComments)
           {
-            String ret = needsFilter ?
-              filter(header, start, pos - 1) :
-              header.substring(start, pos - 1);
-            return new Token(Token.COMMENT, ret);
+            return comment;
           }
-
-        if (skipWhitespace() == Token.EOF)
+        skipWhitespace();
+        if (pos >= maxPos)
           {
             return EOF;
           }
+        c = header.charAt(pos);
       }
 
     // quotedstring
     if (c == '"')
       {
-        int start = ++pos;
-        while (pos < maxPos)
-          {
-            c = header.charAt(pos);
-            if (c == '\\')
-              {
-                pos++;
-                needsFilter = true;
-              }
-            else if (c == '\r')
-              {
-                needsFilter = true;
-              }
-            else if (c == '"')
-              {
-                pos++;
-                String ret = needsFilter ?
-                  filter(header, start, pos - 1) :
-                  header.substring(start, pos - 1);
-                return new Token(Token.QUOTEDSTRING, ret);
-              }
-            pos++;
-          }
-        throw new ParseException("Illegal quoted string");
+        pos++;
+        return parseQuotedString(c, keepEscapes);
       }
 
     // delimiter
     if (c < ' ' || c >= '\177' || delimiters.indexOf(c) >= 0)
       {
+        if (endOfAtom != '\0' && c != endOfAtom)
+          {
+            return parseQuotedString(endOfAtom, keepEscapes);
+          }
         pos++;
         char[] chars = new char[] { c };
         return new Token(c, new String(chars));
@@ -347,6 +328,10 @@ public class HeaderTokenizer
         if (c < ' ' || c >= '\177' || c == '(' || c == ' ' || c == '"' ||
             delimiters.indexOf(c) >= 0)
           {
+            if (endOfAtom != '\0' && c != endOfAtom)
+              {
+                return parseQuotedString(endOfAtom, keepEscapes);
+              }
             break;
           }
         pos++;
@@ -354,64 +339,129 @@ public class HeaderTokenizer
     return new Token(Token.ATOM, header.substring(start, pos));
   }
 
+  private Token parseComment(boolean keepEscapes)
+    throws ParseException
+  {
+    int start = pos;
+    boolean needsNormalization = false;
+    int parenCount = 1;
+    while (parenCount > 0 && pos < maxPos)
+      {
+        char c = header.charAt(pos);
+        if (c == '\\')
+          {
+            pos++;
+            needsNormalization = true;
+          }
+        else if (c == '\r')
+          {
+            needsNormalization = true;
+          }
+        else if (c == '(')
+          {
+            parenCount++;
+          }
+        else if (c == ')')
+          {
+            parenCount--;
+          }
+        pos++;
+      }
+    if (parenCount != 0)
+      {
+        String m = L10N.getString("err.bad_comment");
+        Object[] args = new Object[] { header };
+        throw new ParseException(MessageFormat.format(m, args));
+      }
+    String ret = needsNormalization ?
+      normalize(header, start, pos - 1, keepEscapes) :
+      header.substring(start, pos - 1);
+    return new Token(Token.COMMENT, ret);
+  }
+
+  private Token parseQuotedString(char endOfAtom, boolean keepEscapes)
+    throws ParseException
+  {
+    int start = pos;
+    boolean needsNormalization = false;
+    for (; pos < maxPos; pos++)
+      {
+        char c = header.charAt(pos);
+        if (c == '\\')
+          {
+            pos++;
+            needsNormalization = true;
+          }
+        else if (c == '\r')
+          {
+            needsNormalization = true;
+          }
+        else if (c == endOfAtom)
+          {
+            String ret = needsNormalization ?
+              normalize(header, start, pos - 1, keepEscapes) :
+              header.substring(start, pos - 1);
+            return new Token(Token.QUOTEDSTRING, ret);
+          }
+      }
+    if (endOfAtom == '"')
+      {
+        String m = L10N.getString("err.bad_quoted_string");
+        Object[] args = new Object[] { header };
+        throw new ParseException(MessageFormat.format(m, args));
+      }
+    String ret = needsNormalization ?
+      normalize(header, start, pos - 1, keepEscapes) :
+      header.substring(start, pos - 1);
+    return new Token(Token.QUOTEDSTRING, ret);
+  }
+
   /*
    * Advance pos over any whitespace delimiters.
    */
-  private int skipWhitespace()
+  private void skipWhitespace()
   {
     while (pos < maxPos)
       {
         char c = header.charAt(pos);
         if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
           {
-            return pos;
+            return;
           }
         pos++;
       }
-    return Token.EOF;
   }
 
   /*
    * Process out CR and backslash (line continuation) bytes.
    */
-  private String filter(String s, int start, int end)
+  private String normalize(String s, int start, int end, boolean keepEscapes)
   {
-    StringBuffer buffer = new StringBuffer();
-    boolean backslash = false;
-    boolean cr = false;
+    StringBuilder buf = new StringBuilder();
+    char last = '\0';
     for (int i = start; i < end; i++)
       {
         char c = s.charAt(i);
-        if (c == '\n' && cr)
+        if (c == '\\' && !keepEscapes)
           {
-            cr = false;
+            last = c;
+            continue;
           }
-        else
+        if (c == '\r' && i + 1 < end && s.charAt(i + 1) == '\n')
           {
-            cr = false;
-            if (!backslash)
-              {
-                if (c == '\\')
-                  {
-                    backslash = true;
-                  }
-                else if (c == '\r')
-                  {
-                    cr = true;
-                  }
-                else
-                  {
-                    buffer.append(c);
-                  }
-              }
-            else
-              {
-                buffer.append(c);
-                backslash = false;
-              }
+            // Coalesce CRLF to LF
+            c = '\n';
+            i++;
           }
+        if (c == '\n' && last == '\\')
+          {
+            // Line continuation
+            continue;
+          }
+        buf.append(c);
+        last = c;
       }
-    return buffer.toString();
+    return buf.toString();
   }
 
 }

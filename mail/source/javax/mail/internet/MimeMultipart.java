@@ -49,7 +49,7 @@ import gnu.inet.util.LineInputStream;
  * <code>MimeMultipart(String)</code> constructor.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MimeMultipart
   extends Multipart
@@ -118,6 +118,31 @@ public class MimeMultipart
         this.ds = ds;
         contentType = ds.getContentType();
         parsed = false;
+      }
+  }
+
+  /**
+   * Constructor with the "mixed" subtype and specified body parts.
+   * More body parts may be added.
+   * @since JavaMail 1.5
+   */
+  public MimeMultipart(BodyPart... parts) throws MessagingException
+  {
+    this("mixed", parts);
+  }
+   
+  /**
+   * Constructor with the specified subtype and body parts.
+   * More body parts may be added later.
+   * @since JavaMail 1.5
+   */
+  public MimeMultipart(String subtype, BodyPart... parts)
+    throws MessagingException
+  {
+    this(subtype);
+    for (int i = 0; i < parts.length; i++)
+      {
+        addBodyPart(parts[i]);
       }
   }
 

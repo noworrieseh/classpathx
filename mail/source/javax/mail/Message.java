@@ -41,7 +41,7 @@ import javax.mail.search.SearchTerm;
  *
  * @see Part
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public abstract class Message
   implements Part
@@ -159,6 +159,15 @@ public abstract class Message
   {
     folder = null;
     this.session = session;
+  }
+
+  /**
+   * Returns the session in use when the message was created.
+   * @since JavaMail 1.5
+   */
+  public Session getSession()
+  {
+    return session;
   }
 
   /**

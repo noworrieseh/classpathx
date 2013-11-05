@@ -27,13 +27,13 @@ package javax.mail;
  * its messages. The folder may be reopened.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class FolderClosedException
   extends MessagingException
 {
 
-  private Folder folder;
+  private final Folder folder;
 
   public FolderClosedException(Folder folder)
   {
@@ -43,6 +43,15 @@ public class FolderClosedException
   public FolderClosedException(Folder folder, String message)
   {
     super(message);
+    this.folder = folder;
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public FolderClosedException(Folder folder, String message, Exception e)
+  {
+    super(message, e);
     this.folder = folder;
   }
 

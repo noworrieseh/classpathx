@@ -27,7 +27,7 @@ package javax.mail;
  * message.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public class MessageRemovedException
   extends MessagingException
@@ -40,6 +40,14 @@ public class MessageRemovedException
   public MessageRemovedException(String message)
   {
     super(message);
+  }
+
+  /**
+   * @since JavaMail 1.5
+   */
+  public MessageRemovedException(String message, Exception e)
+  {
+    super(message, e);
   }
 
 }

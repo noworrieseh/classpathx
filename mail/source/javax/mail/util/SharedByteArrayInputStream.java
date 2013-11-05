@@ -30,7 +30,7 @@ import javax.mail.internet.SharedInputStream;
  * A byte array input stream that is shareable between multiple readers.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  * @since JavaMail 1.4
  */
 public class SharedByteArrayInputStream

@@ -34,7 +34,7 @@ package javax.mail;
  *
  * @see RFC 2060 http://www.ietf.org/rfc/rfc2060.txt
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
- * @version 1.4
+ * @version 1.5
  */
 public interface UIDFolder
 {
