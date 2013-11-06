@@ -170,7 +170,6 @@ JAVADOC = @JAVADOC@
 JAVADOCFLAGS = @JAVADOCFLAGS@
 JAVAFLAGS = @JAVAFLAGS@
 JAVAPREFIX = @JAVAPREFIX@
-JSSE_JAR = @JSSE_JAR@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
@@ -227,15 +226,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-uudecode = @uudecode@
 src = @srcdir@/source
 dst = classes
 doc = @srcdir@/docs
 gnumail_jar = gnumail.jar
-providers_jar = gnumail-providers.jar
-
-# The java source files that make up the GNU version of the javax.mail API.
-gnumail_sources = \
+sources = \
 $(src)/javax/mail/Address.java \
 $(src)/javax/mail/AuthenticationFailedException.java \
 $(src)/javax/mail/Authenticator.java \
@@ -346,11 +341,7 @@ $(src)/gnu/mail/handler/MultipartSigned.java \
 $(src)/gnu/mail/handler/Text.java \
 $(src)/gnu/mail/handler/TextHtml.java \
 $(src)/gnu/mail/handler/TextPlain.java \
-$(src)/gnu/mail/handler/TextXml.java
-
-
-# Utility and helper classes for the JavaMail API.
-util_sources = \
+$(src)/gnu/mail/handler/TextXml.java \
 $(src)/gnu/mail/util/BOutputStream.java \
 $(src)/gnu/mail/util/Base64InputStream.java \
 $(src)/gnu/mail/util/Base64OutputStream.java \
@@ -361,98 +352,52 @@ $(src)/gnu/mail/util/QPInputStream.java \
 $(src)/gnu/mail/util/QPOutputStream.java \
 $(src)/gnu/mail/util/RFC2822OutputStream.java \
 $(src)/gnu/mail/util/UUInputStream.java \
-$(src)/gnu/mail/util/UUOutputStream.java
-
-
-# Utility and helper classes for the providers.
-provider_sources = \
+$(src)/gnu/mail/util/UUOutputStream.java \
 $(src)/gnu/mail/treeutil/StatusEvent.java \
 $(src)/gnu/mail/treeutil/StatusListener.java \
 $(src)/gnu/mail/treeutil/StatusSource.java \
-$(src)/gnu/mail/providers/ReadOnlyMessage.java
+$(src)/gnu/mail/providers/ReadOnlyMessage.java \
+$(src)/gnu/mail/providers/smtp/SMTPTransport.java\
+$(src)/gnu/mail/providers/imap/ACL.java \
+$(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
+$(src)/gnu/mail/providers/imap/IMAPFlags.java \
+$(src)/gnu/mail/providers/imap/IMAPFolder.java \
+$(src)/gnu/mail/providers/imap/IMAPMessage.java \
+$(src)/gnu/mail/providers/imap/IMAPMultipart.java \
+$(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
+$(src)/gnu/mail/providers/imap/IMAPStore.java \
+$(src)/gnu/mail/providers/imap/Rights.java \
+$(src)/gnu/mail/providers/pop3/POP3Folder.java \
+$(src)/gnu/mail/providers/pop3/POP3Message.java \
+$(src)/gnu/mail/providers/pop3/POP3Store.java \
+$(src)/gnu/mail/providers/nntp/ListFolderListener.java \
+$(src)/gnu/mail/providers/nntp/NNTPFolder.java \
+$(src)/gnu/mail/providers/nntp/NNTPMessage.java \
+$(src)/gnu/mail/providers/nntp/NNTPRootFolder.java \
+$(src)/gnu/mail/providers/nntp/NNTPStore.java \
+$(src)/gnu/mail/providers/nntp/NNTPTransport.java \
+$(src)/gnu/mail/providers/mbox/MboxFolder.java \
+$(src)/gnu/mail/providers/mbox/MboxMessage.java \
+$(src)/gnu/mail/providers/mbox/MboxOutputStream.java \
+$(src)/gnu/mail/providers/mbox/MboxStore.java \
+$(src)/gnu/mail/providers/maildir/MaildirFolder.java \
+$(src)/gnu/mail/providers/maildir/MaildirMessage.java \
+$(src)/gnu/mail/providers/maildir/MaildirStore.java
 
-@ENABLE_SMTP_FALSE@smtp_sources = 
-
-# The SMTP provider
-@ENABLE_SMTP_TRUE@smtp_sources = \
-@ENABLE_SMTP_TRUE@$(src)/gnu/mail/providers/smtp/SMTPTransport.java
-
-@ENABLE_IMAP_FALSE@imap_sources = 
-
-# The IMAP provider
-@ENABLE_IMAP_TRUE@imap_sources = \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/ACL.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPFlags.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPFolder.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMessage.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipart.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/IMAPStore.java \
-@ENABLE_IMAP_TRUE@$(src)/gnu/mail/providers/imap/Rights.java
-
-@ENABLE_POP3_FALSE@pop3_sources = 
-
-# POP3 protocol
-@ENABLE_POP3_TRUE@pop3_sources = \
-@ENABLE_POP3_TRUE@$(src)/gnu/mail/providers/pop3/POP3Folder.java \
-@ENABLE_POP3_TRUE@$(src)/gnu/mail/providers/pop3/POP3Message.java \
-@ENABLE_POP3_TRUE@$(src)/gnu/mail/providers/pop3/POP3Store.java
-
-@ENABLE_NNTP_FALSE@nntp_sources = 
-
-# News protocol
-@ENABLE_NNTP_TRUE@nntp_sources = \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/ListFolderListener.java \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPFolder.java \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPMessage.java \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPRootFolder.java \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPStore.java \
-@ENABLE_NNTP_TRUE@$(src)/gnu/mail/providers/nntp/NNTPTransport.java
-
-@ENABLE_MBOX_FALSE@mbox_sources = 
-
-# Mbox provider.
-@ENABLE_MBOX_TRUE@mbox_sources = \
-@ENABLE_MBOX_TRUE@$(src)/gnu/mail/providers/mbox/MboxFolder.java \
-@ENABLE_MBOX_TRUE@$(src)/gnu/mail/providers/mbox/MboxMessage.java \
-@ENABLE_MBOX_TRUE@$(src)/gnu/mail/providers/mbox/MboxOutputStream.java \
-@ENABLE_MBOX_TRUE@$(src)/gnu/mail/providers/mbox/MboxStore.java
-
-@ENABLE_MAILDIR_FALSE@maildir_sources = 
-
-# Maildir message store provider.
-@ENABLE_MAILDIR_TRUE@maildir_sources = \
-@ENABLE_MAILDIR_TRUE@$(src)/gnu/mail/providers/maildir/MaildirFolder.java \
-@ENABLE_MAILDIR_TRUE@$(src)/gnu/mail/providers/maildir/MaildirMessage.java \
-@ENABLE_MAILDIR_TRUE@$(src)/gnu/mail/providers/maildir/MaildirStore.java
-
-@ENABLE_SMTP_FALSE@smtp_package_name = 
 
 # Package names for Javadoc
-@ENABLE_SMTP_TRUE@smtp_package_name = gnu.mail.providers.smtp
-@ENABLE_IMAP_FALSE@imap_package_name = 
-@ENABLE_IMAP_TRUE@imap_package_name = gnu.mail.providers.imap
-@ENABLE_POP3_FALSE@pop3_package_name = 
-@ENABLE_POP3_TRUE@pop3_package_name = gnu.mail.providers.pop3
-@ENABLE_NNTP_FALSE@nntp_package_name = 
-@ENABLE_NNTP_TRUE@nntp_package_name = gnu.mail.providers.nntp
-@ENABLE_MBOX_FALSE@mbox_package_name = 
-@ENABLE_MBOX_TRUE@mbox_package_name = gnu.mail.providers.mbox
-@ENABLE_MAILDIR_FALSE@maildir_package_name = 
-@ENABLE_MAILDIR_TRUE@maildir_package_name = gnu.mail.providers.maildir
 package_names = \
 javax.mail \
 javax.mail.event \
 javax.mail.internet \
 javax.mail.search \
-$(smtp_package_name) \
-$(imap_package_name) \
-$(pop3_package_name) \
-$(nntp_package_name) \
-$(mbox_package_name) \
-$(maildir_package_name) \
-gnu.mail.util
+gnu.mail.util \
+gnu.mail.providers.smtp \
+gnu.mail.providers.imap \
+gnu.mail.providers.pop3 \
+gnu.mail.providers.nntp \
+gnu.mail.providers.mbox \
+gnu.mail.providers.maildir
 
 
 # The GNU JAF library.
@@ -462,7 +407,7 @@ activation_jar = @ACTIVATION_JAR@
 inetlib_jar = @INETLIB_JAR@
 
 # The JSSE library.
-jsse_jar = @JSSE_JAR@
+#jsse_jar = @JSSE_JAR@
 
 # Resources
 src_l10n = \
@@ -476,30 +421,18 @@ gnumail_meta = \
 META-INF/COPYING \
 META-INF/mime.types \
 META-INF/mailcap \
-META-INF/javamail.charset.map
-
-providers_meta = \
+META-INF/javamail.charset.map \
 META-INF/javamail.default.providers \
 META-INF/javamail.default.address.map
 
 manifest_mf = @srcdir@/MANIFEST.MF
 
 # Classpaths
-classpath = $(src):$(activation_jar):$(inetlib_jar):$(jsse_jar)
+classpath = $(src):$(dst)
 
 # Targets
-BUILT_SOURCES = $(gnumail_jar) $(providers_jar)
-
-#£EXTRA_DIST = jarcompiler $(API_JAVASRC) $(GNU_SRC) $(MAIL_META)
-gnumail_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(gnumail_sources))
-util_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(util_sources))
-provider_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(provider_sources))
-smtp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(smtp_sources))
-imap_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(imap_sources))
-pop3_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(pop3_sources))
-nntp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(nntp_sources))
-mbox_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(mbox_sources))
-maildir_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(maildir_sources))
+BUILT_SOURCES = $(gnumail_jar)
+classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 dst_l10n = $(patsubst $(src)/%, $(dst)/%, $(src_l10n))
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -832,106 +765,46 @@ uninstall-am:
 
 
 META-INF:
-	mkdir -p META-INF
+	mkdir -p $@
 
 META-INF/COPYING: META-INF @srcdir@/COPYING
-	cp @srcdir@/COPYING META-INF/COPYING
+	cp @srcdir@/COPYING $@
 
 META-INF/mime.types: META-INF @srcdir@/mime.types
-	cp @srcdir@/mime.types META-INF/mime.types
+	cp @srcdir@/mime.types $@
 
 META-INF/mailcap: META-INF @srcdir@/mailcap
-	cp @srcdir@/mailcap META-INF/mailcap
+	cp @srcdir@/mailcap $@
 
 META-INF/javamail.charset.map: META-INF @srcdir@/javamail.charset.map
-	cp @srcdir@/javamail.charset.map META-INF/javamail.charset.map
+	cp @srcdir@/javamail.charset.map $@
 
-META-INF/javamail.default.providers: META-INF
-	echo "# javamail.providers for GNU JavaMail" > javamail.providers
-@ENABLE_SMTP_TRUE@	grep "protocol=smtp" @srcdir@/javamail.providers.in >> javamail.providers
-@ENABLE_IMAP_TRUE@	grep "protocol=imap" @srcdir@/javamail.providers.in >> javamail.providers
-@ENABLE_POP3_TRUE@	grep "protocol=pop3" @srcdir@/javamail.providers.in >> javamail.providers
-@ENABLE_NNTP_TRUE@	grep "protocol=nntp" @srcdir@/javamail.providers.in >> javamail.providers
-@ENABLE_MBOX_TRUE@	grep "protocol=mbox" @srcdir@/javamail.providers.in >> javamail.providers
-@ENABLE_MAILDIR_TRUE@	grep "protocol=maildir" @srcdir@/javamail.providers.in >> javamail.providers
-	cp javamail.providers META-INF/javamail.default.providers
+META-INF/javamail.default.providers: META-INF @srcdir@/javamail.providers
+	cp @srcdir@/javamail.providers $@
 
-META-INF/javamail.default.address.map: META-INF javamail.address.map
-	cp javamail.address.map META-INF/javamail.default.address.map
+META-INF/javamail.default.address.map: META-INF @srcdir@/javamail.address.map
+	cp @srcdir@/javamail.address.map $@
 
-javamail.address.map:
-	rm -f javamail.address.map
-@ENABLE_SMTP_TRUE@	echo "rfc822=smtp" >> javamail.address.map
-@ENABLE_NNTP_TRUE@	echo "news=nntp-post" >> javamail.address.map
-
+# Prepare classes location
 $(dst):
-	test ! -d $(dst) && mkdir $(dst)
+	mkdir -p $(dst)
+	cd $(dst) && $(JAR) xf $(activation_jar) javax gnu
+	cd $(dst) && $(JAR) xf $(inetlib_jar) gnu/inet/imap gnu/inet/smtp gnu/inet/nntp gnu/inet/pop3 gnu/inet/util
 
 $(dst_l10n): $(dst)/%: $(src)/% $(dst)
 	cp $< $@
 
 # Jars
 
-$(gnumail_jar): $(dst) $(gnumail_meta) $(gnumail_classes) $(util_classes) $(dst_l10n)
+$(gnumail_jar): $(dst) $(gnumail_meta) $(classes) $(dst_l10n)
 	$(JAR) cfm $(gnumail_jar) $(manifest_mf) \
 		$(gnumail_meta) \
 		-C $(dst) javax \
-		-C $(dst) gnu/mail/handler \
-		-C $(dst) gnu/mail/util 
-
-$(providers_jar): $(dst) $(providers_meta) $(provider_classes) $(smtp_classes) \
-	$(imap_classes) $(pop3_classes) $(nntp_classes) $(mbox_classes) \
-	$(maildir_classes)
-	$(JAR) cfm $(providers_jar) $(manifest_mf) \
-		$(providers_meta) \
-		-C $(dst) gnu/mail/providers \
-		-C $(dst) gnu/mail/treeutil
+		-C $(dst) gnu
 
 # Compilation
 
-#gnumail: util $(gnumail_classes)
-
-$(gnumail_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#util: $(util_classes)
-
-$(util_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#provider_util: $(gnumail_jar) $(provider_classes)
-
-$(provider_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#smtp: provider_util $(smtp_classes)
-
-$(smtp_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#imap: provider_util $(imap_classes)
-
-$(imap_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#pop3: provider_util $(pop3_classes)
-
-$(pop3_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#nntp: provider_util $(nntp_classes)
-
-$(nntp_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#mbox: provider_util $(mbox_classes)
-
-$(mbox_classes): $(dst)/%.class: $(src)/%.java
-	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
-
-#maildir: provider_util $(maildir_classes)
-
-$(maildir_classes): $(dst)/%.class: $(src)/%.java
+$(classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(classpath) -d $(dst) $<
 
 # Javadoc
@@ -942,13 +815,11 @@ javadoc:
 
 # Remove jar files and directories
 clean-local:
-	rm -f javamail.address.map javamail.providers
-	rm -rf $(gnumail_jar) $(providers_jar) META-INF $(dst) $(doc)
+	rm -rf $(gnumail_jar) META-INF $(dst) $(doc)
 
 install-data-local:
 	@srcdir@/mkinstalldirs $(DESTDIR)/$(datadir)/java
 	$(INSTALL_DATA) $(gnumail_jar) $(DESTDIR)/$(datadir)/java
-	$(INSTALL_DATA) $(providers_jar) $(DESTDIR)/$(datadir)/java
 
 # End of Makefile.am
 
