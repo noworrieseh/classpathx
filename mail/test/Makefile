@@ -8,13 +8,13 @@ JAVA = jamvm
 JAVAC = javac
 JAVAC_OPTS = 
 JAR = jar
-CLASSPATH = /gnu/share/classpath/glibj.zip
+CLASSPATH = 
 
-prefix = /gnu/share/java
-extra = /gnu/share/java
+prefix = /usr/local/share/java
+extra = /usr/local/share/java
 
 OPTIONS = -Dmail.pop3.apop=false -Dmail.debug=true -Djavax.net.debug=true \
--Dmail.smtp.host=bluezoo.org -Dmail.smtp.auth=required \
+-Dmail.smtp.host=smtp.gmail.com -Dmail.smtp.auth=required \
 -Djava.util.logging.config.file=logging.properties
 
 all: test
@@ -24,9 +24,6 @@ test_sourcefiles=$(shell find $(test_sourcedir) -name "*.java" -print)
 test_classpath=$(prefix)/gnumail.jar $(prefix)/gnumail-providers.jar \
 $(prefix)/activation.jar $(prefix)/inetlib.jar \
 $(extra)/junit.jar
-#$(prefix)/jsse.jar $(prefix)/jessie.jar \
-#$(prefix)/javax-security.jar $(prefix)/gnu-crypto.jar \
-#$(prefix)/javax-crypto.jar
 test_classesdest=$(PROJECTROOT)/classes
 test_otherfiles=
 test_debugclasses=$(test_sourcefiles:.java=.class)
