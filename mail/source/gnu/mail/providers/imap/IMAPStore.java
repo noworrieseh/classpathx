@@ -42,6 +42,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
 import javax.mail.PasswordAuthentication;
+import javax.mail.QuotaAwareStore;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.StoreClosedException;
@@ -63,6 +64,7 @@ import gnu.inet.util.LaconicFormatter;
  */
 public class IMAPStore
   extends Store
+  implements QuotaAwareStore
 {
 
   /**
@@ -560,7 +562,7 @@ public class IMAPStore
    * Returns the quota for the specified quota root.
    * @param root the quota root
    */
-  public Quota getQuota(String root)
+  public javax.mail.Quota[] getQuota(String root)
     throws MessagingException
   {
     if (!super.isConnected())
@@ -571,7 +573,29 @@ public class IMAPStore
       {
         try
           {
-            return connection.getquota(root);
+            Quota[] sqa = connection.getquotaroot(root);
+            if (sqa == null)
+              {
+                return new javax.mail.Quota[0];
+              }
+            javax.mail.Quota[] tqa = new javax.mail.Quota[sqa.length];
+            for (int i = 0; i < tqa.length; i++)
+              {
+                Quota sq = sqa[i];
+                javax.mail.Quota tq = new javax.mail.Quota(sq.getQuotaRoot());
+                Quota.Resource[] sr = sq.getResources();
+                javax.mail.Quota.Resource[] tr =
+                new javax.mail.Quota.Resource[sr.length];
+                for (int j = 0; j < sr.length; j++)
+                {
+                    tr[j] = new javax.mail.Quota.Resource(sr[j].getName(),
+                            sr[j].getCurrentUsage(),
+                            sr[j].getLimit());
+                }
+                tq.resources = tr;
+                tqa[i] = tq;
+              }
+            return tqa;
           }
         catch (IOException e)
           {
@@ -582,10 +606,9 @@ public class IMAPStore
 
   /**
    * Sets the quota resource set for the specified quota root.
-   * @param root the quota root
-   * @param resources the quota resources to set
+   * @param quota the mail quota
    */
-  public void setQuota(String root, Quota.Resource[] resources)
+  public void setQuota(javax.mail.Quota quota)
     throws MessagingException
   {
     if (!super.isConnected())
@@ -596,7 +619,14 @@ public class IMAPStore
       {
         try
           {
-            connection.setquota(root, resources);
+            String root = quota.quotaRoot;
+            Quota.Resource tr[] = new Quota.Resource[quota.resources.length];
+            for (int i = 0; i < tr.length; i++)
+              {
+                javax.mail.Quota.Resource sr = quota.resources[i];
+                tr[i] = new Quota.Resource(sr.name, (int) sr.limit);
+              }
+            connection.setquota(root, tr);
           }
         catch (IOException e)
           {

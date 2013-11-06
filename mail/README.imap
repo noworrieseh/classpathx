@@ -8,14 +8,15 @@ Features:
 - authentication via SASL
 - TLS
 - ANSI coloured debug output! (set session property mail.debug.ansi=true)
-- currently tested against UW imapd and GNU mailutils imapd
+- currently tested against UW imapd, GNU mailutils imapd, and GMail
+- IMAPFolder implements UIDFolder for disconnected operation
+- quota support
 
 For more information, see the Javadoc for the gnu.mail.providers.imap
 package.
 
 Todo:
 - implement message/* body parts
-- write the UID code and make IMAPFolder implement UIDFolder
 - test against as many IMAP servers as possible
 
 If you want to help with this provider, please contact dog@gnu.org
