@@ -120,7 +120,7 @@ public class IMAPConnection
   /**
    * The logger used for IMAP protocol traces.
    */
-  public final Logger logger = Logger.getLogger("gnu.inet.imap");
+  private final Logger logger = Logger.getLogger("gnu.inet.imap");
 
   /**
    * The socket used for communication with the server.
@@ -270,6 +270,14 @@ public class IMAPConnection
     
     asyncResponses = new ArrayList();
     alerts = new ArrayList();
+  }
+
+  /**
+   * Returns the logger used by this connection for debug output.
+   */
+  public Logger getLogger()
+  {
+    return logger;
   }
 
   /**

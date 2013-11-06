@@ -136,7 +136,7 @@ public class POP3Connection
   /**
    * The logger used for POP3 protocol traces.
    */
-  public final Logger logger = Logger.getLogger("gnu.inet.pop3");
+  private final Logger logger = Logger.getLogger("gnu.inet.pop3");
 
   /**
    * The socket used to communicate with the server.
@@ -302,6 +302,14 @@ public class POP3Connection
       }
     // APOP timestamp
     timestamp = parseTimestamp(response);
+  }
+
+  /**
+   * Returns the logger used by this connection for debug output.
+   */
+  public Logger getLogger()
+  {
+    return logger;
   }
 
   /**

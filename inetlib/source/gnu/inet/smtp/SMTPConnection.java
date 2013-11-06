@@ -123,7 +123,7 @@ public class SMTPConnection
   /**
    * The logger used for SMTP protocol traces.
    */
-  public final Logger logger = Logger.getLogger("gnu.inet.smtp");
+  private final Logger logger = Logger.getLogger("gnu.inet.smtp");
 
   /**
    * The underlying socket used for communicating with the server.
@@ -318,6 +318,14 @@ public class SMTPConnection
     greeting = greetingBuffer.toString();
   }
   
+  /**
+   * Returns the logger used by this connection for debug output.
+   */
+  public Logger getLogger()
+  {
+    return logger;
+  }
+
   /**
    * Returns the server greeting message.
    */

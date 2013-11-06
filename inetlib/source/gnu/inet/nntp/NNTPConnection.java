@@ -105,7 +105,7 @@ public class NNTPConnection
   /**
    * The logger used for NNTP protocol traces.
    */
-  public final Logger logger = Logger.getLogger("gnu.inet.nntp");
+  private final Logger logger = Logger.getLogger("gnu.inet.nntp");
 
   /**
    * The hostname of the host we are connected to.
@@ -306,6 +306,14 @@ public class NNTPConnection
       }
   }
   
+  /**
+   * Returns the logger used by this connection for debug output.
+   */
+  public Logger getLogger()
+  {
+    return logger;
+  }
+
   /**
    * Negotiate TLS over the current connection.
    * This depends on many features, such as the JSSE classes being in the

@@ -14,7 +14,9 @@ src = @srcdir@/source
 dst = classes
 doc = @srcdir@/docs
 
+version = 1.1.3
 inetlib_jar = inetlib.jar
+inetlib_version_jar = inetlib-$(version).jar
 
 # Utility and helper classes for the clients.
 util_sources = \
@@ -181,7 +183,7 @@ gnu.inet.ldap \
 gnu.inet.comsat
 
 # Targets
-BUILT_SOURCES = $(inetlib_jar)
+BUILT_SOURCES = $(inetlib_version_jar)
 
 jsse = @JSSE_JAR@
 sasl = @SASL_JAR@
@@ -207,8 +209,9 @@ comsat_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(comsat_sources))
 
 # Jar
 
-$(inetlib_jar): $(dst) $(META_INF_FILES) $(smtp_classes) $(imap_classes) $(pop3_classes) $(nntp_classes) $(ftp_classes) $(gopher_classes) $(finger_classes) $(http_classes) $(ldap_classes) $(comsat_classes)
-	$(JAR) cf $(inetlib_jar) -C $(dst) META-INF -C $(dst) gnu
+$(inetlib_version_jar): $(dst) $(META_INF_FILES) $(smtp_classes) $(imap_classes) $(pop3_classes) $(nntp_classes) $(ftp_classes) $(gopher_classes) $(finger_classes) $(http_classes) $(ldap_classes) $(comsat_classes)
+	$(JAR) cf $(inetlib_version_jar) -C $(dst) META-INF -C $(dst) gnu
+	ln -s $(inetlib_version_jar) $(inetlib_jar)
 
 $(dst):
 	mkdir -p $(dst)
@@ -280,10 +283,10 @@ javadoc:
 	$(JAVADOC) -d $(doc) -windowtitle "GNU inetlib API documentation" -sourcepath $(src) $(package_names)
 
 clean-local:
-	rm -rf $(META_INF) $(doc) $(inetlib_jar)
+	rm -rf $(META_INF) $(doc) $(inetlib_version_jar) $(inetlib_jar)
 	find $(dst) -name '*.class' -exec rm -f '{}' ';'
 
 datadir = $(prefix)/share/java
-data_DATA = $(inetlib_jar)
+data_DATA = $(inetlib_jar) $(inetlib_version_jar)
 
 # End of Makefile.am
