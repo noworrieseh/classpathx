@@ -175,12 +175,12 @@ public class NNTPStore extends Store
                                           tls, tm, false);
           if (session.getDebug())
             {
-              connection.logger.setLevel(NNTPConnection.NNTP_TRACE);
+              connection.getLogger().setLevel(NNTPConnection.NNTP_TRACE);
               Formatter formatter = new LaconicFormatter();
               Handler handler =
                 new StreamHandler(session.getDebugOut(), formatter);
               handler.setLevel(Level.ALL);
-              connection.logger.addHandler(handler);
+              connection.getLogger().addHandler(handler);
               logger.setLevel(NNTPConnection.NNTP_TRACE);
               logger.addHandler(handler);
             }

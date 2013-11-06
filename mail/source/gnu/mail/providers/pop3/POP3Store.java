@@ -135,7 +135,7 @@ public final class POP3Store
                                             tls, tm, false);
             if (session.getDebug())
               {
-                Logger logger = connection.logger;
+                Logger logger = connection.getLogger();
                 logger.setLevel(POP3Connection.POP3_TRACE);
                 Formatter formatter = new LaconicFormatter();
                 Handler handler =

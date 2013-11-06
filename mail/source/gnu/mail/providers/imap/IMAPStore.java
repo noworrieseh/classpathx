@@ -135,7 +135,7 @@ public class IMAPStore
                                             tls, tm);
             if (session.getDebug())
               {
-                Logger logger = connection.logger;
+                Logger logger = connection.getLogger();
                 logger.setLevel(IMAPConnection.IMAP_TRACE);
                 Formatter formatter = new LaconicFormatter();
                 Handler handler =

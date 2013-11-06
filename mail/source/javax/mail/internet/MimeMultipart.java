@@ -390,6 +390,7 @@ public class MimeMultipart
             LineInputStream lis = new LineInputStream(is);
             String line;
             StringBuilder preambleBuf = null;
+            // Find start boundary
             while ((line = lis.readLine()) != null)
               {
                 String l = trim(line);

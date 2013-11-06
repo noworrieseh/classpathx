@@ -159,7 +159,7 @@ public class SMTPTransport
                                         tls, tm, false);
         if (session.getDebug())
           {
-            Logger logger = connection.logger;
+            Logger logger = connection.getLogger();
             logger.setLevel(SMTPConnection.SMTP_TRACE);
             Formatter formatter = new LaconicFormatter();
             Handler handler =

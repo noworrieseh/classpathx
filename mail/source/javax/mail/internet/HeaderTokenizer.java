@@ -399,8 +399,9 @@ public class HeaderTokenizer
         else if (c == endOfAtom)
           {
             String ret = needsNormalization ?
-              normalize(header, start, pos - 1, keepEscapes) :
-              header.substring(start, pos - 1);
+              normalize(header, start, pos, keepEscapes) :
+              header.substring(start, pos);
+            pos++;
             return new Token(Token.QUOTEDSTRING, ret);
           }
       }
@@ -411,8 +412,9 @@ public class HeaderTokenizer
         throw new ParseException(MessageFormat.format(m, args));
       }
     String ret = needsNormalization ?
-      normalize(header, start, pos - 1, keepEscapes) :
-      header.substring(start, pos - 1);
+      normalize(header, start, pos, keepEscapes) :
+      header.substring(start, pos);
+    pos++;
     return new Token(Token.QUOTEDSTRING, ret);
   }
 

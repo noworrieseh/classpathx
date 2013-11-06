@@ -118,9 +118,11 @@ public final class Session
   {
     this.props = props;
     this.authenticator = authenticator;
+    String m;
+    Object[] args;
     debug = new Boolean(props.getProperty("mail.debug")).booleanValue();
     logger.setLevel(debug ? Level.FINER : Level.SEVERE);
-    logger.info("using GNU JavaMail 1.3");
+    logger.info(L10N.getString("log.startup_notice"));
     ClassLoader loader = null;
     if (authenticator == null)
       {
@@ -141,17 +143,21 @@ public final class Session
       }
     catch (FileNotFoundException e)
       {
-        logger.log(Level.WARNING, "no system providers", e);
+        m = L10N.getString("log.no_system_providers");
+        logger.log(Level.WARNING, m, e);
       }
-    logger.log(Level.FINE, "Providers by class name: "
-               + providersByClassName.toString());
-    logger.log(Level.FINE, "Providers by protocol: "
-               + providersByProtocol.toString());
+    if (logger.isLoggable(Level.FINE))
+      {
+        m = L10N.getString("log.providers_by_class");
+        args = new Object[] { providersByClassName.toString() };
+        logger.log(Level.FINE, MessageFormat.format(m, args));
+        m = L10N.getString("log.providers_by_protocol");
+        args = new Object[] { providersByProtocol.toString() };
+        logger.log(Level.FINE, MessageFormat.format(m, args));
+      }
     // Load the address map
-    loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP),
-                   "default");
-    loadAddressMap(getResourceAsStream(loader, CUSTOM_ADDRESS_MAP),
-                   "custom");
+    loadAddressMap(getResourceAsStream(loader, DEFAULT_ADDRESS_MAP), "default");
+    loadAddressMap(getResourceAsStream(loader, CUSTOM_ADDRESS_MAP), "custom");
     try
       {
         File file = new File(SYSTEM_ADDRESS_MAP);
@@ -160,7 +166,8 @@ public final class Session
       }
     catch (FileNotFoundException e)
       {
-        logger.log(Level.WARNING, "no system address map", e);
+        m = L10N.getString("log.no_system_address_map");
+        logger.log(Level.WARNING, m, e);
       }
   }
 
@@ -198,9 +205,14 @@ public final class Session
    */
   private void loadProviders(InputStream in, String description)
   {
+    description = L10N.getString("log." + description);
+    String m;
+    Object[] args;
     if (in == null)
       {
-        logger.info("no " + description + " providers");
+        m = L10N.getString("log.no_providers");
+        args = new Object[] { description };
+        logger.info(MessageFormat.format(m, args));
         return;
       }
     try
@@ -256,7 +268,9 @@ public final class Session
 
                 if (type == null || protocol == null || className == null)
                   {
-                    logger.warning("Invalid provider: " + line);
+                    m = L10N.getString("log.bad_provider");
+                    args = new Object[] { line };
+                    logger.warning(MessageFormat.format(m, args));
                   }
                 else
                   {
@@ -272,7 +286,9 @@ public final class Session
               }
           }
         in.close();
-        logger.info("loaded " + description + " providers");
+        m = L10N.getString("log.loaded_providers");
+        args = new Object[] { description };
+        logger.info(MessageFormat.format(m, args));
       }
     catch (IOException e)
       {
@@ -280,23 +296,31 @@ public final class Session
       }
     catch (SecurityException e)
       {
-        logger.log(Level.WARNING, "can't load " + description +
-                   " providers", e);
+        m = L10N.getString("log.not_loaded_providers");
+        args = new Object[] { description };
+        logger.log(Level.WARNING, MessageFormat.format(m, args), e);
       }
   }
 
   private void loadAddressMap(InputStream in, String description)
   {
+    description = L10N.getString("log." + description);
+    String m;
+    Object[] args;
     if (in == null)
       {
-        logger.info("no " + description + " address map");
+        m = L10N.getString("log.no_address_map");
+        args = new Object[] { description };
+        logger.info(MessageFormat.format(m, args));
         return;
       }
     try
       {
         addressMap.load(in);
         in.close();
-        logger.info("loaded " + description + " address map");
+        m = L10N.getString("log.loaded_address_map");
+        args = new Object[] { description };
+        logger.info(MessageFormat.format(m, args));
       }
     catch (IOException e)
       {
@@ -304,8 +328,9 @@ public final class Session
       }
     catch (SecurityException e)
       {
-        logger.log(Level.WARNING, "can't load " + description +
-                   " address map", e);
+        m = L10N.getString("log.not_loaded_address_map");
+        args = new Object[] { description };
+        logger.log(Level.WARNING, MessageFormat.format(m, args), e);
       }
   }
 

@@ -277,6 +277,12 @@ inetlib_jar = @INETLIB_JAR@
 # The JSSE library.
 jsse_jar = @JSSE_JAR@
 
+# Resources
+src_l10n = \
+$(src)/javax/mail/L10N.properties \
+$(src)/javax/mail/internet/L10N.properties \
+$(src)/javax/mail/util/L10N.properties
+
 # The META stuff
 gnumail_meta = \
 META-INF/COPYING \
@@ -307,6 +313,7 @@ pop3_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(pop3_sources))
 nntp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(nntp_sources))
 mbox_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(mbox_sources))
 maildir_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(maildir_sources))
+dst_l10n = $(patsubst $(src)/%, $(dst)/%, $(src_l10n))
 
 META-INF:
 	mkdir -p META-INF
@@ -360,9 +367,12 @@ endif
 $(dst):
 	test ! -d $(dst) && mkdir $(dst)
 
+$(dst_l10n): $(dst)/%: $(src)/% $(dst)
+	cp $< $@
+
 # Jars
 
-$(gnumail_jar): $(dst) $(gnumail_meta) $(gnumail_classes) $(util_classes)
+$(gnumail_jar): $(dst) $(gnumail_meta) $(gnumail_classes) $(util_classes) $(dst_l10n)
 	$(JAR) cfm $(gnumail_jar) $(manifest_mf) \
 		$(gnumail_meta) \
 		-C $(dst) javax \

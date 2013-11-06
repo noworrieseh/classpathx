@@ -166,7 +166,7 @@ public class ParameterList
         for (int i = 0; i < len; i++)
           {
             String key = names.get(i);
-            String value = list.get(key);
+            String value = unquote(list.get(key));
             int si = key.lastIndexOf('*');
             if (si == key.length() - 1)
               {
@@ -228,7 +228,7 @@ public class ParameterList
       }
     finally
       {
-        // Concatenate the segments and put into lookup table
+        // Concatenate the segments and put into list
         Map<String,String> lookup = new HashMap<String,String>();
         for (Iterator<String> i = segments.keySet().iterator(); i.hasNext(); )
           {
@@ -240,31 +240,7 @@ public class ParameterList
               {
                 buf.append(values.get(j));
               }
-            lookup.put(key, buf.toString());
-          }
-        // Now work out whether the keys in the lookup table correspond to a
-        // parameter value or a key in the list
-        // Damn your eyes RFC2231 for not making this explicit
-        Set<String> isValue = new HashSet<String>();
-        for (Iterator<String> i = list.keySet().iterator(); i.hasNext(); )
-          {
-            String key = i.next();
-            String value = list.get(key);
-            if (lookup.containsKey(value))
-              {
-                list.put(key, lookup.get(value));
-                isValue.add(value);
-              }
-          }
-        // Anything else has got to be a key
-        // although values might also be keys, who knows?
-        for (Iterator<String> i = lookup.keySet().iterator(); i.hasNext(); )
-          {
-            String key = i.next();
-            if (!isValue.contains(key))
-              {
-                list.put(key, lookup.get(key));
-              }
+            list.put(key, buf.toString());
           }
       }
   }
@@ -455,6 +431,11 @@ public class ParameterList
                     int clen = needsEncoding ? 3 : 1;
                     if (used + len + clen > 76)
                       {
+                        buf.append("\r\n\t");
+                        used = 8;
+                      }
+                    if (used + len + clen > 76)
+                      {
                         buf.append(key);
                         buf.append('*');
                         buf.append(segmentIndexString);
@@ -499,6 +480,11 @@ public class ParameterList
         if (!handled)
           {
             int vlen = value.length();
+            if (used + klen + 1 + vlen > 76)
+              {
+                buf.append("\r\n\t");
+                used = 8;
+              }
             if (used + klen + 1 + vlen > 76)
               {
                 StringBuilder vb = new StringBuilder();
@@ -546,16 +532,13 @@ public class ParameterList
     return buf.toString();
   }
 
-  /**
-   * If a value is all ASCII it doesn't need encoding.
-   */
   private static boolean needsEncoding(String value)
   {
     int len = value.length();
     for (int i = 0; i < len; i++)
       {
         char c = value.charAt(i);
-        if (c < 32 || c > 126)
+        if (c < 32 || c > 126 || c == ';' || c == '"')
           {
             return true;
           }
