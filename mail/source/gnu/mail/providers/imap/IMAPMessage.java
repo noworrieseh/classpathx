@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 import javax.mail.internet.ContentType;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.ParameterList;
 
@@ -300,7 +302,67 @@ extends ReadOnlyMessage
           }
         else if (key == IMAPConstants.ENVELOPE)
           {
-            // TODO
+            List elist = (List) code.get(++i);
+            if (elist != null && elist.size() == 10)
+              {
+                String date = getString(elist, 0);
+                String subject = getString(elist, 1);
+                InternetAddress[] from = getAddressList(elist, 2);
+                InternetAddress[] sender = getAddressList(elist, 3);
+                InternetAddress[] replyTo = getAddressList(elist, 4);
+                InternetAddress[] to = getAddressList(elist, 5);
+                InternetAddress[] cc = getAddressList(elist, 6);
+                InternetAddress[] bcc = getAddressList(elist, 7);
+                String inReplyTo = getString(elist, 8);
+                String messageId = getString(elist, 9);
+                if (headers == null)
+                  {
+                    headers = new InternetHeaders();
+                  }
+                if (date != null)
+                  {
+                    headers.setHeader("Date", date);
+                  }
+                if (subject != null)
+                  {
+                    headers.setHeader("Subject", subject);
+                  }
+                if (inReplyTo != null)
+                  {
+                    headers.setHeader("In-Reply-To", inReplyTo);
+                  }
+                if (messageId != null)
+                  {
+                    headers.setHeader("Message-ID", messageId);
+                  }
+                if (from != null)
+                  {
+                    headers.setHeader("From", InternetAddress.toString(from));
+                  }
+                if (sender != null)
+                  {
+                    headers.setHeader("Sender",
+                            InternetAddress.toString(sender));
+                  }
+                if (replyTo != null)
+                  {
+                    headers.setHeader("Reply-To",
+                            InternetAddress.toString(replyTo));
+                  }
+                if (to != null)
+                  {
+                    headers.setHeader("To", InternetAddress.toString(to));
+                  }
+                if (cc != null)
+                  {
+                    headers.setHeader("Cc", InternetAddress.toString(cc));
+                  }
+                if (bcc != null)
+                  {
+                    headers.setHeader("Bcc", InternetAddress.toString(bcc));
+                  }
+                // NB headers not complete
+              }
           }
         else if (key == IMAPConstants.FLAGS)
           {
@@ -832,6 +894,85 @@ extends ReadOnlyMessage
         flags = null; // will be re-read next time
         throw new MessagingException(e.getMessage(), e);
       }
+  }
+
+  private String getString(List list, int index)
+  {
+    if (list == null)
+      {
+        return null;
+      }
+    Object o = list.get(index);
+    if (o instanceof String)
+      {
+        String s = (String) o;
+        int len = s.length();
+        if (len > 1 && s.charAt(0) == '"' && s.charAt(len - 1) == '"')
+          {
+            return s.substring(1, len - 1);
+          }
+      }
+    return null;
+  }
+
+  private Date getDate(List list, int index)
+  {
+    String s = getString(list, index);
+    if (s != null)
+      {
+        try
+          {
+            return internalDateFormat.parse(s);
+          }
+        catch (ParseException e)
+          {
+            // NOOP
+          }
+      }
+    return null;
+  }
+
+  private InternetAddress[] getAddressList(List list, int index)
+  {
+    List l = (List) list.get(index);
+    if (l != null)
+      {
+        List acc = new ArrayList();
+        for (Iterator i = l.iterator(); i.hasNext(); )
+          {
+            Object o = i.next();
+            if (o instanceof List)
+              {
+                List addr = (List) o;
+                if (addr.size() == 4)
+                  {
+                    String personal = getString(addr, 0);
+                    String mailbox = getString(addr, 2);
+                    String host = getString(addr, 3);
+                    String address = null;
+                    if (host != null) // ignore groups for now
+                      {
+                        address = mailbox + "@" + host;
+                      }
+                    if (address  != null)
+                      {
+                        try
+                          {
+                            acc.add(new InternetAddress(address, personal));
+                          }
+                        catch (UnsupportedEncodingException e)
+                          {
+                            // NOOP
+                          }
+                      }
+                  }
+              }
+          }
+        InternetAddress[] ret = new InternetAddress[acc.size()];
+        acc.toArray(ret);
+        return ret;
+      }
+    return null;
   }
 
   // -- Utility --
