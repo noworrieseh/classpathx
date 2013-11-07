@@ -18,8 +18,7 @@ version = 1.1.3
 inetlib_jar = inetlib.jar
 inetlib_version_jar = inetlib-$(version).jar
 
-# Utility and helper classes for the clients.
-util_sources = \
+sources = \
 $(src)/gnu/inet/util/BASE64.java \
 $(src)/gnu/inet/util/CRLFInputStream.java \
 $(src)/gnu/inet/util/CRLFOutputStream.java \
@@ -36,17 +35,11 @@ $(src)/gnu/inet/util/SaslInputStream.java \
 $(src)/gnu/inet/util/SaslLogin.java \
 $(src)/gnu/inet/util/SaslOutputStream.java \
 $(src)/gnu/inet/util/SaslPlain.java \
-$(src)/gnu/inet/util/TraceLevel.java
-
-# The SMTP client
-smtp_sources = \
+$(src)/gnu/inet/util/TraceLevel.java \
 $(src)/gnu/inet/smtp/Parameter.java \
 $(src)/gnu/inet/smtp/ParameterList.java \
 $(src)/gnu/inet/smtp/SMTPConnection.java \
-$(src)/gnu/inet/smtp/SMTPOutputStream.java
-
-# The IMAP client
-imap_sources = \
+$(src)/gnu/inet/smtp/SMTPOutputStream.java \
 $(src)/gnu/inet/imap/IMAPConnection.java \
 $(src)/gnu/inet/imap/IMAPConstants.java \
 $(src)/gnu/inet/imap/IMAPException.java \
@@ -60,14 +53,8 @@ $(src)/gnu/inet/imap/Namespaces.java \
 $(src)/gnu/inet/imap/Pair.java \
 $(src)/gnu/inet/imap/Quota.java \
 $(src)/gnu/inet/imap/UIDPlusHandler.java \
-$(src)/gnu/inet/imap/UTF7imap.java
-
-# The POP3 client
-pop3_sources = \
-$(src)/gnu/inet/pop3/POP3Connection.java
-
-# The NNTP client
-nntp_sources = \
+$(src)/gnu/inet/imap/UTF7imap.java \
+$(src)/gnu/inet/pop3/POP3Connection.java \
 $(src)/gnu/inet/nntp/ActiveTime.java \
 $(src)/gnu/inet/nntp/ActiveTimesIterator.java \
 $(src)/gnu/inet/nntp/ArticleNumberIterator.java \
@@ -91,10 +78,7 @@ $(src)/gnu/inet/nntp/Pair.java \
 $(src)/gnu/inet/nntp/PendingData.java \
 $(src)/gnu/inet/nntp/PostStream.java \
 $(src)/gnu/inet/nntp/Range.java \
-$(src)/gnu/inet/nntp/StatusResponse.java
-
-# The FTP client.
-ftp_sources = \
+$(src)/gnu/inet/nntp/StatusResponse.java \
 $(src)/gnu/inet/ftp/ActiveModeDTP.java \
 $(src)/gnu/inet/ftp/BlockInputStream.java \
 $(src)/gnu/inet/ftp/BlockOutputStream.java \
@@ -110,25 +94,16 @@ $(src)/gnu/inet/ftp/FTPURLConnection.java \
 $(src)/gnu/inet/ftp/Handler.java \
 $(src)/gnu/inet/ftp/PassiveModeDTP.java \
 $(src)/gnu/inet/ftp/StreamInputStream.java \
-$(src)/gnu/inet/ftp/StreamOutputStream.java
-
-# The Gopher client.
-gopher_sources = \
+$(src)/gnu/inet/ftp/StreamOutputStream.java \
 $(src)/gnu/inet/gopher/DirectoryEntry.java \
 $(src)/gnu/inet/gopher/DirectoryListing.java \
 $(src)/gnu/inet/gopher/GopherConnection.java \
 $(src)/gnu/inet/gopher/GopherContentHandler.java \
 $(src)/gnu/inet/gopher/GopherURLConnection.java \
-$(src)/gnu/inet/gopher/Handler.java
-
-# The finger client.
-finger_sources = \
+$(src)/gnu/inet/gopher/Handler.java \
 $(src)/gnu/inet/finger/FingerConnection.java \
 $(src)/gnu/inet/finger/FingerURLConnection.java \
-$(src)/gnu/inet/finger/Handler.java
-
-# The HTTP client.
-http_sources = \
+$(src)/gnu/inet/finger/Handler.java \
 $(src)/gnu/inet/http/Authenticator.java \
 $(src)/gnu/inet/http/ByteArrayRequestBodyWriter.java \
 $(src)/gnu/inet/http/ByteArrayResponseBodyReader.java \
@@ -148,10 +123,7 @@ $(src)/gnu/inet/http/SimpleCookieManager.java \
 $(src)/gnu/inet/http/event/ConnectionEvent.java \
 $(src)/gnu/inet/http/event/ConnectionListener.java \
 $(src)/gnu/inet/http/event/RequestEvent.java \
-$(src)/gnu/inet/http/event/RequestListener.java
-
-# The LDAP client.
-ldap_sources = \
+$(src)/gnu/inet/http/event/RequestListener.java \
 $(src)/gnu/inet/ldap/AttributeValues.java \
 $(src)/gnu/inet/ldap/BERConstants.java \
 $(src)/gnu/inet/ldap/BERDecoder.java \
@@ -160,10 +132,7 @@ $(src)/gnu/inet/ldap/BERException.java \
 $(src)/gnu/inet/ldap/LDAPConnection.java \
 $(src)/gnu/inet/ldap/LDAPResult.java \
 $(src)/gnu/inet/ldap/Modification.java \
-$(src)/gnu/inet/ldap/ResultHandler.java
-
-# The comsat client.
-comsat_sources = \
+$(src)/gnu/inet/ldap/ResultHandler.java \
 $(src)/gnu/inet/comsat/ComsatClient.java \
 $(src)/gnu/inet/comsat/ComsatInfo.java
 
@@ -193,24 +162,15 @@ INETLIB_CLASSPATH = $(dst):$(src):$(jsse):$(sasl):$(auth_callback)
 META_INF = $(dst)/META-INF
 META_INF_FILES = $(META_INF)/COPYING
 
-util_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(util_sources))
-smtp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(smtp_sources))
-imap_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(imap_sources))
-pop3_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(pop3_sources))
-nntp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(nntp_sources))
-ftp_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(ftp_sources))
-gopher_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(gopher_sources))
-finger_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(finger_sources))
-http_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(http_sources))
-ldap_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(ldap_sources))
-comsat_classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(comsat_sources))
+classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
 
 # Targets...
 
 # Jar
 
-$(inetlib_version_jar): $(dst) $(META_INF_FILES) $(smtp_classes) $(imap_classes) $(pop3_classes) $(nntp_classes) $(ftp_classes) $(gopher_classes) $(finger_classes) $(http_classes) $(ldap_classes) $(comsat_classes)
+$(inetlib_version_jar): $(dst) $(META_INF_FILES) $(classes)
 	$(JAR) cf $(inetlib_version_jar) -C $(dst) META-INF -C $(dst) gnu
+	rm -f $(inetlib_jar)
 	ln -s $(inetlib_version_jar) $(inetlib_jar)
 
 $(dst):
@@ -224,59 +184,8 @@ $(META_INF)/COPYING: $(META_INF) COPYING
 
 # Compilation
 
-$(util_classes): $(dst)/%.class: $(src)/%.java
+$(classes): $(dst)/%.class: $(src)/%.java
 	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-
-$(smtp_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_SMTP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-
-$(imap_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_IMAP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(pop3_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_POP3
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(nntp_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_NNTP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(ftp_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_FTP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(gopher_classes): $(dst)/%.class: $(src)/%.java $(util_classes)
-if ENABLE_GOPHER
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(finger_classes): $(dst)/%.class: $(src)/%.java
-if ENABLE_FINGER
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(http_classes): $(dst)/%.class: $(src)/%.java
-if ENABLE_HTTP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(ldap_classes): $(dst)/%.class: $(src)/%.java
-if ENABLE_LDAP
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
-
-$(comsat_classes): $(dst)/%.class: $(src)/%.java
-if ENABLE_COMSAT
-	$(JAVAC) $(JAVACFLAGS) -classpath $(INETLIB_CLASSPATH) -d $(dst) $<
-endif
 
 javadoc:
 	mkdir -p $(doc)
