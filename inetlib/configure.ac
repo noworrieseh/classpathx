@@ -22,13 +22,13 @@ dnl Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 dnl 02110-1301 USA. 
 dnl
 
-AC_INIT(inetlib, 1.1.3)
+AC_INIT(inetlib, 1.2)
 AC_CONFIG_SRCDIR(source/gnu/inet/util/LineInputStream.java)
 AC_CONFIG_AUX_DIR([config])
 AM_INIT_AUTOMAKE
 
 PACKAGE="inetlib"
-VERSION="1.1.3"
+VERSION="1.2"
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 

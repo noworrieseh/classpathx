@@ -9,14 +9,14 @@ JAVAC = @JAVAC@
 JAVACFLAGS = @JAVACFLAGS@
 JAVADOC = @JAVADOC@
 JAVADOCFLAGS = @JAVADOCFLAGS@
+VERSION=@VERSION@
 
 src = @srcdir@/source
 dst = classes
 doc = @srcdir@/docs
 
-version = 1.1.3
 inetlib_jar = inetlib.jar
-inetlib_version_jar = inetlib-$(version).jar
+inetlib_version_jar = inetlib-$(VERSION).jar
 
 sources = \
 $(src)/gnu/inet/util/BASE64.java \
