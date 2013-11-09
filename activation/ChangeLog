@@ -1,3 +1,18 @@
+2013-11-06  Chris Burdess  <dog@gnu.org>
+
+    * activation: Updated to GPL 3
+
+2013-10-28  Chris Burdess  <dog@gnu.org>
+
+    * source/javax/activation/DataHandler.java: Fix race condition with
+      piped stream (#22061).
+
+2013-10-28  Chris Burdess  <dog@gnu.org>
+
+    * source/javax/activation/MimeType.java,
+    * source/javax/activation/MimeTypeParseException.java: Match IcedTea
+      constructor.
+
 2007-03-29  Chris Burdess  <dog@bluezoo.org>
 
 	* COPYING: Corrected to use GPL licence text instead of incorrect LGPL.
