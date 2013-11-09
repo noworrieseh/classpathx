@@ -22,12 +22,12 @@ dnl Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 dnl 02110-1301 USA. 
 dnl
 
-AC_INIT(activation, 1.0)
+AC_INIT(activation, 1.1.2)
 AC_CONFIG_SRCDIR(source/javax/activation/DataSource.java)
 AM_INIT_AUTOMAKE
 
 PACKAGE="activation"
-VERSION="1.0"
+VERSION="1.1.2"
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
