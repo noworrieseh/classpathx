@@ -1,6 +1,6 @@
 /*
  * IMAPResponse.java
- * Copyright (C) 2003 The Free Software Foundation
+ * Copyright (C) 2003, 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -26,58 +26,58 @@ import java.util.List;
 
 /**
  * An IMAP4rev1 server response.
- *
+ * @version 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class IMAPResponse
+class IMAPResponse
 {
 
   /**
    * The untagged response tag.
    */
-  public static final String UNTAGGED = "*";
+  static final String UNTAGGED = "*";
 
   /**
    * The continuation response tag.
    */
-  public static final String CONTINUATION = "+";
+  static final String CONTINUATION = "+";
 
   /**
    * The tag for this response.
    */
-  protected String tag = null;
+  String tag = null;
 
   /**
    * The response ID.
    */
-  protected String id = null;
+  String id = null;
 
   /**
    * The message count (for responses returning counts).
    */
-  protected int count = -1;
+  int count = -1;
 
   /**
    * The mailbox (for STATUS responses).
    */
-  protected String mailbox = null;
+  String mailbox = null;
 
   /**
    * The response code.
    */
-  protected List code = null;
+  List code = null;
 
   /**
    * The human-readable text.
    */
-  protected String text;
+  String text;
 
   public String getTag()
   {
     return tag;
   }
 
-  public boolean isTagged()
+  boolean isTagged()
   {
     return (tag != UNTAGGED && tag != CONTINUATION);
   }
@@ -87,27 +87,27 @@ public class IMAPResponse
     return (tag == UNTAGGED);
   }
 
-  public boolean isContinuation()
+  boolean isContinuation()
   {
     return (tag == CONTINUATION);
   }
 
-  public String getID()
+  String getID()
   {
     return id;
   }
 
-  public int getCount()
+  int getCount()
   {
     return count;
   }
 
-  public List getResponseCode()
+  List getResponseCode()
   {
     return code;
   }
 
-  public String getText()
+  String getText()
   {
     return text;
   }
@@ -115,7 +115,7 @@ public class IMAPResponse
   /**
    * ANSI-coloured toString for debugging.
    */
-  public String toANSIString()
+  String toANSIString()
   {
     StringBuffer buffer = new StringBuffer();
     buffer.append(tag);

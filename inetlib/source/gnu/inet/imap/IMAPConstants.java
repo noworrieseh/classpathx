@@ -89,6 +89,8 @@ public interface IMAPConstants
   public static final String QUOTAROOT = "QUOTAROOT";
   public static final String APPENDUID = "APPENDUID";
   public static final String COPYUID = "COPYUID";
+  public static final String BADCHARSET = "BADCHARSET";
+  public static final String UIDNOTSTICKY = "UIDNOTSTICKY";
 
   // Select responses
   public static final String FLAGS = "FLAGS";
@@ -115,8 +117,8 @@ public interface IMAPConstants
   public static final String FLAG_RECENT = "\\Recent";
 
   // Fetch data items
-  public static final String BODY = "BODY";
-  public static final String BODY_PEEK = "BODY.PEEK";
+  public static final String BODY = "BODY[]";
+  public static final String BODY_PEEK = "BODY.PEEK[]";
   public static final String HEADER = "HEADER";
   public static final String HEADER_FIELDS = "HEADER.FIELDS";
   public static final String HEADER_FIELDS_NOT = "HEADER.FIELDS.NOT";

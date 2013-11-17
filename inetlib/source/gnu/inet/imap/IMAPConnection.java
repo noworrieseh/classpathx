@@ -1,6 +1,6 @@
 /*
  * IMAPConnection.java
- * Copyright (C) 2003,2004,2005 The Free Software Foundation
+ * Copyright (C) 2003,2004,2005,2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -69,7 +70,7 @@ import gnu.inet.util.TraceLevel;
 
 /**
  * The protocol class implementing IMAP4rev1.
- *
+ * @version 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public class IMAPConnection
@@ -112,34 +113,19 @@ public class IMAPConnection
   protected Socket socket;
 
   /**
-   * The tokenizer used to read IMAP responses from.
+   * The tokenizer used to read IMAP stream tokens from.
    */
-  protected IMAPResponseTokenizer in;
+  protected IMAPTokenizer in;
 
   /**
    * The output stream.
    */
   protected CRLFOutputStream out;
 
-  /**
-   * List of responses received asynchronously.
-   */
-  protected List asyncResponses;
-
-  /**
-   * List of alert strings.
-   */
-  private List alerts;
-
   /*
    * Used to generate new tags for tagged commands.
    */
   private int tagIndex = 0;
-
-  /*
-   * Print debugging output using ANSI colour escape sequences.
-   */
-  private boolean ansiDebug = false;
 
   /**
    * Creates a new connection to the default IMAP port.
@@ -247,13 +233,10 @@ public class IMAPConnection
     
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
-    in = new IMAPResponseTokenizer(is);
+    in = new IMAPTokenizer(is);
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
-    
-    asyncResponses = new ArrayList();
-    alerts = new ArrayList();
   }
 
   /**
@@ -264,14 +247,6 @@ public class IMAPConnection
     return logger;
   }
 
-  /**
-   * Sets whether debugging output should use ANSI colour escape sequences.
-   */
-  public void setAnsiDebug(boolean flag)
-  {
-    ansiDebug = flag;
-  }
-  
   /**
    * Returns a new tag for a command.
    */
@@ -298,246 +273,908 @@ public class IMAPConnection
    * @return true if OK was received, or false if NO was received
    * @exception IOException if BAD was received or an I/O error occurred
    */
-  public boolean invokeSimpleCommand(String command)
+  protected boolean invokeSimpleCommand(String command, IMAPCallback callback)
     throws IOException
   {
     String tag = newTag();
     sendCommand(tag, command);
+    return handleSimpleResponse(tag, callback);
+  }
+
+  private boolean handleSimpleResponse(String tag, IMAPCallback callback)
+    throws IOException
+  {
     while (true)
       {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
+        IMAPTokenizer.Token token = in.next();
+        switch (token.type)
           {
-            processAlerts(response);
-            if (id == OK)
+          case IMAPTokenizer.TAG:
+            boolean match = tag.equals(token.value);
+            boolean result = parseRespCondState(callback);
+            in.collectToEOL();
+            in.reset();
+            if (match)
               {
-                return true;
+                return result;
               }
-            else if (id == NO)
+            break;
+          case IMAPTokenizer.UNTAGGED_RESPONSE:
+            token = in.next();
+            switch (token.type)
               {
-                return false;
+              case IMAPTokenizer.NUMBER:
+                int number = Integer.parseInt(token.value);
+                parseUntaggedNumber(number, callback);
+                break;
+              case IMAPTokenizer.ATOM:
+                parseUntaggedAtom(token, callback);
+                break;
               }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            asyncResponses.add(response);
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
+            in.collectToEOL();
+            in.reset();
+            break;
+          default:
+            throw new IMAPException(token.value, "err.unexpected_token");
           }
       }
   }
-  
-  
-  /**
-   * Reads an IMAP response from the server.
-   * The response will consist of <i>either</i>:
-   * <ul>
-   * <li>A tagged response corresponding to a pending command</li>
-   * <li>An untagged error response</li>
-   * <li>A continuation response</li>
-   */
-  protected IMAPResponse readResponse()
+
+  // -- start parsing --
+
+  private IMAPTokenizer.Token requireToken(int type, String error)
     throws IOException
   {
-    IMAPResponse response = in.next();
-    if (response == null)
+    IMAPTokenizer.Token token = in.next();
+    if ((token.type & type) == 0)
       {
-        logger.log(IMAP_TRACE, "<EOF");
-        throw new EOFException();
+        throw new IOException(error);
       }
-    else if (ansiDebug)
+    return token;
+  }
+  
+  private boolean parseRespCondState(IMAPCallback callback)
+    throws IOException
+  {
+    boolean ret = false;
+    IMAPTokenizer.Token token;
+    token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
+    String status = token.value;
+    String text = parseRespText(callback);
+    if (OK.equals(status))
       {
-        logger.log(IMAP_TRACE, "< " + response.toANSIString());
+        return true;
+      }
+    else if (NO.equals(status))
+      {
+        return false;
+      }
+    throw new IMAPException(status, text);
+  }
+
+  private String parseRespText(IMAPCallback callback)
+    throws IOException
+  {
+    String code = null;
+    Map params = null;
+    IMAPTokenizer.Token token = in.peek();
+    if (token.type == IMAPTokenizer.LBRACKET)
+      {
+        in.next();
+        token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
+        code = token.value;
+        params = new HashMap();
+        if (PERMANENTFLAGS.equals(code) ||
+            CAPABILITY.equals(code) ||
+            BADCHARSET.equals(code))
+          {
+            List<String> data = parseFlags(BADCHARSET.equals(code));
+            params.put(code, data);
+          }
+        else if (UIDNEXT.equals(code) ||
+                 UIDVALIDITY.equals(code) ||
+                 UNSEEN.equals(code))
+          {
+            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+            params.put(code, token.value);
+          }
+        else if (APPENDUID.equals(code) ||
+                 COPYUID.equals(code))
+          {
+            List<String> args = new ArrayList<String>();
+            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+            while (token.type != IMAPTokenizer.RBRACKET)
+              {
+                args.add(token.value);
+                token = in.next();
+              }
+            params.put(code, args);
+          }
+        while (token.type != IMAPTokenizer.RBRACKET)
+          {
+            token = in.next();
+          }
+      }
+    String text = in.collectToEOL();
+    if (ALERT.equals(code))
+      {
+        callback.alert(text);
+      }
+    else if (CAPABILITY.equals(code))
+      {
+        callback.capability((List<String>) params.get(code));
+      }
+    else if (callback instanceof SelectCallback)
+      {
+        SelectCallback select = (SelectCallback) callback;
+        if (PERMANENTFLAGS.equals(code))
+          {
+            select.permanentflags((List<String>) params.get(code));
+          }
+        else if (UIDVALIDITY.equals(code))
+          {
+            select.uidvalidity(Long.parseLong((String) params.get(code)));
+          }
+        else if (UIDNEXT.equals(code))
+          {
+            select.uidnext(Long.parseLong((String) params.get(code)));
+          }
+        else if (UNSEEN.equals(code))
+          {
+            select.unseen(Integer.parseInt((String) params.get(code)));
+          }
+        else if (READ_ONLY.equals(code))
+          {
+            select.readOnly();
+          }
+        else if (READ_WRITE.equals(code))
+          {
+            select.readWrite();
+          }
+        else if (TRYCREATE.equals(code))
+          {
+            select.tryCreate();
+          }
+      }
+    if (callback instanceof UIDPlusCallback)
+      {
+        UIDPlusCallback uidplus = (UIDPlusCallback) callback;
+        if (APPENDUID.equals(code))
+          {
+            List<String> args = (List<String>) params.get(code);
+            long uidvalidity = Long.parseLong(args.get(0));
+            long uid = Long.parseLong(args.get(1));
+            uidplus.appenduid(uidvalidity, uid);
+          }
+        else if (COPYUID.equals(code))
+          {
+            List<String> args = (List<String>) params.get(code);
+            long uidvalidity = Long.parseLong(args.get(0));
+            UIDSet source = new UIDSet(args.get(1));
+            UIDSet destination = new UIDSet(args.get(2));
+            uidplus.copyuid(uidvalidity, source, destination);
+          }
+        else if (UIDNOTSTICKY.equals(code))
+          {
+            uidplus.uidnotsticky();
+          }
+      }
+    return text;
+  }
+
+  /*
+   * resp-cond-state | resp-cond-bye | mailbox-data | capability-data
+   * token is an atom
+   */
+  void parseUntaggedAtom(IMAPTokenizer.Token token, IMAPCallback callback)
+    throws IOException
+  {
+    String status = token.value;
+    if (OK.equals(token.value) ||
+        NO.equals(token.value) ||
+        BYE.equals(token.value))
+      {
+        parseRespText(callback);
+      }
+    else if (BAD.equals(token.value))
+      {
+        String text = parseRespText(callback);
+        throw new IMAPException(token.value, text);
+      }
+    else if (FLAGS.equals(token.value))
+      {
+        List<String> data = parseFlags(false);
+        if (callback instanceof SelectCallback)
+          {
+            ((SelectCallback) callback).flags(data);
+          }
+      }
+    else if (LIST.equals(token.value) ||
+             LSUB.equals(token.value))
+      {
+        List<String> flags = parseFlags(false);
+        token = requireToken(IMAPTokenizer.QUOTED_STRING |
+                             IMAPTokenizer.NIL, "err.expected_list_delim");
+        String delim = toString(token);
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        if (callback instanceof ListCallback)
+          {
+            ((ListCallback) callback).list(flags, delim, mailbox);
+          }
+      }
+    else if (SEARCH.equals(token.value))
+      {
+        List<Integer> results = parseNumberList();
+        if (callback instanceof SearchCallback)
+          {
+            ((SearchCallback) callback).search(results);
+          }
+      }
+    else if (STATUS.equals(token.value))
+      {
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+        Map<String,Integer> data = new LinkedHashMap<String,Integer>();
+        do
+          {
+            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RPAREN,
+                                 "err.expected_status_item");
+            if (token.type == IMAPTokenizer.ATOM)
+              {
+                String statusAtt = toString(token);
+                token = requireToken(IMAPTokenizer.NUMBER,
+                                     "err.expected_number");
+                data.put(statusAtt, new Integer(token.value));
+              }
+          }
+        while (token.type != IMAPTokenizer.RPAREN);
+        if (callback instanceof StatusCallback)
+          {
+            ((StatusCallback) callback).status(mailbox, data);
+          }
+      }
+    else if (CAPABILITY.equals(token.value))
+      {
+        List<String> data = new ArrayList<String>();
+        do
+          {
+            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.EOL,
+                                 "err.expected_capability");
+            if (token.type == IMAPTokenizer.ATOM)
+              {
+                data.add(toString(token));
+              }
+          }
+        while (token.type != IMAPTokenizer.EOL);
+        callback.capability(data);
+      }
+    else if (NAMESPACE.equals(token.value))
+      {
+        Namespace personal = parseNamespace();
+        Namespace otherUsers = parseNamespace();
+        Namespace shared = parseNamespace();
+        if (callback instanceof NamespaceCallback)
+          {
+            ((NamespaceCallback) callback).namespace(personal, otherUsers,
+                                                     shared);
+          }
+      }
+    else if (ACL.equals(token.value))
+      {
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        Map<String,String> rights = parseACL();
+        if (callback instanceof ACLCallback)
+          {
+            ((ACLCallback) callback).acl(mailbox, rights);
+          }
+      }
+    else if (LISTRIGHTS.equals(token.value))
+      {
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String identifier = UTF7imap.decode(toAString(token));
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String required = toAString(token);
+        List<String> optional = new ArrayList<String>();
+        while (token.type != IMAPTokenizer.EOL)
+          {
+            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+              {
+                throw new IOException("err.expected_astring");
+              }
+            optional.add(toAString(token));
+            token = in.next();
+          }
+        if (callback instanceof ACLCallback)
+          {
+            ((ACLCallback) callback).listrights(mailbox, identifier,
+                                                required, optional);
+          }
+      }
+    else if (MYRIGHTS.equals(token.value))
+      {
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String rights = toAString(token);
+        if (callback instanceof ACLCallback)
+          {
+            ((ACLCallback) callback).myrights(mailbox, rights);
+          }
+      }
+    else if (QUOTA.equals(token.value))
+      {
+        Map<String,Integer> currentUsage = new LinkedHashMap<String,Integer>();
+        Map<String,Integer> limit = new LinkedHashMap<String,Integer>();
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String quotaRoot = UTF7imap.decode(toAString(token));
+        token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparam");
+        while (token.type != IMAPTokenizer.RPAREN)
+          {
+            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+              {
+                throw new IOException("err.expected_astring");
+              }
+            String resource = UTF7imap.decode(toAString(token));
+            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+            currentUsage.put(resource, new Integer(token.value));
+            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+            limit.put(resource, new Integer(token.value));
+            token = in.next();
+          }
+        if (callback instanceof QuotaCallback)
+          {
+            ((QuotaCallback) callback).quota(quotaRoot, currentUsage, limit);
+          }
+      }
+    else if (QUOTAROOT.equals(token.value))
+      {
+        List<String> roots = new ArrayList<String>();
+        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        String mailbox = UTF7imap.decode(toAString(token));
+        while (token.type != IMAPTokenizer.EOL)
+          {
+            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+              {
+                throw new IOException("err.expected_astring");
+              }
+            roots.add(UTF7imap.decode(toAString(token)));
+            token = in.next();
+          }
+        if (callback instanceof QuotaCallback)
+          {
+            ((QuotaCallback) callback).quotaroot(mailbox, roots);
+          }
       }
     else
       {
-        logger.log(IMAP_TRACE, "< " + response.toString());
+        logger.warning("err.unhandled_response");
       }
-    return response;
   }
-  
-  // -- Alert notifications --
-  
-  private void processAlerts(IMAPResponse response)
+
+  /*
+   * message-data | number SP "EXISTS" | number SP "RECENT"
+   */
+  void parseUntaggedNumber(int number, IMAPCallback callback)
+    throws IOException
   {
-    List code = response.getResponseCode();
-    if (code != null && code.contains(ALERT))
+    IMAPTokenizer.Token token;
+    token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
+    if (EXPUNGE.equals(token.value))
       {
-        alerts.add(response.getText());
+        callback.expunge(number);
+      }
+    else if (FETCH.equals(token.value))
+      {
+        List<FetchDataItem> items = new ArrayList<FetchDataItem>();
+        requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+        do
+          {
+            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RPAREN,
+                                 "err.unexpected_fetch_data_item");
+            if (token.type == IMAPTokenizer.ATOM)
+              {
+                items.add(parseFetchDataItem(token.value));
+              }
+          }
+        while (token.type != IMAPTokenizer.RPAREN);
+        callback.fetch(number, items);
+      }
+    else if (EXISTS.equals(token.value))
+      {
+        callback.exists(number);
+      }
+    else if (RECENT.equals(token.value))
+      {
+        callback.recent(number);
+      }
+    else
+      {
+        throw new IMAPException(token.value, "err.unexpected_token");
       }
   }
-  
-  /**
-   * Indicates if there are alerts pending for the user-agent.
-   */
-  public boolean alertsPending()
+
+  private FetchDataItem parseFetchDataItem(String code)
+    throws IOException
   {
-    return (alerts.size() > 0);
+    IMAPTokenizer.Token token;
+    if (FLAGS.equals(code))
+      {
+        return new FLAGS(parseFlags(false));
+      }
+    else if (UID.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+        return new UID(Long.parseLong(token.value));
+      }
+    else if (INTERNALDATE.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+        String date = toString(token);
+        return new INTERNALDATE(date);
+      }
+    else if (RFC822_SIZE.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+        return new RFC822_SIZE(Integer.parseInt(token.value));
+      }
+    else if (BODY.equals(code) || BODYSTRUCTURE.equals(code))
+      {
+        return new BODYSTRUCTURE(parsePart());
+      }
+    else if (ENVELOPE.equals(code))
+      {
+        return parseEnvelope();
+      }
+    else if (RFC822.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+        return new BODY(null, -1, token.literal);
+      }
+    else if (RFC822_HEADER.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+        return new BODY("HEADER", -1, token.literal);
+      }
+    else if (RFC822_TEXT.equals(code))
+      {
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+        return new BODY("TEXT", -1, token.literal);
+      }
+    else
+      {
+        if (code.startsWith("BODY["))
+          {
+            int se = code.indexOf(']');
+            if (se > 4)
+              {
+                String section = null;
+                if (se > 5)
+                  {
+                    section = code.substring(5, se);
+                  }
+                String tail = code.substring(se + 1);
+                int len = tail.length();
+                if (len == 0)
+                  {
+                    token = requireToken(IMAPTokenizer.STRING,
+                                         "err.expected_string");
+                    return new BODY(section, -1, token.literal);
+                  }
+                if (len > 2 && tail.charAt(0) == '<' &&
+                    tail.charAt(len - 1) == '>')
+                  {
+                    tail = tail.substring(1, len - 1);
+                    int oo = Integer.parseInt(tail);
+                    token = requireToken(IMAPTokenizer.STRING,
+                                         "err.expected_string");
+                    return new BODY(section, oo, token.literal);
+                  }
+              }
+          }
+        throw new IMAPException(code,
+                                "err.unexpected_fetch_data_item");
+      }
   }
-  
-  /**
-   * Returns the pending alerts for the user-agent as an array.
-   */
-  public String[] getAlerts()
+
+  private List<String> parseFlags(boolean allowNil)
+    throws IOException
   {
-    String[] a = new String[alerts.size()];
-    alerts.toArray(a);
-    alerts.clear();             // flush
-    return a;
+    List<String> data = new ArrayList<String>();
+    IMAPTokenizer.Token token;
+    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+    do
+      {
+        token = in.next();
+        switch (token.type)
+          {
+          case IMAPTokenizer.ATOM:
+            data.add(token.value);
+            break;
+          case IMAPTokenizer.RPAREN:
+            break;
+          case IMAPTokenizer.NIL:
+            if (allowNil)
+              {
+                data.add("NIL");
+                break;
+              }
+          default:
+            throw new IOException("err.expected_atom_or_rparen");
+          }
+      }
+    while (token.type != IMAPTokenizer.RPAREN);
+    return data;
   }
-  
+
+  private BODYSTRUCTURE.Part parsePart()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.LPAREN:
+        return parsePartInternal();
+      default:
+        throw new IOException("err.expected_lparam");
+      }
+  }
+
+  private BODYSTRUCTURE.Part parsePartInternal()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.LPAREN:
+        return parseMultipart();
+      case IMAPTokenizer.QUOTED_STRING:
+      case IMAPTokenizer.LITERAL:
+        return parseBodyPart(token);
+      default:
+        throw new IOException("err.expected_part");
+      }
+  }
+
+  private String toString(IMAPTokenizer.Token token)
+    throws IOException
+  {
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.ATOM:
+        return token.value;
+      case IMAPTokenizer.QUOTED_STRING:
+      case IMAPTokenizer.LITERAL:
+        return new String(token.literal, "US-ASCII");
+      default:
+        throw new IOException("err.expected_string");
+      }
+  }
+
+  private String toLowerCaseString(IMAPTokenizer.Token token)
+    throws IOException
+  {
+    String ret = toString(token);
+    return ret == null ? null : ret.toLowerCase();
+  }
+
+  private String toAString(IMAPTokenizer.Token token)
+    throws IOException
+  {
+    String ret = toString(token);
+    return (ret == null) ? "NIL" : ret;
+  }
+
+  private BODYSTRUCTURE.Part parseBodyPart(IMAPTokenizer.Token token)
+    throws IOException
+  {
+    String primaryType = toLowerCaseString(token);
+    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    String subtype = toLowerCaseString(token);
+    Map<String,String> parameters = parseMIMEParameters();
+    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    String id = toLowerCaseString(token);
+    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    String description = toLowerCaseString(token);
+    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    String encoding = toLowerCaseString(token);
+    token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+    int size = Integer.parseInt(token.value);
+    BODYSTRUCTURE.Part ret;
+    if ("text".equals(primaryType))
+      {
+        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+        int lines = Integer.parseInt(token.value);
+        ret = new BODYSTRUCTURE.TextPart(primaryType, subtype, parameters,
+                                         id, description, encoding, size,
+                                         lines);
+      }
+    else if ("message".equals(primaryType))
+      {
+        ENVELOPE envelope = parseEnvelope();
+        BODYSTRUCTURE.Part bodystructure = parsePart();
+        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
+        int lines = Integer.parseInt(token.value);
+        ret = new BODYSTRUCTURE.MessagePart(primaryType, subtype, parameters,
+                                            id, description, encoding, size,
+                                            envelope, bodystructure, lines);
+      }
+    else
+      {
+        ret = new BODYSTRUCTURE.BodyPart(primaryType, subtype, parameters,
+                                         id, description, encoding, size);
+      }
+    requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+    return ret;
+  }
+
+  private BODYSTRUCTURE.Part parseMultipart()
+    throws IOException
+  {
+    List<BODYSTRUCTURE.Part> parts = new ArrayList<BODYSTRUCTURE.Part>();
+    IMAPTokenizer.Token token;
+    do
+      {
+        token = in.next();
+        if (token.type == IMAPTokenizer.LPAREN)
+          {
+            parts.add(parsePartInternal());
+          }
+        else if ((token.type & IMAPTokenizer.STRING) == 0)
+          {
+            throw new IOException("err.expected_part");
+          }
+      }
+    while (token.type == IMAPTokenizer.LPAREN);
+    String subtype = toLowerCaseString(token);
+    Map<String,String> parameters = null;
+    BODYSTRUCTURE.Disposition disposition = null;
+    List<String> language = null;
+    List<String> location = null;
+    token = in.peek();
+    if (token.type == IMAPTokenizer.RPAREN)
+      {
+        in.next();
+      }
+    else
+      {
+        parameters = parseMIMEParameters();
+        disposition = parseDisposition();
+        language = parseStringList();
+        location = parseStringList();
+        requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+      }
+    return new BODYSTRUCTURE.Multipart(parts, subtype, parameters,
+                                       disposition, language, location);
+  }
+
+  private Map<String,String> parseMIMEParameters()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.LPAREN:
+        Map<String,String> map = new LinkedHashMap<String,String>();
+        do
+          {
+            token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.RPAREN,
+                                 "err.expected_body_param");
+            if ((token.type & IMAPTokenizer.STRING) != 0)
+              {
+                String key = toLowerCaseString(token);
+                token = requireToken(IMAPTokenizer.STRING,
+                                     "err.expected_body_param");
+                String val = toString(token);
+                map.put(key, val);
+              }
+          }
+        while (token.type != IMAPTokenizer.RPAREN);
+        return map;
+      default:
+        throw new IOException("err.expected_plist");
+      }
+  }
+
+  private BODYSTRUCTURE.Disposition parseDisposition()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.LPAREN:
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_body_param");
+        String type = toLowerCaseString(token);
+        return new BODYSTRUCTURE.Disposition(type, parseMIMEParameters());
+      default:
+        throw new IOException("err.expected_plist");
+      }
+  }
+
+  private ENVELOPE parseEnvelope()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.LPAREN:
+        token = requireToken(IMAPTokenizer.STRING, "err.expected_envelope");
+        String date = toString(token);
+        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        String subject = toString(token);
+        List<ENVELOPE.Address> from = parseAddressList();
+        List<ENVELOPE.Address> sender = parseAddressList();
+        List<ENVELOPE.Address> replyTo = parseAddressList();
+        List<ENVELOPE.Address> to = parseAddressList();
+        List<ENVELOPE.Address> cc = parseAddressList();
+        List<ENVELOPE.Address> bcc = parseAddressList();
+        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        String inReplyTo = toString(token);
+        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        String messageId = toString(token);
+        return new ENVELOPE(date, subject, from, sender, replyTo, to, cc, bcc,
+                            inReplyTo, messageId);
+      default:
+        throw new IOException("err.expected_plist");
+      }
+  }
+
+  private List<ENVELOPE.Address> parseAddressList()
+    throws IOException
+  {
+    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case IMAPTokenizer.NIL:
+        return null;
+      case IMAPTokenizer.LPAREN:
+        List<ENVELOPE.Address> ret = new ArrayList<ENVELOPE.Address>();
+        do
+          {
+            token = requireToken(IMAPTokenizer.LPAREN | IMAPTokenizer.RPAREN,
+                                 "err.expected_address");
+            if (token.type == IMAPTokenizer.LPAREN)
+              {
+                token = requireToken(IMAPTokenizer.NSTRING,
+                                     "err.expected_string");
+                String personal = toString(token);
+                in.next();
+                token = requireToken(IMAPTokenizer.NSTRING,
+                                     "err.expected_string");
+                String address = toString(token);
+                token = requireToken(IMAPTokenizer.NSTRING,
+                                     "err.expected_string");
+                String host = toString(token);
+                if (host != null)
+                  {
+                    address = new StringBuilder(address).append('@')
+                      .append(host).toString();
+                  }
+                ret.add(new ENVELOPE.Address(personal, address));
+                requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+              }
+          }
+        while (token.type != IMAPTokenizer.RPAREN);
+        return ret;
+      default:
+        throw new IOException("err.expected_plist");
+      }
+  }
+
+  private List<String> parseStringList()
+    throws IOException
+  {
+    List<String> data = new ArrayList<String>();
+    IMAPTokenizer.Token token;
+    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+    do
+      {
+        token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.RPAREN,
+                             "err.expected_string_or_rparen");
+        if ((token.type & IMAPTokenizer.STRING) != 0)
+          {
+            data.add(new String(token.literal, "US-ASCII"));
+          }
+      }
+    while (token.type != IMAPTokenizer.RPAREN);
+    return data;
+  }
+
+  private List<Integer> parseNumberList()
+    throws IOException
+  {
+    List<Integer> data = new ArrayList<Integer>();
+    IMAPTokenizer.Token token;
+    do
+      {
+        token = requireToken(IMAPTokenizer.NUMBER | IMAPTokenizer.EOL,
+                             "err.expected_number");
+        if (token.type == IMAPTokenizer.NUMBER)
+          {
+            data.add(new Integer(token.value));
+          }
+      }
+    while (token.type != IMAPTokenizer.EOL);
+    return data;
+  }
+
+  private Namespace parseNamespace()
+    throws IOException
+  {
+    IMAPTokenizer.Token token;
+    token = requireToken(IMAPTokenizer.NIL | IMAPTokenizer.LPAREN,
+                         "err.expected_namespace");
+    if (token.type == IMAPTokenizer.NIL)
+      {
+        return null;
+      }
+    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+    token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+    String prefix = UTF7imap.decode(toString(token));
+    token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+    String hierarchyDelimiter = toString(token);
+    token = requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+    token = requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+    return new Namespace(prefix, hierarchyDelimiter);
+  }
+
+  private Map<String,String> parseACL()
+    throws IOException
+  {
+    Map<String, String> acls = new LinkedHashMap<String,String>();
+    IMAPTokenizer.Token token;
+    do
+      {
+        token = requireToken(IMAPTokenizer.ASTRING | IMAPTokenizer.EOL,
+                             "err.expected_acl");
+        if ((token.type & IMAPTokenizer.ASTRING) != 0)
+          {
+            String identifier = UTF7imap.decode(toString(token));
+            token = requireToken(IMAPTokenizer.ASTRING,
+                                 "err.expected_astring");
+            String rights = toString(token);
+            acls.put(identifier, rights);
+          }
+      }
+    while (token.type != IMAPTokenizer.EOL);
+    return acls;
+  }
+
+  // -- end parsing --
+
   // -- IMAP commands --
   
   /**
    * Returns a list of the capabilities of the IMAP server.
    */
-  public List capability()
+  public boolean capability(IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, CAPABILITY);
-    List capabilities = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                if (capabilities.size() == 0)
-                  {
-                    // The capability list may be contained in the
-                    // response text.
-                    addTokens(capabilities, response.getText());
-                  }
-                return capabilities;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (id == CAPABILITY)
-              {
-                // The capability list may be contained in the
-                // response text.
-                addTokens(capabilities, response.getText());
-              }
-            else if (id == OK)
-              {
-                // The capability list may be contained in the
-                // response code.
-                List code = response.getResponseCode();
-                int len = (code == null) ? 0 : code.size();
-                if (len > 0 && CAPABILITY.equals(code.get(0)))
-                  {
-                    for (int i = 1; i < len; i++)
-                      {
-                        String token = (String) code.get(i);
-                        if (!capabilities.contains(token))
-                          {
-                            capabilities.add(token);
-                          }
-                      }
-                  }
-                else
-                  {
-                    asyncResponses.add(response);
-                  }
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
-  }
-  
-  private void addTokens(List list, String text)
-  {
-    int start = 0;
-    int end = text.indexOf(' ');
-    String token;
-    while (end != -1)
-      {
-        token = text.substring(start, end);
-        if (!list.contains(token))
-          {
-            list.add(token);
-          }
-        start = end + 1;
-        end = text.indexOf(' ', start);
-      }
-    token = text.substring(start);
-    if (token.length() > 0 && !list.contains(token))
-      {
-        list.add(token);
-      }
+    return invokeSimpleCommand(CAPABILITY, callback);
   }
   
   /**
    * Ping the server.
-   * If a change in mailbox state is detected, a new mailbox status is
-   * returned, otherwise this method returns null.
+   * The callback will be notified of any changes in state.
    */
-  public MailboxStatus noop()
+  public void noop(IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, NOOP);
-    boolean changed = false;
-    MailboxStatus ms = new MailboxStatus();
-    Iterator asyncIterator = asyncResponses.iterator();
-    while (true)
-      {
-        IMAPResponse response;
-        // Process any asynchronous responses first
-        if (asyncIterator.hasNext())
-          {
-            response = (IMAPResponse) asyncIterator.next();
-            asyncIterator.remove();
-          }
-        else
-          {
-            response = readResponse();
-          }
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            changed = changed || updateMailboxStatus(ms, id, response);
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return changed ? ms : null;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    invokeSimpleCommand(NOOP, callback);
   }
 
   /**
@@ -563,10 +1200,10 @@ public class IMAPConnection
    * See RFC 2595 for details.
    * @return true if successful, false otherwise
    */
-  public boolean starttls()
+  public boolean starttls(IMAPCallback callback)
     throws IOException
   {
-    return starttls(new EmptyX509TrustManager());
+    return starttls(callback, new EmptyX509TrustManager());
   }
   
   /**
@@ -575,7 +1212,7 @@ public class IMAPConnection
    * @param tm the custom trust manager to use
    * @return true if successful, false otherwise
    */
-  public boolean starttls(TrustManager tm)
+  public boolean starttls(IMAPCallback callback, TrustManager tm)
     throws IOException
   {
     try
@@ -584,28 +1221,9 @@ public class IMAPConnection
         String hostname = socket.getInetAddress().getHostName();
         int port = socket.getPort();
         
-        String tag = newTag();
-        sendCommand(tag, STARTTLS);
-        while (true)
+        if (!invokeSimpleCommand(STARTTLS, callback))
           {
-            IMAPResponse response = readResponse();
-            if (response.isTagged() && tag.equals(response.getTag()))
-              {
-                processAlerts(response);
-                String id = response.getID();
-                if (id == OK)
-                  {
-                    break;              // negotiate TLS
-                  }
-                else if (id == BAD)
-                  {
-                    return false;
-                  }
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
+            return false;
           }
         
         SSLSocket ss =
@@ -617,7 +1235,7 @@ public class IMAPConnection
         
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
-        in = new IMAPResponseTokenizer(is);
+        in = new IMAPTokenizer(is);
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
         out = new CRLFOutputStream(os);
@@ -636,11 +1254,16 @@ public class IMAPConnection
    * @param password the authentication credentials
    * @return true if authentication was successful, false otherwise
    */
-  public boolean login(String username, String password)
+  public boolean login(String username, String password, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(LOGIN + ' ' + quote(username) +
-                               ' ' + quote(password));
+    String cmd = new StringBuilder(LOGIN)
+        .append(' ')
+        .append(quote(username))
+        .append(' ')
+        .append(quote(password))
+        .toString();
+    return invokeSimpleCommand(cmd, callback);
   }
   
   /**
@@ -653,7 +1276,7 @@ public class IMAPConnection
    * @return true if authentication was successful, false otherwise
    */
   public boolean authenticate(String mechanism, String username,
-                              String password)
+                              String password, IMAPCallback callback)
     throws IOException
   {
     try
@@ -688,83 +1311,93 @@ public class IMAPConnection
                 return false;
               }
           }
-        
-        StringBuffer cmd = new StringBuffer(AUTHENTICATE);
-        cmd.append(' ');
-        cmd.append(mechanism);
+        StringBuilder buf = new StringBuilder(AUTHENTICATE)
+            .append(' ')
+            .append(mechanism);
         String tag = newTag();
-        sendCommand(tag, cmd.toString());
+        sendCommand(tag, buf.toString());
         while (true)
           {
-            IMAPResponse response = readResponse();
-            if (tag.equals(response.getTag()))
+            IMAPTokenizer.Token token = in.next();
+            switch (token.type)
               {
-                processAlerts(response);
-                String id = response.getID();
-                if (id == OK)
-                  {
-                    String qop =
-                     (String) sasl.getNegotiatedProperty(Sasl.QOP);
-                    if ("auth-int".equalsIgnoreCase(qop)
-                        || "auth-conf".equalsIgnoreCase(qop))
-                      {
-                        InputStream is = socket.getInputStream();
-                        is = new BufferedInputStream(is);
-                        is = new SaslInputStream(sasl, is);
-                        in = new IMAPResponseTokenizer(is);
-                        OutputStream os = socket.getOutputStream();
-                        os = new BufferedOutputStream(os);
-                        os = new SaslOutputStream(sasl, os);
-                        out = new CRLFOutputStream(os);
-                      }
-                    return true;
-                  }
-                else if (id == NO)
-                  {
-                    return false;
-                  }
-                else if (id == BAD)
-                  {
-                    throw new IMAPException(id, response.getText());
-                  }
-              }
-            else if (response.isContinuation())
-              {
+              case IMAPTokenizer.CONTINUATION:
+                String text = in.collectToEOL();
+                in.reset();
                 try
                   {
-                    byte[] c0 = response.getText().getBytes(US_ASCII);
-                    byte[] c1 = BASE64.decode(c0);       // challenge
+                    byte[] c0 = text.getBytes("US-ASCII");
+                    byte[] c1 = BASE64.decode(c0); // challenge
                     byte[] r0 = sasl.evaluateChallenge(c1);
-                    byte[] r1 = BASE64.encode(r0);       // response
+                    byte[] r1 = BASE64.encode(r0); // response
                     out.write(r1);
-                    out.writeln();
-                    out.flush();
                     logger.log(IMAP_TRACE, "> " + new String(r1, US_ASCII));
                   }
                 catch (SaslException e)
                   {
                     // Error in SASL challenge evaluation - cancel exchange
                     out.write(0x2a);
-                    out.writeln();
-                    out.flush();
                     logger.log(IMAP_TRACE, "> *");
                   }
-              }
-            else
-              {
-                asyncResponses.add(response);
+                out.writeln();
+                out.flush();
+                break;
+              case IMAPTokenizer.TAG:
+                boolean match = tag.equals(token.value);
+                boolean result = parseRespCondState(callback);
+                in.collectToEOL();
+                in.reset();
+                if (match)
+                  {
+                    if (result) // OK
+                      {
+                        String qop =
+                          (String) sasl.getNegotiatedProperty(Sasl.QOP);
+                        if ("auth-int".equalsIgnoreCase(qop) ||
+                            "auth-conf".equalsIgnoreCase(qop))
+                          {
+                            InputStream is = socket.getInputStream();
+                            is = new BufferedInputStream(is);
+                            is = new SaslInputStream(sasl, is);
+                            in = new IMAPTokenizer(is);
+                            OutputStream os = socket.getOutputStream();
+                            os = new BufferedOutputStream(os);
+                            os = new SaslOutputStream(sasl, os);
+                            out = new CRLFOutputStream(os);
+                          }
+                      }
+                    return result;
+                  }
+                break;
+              case IMAPTokenizer.UNTAGGED_RESPONSE:
+                token = in.next();
+                switch (token.type)
+                  {
+                  case IMAPTokenizer.NUMBER:
+                    int number = Integer.parseInt(token.value);
+                    parseUntaggedNumber(number, callback);
+                    break;
+                  case IMAPTokenizer.ATOM:
+                    parseUntaggedAtom(token, callback);
+                    break;
+                  }
+                in.collectToEOL();
+                in.reset();
+                break;
+              default:
+                throw new IMAPException(token.value, "err.unexpected_token");
               }
           }
       }
     catch (SaslException e)
       {
         logger.log(IMAP_TRACE, e.getMessage(), e);
-        return false;             // No provider for mechanism
+        return false; // No provider for mechanism
       }
     catch (RuntimeException e)
       {
         logger.log(IMAP_TRACE, e.getMessage(), e);
-        return false;             // No javax.security.sasl classes
+        return false; // No javax.security.sasl classes
       }
   }
   
@@ -772,32 +1405,12 @@ public class IMAPConnection
    * Logout this connection.
    * Underlying network resources will be freed.
    */
-  public void logout()
+  public void logout(IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, LOGOUT);
-    while (true)
+    if (invokeSimpleCommand(LOGOUT, callback))
       {
-        IMAPResponse response = readResponse();
-        if (response.isTagged() && tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            String id = response.getID();
-            if (id == OK)
-              {
-                socket.close();
-                return;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            asyncResponses.add(response);
-          }
+        socket.close();
       }
   }
   
@@ -805,144 +1418,36 @@ public class IMAPConnection
    * Selects the specified mailbox.
    * The mailbox is identified as read-write if writes are permitted.
    * @param mailbox the mailbox name
-   * @return a MailboxStatus containing the state of the selected mailbox
+   * @param callback the callback to be notified of the state of the
+   * selected mailbox
    */
-  public MailboxStatus select(String mailbox)
+  public boolean select(String mailbox, SelectCallback callback)
     throws IOException
   {
-    return selectImpl(mailbox, SELECT);
+    return selectImpl(mailbox, SELECT, callback);
   }
   
   /**
    * Selects the specified mailbox.
    * The mailbox is identified as read-only.
    * @param mailbox the mailbox name
-   * @return a MailboxStatus containing the state of the selected mailbox
+   * @param callback the callback to be notified of the state of the
+   * selected mailbox
    */
-  public MailboxStatus examine(String mailbox)
+  public boolean examine(String mailbox, SelectCallback callback)
     throws IOException
   {
-    return selectImpl(mailbox, EXAMINE);
+    return selectImpl(mailbox, EXAMINE, callback);
   }
 
-  protected MailboxStatus selectImpl(String mailbox, String command)
+  protected boolean selectImpl(String mailbox, String command,
+                               SelectCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, command + ' ' + quote(UTF7imap.encode(mailbox)));
-    MailboxStatus ms = new MailboxStatus();
-    ms.select = true;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (!updateMailboxStatus(ms, id, response))
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                List rc = response.getResponseCode();
-                if (rc != null && rc.size() > 0 && rc.get(0) == READ_WRITE)
-                  {
-                    ms.readWrite = true;
-                  }
-                return ms;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
-  }
-  
-  protected boolean updateMailboxStatus(MailboxStatus ms, String id,
-                                        IMAPResponse response)
-    throws IOException
-  {
-    if (id == OK)
-      {
-        boolean changed = false;
-        List rc = response.getResponseCode();
-        int len = (rc == null) ? 0 : rc.size();
-        for (int i = 0; i < len; i++)
-          {
-            Object ocmd = rc.get(i);
-            if (ocmd instanceof String)
-              {
-                String cmd = (String) ocmd;
-                if (i + 1 < len)
-                  {
-                    Object oparam = rc.get(i + 1);
-                    if (oparam instanceof String)
-                      {
-                        String param = (String) oparam;
-                        try
-                          {
-                            if (cmd == UNSEEN)
-                              {
-                                ms.firstUnreadMessage =
-                                  Integer.parseInt(param);
-                                i++;
-                                changed = true;
-                              }
-                            else if (cmd == UIDVALIDITY)
-                              {
-                                ms.uidValidity = Integer.parseInt(param);
-                                i++;
-                                changed = true;
-                              }
-                          }
-                        catch (NumberFormatException e)
-                          {
-                            throw new ProtocolException("Illegal " + cmd +
-                                                        " value: " + param);
-                          }
-                      }
-                    else if (oparam instanceof List)
-                      {
-                        if (cmd == PERMANENTFLAGS)
-                          {
-                            ms.permanentFlags = (List) oparam;
-                            i++;
-                            changed = true;
-                          }
-                      }
-                  }
-              }
-          }
-        return changed;
-      }
-    else if (id == EXISTS)
-      {
-        ms.messageCount = response.getCount();
-        return true;
-      }
-    else if (id == RECENT)
-      {
-        ms.newMessageCount = response.getCount();
-        return true;
-      }
-    else if (id == FLAGS)
-      {
-        ms.flags = response.getResponseCode();
-        return true;
-      }
-    else
-      {
-        return false;
-      }
+    return invokeSimpleCommand(new StringBuilder(command)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(mailbox)))
+                               .toString(), callback);
   }
   
   /**
@@ -950,10 +1455,13 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @return true if the mailbox was successfully created, false otherwise
    */
-  public boolean create(String mailbox)
+  public boolean create(String mailbox, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(CREATE + ' ' + quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(new StringBuilder(CREATE)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(mailbox)))
+                               .toString(), callback);
   }
   
   /**
@@ -961,10 +1469,13 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @return true if the mailbox was successfully deleted, false otherwise
    */
-  public boolean delete(String mailbox)
+  public boolean delete(String mailbox, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(DELETE + ' ' + quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(new StringBuilder(DELETE)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(mailbox)))
+                               .toString(), callback);
   }
   
   /**
@@ -973,11 +1484,15 @@ public class IMAPConnection
    * @param target the target mailbox name
    * @return true if the mailbox was successfully renamed, false otherwise
    */
-  public boolean rename(String source, String target)
+  public boolean rename(String source, String target, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(RENAME + ' ' + quote(UTF7imap.encode(source)) +
-                               ' ' + quote(UTF7imap.encode(target)));
+    return invokeSimpleCommand(new StringBuilder(RENAME)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(source)))
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(target)))
+                               .toString(), callback);
   }
   
   /**
@@ -986,11 +1501,13 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @return true if the mailbox was successfully subscribed, false otherwise
    */
-  public boolean subscribe(String mailbox)
+  public boolean subscribe(String mailbox, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(SUBSCRIBE + ' ' +
-                               quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(new StringBuilder(SUBSCRIBE)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(mailbox)))
+                               .toString(), callback);
   }
   
   /**
@@ -999,38 +1516,45 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @return true if the mailbox was successfully unsubscribed, false otherwise
    */
-  public boolean unsubscribe(String mailbox)
+  public boolean unsubscribe(String mailbox, IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(UNSUBSCRIBE + ' ' +
-                               quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(new StringBuilder(UNSUBSCRIBE)
+                               .append(' ')
+                               .append(quote(UTF7imap.encode(mailbox)))
+                               .toString(), callback);
   }
   
   /**
-   * Returns a subset of names from the compete set of names available to
+   * Returns a subset of names from the complete set of names available to
    * the client.
    * @param reference the context relative to which mailbox names are
    * defined
    * @param mailbox a mailbox name, possibly including IMAP wildcards
    */
-  public ListEntry[] list(String reference, String mailbox)
+  public boolean list(String reference, String mailbox,
+                      ListCallback callback)
     throws IOException
   {
-    return listImpl(LIST, reference, mailbox);
+    return listImpl(LIST, reference, mailbox, callback);
   }
   
   /**
    * Returns a subset of subscribed names.
+   * @param reference the context relative to which mailbox names are
+   * defined
+   * @param mailbox a mailbox name, possibly including IMAP wildcards
    * @see #list
    */
-  public ListEntry[] lsub(String reference, String mailbox)
+  public boolean lsub(String reference, String mailbox,
+                      ListCallback callback)
     throws IOException
   {
-    return listImpl(LSUB, reference, mailbox);
+    return listImpl(LSUB, reference, mailbox, callback);
   }
   
-  protected ListEntry[] listImpl(String command, String reference,
-                                 String mailbox)
+  protected boolean listImpl(String command, String reference,
+                             String mailbox, ListCallback callback)
     throws IOException
   {
     if (reference == null)
@@ -1041,318 +1565,98 @@ public class IMAPConnection
       {
         mailbox = "";
       }
-    String tag = newTag();
-    sendCommand(tag, command + ' ' +
-                quote(UTF7imap.encode(reference)) + ' ' +
-                quote(UTF7imap.encode(mailbox)));
-    List acc = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id.equals(command))
-              {
-                List code = response.getResponseCode();
-                String text = response.getText();
-                
-                // Populate entry attributes with the interned versions
-                // of the response code.
-                // NB IMAP servers do not necessarily pay attention to case.
-                int alen = (code == null) ? 0 : code.size();
-                boolean noinferiors = false;
-                boolean noselect = false;
-                boolean marked = false;
-                boolean unmarked = false;
-                for (int i = 0; i < alen; i++)
-                  {
-                    String attribute = (String) code.get(i);
-                    if (attribute.equalsIgnoreCase(LIST_NOINFERIORS))
-                      {
-                        noinferiors = true;
-                      }
-                    else if (attribute.equalsIgnoreCase(LIST_NOSELECT))
-                      {
-                        noselect = true;
-                      }
-                    else if (attribute.equalsIgnoreCase(LIST_MARKED))
-                      {
-                        marked = true;
-                      }
-                    else if (attribute.equalsIgnoreCase(LIST_UNMARKED))
-                      {
-                        unmarked = true;
-                      }
-                  }
-                int si = text.indexOf(' ');
-                char delimiter = '\u0000';
-                String d = text.substring(0, si);
-                if (!d.equalsIgnoreCase(NIL))
-                  {
-                    delimiter = stripQuotes(d).charAt(0);
-                  }
-                String mbox = stripQuotes(text.substring(si + 1));
-                mbox = UTF7imap.decode(mbox);
-                ListEntry entry = new ListEntry(mbox, delimiter, noinferiors,
-                                                noselect, marked, unmarked);
-                acc.add(entry);
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                ListEntry[] entries = new ListEntry[acc.size()];
-                acc.toArray(entries);
-                return entries;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder buf = new StringBuilder(command)
+      .append(' ')
+      .append(quote(UTF7imap.encode(reference)))
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(buf.toString(), callback);
   }
   
   /**
    * Requests the status of the specified mailbox.
    */
-  public MailboxStatus status(String mailbox, String[] statusNames)
+  public boolean status(String mailbox, List<String> statusNames,
+                        StatusCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    StringBuffer buffer = new StringBuffer(STATUS)
+    StringBuilder buf = new StringBuilder(STATUS)
       .append(' ')
       .append(quote(UTF7imap.encode(mailbox)))
       .append(' ')
       .append('(');
-    for (int i = 0; i < statusNames.length; i++)
+    int len = statusNames.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
-            buffer.append(' ');
+            buf.append(' ');
           }
-        buffer.append(statusNames[i]);
+        buf.append(statusNames.get(i));
       }
-    buffer.append(')');
-    sendCommand(tag, buffer.toString());
-    MailboxStatus ms = new MailboxStatus();
-    while (true)
+    buf.append(')');
+    return invokeSimpleCommand(buf.toString(), callback);
+  }
+  
+  /**
+   * Append a message to the specified mailbox.
+   * @param mailbox the mailbox name
+   * @param flags optional list of flags to specify for the message
+   * @param content the RFC822 message (including headers)
+   * @return true if successful, false if error in flags/text
+   */
+  public boolean append(String mailbox, List<String> flags, byte[] content,
+                        IMAPCallback callback)
+    throws IOException
+  {
+    if (content == null || content.length == 0)
       {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id == STATUS)
-              {
-                List code = response.getResponseCode();
-                int last = (code == null) ? 0 : code.size() - 1;
-                for (int i = 0; i < last; i += 2)
-                  {
-                    try
-                      {
-                        String statusName = ((String) code.get(i)).intern();
-                        int value = Integer.parseInt((String) code.get(i + 1));
-                        if (statusName == MESSAGES)
-                          {
-                            ms.messageCount = value;
-                          }
-                        else if (statusName == RECENT)
-                          {
-                            ms.newMessageCount = value;
-                          }
-                        else if (statusName == UIDNEXT)
-                          {
-                            ms.uidNext = value;
-                          }
-                        else if (statusName == UIDVALIDITY)
-                          {
-                            ms.uidValidity = value;
-                          }
-                        else if (statusName == UNSEEN)
-                          {
-                            ms.firstUnreadMessage = value;
-                          }
-                      }
-                    catch (NumberFormatException e)
-                      {
-                        throw new IMAPException(id, "Invalid code: " + code);
-                      }
-                  }
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ms;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
+        return false;
       }
-  }
-  
-  /**
-   * Append a message to the specified mailbox.
-   * This method returns an OutputStream to which the message should be
-   * written and then closed.
-   * @param mailbox the mailbox name
-   * @param flags optional list of flags to specify for the message
-   * @param content the message body(including headers)
-   * @return true if successful, false if error in flags/text
-   */
-  public boolean append(String mailbox, String[] flags, byte[] content)
-    throws IOException
-  {
-    return append(mailbox, flags, content, null);
-  }
-  
-  /**
-   * Append a message to the specified mailbox.
-   * This method returns an OutputStream to which the message should be
-   * written and then closed.
-   * @param mailbox the mailbox name
-   * @param flags optional list of flags to specify for the message
-   * @param content the message body(including headers)
-   * @param uidplus handler for any APPENDUID information in the response
-   * @return true if successful, false if error in flags/text
-   */
-  public boolean append(String mailbox, String[] flags, byte[] content,
-                        UIDPlusHandler uidplus)
-    throws IOException
-  {
     String tag = newTag();
-    StringBuffer buffer = new StringBuffer(APPEND)
+    StringBuilder buf = new StringBuilder(APPEND)
       .append(' ')
       .append(quote(UTF7imap.encode(mailbox)))
       .append(' ');
     if (flags != null)
       {
-        buffer.append('(');
-        for (int i = 0; i < flags.length; i++)
+        buf.append('(');
+        int len = flags.size();
+        for (int i = 0; i < len; i++)
           {
             if (i > 0)
               {
-                buffer.append(' ');
+                buf.append(' ');
               }
-            buffer.append(flags[i]);
+            buf.append(flags.get(i));
           }
-        buffer.append(')');
-        buffer.append(' ');
+        buf.append(')');
+        buf.append(' ');
       }
-    buffer.append('{');
-    buffer.append(content.length);
-    buffer.append('}');
-    sendCommand(tag, buffer.toString());
-    IMAPResponse response = readResponse();
-    if (!response.isContinuation())
+    buf.append('{');
+    buf.append(content.length);
+    buf.append('}');
+    sendCommand(tag, buf.toString());
+    IMAPTokenizer.Token token = in.next();
+    if (token.type != IMAPTokenizer.CONTINUATION)
       {
-        throw new IMAPException(response.getID(), response.getText());
+        throw new IOException("err.expected_continuation");
       }
+    in.collectToEOL();
+    in.reset();
     out.write(content);         // write the message body
     out.writeln();
     out.flush();
-    while (true)
-      {
-        response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                if (uidplus != null)
-                  {
-                    processUIDPlus(response.getResponseCode(), uidplus);
-                  }
-                return true;
-              }
-            else if (id == NO)
-              {
-                return false;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            asyncResponses.add(response);
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    return handleSimpleResponse(tag, callback);
   }
 
-  void processUIDPlus(List code, UIDPlusHandler uidplus)
-  {
-    int len = code.size();
-    for (int i = 0; i < len; i++)
-      {
-        Object item = code.get(i);
-        if (item instanceof String)
-          {
-            if ("APPENDUID".equals(item) && i < len - 2)
-              {
-                long uidvalidity = Long.parseLong((String) code.get(i + 1));
-                long uid = Long.parseLong((String) code.get(i + 2));
-                uidplus.appenduid(uidvalidity, uid);
-              }
-            else if ("COPYUID".equals(item) && i < len - 3)
-              {
-                long uidvalidity =
-                  Long.parseLong((String) code.get(i + 1));
-                MessageSetTokenizer oldUIDs =
-                  new MessageSetTokenizer((String) code.get(i + 2));
-                MessageSetTokenizer newUIDs =
-                  new MessageSetTokenizer((String) code.get(i + 3));
-                while (oldUIDs.hasNext())
-                  {
-                    long oldUID = ((Long) oldUIDs.next()).longValue();
-                    long newUID = ((Long) newUIDs.next()).longValue();
-                    uidplus.copyuid(uidvalidity, oldUID, newUID);
-                  }
-              }
-          }
-        else
-          {
-            processUIDPlus((List) item, uidplus);
-          }
-      }
-  }
-  
   /**
    * Request a checkpoint of the currently selected mailbox.
    */
-  public void check()
+  public boolean check(IMAPCallback callback)
     throws IOException
   {
-    invokeSimpleCommand(CHECK);
+    return invokeSimpleCommand(CHECK, callback);
   }
   
   /**
@@ -1360,173 +1664,78 @@ public class IMAPConnection
    * and close the mailbox.
    * @return true if successful, false if no mailbox was selected
    */
-  public boolean close()
+  public boolean close(IMAPCallback callback)
     throws IOException
   {
-    return invokeSimpleCommand(CLOSE);
+    return invokeSimpleCommand(CLOSE, callback);
   }
   
   /**
    * Permanently removes all messages that have the \Delete flag set.
-   * @return the numbers of the messages expunged
    */
-  public int[] expunge()
+  public boolean expunge(IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, EXPUNGE);
-    List numbers = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id == EXPUNGE)
-              {
-                numbers.add(new Integer(response.getCount()));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                int len = numbers.size();
-                int[] mn = new int[len];
-                for (int i = 0; i < len; i++)
-                  {
-                    mn[i] = ((Integer) numbers.get(i)).intValue();
-                  }
-                return mn;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    return invokeSimpleCommand(EXPUNGE, callback);
   }
   
   /**
    * Searches the currently selected mailbox for messages matching the
    * specified criteria.
    */
-  public int[] search(String charset, String[] criteria)
+  public boolean search(String charset, List<String> criteria,
+                        SearchCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    StringBuffer buffer = new StringBuffer(SEARCH);
-    buffer.append(' ');
+    StringBuilder buf = new StringBuilder(SEARCH);
     if (charset != null)
       {
-        buffer.append(charset);
-        buffer.append(' ');
+        buf.append(' ');
+        buf.append(charset);
       }
-    for (int i = 0; i < criteria.length; i++)
+    if (criteria != null)
       {
-        if (i > 0)
+        int len = criteria.size();
+        for (int i = 0; i < len; i++)
           {
-            buffer.append(' ');
-          }
-        buffer.append(criteria[i]);
-      }
-    sendCommand(tag, buffer.toString());
-    List list = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id == SEARCH)
-              {
-                String text = response.getText();
-                if (text == null)
-                  {
-                    continue;
-                  }
-                try
-                  {
-                    int si = text.indexOf(' ');
-                    while (si != -1)
-                      {
-                        list.add(new Integer(text.substring(0, si)));
-                        text = text.substring(si + 1);
-                        si = text.indexOf(' ');
-                      }
-                    list.add(new Integer(text));
-                  }
-                catch (NumberFormatException e)
-                  {
-                    throw new IMAPException(id, "Expecting number: " + text);
-                  }
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                int len = list.size();
-                int[] mn = new int[len];
-                for (int i = 0; i < len; i++)
-                  {
-                    mn[i] = ((Integer) list.get(i)).intValue();
-                  }
-                return mn;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
+            buf.append(' ');
+            buf.append(criteria.get(i));
           }
       }
+    return invokeSimpleCommand(buf.toString(), callback);
   }
   
   /**
    * Retrieves data associated with the specified message in the mailbox.
-   * @param message the message number
+   * @param message the message number, or -1 for all messages
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus fetch(int message, String[] fetchCommands)
+  public boolean fetch(int message, List<String> fetchCommands,
+                       IMAPCallback callback)
     throws IOException
   {
-    String ids = (message == -1) ? "*" : Integer.toString(message);
-    return fetchImpl(FETCH, ids, fetchCommands)[0];
+    String ids = (message < 0) ? "*" : Integer.toString(message);
+    return fetchImpl(FETCH, ids, fetchCommands, callback);
   }
 
   /**
    * Retrieves data associated with the specified range of messages in
    * the mailbox.
-   * @param start the message number of the first message
-   * @param end the message number of the last message
+   * @param start the message number of the first message, or -1 for the
+   * first available message
+   * @param end the message number of the last message, or -1 for the last
+   * available message
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus[] fetch(int start, int end, String[] fetchCommands)
+  public boolean fetch(int start, int end, List<String> fetchCommands,
+                       IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
-    ids.append((start == -1) ? '*' : start);
+    StringBuilder ids = new StringBuilder();
+    ids.append((start < 0) ? '*' : start);
     ids.append(':');
-    ids.append((end == -1) ? '*' : end);
-    return fetchImpl(FETCH, ids.toString(), fetchCommands);
+    ids.append((end < 0) ? '*' : end);
+    return fetchImpl(FETCH, ids.toString(), fetchCommands, callback);
   }
 
   /**
@@ -1534,19 +1743,21 @@ public class IMAPConnection
    * @param messages the message numbers
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus[] fetch(int[] messages, String[] fetchCommands)
+  public boolean fetch(List<Integer> messages, List<String> fetchCommands,
+                       IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
-    for (int i = 0; i < messages.length; i++)
+    StringBuilder ids = new StringBuilder();
+    int len = messages.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
             ids.append(',');
           }
-        ids.append(messages[i]);
+        ids.append(messages.get(i));
       }
-    return fetchImpl(FETCH, ids.toString(), fetchCommands);
+    return fetchImpl(FETCH, ids.toString(), fetchCommands, callback);
   }
 
   /**
@@ -1554,11 +1765,12 @@ public class IMAPConnection
    * @param uid the message UID
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus uidFetch(long uid, String[] fetchCommands)
+  public boolean uidFetch(long uid, List<String> fetchCommands,
+                          IMAPCallback callback)
     throws IOException
   {
-    String ids = (uid == -1L) ? "*" : Long.toString(uid);
-    return fetchImpl(UID + ' ' + FETCH, ids, fetchCommands)[0];
+    String ids = (uid < 0) ? "*" : Long.toString(uid);
+    return fetchImpl(UID + ' ' + FETCH, ids, fetchCommands, callback);
   }
   
   /**
@@ -1568,15 +1780,16 @@ public class IMAPConnection
    * @param end the message number of the last message
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus[] uidFetch(long start, long end,
-                                   String[] fetchCommands)
+  public boolean uidFetch(long start, long end, List<String> fetchCommands,
+                          IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
+    StringBuilder ids = new StringBuilder();
     ids.append((start == -1L) ? '*' : start);
     ids.append(':');
     ids.append((end == -1L) ? '*' : end);
-    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands);
+    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands,
+                     callback);
   }
   
   /**
@@ -1584,79 +1797,44 @@ public class IMAPConnection
    * @param uids the message UIDs
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public MessageStatus[] uidFetch(long[] uids, String[] fetchCommands)
+  public boolean uidFetch(List<Long> uids, List<String> fetchCommands,
+                          IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
-    for (int i = 0; i < uids.length; i++)
+    StringBuilder ids = new StringBuilder();
+    int len = uids.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
             ids.append(',');
           }
-        ids.append(uids[i]);
+        ids.append(uids.get(i));
       }
-    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands);
+    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands,
+                     callback);
   }
   
-  private MessageStatus[] fetchImpl(String cmd, String ids,
-                                    String[] fetchCommands)
+  private boolean fetchImpl(String cmd, String ids, List<String> fetchCommands,
+                            IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    StringBuffer buffer = new StringBuffer(cmd);
-    buffer.append(' ');
-    buffer.append(ids);
-    buffer.append(' ');
-    buffer.append('(');
-    for (int i = 0; i < fetchCommands.length; i++)
+    StringBuilder buf = new StringBuilder(cmd);
+    buf.append(' ');
+    buf.append(ids);
+    buf.append(' ');
+    buf.append('(');
+    int len = fetchCommands.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
-            buffer.append(' ');
+            buf.append(' ');
           }
-        buffer.append(fetchCommands[i]);
+        buf.append(fetchCommands.get(i));
       }
-    buffer.append(')');
-    sendCommand(tag, buffer.toString());
-    List list = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id == FETCH)
-              {
-                int msgnum = response.getCount();
-                List code = response.getResponseCode();
-                MessageStatus status = new MessageStatus(msgnum, code);
-                list.add(status);
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                MessageStatus[] statuses = new MessageStatus[list.size()];
-                list.toArray(statuses);
-                return statuses;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    buf.append(')');
+    return invokeSimpleCommand(buf.toString(), callback);
   }
 
   /**
@@ -1664,14 +1842,13 @@ public class IMAPConnection
    * @param message the message number
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return the message status
    */
-  public MessageStatus store(int message, String flagCommand,
-                             String[] flags)
+  public boolean store(int message, String flagCommand,
+                       List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    String ids = (message == -1) ? "*" : Integer.toString(message);
-    return storeImpl(STORE, ids, flagCommand, flags)[0];
+    String ids = (message < 0) ? "*" : Integer.toString(message);
+    return storeImpl(STORE, ids, flagCommand, flags, callback);
   }
 
   /**
@@ -1681,17 +1858,16 @@ public class IMAPConnection
    * @param end the message number of the last message
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return a list of message-number to current flags
    */
-  public MessageStatus[] store(int start, int end, String flagCommand,
-                               String[] flags)
+  public boolean store(int start, int end, String flagCommand,
+                       List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
+    StringBuilder ids = new StringBuilder();
     ids.append((start == -1) ? '*' : start);
     ids.append(':');
     ids.append((end == -1) ? '*' : end);
-    return storeImpl(STORE, ids.toString(), flagCommand, flags);
+    return storeImpl(STORE, ids.toString(), flagCommand, flags, callback);
   }
 
   /**
@@ -1699,22 +1875,22 @@ public class IMAPConnection
    * @param messages the message numbers
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return a list of message-number to current flags
    */
-  public MessageStatus[] store(int[] messages, String flagCommand,
-                               String[] flags)
+  public boolean store(List<Integer> messages, String flagCommand,
+                       List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
-    for (int i = 0; i < messages.length; i++)
+    StringBuilder ids = new StringBuilder();
+    int len = messages.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
             ids.append(',');
           }
-        ids.append(messages[i]);
+        ids.append(messages.get(i));
       }
-    return storeImpl(STORE, ids.toString(), flagCommand, flags);
+    return storeImpl(STORE, ids.toString(), flagCommand, flags, callback);
   }
   
   /**
@@ -1722,14 +1898,13 @@ public class IMAPConnection
    * @param uid the message UID
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return the message status
    */
-  public MessageStatus uidStore(long uid, String flagCommand,
-                                String[] flags)
+  public boolean uidStore(long uid, String flagCommand,
+                          List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    String ids = (uid == -1L) ? "*" : Long.toString(uid);
-    return storeImpl(UID + ' ' + STORE, ids, flagCommand, flags)[0];
+    String ids = (uid < 0) ? "*" : Long.toString(uid);
+    return storeImpl(UID + ' ' + STORE, ids, flagCommand, flags, callback);
   }
 
   /**
@@ -1739,17 +1914,17 @@ public class IMAPConnection
    * @param end the UID of the last message
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return a list of message-number to current flags
    */
-  public MessageStatus[] uidStore(long start, long end, String flagCommand,
-                                  String[] flags)
+  public boolean uidStore(long start, long end, String flagCommand,
+                          List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
+    StringBuilder ids = new StringBuilder();
     ids.append((start == -1L) ? '*' : start);
     ids.append(':');
     ids.append((end == -1L) ? '*' : end);
-    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags);
+    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags,
+                     callback);
   }
 
   /**
@@ -1757,93 +1932,47 @@ public class IMAPConnection
    * @param uids the message UIDs
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
-   * @return a list of message-number to current flags
    */
-  public MessageStatus[] uidStore(long[] uids, String flagCommand,
-                                  String[] flags)
+  public boolean uidStore(List<Long> uids, String flagCommand,
+                          List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    StringBuffer ids = new StringBuffer();
-    for (int i = 0; i < uids.length; i++)
+    StringBuilder ids = new StringBuilder();
+    int len = uids.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
             ids.append(',');
           }
-        ids.append(uids[i]);
+        ids.append(uids.get(i));
       }
-    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags);
+    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags,
+                     callback);
   }
   
-  private MessageStatus[] storeImpl(String cmd, String ids,
-                                    String flagCommand, String[] flags)
+  private boolean storeImpl(String cmd, String ids, String flagCommand,
+                            List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    StringBuffer buffer = new StringBuffer(cmd);
-    buffer.append(' ');
-    buffer.append(ids);
-    buffer.append(' ');
-    buffer.append(flagCommand);
-    buffer.append(' ');
-    buffer.append('(');
-    for (int i = 0; i < flags.length; i++)
+    StringBuilder buf = new StringBuilder(cmd);
+    buf.append(' ');
+    buf.append(ids);
+    buf.append(' ');
+    buf.append(flagCommand);
+    buf.append(' ');
+    buf.append('(');
+    int len = flags.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
-            buffer.append(' ');
+            buf.append(' ');
           }
-        buffer.append(flags[i]);
+        buf.append(flags.get(i));
       }
-    buffer.append(')');
-    sendCommand(tag, buffer.toString());
-    List list = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            int msgnum = response.getCount();
-            List code = response.getResponseCode();
-            // 2 different styles returned by server: FETCH or FETCH FLAGS
-            if (id == FETCH)
-              {
-                MessageStatus mf = new MessageStatus(msgnum, code);
-                list.add(mf);
-              }
-            else if (id == FETCH_FLAGS)
-              {
-                List base = new ArrayList();
-                base.add(FLAGS);
-                base.add(code);
-                MessageStatus mf = new MessageStatus(msgnum, base);
-                list.add(mf);
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                MessageStatus[] mf = new MessageStatus[list.size()];
-                list.toArray(mf);
-                return mf;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    buf.append(')');
+    return invokeSimpleCommand(buf.toString(), callback);
   }
   
   /**
@@ -1851,115 +1980,38 @@ public class IMAPConnection
    * @param messages the message numbers
    * @param mailbox the destination mailbox
    */
-  public boolean copy(int[] messages, String mailbox)
+  public boolean copy(List<Integer> messages, String mailbox,
+                      IMAPCallback callback)
     throws IOException
   {
-    return copy(messages, mailbox, null);
-  }
-  
-  /**
-   * Copies the specified messages to the end of the destination mailbox.
-   * @param messages the message numbers
-   * @param mailbox the destination mailbox
-   * @param uidplus UIDPLUS callback for COPYUID information
-   */
-  public boolean copy(int[] messages, String mailbox, UIDPlusHandler uidplus)
-    throws IOException
-  {
-    if (messages == null || messages.length < 1)
+    if (messages == null || messages.size() < 1)
       {
         return true;
       }
-    StringBuffer buffer = new StringBuffer(COPY)
+    StringBuilder buf = new StringBuilder(COPY)
       .append(' ');
-    for (int i = 0; i < messages.length; i++)
+    int len = messages.size();
+    for (int i = 0; i < len; i++)
       {
         if (i > 0)
           {
-            buffer.append(',');
+            buf.append(',');
           }
-        buffer.append(messages[i]);
+        buf.append(messages.get(i));
       }
-    buffer.append(' ').append(quote(UTF7imap.encode(mailbox)));
-    String tag = newTag();
-    sendCommand(tag, buffer.toString());
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                if (uidplus != null)
-                  {
-                    processUIDPlus(response.getResponseCode(), uidplus);
-                  }
-                return true;
-              }
-            else if (id == NO)
-              {
-                return false;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            asyncResponses.add(response);
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    buf.append(' ');
+    buf.append(quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(buf.toString(), callback);
   }
 
   /**
    * Returns the namespaces available on the server.
-   * See RFC 2342 for details.
+   * @see RFC 2342
    */
-  public Namespaces namespace()
+  public boolean namespace(NamespaceCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, NAMESPACE);
-    Namespaces namespaces = null;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return namespaces;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (NAMESPACE.equals(response.getID()))
-              {
-                namespaces = new Namespaces(response.getText());
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    return invokeSimpleCommand(NAMESPACE, callback);
   }
 
   /**
@@ -1968,13 +2020,20 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @param principal the authentication identifier
    * @param rights the rights to assign
+   * @see RFC 4314
    */
-  public boolean setacl(String mailbox, String principal, int rights)
+  public boolean setacl(String mailbox, String principal, int rights, 
+                        ACLCallback callback)
     throws IOException
   {
-    String command = SETACL + ' ' + quote(UTF7imap.encode(mailbox)) +
-      ' ' + UTF7imap.encode(principal) + ' ' + rightsToString(rights);
-    return invokeSimpleCommand(command);
+    StringBuilder cmd = new StringBuilder(SETACL)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)))
+      .append(' ')
+      .append(UTF7imap.encode(principal))
+      .append(' ')
+      .append(rights);
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
@@ -1982,66 +2041,32 @@ public class IMAPConnection
    * specified mailbox.
    * @param mailbox the mailbox name
    * @param principal the authentication identifier
+   * @see RFC 4314
    */
-  public boolean deleteacl(String mailbox, String principal)
+  public boolean deleteacl(String mailbox, String principal,
+                           ACLCallback callback)
     throws IOException
   {
-    String command = DELETEACL + ' ' + quote(UTF7imap.encode(mailbox)) +
-      ' ' + UTF7imap.encode(principal);
-    return invokeSimpleCommand(command);
+    StringBuilder cmd = new StringBuilder(DELETEACL)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)))
+      .append(' ')
+      .append(UTF7imap.encode(principal));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
    * Returns the access control list for the specified mailbox.
-   * The returned rights are a logical OR of RIGHTS_* bits.
    * @param mailbox the mailbox name
-   * @return a map of principal names to Integer rights
+   * @see RFC 4314
    */
-  public Map getacl(String mailbox)
+  public boolean getacl(String mailbox, ACLCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    sendCommand(tag, GETACL + ' ' + quote(UTF7imap.encode(mailbox)));
-    Map ret = new TreeMap();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return null;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (ACL.equals(response.getID()))
-              {
-                String text = response.getText();
-                List args = parseACL(text, 1);
-                String rights = (String) args.get(2);
-                ret.put(args.get(1), new Integer(stringToRights(rights)));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder cmd = new StringBuilder(GETACL)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
@@ -2049,389 +2074,88 @@ public class IMAPConnection
    * The returned rights are a logical OR of RIGHTS_* bits.
    * @param mailbox the mailbox name
    * @param principal the authentication identity
+   * @see RFC 4314
    */
-  public int listrights(String mailbox, String principal)
+  public boolean listrights(String mailbox, String principal,
+                            ACLCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    String command = LISTRIGHTS + ' ' + quote(UTF7imap.encode(mailbox)) +
-      ' ' + UTF7imap.encode(principal);
-    sendCommand(tag, command);
-    int ret = -1;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return -1;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (LISTRIGHTS.equals(response.getID()))
-              {
-                String text = response.getText();
-                List args = parseACL(text, 1);
-                ret = stringToRights((String) args.get(2));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder cmd = new StringBuilder(LISTRIGHTS)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)))
+      .append(' ')
+      .append(UTF7imap.encode(principal));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
    * Returns the rights for the current principal for the specified mailbox.
    * The returned rights are a logical OR of RIGHTS_* bits.
    * @param mailbox the mailbox name
+   * @see RFC 4314
    */
-  public int myrights(String mailbox)
+  public boolean myrights(String mailbox, ACLCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    String command = MYRIGHTS + ' ' + quote(UTF7imap.encode(mailbox));
-    sendCommand(tag, command);
-    int ret = -1;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return -1;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (MYRIGHTS.equals(response.getID()))
-              {
-                String text = response.getText();
-                List args = parseACL(text, 0);
-                ret = stringToRights((String) args.get(2));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
-  }
-
-  private String rightsToString(int rights)
-  {
-    StringBuffer buf = new StringBuffer();
-    if ((rights & RIGHTS_LOOKUP) != 0)
-      {
-        buf.append('l');
-      }
-    if ((rights & RIGHTS_READ) != 0)
-      {
-        buf.append('r');
-      }
-    if ((rights & RIGHTS_SEEN) != 0)
-      {
-        buf.append('s');
-      }
-    if ((rights & RIGHTS_WRITE) != 0)
-      {
-        buf.append('w');
-      }
-    if ((rights & RIGHTS_INSERT) != 0)
-      {
-        buf.append('i');
-      }
-    if ((rights & RIGHTS_POST) != 0)
-      {
-        buf.append('p');
-      }
-    if ((rights & RIGHTS_CREATE) != 0)
-      {
-        buf.append('c');
-      }
-    if ((rights & RIGHTS_DELETE) != 0)
-      {
-        buf.append('d');
-      }
-    if ((rights & RIGHTS_ADMIN) != 0)
-      {
-        buf.append('a');
-      }
-    return buf.toString();
-  }
-
-  private int stringToRights(String text)
-  {
-    int ret = 0;
-    int len = text.length();
-    for (int i = 0; i < len; i++)
-      {
-        switch (text.charAt(i))
-          {
-          case 'l':
-            ret |= RIGHTS_LOOKUP;
-            break;
-          case 'r':
-            ret |= RIGHTS_READ;
-            break;
-          case 's':
-            ret |= RIGHTS_SEEN;
-            break;
-          case 'w':
-            ret |= RIGHTS_WRITE;
-            break;
-          case 'i':
-            ret |= RIGHTS_INSERT;
-            break;
-          case 'p':
-            ret |= RIGHTS_POST;
-            break;
-          case 'c':
-            ret |= RIGHTS_CREATE;
-            break;
-          case 'd':
-            ret |= RIGHTS_DELETE;
-            break;
-          case 'a':
-            ret |= RIGHTS_ADMIN;
-            break;
-          }
-      }
-    return ret;
-  }
-
-  /*
-   * Parse an ACL entry into a list of 2 or 3 components: mailbox name,
-   * optional principal, and rights.
-   */
-  private List parseACL(String text, int prolog)
-  {
-    int len = text.length();
-    boolean inQuotes = false;
-    List ret = new ArrayList();
-    StringBuffer buf = new StringBuffer();
-    for (int i = 0; i < len; i++)
-      {
-        char c = text.charAt(i);
-        switch (c)
-          {
-          case '"':
-            inQuotes = !inQuotes;
-            break;
-          case ' ':
-            if (inQuotes || ret.size() > prolog)
-              {
-                buf.append(c);
-              }
-            else
-              {
-                ret.add(UTF7imap.decode(buf.toString()));
-                buf.setLength(0);
-              }
-            break;
-          default:
-            buf.append(c);
-          }
-      }
-    ret.add(buf.toString());
-    return ret;
+    StringBuilder cmd = new StringBuilder(MYRIGHTS)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
    * Sets the quota for the specified quota root.
    * @param quotaRoot the quota root
    * @param resources the list of resources and associated limits to set
-   * @return the new quota, or <code>null</code> if the operation failed
    */
-  public Quota setquota(String quotaRoot, Quota.Resource[] resources)
+  public boolean setquota(String quotaRoot, Map<String,Integer> resources,
+                          QuotaCallback callback)
     throws IOException
   {
-    // Create resource limits list
-    StringBuffer resourceLimits = new StringBuffer();
+    StringBuilder cmd = new StringBuilder(SETQUOTA)
+      .append(' ')
+      .append(quote(UTF7imap.encode(quotaRoot)));
     if (resources != null)
       {
-        for (int i = 0; i < resources.length; i++)
+        for (Iterator<String> i = resources.keySet().iterator(); i.hasNext(); )
           {
-            if (i > 0)
-              {
-                resourceLimits.append(' ');
-              }
-            resourceLimits.append(resources[i].toString());
+            String resource = i.next();
+            int limit = resources.get(resource);
+            cmd.append(' ');
+            cmd.append('(');
+            cmd.append(quote(UTF7imap.encode(resource)));
+            cmd.append(' ');
+            cmd.append(limit);
+            cmd.append(')');
           }
       }
-    String tag = newTag();
-    String command = SETQUOTA + ' ' + quote(UTF7imap.encode(quotaRoot)) +
-      ' ' + resourceLimits.toString();
-    sendCommand(tag, command);
-    Quota ret = null;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return null;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (QUOTA.equals(response.getID()))
-              {
-                ret = new Quota(response.getText());
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
    * Returns the specified quota root's resource usage and limits.
    * @param quotaRoot the quota root
    */
-  public Quota getquota(String quotaRoot)
+  public boolean getquota(String quotaRoot, QuotaCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    String command = GETQUOTA + ' ' + quote(UTF7imap.encode(quotaRoot));
-    sendCommand(tag, command);
-    Quota ret = null;
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return null;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (QUOTA.equals(response.getID()))
-              {
-                ret = new Quota(response.getText());
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder cmd = new StringBuilder(GETQUOTA)
+      .append(' ')
+      .append(quote(UTF7imap.encode(quotaRoot)));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
   
   /**
    * Returns the quotas for the given mailbox.
    * @param mailbox the mailbox name
    */
-  public Quota[] getquotaroot(String mailbox)
+  public boolean getquotaroot(String mailbox, QuotaCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    String command = GETQUOTAROOT + ' ' + quote(UTF7imap.encode(mailbox));
-    sendCommand(tag, command);
-    List acc = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                Quota[] ret = new Quota[acc.size()];
-                acc.toArray(ret);
-                return ret;
-              }
-            else if (id == NO)
-              {
-                return null;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else if (response.isUntagged())
-          {
-            if (QUOTA.equals(response.getID()))
-              {
-                acc.add(new Quota(response.getText()));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder cmd = new StringBuilder(GETQUOTAROOT)
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)));
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
 
   /**
@@ -2440,74 +2164,18 @@ public class IMAPConnection
    * @param start the UID of the first message to expunge
    * @param end the UID of the last message to expunge
    */
-  public int[] uidExpunge(long start, long end)
+  public boolean uidExpunge(long start, long end, IMAPCallback callback)
     throws IOException
   {
-    String tag = newTag();
-    StringBuffer cmd = new StringBuffer(UID_EXPUNGE);
-    cmd.append(' ');
-    cmd.append(start);
-    cmd.append(':');
-    cmd.append(end);
-    sendCommand(tag, cmd.toString());
-    List numbers = new ArrayList();
-    while (true)
-      {
-        IMAPResponse response = readResponse();
-        String id = response.getID();
-        if (response.isUntagged())
-          {
-            if (id == EXPUNGE)
-              {
-                numbers.add(new Integer(response.getCount()));
-              }
-            else
-              {
-                asyncResponses.add(response);
-              }
-          }
-        else if (tag.equals(response.getTag()))
-          {
-            processAlerts(response);
-            if (id == OK)
-              {
-                int len = numbers.size();
-                int[] mn = new int[len];
-                for (int i = 0; i < len; i++)
-                  {
-                    mn[i] = ((Integer) numbers.get(i)).intValue();
-                  }
-                return mn;
-              }
-            else
-              {
-                throw new IMAPException(id, response.getText());
-              }
-          }
-        else
-          {
-            throw new IMAPException(id, response.getText());
-          }
-      }
+    StringBuilder cmd = new StringBuilder(UID_EXPUNGE)
+      .append(' ')
+      .append(start)
+      .append(':')
+      .append(end);
+    return invokeSimpleCommand(cmd.toString(), callback);
   }
   
   // -- Utility methods --
-  
-  /**
-   * Remove the quotes from each end of a string literal.
-   */
-  static String stripQuotes(String text)
-  {
-    if (text.charAt(0) == '"')
-      {
-        int len = text.length();
-        if (text.charAt(len - 1) == '"')
-          {
-            return text.substring(1, len - 1);
-          }
-      }
-    return text;
-  }
   
   /**
    * Quote the specified text if necessary.
@@ -2517,7 +2185,7 @@ public class IMAPConnection
     if (text.length() == 0 || text.indexOf(' ') != -1 ||
         text.indexOf('%') != -1)
       {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append('"');
         buffer.append(text);
         buffer.append('"');
