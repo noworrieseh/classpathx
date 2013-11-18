@@ -36,8 +36,11 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -126,6 +129,9 @@ public class IMAPConnection
    * Used to generate new tags for tagged commands.
    */
   private int tagIndex = 0;
+
+  private static final SimpleDateFormat DATETIME_FORMAT =
+    new SimpleDateFormat("'\"'dd-MMM-yyyy hh:mm:ss Z'\"'");
 
   /**
    * Creates a new connection to the default IMAP port.
@@ -404,60 +410,52 @@ public class IMAPConnection
       {
         callback.capability((List<String>) params.get(code));
       }
-    else if (callback instanceof SelectCallback)
+    else if (PERMANENTFLAGS.equals(code))
       {
-        SelectCallback select = (SelectCallback) callback;
-        if (PERMANENTFLAGS.equals(code))
-          {
-            select.permanentflags((List<String>) params.get(code));
-          }
-        else if (UIDVALIDITY.equals(code))
-          {
-            select.uidvalidity(Long.parseLong((String) params.get(code)));
-          }
-        else if (UIDNEXT.equals(code))
-          {
-            select.uidnext(Long.parseLong((String) params.get(code)));
-          }
-        else if (UNSEEN.equals(code))
-          {
-            select.unseen(Integer.parseInt((String) params.get(code)));
-          }
-        else if (READ_ONLY.equals(code))
-          {
-            select.readOnly();
-          }
-        else if (READ_WRITE.equals(code))
-          {
-            select.readWrite();
-          }
-        else if (TRYCREATE.equals(code))
-          {
-            select.tryCreate();
-          }
+        callback.permanentflags((List<String>) params.get(code));
       }
-    if (callback instanceof UIDPlusCallback)
+    else if (UIDVALIDITY.equals(code))
       {
-        UIDPlusCallback uidplus = (UIDPlusCallback) callback;
-        if (APPENDUID.equals(code))
-          {
-            List<String> args = (List<String>) params.get(code);
-            long uidvalidity = Long.parseLong(args.get(0));
-            long uid = Long.parseLong(args.get(1));
-            uidplus.appenduid(uidvalidity, uid);
-          }
-        else if (COPYUID.equals(code))
-          {
-            List<String> args = (List<String>) params.get(code);
-            long uidvalidity = Long.parseLong(args.get(0));
-            UIDSet source = new UIDSet(args.get(1));
-            UIDSet destination = new UIDSet(args.get(2));
-            uidplus.copyuid(uidvalidity, source, destination);
-          }
-        else if (UIDNOTSTICKY.equals(code))
-          {
-            uidplus.uidnotsticky();
-          }
+        callback.uidvalidity(Long.parseLong((String) params.get(code)));
+      }
+    else if (UIDNEXT.equals(code))
+      {
+        callback.uidnext(Long.parseLong((String) params.get(code)));
+      }
+    else if (UNSEEN.equals(code))
+      {
+        callback.firstUnseen(Integer.parseInt((String) params.get(code)));
+      }
+    else if (READ_ONLY.equals(code))
+      {
+        callback.readOnly();
+      }
+    else if (READ_WRITE.equals(code))
+      {
+        callback.readWrite();
+      }
+    else if (TRYCREATE.equals(code))
+      {
+        callback.tryCreate();
+      }
+    else if (APPENDUID.equals(code))
+      {
+        List<String> args = (List<String>) params.get(code);
+        long uidvalidity = Long.parseLong(args.get(0));
+        long uid = Long.parseLong(args.get(1));
+        callback.appenduid(uidvalidity, uid);
+      }
+    else if (COPYUID.equals(code))
+      {
+        List<String> args = (List<String>) params.get(code);
+        long uidvalidity = Long.parseLong(args.get(0));
+        UIDSet source = new UIDSet(args.get(1));
+        UIDSet destination = new UIDSet(args.get(2));
+        callback.copyuid(uidvalidity, source, destination);
+      }
+    else if (UIDNOTSTICKY.equals(code))
+      {
+        callback.uidnotsticky();
       }
     return text;
   }
@@ -483,11 +481,7 @@ public class IMAPConnection
       }
     else if (FLAGS.equals(token.value))
       {
-        List<String> data = parseFlags(false);
-        if (callback instanceof SelectCallback)
-          {
-            ((SelectCallback) callback).flags(data);
-          }
+        callback.flags(parseFlags(false));
       }
     else if (LIST.equals(token.value) ||
              LSUB.equals(token.value))
@@ -498,18 +492,11 @@ public class IMAPConnection
         String delim = toString(token);
         token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
-        if (callback instanceof ListCallback)
-          {
-            ((ListCallback) callback).list(flags, delim, mailbox);
-          }
+        callback.list(flags, delim, mailbox);
       }
     else if (SEARCH.equals(token.value))
       {
-        List<Integer> results = parseNumberList();
-        if (callback instanceof SearchCallback)
-          {
-            ((SearchCallback) callback).search(results);
-          }
+        callback.search(parseNumberList());
       }
     else if (STATUS.equals(token.value))
       {
@@ -523,17 +510,32 @@ public class IMAPConnection
                                  "err.expected_status_item");
             if (token.type == IMAPTokenizer.ATOM)
               {
-                String statusAtt = toString(token);
+                String item = toString(token);
                 token = requireToken(IMAPTokenizer.NUMBER,
                                      "err.expected_number");
-                data.put(statusAtt, new Integer(token.value));
+                if (MESSAGES.equals(item))
+                  {
+                    callback.exists(Integer.parseInt(token.value));
+                  }
+                else if (RECENT.equals(item))
+                  {
+                    callback.recent(Integer.parseInt(token.value));
+                  }
+                else if (UIDNEXT.equals(item))
+                  {
+                    callback.uidnext(Long.parseLong(token.value));
+                  }
+                else if (UIDVALIDITY.equals(item))
+                  {
+                    callback.uidvalidity(Long.parseLong(token.value));
+                  }
+                else if (UNSEEN.equals(item))
+                  {
+                    callback.unseen(Integer.parseInt(token.value));
+                  }
               }
           }
         while (token.type != IMAPTokenizer.RPAREN);
-        if (callback instanceof StatusCallback)
-          {
-            ((StatusCallback) callback).status(mailbox, data);
-          }
       }
     else if (CAPABILITY.equals(token.value))
       {
@@ -555,21 +557,14 @@ public class IMAPConnection
         Namespace personal = parseNamespace();
         Namespace otherUsers = parseNamespace();
         Namespace shared = parseNamespace();
-        if (callback instanceof NamespaceCallback)
-          {
-            ((NamespaceCallback) callback).namespace(personal, otherUsers,
-                                                     shared);
-          }
+        callback.namespace(personal, otherUsers, shared);
       }
     else if (ACL.equals(token.value))
       {
         token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
         Map<String,String> rights = parseACL();
-        if (callback instanceof ACLCallback)
-          {
-            ((ACLCallback) callback).acl(mailbox, rights);
-          }
+        callback.acl(mailbox, rights);
       }
     else if (LISTRIGHTS.equals(token.value))
       {
@@ -589,11 +584,7 @@ public class IMAPConnection
             optional.add(toAString(token));
             token = in.next();
           }
-        if (callback instanceof ACLCallback)
-          {
-            ((ACLCallback) callback).listrights(mailbox, identifier,
-                                                required, optional);
-          }
+        callback.listrights(mailbox, identifier, required, optional);
       }
     else if (MYRIGHTS.equals(token.value))
       {
@@ -601,10 +592,7 @@ public class IMAPConnection
         String mailbox = UTF7imap.decode(toAString(token));
         token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
         String rights = toAString(token);
-        if (callback instanceof ACLCallback)
-          {
-            ((ACLCallback) callback).myrights(mailbox, rights);
-          }
+        callback.myrights(mailbox, rights);
       }
     else if (QUOTA.equals(token.value))
       {
@@ -626,10 +614,7 @@ public class IMAPConnection
             limit.put(resource, new Integer(token.value));
             token = in.next();
           }
-        if (callback instanceof QuotaCallback)
-          {
-            ((QuotaCallback) callback).quota(quotaRoot, currentUsage, limit);
-          }
+        callback.quota(quotaRoot, currentUsage, limit);
       }
     else if (QUOTAROOT.equals(token.value))
       {
@@ -645,10 +630,7 @@ public class IMAPConnection
             roots.add(UTF7imap.decode(toAString(token)));
             token = in.next();
           }
-        if (callback instanceof QuotaCallback)
-          {
-            ((QuotaCallback) callback).quotaroot(mailbox, roots);
-          }
+        callback.quotaroot(mailbox, roots);
       }
     else
       {
@@ -714,7 +696,8 @@ public class IMAPConnection
     else if (INTERNALDATE.equals(code))
       {
         token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
-        String date = toString(token);
+        Date date = DATETIME_FORMAT.parse(toString(token),
+                                          new ParsePosition(0));
         return new INTERNALDATE(date);
       }
     else if (RFC822_SIZE.equals(code))
@@ -1421,7 +1404,7 @@ public class IMAPConnection
    * @param callback the callback to be notified of the state of the
    * selected mailbox
    */
-  public boolean select(String mailbox, SelectCallback callback)
+  public boolean select(String mailbox, IMAPCallback callback)
     throws IOException
   {
     return selectImpl(mailbox, SELECT, callback);
@@ -1434,14 +1417,14 @@ public class IMAPConnection
    * @param callback the callback to be notified of the state of the
    * selected mailbox
    */
-  public boolean examine(String mailbox, SelectCallback callback)
+  public boolean examine(String mailbox, IMAPCallback callback)
     throws IOException
   {
     return selectImpl(mailbox, EXAMINE, callback);
   }
 
   protected boolean selectImpl(String mailbox, String command,
-                               SelectCallback callback)
+                               IMAPCallback callback)
     throws IOException
   {
     return invokeSimpleCommand(new StringBuilder(command)
@@ -1533,7 +1516,7 @@ public class IMAPConnection
    * @param mailbox a mailbox name, possibly including IMAP wildcards
    */
   public boolean list(String reference, String mailbox,
-                      ListCallback callback)
+                      IMAPCallback callback)
     throws IOException
   {
     return listImpl(LIST, reference, mailbox, callback);
@@ -1547,14 +1530,14 @@ public class IMAPConnection
    * @see #list
    */
   public boolean lsub(String reference, String mailbox,
-                      ListCallback callback)
+                      IMAPCallback callback)
     throws IOException
   {
     return listImpl(LSUB, reference, mailbox, callback);
   }
   
   protected boolean listImpl(String command, String reference,
-                             String mailbox, ListCallback callback)
+                             String mailbox, IMAPCallback callback)
     throws IOException
   {
     if (reference == null)
@@ -1577,7 +1560,7 @@ public class IMAPConnection
    * Requests the status of the specified mailbox.
    */
   public boolean status(String mailbox, List<String> statusNames,
-                        StatusCallback callback)
+                        IMAPCallback callback)
     throws IOException
   {
     StringBuilder buf = new StringBuilder(STATUS)
@@ -1602,11 +1585,12 @@ public class IMAPConnection
    * Append a message to the specified mailbox.
    * @param mailbox the mailbox name
    * @param flags optional list of flags to specify for the message
+   * @param date optional date of the message
    * @param content the RFC822 message (including headers)
    * @return true if successful, false if error in flags/text
    */
-  public boolean append(String mailbox, List<String> flags, byte[] content,
-                        IMAPCallback callback)
+  public boolean append(String mailbox, List<String> flags, Date date,
+                        byte[] content, IMAPCallback callback)
     throws IOException
   {
     if (content == null || content.length == 0)
@@ -1631,6 +1615,11 @@ public class IMAPConnection
             buf.append(flags.get(i));
           }
         buf.append(')');
+        buf.append(' ');
+      }
+    if (date != null)
+      {
+        buf.append(DATETIME_FORMAT.format(date));
         buf.append(' ');
       }
     buf.append('{');
@@ -1682,9 +1671,11 @@ public class IMAPConnection
   /**
    * Searches the currently selected mailbox for messages matching the
    * specified criteria.
+   * @param charset optional charset
+   * @param criteria the list of criteria
    */
   public boolean search(String charset, List<String> criteria,
-                        SearchCallback callback)
+                        IMAPCallback callback)
     throws IOException
   {
     StringBuilder buf = new StringBuilder(SEARCH);
@@ -2008,7 +1999,7 @@ public class IMAPConnection
    * Returns the namespaces available on the server.
    * @see RFC 2342
    */
-  public boolean namespace(NamespaceCallback callback)
+  public boolean namespace(IMAPCallback callback)
     throws IOException
   {
     return invokeSimpleCommand(NAMESPACE, callback);
@@ -2023,7 +2014,7 @@ public class IMAPConnection
    * @see RFC 4314
    */
   public boolean setacl(String mailbox, String principal, int rights, 
-                        ACLCallback callback)
+                        IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(SETACL)
@@ -2044,7 +2035,7 @@ public class IMAPConnection
    * @see RFC 4314
    */
   public boolean deleteacl(String mailbox, String principal,
-                           ACLCallback callback)
+                           IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(DELETEACL)
@@ -2060,7 +2051,7 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @see RFC 4314
    */
-  public boolean getacl(String mailbox, ACLCallback callback)
+  public boolean getacl(String mailbox, IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(GETACL)
@@ -2077,7 +2068,7 @@ public class IMAPConnection
    * @see RFC 4314
    */
   public boolean listrights(String mailbox, String principal,
-                            ACLCallback callback)
+                            IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(LISTRIGHTS)
@@ -2094,7 +2085,7 @@ public class IMAPConnection
    * @param mailbox the mailbox name
    * @see RFC 4314
    */
-  public boolean myrights(String mailbox, ACLCallback callback)
+  public boolean myrights(String mailbox, IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(MYRIGHTS)
@@ -2109,7 +2100,7 @@ public class IMAPConnection
    * @param resources the list of resources and associated limits to set
    */
   public boolean setquota(String quotaRoot, Map<String,Integer> resources,
-                          QuotaCallback callback)
+                          IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(SETQUOTA)
@@ -2136,7 +2127,7 @@ public class IMAPConnection
    * Returns the specified quota root's resource usage and limits.
    * @param quotaRoot the quota root
    */
-  public boolean getquota(String quotaRoot, QuotaCallback callback)
+  public boolean getquota(String quotaRoot, IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(GETQUOTA)
@@ -2149,7 +2140,7 @@ public class IMAPConnection
    * Returns the quotas for the given mailbox.
    * @param mailbox the mailbox name
    */
-  public boolean getquotaroot(String mailbox, QuotaCallback callback)
+  public boolean getquotaroot(String mailbox, IMAPCallback callback)
     throws IOException
   {
     StringBuilder cmd = new StringBuilder(GETQUOTAROOT)

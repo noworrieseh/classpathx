@@ -22,6 +22,8 @@
 
 package gnu.inet.imap;
 
+import java.util.Date;
+
 /**
  * An INTERNALDATE data item in a FETCH response.
  * @version 1.2
@@ -32,14 +34,14 @@ public class INTERNALDATE
   extends FetchDataItem
 {
 
-  private final String internalDate;
+  private final Date internalDate;
 
-  INTERNALDATE(String internalDate)
+  INTERNALDATE(Date internalDate)
   {
     this.internalDate = internalDate;
   }
 
-  public String getInternalDate()
+  public Date getInternalDate()
   {
     return internalDate;
   }
