@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import gnu.inet.util.TraceLevel;
 
 /**
  * IMAP stream tokenizer.
@@ -40,9 +39,6 @@ import gnu.inet.util.TraceLevel;
  */
 class IMAPTokenizer
 {
-
-  private static final Level TRACE = new TraceLevel("imap");
-  private final Logger logger = Logger.getLogger("gnu.inet.imap");
 
   static final int NIL =  1<<0;
   static final int ATOM = 1<<1;
@@ -143,15 +139,17 @@ class IMAPTokenizer
   private int state;
   private int depth; // parenthesized list depth
   private InputStream in;
+  private Logger logger;
   private ByteArrayOutputStream sink;
   private ByteArrayOutputStream trace;
   private boolean peeking;
 
-  IMAPTokenizer(InputStream in)
+  IMAPTokenizer(InputStream in, Logger logger)
   {
     this.in = in;
+    this.logger = logger;
     sink = new ByteArrayOutputStream();
-    if (logger.isLoggable(TRACE))
+    if (logger.isLoggable(IMAPConnection.IMAP_TRACE))
       {
         trace = new ByteArrayOutputStream();
       }
@@ -269,7 +267,8 @@ class IMAPTokenizer
           }
         try
           {
-            logger.log(TRACE, "< " + new String(buf, "US-ASCII"));
+            logger.log(IMAPConnection.IMAP_TRACE,
+                       "< " + new String(buf, "US-ASCII"));
           }
         catch (IOException e) // Won't happen
           {

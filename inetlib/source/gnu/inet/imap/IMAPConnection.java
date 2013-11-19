@@ -239,7 +239,7 @@ public class IMAPConnection
     
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
-    in = new IMAPTokenizer(is);
+    in = new IMAPTokenizer(is, logger);
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
@@ -1218,7 +1218,7 @@ public class IMAPConnection
         
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
-        in = new IMAPTokenizer(is);
+        in = new IMAPTokenizer(is, logger);
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
         out = new CRLFOutputStream(os);
@@ -1342,7 +1342,7 @@ public class IMAPConnection
                             InputStream is = socket.getInputStream();
                             is = new BufferedInputStream(is);
                             is = new SaslInputStream(sasl, is);
-                            in = new IMAPTokenizer(is);
+                            in = new IMAPTokenizer(is, logger);
                             OutputStream os = socket.getOutputStream();
                             os = new BufferedOutputStream(os);
                             os = new SaslOutputStream(sasl, os);
@@ -1701,112 +1701,29 @@ public class IMAPConnection
    * @param message the message number, or -1 for all messages
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public boolean fetch(int message, List<String> fetchCommands,
+  public boolean fetch(MessageSet messages, List<String> fetchCommands,
                        IMAPCallback callback)
     throws IOException
   {
-    String ids = (message < 0) ? "*" : Integer.toString(message);
+    String ids = (messages == null) ? "*" : messages.toString(':');
     return fetchImpl(FETCH, ids, fetchCommands, callback);
   }
 
   /**
-   * Retrieves data associated with the specified range of messages in
-   * the mailbox.
-   * @param start the message number of the first message, or -1 for the
-   * first available message
-   * @param end the message number of the last message, or -1 for the last
-   * available message
-   * @param fetchCommands the fetch commands, e.g. FLAGS
-   */
-  public boolean fetch(int start, int end, List<String> fetchCommands,
-                       IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    ids.append((start < 0) ? '*' : start);
-    ids.append(':');
-    ids.append((end < 0) ? '*' : end);
-    return fetchImpl(FETCH, ids.toString(), fetchCommands, callback);
-  }
-
-  /**
-   * Retrieves data associated with messages in the mailbox.
-   * @param messages the message numbers
-   * @param fetchCommands the fetch commands, e.g. FLAGS
-   */
-  public boolean fetch(List<Integer> messages, List<String> fetchCommands,
-                       IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    int len = messages.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            ids.append(',');
-          }
-        ids.append(messages.get(i));
-      }
-    return fetchImpl(FETCH, ids.toString(), fetchCommands, callback);
-  }
-
-  /**
    * Retrieves data associated with the specified message in the mailbox.
-   * @param uid the message UID
+   * @param uids the message UIDs, or null for all messages
    * @param fetchCommands the fetch commands, e.g. FLAGS
    */
-  public boolean uidFetch(long uid, List<String> fetchCommands,
+  public boolean uidFetch(UIDSet uids, List<String> fetchCommands,
                           IMAPCallback callback)
     throws IOException
   {
-    String ids = (uid < 0) ? "*" : Long.toString(uid);
+    String ids = (uids == null) ? "*" : uids.toString(':');
     return fetchImpl(UID + ' ' + FETCH, ids, fetchCommands, callback);
   }
   
-  /**
-   * Retrieves data associated with the specified range of messages in
-   * the mailbox.
-   * @param start the message number of the first message
-   * @param end the message number of the last message
-   * @param fetchCommands the fetch commands, e.g. FLAGS
-   */
-  public boolean uidFetch(long start, long end, List<String> fetchCommands,
-                          IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    ids.append((start == -1L) ? '*' : start);
-    ids.append(':');
-    ids.append((end == -1L) ? '*' : end);
-    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands,
-                     callback);
-  }
-  
-  /**
-   * Retrieves data associated with messages in the mailbox.
-   * @param uids the message UIDs
-   * @param fetchCommands the fetch commands, e.g. FLAGS
-   */
-  public boolean uidFetch(List<Long> uids, List<String> fetchCommands,
-                          IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    int len = uids.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            ids.append(',');
-          }
-        ids.append(uids.get(i));
-      }
-    return fetchImpl(UID + ' ' + FETCH, ids.toString(), fetchCommands,
-                     callback);
-  }
-  
-  private boolean fetchImpl(String cmd, String ids, List<String> fetchCommands,
+  private boolean fetchImpl(String cmd, String ids,
+                            List<String> fetchCommands,
                             IMAPCallback callback)
     throws IOException
   {

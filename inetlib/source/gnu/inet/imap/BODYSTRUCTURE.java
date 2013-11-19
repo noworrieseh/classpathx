@@ -63,6 +63,8 @@ public class BODYSTRUCTURE
       return subtype;
     }
 
+    public abstract Map<String,String> getParameters();
+
   }
 
   public static class BodyPart

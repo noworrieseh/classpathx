@@ -1,5 +1,5 @@
 /*
- * UIDSet.java
+ * MessageSet.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -30,25 +30,24 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * A set of UIDs. These are long values.
+ * A set of message numbers. These are integer values.
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @see RFC 2359
  */
-public class UIDSet
+public class MessageSet
   extends AbstractSet
 {
 
   private final List elements;
   private int count;
 
-  public UIDSet()
+  public MessageSet()
   {
     elements = new ArrayList();
   }
 
-  UIDSet(String s)
+  MessageSet(String s)
   {
     count = 0;
     elements = new ArrayList();
@@ -59,13 +58,13 @@ public class UIDSet
         int ci = token.indexOf(':');
         if (ci == -1)
           {
-            elements.add(new Long(token));
+            elements.add(new Integer(token));
             count++;
           }
         else
           {
-            long start = Long.parseLong(token.substring(0, ci));
-            long end = Long.parseLong(token.substring(ci + 1));
+            int start = Integer.parseInt(token.substring(0, ci));
+            int end = Integer.parseInt(token.substring(ci + 1));
             elements.add(new Range(start, end));
             count += (end - start) + 1;
           }
@@ -113,7 +112,7 @@ public class UIDSet
 
   public boolean add(Object o)
   {
-    long src = ((Long) o).longValue();
+    int src = ((Integer) o).intValue();
     if (src < 1L)
       {
         return false;
@@ -122,14 +121,14 @@ public class UIDSet
     for (int i = 0; i < len; i++)
       {
         Object e = elements.get(i);
-        if (e instanceof Long)
+        if (e instanceof Integer)
           {
-            long dst = ((Long) e).longValue();
+            int dst = ((Integer) e).intValue();
             if (src == dst)
               {
                 return false;
               }
-            else if (src == dst - 1L) // replace with range
+            else if (src == dst - 1) // replace with range
               {
                 elements.set(i, new Range(src, dst));
                 coalesceAt(i);
@@ -151,7 +150,7 @@ public class UIDSet
               {
                 return false;
               }
-            else if (src == range.start - 1L)
+            else if (src == range.start - 1)
               {
                 range.start = src;
                 coalesceAt(i);
@@ -182,13 +181,13 @@ public class UIDSet
       {
         Object o1 = elements.get(index - 1);
         Object o2 = elements.get(index);
-        if (o1 instanceof Long)
+        if (o1 instanceof Integer)
           {
-            long l1 = ((Long) o1).longValue();
-            if (o2 instanceof Long)
+            int l1 = ((Integer) o1).intValue();
+            if (o2 instanceof Integer)
               {
-                long l2 = ((Long) o2).longValue();
-                if (l1 == l2 - 1L)
+                int l2 = ((Integer) o2).intValue();
+                if (l1 == l2 - 1)
                   {
                     elements.set(index - 1, new Range(l1, l2));
                     elements.remove(index);
@@ -197,7 +196,7 @@ public class UIDSet
             else
               {
                 Range r2 = (Range) o2;
-                if (l1 == r2.start - 1L)
+                if (l1 == r2.start - 1)
                   {
                     r2.start = l1;
                     elements.remove(index - 1);
@@ -207,10 +206,10 @@ public class UIDSet
         else
           {
             Range r1 = (Range) o1;
-            if (o2 instanceof Long)
+            if (o2 instanceof Integer)
               {
-                long l2 = ((Long) o2).longValue();
-                if (r1.end == l2 - 1L)
+                int l2 = ((Integer) o2).intValue();
+                if (r1.end == l2 - 1)
                   {
                     r1.end = l2;
                     elements.remove(index);
@@ -219,7 +218,7 @@ public class UIDSet
             else
               {
                 Range r2 = (Range) o2;
-                if (r1.end == r2.start - 1L)
+                if (r1.end == r2.start - 1)
                   {
                     r1.end = r2.end;
                     elements.remove(index);
@@ -231,18 +230,18 @@ public class UIDSet
 
   public boolean remove(Object o)
   {
-    long src = ((Long) o).longValue();
+    int src = ((Integer) o).intValue();
     int len = elements.size();
+    if (count == 1)
+      {
+        return false; // can't remove last element
+      }
     for (int i = 0; i < len; i++)
       {
         Object e = elements.get(i);
-        if (e instanceof Long)
+        if (e instanceof Integer)
           {
-            if (len == 1)
-              {
-                return false; // can't remove last element
-              }
-            long dst = ((Long) e).longValue();
+            int dst = ((Integer) e).intValue();
             if (src == dst)
               {
                 elements.remove(i);
@@ -258,7 +257,7 @@ public class UIDSet
                 range.start++;
                 if (range.start == range.end)
                   {
-                    elements.set(i, Long.valueOf(range.start));
+                    elements.set(i, Integer.valueOf(range.start));
                   }
                 count--;
                 return true;
@@ -268,19 +267,19 @@ public class UIDSet
                 range.end--;
                 if (range.start == range.end)
                   {
-                    elements.set(i, Long.valueOf(range.start));
+                    elements.set(i, Integer.valueOf(range.start));
                   }
                 count--;
                 return true;
               }
             else if (range.contains(src)) // split range
               {
-                Object o1 = (range.start == src - 1L) ?
-                  Long.valueOf(range.start) :
-                  new Range(range.start, src - 1L);
-                Object o2 = (range.end == src + 1L) ?
-                  Long.valueOf(range.end) :
-                  new Range(src + 1L, range.end);
+                Object o1 = (range.start == src - 1) ?
+                  Integer.valueOf(range.start) :
+                  new Range(range.start, src - 1);
+                Object o2 = (range.end == src + 1) ?
+                  Integer.valueOf(range.end) :
+                  new Range(src + 1, range.end);
                 elements.set(i, o2);
                 elements.add(i, o1);
                 count--;
@@ -293,7 +292,8 @@ public class UIDSet
 
   public boolean equals(Object o)
   {
-    return (o instanceof UIDSet && o.toString().equals(toString()));
+    return (o instanceof MessageSet &&
+            o.toString().equals(toString()));
   }
 
   public int hashCode()
@@ -341,20 +341,20 @@ public class UIDSet
 
   public Iterator iterator()
   {
-    return new UIDSetIterator(elements.iterator());
+    return new MessageSetIterator(elements.iterator());
   }
 
   public Object[] toArray()
   {
-    Long[] l = new Long[count];
+    Integer[] l = new Integer[count];
     return toArray(l);
   }
 
   public Object[] toArray(Object[] a)
   {
-    if (a == null || !(a instanceof Long[]) || a.length < count)
+    if (a == null || !(a instanceof Integer[]) || a.length < count)
       {
-        a = new Long[count];
+        a = new Integer[count];
       }
     Iterator li = iterator();
     for (int i = 0; i < count; i++)
@@ -367,10 +367,10 @@ public class UIDSet
   private static class Range
   {
 
-    private long start;
-    private long end;
+    int start;
+    int end;
 
-    Range(long start, long end)
+    Range(int start, int end)
     {
       this.start = start;
       this.end = end;
@@ -378,7 +378,7 @@ public class UIDSet
 
     public boolean contains(Object o)
     {
-      long l = ((Long) o).longValue();
+      int l = ((Integer) o).intValue();
       return l >= start && l <= end;
     }
 
@@ -409,17 +409,17 @@ public class UIDSet
       implements Iterator
     {
 
-      private long index;
-      private long end;
+      private int index;
+      private int end;
       
-      RangeIterator(long start, long end) {
+      RangeIterator(int start, int end) {
         index = start;
         this.end = end;
       }
 
       public Object next()
       {
-        return Long.valueOf(index++);
+        return Integer.valueOf(index++);
       }
 
       public boolean hasNext()
@@ -436,14 +436,14 @@ public class UIDSet
 
   }
 
-  private static class UIDSetIterator
+  private static class MessageSetIterator
     implements Iterator
   {
 
     private Iterator ei;
     private Iterator ri;
 
-    UIDSetIterator(Iterator ei) {
+    MessageSetIterator(Iterator ei) {
       this.ei = ei;
     }
 

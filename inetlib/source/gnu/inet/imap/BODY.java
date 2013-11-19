@@ -22,9 +22,6 @@
 
 package gnu.inet.imap;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 /**
  * A BODY data item in a FETCH response.
  * @version 1.2
@@ -61,9 +58,9 @@ public class BODY
     return originOffset < 0 ? 0 : originOffset;
   }
 
-  public InputStream getContents()
+  public byte[] getContents()
   {
-    return new ByteArrayInputStream(contents);
+    return contents;
   }
 
 }

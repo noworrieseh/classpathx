@@ -303,6 +303,7 @@ $(src)/gnu/inet/imap/IMAPConstants.java \
 $(src)/gnu/inet/imap/IMAPException.java \
 $(src)/gnu/inet/imap/IMAPTokenizer.java \
 $(src)/gnu/inet/imap/INTERNALDATE.java \
+$(src)/gnu/inet/imap/MessageSet.java \
 $(src)/gnu/inet/imap/Namespace.java \
 $(src)/gnu/inet/imap/RFC822_SIZE.java \
 $(src)/gnu/inet/imap/UID.java \
