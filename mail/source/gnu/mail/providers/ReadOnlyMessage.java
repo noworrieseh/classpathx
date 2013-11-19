@@ -43,7 +43,6 @@ public abstract class ReadOnlyMessage extends MimeMessage
 {
 
   protected ReadOnlyMessage(Folder folder, int msgnum)
-    throws MessagingException
   {
     super(folder, msgnum);
   }

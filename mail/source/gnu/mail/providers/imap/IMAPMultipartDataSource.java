@@ -1,6 +1,6 @@
 /*
  * IMAPMultipartDataSource.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -22,131 +22,62 @@
 
 package gnu.mail.providers.imap;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.ProtocolException;
+import java.util.List;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.MultipartDataSource;
-import javax.mail.Part;
+import javax.mail.internet.MimePart;
+import javax.mail.internet.MimePartDataSource;
+
+import gnu.inet.imap.BODYSTRUCTURE;
 
 /**
  * An IMAP multipart component.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 0.1
+ * @version 1.5
  */
-public class IMAPMultipartDataSource
+final class IMAPMultipartDataSource
+  extends MimePartDataSource
   implements MultipartDataSource
 {
 
-  /**
-   * The multipart object this data source is associated with.
-   */
-  protected IMAPMultipart multipart;
+  final IMAPMessage message;
+  final List<BODYSTRUCTURE.Part> mparts;
+  final String section;
+  final BodyPart[] parts;
 
-  /**
-   * Called by the IMAPMessage.
-   */
-  protected IMAPMultipartDataSource(IMAPMultipart multipart)
+  IMAPMultipartDataSource(IMAPMessage message, MimePart part,
+                          BODYSTRUCTURE.Multipart mp, String section)
   {
-    if (multipart == null)
-      throw new NullPointerException();
-    this.multipart = multipart;
+    super(part);
+    this.message = message;
+    this.section = section;
+    mparts = mp.getParts();
+    parts = new BodyPart[mparts.size()];
   }
 
-  /**
-   * Returns the content description of the body part that contains the
-   * multipart.
-   */
-  public String getName()
-  {
-    try
-      {
-        return multipart.getParent().getDescription();
-      }
-    catch (MessagingException e)
-      {
-        return null;
-      }
-  }
-
-  /**
-   * Returns the content type of the body part that contains the multipart.
-   */
-  public String getContentType()
-  {
-    try
-      {
-        return multipart.getParent().getContentType();
-      }
-    catch (MessagingException e)
-      {
-        return null;
-      }
-  }
-
-  /**
-   * Returns an input stream from which the content of this multipart can be
-   * read.
-   */
-  public InputStream getInputStream()
-    throws IOException
-  {
-    try
-      {
-        Part part = multipart.getParent();
-        if (part instanceof IMAPBodyPart)
-          {
-            return ((IMAPBodyPart) part).getContentStream();
-          }
-        else if (part instanceof IMAPMessage)
-          {
-            return ((IMAPMessage) part).getContentStream();
-          }
-        else
-          {
-            throw new IOException("Internal error in part structure");
-          }
-      }
-    catch (MessagingException e)
-      {
-        throw new IOException(e.getMessage());
-      }
-  }
-
-  /**
-   * IMAP multiparts are read-only.
-   */
-  public OutputStream getOutputStream()
-    throws IOException
-  {
-    throw new ProtocolException("IMAP multiparts are read-only");
-  }
-
-  /**
-   * Returns the secified sub-part of the multipart.
-   */
   public BodyPart getBodyPart(int index)
     throws MessagingException
   {
-    return multipart.getBodyPart(index);
+    if (parts[index] == null)
+      {
+        String s = Integer.toString(index + 1);
+        if (section != null)
+          {
+            s = new StringBuilder(section).append('.').append(s).toString();
+          }
+        parts[index] = new IMAPBodyPart(message,
+                                        mparts.get(index),
+                                        s);
+
+      }
+    return parts[index];
   }
 
-  /**
-   * Returns the number of sub-parts of the multipart.
-   */
   public int getCount()
   {
-    try
-      {
-        return multipart.getCount();
-      }
-    catch (MessagingException e)
-      {
-        return 0;
-      }
+    return parts.length;
   }
 
 }

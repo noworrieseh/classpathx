@@ -1,6 +1,6 @@
 /*
  * IMAPMessage.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -27,689 +27,287 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.activation.DataHandler;
 import javax.mail.Flags;
 import javax.mail.Folder;
+import javax.mail.IllegalWriteException;
 import javax.mail.MessagingException;
 import javax.mail.Part;
+import javax.mail.internet.ContentDisposition;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.MailDateFormat;
+import javax.mail.internet.MimeUtility;
 import javax.mail.internet.ParameterList;
 
+import gnu.inet.imap.BODY;
+import gnu.inet.imap.BODYSTRUCTURE;
+import gnu.inet.imap.IMAPAdapter;
+import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
-import gnu.inet.imap.MessageStatus;
-import gnu.inet.imap.Pair;
+import gnu.inet.imap.ENVELOPE;
+import gnu.inet.imap.FetchDataItem;
+import gnu.inet.imap.FLAGS;
+import gnu.inet.imap.INTERNALDATE;
+import gnu.inet.imap.RFC822_SIZE;
+import gnu.inet.imap.UID;
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.providers.ReadOnlyMessage;
 
 /**
  * The message class implementing the IMAP4 mail protocol.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 1.0
+ * @version 1.2
  */
 public final class IMAPMessage
-extends ReadOnlyMessage
+  extends ReadOnlyMessage
 {
 
-  static final String FETCH_HEADERS = "BODY.PEEK[HEADER]";
-  static final String FETCH_CONTENT = "BODY.PEEK[]";
+  private static MailDateFormat dateFormat = new MailDateFormat();
 
   static final String PLUS_FLAGS = "+FLAGS";
   static final String MINUS_FLAGS = "-FLAGS";
 
-  // BODYSTRUCTURE response atom indices
-  static final int BS_CONTENT_TYPE = 0;
-  static final int BS_CONTENT_SUBTYPE = 1;
-  static final int BS_PARAMETERS = 2;
-  static final int BS_ID = 3;
-  static final int BS_DESCRIPTION = 4;
-  static final int BS_ENCODING = 5;
-  static final int BS_OCTETS = 6;
-  static final int BS_TEXT_LINES = 7;
-  static final int BS_EXT_MD5 = 7;
-  static final int BS_EXT_DISPOSITION = 8;
-  static final int BS_EXT_LANGUAGE = 9;
-
   /**
-   * If set, this contains the string value of the received date.
+   * If set, this contains the received date.
    */
-  protected String internalDate = null;
+  Date internalDate = null;
 
   /**
    * The UID associated with this message.
    */
-  protected long uid = -1L;
-
-  /**
-   * The date format used to parse IMAP INTERNALDATE values.
-   */
-  protected static final DateFormat internalDateFormat =
-    new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss zzzzz");
+  long uid = -1L;
 
   /**
    * If set, the current set of headers is complete.
    * If false, and a header is requested but returns null, all headers will
    * be requested from the server.
    */
-  protected boolean headersComplete = false;
+  boolean headersComplete = false;
 
-  /*
-   * Parsed multipart object representing this message's content.
-   */
-  private IMAPMultipart multipart = null;
+  BODYSTRUCTURE.Part part;
+  ContentType type;
+  ContentDisposition disposition;
+  String section;
+  int size = -1;
+  ENVELOPE envelope;
 
-  IMAPMessage(IMAPFolder folder, InputStream in, int msgnum)
-    throws MessagingException
+  IMAPCallback callback = new IMAPAdapter()
   {
-    super(folder, in, msgnum);
-    flags = null;
-  }
 
+    public void fetch(int message, List<FetchDataItem> data)
+    {
+      for (FetchDataItem item : data)
+        {
+          update(item);
+        }
+    }
+  
+  };
+
+  /**
+   * Constructor for a top-level message.
+   */
   IMAPMessage(IMAPFolder folder, int msgnum)
-    throws MessagingException
   {
     super(folder, msgnum);
-    flags = null;
   }
 
   /**
-   * Fetches the flags fo this message.
+   * Constructor for a message/rfc866 body part.
    */
-  void fetchFlags()
-    throws MessagingException
+  IMAPMessage(IMAPMessage parent, BODYSTRUCTURE.MessagePart part,
+              ContentType type, ContentDisposition disposition,
+              String section)
   {
-    String[] commands = new String[] { IMAPConstants.FLAGS };
-    fetch(commands);
-  }
-
-  /**
-   * Fetches the message header.
-   */
-  void fetchHeaders()
-    throws MessagingException
-  {
-    String[] commands = new String[] { FETCH_HEADERS,
-      IMAPConstants.INTERNALDATE };
-    fetch(commands);
-  }
-
-  /**
-   * Fetches the message body.
-   */
-  void fetchContent()
-    throws MessagingException
-  {
-    String[] commands = new String[] { FETCH_CONTENT,
-      IMAPConstants.INTERNALDATE };
-    fetch(commands);
-  }
-
-  /**
-   * Fetches the multipart corresponding to the message body.
-   */
-  void fetchMultipart()
-    throws MessagingException
-  {
-    String[] commands = new String[] { IMAPConstants.BODYSTRUCTURE };
-    fetch(commands);
-  }
-
-  /**
-   * Fetches the UID.
-   */
-  void fetchUID()
-    throws MessagingException
-  {
-    String[] commands = new String[] { IMAPConstants.UID };
-    fetch(commands);
-  }
-
-  /**
-   * Generic fetch routine.
-   */
-  void fetch(String[] commands)
-    throws MessagingException
-  {
-    try
+    super(parent.getFolder(), parent.msgnum);
+    this.part = part;
+    this.type = type;
+    this.disposition = disposition;
+    this.section = section;
+    if (part instanceof BODYSTRUCTURE.MessagePart)
       {
-        IMAPConnection connection =
-         ((IMAPStore) folder.getStore()).getConnection();
-        // Select folder
-        if (!folder.isOpen())
-          {
-            folder.open(Folder.READ_WRITE);
-          }
-        int[] messages = new int[] { msgnum };
-        synchronized (connection)
-          {
-            MessageStatus[] ms = connection.fetch(messages, commands);
-            for (int i = 0; i < ms.length; i++)
-              {
-                if (ms[i].getMessageNumber() == msgnum)
-                  {
-                    update(ms[i]);
-                  }
-              }
-          }
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
+        envelope = ((BODYSTRUCTURE.MessagePart) part).getEnvelope();
       }
   }
 
-  /**
-   * Updates this message using the specified message status object.
-   */
-  void update(MessageStatus status)
-    throws MessagingException
-  {
-    List code = status.getCode();
-    int clen = code.size();
-    for (int i = 0; i < clen; i += 2)
-      {
-        Object item = code.get(i);
-        String key = null;
-        List params = Collections.EMPTY_LIST;
-        if (item instanceof Pair)
-          {
-            Pair pair = (Pair) item;
-            key = pair.getKey();
-            params = pair.getValue();
-          }
-        else if (item instanceof String)
-          {
-            key = (String) item;
-          }
-        else
-          {
-            throw new MessagingException("Unexpected status item: " + item);
-          }
-
-        if (key == IMAPConstants.BODY || key == IMAPConstants.RFC822)
-          {
-            byte[] literal = (byte[]) code.get(i + 1);
-            int plen = params.size();
-            if (plen == 0)
-              {
-                InputStream in = new ByteArrayInputStream(literal);
-                parse(in);
-              }
-            else
-              {
-                for (int pi = 0; pi < plen; pi += 2)
-                  {
-                    Object pitem = params.get(pi);
-                    String pkey = null;
-                    if (pitem instanceof String)
-                      {
-                        pkey = (String) pitem;
-                      }
-                    else
-                      {
-                        throw new MessagingException("Unexpected status item: " +
-                                                      pitem);
-                      }
-
-                    if (pkey == IMAPConstants.HEADER)
-                      {
-                        InputStream in = new ByteArrayInputStream(literal);
-                        headers = createInternetHeaders(in);
-                        headersComplete = true;
-                      }
-                    else if (pkey == IMAPConstants.HEADER_FIELDS)
-                      {
-                        if (!headersComplete)
-                          {
-                            InputStream in = new ByteArrayInputStream(literal);
-                            headers = createInternetHeaders(in);
-                          }
-                      }
-                    else
-                      {
-                        throw new MessagingException("Unknown message status key: " +
-                                                     pkey);
-                      }
-                  }
-              }
-          }
-        else if (key == IMAPConstants.RFC822_HEADER)
-          {
-            byte[] literal = (byte[]) code.get(i + 1);
-            InputStream in = new ByteArrayInputStream(literal);
-            headers = createInternetHeaders(in);
-            headersComplete = true;
-          }
-        else if (key == IMAPConstants.BODYSTRUCTURE)
-          {
-            List mlist = (List) code.get(i + 1);
-            if (headers == null)
-              {
-                headers = new InternetHeaders();
-              }
-            multipart = parseMultipart(mlist, this, headers, null);
-          }
-        else if (key == IMAPConstants.ENVELOPE)
-          {
-            List elist = (List) code.get(++i);
-            if (elist != null && elist.size() == 10)
-              {
-                String date = getString(elist, 0);
-                String subject = getString(elist, 1);
-                InternetAddress[] from = getAddressList(elist, 2);
-                InternetAddress[] sender = getAddressList(elist, 3);
-                InternetAddress[] replyTo = getAddressList(elist, 4);
-                InternetAddress[] to = getAddressList(elist, 5);
-                InternetAddress[] cc = getAddressList(elist, 6);
-                InternetAddress[] bcc = getAddressList(elist, 7);
-                String inReplyTo = getString(elist, 8);
-                String messageId = getString(elist, 9);
-                if (headers == null)
-                  {
-                    headers = new InternetHeaders();
-                  }
-                if (date != null)
-                  {
-                    headers.setHeader("Date", date);
-                  }
-                if (subject != null)
-                  {
-                    headers.setHeader("Subject", subject);
-                  }
-                if (inReplyTo != null)
-                  {
-                    headers.setHeader("In-Reply-To", inReplyTo);
-                  }
-                if (messageId != null)
-                  {
-                    headers.setHeader("Message-ID", messageId);
-                  }
-                if (from != null)
-                  {
-                    headers.setHeader("From", InternetAddress.toString(from));
-                  }
-                if (sender != null)
-                  {
-                    headers.setHeader("Sender",
-                            InternetAddress.toString(sender));
-                  }
-                if (replyTo != null)
-                  {
-                    headers.setHeader("Reply-To",
-                            InternetAddress.toString(replyTo));
-                  }
-                if (to != null)
-                  {
-                    headers.setHeader("To", InternetAddress.toString(to));
-                  }
-                if (cc != null)
-                  {
-                    headers.setHeader("Cc", InternetAddress.toString(cc));
-                  }
-                if (bcc != null)
-                  {
-                    headers.setHeader("Bcc", InternetAddress.toString(bcc));
-                  }
-                // NB headers not complete
-              }
-          }
-        else if (key == IMAPConstants.FLAGS)
-          {
-            List fl = (List) code.get(i + 1);
-            flags = new IMAPFlags();
-            for (Iterator j = fl.iterator(); j.hasNext(); )
-              {
-                Object f = j.next();
-                if (f == IMAPConstants.FLAG_ANSWERED)
-                  {
-                    flags.add(Flags.Flag.ANSWERED);
-                  }
-                else if (f == IMAPConstants.FLAG_DELETED)
-                  {
-                    flags.add(Flags.Flag.DELETED);
-                  }
-                else if (f == IMAPConstants.FLAG_DRAFT)
-                  {
-                    flags.add(Flags.Flag.DRAFT);
-                  }
-                else if (f == IMAPConstants.FLAG_FLAGGED)
-                  {
-                    flags.add(Flags.Flag.FLAGGED);
-                  }
-                else if (f == IMAPConstants.FLAG_RECENT)
-                  {
-                    flags.add(Flags.Flag.RECENT);
-                  }
-                else if (f == IMAPConstants.FLAG_SEEN)
-                  {
-                    flags.add(Flags.Flag.SEEN);
-                  }
-                else if (f instanceof String)
-                  {
-                    flags.add((String) f);
-                  }
-              }
-            ((IMAPFlags) flags).checkpoint();
-          }
-        else if (key == IMAPConstants.INTERNALDATE)
-          {
-            internalDate = (String) code.get(i + 1);
-          }
-        else if (key==IMAPConstants.UID)
-          {
-            uid = Long.parseLong((String) code.get(i + 1));
-          }
-        else
-          {
-            throw new MessagingException("Unknown message status key: " + key);
-          }
-      }
-  }
-
-  /*
-   * Parse a multipart content object for the specified multipart Part.
-   */
-  IMAPMultipart parseMultipart(List list, Part parent,
-                                InternetHeaders parentHeaders,
-                                String baseSection)
-    throws MessagingException
-  {
-    int len = list.size();
-    if (len == 0)
-      {
-        throw new MessagingException("Empty [MIME-IMB] structure");
-      }
-    int offset = 0;
-    // First parts, in lists
-    Object value = list.get(offset);
-    List partList = new ArrayList();
-    List sectionList = new ArrayList();
-    for (; value instanceof List; value = list.get(++offset))
-      {
-        String section = (baseSection == null) ?
-          Integer.toString(offset+1) :
-          baseSection + "." +(offset + 1);
-        partList.add(value);
-        sectionList.add(section);
-      }
-    // Next the multipart subtype
-    String subtype = parseAtom(value).toLowerCase();
-    IMAPMultipart m = new IMAPMultipart(this, parent, subtype);
-    ContentType ct = new ContentType(m.getContentType());
-    // Add the parts
-    for (int i = 0; i < offset; i++)
-      {
-        List part = (List) partList.get(i);
-        String section = (String) sectionList.get(i);
-        m.addBodyPart(parseBodyPart(part, m, section));
-      }
-    // Now extension data
-    //offset++;
-    if (offset < len)
-      {
-        // Last 2 are disposition and language
-        String disposition = parseAtom(list.get(len - 2));
-        String language = parseAtom(list.get(len - 1));
-
-        if (disposition != null)
-          {
-            parentHeaders.setHeader("Content-Disposition", disposition);
-          }
-        if (language != null)
-          {
-            parentHeaders.setHeader("Content-Language", language);
-          }
-
-        // Next any parameters
-        // Note that there should only be 1 slot containing a list,
-        // but servers sometimes return multiple lists
-        List plist = new ArrayList();
-        for (int i = offset; i < len - 2; i++)
-          {
-            value = list.get(i);
-            if (value instanceof List)
-              {
-                plist.addAll((List) value);
-              }
-          }
-        if (plist.size() > 0)
-          {
-            ParameterList params = parseParameterList(plist);
-            ct = new ContentType(ct.getPrimaryType(), subtype, params);
-          }
-      }
-    parentHeaders.setHeader("Content-Type", ct.toString());
-    return m;
-  }
-
-  /*
-   * Parse a body part for the specified multipart content object.
-   */
-  IMAPBodyPart parseBodyPart(List list, IMAPMultipart parent, String section)
-    throws MessagingException
-  {
-    int len = list.size();
-    if (len == 0)
-      {
-        throw new MessagingException("Empty [MIME-IMB] structure");
-      }
-    Object arg1 = list.get(0);
-    if (arg1 instanceof List)
-      {
-        // Multipart body part
-        InternetHeaders h = new InternetHeaders();
-        IMAPBodyPart part = new IMAPBodyPart(this, parent, section, h, -1, -1);
-        IMAPMultipart m = parseMultipart(list, part, h, section);
-        part.multipart = m;
-        return part;
-      }
-
-    if (len < 8)
-      {
-        throw new MessagingException("Unexpected number of fields in " +
-                                      "[MIME-IMB] structure: " + list);
-      }
-
-    // Basic fields
-    String type = parseAtom(list.get(BS_CONTENT_TYPE)).toLowerCase();
-    String subtype = parseAtom(list.get(BS_CONTENT_SUBTYPE)).toLowerCase();
-    ParameterList params = parseParameterList(list.get(BS_PARAMETERS));
-    String id = parseAtom(list.get(BS_ID));
-    String description = parseAtom(list.get(BS_DESCRIPTION));
-    String encoding = parseAtom(list.get(BS_ENCODING));
-    String sizeVal = parseAtom(list.get(BS_OCTETS));
-    String linesVal = parseAtom(list.get(BS_TEXT_LINES));
-
-    int size = -1;
-    int lines = -1;
-    try
-      {
-        if (sizeVal != null)
-          {
-            size = Integer.parseInt(sizeVal);
-          }
-        if ("text".equalsIgnoreCase(type) && linesVal != null)
-          {
-            lines = Integer.parseInt(linesVal);
-          }
-      }
-    catch (NumberFormatException e)
-      {
-        throw new MessagingException("Expecting number in [MIME-IMB] " +
-                                      "structure: " + list);
-      }
-
-    ContentType ct = new ContentType(type, subtype, params);
-    InternetHeaders h = new InternetHeaders();
-    h.setHeader("Content-Type", ct.toString());
-    if (id != null)
-      {
-        h.setHeader("Content-Id", id);
-      }
-    if (description != null)
-      {
-        h.setHeader("Content-Description", description);
-      }
-    if (encoding != null)
-      {
-        h.setHeader("Content-Transfer-Encoding", encoding);
-      }
-
-    // Extension fields
-    if (!"text".equalsIgnoreCase(type))
-      {
-        String md5 = parseAtom(list.get(BS_EXT_MD5));
-        if (md5 != null)
-          {
-            h.setHeader("Content-MD5", md5);
-          }
-      }
-    if (len > 8)
-      {
-        Object dispositionVal = list.get(BS_EXT_DISPOSITION);
-        String disposition = parseAtom(dispositionVal);
-        if (disposition != null)
-          {
-            h.setHeader("Content-Disposition", disposition);
-          }
-        else if (dispositionVal instanceof List)
-          {
-            List d = (List) dispositionVal;
-            if (d != null && d.size() == 2)
-              {
-                disposition = parseAtom(d.get(0));
-                ParameterList pl = parseParameterList(d.get(1));
-                if (pl != null)
-                  {
-                    disposition += pl.toString();
-                  }
-                h.setHeader("Content-Disposition", disposition);
-              }
-          }
-      }
-    if (len > 9)
-      {
-        String language = parseAtom(list.get(BS_EXT_LANGUAGE));
-        if (language != null)
-          {
-            h.setHeader("Content-Language", language);
-          }
-      }
-
-    return new IMAPBodyPart(this, parent, section, h, size, lines);
-  }
-
-  String parseAtom(Object value)
-  {
-    if (value instanceof String && !(value.equals(IMAPConstants.NIL)))
-      {
-        return (String) value;
-      }
-    return null;
-  }
-
-  ParameterList parseParameterList(Object params)
-  {
-    if (params instanceof List)
-      {
-        List list = (List) params;
-        int len = list.size();
-        ParameterList plist = new ParameterList();
-        for (int i = 0; i < len - 1; i += 2)
-          {
-            Object key = list.get(i);
-            Object value = list.get(i + 1);
-            if (key instanceof String && value instanceof String)
-              {
-                String atom = parseAtom(value);
-                if (atom != null)
-                  plist.set((String) key, atom);
-              }
-          }
-        return plist;
-      }
-    return null;
-  }
-
-  /**
-   * Returns the date on which this message was received.
-   */
   public Date getReceivedDate()
     throws MessagingException
   {
-    if (internalDate == null && headers == null)
+    if (section == null && internalDate == null)
       {
-        fetchHeaders(); // seems reasonable
+        fetchHeaders();
       }
-    if (internalDate == null)
-      {
-        return null;
-      }
-    try
-      {
-        return internalDateFormat.parse(internalDate);
-      }
-    catch (ParseException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
+    return internalDate;
   }
 
-  // -- Content access --
-
-  /**
-   * Returns a data handler for this message's content.
-   */
-  public DataHandler getDataHandler()
+  public int getSize()
     throws MessagingException
   {
-    // Hook into BODYSTRUCTURE method
-    ContentType ct = new ContentType(getContentType());
-    // TODO message/* content-types
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
+    if (part instanceof BODYSTRUCTURE.BodyPart)
       {
-        if (multipart == null)
-          {
-            fetchMultipart();
-          }
-        return new DataHandler(new IMAPMultipartDataSource(multipart));
+        return ((BODYSTRUCTURE.BodyPart) part).getSize();
       }
-    if (content == null)
+    if (section == null && size == -1)
       {
-        fetchContent();
+        fetchSize();
       }
-    return super.getDataHandler();
+    return super.getSize();
   }
 
-  public Object getContent()
-    throws MessagingException, IOException
+  public int getLineCount()
+    throws MessagingException
   {
-    ContentType ct = new ContentType(getContentType());
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
+    if (part instanceof BODYSTRUCTURE.TextPart)
       {
-        if (multipart == null)
-          {
-            fetchMultipart();
-          }
-        return multipart;
+        return ((BODYSTRUCTURE.TextPart) part).getLines();
       }
-    return super.getContent();
+    return super.getLineCount();
   }
 
-  /**
-   * Returns the raw content stream.
-   */
+  public String getContentType()
+    throws MessagingException
+  {
+    if (type == null)
+      {
+        fetchBodyStructure();
+      }
+    return type.toString();
+  }
+
+  public String getDisposition()
+    throws MessagingException
+  {
+    if (disposition == null && section == null)
+      {
+        fetchBodyStructure();
+      }
+    return (disposition == null) ?
+      super.getDisposition() :
+      disposition.toString();
+  }
+
+  public String getEncoding()
+    throws MessagingException
+  {
+    if (part == null)
+      {
+        fetchBodyStructure();
+      }
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getEncoding();
+      }
+    return super.getEncoding();
+  }
+
+  public String getContentID()
+    throws MessagingException
+  {
+    if (part == null)
+      {
+        fetchBodyStructure();
+      }
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getId();
+      }
+    return super.getContentID();
+  }
+
+  public String[] getContentLanguage()
+    throws MessagingException
+  {
+    if (part == null)
+      {
+        fetchBodyStructure();
+      }
+    if (part instanceof BODYSTRUCTURE.Multipart)
+      {
+        List<String> l = ((BODYSTRUCTURE.Multipart) part).getLanguage();
+        String[] ret = new String[l.size()];
+        l.toArray(ret);
+        return ret;
+      }
+    return super.getContentLanguage();
+  }
+
+  public String getDescription()
+    throws MessagingException
+  {
+    if (part == null)
+      {
+        fetchBodyStructure();
+      }
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getDescription();
+      }
+    return super.getDescription();
+  }
+  
+  public String getMessageID()
+    throws MessagingException
+  {
+    if (section == null && envelope == null)
+      {
+        fetchEnvelope();
+      }
+    if (envelope != null)
+      {
+        String messageId = envelope.getMessageId();
+        if (messageId != null)
+          {
+            return messageId;
+          }
+      }
+    return super.getMessageID();
+  }
+
+  public String getFileName()
+    throws MessagingException
+  {
+    String filename = null;
+    if (disposition != null)
+      {
+        filename = disposition.getParameter("filename");
+      }
+    if (filename == null)
+      {
+        filename = type.getParameter("name");
+      }
+    if (filename != null)
+      {
+        PrivilegedAction a =
+          new GetSystemPropertyAction("mail.mime.decodefilename");
+        if ("true".equals(AccessController.doPrivileged(a)))
+          {
+            try
+              {
+                filename = MimeUtility.decodeText(filename);
+              }
+            catch (UnsupportedEncodingException e)
+              {
+                throw new MessagingException(null, e);
+              }
+          }
+      }
+    return filename;
+  }
+
   protected InputStream getContentStream()
     throws MessagingException
   {
@@ -720,7 +318,40 @@ extends ReadOnlyMessage
     return super.getContentStream();
   }
 
-  // -- Header access --
+  public DataHandler getDataHandler()
+    throws MessagingException
+  {
+    if (dh == null)
+      {
+        fetchBodyStructure();
+        if (part instanceof BODYSTRUCTURE.Multipart)
+          {
+            BODYSTRUCTURE.Multipart mp = (BODYSTRUCTURE.Multipart) part;
+            dh = new DataHandler(new IMAPMultipartDataSource(this, this,
+                                                             mp, section));
+          }
+        else if (part instanceof BODYSTRUCTURE.MessagePart)
+          {
+            BODYSTRUCTURE.MessagePart m = (BODYSTRUCTURE.MessagePart) part;
+            String ms = (section == null) ? "1" : section + ".1";
+            String ct = getContentType();
+            dh = new DataHandler(new IMAPMessage(this, m, type, disposition,
+                                                 ms), ct);
+          }
+        // otherwise it will be a MimePartDataHandler
+      }
+    return super.getDataHandler();
+  }
+
+  protected void updateHeaders()
+    throws MessagingException
+  {
+    if (!headersComplete)
+      {
+        fetchHeaders();
+      }
+    super.updateHeaders();
+  }
 
   /**
    * Returns the specified header field.
@@ -848,10 +479,16 @@ extends ReadOnlyMessage
   public void setFlags(Flags flag, boolean set)
     throws MessagingException
   {
+    if (section != null)
+      {
+        throw new IllegalWriteException();
+      }
     if (flags == null)
       {
         fetchFlags();
       }
+    IMAPConnection connection =
+      ((IMAPStore) folder.getStore()).connection;
     try
       {
         if (set)
@@ -862,31 +499,11 @@ extends ReadOnlyMessage
           {
             flags.remove(flag);
           }
-
-        // Create lists of flags to send to the server
-        IMAPFlags iflags = (IMAPFlags) flags;
-        List aflagList = iflags.getAddedFlags();
-        String[] aflags = new String[aflagList.size()];
-        aflagList.toArray(aflags);
-        List rflagList = iflags.getRemovedFlags();
-        String[] rflags = new String[rflagList.size()];
-        rflagList.toArray(rflags);
-
-        // Perform store
-        if (aflags.length > 0 || rflags.length > 0)
+        List<String> f = IMAPFolder.flagsToString(flags);
+        if (!connection.store(msgnum, "FLAGS", f, callback))
           {
-            IMAPStore store = (IMAPStore) folder.getStore();
-            IMAPConnection c = store.getConnection();
-            int[] messages = new int[] { msgnum };
-            if (aflags.length > 0)
-              {
-                c.store(messages, PLUS_FLAGS, aflags);
-              }
-            if (rflags.length > 0)
-              {
-                c.store(messages, MINUS_FLAGS, rflags);
-              }
-            flags = null; // Reread from server next time
+            flags = null; // re-read
+            throw new MessagingException("Could not store flags");
           }
       }
     catch (IOException e)
@@ -896,113 +513,327 @@ extends ReadOnlyMessage
       }
   }
 
-  private String getString(List list, int index)
+  /**
+   * Fetches the flags fo this message.
+   */
+  void fetchFlags()
+    throws MessagingException
   {
-    if (list == null)
+    List<String> commands = new ArrayList<String>();
+    commands.add(IMAPConstants.FLAGS);
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the message header.
+   */
+  void fetchHeaders()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    if (section == null)
+      {
+        commands.add("BODY.PEEK[HEADER]");
+        commands.add(IMAPConstants.INTERNALDATE);
+      }
+    else
+      {
+        commands.add("BODY.PEEK[" + section + ".HEADER]");
+      }
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the message body.
+   */
+  void fetchContent()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    if (section == null)
+      {
+        commands.add("BODY.PEEK[]");
+        commands.add(IMAPConstants.INTERNALDATE);
+      }
+    else
+      {
+        commands.add("BODY.PEEK[" + section + ".MIME]");
+      }
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the MIME structure of this message.
+   */
+  void fetchBodyStructure()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(IMAPConstants.BODYSTRUCTURE);
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the envelope of this message.
+   */
+  void fetchEnvelope()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(IMAPConstants.ENVELOPE);
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the UID.
+   */
+  void fetchUID()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(IMAPConstants.UID);
+    fetch(commands);
+  }
+
+  /**
+   * Fetches the size.
+   */
+  void fetchSize()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(IMAPConstants.RFC822_SIZE);
+    fetch(commands);
+  }
+
+  /**
+   * Generic fetch routine.
+   */
+  private void fetch(List<String> commands)
+    throws MessagingException
+  {
+    IMAPConnection connection =
+      ((IMAPStore) folder.getStore()).connection;
+    try
+      {
+        connection.fetch(msgnum, commands, callback);
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    catch (RuntimeException e)
+      {
+        Throwable cause = e.getCause();
+        if (cause instanceof MessagingException)
+          {
+            throw (MessagingException) cause;
+          }
+        throw e;
+      }
+  }
+
+  /**
+   * Main fetch data item dispatch.
+   */
+  void update(FetchDataItem item)
+  {
+    if (item instanceof FLAGS)
+      {
+        updateFLAGS((FLAGS) item);
+      }
+    else if (item instanceof UID)
+      {
+        updateUID((UID) item);
+      }
+    else if (item instanceof INTERNALDATE)
+      {
+        updateINTERNALDATE((INTERNALDATE) item);
+      }
+    else if (item instanceof RFC822_SIZE)
+      {
+        updateRFC822_SIZE((RFC822_SIZE) item);
+      }
+    else if (item instanceof BODYSTRUCTURE)
+      {
+        updateBODYSTRUCTURE((BODYSTRUCTURE) item);
+      }
+    else if (item instanceof BODY)
+      {
+        updateBODY((BODY) item);
+      }
+    else if (item instanceof ENVELOPE)
+      {
+        updateENVELOPE((ENVELOPE) item);
+      }
+  }
+
+  private void updateRFC822_SIZE(RFC822_SIZE size)
+  {
+    this.size = size.getSize();
+  }
+
+  private void updateBODY(BODY body)
+  {
+    String section = body.getSection();
+    byte[] c = body.getContents();
+    InputStream in = new ByteArrayInputStream(c);
+    try
+      {
+        headers = createInternetHeaders(in);
+        headersComplete = true;
+      }
+    catch (MessagingException e)
+      {
+        throw (RuntimeException) new RuntimeException().initCause(e);
+      }
+    if (section == null || !section.endsWith("HEADERS"))
+      {
+        content = c;
+      }
+  }
+
+  private void updateBODYSTRUCTURE(BODYSTRUCTURE bodystructure)
+  {
+    part = bodystructure.getPart();
+    ParameterList pl = new ParameterList();
+    Map<String,String> params = part.getParameters();
+    if (params != null)
+      {
+        for (String key : params.keySet())
+          {
+            pl.set(key, params.get(key));
+          }
+      }
+    type = new ContentType(part.getPrimaryType(), part.getSubtype(), pl);
+    if (part instanceof BODYSTRUCTURE.Multipart)
+      {
+        BODYSTRUCTURE.Disposition d =
+          ((BODYSTRUCTURE.Multipart) part).getDisposition();
+        if (d != null)
+          {
+            pl = new ParameterList();
+            params = d.getParameters();
+            if (params != null)
+              {
+                for (String key : params.keySet())
+                  {
+                    pl.set(key, params.get(key));
+                  }
+              }
+            disposition = new ContentDisposition(d.getType(), pl);
+          }
+      }
+  }
+
+  private void updateENVELOPE(ENVELOPE envelope)
+  {
+    String date = envelope.getDate();
+    String subject = envelope.getSubject();
+    InternetAddress[] from = getAddressList(envelope.getFrom());
+    InternetAddress[] sender = getAddressList(envelope.getSender());
+    InternetAddress[] replyTo = getAddressList(envelope.getReplyTo());
+    InternetAddress[] to = getAddressList(envelope.getTo());
+    InternetAddress[] cc = getAddressList(envelope.getCc());
+    InternetAddress[] bcc = getAddressList(envelope.getBcc());
+    String inReplyTo = envelope.getInReplyTo();
+    String messageId = envelope.getMessageId();
+    if (headers == null)
+      {
+        headers = new InternetHeaders();
+      }
+    if (date != null)
+      {
+        headers.setHeader("Date", date);
+      }
+    if (subject != null)
+      {
+        headers.setHeader("Subject", subject);
+      }
+    if (inReplyTo != null)
+      {
+        headers.setHeader("In-Reply-To", inReplyTo);
+      }
+    if (messageId != null)
+      {
+        headers.setHeader("Message-ID", messageId);
+      }
+    if (from != null)
+      {
+        headers.setHeader("From", InternetAddress.toString(from));
+      }
+    if (sender != null)
+      {
+        headers.setHeader("Sender",
+                          InternetAddress.toString(sender));
+      }
+    if (replyTo != null)
+      {
+        headers.setHeader("Reply-To",
+                          InternetAddress.toString(replyTo));
+      }
+    if (to != null)
+      {
+        headers.setHeader("To", InternetAddress.toString(to));
+      }
+    if (cc != null)
+      {
+        headers.setHeader("Cc", InternetAddress.toString(cc));
+      }
+    if (bcc != null)
+      {
+        headers.setHeader("Bcc", InternetAddress.toString(bcc));
+      }
+    // NB headers not complete
+  }
+
+  private void updateFLAGS(FLAGS flags)
+  {
+    this.flags = new Flags();
+    for (String flag : flags.getFlags())
+      {
+        Flags.Flag f = IMAPFolder.STR2FLAG.get(flag);
+        if (f != null)
+          {
+            this.flags.add(f);
+          }
+        else
+          {
+            this.flags.add(flag);
+          }
+      }
+  }
+
+  private void updateINTERNALDATE(INTERNALDATE internaldate)
+  {
+    this.internalDate = internaldate.getInternalDate();
+  }
+  
+  private void updateUID(UID uid)
+  {
+    this.uid = uid.getUid();
+  }
+
+  private static InternetAddress[] getAddressList(List<ENVELOPE.Address> l)
+  {
+    if (l == null)
       {
         return null;
       }
-    Object o = list.get(index);
-    if (o instanceof String)
+    InternetAddress[] ret = new InternetAddress[l.size()];
+    for (int i = 0; i < ret.length; i++)
       {
-        String s = (String) o;
-        int len = s.length();
-        if (len > 1 && s.charAt(0) == '"' && s.charAt(len - 1) == '"')
-          {
-            return s.substring(1, len - 1);
-          }
-      }
-    return null;
-  }
-
-  private Date getDate(List list, int index)
-  {
-    String s = getString(list, index);
-    if (s != null)
-      {
+        ENVELOPE.Address a = l.get(i);
         try
           {
-            return internalDateFormat.parse(s);
+            ret[i] = new InternetAddress(a.getAddress(), a.getPersonal());
           }
-        catch (ParseException e)
+        catch (UnsupportedEncodingException e)
           {
-            // NOOP
+            throw (RuntimeException) new RuntimeException().initCause(e);
           }
       }
-    return null;
+    return ret;
   }
-
-  private InternetAddress[] getAddressList(List list, int index)
-  {
-    List l = (List) list.get(index);
-    if (l != null)
-      {
-        List acc = new ArrayList();
-        for (Iterator i = l.iterator(); i.hasNext(); )
-          {
-            Object o = i.next();
-            if (o instanceof List)
-              {
-                List addr = (List) o;
-                if (addr.size() == 4)
-                  {
-                    String personal = getString(addr, 0);
-                    String mailbox = getString(addr, 2);
-                    String host = getString(addr, 3);
-                    String address = null;
-                    if (host != null) // ignore groups for now
-                      {
-                        address = mailbox + "@" + host;
-                      }
-                    if (address  != null)
-                      {
-                        try
-                          {
-                            acc.add(new InternetAddress(address, personal));
-                          }
-                        catch (UnsupportedEncodingException e)
-                          {
-                            // NOOP
-                          }
-                      }
-                  }
-              }
-          }
-        InternetAddress[] ret = new InternetAddress[acc.size()];
-        acc.toArray(ret);
-        return ret;
-      }
-    return null;
-  }
-
-  // -- Utility --
-
-  public void writeTo(OutputStream msgStream)
-    throws IOException, MessagingException
-  {
-    if (headers == null)
-      {
-        fetchHeaders();
-      }
-    if (content == null)
-      {
-        fetchContent();
-      }
-    super.writeTo(msgStream);
-  }
-
-  public void writeTo(OutputStream msgStream, String[] ignoreList)
-    throws IOException, MessagingException
-  {
-    if (headers == null)
-      {
-        fetchHeaders();
-      }
-    if (content == null)
-      {
-        fetchContent();
-      }
-    super.writeTo(msgStream, ignoreList);
-  }
-
+  
 }

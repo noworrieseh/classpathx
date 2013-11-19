@@ -1,6 +1,6 @@
 /*
  * IMAPBodyPart.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -22,264 +22,197 @@
 
 package gnu.mail.providers.imap;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import javax.activation.DataHandler;
 import javax.mail.MessagingException;
+import javax.mail.internet.ContentDisposition;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeUtility;
+import javax.mail.internet.ParameterList;
 
+import gnu.inet.imap.BODY;
+import gnu.inet.imap.BODYSTRUCTURE;
+import gnu.inet.imap.IMAPAdapter;
+import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
-import gnu.inet.imap.IMAPConstants;
-import gnu.inet.imap.MessageStatus;
-import gnu.inet.imap.Pair;
+import gnu.inet.imap.FetchDataItem;
+import gnu.inet.util.GetSystemPropertyAction;
+import gnu.mail.providers.ReadOnlyBodyPart;
 
 /**
  * A MIME body part of an IMAP multipart message.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.5
  */
-public class IMAPBodyPart
-extends MimeBodyPart
-implements IMAPConstants
+final class IMAPBodyPart
+  extends ReadOnlyBodyPart
 {
 
-  /**
-   * The message this part belongs to.
-   */
-  protected IMAPMessage message;
+  final IMAPMessage message;
+  final BODYSTRUCTURE.Part part;
+  final String section;
+  private ContentType type;
+  private ContentDisposition disposition;
+  private boolean headersLoaded;
 
-  /**
-   * The section used to refer to this part.
-   */
-  protected String section;
-
-  /**
-   * The size of this part's content in bytes.
-   */
-  protected int size;
-
-  /**
-   * The number of text lines of this part's content.
-   */
-  protected int lines;
-
-  /*
-   * Multipart content.
-   */
-  IMAPMultipart multipart = null;
-
-  /**
-   * Called by the IMAPMessage.
-   */
-  protected IMAPBodyPart(IMAPMessage message,
-                          IMAPMultipart parent,
-                          String section,
-                          InternetHeaders headers,
-                          int size,
-                          int lines)
-    throws MessagingException
+  IMAPBodyPart(IMAPMessage message,
+               BODYSTRUCTURE.Part part,
+               String section)
   {
-    super(headers, null);
-    this.parent = parent;
     this.message = message;
+    this.part = part;
     this.section = section;
-    this.size = size;
-    this.lines = lines;
-  }
-
-  /**
-   * Fetches the message body.
-   */
-  void fetchContent()
-    throws MessagingException
-  {
-    String[] commands = new String[1];
-    commands[0] = "BODY.PEEK[" + section + "]";
-    fetch(commands);
-  }
-
-  /*
-   * Perform the IMAP fetch.
-   */
-  void fetch(String[] commands)
-    throws MessagingException
-  {
-    try
+    ParameterList pl = new ParameterList();
+    Map<String,String> params = part.getParameters();
+    if (params != null)
       {
-        IMAPConnection connection =
-         ((IMAPStore) message.getFolder().getStore()).getConnection();
-        int msgnum = message.getMessageNumber();
-        int[] messages = new int[] { msgnum };
-        synchronized (connection)
+        for (String key : params.keySet())
           {
-            MessageStatus[] ms = connection.fetch(messages, commands);
-            for (int i = 0; i < ms.length; i++)
-              {
-                if (ms[i].getMessageNumber() == msgnum)
-                  {
-                    update(ms[i]);
-                  }
-              }
+            pl.set(key, params.get(key));
           }
       }
-    catch (IOException e)
+    type = new ContentType(part.getPrimaryType(), part.getSubtype(), pl);
+    if (part instanceof BODYSTRUCTURE.Multipart)
       {
-        throw new MessagingException(e.getMessage(), e);
-      }
-  }
-
-  /*
-   * Update this body part's content from the specified message status
-   * object.
-   */
-  void update(MessageStatus status)
-    throws MessagingException
-  {
-    List code = status.getCode();
-    int clen = code.size();
-    for (int i = 0; i < clen; i += 2)
-      {
-        Object item = code.get(i);
-        String key = null;
-        List params = Collections.EMPTY_LIST;
-        if (item instanceof Pair)
+        BODYSTRUCTURE.Disposition d =
+          ((BODYSTRUCTURE.Multipart) part).getDisposition();
+        if (d != null)
           {
-            Pair pair = (Pair) item;
-            key = pair.getKey();
-            params = pair.getValue();
-          }
-        else if (item instanceof String)
-          {
-            key = (String) item;
-          }
-        else
-          {
-            throw new MessagingException("Unexpected status item: " + item);
-          }
-
-        if (key == BODY)
-          {
-            int plen = params.size();
-            if (plen > 0)
+            pl = new ParameterList();
+            params = d.getParameters();
+            if (params != null)
               {
-                Object pitem = params.get(0);
-                String pkey = null;
-                if (pitem instanceof String)
+                for (String key : params.keySet())
                   {
-                    pkey = (String) pitem;
-                  }
-                else
-                  {
-                    throw new MessagingException("Unexpected status item: " +
-                                                  pitem);
-                  }
-
-                if (pkey.equals(section))
-                  {
-                    Object c = code.get(i + 1);
-                    if (c instanceof byte[])
-                      content = (byte[]) c;
-                    else if (c instanceof String)
-                      {
-                        ContentType ct = new ContentType(getContentType());
-                        String charset = ct.getParameter("charset");
-                        if (charset == null)
-                          charset = "US-ASCII";
-                        try
-                          {
-                            content = ((String) c).getBytes(charset);
-                          }
-                        catch (IOException e)
-                          {
-                            MessagingException e2 = new MessagingException();
-                            e2.initCause(e);
-                            throw e2;
-                          }
-                      }
-                    else
-                      throw new MessagingException("Unexpected MIME body " +
-                                                   "part content: " + c);
-                  }
-                else
-                  {
-                    throw new MessagingException("Unexpected section number: " +
-                                                  pkey);
+                    pl.set(key, params.get(key));
                   }
               }
-            else
-              {
-                throw new MessagingException("Not a section!");
-              }
-          }
-        else
-          {
-            throw new MessagingException("Unknown section status key: " + key);
+            disposition = new ContentDisposition(d.getType(), pl);
           }
       }
   }
 
-  // -- Simple accessors --
-
-  /**
-   * Returns the content size of this body part in bytes.
-   */
   public int getSize()
     throws MessagingException
   {
-    return size;
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getSize();
+      }
+    return -1;
   }
 
-  /**
-   * Returns the number of text lines in the content of this body part.
-   */
   public int getLineCount()
     throws MessagingException
   {
-    return lines;
+    if (part instanceof BODYSTRUCTURE.TextPart)
+      {
+        return ((BODYSTRUCTURE.TextPart) part).getLines();
+      }
+    return -1;
   }
 
-  // -- Content access --
-
-  /**
-   * Returns a data handler for this part's content.
-   */
-  public DataHandler getDataHandler()
+  public String getContentType()
     throws MessagingException
   {
-    ContentType ct = new ContentType(getContentType());
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
-      {
-        // Our multipart object should already have been configured
-        return new DataHandler(new IMAPMultipartDataSource(multipart));
-      }
-    else
-      {
-        if (content == null)
-          {
-            fetchContent();
-          }
-        return super.getDataHandler();
-      }
+    return type.toString();
   }
 
-  public Object getContent()
-    throws MessagingException, IOException
+  public String getDisposition()
+    throws MessagingException
   {
-    ContentType ct = new ContentType(getContentType());
-    if ("multipart".equalsIgnoreCase(ct.getPrimaryType()))
-      {
-        return multipart;
-      }
-    return super.getContent();
+    return (disposition == null) ?
+      super.getDisposition() :
+      disposition.toString();
   }
 
-  /**
-   * Returns the raw content stream.
-   */
+  public String getEncoding()
+    throws MessagingException
+  {
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getEncoding();
+      }
+    return super.getEncoding();
+  }
+
+  public String getContentID()
+    throws MessagingException
+  {
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getId();
+      }
+    return super.getContentID();
+  }
+
+  public String[] getContentLanguage()
+    throws MessagingException
+  {
+    if (part instanceof BODYSTRUCTURE.Multipart)
+      {
+        List<String> l = ((BODYSTRUCTURE.Multipart) part).getLanguage();
+        String[] ret = new String[l.size()];
+        l.toArray(ret);
+        return ret;
+      }
+    return super.getContentLanguage();
+  }
+
+  public String getDescription()
+    throws MessagingException
+  {
+    if (part instanceof BODYSTRUCTURE.BodyPart)
+      {
+        return ((BODYSTRUCTURE.BodyPart) part).getDescription();
+      }
+    return super.getDescription();
+  }
+
+  public String getFileName()
+    throws MessagingException
+  {
+    String filename = null;
+    if (disposition != null)
+      {
+        filename = disposition.getParameter("filename");
+      }
+    if (filename == null)
+      {
+        filename = type.getParameter("name");
+      }
+    if (filename != null)
+      {
+        PrivilegedAction a =
+          new GetSystemPropertyAction("mail.mime.decodefilename");
+        if ("true".equals(AccessController.doPrivileged(a)))
+          {
+            try
+              {
+                filename = MimeUtility.decodeText(filename);
+              }
+            catch (UnsupportedEncodingException e)
+              {
+                throw new MessagingException(null, e);
+              }
+          }
+      }
+    return filename;
+  }
+
   protected InputStream getContentStream()
     throws MessagingException
   {
@@ -288,6 +221,172 @@ implements IMAPConstants
         fetchContent();
       }
     return super.getContentStream();
+  }
+
+  public DataHandler getDataHandler()
+    throws MessagingException
+  {
+    if (part instanceof BODYSTRUCTURE.Multipart)
+      {
+        BODYSTRUCTURE.Multipart mp = (BODYSTRUCTURE.Multipart) part;
+        dh = new DataHandler(new IMAPMultipartDataSource(message, this,
+                                                         mp, section));
+      }
+    else if (part instanceof BODYSTRUCTURE.MessagePart)
+      {
+        BODYSTRUCTURE.MessagePart m = (BODYSTRUCTURE.MessagePart) part;
+        String ms = section + ".1";
+        dh = new DataHandler(new IMAPMessage(message, m, type, disposition,
+                                             ms), type.toString());
+      }
+    return super.getDataHandler();
+  }
+
+  public String[] getHeader(String name)
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getHeader(name);
+  }
+
+  public Enumeration getAllHeaders()
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getAllHeaders();
+  }
+
+  public Enumeration getMatchingHeaders(String[] names)
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getMatchingHeaders(names);
+  }
+
+  public Enumeration getNonMatchingHeaders(String[] names)
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getNonMatchingHeaders(names);
+  }
+
+  public Enumeration getAllHeaderLines()
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getAllHeaderLines();
+  }
+
+  public Enumeration getMatchingHeaderLines(String[] names)
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getMatchingHeaderLines(names);
+  }
+
+  public Enumeration getNonMatchingHeaderLines(String[] names)
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    return super.getNonMatchingHeaderLines(names);
+  }
+
+  protected void updateHeaders()
+    throws MessagingException
+  {
+    if (headers == null)
+      {
+        fetchContent();
+      }
+    super.updateHeaders();
+  }
+
+  // -- Lazy loading stuff --
+
+  void fetchContent()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(new StringBuilder("BODY.PEEK[")
+                 .append(section)
+                 .append(']')
+                 .toString());
+    fetch(commands);
+  }
+
+  void fetch(List<String> commands)
+    throws MessagingException
+  {
+    final IMAPStore s = (IMAPStore) message.getFolder().getStore();
+    IMAPConnection connection = s.connection;
+    int msgnum = message.getMessageNumber();
+    try
+      {
+        IMAPCallback callback = new IMAPAdapter()
+        {
+          public void alert(String message)
+          {
+            s.processAlert(message);
+          }
+          public void fetch(int message, List<FetchDataItem> data)
+          {
+            for (int i = 0; i < data.size(); i++)
+              {
+                FetchDataItem item = data.get(i);
+                if (item instanceof BODY)
+                  {
+                    BODY body = (BODY) item;
+                    content = body.getContents();
+                    InputStream in = new ByteArrayInputStream(content);
+                    try
+                      {
+                        headers = new InternetHeaders(in);
+                      }
+                    catch (MessagingException e)
+                      {
+                        throw (RuntimeException) 
+                          new RuntimeException().initCause(e);
+                      }
+                  }
+              }
+          }
+        };
+        connection.fetch(msgnum, commands, callback);
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    catch (RuntimeException e)
+      {
+        Throwable cause = e.getCause();
+        if (cause instanceof MessagingException)
+          {
+            throw (MessagingException) cause;
+          }
+        throw e;
+      }
   }
 
 }

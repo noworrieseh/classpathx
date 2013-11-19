@@ -139,17 +139,14 @@ $(src)/gnu/mail/util/UUOutputStream.java \
 $(src)/gnu/mail/treeutil/StatusEvent.java \
 $(src)/gnu/mail/treeutil/StatusListener.java \
 $(src)/gnu/mail/treeutil/StatusSource.java \
+$(src)/gnu/mail/providers/ReadOnlyBodyPart.java \
 $(src)/gnu/mail/providers/ReadOnlyMessage.java \
 $(src)/gnu/mail/providers/smtp/SMTPTransport.java\
-$(src)/gnu/mail/providers/imap/ACL.java \
 $(src)/gnu/mail/providers/imap/IMAPBodyPart.java \
-$(src)/gnu/mail/providers/imap/IMAPFlags.java \
 $(src)/gnu/mail/providers/imap/IMAPFolder.java \
 $(src)/gnu/mail/providers/imap/IMAPMessage.java \
-$(src)/gnu/mail/providers/imap/IMAPMultipart.java \
 $(src)/gnu/mail/providers/imap/IMAPMultipartDataSource.java \
 $(src)/gnu/mail/providers/imap/IMAPStore.java \
-$(src)/gnu/mail/providers/imap/Rights.java \
 $(src)/gnu/mail/providers/pop3/POP3Folder.java \
 $(src)/gnu/mail/providers/pop3/POP3Message.java \
 $(src)/gnu/mail/providers/pop3/POP3Store.java \
@@ -209,7 +206,7 @@ META-INF/javamail.default.address.map
 manifest_mf = @srcdir@/MANIFEST.MF
 
 # Classpaths
-classpath = $(src):$(dst)
+classpath = $(src):$(dst):$(inetlib_jar):$(activation_jar)
 
 # Targets
 BUILT_SOURCES = $(gnumail_jar)

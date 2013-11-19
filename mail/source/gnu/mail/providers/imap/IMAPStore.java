@@ -31,7 +31,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -42,6 +44,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
 import javax.mail.PasswordAuthentication;
+import javax.mail.Quota;
 import javax.mail.QuotaAwareStore;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -50,11 +53,11 @@ import javax.mail.URLName;
 import javax.mail.event.StoreEvent;
 import javax.net.ssl.TrustManager;
 
+import gnu.inet.imap.IMAPAdapter;
+import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
-import gnu.inet.imap.MailboxStatus;
-import gnu.inet.imap.Namespaces;
-import gnu.inet.imap.Quota;
+import gnu.inet.imap.Namespace;
 import gnu.inet.util.LaconicFormatter;
 
 /**
@@ -70,17 +73,17 @@ public class IMAPStore
   /**
    * The connection to the IMAP server.
    */
-  protected IMAPConnection connection = null;
+  IMAPConnection connection = null;
 
   /**
    * Folder representing the root namespace of the IMAP connection.
    */
-  protected IMAPFolder root = null;
+  IMAPFolder root = null;
 
   /**
    * The currently selected folder.
    */
-  protected IMAPFolder selected = null;
+  IMAPFolder selected = null;
 
   /**
    * Constructor.
@@ -140,12 +143,10 @@ public class IMAPStore
                 handler.setLevel(Level.ALL);
                 logger.addHandler(handler);
               }
-            if (propertyIsTrue("debug.ansi"))
-              {
-                connection.setAnsiDebug(true);
-              }
 
-            List capabilities = connection.capability();
+            final List<String> capabilities = new ArrayList<String>();
+            IMAPAdapter callback = this.new DefaultAdapter(capabilities);
+            connection.capability(callback);
 
             // Ignore tls settings if we are making the connection
             // to a dedicated SSL port. (imaps)
@@ -155,16 +156,17 @@ public class IMAPStore
                   {
                     if (tm == null)
                       {
-                        tls = connection.starttls();
+                        tls = connection.starttls(callback);
                       }
                     else
                       {
-                        tls = connection.starttls(tm);
+                        tls = connection.starttls(callback, tm);
                       }
                     // Capabilities may have changed since STARTTLS
                     if (tls)
                       {
-                        capabilities = connection.capability();
+                        capabilities.clear();
+                        connection.capability(callback);
                       }
                   }
               }
@@ -173,22 +175,16 @@ public class IMAPStore
                 throw new MessagingException("TLS not available");
               }
             // Build list of available SASL mechanisms
-            List authenticationMechanisms = null;
-            for (Iterator i = capabilities.iterator(); i.hasNext(); )
+            List<String> mechanisms = new ArrayList<String>();
+            for (String cap : capabilities)
               {
-                String cap = (String) i.next();
                 if (cap.startsWith("AUTH="))
                   {
-                    if (authenticationMechanisms == null)
-                      {
-                        authenticationMechanisms = new ArrayList();
-                      }
-                    authenticationMechanisms.add(cap.substring(5));
+                    mechanisms.add(cap.substring(5));
                   }
               }
             // User authentication
-            if (authenticationMechanisms != null &&
-                !authenticationMechanisms.isEmpty())
+            if (!mechanisms.isEmpty())
               {
                 if (username == null || password == null)
                   {
@@ -214,25 +210,29 @@ public class IMAPStore
                     // Discover user ordering preferences for auth
                     // mechanisms
                     String authPrefs = getProperty("auth.mechanisms");
-                    Iterator i = null;
+                    Iterator<String> i = null;
                     if (authPrefs == null)
                       {
-                        i = authenticationMechanisms.iterator();
+                        i = mechanisms.iterator();
                       }
                     else
                       {
                         StringTokenizer st =
                           new StringTokenizer(authPrefs, ",");
-                        List authPrefList = Collections.list(st);
+                        List<String> authPrefList = new ArrayList<String>();
+                        while (st.hasMoreTokens())
+                          {
+                            authPrefList.add(st.nextToken());
+                          }
                         i = authPrefList.iterator();
                       }
                     // Try each mechanism in the list in turn
                     while (i.hasNext())
                       {
-                        String mechanism = (String) i.next();
-                        if (authenticationMechanisms.contains(mechanism) &&
+                        String mechanism = i.next();
+                        if (mechanisms.contains(mechanism) &&
                             connection.authenticate(mechanism, username,
-                                                     password))
+                                                    password, callback))
                           {
                             return true;
                           }
@@ -243,7 +243,7 @@ public class IMAPStore
               {
                 return false; // sorry
               }
-            return connection.login(username, password);
+            return connection.login(username, password, callback);
           }
         catch (UnknownHostException e)
           {
@@ -252,13 +252,6 @@ public class IMAPStore
         catch (IOException e)
           {
             throw new MessagingException(e.getMessage(), e);
-          }
-        finally
-          {
-            if (connection != null && connection.alertsPending())
-              {
-                processAlerts();
-              }
           }
       }
   }
@@ -313,7 +306,8 @@ public class IMAPStore
           {
             try
               {
-                connection.logout();
+                IMAPAdapter callback = this.new DefaultAdapter(null);
+                connection.logout(callback);
               }
             catch (IOException e)
               {
@@ -375,18 +369,16 @@ public class IMAPStore
       {
         synchronized (this)
           {
-            MailboxStatus ms = connection.noop();
-            if (selected != null)
+            IMAPCallback callback;
+            if (selected == null)
               {
-                try
-                  {
-                    selected.update(ms, true);
-                  }
-                catch (MessagingException e)
-                  {
-                    // Ignore
-                  }
+                callback = this.new DefaultAdapter(null);
               }
+            else
+              {
+                callback = selected.callback;
+              }
+            connection.noop(callback);
           }
         return true;
       }
@@ -427,15 +419,11 @@ public class IMAPStore
   }
 
   /**
-   * Process any alerts supplied by the server.
+   * Process an alert supplied by the server.
    */
-  protected void processAlerts()
+  protected void processAlert(String message)
   {
-    String[] alerts = connection.getAlerts();
-    for (int i = 0; i < alerts.length; i++)
-      {
-        notifyStoreListeners(StoreEvent.ALERT, alerts[i]);
-      }
+    notifyStoreListeners(StoreEvent.ALERT, message);
   }
 
   /**
@@ -453,23 +441,34 @@ public class IMAPStore
       {
         try
           {
-            Namespaces ns = connection.namespace();
-            if (ns == null)
+            final List<Folder> acc = new ArrayList<Folder>();
+            IMAPAdapter callback = new IMAPAdapter()
+            {
+              public void alert(String message)
               {
-                throw new MethodNotSupportedException("IMAP NAMESPACE " +
-                                                       "command not supported");
+                processAlert(message);
               }
-            Namespaces.Namespace[] n = ns.getPersonal();
-            if (n == null)
-              return new Folder[0];
-            Folder[] f = new Folder[n.length];
-            for (int i = 0; i < n.length; i++)
+              public void namespace(Namespace personal,
+                                    Namespace otherUsers,
+                                    Namespace shared)
               {
-                String prefix = n[i].getPrefix();
-                char delimiter = n[i].getDelimiter();
-                f[i] = new IMAPFolder(this, prefix, delimiter);
+                if (personal != null)
+                  {
+                    String d = personal.getHierarchyDelimiter();
+                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                    acc.add(new IMAPFolder(IMAPStore.this,
+                                           personal.getPrefix(),
+                                           delimiter));
+                  }
               }
-            return f;
+            };
+            if (connection.namespace(callback))
+              {
+                Folder[] ret = new Folder[acc.size()];
+                acc.toArray(ret);
+                return ret;
+              }
+            return null;
           }
         catch (IOException e)
           {
@@ -493,23 +492,34 @@ public class IMAPStore
       {
         try
           {
-            Namespaces ns = connection.namespace();
-            if (ns == null)
+            final List<Folder> acc = new ArrayList<Folder>();
+            IMAPAdapter callback = new IMAPAdapter()
+            {
+              public void alert(String message)
               {
-                throw new MethodNotSupportedException("IMAP NAMESPACE " +
-                                                       "command not supported");
+                processAlert(message);
               }
-            Namespaces.Namespace[] n = ns.getOther();
-            if (n == null)
-              return new Folder[0];
-            Folder[] f = new Folder[n.length];
-            for (int i = 0; i < n.length; i++)
+              public void namespace(Namespace personal,
+                                    Namespace otherUsers,
+                                    Namespace shared)
               {
-                String prefix = n[i].getPrefix();
-                char delimiter = n[i].getDelimiter();
-                f[i] = new IMAPFolder(this, prefix, delimiter);
+                if (otherUsers != null)
+                  {
+                    String d = otherUsers.getHierarchyDelimiter();
+                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                    acc.add(new IMAPFolder(IMAPStore.this,
+                                           otherUsers.getPrefix(),
+                                           delimiter));
+                  }
               }
-            return f;
+            };
+            if (connection.namespace(callback))
+              {
+                Folder[] ret = new Folder[acc.size()];
+                acc.toArray(ret);
+                return ret;
+              }
+            return null;
           }
         catch (IOException e)
           {
@@ -533,23 +543,34 @@ public class IMAPStore
       {
         try
           {
-            Namespaces ns = connection.namespace();
-            if (ns == null)
+            final List<Folder> acc = new ArrayList<Folder>();
+            IMAPAdapter callback = new IMAPAdapter()
+            {
+              public void alert(String message)
               {
-                throw new MethodNotSupportedException("IMAP NAMESPACE " +
-                                                       "command not supported");
+                processAlert(message);
               }
-            Namespaces.Namespace[] n = ns.getShared();
-            if (n == null)
-              return new Folder[0];
-            Folder[] f = new Folder[n.length];
-            for (int i = 0; i < n.length; i++)
+              public void namespace(Namespace personal,
+                                    Namespace otherUsers,
+                                    Namespace shared)
               {
-                String prefix = n[i].getPrefix();
-                char delimiter = n[i].getDelimiter();
-                f[i] = new IMAPFolder(this, prefix, delimiter);
+                if (shared != null)
+                  {
+                    String d = shared.getHierarchyDelimiter();
+                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                    acc.add(new IMAPFolder(IMAPStore.this,
+                                           shared.getPrefix(),
+                                           delimiter));
+                  }
               }
-            return f;
+            };
+            if (connection.namespace(callback))
+              {
+                Folder[] ret = new Folder[acc.size()];
+                acc.toArray(ret);
+                return ret;
+              }
+            return null;
           }
         catch (IOException e)
           {
@@ -562,7 +583,7 @@ public class IMAPStore
    * Returns the quota for the specified quota root.
    * @param root the quota root
    */
-  public javax.mail.Quota[] getQuota(String root)
+  public Quota[] getQuota(String root)
     throws MessagingException
   {
     if (!super.isConnected())
@@ -573,29 +594,38 @@ public class IMAPStore
       {
         try
           {
-            Quota[] sqa = connection.getquotaroot(root);
-            if (sqa == null)
+            final List<Quota> acc = new ArrayList<Quota>();
+            IMAPAdapter callback = new IMAPAdapter()
+            {
+              public void alert(String message)
               {
-                return new javax.mail.Quota[0];
+                processAlert(message);
               }
-            javax.mail.Quota[] tqa = new javax.mail.Quota[sqa.length];
-            for (int i = 0; i < tqa.length; i++)
+              public void quota(String quotaRoot,
+                                Map<String,Integer> currentUsage,
+                                Map<String,Integer> limit)
               {
-                Quota sq = sqa[i];
-                javax.mail.Quota tq = new javax.mail.Quota(sq.getQuotaRoot());
-                Quota.Resource[] sr = sq.getResources();
-                javax.mail.Quota.Resource[] tr =
-                new javax.mail.Quota.Resource[sr.length];
-                for (int j = 0; j < sr.length; j++)
-                {
-                    tr[j] = new javax.mail.Quota.Resource(sr[j].getName(),
-                            sr[j].getCurrentUsage(),
-                            sr[j].getLimit());
-                }
-                tq.resources = tr;
-                tqa[i] = tq;
+                Quota quota = new Quota(quotaRoot);
+                List<Quota.Resource> l = new ArrayList<Quota.Resource>();
+                for (Iterator<String> i = currentUsage.keySet().iterator();
+                     i.hasNext(); )
+                  {
+                    String resource = i.next();
+                    l.add(new Quota.Resource(resource,
+                                             currentUsage.get(resource),
+                                             limit.get(resource)));
+                  }
+                quota.resources = new Quota.Resource[l.size()];
+                l.toArray(quota.resources);
               }
-            return tqa;
+            };
+            if (connection.getquota(root, callback))
+              {
+                Quota[] ret = new Quota[acc.size()];
+                acc.toArray(ret);
+                return ret;
+              }
+            return new Quota[0];
           }
         catch (IOException e)
           {
@@ -608,7 +638,7 @@ public class IMAPStore
    * Sets the quota resource set for the specified quota root.
    * @param quota the mail quota
    */
-  public void setQuota(javax.mail.Quota quota)
+  public void setQuota(Quota quota)
     throws MessagingException
   {
     if (!super.isConnected())
@@ -619,14 +649,24 @@ public class IMAPStore
       {
         try
           {
-            String root = quota.quotaRoot;
-            Quota.Resource tr[] = new Quota.Resource[quota.resources.length];
-            for (int i = 0; i < tr.length; i++)
+            IMAPAdapter callback = new IMAPAdapter()
+            {
+              public void alert(String message)
               {
-                javax.mail.Quota.Resource sr = quota.resources[i];
-                tr[i] = new Quota.Resource(sr.name, (int) sr.limit);
+                processAlert(message);
               }
-            connection.setquota(root, tr);
+            };
+            Map<String,Integer> resources =
+              new LinkedHashMap<String,Integer>();
+            if (quota.resources != null)
+              {
+                for (int i = 0; i < quota.resources.length; i++)
+                  {
+                    Quota.Resource r = quota.resources[i];
+                    resources.put(r.name, (int) r.limit);
+                  }
+              }
+            connection.setquota(quota.quotaRoot, resources, callback);
           }
         catch (IOException e)
           {
@@ -675,6 +715,32 @@ public class IMAPStore
         value = session.getProperty("mail." + key);
       }
     return value;
+  }
+
+  class DefaultAdapter
+    extends IMAPAdapter
+  {
+
+    private List<String> capabilities;
+    
+    DefaultAdapter(List<String> capabilities)
+    {
+      this.capabilities = capabilities;
+    }
+
+    public void alert(String message)
+    {
+      processAlert(message);
+    }
+    
+    public void capability(List<String> caps)
+    {
+      if (capabilities != null)
+        {
+          capabilities.addAll(caps);
+        }
+    }
+
   }
 
 }

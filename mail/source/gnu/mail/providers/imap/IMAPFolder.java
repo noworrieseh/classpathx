@@ -1,6 +1,6 @@
 /*
  * IMAPFolder.java
- * Copyright (C) 2003, 2004 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2004, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -28,9 +28,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.mail.Address;
 import javax.mail.FetchProfile;
 import javax.mail.Flags;
@@ -66,12 +68,11 @@ import javax.mail.search.SizeTerm;
 import javax.mail.search.StringTerm;
 import javax.mail.search.SubjectTerm;
 
+import gnu.inet.imap.IMAPAdapter;
+import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
-import gnu.inet.imap.ListEntry;
-import gnu.inet.imap.MailboxStatus;
-import gnu.inet.imap.MessageStatus;
-import gnu.inet.imap.Quota;
+import gnu.inet.imap.FetchDataItem;
 
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
@@ -82,6 +83,26 @@ public class IMAPFolder
   extends Folder
   implements UIDFolder
 {
+
+  static final Map<String,Flags.Flag> STR2FLAG;
+  static final Map<Flags.Flag,String> FLAG2STR;
+  static
+  {
+    STR2FLAG = new TreeMap<String,Flags.Flag>();
+    STR2FLAG.put(IMAPConstants.FLAG_ANSWERED, Flags.Flag.ANSWERED);
+    STR2FLAG.put(IMAPConstants.FLAG_DELETED, Flags.Flag.DELETED);
+    STR2FLAG.put(IMAPConstants.FLAG_DRAFT, Flags.Flag.DRAFT);
+    STR2FLAG.put(IMAPConstants.FLAG_FLAGGED, Flags.Flag.FLAGGED);
+    STR2FLAG.put(IMAPConstants.FLAG_RECENT, Flags.Flag.RECENT);
+    STR2FLAG.put(IMAPConstants.FLAG_SEEN, Flags.Flag.SEEN);
+    FLAG2STR = new TreeMap<Flags.Flag,String>();
+    FLAG2STR.put(Flags.Flag.ANSWERED, IMAPConstants.FLAG_ANSWERED);
+    FLAG2STR.put(Flags.Flag.DELETED, IMAPConstants.FLAG_DELETED);
+    FLAG2STR.put(Flags.Flag.DRAFT, IMAPConstants.FLAG_DRAFT);
+    FLAG2STR.put(Flags.Flag.FLAGGED, IMAPConstants.FLAG_FLAGGED);
+    FLAG2STR.put(Flags.Flag.RECENT, IMAPConstants.FLAG_RECENT);
+    FLAG2STR.put(Flags.Flag.SEEN, IMAPConstants.FLAG_SEEN);
+  }
 
   /**
    * The folder path.
@@ -101,11 +122,103 @@ public class IMAPFolder
 
   protected int newMessageCount = -1;
 
-  protected long uidValidity = -1L;
+  protected int unreadMessageCount = -1;
 
-  protected boolean subscribed;
+  protected long uidvalidity = -1L;
+
+  protected long uidnext = -1L;
+
+  private boolean seenTryCreate;
 
   private static DateFormat searchdf = new SimpleDateFormat("d-MMM-yyyy");
+
+  // -- IMAPCallback --
+
+  IMAPCallback callback = new IMAPAdapter()
+  {
+
+    public void alert(String message)
+    {
+      ((IMAPStore) store).processAlert(message);
+    }
+
+    public void exists(int messages)
+    {
+      int oldMessageCount = messageCount;
+      messageCount = messages;
+      if (messageCount > oldMessageCount)
+        {
+          Message[] m = new Message[messageCount - oldMessageCount];
+          for (int i = oldMessageCount; i < messageCount; i++)
+            {
+              m[i - oldMessageCount] = new IMAPMessage(IMAPFolder.this, i);
+            }
+          notifyMessageAddedListeners(m);
+        }
+      else if (messageCount < oldMessageCount)
+        {
+          Message[] m = new Message[oldMessageCount - messageCount];
+          for (int i = messageCount; i < oldMessageCount; i++)
+            {
+              m[i - messageCount] = new IMAPMessage(IMAPFolder.this, i);
+            }
+          notifyMessageRemovedListeners(false, m);
+        }
+    }
+
+    public void recent(int messages)
+    {
+      newMessageCount = messages;
+    }
+
+    public void permanentflags(List<String> flags)
+    {
+      permanentFlags = new Flags();
+      for (String flag: flags)
+        {
+          Flags.Flag ff = STR2FLAG.get(flag);
+          if (ff != null)
+            {
+              permanentFlags.add(ff);
+            }
+          else
+            {
+              permanentFlags.add(flag);
+            }
+        }
+    }
+
+    public void unseen(int messages)
+    {
+      unreadMessageCount = messages;
+    }
+
+    public void uidvalidity(long val)
+    {
+      uidvalidity = val;
+    }
+
+    public void uidnext(long val)
+    {
+      uidnext = val;
+    }
+
+    public void readWrite()
+    {
+      mode = Folder.READ_WRITE;
+    }
+
+    public void readOnly()
+    {
+      mode = Folder.READ_ONLY;
+    }
+
+    public void tryCreate()
+    {
+      seenTryCreate = true;
+    }
+
+  };
 
   /**
    * Constructor.
@@ -134,89 +247,7 @@ public class IMAPFolder
     this.delimiter = delimiter;
   }
 
-  /*
-   * Updates this folder from the specified mailbox status object.
-   */
-  void update(MailboxStatus status, boolean fireEvents)
-    throws MessagingException
-  {
-    if (status == null)
-      {
-        throw new FolderNotFoundException(this);
-      }
-    if (status.select)
-      {
-        mode = status.readWrite ? Folder.READ_WRITE : Folder.READ_ONLY;
-      }
-    if (status.permanentFlags != null)
-      {
-        permanentFlags = readFlags(status.permanentFlags);
-      }
-    // message counts
-    int oldMessageCount = messageCount;
-    messageCount = status.messageCount;
-    newMessageCount = status.newMessageCount;
-    // uidvalidity
-    uidValidity = status.uidValidity;
-    // fire events if necessary
-    if (fireEvents)
-      {
-        if (messageCount > oldMessageCount)
-          {
-            Message[] m = new Message[messageCount - oldMessageCount];
-            for (int i = oldMessageCount; i < messageCount; i++)
-              {
-                m[i - oldMessageCount] = getMessage(i);
-              }
-            notifyMessageAddedListeners(m);
-          }
-        else if (messageCount < oldMessageCount)
-          {
-            Message[] m = new Message[oldMessageCount - messageCount];
-            for (int i = messageCount; i < oldMessageCount; i++)
-              {
-                m[i - messageCount] = getMessage(i);
-              }
-            notifyMessageRemovedListeners(false, m);
-          }
-      }
-  }
-
-  Flags readFlags(List sflags)
-  {
-    Flags flags = new Flags();
-    int len = sflags.size();
-    for (int i = 0; i < len; i++)
-    {
-      String flag = (String) sflags.get(i);
-      if (flag == IMAPConstants.FLAG_ANSWERED)
-        {
-          flags.add(Flags.Flag.ANSWERED);
-        }
-      else if (flag == IMAPConstants.FLAG_DELETED)
-        {
-          flags.add(Flags.Flag.DELETED);
-        }
-      else if (flag == IMAPConstants.FLAG_DRAFT)
-        {
-          flags.add(Flags.Flag.DRAFT);
-        }
-      else if (flag == IMAPConstants.FLAG_FLAGGED)
-        {
-          flags.add(Flags.Flag.FLAGGED);
-        }
-      else if (flag == IMAPConstants.FLAG_RECENT)
-        {
-          flags.add(Flags.Flag.RECENT);
-        }
-      else if (flag == IMAPConstants.FLAG_SEEN)
-        {
-          flags.add(Flags.Flag.SEEN);
-        }
-      // user flags?
-    }
-    return flags;
-  }
+  // -- Folder --
 
   /**
    * Returns the name of this folder.
@@ -242,40 +273,9 @@ public class IMAPFolder
   public int getType()
     throws MessagingException
   {
-    if (type == -1)
+    if (type == -1 && !exists())
       {
-        int lsi = path.lastIndexOf(getSeparator());
-        String parent = (lsi == -1) ? "" : path.substring(0, lsi);
-        String name = (lsi == -1) ? path : path.substring(lsi+1);
-        IMAPConnection connection = ((IMAPStore) store).getConnection();
-        try
-          {
-            ListEntry[] entries = null;
-            synchronized (connection)
-              {
-                entries = connection.list(parent, name);
-              }
-            if (connection.alertsPending())
-              {
-               ((IMAPStore) store).processAlerts();
-              }
-            type = Folder.HOLDS_FOLDERS;
-            if (entries.length > 0)
-              {
-                if (!"".equals(path) && entries[0].isNoinferiors())
-                  {
-                    type |= Folder.HOLDS_MESSAGES;
-                  }
-              }
-            else
-              {
-                throw new FolderNotFoundException(this);
-              }
-          }
-        catch (IOException e)
-          {
-            throw new MessagingException(e.getMessage(), e);
-          }
+        throw new FolderNotFoundException(this, path);
       }
     return type;
   }
@@ -287,15 +287,38 @@ public class IMAPFolder
   public boolean exists()
     throws MessagingException
   {
+    int lsi = path.lastIndexOf(getSeparator());
+    String parent = (lsi == -1) ? "" : path.substring(0, lsi);
+    String name = (lsi == -1) ? path : path.substring(lsi+1);
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        getType();
+        type = -1;
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void list(List<String> attributes, String d,
+                           String mailbox)
+          {
+            type = 0;
+            if (!attributes.contains(IMAPConstants.LIST_NOINFERIORS))
+              {
+                type |= Folder.HOLDS_FOLDERS;
+              }
+            if (!attributes.contains(IMAPConstants.LIST_NOSELECT))
+              {
+                type |= Folder.HOLDS_MESSAGES;
+              }
+            delimiter = (d == null) ? '\u0000' : d.charAt(0);
+            path = mailbox;
+          }
+        };
+        connection.list(parent, name, adapter);
+        return type != -1;
       }
-    catch (FolderNotFoundException e)
+    catch (IOException e)
       {
-        return false;
+        throw new MessagingException(e.getMessage(), e);
       }
-    return true;
   }
 
   /**
@@ -316,31 +339,31 @@ public class IMAPFolder
     throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = s.connection;
     try
       {
-        MailboxStatus status = null;
-        synchronized (connection)
+        boolean selected = false;
+        switch (mode)
           {
-            switch (mode)
+          case Folder.READ_WRITE:
+            selected = connection.select(path, callback);
+            break;
+          case Folder.READ_ONLY:
+            selected = connection.examine(path, callback);
+            break;
+          default:
+            throw new MessagingException("No such mode: " + mode);
+          }
+        if (!selected)
+          {
+            if (type == -1 && !exists())
               {
-              case Folder.READ_WRITE:
-                status = connection.select(path);
-                break;
-              case Folder.READ_ONLY:
-                status = connection.examine(path);
-                break;
-              default:
-                throw new MessagingException("No such mode: " + mode);
+                throw new FolderNotFoundException(this, path);
               }
-            update(status, false);
+            throw new MessagingException();
           }
         s.setSelected(this);
         notifyConnectionListeners(ConnectionEvent.OPENED);
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
       }
     catch (IOException e)
       {
@@ -354,12 +377,11 @@ public class IMAPFolder
   public boolean create(int type)
     throws MessagingException
   {
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
         String newPath = path;
-        if ((type & HOLDS_FOLDERS) != 0)
+        if ((type & HOLDS_MESSAGES) == 0)
           {
             getSeparator();
             if (delimiter == '\u0000') // this folder cannot be created
@@ -370,21 +392,13 @@ public class IMAPFolder
               .append(delimiter)
               .toString();
           }
-        boolean ret = false;
-        synchronized (connection)
-          {
-            ret = connection.create(newPath);
-          }
-        if (ret)
+        if (connection.create(newPath, callback))
           {
             type = -1;
             notifyFolderListeners(FolderEvent.CREATED);
+            return true;
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return ret;
+        return false;
       }
     catch (IOException e)
       {
@@ -398,25 +412,16 @@ public class IMAPFolder
   public boolean delete(boolean flag)
     throws MessagingException
   {
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        boolean ret = false;
-        synchronized (connection)
-          {
-            ret = connection.delete(path);
-          }
-        if (ret)
+        if (connection.delete(path, callback))
           {
             type = -1;
             notifyFolderListeners(FolderEvent.DELETED);
+            return true;
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return ret;
+        return false;
       }
     catch (IOException e)
       {
@@ -430,25 +435,16 @@ public class IMAPFolder
   public boolean renameTo(Folder folder)
     throws MessagingException
   {
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        boolean ret = false;
-        synchronized (connection)
-          {
-            ret = connection.rename(path, folder.getFullName());
-          }
-        if (ret)
+        if (connection.rename(path, folder.getFullName(), callback))
           {
             type = -1;
-            notifyFolderRenamedListeners(folder); // do we have to close?
+            notifyFolderRenamedListeners(folder);
+            return true;
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return ret;
+        return false;
       }
     catch (IOException e)
       {
@@ -470,33 +466,33 @@ public class IMAPFolder
       }
     IMAPStore s = (IMAPStore) store;
     boolean selected = s.isSelected(this);
-    if (selected)
-      {
-        s.setSelected(null);
-      }
     mode = -1;
-    notifyConnectionListeners(ConnectionEvent.CLOSED);
-    if (expunge)
+    if (expunge && mode == READ_WRITE)
       {
         if (!selected)
           {
             throw new FolderClosedException(this);
           }
-        IMAPConnection connection = s.getConnection();
+        IMAPConnection connection = s.connection;
         try
           {
-            boolean success = false;
-            synchronized (connection)
+            final List<Message> acc = new ArrayList<Message>();
+            IMAPAdapter adapter = new IMAPAdapter(callback)
+            {
+              public void expunge(int message)
               {
-                success = connection.close();
+                acc.add(new IMAPMessage(IMAPFolder.this, message));
               }
-            if (connection.alertsPending())
-              {
-                s.processAlerts();
-              }
-            if (!success)
+            };
+            if (!connection.close(adapter))
               {
                 throw new IllegalWriteException();
+              }
+            if (!acc.isEmpty())
+              {
+                IMAPMessage[] ret = new IMAPMessage[acc.size()];
+                acc.toArray(ret);
+                notifyMessageRemovedListeners(false, ret);
               }
           }
         catch (IOException e)
@@ -504,6 +500,11 @@ public class IMAPFolder
             throw new MessagingException(e.getMessage(), e);
           }
       }
+    if (selected)
+      {
+        s.setSelected(null);
+      }
+    notifyConnectionListeners(ConnectionEvent.CLOSED);
   }
 
   /**
@@ -522,28 +523,22 @@ public class IMAPFolder
       {
         throw new MessagingException("Folder was opened read-only");
       }
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        int[] messageNumbers = null;
-        synchronized (connection)
+        final List<Message> acc = new ArrayList<Message>();
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void expunge(int message)
           {
-            messageNumbers = connection.expunge();
+            acc.add(new IMAPMessage(IMAPFolder.this, message));
           }
-        // construct empty IMAPMessages for the messageNumbers
-        IMAPMessage[] messages = new IMAPMessage[messageNumbers.length];
-        for (int i = 0; i < messages.length; i++)
-          {
-            messages[i] = new IMAPMessage(this, messageNumbers[i]);
-          }
-        // do we need to do this?
-        notifyMessageRemovedListeners(true, messages);
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return messages;
+        };
+        connection.expunge(adapter);
+        IMAPMessage[] ret = new IMAPMessage[acc.size()];
+        acc.toArray(ret);
+        notifyMessageRemovedListeners(true, ret);
+        return ret;
       }
     catch (IOException e)
       {
@@ -574,40 +569,24 @@ public class IMAPFolder
   public int getMessageCount()
     throws MessagingException
   {
-    MailboxStatus ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        if (mode == -1 || messageCount < 0)
+        messageCount = -1;
+        if (mode != -1)
           {
-            String[] items = new String[1];
-            items[0] = IMAPConstants.MESSAGES;
-            synchronized (connection)
-              {
-                ms = connection.status(path, items);
-              }
-            update(ms, true);
+            connection.noop(callback);
           }
-        else // NOOP
+        if (messageCount == -1 || mode == -1)
           {
-            synchronized (connection)
-              {
-                ms = connection.noop();
-              }
-            if (ms != null)
-              {
-                update(ms, true);
-              }
+            List<String> items = new ArrayList<String>();
+            items.add(IMAPConstants.MESSAGES);
+            connection.status(path, items, callback);
           }
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
-      }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
       }
     return messageCount;
   }
@@ -619,40 +598,24 @@ public class IMAPFolder
   public int getNewMessageCount()
     throws MessagingException
   {
-    MailboxStatus ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        if (mode == -1 || newMessageCount < 0)
+        newMessageCount = -1;
+        if (mode != -1)
           {
-            String[] items = new String[1];
-            items[0] = IMAPConstants.RECENT;
-            synchronized (connection)
-              {
-                ms = connection.status(path, items);
-                update(ms, true);
-              }
+            connection.noop(callback);
           }
-        else // NOOP
+        if (newMessageCount == -1 || mode == -1)
           {
-            synchronized (connection)
-              {
-                ms = connection.noop();
-              }
-            if (ms != null)
-              {
-                update(ms, true);
-              }
+            List<String> items = new ArrayList<String>();
+            items.add(IMAPConstants.RECENT);
+            connection.status(path, items, callback);
           }
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
-      }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
       }
     return newMessageCount;
   }
@@ -685,17 +648,34 @@ public class IMAPFolder
   public void copyMessages(Message[] msgs, Folder folder)
     throws MessagingException
   {
-    FetchProfile fp = new FetchProfile();
-    fp.add(IMAPConstants.BODYSTRUCTURE);
-    fetch(msgs, fp);
-    if (!folder.exists())
+    if (mode == -1)
       {
-        throw new FolderNotFoundException("Folder does not exist", folder);
+        throw new FolderClosedException(this);
       }
-    if (folder instanceof IMAPFolder &&
-            ((IMAPFolder) folder).store.equals(store))
+    if (folder.getStore() == store)
       {
-        folder.appendMessages(msgs);
+        IMAPConnection connection = ((IMAPStore) store).connection;
+        try
+          {
+            List<Integer> messages = new ArrayList<Integer>(msgs.length);
+            seenTryCreate = false;
+            for (int i = 0; i < msgs.length; i++)
+              {
+                messages.add(msgs[i].getMessageNumber());
+              }
+            if (!connection.copy(messages, folder.getFullName(), callback))
+              {
+                if (seenTryCreate)
+                  {
+                    throw new FolderNotFoundException(folder);
+                  }
+                throw new MessagingException();
+              }
+          }
+        catch (IOException e)
+          {
+            throw new MessagingException(e.getMessage(), e);
+          }
       }
     else
       {
@@ -710,44 +690,31 @@ public class IMAPFolder
   public void appendMessages(Message[] messages)
     throws MessagingException
   {
-    MimeMessage[] m = new MimeMessage[messages.length];
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
+        List<Message> acc = new ArrayList<Message>(messages.length);
         for (int i = 0; i < messages.length; i++)
           {
-            m[i] = (MimeMessage) messages[i];
+            Date date = messages[i].getReceivedDate();
+            List<String> flags = flagsToString(messages[i].getFlags());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            messages[i].writeTo(out);
+            byte[] content = out.toByteArray();
+            out = null;
+            if (connection.append(path, flags, date, content, callback))
+              {
+                acc.add(messages[i]);
+              }
           }
+        messages = new Message[acc.size()];
+        acc.toArray(messages);
+        notifyMessageAddedListeners(messages);
       }
-    catch (ClassCastException e)
-      {
-        throw new MessagingException("Only MimeMessages can be appended to " +
-                                      "this folder");
-      }
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-    {
-      for (int i = 0; i < m.length; i++)
-      {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m[i].writeTo(out);
-        byte[] content = out.toByteArray();
-        out = null;
-        synchronized (connection)
-        {
-          connection.append(path, null, content);
-        }
-      }
-      if (connection.alertsPending())
-        {
-          s.processAlerts();
-        }
-    }
     catch (IOException e)
-    {
-      throw new MessagingException(e.getMessage(), e);
-    }
-    notifyMessageAddedListeners(m);
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
   }
 
   /**
@@ -762,21 +729,25 @@ public class IMAPFolder
       {
         throw new FolderClosedException(this);
       }
+    if (messages.length == 0)
+      {
+        return;
+      }
     // decide which commands to send
     String[] headers = fp.getHeaderNames();
-    List l = new ArrayList();
+    List<String> cmds = new ArrayList<String>();
     if (fp.contains(FetchProfile.Item.CONTENT_INFO))
       {
-        l.add(IMAPMessage.FETCH_CONTENT);
+        cmds.add(IMAPConstants.BODYSTRUCTURE);
       }
     else if (fp.contains(FetchProfile.Item.ENVELOPE))
       {
-        l.add(IMAPMessage.FETCH_HEADERS);
+        cmds.add(IMAPConstants.ENVELOPE);
       }
     else if (headers.length > 0)
       {
         // specified headers only
-        StringBuffer hbuf = new StringBuffer("BODY.PEEK[HEADER.FIELDS(");
+        StringBuilder hbuf = new StringBuilder("BODY.PEEK[HEADER.FIELDS(");
         for (int i = 0; i < headers.length; i++)
           {
             if (i > 0)
@@ -787,61 +758,36 @@ public class IMAPFolder
           }
         hbuf.append(')');
         hbuf.append(']');
-        l.add(hbuf.toString());
+        cmds.add(hbuf.toString());
     }
     if (fp.contains(FetchProfile.Item.FLAGS))
       {
-        l.add(IMAPConstants.FLAGS);
+        cmds.add(IMAPConstants.FLAGS);
       }
-    l.add(IMAPConstants.INTERNALDATE); // for received date
-    int llen = l.size();
-    if (llen == 0)
+    cmds.add(IMAPConstants.INTERNALDATE); // for received date
+    // get message numbers
+    List<Integer> nums = new ArrayList<Integer>(messages.length);
+    final Map<Integer,IMAPMessage> num2msg =
+      new HashMap<Integer,IMAPMessage>();
+    for (int i = 0; i < messages.length; i++)
       {
-        return; // no commands to send: don't bother the server
-      }
-    String[] commands = new String[llen];
-    l.toArray(commands);
-    l = null;
-    // get casted imapmessages and message numbers
-    IMAPMessage[] m = new IMAPMessage[messages.length];
-    int[] msgnums = new int[messages.length];
-    try
-      {
-        for (int i = 0; i < messages.length; i++)
-          {
-            m[i] = (IMAPMessage) messages[i];
-            msgnums[i] = m[i].getMessageNumber();
-          }
-      }
-    catch (ClassCastException e)
-      {
-        throw new MessagingException("Only IMAPMessages can be fetched");
+        int num = messages[i].getMessageNumber();
+        nums.add(num);
+        num2msg.put(num, (IMAPMessage) messages[i]);
       }
     // execute
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        synchronized (connection)
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void fetch(int message, List<FetchDataItem> data)
           {
-            MessageStatus[] ms = connection.fetch(msgnums, commands);
-            for (int i = 0; i < ms.length; i++)
-              {
-                int msgnum = ms[i].getMessageNumber();
-                for (int j = 0; j < msgnums.length; j++)
-                  {
-                    if (msgnums[j] == msgnum)
-                      {
-                        m[j].update(ms[i]);
-                        break;
-                      }
-                  }
-              }
+            IMAPMessage msg = num2msg.get(message);
+            msg.callback.fetch(message, data);
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
+        };
+        connection.fetch(nums, cmds, adapter);
       }
     catch (IOException e)
       {
@@ -864,11 +810,11 @@ public class IMAPFolder
   public Message[] search(SearchTerm term, Message[] msgs)
     throws MessagingException
   {
-    List list = new ArrayList();
+    List<String> criteria = new ArrayList<String>();
     if (msgs != null)
       {
         // <message set>
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < msgs.length; i++)
           {
             int msgnum = msgs[i].getMessageNumber();
@@ -878,31 +824,35 @@ public class IMAPFolder
               }
             buffer.append(msgnum);
           }
-        list.add(buffer.toString());
+        criteria.add(buffer.toString());
       }
-    boolean isIMAPSearch = addTerm(term, list);
-    String[] criteria = new String[list.size()];
-    list.toArray(criteria);
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    boolean isIMAPSearch = addTerm(term, criteria);
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
         Message[] messages;
-        if (isIMAPSearch && criteria.length > 0)
+        if (isIMAPSearch && !criteria.isEmpty())
           {
-            int[] mn = null;
-            synchronized (connection)
+            final List<Integer> acc = new ArrayList<Integer>();
+            IMAPAdapter adapter = new IMAPAdapter(callback)
+            {
+              public void search(List<Integer> results)
               {
-                mn = connection.search(null, criteria);
+                acc.addAll(results);
               }
-            messages = new Message[mn.length];
-            for (int i = 0; i < mn.length; i++)
-              messages[i] = new IMAPMessage(this, mn[i]);
-            if (connection.alertsPending())
-              s.processAlerts();
+            };
+            connection.search(null, criteria, adapter);
+            messages = new Message[acc.size()];
+            for (int i = 0; i < acc.size(); i++)
+              {
+                int num = acc.get(i);
+                messages[i] = new IMAPMessage(IMAPFolder.this, num);
+              }
           }
         else
-          messages = (msgs != null) ? msgs : getMessages();
+          {
+            messages = (msgs != null) ? msgs : getMessages();
+          }
         // Enforce final constraints
         return super.search(term, messages);
       }
@@ -919,7 +869,7 @@ public class IMAPFolder
    * <code>super.search()</code> in the search method.
    * @return true if all the terms can be represented in IMAP
    */
-  private boolean addTerm(SearchTerm term, List list)
+  private boolean addTerm(SearchTerm term, List<String> list)
   {
     if (term instanceof AndTerm)
       {
@@ -1143,7 +1093,9 @@ public class IMAPFolder
             criterion.append("Message-ID");
           }
         else
-          criterion = null; // TODO StringAddressTerms?
+          {
+            criterion = null; // TODO StringAddressTerms?
+          }
         if (criterion != null)
           {
             criterion.append(' ');
@@ -1162,26 +1114,43 @@ public class IMAPFolder
 
   public boolean isSubscribed()
   {
-    return subscribed;
+    int lsi = path.lastIndexOf(delimiter);
+    String parent = (lsi == -1) ? "" : path.substring(0, lsi);
+    String name = (lsi == -1) ? path : path.substring(lsi+1);
+    IMAPConnection connection = ((IMAPStore) store).connection;
+    try
+      {
+        final boolean[] subscribed = new boolean[] { false };
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void list(List<String> attributes, String d,
+                           String mailbox)
+          {
+            subscribed[0] = true;
+          }
+        };
+        connection.lsub(parent, name, adapter);
+        return subscribed[0];
+      }
+    catch (IOException e)
+      {
+        return false;
+      }
   }
 
   public void setSubscribed(boolean flag)
     throws MessagingException
   {
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        synchronized (connection)
+        if (flag)
           {
-            if (flag)
-              {
-                connection.subscribe(path);
-              }
-            else
-              {
-                connection.unsubscribe(path);
-              }
+            connection.subscribe(path, callback);
+          }
+        else
+          {
+            connection.unsubscribe(path, callback);
           }
       }
     catch (IOException e)
@@ -1196,23 +1165,35 @@ public class IMAPFolder
   public Folder[] list(String pattern)
     throws MessagingException
   {
-    char sep = getSeparator();
+    getSeparator();
     String spec = ("".equals(path)) ? "%" :
-      new StringBuffer(path).append(sep).append(pattern).toString();
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+      new StringBuilder(path).append(delimiter).append(pattern).toString();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        ListEntry[] entries;
-        synchronized (connection)
+        final List<Folder> acc = new ArrayList<Folder>();
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void list(List<String> attributes, String d,
+                           String mailbox)
           {
-            entries = connection.list("", spec);
+            int type = 0;
+            if (!attributes.contains(IMAPConstants.LIST_NOINFERIORS))
+              {
+                type |= Folder.HOLDS_FOLDERS;
+              }
+            if (!attributes.contains(IMAPConstants.LIST_NOSELECT))
+              {
+                type |= Folder.HOLDS_MESSAGES;
+              }
+            char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+            acc.add(new IMAPFolder(store, mailbox, type, delimiter));
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return getFolders(entries, false);
+        };
+        connection.list("", spec, adapter);
+        Folder[] ret = new Folder[acc.size()];
+        acc.toArray(ret);
+        return ret;
       }
     catch (IOException e)
       {
@@ -1226,57 +1207,40 @@ public class IMAPFolder
   public Folder[] listSubscribed(String pattern)
     throws MessagingException
   {
-    char sep = getSeparator();
+    getSeparator();
     String spec = ("".equals(path)) ? "%" :
-      new StringBuffer(path).append(sep).append(pattern).toString();
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+      new StringBuffer(path).append(delimiter).append(pattern).toString();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        ListEntry[] entries = null;
-        synchronized (connection)
+        final List<Folder> acc = new ArrayList<Folder>();
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void list(List<String> attributes, String d,
+                           String mailbox)
           {
-            entries = connection.lsub("", spec);
+            int type = 0;
+            if (!attributes.contains(IMAPConstants.LIST_NOINFERIORS))
+              {
+                type |= Folder.HOLDS_FOLDERS;
+              }
+            if (!attributes.contains(IMAPConstants.LIST_NOSELECT))
+              {
+                type |= Folder.HOLDS_MESSAGES;
+              }
+            char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+            acc.add(new IMAPFolder(store, mailbox, type, delimiter));
           }
-        if (connection.alertsPending())
-          {
-            s.processAlerts();
-          }
-        return getFolders(entries, true);
+        };
+        connection.list("", spec, adapter);
+        Folder[] ret = new Folder[acc.size()];
+        acc.toArray(ret);
+        return ret;
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-  }
-
-  /*
-   * Returns a set of folders for a corresponding set of list entries.
-   */
-  Folder[] getFolders(ListEntry[] entries, boolean subscribed)
-    throws MessagingException
-  {
-    List unique = new ArrayList(entries.length);
-    for (int i = 0; i < entries.length; i++)
-      {
-        ListEntry entry = entries[i];
-        int etype = entry.isNoinferiors() ?
-          Folder.HOLDS_MESSAGES :
-          Folder.HOLDS_FOLDERS;
-        if (!entry.isNoselect())
-          {
-            IMAPFolder f = new IMAPFolder(store, entry.getMailbox(),
-                                           etype, entry.getDelimiter());
-            if (!unique.contains(f))
-              {
-                unique.add(f);
-                f.subscribed = subscribed;
-              }
-          }
-      }
-    Folder[] folders = new Folder[unique.size()];
-    unique.toArray(folders);
-    return folders;
   }
 
   /**
@@ -1286,7 +1250,6 @@ public class IMAPFolder
     throws MessagingException
   {
     IMAPStore s = (IMAPStore) store;
-    s.getConnection();
     getSeparator();
     int di = path.lastIndexOf(delimiter);
     if (di == -1)
@@ -1302,14 +1265,15 @@ public class IMAPFolder
   public Folder getFolder(String name)
     throws MessagingException
   {
-    StringBuffer buf = new StringBuffer();
+    getSeparator();
+    StringBuilder buf = new StringBuilder();
     if (path != null && path.length() > 0)
       {
         buf.append(path);
         buf.append(delimiter);
       }
     buf.append(name);
-    return new IMAPFolder(store, buf.toString(), -1, getSeparator());
+    return new IMAPFolder(store, buf.toString());
   }
 
   /**
@@ -1320,31 +1284,9 @@ public class IMAPFolder
   {
     if (delimiter == '\u0000')
       {
-        IMAPStore s = (IMAPStore) store;
-        IMAPConnection connection = s.getConnection();
-        try
+        if (!exists())
           {
-            ListEntry[] entries = null;
-            synchronized (connection)
-              {
-                entries = connection.list(path, null);
-              }
-            if (connection.alertsPending())
-              {
-                s.processAlerts();
-              }
-            if (entries.length > 0)
-              {
-                delimiter = entries[0].getDelimiter();
-              }
-            else
-              {
-                throw new FolderNotFoundException(this);
-              }
-          }
-        catch (IOException e)
-          {
-            throw new MessagingException(e.getMessage(), e);
+            throw new FolderNotFoundException(this);
           }
       }
     return delimiter;
@@ -1364,42 +1306,26 @@ public class IMAPFolder
   public long getUIDValidity()
     throws MessagingException
   {
-    MailboxStatus ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        if (mode == -1 || uidValidity < 0L)
+        uidvalidity = -1L;
+        if (mode != -1)
           {
-            String[] items = new String[1];
-            items[0] = IMAPConstants.UIDVALIDITY;
-            synchronized (connection)
-              {
-                ms = connection.status(path, items);
-              }
-            update(ms, true);
+            connection.noop(callback);
           }
-        else // NOOP
+        if (uidvalidity == -1L || mode == -1)
           {
-            synchronized (connection)
-              {
-                ms = connection.noop();
-              }
-            if (ms != null)
-              {
-                update(ms, true);
-              }
+            List<String> items = new ArrayList<String>();
+            items.add(IMAPConstants.UIDVALIDITY);
+            connection.status(path, items, callback);
           }
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
-      }
-    return uidValidity;
+    return uidvalidity;
   }
 
   public Message getMessageByUID(long uid)
@@ -1409,28 +1335,31 @@ public class IMAPFolder
       {
         throw new FolderClosedException(this);
       }
-    MessageStatus ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        String[] cmds = new String[] { IMAPConstants.FLAGS };
-        synchronized (connection)
+        final List<Message> acc = new ArrayList<Message>();
+        List<String> cmds = new ArrayList<String>();
+        cmds.add(IMAPConstants.FLAGS);
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void fetch(int message, List<FetchDataItem> data)
           {
-            ms = connection.uidFetch(uid, cmds);
+            IMAPMessage msg = new IMAPMessage(IMAPFolder.this, message);
+            msg.callback.fetch(message, data);
+            acc.add(msg);
           }
+        };
+        if (connection.uidFetch(uid, cmds, adapter) && !acc.isEmpty())
+          {
+            return acc.get(0);
+          }
+        return null;
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
-      }
-    IMAPMessage message = new IMAPMessage(this, ms.getMessageNumber());
-    message.update(ms);
-    return message;
   }
 
   public Message[] getMessagesByUID(long start, long end)
@@ -1440,34 +1369,30 @@ public class IMAPFolder
       {
         throw new FolderClosedException(this);
       }
-    MessageStatus[] ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        String[] cmds = new String[] { IMAPConstants.FLAGS };
-        synchronized (connection)
+        final List<Message> acc = new ArrayList<Message>();
+        List<String> cmds = new ArrayList<String>();
+        cmds.add(IMAPConstants.FLAGS);
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void fetch(int message, List<FetchDataItem> data)
           {
-            ms = connection.uidFetch(start, end, cmds);
+            IMAPMessage msg = new IMAPMessage(IMAPFolder.this, message);
+            msg.callback.fetch(message, data);
+            acc.add(msg);
           }
+        };
+        connection.uidFetch(start, end, cmds, adapter);
+        Message[] ret = new Message[acc.size()];
+        acc.toArray(ret);
+        return ret;
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
-      }
-    Message[] messages = new Message[ms.length];
-    for (int i = 0; i < messages.length; i++)
-      {
-        IMAPMessage message =
-          new IMAPMessage(this, ms[i].getMessageNumber());
-        message.update(ms[i]);
-        messages[i] = message;
-      }
-    return messages;
   }
 
   public Message[] getMessagesByUID(long[] uids)
@@ -1477,34 +1402,35 @@ public class IMAPFolder
       {
         throw new FolderClosedException(this);
       }
-    MessageStatus[] ms = null;
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        String[] cmds = new String[] { IMAPConstants.FLAGS };
-        synchronized (connection)
+        List<Long> u = new ArrayList<Long>(uids.length);
+        for (int i = 0; i < uids.length; i++)
           {
-            ms = connection.uidFetch(uids, cmds);
+            u.add(uids[i]);
           }
+        final List<Message> acc = new ArrayList<Message>();
+        List<String> cmds = new ArrayList<String>();
+        cmds.add(IMAPConstants.FLAGS);
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void fetch(int message, List<FetchDataItem> data)
+          {
+            IMAPMessage msg = new IMAPMessage(IMAPFolder.this, message);
+            msg.callback.fetch(message, data);
+            acc.add(msg);
+          }
+        };
+        connection.uidFetch(u, cmds, adapter);
+        Message[] ret = new Message[acc.size()];
+        acc.toArray(ret);
+        return ret;
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-    if (connection.alertsPending())
-      {
-        s.processAlerts();
-      }
-    Message[] messages = new Message[ms.length];
-    for (int i = 0; i < messages.length; i++)
-      {
-        IMAPMessage message =
-          new IMAPMessage(this, ms[i].getMessageNumber());
-        message.update(ms[i]);
-        messages[i] = message;
-      }
-    return messages;
   }
 
   public long getUID(Message message)
@@ -1527,30 +1453,6 @@ public class IMAPFolder
   }
 
   /**
-   * Returns the quotas for this folder.
-   */
-  public Quota[] getQuota()
-    throws MessagingException
-  {
-    if (mode == -1)
-      {
-        throw new FolderClosedException(this);
-      }
-    IMAPStore s = (IMAPStore) store;
-    synchronized (s)
-      {
-        try
-          {
-            return s.connection.getquotaroot(path);
-          }
-        catch (IOException e)
-          {
-            throw new MessagingException(e.getMessage(), e);
-          }
-      }
-  }
-
-  /**
    * Returns the number of unread messages in this folder.
    * @see javax.mail.Folder#getUnreadMessageCount()
    */
@@ -1566,7 +1468,7 @@ public class IMAPFolder
    */
   public synchronized int getDeletedMessageCount()
     throws MessagingException
-  {
+      {
     return getMessageCountByCriteria("DELETED");
   }
 
@@ -1581,225 +1483,42 @@ public class IMAPFolder
       {
         return -1;
       }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    String[] criterias = new String[] { criteria };
-
-    int[] ids = null;
+    IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        ids = connection.search(null, criterias);
+        List<String> c = new ArrayList<String>();
+        c.add(criteria);
+        final List<Integer> acc = new ArrayList<Integer>();
+        IMAPAdapter adapter = new IMAPAdapter(callback)
+        {
+          public void search(List<Integer> results)
+          {
+            acc.addAll(results);
+          }
+        };
+        connection.search(null, c, adapter);
+        return acc.size();
       }
     catch (IOException e)
       {
         throw new MessagingException(e.getMessage(), e);
       }
-
-    return ids.length;
   }
 
-  /**
-   * Returns the access control list for this folder.
-   * This is an array of access control entries.
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public ACL[] getACL()
-    throws MessagingException
+  static final List<String> flagsToString(Flags flags)
   {
-    if (!isOpen())
+    List<String> ret = new ArrayList<String>();
+    Flags.Flag[] sf = flags.getSystemFlags();
+    String[] uf = flags.getUserFlags();
+    for (int i = 0; i < sf.length; i++)
       {
-        return null;
+        ret.add(FLAG2STR.get(sf[i]));
       }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    List acc = new ArrayList();
-    try
+    for (int i = 0; i < uf.length; i++)
       {
-        Map acl = connection.getacl(path);
-        for (Iterator i = acl.entrySet().iterator(); i.hasNext(); )
-          {
-            Map.Entry entry = (Map.Entry) i.next();
-            String name = (String) entry.getKey();
-            Integer rights = (Integer) entry.getValue();
-            ACL ace = new ACL(name);
-            if (rights != null)
-              {
-                ace.rights = new Rights();
-                ace.rights.rights = rights.intValue();
-              }
-            acc.add(ace);
-          }
+        ret.add(uf[i]);
       }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-    ACL[] ret = new ACL[acc.size()];
-    acc.toArray(ret);
     return ret;
-  }
-
-  /**
-   * Adds the specified access control entry to this folder.
-   * @param ace the access control entry
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public void addACL(ACL ace)
-    throws MessagingException
-  {
-    if (!isOpen())
-      {
-        return;
-      }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-      {
-        Rights aceRights = ace.getRights();
-        if (aceRights != null)
-          {
-            int rights = connection.listrights(path, ace.name);
-            rights |= aceRights.rights;
-            if (!connection.setacl(path, ace.name, rights))
-              {
-                throw new MessagingException("can't set ACL");
-              }
-          }
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-  }
-
-  /**
-   * Removes the ACL for the given principal.
-   * @param name the name of the principal
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public void removeACL(String name)
-    throws MessagingException
-  {
-    if (!isOpen())
-      {
-        return;
-      }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-      {
-        if (!connection.deleteacl(path, name))
-          {
-            throw new MessagingException("can't delete ACL");
-          }
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-  }
-
-  /**
-   * Adds the rights for the specified access control entry.
-   * @param ace the access control entry
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public void addRights(ACL ace)
-    throws MessagingException
-  {
-    addACL(ace);
-  }
-
-  /**
-   * Removes the rights specified in the given access control entry from the
-   * principal.
-   * @param ace the access control entry
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public void removeRights(ACL ace)
-    throws MessagingException
-  {
-    if (!isOpen())
-      {
-        return;
-      }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-      {
-        Rights aceRights = ace.getRights();
-        if (aceRights != null)
-          {
-            int rights = connection.listrights(path, ace.name);
-            rights -= aceRights.rights;
-            if (!connection.setacl(path, ace.name, rights))
-              {
-                throw new MessagingException("can't set ACL");
-              }
-          }
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-  }
-
-  /**
-   * Returns the rights currently assigned to the given principal.
-   * @param name the name of the principal
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public Rights listRights(String name)
-    throws MessagingException
-  {
-    if (!isOpen())
-      {
-        return null;
-      }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-      {
-        Rights rights = new Rights();
-        rights.rights = connection.listrights(path, name);
-        return rights;
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
-  }
-
-  /**
-   * Returns the rights assigned to the currently authenticated principal.
-   * @deprecated this API will probably change incompatibly soon
-   */
-  public Rights myRights()
-    throws MessagingException
-  {
-    if (!isOpen())
-      {
-        return null;
-      }
-
-    IMAPStore s = (IMAPStore) store;
-    IMAPConnection connection = s.getConnection();
-    try
-      {
-        Rights rights = new Rights();
-        rights.rights = connection.myrights(path);
-        return rights;
-      }
-    catch (IOException e)
-      {
-        throw new MessagingException(e.getMessage(), e);
-      }
   }
 
 }
