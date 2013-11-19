@@ -348,11 +348,8 @@ public class IMAPFolder
           case Folder.READ_WRITE:
             selected = connection.select(path, callback);
             break;
-          case Folder.READ_ONLY:
-            selected = connection.examine(path, callback);
-            break;
           default:
-            throw new MessagingException("No such mode: " + mode);
+            selected = connection.examine(path, callback);
           }
         if (!selected)
           {
@@ -517,11 +514,11 @@ public class IMAPFolder
   {
     if (!isOpen())
       {
-        throw new MessagingException("Folder is not open");
+        throw new FolderClosedException(this);
       }
     if (mode == Folder.READ_ONLY)
       {
-        throw new MessagingException("Folder was opened read-only");
+        throw new IllegalWriteException();
       }
     IMAPConnection connection = ((IMAPStore) store).connection;
     try

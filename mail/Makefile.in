@@ -410,7 +410,9 @@ inetlib_jar = @INETLIB_JAR@
 src_l10n = \
 $(src)/javax/mail/L10N.properties \
 $(src)/javax/mail/internet/L10N.properties \
-$(src)/javax/mail/util/L10N.properties
+$(src)/javax/mail/util/L10N.properties \
+$(src)/gnu/mail/providers/L10N.properties \
+$(src)/gnu/mail/util/L10N.properties
 
 
 # The META stuff

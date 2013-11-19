@@ -27,6 +27,7 @@ import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import gnu.inet.util.LineInputStream;
 
@@ -38,6 +39,9 @@ import gnu.inet.util.LineInputStream;
 public class UUInputStream
   extends FilterInputStream
 {
+
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.mail.util.L10N");
 
   /**
    * True if we are in the code body, between the begin and end lines.
@@ -90,7 +94,7 @@ public class UUInputStream
             line = lin.readLine();
             if (line == null || !line.startsWith("begin "))
               {
-                throw new IOException("No `begin' line");
+                throw new IOException(L10N.getString("err.uu_no_begin"));
               }
             // mode and filename are currently ignored
             body = true;
@@ -114,7 +118,7 @@ public class UUInputStream
             line = lin.readLine();
             if (line == null || !line.equals("end"))
               {
-                throw new IOException("No `end' line");
+                throw new IOException(L10N.getString("err.uu_no_end"));
               }
             return -1;
           }
@@ -164,12 +168,7 @@ public class UUInputStream
    */
   static int decode(byte c)
   {
-    int c2 = (int) c;
-    if (c2 < 0)
-       {
-         c2 += 256;
-       }
-    return (c2 - 32) & 077;
+    return (((int) c & 0xff) - 32) & 077;
   }
 
 }

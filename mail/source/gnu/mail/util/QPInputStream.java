@@ -1,6 +1,6 @@
 /*
  * QPInputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -31,12 +31,11 @@ import java.io.PushbackInputStream;
  * A Quoted-Printable decoder stream.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.5
  */
 public class QPInputStream
   extends FilterInputStream
 {
-
-  protected byte[] buf;
 
   /**
    * The number of times read() will return a space.
@@ -55,7 +54,6 @@ public class QPInputStream
   public QPInputStream(InputStream in)
   {
     super(new PushbackInputStream(in, 2));
-    buf = new byte[2];
   }
 
   /**
@@ -64,55 +62,53 @@ public class QPInputStream
   public int read()
     throws IOException
   {
-    if (spaceCount>0)
-    {
-      spaceCount--;
-      return SPACE;
-    }
+    if (spaceCount > 0)
+      {
+        spaceCount--;
+        return SPACE;
+      }
 
     int c = in.read();
-    if (c==SPACE)
-    {
-      while ((c = in.read())==SPACE)
-        spaceCount++;
-      if (c==LF || c==CR || c==-1)
-        spaceCount = 0;
-      else
+    if (c == SPACE)
       {
-       ((PushbackInputStream)in).unread(c);
-        c = SPACE;
+        while ((c = in.read()) == SPACE)
+          {
+            spaceCount++;
+          }
+        if (c == LF || c == CR || c == -1)
+          {
+            spaceCount = 0;
+          }
+        else
+          {
+            ((PushbackInputStream) in).unread(c);
+            c = SPACE;
+          }
+        return c;
       }
-      return c;
-    }
-    if (c==EQ)
-    {
-      int c2 = super.in.read();
-      if (c2==LF)
-        return read();
-      if (c2==CR)
+    if (c == EQ)
       {
-        int peek = in.read();
-        if (peek!=LF)
-         ((PushbackInputStream)in).unread(peek);
-        return read();
+        int c2 = super.in.read();
+        if (c2 == LF)
+          {
+            return read();
+          }
+        if (c2 == CR)
+          {
+            int peek = in.read();
+            if (peek != LF)
+              ((PushbackInputStream) in).unread(peek);
+            return read();
+          }
+        int hi = c2;
+        int lo = in.read();
+        if (hi < 0 || lo < 0)
+          {
+            return -1;
+          }
+        return (Character.digit(hi, 16) << 4) | Character.digit(lo, 16);
       }
-      if (c2==-1)
-        return c2;
-
-      buf[0] = (byte)c2;
-      buf[1] = (byte)in.read();
-      try
-      {
-        return Integer.parseInt(new String(buf, 0, 2), 16);
-      }
-      catch (NumberFormatException e)
-      {
-       ((PushbackInputStream)in).unread(buf);
-      }
-      return c;
-    }
-    else
-      return c;
+    return c;
   }
 
   /**
@@ -122,27 +118,12 @@ public class QPInputStream
     throws IOException
   {
     int pos = 0;
-    try
-    {
-      while (pos<len)
+    for (int c = read(); c != -1 && pos < len; c = read())
       {
-        int c = read();
-        if (c==-1)
-        {
-          if (pos==0)
-            pos = -1;
-          break;
-        }
-        bytes[off+pos] = (byte)c;
+        bytes[off + pos] = (byte) c;
         pos++;
       }
-
-    }
-    catch (IOException e)
-    {
-      pos = -1;
-    }
-    return pos;
+    return (pos < 1) ? -1 : pos;
   }
 
   /**

@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -69,6 +70,9 @@ public class IMAPStore
   extends Store
   implements QuotaAwareStore
 {
+
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.mail.providers.L10N");
 
   /**
    * The connection to the IMAP server.
@@ -172,7 +176,7 @@ public class IMAPStore
               }
             if (!tls && "required".equals(getProperty("tls")))
               {
-                throw new MessagingException("TLS not available");
+                throw new MessagingException(L10N.getString("err.no_tls"));
               }
             // Build list of available SASL mechanisms
             List<String> mechanisms = new ArrayList<String>();

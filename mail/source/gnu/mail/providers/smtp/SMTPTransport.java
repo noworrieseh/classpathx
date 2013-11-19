@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -71,6 +72,9 @@ import gnu.inet.util.LaconicFormatter;
 public class SMTPTransport
   extends Transport
 {
+
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.mail.providers.L10N");
 
   /**
    * The connection used to communicate with the server.
@@ -169,8 +173,7 @@ public class SMTPTransport
         if (propertyIsFalse("ehlo"))
           {
             if (!connection.helo(localHostName))
-              throw new MessagingException("HELO failed: "+
-                                           connection.getLastResponse());
+              throw new MessagingException(connection.getLastResponse());
           }
         else
           {
@@ -179,8 +182,7 @@ public class SMTPTransport
               {
                 if (!connection.helo(localHostName))
                   {
-                    throw new MessagingException("HELO failed: "+
-                                                 connection.getLastResponse());
+                    throw new MessagingException(connection.getLastResponse());
                   }
               }
             else
@@ -206,7 +208,7 @@ public class SMTPTransport
                   }
                 if (!tls && "required".equals(getProperty("tls")))
                   {
-                    throw new MessagingException("TLS not available");
+                    throw new MessagingException(L10N.getString("err.no_tls"));
                   }
                 // Populate authenticationMechanisms
                 for (Iterator i = extensions.iterator(); i.hasNext(); )
@@ -349,11 +351,11 @@ public class SMTPTransport
   {
     if (!isConnected())
       {
-        throw new MessagingException("not connected");
+        throw new MessagingException(L10N.getString("err.not_connected"));
       }
     if (!(message instanceof MimeMessage))
       {
-        throw new SendFailedException("only MimeMessages are supported");
+        throw new SendFailedException(L10N.getString("err.mimemessage_only"));
       }
     // Cast message
     MimeMessage mimeMessage = (MimeMessage) message;

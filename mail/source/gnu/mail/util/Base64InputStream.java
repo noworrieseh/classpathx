@@ -25,6 +25,7 @@ package gnu.mail.util;
 import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 /**
  * A Base64 content transfer encoding filter stream.
@@ -42,6 +43,9 @@ import java.io.IOException;
 public class Base64InputStream
   extends FilterInputStream
 {
+
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.mail.util.L10N");
 
   private byte[] buffer;
   private int buflen;
@@ -157,7 +161,7 @@ public class Base64InputStream
     for (int k=1;(l=in.read(decodeBuf, k, j))!=j; k += l)
     {
       if (l==-1)
-        throw new IOException("Base64 encoding error");
+        throw new IOException(L10N.getString("err.bad_Base64"));
       j -= l;
     }
 

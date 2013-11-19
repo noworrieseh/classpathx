@@ -1,6 +1,6 @@
 /*
  * QInputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -53,6 +53,7 @@ import java.io.IOException;
  * within encoded words.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.5
  */
 public class QInputStream
   extends QPInputStream
@@ -78,22 +79,20 @@ public class QInputStream
     throws IOException
   {
     int c = in.read();
-    if (c==UNDERSCORE)
-      return SPACE;
-    if (c==EQ)
-    {
-      buf[0] = (byte)in.read();
-      buf[1] = (byte)in.read();
-      try
+    if (c == UNDERSCORE)
       {
-        return Integer.parseInt(new String(buf, 0, 2), 16);
+        return SPACE;
       }
-      catch (NumberFormatException e)
+    if (c == EQ)
       {
-        throw new IOException("Quoted-Printable encoding error: "+
-            e.getMessage());
+        int hi = in.read();
+        int lo = in.read();
+        if (hi < 0 || lo < 0)
+          {
+            return -1;
+          }
+        return (Character.digit(hi, 16) << 4) | Character.digit(lo, 16);
       }
-    }
     return c;
   }
 

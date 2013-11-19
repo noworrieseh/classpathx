@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -59,6 +60,9 @@ import gnu.inet.util.LaconicFormatter;
 public final class POP3Store
   extends Store
 {
+  
+  private static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.mail.providers.L10N");
 
   /*
    * The connection.
@@ -171,7 +175,7 @@ public final class POP3Store
                   }
                 if (!tls && "required".equals(getProperty("tls")))
                   {
-                    throw new MessagingException("TLS not available");
+                    throw new MessagingException(L10N.getString("err.no_tls"));
                   }
                 // Build list of SASL mechanisms
                 List authenticationMechanisms = null;
@@ -253,11 +257,11 @@ public final class POP3Store
           }
         catch (UnknownHostException e)
           {
-            throw new MessagingException("Connect failed", e);
+            throw new MessagingException(null, e);
           }
         catch (IOException e)
           {
-            throw new MessagingException("Connect failed", e);
+            throw new MessagingException(null, e);
           }
       }
   }
@@ -320,7 +324,7 @@ public final class POP3Store
               }
             catch (IOException e)
               {
-                throw new MessagingException("Close failed", e);
+                throw new MessagingException(null, e);
               }
           }
         connection = null;
