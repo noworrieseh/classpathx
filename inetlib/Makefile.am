@@ -155,6 +155,10 @@ gnu.inet.http.event \
 gnu.inet.ldap \
 gnu.inet.comsat
 
+# Resources
+src_l10n = \
+$(src)/gnu/inet/imap/L10N.properties
+
 # Targets
 BUILT_SOURCES = $(inetlib_version_jar)
 
@@ -167,18 +171,22 @@ META_INF = $(dst)/META-INF
 META_INF_FILES = $(META_INF)/COPYING
 
 classes = $(patsubst $(src)/%.java, $(dst)/%.class, $(sources))
+dst_l10n = $(patsubst $(src)/%, $(dst)/%, $(src_l10n))
 
 # Targets...
 
 # Jar
 
-$(inetlib_version_jar): $(dst) $(META_INF_FILES) $(classes)
+$(inetlib_version_jar): $(dst) $(dst_l10n) $(META_INF_FILES) $(classes)
 	$(JAR) cf $(inetlib_version_jar) -C $(dst) META-INF -C $(dst) gnu
 	rm -f $(inetlib_jar)
 	ln -s $(inetlib_version_jar) $(inetlib_jar)
 
 $(dst):
 	mkdir -p $(dst)
+
+$(dst_l10n): $(dst)/%: $(src)/% $(dst)
+	cp $< $@
 
 $(META_INF):
 	mkdir -p $(META_INF)

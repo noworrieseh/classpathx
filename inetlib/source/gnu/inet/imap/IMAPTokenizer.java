@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -149,10 +150,18 @@ class IMAPTokenizer
     this.in = in;
     this.logger = logger;
     sink = new ByteArrayOutputStream();
-    if (logger.isLoggable(IMAPConnection.IMAP_TRACE))
+    trace = new ByteArrayOutputStream();
+  }
+
+  private IOException createException(String key, Object... args)
+  {
+    String message = IMAPConnection.L10N.getString(key);
+    if (args != null)
       {
-        trace = new ByteArrayOutputStream();
+        message = MessageFormat.format(message, args);
       }
+    reset(); // flush for debug output
+    return new IOException(message);
   }
 
   Token next()
@@ -187,7 +196,7 @@ class IMAPTokenizer
           {
             if (readeof() != SP)
               {
-                throw new IOException("err.bad_untagged");
+                throw createException("err.bad_untagged");
               }
             return new Token(UNTAGGED_RESPONSE);
           }
@@ -195,7 +204,7 @@ class IMAPTokenizer
           {
             if (readeof() != SP)
               {
-                throw new IOException("err.bad_continuation");
+                throw createException("err.bad_continuation");
               }
             return new Token(CONTINUATION);
           }
@@ -260,7 +269,7 @@ class IMAPTokenizer
         for (int i = 0; i < buf.length; i++)
           {
             byte c = buf[i];
-            if (c < 32 || c > 126)
+            if ((c < 32 || c > 126) && c != 10 && c != 9)
               {
                 buf[i] = 63; // '?'
               }
@@ -317,7 +326,7 @@ class IMAPTokenizer
 
   private static final byte[] ATOM_SPECIALS = new byte[]
     {
-      SP, '"', '%', '(', ')', '*', '\\', ']', '{'
+      SP, '"', '%', '(', ')', '*', '[', '\\', ']', '{'
     };
 
   private int readeof()
@@ -328,7 +337,7 @@ class IMAPTokenizer
       {
         throw new EOFException();
       }
-    if (!peeking && trace != null)
+    if (!peeking && trace != null && c != 13 && c != 10)
       {
         trace.write(c);
       }
@@ -347,7 +356,7 @@ class IMAPTokenizer
           }
         else
           {
-            throw new IOException("err.bad_atom c="+(char)c);
+            throw createException("err.bad_atom", (char) c);
           }
       }
     do
@@ -429,7 +438,7 @@ class IMAPTokenizer
           }
         else if (c == LF)
           {
-            throw new IOException("err.bad_quoted_string");
+            throw createException("err.bad_quoted_string");
           }
         else
           {
@@ -449,14 +458,29 @@ class IMAPTokenizer
       }
     if (c != '}' || readeof() != CR || readeof() != LF)
       {
-        throw new IOException("err.bad_literal");
+        throw createException("err.bad_literal");
       }
     int total = Integer.parseInt(new String(sink.toByteArray(), "US-ASCII"));
     sink.reset();
     int count = 0;
+    byte[] buf = new byte[Math.min(total, 4096)];
     while (count < total)
       {
-        sink.write(readeof());
+        int len = in.read(buf, 0, Math.min(buf.length, total - count));
+        if (len == -1)
+          {
+            throw new EOFException();
+          }
+        sink.write(buf, 0, len);
+        for (int i = 0; i < len; i++)
+          {
+            byte c0 = buf[i];
+            if (c0 != 13)
+              {
+                trace.write(c0);
+              }
+          }
+        count += len;
       }
     byte[] literal = sink.toByteArray();
     sink.reset();

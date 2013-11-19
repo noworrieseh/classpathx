@@ -452,6 +452,38 @@ public final class IMAPMessage
     return super.getNonMatchingHeaderLines(names);
   }
 
+  public String getSubject()
+    throws MessagingException
+  {
+    if (envelope == null && section == null && !headersComplete)
+      {
+        fetchEnvelope();
+      }
+    if (envelope != null)
+      {
+        return envelope.getSubject();
+      }
+    return super.getSubject();
+  }
+
+  public Date getSentDate()
+    throws MessagingException
+  {
+    if (envelope == null && section == null && !headersComplete)
+      {
+        fetchEnvelope();
+      }
+    if (envelope != null)
+      {
+        String date = envelope.getDate();
+        if (date != null)
+          {
+            return dateFormat.parse(date, new ParsePosition(0));
+          }
+      }
+    return super.getSentDate();
+  }
+
   // -- Flags access --
 
   public Flags getFlags()

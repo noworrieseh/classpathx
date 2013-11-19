@@ -813,20 +813,15 @@ public class IMAPFolder
     throws MessagingException
   {
     List<String> criteria = new ArrayList<String>();
-    if (msgs != null)
+    if (msgs != null && msgs.length > 0)
       {
         // <message set>
-        StringBuilder buffer = new StringBuilder();
+        MessageSet msgset = new MessageSet();
         for (int i = 0; i < msgs.length; i++)
           {
-            int msgnum = msgs[i].getMessageNumber();
-            if (i > 0)
-              {
-                buffer.append(',');
-              }
-            buffer.append(msgnum);
+            msgset.add(msgs[i].getMessageNumber());
           }
-        criteria.add(buffer.toString());
+        criteria.add(msgset.toString());
       }
     boolean isIMAPSearch = addTerm(term, criteria);
     IMAPConnection connection = ((IMAPStore) store).connection;
@@ -845,7 +840,7 @@ public class IMAPFolder
             };
             connection.search(null, criteria, adapter);
             messages = new Message[acc.size()];
-            for (int i = 0; i < acc.size(); i++)
+            for (int i = 0; i < messages.length; i++)
               {
                 int num = acc.get(i);
                 messages[i] = new IMAPMessage(IMAPFolder.this, num);
@@ -856,7 +851,8 @@ public class IMAPFolder
             messages = (msgs != null) ? msgs : getMessages();
           }
         // Enforce final constraints
-        return super.search(term, messages);
+        messages = super.search(term, messages);
+        return messages;
       }
     catch (IOException e)
       {

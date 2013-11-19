@@ -117,8 +117,7 @@ public interface IMAPConstants
   public static final String FLAG_RECENT = "\\Recent";
 
   // Fetch data items
-  public static final String BODY = "BODY[]";
-  public static final String BODY_PEEK = "BODY.PEEK[]";
+  public static final String BODY = "BODY";
   public static final String HEADER = "HEADER";
   public static final String HEADER_FIELDS = "HEADER.FIELDS";
   public static final String HEADER_FIELDS_NOT = "HEADER.FIELDS.NOT";

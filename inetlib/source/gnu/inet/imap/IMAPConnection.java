@@ -36,8 +36,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
 import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -46,6 +47,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +81,9 @@ import gnu.inet.util.TraceLevel;
 public class IMAPConnection
   implements IMAPConstants
 {
+
+  static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.inet.imap.L10N");
 
   /**
    * The network trace level.
@@ -321,9 +326,20 @@ public class IMAPConnection
             in.reset();
             break;
           default:
-            throw new IMAPException(token.value, "err.unexpected_token");
+            throw createException("err.unexpected_token", token);
           }
       }
+  }
+
+  private IOException createException(String key, Object... args)
+  {
+    in.reset();
+    String message = L10N.getString(key);
+    if (args != null)
+      {
+        message = MessageFormat.format(message, args);
+      }
+    return new IOException(message);
   }
 
   // -- start parsing --
@@ -334,7 +350,7 @@ public class IMAPConnection
     IMAPTokenizer.Token token = in.next();
     if ((token.type & type) == 0)
       {
-        throw new IOException(error);
+        throw createException(error, token);
       }
     return token;
   }
@@ -371,10 +387,24 @@ public class IMAPConnection
         code = token.value;
         params = new HashMap();
         if (PERMANENTFLAGS.equals(code) ||
-            CAPABILITY.equals(code) ||
             BADCHARSET.equals(code))
           {
             List<String> data = parseFlags(BADCHARSET.equals(code));
+            params.put(code, data);
+          }
+        else if (CAPABILITY.equals(code))
+          {
+            List<String> data = new ArrayList<String>();
+            while (token.type != IMAPTokenizer.RBRACKET)
+              {
+                token = requireToken(IMAPTokenizer.ATOM |
+                                     IMAPTokenizer.RBRACKET,
+                                     "err.expected_capability");
+                if (token.type == IMAPTokenizer.ATOM)
+                  {
+                    data.add(token.value);
+                  }
+              }
             params.put(code, data);
           }
         else if (UIDNEXT.equals(code) ||
@@ -605,7 +635,7 @@ public class IMAPConnection
           {
             if ((token.type & IMAPTokenizer.ASTRING) == 0)
               {
-                throw new IOException("err.expected_astring");
+                throw createException("err.expected_astring", token);
               }
             String resource = UTF7imap.decode(toAString(token));
             token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
@@ -625,7 +655,7 @@ public class IMAPConnection
           {
             if ((token.type & IMAPTokenizer.ASTRING) == 0)
               {
-                throw new IOException("err.expected_astring");
+                throw createException("err.expected_astring", token);
               }
             roots.add(UTF7imap.decode(toAString(token)));
             token = in.next();
@@ -634,7 +664,9 @@ public class IMAPConnection
       }
     else
       {
-        logger.warning("err.unhandled_response");
+        String message = L10N.getString("err.unhandled_response");
+        message = MessageFormat.format(message, token);
+        logger.warning(message);
       }
   }
 
@@ -684,32 +716,32 @@ public class IMAPConnection
     throws IOException
   {
     IMAPTokenizer.Token token;
-    if (FLAGS.equals(code))
+    if (IMAPConstants.FLAGS.equals(code))
       {
         return new FLAGS(parseFlags(false));
       }
-    else if (UID.equals(code))
+    else if (IMAPConstants.UID.equals(code))
       {
         token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
         return new UID(Long.parseLong(token.value));
       }
-    else if (INTERNALDATE.equals(code))
+    else if (IMAPConstants.INTERNALDATE.equals(code))
       {
         token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
         Date date = DATETIME_FORMAT.parse(toString(token),
                                           new ParsePosition(0));
         return new INTERNALDATE(date);
       }
-    else if (RFC822_SIZE.equals(code))
+    else if (IMAPConstants.RFC822_SIZE.equals(code))
       {
         token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
         return new RFC822_SIZE(Integer.parseInt(token.value));
       }
-    else if (BODY.equals(code) || BODYSTRUCTURE.equals(code))
+    else if (IMAPConstants.BODYSTRUCTURE.equals(code))
       {
         return new BODYSTRUCTURE(parsePart());
       }
-    else if (ENVELOPE.equals(code))
+    else if (IMAPConstants.ENVELOPE.equals(code))
       {
         return parseEnvelope();
       }
@@ -728,39 +760,55 @@ public class IMAPConnection
         token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
         return new BODY("TEXT", -1, token.literal);
       }
-    else
+    else if (IMAPConstants.BODY.equals(code))
       {
-        if (code.startsWith("BODY["))
+        token = in.peek();
+        if (token.type == IMAPTokenizer.LBRACKET)
           {
-            int se = code.indexOf(']');
-            if (se > 4)
+            token = in.next(); // consume it
+            // optional section
+            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RBRACKET,
+                                 "err.expected_section");
+            String section = null;
+            if (token.type == IMAPTokenizer.ATOM)
               {
-                String section = null;
-                if (se > 5)
+                section = token.value;
+                token = requireToken(IMAPTokenizer.RBRACKET,
+                                     "err.expected_rbracket");
+              }
+            // handle <n>
+            int offset = -1;
+            token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.ATOM,
+                                 "err.expected_string");
+            if (token.type == IMAPTokenizer.ATOM)
+              {
+                int len = token.value.length();
+                if (len > 2 && token.value.charAt(0) == '<' &&
+                    token.value.charAt(len - 1) == '>')
                   {
-                    section = code.substring(5, se);
-                  }
-                String tail = code.substring(se + 1);
-                int len = tail.length();
-                if (len == 0)
-                  {
+                    String so = token.value.substring(1, len - 1);
+                    offset = Integer.parseInt(so);
                     token = requireToken(IMAPTokenizer.STRING,
-                                         "err.expected_string");
-                    return new BODY(section, -1, token.literal);
+                                 "err.expected_string");
                   }
-                if (len > 2 && tail.charAt(0) == '<' &&
-                    tail.charAt(len - 1) == '>')
+                else
                   {
-                    tail = tail.substring(1, len - 1);
-                    int oo = Integer.parseInt(tail);
-                    token = requireToken(IMAPTokenizer.STRING,
-                                         "err.expected_string");
-                    return new BODY(section, oo, token.literal);
+                    throw createException("err_invalid_offset", token);
                   }
               }
+            // body literal
+            return new BODY(section, offset, token.literal);
           }
-        throw new IMAPException(code,
-                                "err.unexpected_fetch_data_item");
+        else
+          {
+            return new BODYSTRUCTURE(parsePart());
+          }
+      }
+    else
+      {
+        String message = L10N.getString("err.unexpected_fetch_data_item");
+        message = MessageFormat.format(message, code);
+        throw new IMAPException(code, message);
       }
   }
 
@@ -787,7 +835,7 @@ public class IMAPConnection
                 break;
               }
           default:
-            throw new IOException("err.expected_atom_or_rparen");
+            throw createException("err.expected_atom_or_rparen", token);
           }
       }
     while (token.type != IMAPTokenizer.RPAREN);
@@ -805,7 +853,7 @@ public class IMAPConnection
       case IMAPTokenizer.LPAREN:
         return parsePartInternal();
       default:
-        throw new IOException("err.expected_lparam");
+        throw createException("err.expected_lparen", token);
       }
   }
 
@@ -821,7 +869,7 @@ public class IMAPConnection
       case IMAPTokenizer.LITERAL:
         return parseBodyPart(token);
       default:
-        throw new IOException("err.expected_part");
+        throw createException("err.expected_part", token);
       }
   }
 
@@ -838,7 +886,7 @@ public class IMAPConnection
       case IMAPTokenizer.LITERAL:
         return new String(token.literal, "US-ASCII");
       default:
-        throw new IOException("err.expected_string");
+        throw createException("err.expected_string", token);
       }
   }
 
@@ -913,7 +961,7 @@ public class IMAPConnection
           }
         else if ((token.type & IMAPTokenizer.STRING) == 0)
           {
-            throw new IOException("err.expected_part");
+            throw createException("err.expected_part", token);
           }
       }
     while (token.type == IMAPTokenizer.LPAREN);
@@ -982,7 +1030,7 @@ public class IMAPConnection
         String type = toLowerCaseString(token);
         return new BODYSTRUCTURE.Disposition(type, parseMIMEParameters());
       default:
-        throw new IOException("err.expected_plist");
+        throw createException("err.expected_plist", token);
       }
   }
 
@@ -1368,7 +1416,7 @@ public class IMAPConnection
                 in.reset();
                 break;
               default:
-                throw new IMAPException(token.value, "err.unexpected_token");
+                throw createException("err.unexpected_token", token);
               }
           }
       }
@@ -1391,10 +1439,9 @@ public class IMAPConnection
   public void logout(IMAPCallback callback)
     throws IOException
   {
-    if (invokeSimpleCommand(LOGOUT, callback))
-      {
-        socket.close();
-      }
+    invokeSimpleCommand(LOGOUT, callback);
+    in.reset();
+    socket.close();
   }
   
   /**
@@ -1629,7 +1676,7 @@ public class IMAPConnection
     IMAPTokenizer.Token token = in.next();
     if (token.type != IMAPTokenizer.CONTINUATION)
       {
-        throw new IOException("err.expected_continuation");
+        throw createException("err.expected_continuation", token);
       }
     in.collectToEOL();
     in.reset();
@@ -1705,7 +1752,7 @@ public class IMAPConnection
                        IMAPCallback callback)
     throws IOException
   {
-    String ids = (messages == null) ? "*" : messages.toString(':');
+    String ids = (messages == null) ? "*" : messages.toString();
     return fetchImpl(FETCH, ids, fetchCommands, callback);
   }
 
@@ -1718,7 +1765,7 @@ public class IMAPConnection
                           IMAPCallback callback)
     throws IOException
   {
-    String ids = (uids == null) ? "*" : uids.toString(':');
+    String ids = (uids == null) ? "*" : uids.toString();
     return fetchImpl(UID + ' ' + FETCH, ids, fetchCommands, callback);
   }
   

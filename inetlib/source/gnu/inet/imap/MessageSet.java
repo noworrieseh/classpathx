@@ -316,29 +316,6 @@ public class MessageSet
     return buf.toString();
   }
 
-  String toString(char delim)
-  {
-    StringBuilder buf = new StringBuilder();
-    int len = elements.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            buf.append(',');
-          }
-        Object e = elements.get(i);
-        if (e instanceof Long)
-          {
-            buf.append(e);
-          }
-        else
-          {
-            buf.append(((Range) e).toString(delim));
-          }
-      }
-    return buf.toString();
-  }
-
   public Iterator iterator()
   {
     return new MessageSetIterator(elements.iterator());
@@ -386,16 +363,7 @@ public class MessageSet
     {
       StringBuilder buf = new StringBuilder();
       buf.append(start);
-      buf.append('-');
-      buf.append(end);
-      return buf.toString();
-    }
-
-    String toString(char delim)
-    {
-      StringBuilder buf = new StringBuilder();
-      buf.append(start);
-      buf.append(delim);
+      buf.append(':');
       buf.append(end);
       return buf.toString();
     }
