@@ -61,6 +61,7 @@ import gnu.inet.imap.ENVELOPE;
 import gnu.inet.imap.FetchDataItem;
 import gnu.inet.imap.FLAGS;
 import gnu.inet.imap.INTERNALDATE;
+import gnu.inet.imap.MessageSet;
 import gnu.inet.imap.RFC822_SIZE;
 import gnu.inet.imap.UID;
 import gnu.inet.util.GetSystemPropertyAction;
@@ -616,7 +617,9 @@ public final class IMAPMessage
       ((IMAPStore) folder.getStore()).connection;
     try
       {
-        connection.fetch(msgnum, commands, callback);
+        MessageSet msgs = new MessageSet();
+        msgs.add(msgnum);
+        connection.fetch(msgs, commands, callback);
       }
     catch (IOException e)
       {

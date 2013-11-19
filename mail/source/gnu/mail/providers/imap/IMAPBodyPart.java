@@ -48,6 +48,7 @@ import gnu.inet.imap.IMAPAdapter;
 import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.FetchDataItem;
+import gnu.inet.imap.MessageSet;
 import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.providers.ReadOnlyBodyPart;
 
@@ -372,7 +373,9 @@ final class IMAPBodyPart
               }
           }
         };
-        connection.fetch(msgnum, commands, callback);
+        MessageSet msgs = new MessageSet();
+        msgs.add(msgnum);
+        connection.fetch(msgs, commands, callback);
       }
     catch (IOException e)
       {

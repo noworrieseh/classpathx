@@ -73,6 +73,8 @@ import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.IMAPConstants;
 import gnu.inet.imap.FetchDataItem;
+import gnu.inet.imap.MessageSet;
+import gnu.inet.imap.UIDSet;
 
 /**
  * The folder class implementing the IMAP4rev1 mail protocol.
@@ -95,7 +97,7 @@ public class IMAPFolder
     STR2FLAG.put(IMAPConstants.FLAG_FLAGGED, Flags.Flag.FLAGGED);
     STR2FLAG.put(IMAPConstants.FLAG_RECENT, Flags.Flag.RECENT);
     STR2FLAG.put(IMAPConstants.FLAG_SEEN, Flags.Flag.SEEN);
-    FLAG2STR = new TreeMap<Flags.Flag,String>();
+    FLAG2STR = new HashMap<Flags.Flag,String>();
     FLAG2STR.put(Flags.Flag.ANSWERED, IMAPConstants.FLAG_ANSWERED);
     FLAG2STR.put(Flags.Flag.DELETED, IMAPConstants.FLAG_DELETED);
     FLAG2STR.put(Flags.Flag.DRAFT, IMAPConstants.FLAG_DRAFT);
@@ -287,7 +289,7 @@ public class IMAPFolder
   public boolean exists()
     throws MessagingException
   {
-    int lsi = path.lastIndexOf(getSeparator());
+    int lsi = path.lastIndexOf(delimiter);
     String parent = (lsi == -1) ? "" : path.substring(0, lsi);
     String name = (lsi == -1) ? path : path.substring(lsi+1);
     IMAPConnection connection = ((IMAPStore) store).connection;
@@ -309,7 +311,10 @@ public class IMAPFolder
                 type |= Folder.HOLDS_MESSAGES;
               }
             delimiter = (d == null) ? '\u0000' : d.charAt(0);
-            path = mailbox;
+            if (!d.equals(mailbox))
+              {
+                path = mailbox;
+              }
           }
         };
         connection.list(parent, name, adapter);
@@ -763,13 +768,13 @@ public class IMAPFolder
       }
     cmds.add(IMAPConstants.INTERNALDATE); // for received date
     // get message numbers
-    List<Integer> nums = new ArrayList<Integer>(messages.length);
+    MessageSet messageSet = new MessageSet();
     final Map<Integer,IMAPMessage> num2msg =
       new HashMap<Integer,IMAPMessage>();
     for (int i = 0; i < messages.length; i++)
       {
         int num = messages[i].getMessageNumber();
-        nums.add(num);
+        messageSet.add(num);
         num2msg.put(num, (IMAPMessage) messages[i]);
       }
     // execute
@@ -784,7 +789,7 @@ public class IMAPFolder
             msg.callback.fetch(message, data);
           }
         };
-        connection.fetch(nums, cmds, adapter);
+        connection.fetch(messageSet, cmds, adapter);
       }
     catch (IOException e)
       {
@@ -1347,7 +1352,9 @@ public class IMAPFolder
             acc.add(msg);
           }
         };
-        if (connection.uidFetch(uid, cmds, adapter) && !acc.isEmpty())
+        UIDSet uids = new UIDSet();
+        uids.add(uid);
+        if (connection.uidFetch(uids, cmds, adapter) && !acc.isEmpty())
           {
             return acc.get(0);
           }
@@ -1381,7 +1388,12 @@ public class IMAPFolder
             acc.add(msg);
           }
         };
-        connection.uidFetch(start, end, cmds, adapter);
+        UIDSet uids = new UIDSet();
+        for (long i = start; i <= end; i++)
+          { 
+            uids.add(i);
+          }
+        connection.uidFetch(uids, cmds, adapter);
         Message[] ret = new Message[acc.size()];
         acc.toArray(ret);
         return ret;
@@ -1402,11 +1414,6 @@ public class IMAPFolder
     IMAPConnection connection = ((IMAPStore) store).connection;
     try
       {
-        List<Long> u = new ArrayList<Long>(uids.length);
-        for (int i = 0; i < uids.length; i++)
-          {
-            u.add(uids[i]);
-          }
         final List<Message> acc = new ArrayList<Message>();
         List<String> cmds = new ArrayList<String>();
         cmds.add(IMAPConstants.FLAGS);
@@ -1419,7 +1426,12 @@ public class IMAPFolder
             acc.add(msg);
           }
         };
-        connection.uidFetch(u, cmds, adapter);
+        UIDSet uidset = new UIDSet();
+        for (int i = 0; i < uids.length; i++)
+          {
+            uidset.add(uids[i]);
+          }
+        connection.uidFetch(uidset, cmds, adapter);
         Message[] ret = new Message[acc.size()];
         acc.toArray(ret);
         return ret;
