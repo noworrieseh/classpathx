@@ -314,7 +314,7 @@ public final class IMAPMessage
   protected InputStream getContentStream()
     throws MessagingException
   {
-    if (content == null)
+    if (literal == null)
       {
         fetchContent();
       }
@@ -713,7 +713,7 @@ public final class IMAPMessage
   private void updateBODY(BODY body)
   {
     String section = body.getSection();
-    if (section.endsWith(".HEADER"))
+    if (section.equals("HEADER") || section.endsWith(".HEADER"))
       {
         Literal lh = body.getContents();
         InputStream in = lh.getInputStream();
