@@ -1,6 +1,6 @@
 /*
  * SMTPConnection.java
- * Copyright (C) 2003 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +67,7 @@ import gnu.inet.util.TraceLevel;
  * This implements RFC 2821.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
+ * @version 1.2
  */
 public class SMTPConnection
 {
@@ -79,6 +81,11 @@ public class SMTPConnection
    * The default SMTP port.
    */
   public static final int DEFAULT_PORT = 25;
+
+  /**
+   * The default SMTPS port.
+   */
+  public static final int DEFAULT_SSL_PORT = 465;
 
   protected static final String MAIL_FROM = "MAIL FROM:";
   protected static final String RCPT_TO = "RCPT TO:";
@@ -109,35 +116,42 @@ public class SMTPConnection
    */
   private final Logger logger = Logger.getLogger("gnu.inet.smtp");
 
+  private String host;
+  private int port;
+  private int connectionTimeout;
+  private int timeout;
+  private boolean secure;
+  private TrustManager tm;
+
   /**
    * The underlying socket used for communicating with the server.
    */
-  protected Socket socket;
+  private Socket socket;
 
   /**
    * The input stream used to read responses from the server.
    */
-  protected LineInputStream in;
+  private LineInputStream in;
 
   /**
    * The output stream used to send commands to the server.
    */
-  protected SMTPOutputStream out;
+  private SMTPOutputStream out;
 
   /**
    * The last response message received from the server.
    */
-  protected String response;
+  private String response;
 
   /**
    * If true, there are more responses to read.
    */
-  protected boolean continuation;
+  private boolean continuation;
 
   /**
    * The greeting message given by the server.
    */
-  protected String greeting;
+  private String greeting;
 
   /**
    * Creates a new connection to the specified host, using the default SMTP
@@ -145,7 +159,6 @@ public class SMTPConnection
    * @param host the server hostname
    */
   public SMTPConnection(String host)
-    throws IOException
   {
     this(host, DEFAULT_PORT, 0, 0, false, null);
   }
@@ -157,7 +170,6 @@ public class SMTPConnection
    * @param port the port to connect to
    */
   public SMTPConnection(String host, int port)
-    throws IOException
   {
     this(host, port, 0, 0, false, null);
   }
@@ -172,7 +184,6 @@ public class SMTPConnection
    */
   public SMTPConnection(String host, int port,
                         int connectionTimeout, int timeout)
-    throws IOException
   {
     this(host, port, connectionTimeout, timeout, false, null);
   }
@@ -191,35 +202,25 @@ public class SMTPConnection
   public SMTPConnection(String host, int port,
                         int connectionTimeout, int timeout,
                         boolean secure, TrustManager tm)
-    throws IOException
-  {
-    this(host, port, connectionTimeout, timeout, secure, tm, true);
-  }
-  
-  /**
-   * Creates a new connection to the specified host, using the specified
-   * port.
-   * @param host the server hostname
-   * @param port the port to connect to
-   * @param connectionTimeout the connection timeout in milliseconds
-   * @param timeout the I/O timeout in milliseconds
-   * @param secure true to create an SMTPS connection
-   * @param tm a trust manager used to check SSL certificates, or null to
-   * use the default
-   * @param init initialise the connection
-   */
-  public SMTPConnection(String host, int port,
-                        int connectionTimeout, int timeout,
-                        boolean secure, TrustManager tm, boolean init)
-    throws IOException
   {
     if (port <= 0)
       {
-        port = DEFAULT_PORT;
+        port = secure ? DEFAULT_SSL_PORT : DEFAULT_PORT;
       }
-    response = null;
-    continuation = false;
-    
+    this.host = host;
+    this.port = port;
+    this.connectionTimeout = connectionTimeout;
+    this.timeout = timeout;
+    this.secure = secure;
+    this.tm = tm;
+  }
+
+  /**
+   * Connects the connection.
+   */
+  public void connect()
+    throws IOException
+  {
     // Initialise socket
     try
       {
@@ -265,19 +266,6 @@ public class SMTPConnection
     os = new BufferedOutputStream(os);
     out = new SMTPOutputStream(os);
     
-    if (init)
-      init();
-  }
-
-  /**
-   * Initialises the connection.
-   * Unless the init parameter was provided with the value false,
-   * do not call this method. Otherwise call it only once after e.g.
-   * configuring logging.
-   */
-  public void init()
-    throws IOException
-  {
     // Greeting
     StringBuffer greetingBuffer = new StringBuffer();
     boolean notFirst = false;
@@ -302,6 +290,21 @@ public class SMTPConnection
     greeting = greetingBuffer.toString();
   }
   
+  boolean isDebug()
+  {
+    return logger.getLevel() == SMTP_TRACE;
+  }
+
+  void debug(String message)
+  {
+    logger.log(SMTP_TRACE, message);
+    Handler[] handlers = logger.getHandlers();
+    for (Handler h : handlers)
+      {
+        h.flush();
+      }
+  }
+
   /**
    * Returns the logger used by this connection for debug output.
    */
@@ -764,8 +767,10 @@ public class SMTPConnection
                     out.write(r1);
                     out.write(0x0d);
                     out.flush();
-                    logger.log(SMTP_TRACE, "> " +
-                                    new String(r1, "US-ASCII"));
+                    if (isDebug())
+                      {
+                        debug("> " + new String(r1, "US-ASCII"));
+                      }
                   }
                 catch (SaslException e)
                   {
@@ -773,7 +778,10 @@ public class SMTPConnection
                     out.write(0x2a);
                     out.write(0x0d);
                     out.flush();
-                    logger.log(SMTP_TRACE, "> *");
+                    if (isDebug())
+                      {
+                        debug("> *");
+                      }
                   }
                 break;
               case 235:
@@ -818,7 +826,10 @@ public class SMTPConnection
   protected void send(String command)
     throws IOException
   {
-    logger.log(SMTP_TRACE, "> " + command);
+    if (isDebug())
+      {
+        debug("> " + command);
+      }
     out.write(command.getBytes("US-ASCII"));
     out.write(0x0d);
     out.flush();
@@ -839,7 +850,10 @@ public class SMTPConnection
           {
             line = line + '\n' + in.readLine();
           }
-        logger.log(SMTP_TRACE, "< " + line);
+        if (isDebug())
+          {
+            debug("< " + line);
+          }
         int code = Integer.parseInt(line.substring(0, 3));
         continuation = (line.charAt(3) == '-');
         response = line.substring(4);

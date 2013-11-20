@@ -1,6 +1,6 @@
 /*
  * NNTPConnection.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -48,6 +48,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +67,7 @@ import javax.security.sasl.SaslClient;
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @author <a href='mailto:jan.michalica@centire.com'>Jan Michalica</a>
+ * @version 1.2
  */
 public class NNTPConnection
   implements NNTPConstants
@@ -94,46 +96,50 @@ public class NNTPConnection
   /**
    * The hostname of the host we are connected to.
    */
-  protected String hostname;
+  private String hostname;
 
   /**
    * The port on the host we are connected to.
    */
-  protected int port;
+  private int port;
+
+  private int connectionTimeout;
+  private int timeout;
+  private boolean secure;
+  private TrustManager tm;
 
   /**
    * The socket used for network communication.
    */
-  protected Socket socket;
+  private Socket socket;
 
   /**
    * The socket input stream.
    */
-  protected LineInputStream in;
+  private LineInputStream in;
 
   /**
    * The socket output stream.
    */
-  protected CRLFOutputStream out;
+  private CRLFOutputStream out;
 
   /**
    * Whether the host permits posting of articles.
    */
-  protected boolean canPost;
+  private boolean canPost;
 
   /**
    * The greeting issued by the host when we connected.
    */
-  protected String welcome;
+  private String welcome;
 
   /**
    * Pending data, if any.
    */
-  protected PendingData pendingData;
+  private PendingData pendingData;
 
   private static final String DOT = ".";
   private static final String US_ASCII = "US-ASCII";
-
 
   /**
    * Creates a new connection object.
@@ -142,7 +148,7 @@ public class NNTPConnection
   public NNTPConnection(String hostname)
     throws IOException
   {
-    this(hostname, -1, 0, 0, false, null, true);
+    this(hostname, -1, 0, 0, false, null);
   }
 
   /**
@@ -153,7 +159,7 @@ public class NNTPConnection
   public NNTPConnection(String hostname, int port)
     throws IOException
   {
-    this(hostname, port, 0, 0, false, null, true);
+    this(hostname, port, 0, 0, false, null);
   }
   
   /**
@@ -166,7 +172,7 @@ public class NNTPConnection
   public NNTPConnection(String host, int port, TrustManager tm)
     throws IOException
   {
-    this(host, port, 0, 0, true, tm, true);
+    this(host, port, 0, 0, true, tm);
   }
   
   /**
@@ -180,7 +186,7 @@ public class NNTPConnection
                         int connectionTimeout, int timeout)
     throws IOException
   {
-    this(hostname, port, connectionTimeout, timeout, false, null, true);
+    this(hostname, port, connectionTimeout, timeout, false, null);
   }
 
   /**
@@ -189,22 +195,29 @@ public class NNTPConnection
    * @param port the port to connect to
    * @param connectionTimeout the socket connection timeout
    * @param timeout the read timeout on the socket
-   * @param init initialise the connection
    */
   public NNTPConnection(String hostname, int port,
                         int connectionTimeout, int timeout,
-                        boolean secure, TrustManager tm,
-                        boolean init)
-    throws IOException
+                        boolean secure, TrustManager tm)
   {
     if (port < 0)
       {
     	port = secure ? DEFAULT_SSL_PORT : DEFAULT_PORT;
       }
-    
     this.hostname = hostname;
     this.port = port;
-    
+    this.connectionTimeout = connectionTimeout;
+    this.timeout = timeout;
+    this.secure = secure;
+    this.tm = tm;
+  }
+
+  /**
+   * Connects this connection.
+   */
+  public void connect()
+    throws IOException
+  {  
     // Set up the socket and streams
     try
       {
@@ -244,9 +257,34 @@ public class NNTPConnection
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
-    
-    if (init)
-      init();
+  
+    // Read the welcome message(RFC977:2.4.3)
+    StatusResponse response = parseResponse(read());
+    switch (response.status)
+      {
+      case POSTING_ALLOWED:
+        canPost = true;
+      case NO_POSTING_ALLOWED:
+        welcome = response.getMessage();
+        break;
+      default:
+        throw new NNTPException(response);
+      }
+  }
+
+  boolean isDebug()
+  {
+    return logger.getLevel() == NNTP_TRACE;
+  }
+
+  void debug(String message)
+  {
+    logger.log(NNTP_TRACE, message);
+    Handler[] handlers = logger.getHandlers();
+    for (Handler h : handlers)
+      {
+        h.flush();
+      }
   }
 
   /**
@@ -265,29 +303,6 @@ public class NNTPConnection
     TrustManager[] trust = new TrustManager[] { tm };
     context.init(null, trust, null);
     return context.getSocketFactory();
-  }
-  
-  /**
-   * Initialises the connection.
-   * Unless the init parameter was provided with the value false,
-   * do not call this method. Otherwise call it only once after e.g.
-   * configuring logging.
-   */
-  public void init()
-    throws IOException
-  {
-    // Read the welcome message(RFC977:2.4.3)
-    StatusResponse response = parseResponse(read());
-    switch (response.status)
-      {
-      case POSTING_ALLOWED:
-        canPost = true;
-      case NO_POSTING_ALLOWED:
-        welcome = response.getMessage();
-        break;
-      default:
-        throw new NNTPException(response);
-      }
   }
   
   /**
@@ -318,53 +333,53 @@ public class NNTPConnection
   public boolean starttls(TrustManager tm)
   	throws IOException
   {
-	  try
-	    {
-		  SSLSocketFactory factory = getSSLSocketFactory(tm);
-		  
-		  send(STARTTLS);
-		  StatusResponse response = parseResponse(read());
-		  
-		  switch (response.status)
-		    {
-		  case TLS_INIT_ERROR:
-		  case PERMISSION_DENIED: // e.g. TLS is already active
-		  case COMMAND_NOT_RECOGNIZED: // i.e. server does not implement/allow STARTTLS
-		  /*
-		   * Although RFC 4642 forbids it,
-		   * INN returns this when STARTTLS has already succeeded.
-		   */
-		  case ENCRYPTION_OR_AUTH_REQUIRED:
-		  	  return false;
-		  case CONTINUE_TLS_NEGOTIATION:
-			  break;
-		  default:
-			  throw new NNTPException(response);
-		    }
-		  
-		  SSLSocket ss =
-	          (SSLSocket) factory.createSocket(socket, hostname, port, true);
-	      String[] protocols = { "TLSv1", "SSLv3" };
-	      ss.setEnabledProtocols(protocols);
-	      ss.setUseClientMode(true);
-	      ss.startHandshake();
-		  
-	      // Set up streams
-	      InputStream in = socket.getInputStream();
-	      in = new CRLFInputStream(in);
-	      this.in = new LineInputStream(in);
-	      OutputStream out = socket.getOutputStream();
-	      out = new BufferedOutputStream(out);
-	      this.out = new CRLFOutputStream(out);
-	      
-		  return true;
-		  
-	    }
-	  catch (GeneralSecurityException e)
-	    {
-		  e.printStackTrace();
-		  return false;
-	    }
+    try
+      {
+        SSLSocketFactory factory = getSSLSocketFactory(tm);
+
+        send(STARTTLS);
+        StatusResponse response = parseResponse(read());
+
+        switch (response.status)
+          {
+          case TLS_INIT_ERROR:
+          case PERMISSION_DENIED: // e.g. TLS is already active
+          case COMMAND_NOT_RECOGNIZED: // i.e. server does not implement/allow STARTTLS
+            /*
+             * Although RFC 4642 forbids it,
+             * INN returns this when STARTTLS has already succeeded.
+             */
+          case ENCRYPTION_OR_AUTH_REQUIRED:
+            return false;
+          case CONTINUE_TLS_NEGOTIATION:
+            break;
+          default:
+            throw new NNTPException(response);
+          }
+
+        SSLSocket ss =
+          (SSLSocket) factory.createSocket(socket, hostname, port, true);
+        String[] protocols = { "TLSv1", "SSLv3" };
+        ss.setEnabledProtocols(protocols);
+        ss.setUseClientMode(true);
+        ss.startHandshake();
+
+        // Set up streams
+        InputStream in = socket.getInputStream();
+        in = new CRLFInputStream(in);
+        this.in = new LineInputStream(in);
+        OutputStream out = socket.getOutputStream();
+        out = new BufferedOutputStream(out);
+        this.out = new CRLFOutputStream(out);
+
+        return true;
+
+      }
+    catch (GeneralSecurityException e)
+      {
+        logger.log(NNTP_TRACE, e.getMessage(), e);
+        return false;
+      }
   }
   
   
@@ -1534,7 +1549,10 @@ public class NNTPConnection
         pendingData.readToEOF();
         pendingData = null;
       }
-    logger.log(NNTP_TRACE, ">" + line);
+    if (isDebug())
+      {
+        debug(">" + line);
+      }
     byte[] data = line.getBytes(US_ASCII);
     out.write(data);
     out.writeln();
@@ -1549,13 +1567,16 @@ public class NNTPConnection
     throws IOException
   {
     String line = in.readLine();
-    if (line == null)
+    if (isDebug())
       {
-        logger.log(NNTP_TRACE, "<EOF");
-      }
-    else
-      {
-        logger.log(NNTP_TRACE, "<" + line);
+        if (line == null)
+          {
+            debug("<EOF");
+          }
+        else
+          {
+            debug("<" + line);
+          }
       }
     return line;
   }

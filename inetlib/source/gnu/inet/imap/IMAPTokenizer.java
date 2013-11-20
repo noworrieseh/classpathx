@@ -29,8 +29,6 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * IMAP stream tokenizer.
@@ -96,15 +94,8 @@ class IMAPTokenizer
         }
       else if (literal != null)
         {
-          try
-            {
-              String s = new String(literal, "US-ASCII");
-              buf.append(':');
-              buf.append(s);
-            }
-          catch (IOException e)
-            {
-            }
+          buf.append(':');
+          buf.append(IMAPTokenizer.asciify(literal));
         }
       return buf.toString();
     }
@@ -140,17 +131,20 @@ class IMAPTokenizer
   private int state;
   private int depth; // parenthesized list depth
   private InputStream in;
-  private Logger logger;
+  private IMAPConnection connection;
   private ByteArrayOutputStream sink;
   private ByteArrayOutputStream trace;
   private boolean peeking;
 
-  IMAPTokenizer(InputStream in, Logger logger)
+  IMAPTokenizer(InputStream in, IMAPConnection connection)
   {
     this.in = in;
-    this.logger = logger;
+    this.connection = connection;
     sink = new ByteArrayOutputStream();
-    trace = new ByteArrayOutputStream();
+    if (connection.isDebug())
+      {
+        trace = new ByteArrayOutputStream();
+      }
   }
 
   private IOException createException(String key, Object... args)
@@ -264,26 +258,30 @@ class IMAPTokenizer
     state = STATE_INIT;
     if (trace != null)
       {
-        byte[] buf = trace.toByteArray();
-        // Sanitize for ASCII
-        for (int i = 0; i < buf.length; i++)
-          {
-            byte c = buf[i];
-            if ((c < 32 || c > 126) && c != 10 && c != 9)
-              {
-                buf[i] = 63; // '?'
-              }
-          }
-        try
-          {
-            logger.log(IMAPConnection.IMAP_TRACE,
-                       "< " + new String(buf, "US-ASCII"));
-          }
-        catch (IOException e) // Won't happen
-          {
-          }
+        connection.debug("< " + asciify(trace.toByteArray()));
         trace.reset();
       }
+  }
+
+  /**
+   * For debugging.
+   */
+  static final String asciify(byte[] data)
+  {
+    StringBuilder buf = new StringBuilder(data.length);
+    for (int i = 0; i < data.length; i++)
+      {
+        byte c = data[i];
+        if (c >= 32 || c <= 126 || c == 9 || c == 10)
+          {
+            buf.append((char) c);
+          }
+        else if (c != 13)
+          {
+            buf.append('?');
+          }
+      }
+    return buf.toString();
   }
 
   Token peek()
@@ -315,7 +313,7 @@ class IMAPTokenizer
             if (d == LF)
               {
                 state = STATE_EOL;
-                return new String(sink.toByteArray(), "US-ASCII");
+                return new String(sink.toByteArray(), IMAPConnection.US_ASCII);
               }
             in.reset();
           }
@@ -375,7 +373,7 @@ class IMAPTokenizer
               {
                 in.reset();
               }
-            return new String(sink.toByteArray(), "US-ASCII");
+            return new String(sink.toByteArray(), IMAPConnection.US_ASCII);
           }
       }
     while (true);
@@ -395,7 +393,8 @@ class IMAPTokenizer
               {
                 in.reset();
               }
-            String val = new String(sink.toByteArray(), "US-ASCII");
+            String val = new String(sink.toByteArray(),
+                                    IMAPConnection.US_ASCII);
             return new Token(NUMBER, val);
           }
       }
@@ -408,7 +407,6 @@ class IMAPTokenizer
     boolean escaped = false;
     do
       {
-        in.mark(1);
         int c = readeof();
         if (c == '\\')
           {
@@ -418,23 +416,14 @@ class IMAPTokenizer
               }
             escaped = !escaped;
           }
+        else if (escaped)
+          {
+            sink.write(c);
+            escaped = false;
+          }
         else if (c == '"')
           {
-            if (escaped)
-              {
-                sink.write(c);
-              }
-            else
-              {
-                // consume a following SP
-                in.mark(1);
-                c = readeof();
-                if (c != SP)
-                  {
-                    in.reset();
-                  }
-                return new Token(QUOTED_STRING, sink.toByteArray());
-              }
+            return new Token(QUOTED_STRING, sink.toByteArray());
           }
         else if (c == LF)
           {
@@ -460,7 +449,8 @@ class IMAPTokenizer
       {
         throw createException("err.bad_literal");
       }
-    int total = Integer.parseInt(new String(sink.toByteArray(), "US-ASCII"));
+    int total = Integer.parseInt(new String(sink.toByteArray(),
+                                            IMAPConnection.US_ASCII));
     sink.reset();
     int count = 0;
     byte[] buf = new byte[Math.min(total, 4096)];
@@ -472,13 +462,9 @@ class IMAPTokenizer
             throw new EOFException();
           }
         sink.write(buf, 0, len);
-        for (int i = 0; i < len; i++)
+        if (trace != null)
           {
-            byte c0 = buf[i];
-            if (c0 != 13)
-              {
-                trace.write(c0);
-              }
+            trace.write(buf, 0, len);
           }
         count += len;
       }

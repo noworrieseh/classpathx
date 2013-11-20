@@ -1,6 +1,6 @@
 /*
  * IMAPStore.java
- * Copyright (C) 2003,2004 Chris Burdess <dog@gnu.org>
+ * Copyright (C) 2003, 2004, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -147,6 +147,7 @@ public class IMAPStore
                 handler.setLevel(Level.ALL);
                 logger.addHandler(handler);
               }
+            connection.connect();
 
             final List<String> capabilities = new ArrayList<String>();
             IMAPAdapter callback = this.new DefaultAdapter(capabilities);

@@ -49,7 +49,7 @@ import gnu.inet.util.LaconicFormatter;
  * functionality.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
- * @version 2.0
+ * @version 1.5
  */
 public class NNTPStore extends Store
 {
@@ -73,58 +73,58 @@ public class NNTPStore extends Store
    * @param url the connection URL
    */
   public NNTPStore(Session session, URLName url)
-    {
-      super(session, url);
+  {
+    super(session, url);
 
-      // The permanent flags for NNTPFolders.
-      permanentFlags = new Flags();
-      permanentFlags.add(Flags.Flag.RECENT);
-      permanentFlags.add(Flags.Flag.SEEN);
+    // The permanent flags for NNTPFolders.
+    permanentFlags = new Flags();
+    permanentFlags.add(Flags.Flag.RECENT);
+    permanentFlags.add(Flags.Flag.SEEN);
 
-      // Init newsrc
-      String tn = getProperty("newsrc");
-      if (tn != null)
-        {
-          try
-            {
-              ClassLoader l = Thread.currentThread().getContextClassLoader();
-              Class t = l.loadClass(tn);
+    // Init newsrc
+    String tn = getProperty("newsrc");
+    if (tn != null)
+      {
+        try
+          {
+            ClassLoader l = Thread.currentThread().getContextClassLoader();
+            Class t = l.loadClass(tn);
               newsrc = (Newsrc) t.newInstance();
-            }
-          catch (Exception e)
-            {
-              logger.log(NNTP_TRACE, "ERROR: unable to instantiate newsrc", e);
-            }
-        }
-      else
-        {
-          File file = null;
-          String filename = getProperty("newsrc.file");
-          if (filename == null)
-            {
-              String home = System.getProperty("user.home");
-              // ${HOME}/.newsrc[-${hostname}]
-              String baseFilename = ".newsrc";
-              StringBuffer buffer = new StringBuffer(baseFilename);
-              if (url != null)
-                {
-                  buffer.append('-');
-                  buffer.append(url.getHost());
-                }
-              file = new File(home, buffer.toString());
-              if (!file.exists())
-                {
-                  // ${HOME}/.newsrc
-                  file = new File(home, baseFilename);
-                }
-            }
-          else
-            {
-              file = new File(filename);
-            }
-          newsrc = new FileNewsrc(file, session.getDebug());
-        }
-    }
+          }
+        catch (Exception e)
+          {
+            logger.log(NNTP_TRACE, "ERROR: unable to instantiate newsrc", e);
+          }
+      }
+    else
+      {
+        File file = null;
+        String filename = getProperty("newsrc.file");
+        if (filename == null)
+          {
+            String home = System.getProperty("user.home");
+            // ${HOME}/.newsrc[-${hostname}]
+            String baseFilename = ".newsrc";
+            StringBuffer buffer = new StringBuffer(baseFilename);
+            if (url != null)
+              {
+                buffer.append('-');
+                buffer.append(url.getHost());
+              }
+            file = new File(home, buffer.toString());
+            if (!file.exists())
+              {
+                // ${HOME}/.newsrc
+                file = new File(home, baseFilename);
+              }
+          }
+        else
+          {
+            file = new File(filename);
+          }
+        newsrc = new FileNewsrc(file, session.getDebug());
+      }
+  }
 
   /**
    * Performs the protocol connection.
@@ -132,129 +132,128 @@ public class NNTPStore extends Store
   protected boolean protocolConnect(String host, int port, String username,
                                     String password)
     throws MessagingException
-    {
-      if (connection != null)
-        {
-          return true;
-        }
-      if (host == null)
-        {
-          host = getProperty("host");
-        }
-      if (username == null)
-        {
-          username = getProperty("user");
-        }
-      if (port < 0)
-        {
-          port = getIntProperty("port");
-        }
-      if (host == null)
-        {
-          return false;
-        }
-      try
-        {
-          int connectionTimeout = getIntProperty("connectiontimeout");
-          int timeout = getIntProperty("timeout");
-          boolean tls = "nntps".equals(url.getProtocol());
-          if (port < 0)
-            {
-        	  port = tls ? NNTPConnection.DEFAULT_SSL_PORT : NNTPConnection.DEFAULT_PORT;
-            }
-       // Locate custom trust manager
-          TrustManager tm = getTrustManager();
-          
-          connection = new NNTPConnection(host, port,
-                                          connectionTimeout, timeout,
-                                          tls, tm, false);
-          if (session.getDebug())
-            {
-              connection.getLogger().setLevel(NNTPConnection.NNTP_TRACE);
-              Formatter formatter = new LaconicFormatter();
-              Handler handler =
-                new StreamHandler(session.getDebugOut(), formatter);
-              handler.setLevel(Level.ALL);
-              connection.getLogger().addHandler(handler);
-              logger.setLevel(NNTPConnection.NNTP_TRACE);
-              logger.addHandler(handler);
-            }
-
-          connection.init();
-
-          /*
-           * FIXME First of all, capability list should be retrieved
-           * in order to verify STARTTLS availability. However, capabilities
-           * are matter of RFC 3977, which is not implemented yet.
-           */
-          if (!tls && propertyIsTrue("tls")) {
-        	  tm = getTrustManager();
-        	  
-        	  if (tm == null) {
-        		  tls = connection.starttls();
-        	  } else {
-        		  tls = connection.starttls(tm);
-        	  }
-          }
-          
-          /*
-           * FIXME After STARTTLS, capabilities list should be refreshed.
-           */
-          
-          if (username != null && password != null)
-            {
-              // TODO decide on authentication method
-              // Original authinfo
-              return connection.authinfo(username, password);
-            }
-          else
-            {
-              return true;
-            }
-          }
-        catch (IOException e)
+  {
+    if (connection != null)
+      {
+        return true;
+      }
+    if (host == null)
+      {
+        host = getProperty("host");
+      }
+    if (username == null)
+      {
+        username = getProperty("user");
+      }
+    if (port < 0)
+      {
+        port = getIntProperty("port");
+      }
+    if (host == null)
+      {
+        return false;
+      }
+    try
+      {
+        int connectionTimeout = getIntProperty("connectiontimeout");
+        int timeout = getIntProperty("timeout");
+        boolean tls = "nntps".equals(url.getProtocol());
+        if (port < 0)
           {
+            port = tls ? NNTPConnection.DEFAULT_SSL_PORT : NNTPConnection.DEFAULT_PORT;
+          }
+        // Locate custom trust manager
+        TrustManager tm = getTrustManager();
+
+        connection = new NNTPConnection(host, port,
+                                        connectionTimeout, timeout,
+                                        tls, tm);
+        if (session.getDebug())
+          {
+            connection.getLogger().setLevel(NNTPConnection.NNTP_TRACE);
+            Formatter formatter = new LaconicFormatter();
+            Handler handler =
+              new StreamHandler(session.getDebugOut(), formatter);
+            handler.setLevel(Level.ALL);
+            connection.getLogger().addHandler(handler);
+            logger.setLevel(NNTPConnection.NNTP_TRACE);
+            logger.addHandler(handler);
+          }
+        connection.connect();
+
+        /*
+         * FIXME First of all, capability list should be retrieved
+         * in order to verify STARTTLS availability. However, capabilities
+         * are matter of RFC 3977, which is not implemented yet.
+         */
+        if (!tls && propertyIsTrue("tls")) {
+          tm = getTrustManager();
+
+          if (tm == null) {
+            tls = connection.starttls();
+          } else {
+            tls = connection.starttls(tm);
+          }
+        }
+
+        /*
+         * FIXME After STARTTLS, capabilities list should be refreshed.
+         */
+
+        if (username != null && password != null)
+          {
+            // TODO decide on authentication method
+            // Original authinfo
+            return connection.authinfo(username, password);
+          }
+        else
+          {
+            return true;
+          }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+  }
+
+  private TrustManager getTrustManager()
+    throws MessagingException
+  {
+    String tmt = getProperty("trustmanager");
+    if (tmt != null)
+      {
+        try
+          {
+            Class t = Class.forName(tmt);
+            return (TrustManager) t.newInstance();
+          } catch (Exception e) {
             throw new MessagingException(e.getMessage(), e);
           }
-    }
-  
-    private TrustManager getTrustManager()
-        throws MessagingException
-        {
-		String tmt = getProperty("trustmanager");
-	    if (tmt != null)
-	      {
-	        try
-	          {
-	            Class t = Class.forName(tmt);
-	            return (TrustManager) t.newInstance();
-	          } catch (Exception e) {
-	            throw new MessagingException(e.getMessage(), e);
-	          }
-	      }
-	    return null;
-	  }
+      }
+    return null;
+  }
 
   /**
    * Close the connection.
    */
   public void close()
     throws MessagingException
-    {
-      try
-        {
-          newsrc.close();
-          synchronized (connection)
-            {
-              connection.quit();
-            }
+  {
+    try
+      {
+        newsrc.close();
+        synchronized (connection)
+          {
+            connection.quit();
           }
-      catch (IOException e)
-        {
-          throw new MessagingException(e.getMessage(), e);
-        }
-      super.close();
-    }
+      }
+    catch (IOException e)
+      {
+        throw new MessagingException(e.getMessage(), e);
+      }
+    super.close();
+  }
 
   /**
    * Returns the folder representing the &quot;root&quot; namespace.
@@ -262,22 +261,22 @@ public class NNTPStore extends Store
    */
   public Folder getDefaultFolder()
     throws MessagingException
-    {
-      if (root == null)
-        {
-          root = new NNTPRootFolder(this);
-        }
-      return root;
-    }
+  {
+    if (root == null)
+      {
+        root = new NNTPRootFolder(this);
+      }
+    return root;
+  }
 
   /**
    * Returns a folder by name.
    */
   public Folder getFolder(String name)
     throws MessagingException
-    {
-      return getDefaultFolder().getFolder(name);
-    }
+  {
+    return getDefaultFolder().getFolder(name);
+  }
 
   /**
    * Returns the folder whose name corresponds to the <code>file</code> part
@@ -285,9 +284,9 @@ public class NNTPStore extends Store
    */
   public Folder getFolder(URLName url)
     throws MessagingException
-    {
-      return getDefaultFolder().getFolder(url.getFile());
-    }
+  {
+    return getDefaultFolder().getFolder(url.getFile());
+  }
 
   /*
    * Indicates whether we should attempt to list all newsgroups.
@@ -295,45 +294,45 @@ public class NNTPStore extends Store
    * expect upwards of 30,000 folders to be returned from list().
    */
   boolean isListAll()
-    {
-      return propertyIsTrue("listall");
-    }
+  {
+    return propertyIsTrue("listall");
+  }
 
   // -- Utility methods --
 
   private int getIntProperty(String key)
-    {
-      String value = getProperty(key);
-      if (value != null)
-        {
-          try
-            {
-              return Integer.parseInt(value);
-            }
-          catch (RuntimeException e)
-            {
-            }
-        }
-      return -1;
-    }
+  {
+    String value = getProperty(key);
+    if (value != null)
+      {
+        try
+          {
+            return Integer.parseInt(value);
+          }
+        catch (RuntimeException e)
+          {
+          }
+      }
+    return -1;
+  }
 
   private boolean propertyIsTrue(String key)
-    {
-      return "true".equals(getProperty(key));
-    }
+  {
+    return "true".equals(getProperty(key));
+  }
 
   /*
    * Returns the provider-specific or general mail property corresponding to
    * the specified key.
    */
   private String getProperty(String key)
-    {
-      String value = session.getProperty("mail.nntp." + key);
-      if (value == null)
-        {
-          value = session.getProperty("mail." + key);
-        }
-      return value;
-    }
+  {
+    String value = session.getProperty("mail.nntp." + key);
+    if (value == null)
+      {
+        value = session.getProperty("mail." + key);
+      }
+    return value;
+  }
 
 }

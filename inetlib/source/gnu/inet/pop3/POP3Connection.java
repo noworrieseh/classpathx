@@ -1,6 +1,6 @@
 /*
  * POP3Connection.java
- * Copyright (C) 2003 The Free Software Foundation
+ * Copyright (C) 2003, 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,6 +79,7 @@ import gnu.inet.util.TraceLevel;
  * over POP3 documented in RFC 2595 and the AUTH command in RFC 1734.
  *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
+ * @version 1.2
  */
 public class POP3Connection
 {
@@ -91,6 +93,11 @@ public class POP3Connection
    * The default POP3 port.
    */
   public static final int DEFAULT_PORT = 110;
+
+  /**
+   * The default POP3S port.
+   */
+  public static final int DEFAULT_SSL_PORT = 995;
 
   // -- POP3 vocabulary --
   private static final String _OK = "+OK";
@@ -122,39 +129,45 @@ public class POP3Connection
    */
   private final Logger logger = Logger.getLogger("gnu.inet.pop3");
 
+  private String hostname;
+  private int port;
+  private int connectionTimeout;
+  private int timeout;
+  private boolean secure;
+  private TrustManager tm;
+
   /**
    * The socket used to communicate with the server.
    */
-  protected Socket socket;
+  private Socket socket;
 
   /**
    * The socket input stream.
    */
-  protected LineInputStream in;
+  private LineInputStream in;
 
   /**
    * The socket output stream.
    */
-  protected CRLFOutputStream out;
+  private CRLFOutputStream out;
 
   /**
    * The last response received from the server.
    * The status code (+OK or -ERR) is stripped from the line.
    */
-  protected String response;
+  private String response;
 
   /**
    * The APOP timestamp, if sent by the server on connection.
    * Otherwise null.
    */
-  protected byte[] timestamp;
+  private byte[] timestamp;
 
   /**
    * Creates a new connection to the server.
    * @param hostname the hostname of the server to connect to
    */
   public POP3Connection(String hostname)
-    throws UnknownHostException, IOException
   {
     this(hostname, -1, 0, 0, false, null);
   }
@@ -165,7 +178,6 @@ public class POP3Connection
    * @param port the port to connect to(if &lt;=0, use default POP3 port)
    */
   public POP3Connection(String hostname, int port)
-    throws UnknownHostException, IOException
   {
     this(hostname, port, 0, 0, false, null);
   }
@@ -179,7 +191,6 @@ public class POP3Connection
    */
   public POP3Connection(String hostname, int port,
                         int connectionTimeout, int timeout)
-    throws UnknownHostException, IOException
   {
     this(hostname, port, connectionTimeout, timeout, false, null);
   }
@@ -197,32 +208,25 @@ public class POP3Connection
   public POP3Connection(String hostname, int port,
                         int connectionTimeout, int timeout,
                         boolean secure, TrustManager tm)
-    throws UnknownHostException, IOException
-  {
-    this(hostname, port, connectionTimeout, timeout, secure, tm, true);
-  }
-    
-  /**
-   * Creates a new connection to the server.
-   * @param hostname the hostname of the server to connect to
-   * @param port the port to connect to(if &lt;=0, use default POP3 port)
-   * @param connectionTimeout the connection timeout, in milliseconds
-   * @param timeout the I/O timeout, in milliseconds
-   * @param secure if true, create a POP3S connection
-   * @param tm a trust manager used to check SSL certificates, or null to
-   * use the default
-   * @param init initialise the connection
-   */
-  public POP3Connection(String hostname, int port,
-                        int connectionTimeout, int timeout,
-                        boolean secure, TrustManager tm, boolean init)
-    throws UnknownHostException, IOException
   {
     if (port <= 0)
       {
-        port = DEFAULT_PORT;
+        port = secure ? DEFAULT_SSL_PORT : DEFAULT_PORT;
       }
-    
+    this.hostname = hostname;
+    this.port = port;
+    this.connectionTimeout = connectionTimeout;
+    this.timeout = timeout;
+    this.secure = secure;
+    this.tm = tm;
+  }
+
+  /**
+   * Connects this connection.
+   */
+  public void connect()
+    throws UnknownHostException, IOException
+  {
     // Set up socket
     try
       {
@@ -266,20 +270,7 @@ public class POP3Connection
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
-
-    if (init)
-      init();
-  }
-
-  /**
-   * Initialises the connection.
-   * Unless the init parameter was provided with the value false,
-   * do not call this method. Otherwise call it only once after e.g.
-   * configuring logging.
-   */
-  public void init()
-    throws IOException
-  {
+    
     if (getResponse() != OK)
       {
         throw new ProtocolException("Connect failed: " + response);
@@ -294,6 +285,21 @@ public class POP3Connection
   public Logger getLogger()
   {
     return logger;
+  }
+
+  boolean isDebug()
+  {
+    return logger.getLevel() == POP3_TRACE;
+  }
+
+  void debug(String message)
+  {
+    logger.log(POP3_TRACE, message);
+    Handler[] handlers = logger.getHandlers();
+    for (Handler h : handlers)
+      {
+        h.flush();
+      }
   }
 
   /**
@@ -375,8 +381,10 @@ public class POP3Connection
                     out.write(r1);
                     out.write(0x0d);
                     out.flush();
-                    logger.log(POP3_TRACE, "> " +
-                               new String(r1, "US-ASCII"));
+                    if (isDebug())
+                      {
+                        debug("> " + new String(r1, "US-ASCII"));
+                      }
                   }
                 catch (SaslException e)
                   {
@@ -384,7 +392,10 @@ public class POP3Connection
                     out.write(0x2a);
                     out.write(0x0d);
                     out.flush();
-                    logger.log(POP3_TRACE, "> *");
+                    if (isDebug())
+                      {
+                        debug("> *");
+                      }
                   }
               default:
                 return false;
@@ -782,7 +793,10 @@ public class POP3Connection
   protected void send(String command)
     throws IOException
   {
-    logger.log(POP3_TRACE, "> " + command);
+    if (isDebug())
+      {
+        debug("> " + command);
+      }
     out.write(command);
     out.writeln();
     out.flush();
@@ -799,7 +813,10 @@ public class POP3Connection
       {
         throw new EOFException("unexpected EOF");
       }
-    logger.log(POP3_TRACE, "< " + response);
+    if (isDebug())
+      {
+        debug("< " + response);
+      }
     if (response.indexOf(_OK) == 0)
       {
         response = response.substring(3).trim();

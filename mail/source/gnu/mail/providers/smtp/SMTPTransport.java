@@ -67,7 +67,7 @@ import gnu.inet.util.LaconicFormatter;
  * @author Ben Speakmon
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @author Arend Freije
- * @version 2.0
+ * @version 1.5
  */
 public class SMTPTransport
   extends Transport
@@ -155,7 +155,7 @@ public class SMTPTransport
 
         connection = new SMTPConnection(host, port,
                                         connectionTimeout, timeout,
-                                        tls, tm, false);
+                                        tls, tm);
         if (session.getDebug())
           {
             Logger logger = connection.getLogger();
@@ -166,8 +166,7 @@ public class SMTPTransport
             handler.setLevel(Level.ALL);
             logger.addHandler(handler);
           }
-
-        connection.init();
+        connection.connect();
 
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))

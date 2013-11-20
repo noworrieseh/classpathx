@@ -32,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,6 +87,8 @@ public class IMAPConnection
   static final ResourceBundle L10N =
     ResourceBundle.getBundle("gnu.inet.imap.L10N");
 
+  static final Charset US_ASCII = Charset.forName("US-ASCII");
+
   /**
    * The network trace level.
    */
@@ -93,42 +97,44 @@ public class IMAPConnection
   /**
    * Prefix for tags.
    */
-  protected static final String TAG_PREFIX = "A";
-
-  /**
-   * The encoding used to create strings for IMAP commands.
-   */
-  protected static final String US_ASCII = "US-ASCII";
+  static final String TAG_PREFIX = "A";
 
   /**
    * The default IMAP port.
    */
-  protected static final int DEFAULT_PORT = 143;
+  public static final int DEFAULT_PORT = 143;
 
   /**
    * The default IMAP-SSL port.
    */
-  protected static final int DEFAULT_SSL_PORT = 993;
+  public static final int DEFAULT_SSL_PORT = 993;
 
   /**
    * The logger used for IMAP protocol traces.
    */
   private final Logger logger = Logger.getLogger("gnu.inet.imap");
 
+  private String host;
+  private int port;
+  private int connectionTimeout;
+  private int timeout;
+  private boolean secure;
+  private TrustManager tm;
+
   /**
    * The socket used for communication with the server.
    */
-  protected Socket socket;
+  private Socket socket;
 
   /**
    * The tokenizer used to read IMAP stream tokens from.
    */
-  protected IMAPTokenizer in;
+  private IMAPTokenizer in;
 
   /**
    * The output stream.
    */
-  protected CRLFOutputStream out;
+  private CRLFOutputStream out;
 
   /*
    * Used to generate new tags for tagged commands.
@@ -143,7 +149,6 @@ public class IMAPConnection
    * @param host the name of the host to connect to
    */
   public IMAPConnection(String host)
-    throws UnknownHostException, IOException
   {
     this(host, -1, 0, 0, false, null);
   }
@@ -154,7 +159,6 @@ public class IMAPConnection
    * @param port the port to connect to, or -1 for the default
    */
   public IMAPConnection(String host, int port)
-    throws UnknownHostException, IOException
   {
     this(host, port, 0, 0, false, null);
   }
@@ -168,7 +172,6 @@ public class IMAPConnection
    */
   public IMAPConnection(String host, int port,
                         int connectionTimeout, int timeout)
-    throws UnknownHostException, IOException
   {
     this(host, port, connectionTimeout, timeout, false, null);
   }
@@ -181,7 +184,6 @@ public class IMAPConnection
    * use the default
    */
   public IMAPConnection(String host, int port, TrustManager tm)
-    throws UnknownHostException, IOException
   {
     this(host, port, 0, 0, true, tm);
   }
@@ -199,13 +201,25 @@ public class IMAPConnection
   public IMAPConnection(String host, int port,
                         int connectionTimeout, int timeout,
                         boolean secure, TrustManager tm)
-    throws UnknownHostException, IOException
   {
     if (port < 0)
       {
         port = secure ? DEFAULT_SSL_PORT : DEFAULT_PORT;
       }
-    
+    this.host = host;
+    this.port = port;
+    this.connectionTimeout = connectionTimeout;
+    this.timeout = timeout;
+    this.secure = secure;
+    this.tm = tm;
+  }
+
+  /**
+   * Connects this connection.
+   */
+  public void connect()
+    throws UnknownHostException, IOException
+  { 
     // Set up socket
     try
       {
@@ -241,10 +255,9 @@ public class IMAPConnection
         e2.initCause(e);
         throw e2;
       }
-    
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
-    in = new IMAPTokenizer(is, logger);
+    in = new IMAPTokenizer(is, this);
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
@@ -265,6 +278,21 @@ public class IMAPConnection
   {
     return TAG_PREFIX + (++tagIndex);
   }
+
+  boolean isDebug()
+  {
+    return logger.getLevel() == IMAP_TRACE;
+  }
+
+  void debug(String message)
+  {
+    logger.log(IMAP_TRACE, message);
+    Handler[] handlers = logger.getHandlers();
+    for (Handler h : handlers)
+      {
+        h.flush();
+      }
+  }
   
   /**
    * Sends the specified IMAP tagged command to the server.
@@ -272,8 +300,14 @@ public class IMAPConnection
   protected void sendCommand(String tag, String command)
     throws IOException
   {
-    logger.log(IMAP_TRACE, "> " + tag + " " + command);
-    out.write(tag + ' ' + command);
+    if (isDebug())
+      {
+        debug(new StringBuilder("> ")
+              .append(tag).append(' ').append(command).toString());
+      }
+    out.write(tag);
+    out.write(' ');
+    out.write(command);
     out.writeln();
     out.flush();
   }
@@ -1266,7 +1300,7 @@ public class IMAPConnection
         
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
-        in = new IMAPTokenizer(is, logger);
+        in = new IMAPTokenizer(is, this);
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
         out = new CRLFOutputStream(os);
@@ -1362,13 +1396,19 @@ public class IMAPConnection
                     byte[] r0 = sasl.evaluateChallenge(c1);
                     byte[] r1 = BASE64.encode(r0); // response
                     out.write(r1);
-                    logger.log(IMAP_TRACE, "> " + new String(r1, US_ASCII));
+                    if (isDebug())
+                      {
+                        debug(new String(r1, US_ASCII));
+                      }
                   }
                 catch (SaslException e)
                   {
                     // Error in SASL challenge evaluation - cancel exchange
                     out.write(0x2a);
-                    logger.log(IMAP_TRACE, "> *");
+                    if (isDebug())
+                      {
+                        debug("> *");
+                      }
                   }
                 out.writeln();
                 out.flush();
@@ -1390,7 +1430,7 @@ public class IMAPConnection
                             InputStream is = socket.getInputStream();
                             is = new BufferedInputStream(is);
                             is = new SaslInputStream(sasl, is);
-                            in = new IMAPTokenizer(is, logger);
+                            in = new IMAPTokenizer(is, this);
                             OutputStream os = socket.getOutputStream();
                             os = new BufferedOutputStream(os);
                             os = new SaslOutputStream(sasl, os);

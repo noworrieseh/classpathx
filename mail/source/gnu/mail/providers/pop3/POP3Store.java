@@ -131,7 +131,7 @@ public final class POP3Store
             TrustManager tm = getTrustManager();
             connection = new POP3Connection(host, port,
                                             connectionTimeout, timeout,
-                                            tls, tm, false);
+                                            tls, tm);
             if (session.getDebug())
               {
                 Logger logger = connection.getLogger();
@@ -142,8 +142,7 @@ public final class POP3Store
                 handler.setLevel(Level.ALL);
                 logger.addHandler(handler);
               }
-
-            connection.init();
+            connection.connect();
 
             // Disable APOP if necessary
             if (propertyIsFalse("apop"))
