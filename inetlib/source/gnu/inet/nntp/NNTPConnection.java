@@ -121,7 +121,7 @@ public class NNTPConnection
   /**
    * The socket output stream.
    */
-  private CRLFOutputStream out;
+  CRLFOutputStream out;
 
   /**
    * Whether the host permits posting of articles.

@@ -1,5 +1,5 @@
 /*
- * BODY.java
+ * Literal.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -19,48 +19,29 @@
  * along with classpathx.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package gnu.inet.imap;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
- * A BODY data item in a FETCH response.
+ * Interface defining access to the data of IMAP literals.
+ * @see {@link LiteralFactory}
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class BODY
-  extends FetchDataItem
+public interface Literal
 {
 
-  private final String section;
-  private final int originOffset;
-  private final Literal contents;
+  /**
+   * Requests an output stream for the literal to be written to.
+   */
+  OutputStream getOutputStream();
 
-  BODY(String section, int originOffset, Literal contents)
-  {
-    this.section = section;
-    this.originOffset = originOffset;
-    this.contents = contents;
-  }
-
-  public String getSection()
-  {
-    return section;
-  }
-
-  public boolean isSubstring()
-  {
-    return originOffset < 0;
-  }
-
-  public int getOriginOffset()
-  {
-    return originOffset < 0 ? 0 : originOffset;
-  }
-
-  public Literal getContents()
-  {
-    return contents;
-  }
+  /**
+   * Requests an input stream to read the literal from.
+   */
+  InputStream getInputStream();
 
 }

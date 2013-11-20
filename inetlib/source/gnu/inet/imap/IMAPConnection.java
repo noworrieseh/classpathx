@@ -129,7 +129,9 @@ public class IMAPConnection
   /**
    * The tokenizer used to read IMAP stream tokens from.
    */
-  private IMAPTokenizer in;
+  private Tokenizer in;
+  private LiteralFactory literalFactory;
+  private int literalThreshold = 4096;
 
   /**
    * The output stream.
@@ -257,10 +259,23 @@ public class IMAPConnection
       }
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
-    in = new IMAPTokenizer(is, this);
+    in = new Tokenizer(is, this, literalFactory, literalThreshold);
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
+  }
+
+  /**
+   * Sets a literal factory for the connection.
+   * This must be called before {@link #connect}
+   * @see {@link LiteralFactory}
+   * @param factory the factory
+   * @param threshold the threshold over which literals are considered large
+   */
+  public void setLiteralFactory(LiteralFactory factory, int threshold)
+  {
+    literalFactory = factory;
+    literalThreshold = threshold;
   }
 
   /**
@@ -331,11 +346,11 @@ public class IMAPConnection
   {
     while (true)
       {
-        IMAPTokenizer.Token token = in.next();
+        Token token = in.next();
         switch (token.type)
           {
-          case IMAPTokenizer.TAG:
-            boolean match = tag.equals(token.value);
+          case Token.TAG:
+            boolean match = tag.equals(token.stringValue());
             boolean result = parseRespCondState(callback);
             in.collectToEOL();
             in.reset();
@@ -344,15 +359,15 @@ public class IMAPConnection
                 return result;
               }
             break;
-          case IMAPTokenizer.UNTAGGED_RESPONSE:
+          case Token.UNTAGGED_RESPONSE:
             token = in.next();
             switch (token.type)
               {
-              case IMAPTokenizer.NUMBER:
-                int number = Integer.parseInt(token.value);
+              case Token.NUMBER:
+                int number = token.intValue();
                 parseUntaggedNumber(number, callback);
                 break;
-              case IMAPTokenizer.ATOM:
+              case Token.ATOM:
                 parseUntaggedAtom(token, callback);
                 break;
               }
@@ -378,10 +393,39 @@ public class IMAPConnection
 
   // -- start parsing --
 
-  private IMAPTokenizer.Token requireToken(int type, String error)
+  private String toString(Token token)
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
+    switch (token.type)
+      {
+      case Token.NIL:
+        return null;
+      case Token.ATOM:
+      case Token.QUOTED_STRING:
+        return token.stringValue();
+      default:
+        throw createException("err.expected_string", token);
+      }
+  }
+
+  private String toLowerCaseString(Token token)
+    throws IOException
+  {
+    String ret = toString(token);
+    return ret == null ? null : ret.toLowerCase();
+  }
+
+  private String toAString(Token token)
+    throws IOException
+  {
+    String ret = toString(token);
+    return (ret == null) ? "NIL" : ret;
+  }
+
+  private Token requireToken(int type, String error)
+    throws IOException
+  {
+    Token token = in.next();
     if ((token.type & type) == 0)
       {
         throw createException(error, token);
@@ -393,9 +437,9 @@ public class IMAPConnection
     throws IOException
   {
     boolean ret = false;
-    IMAPTokenizer.Token token;
-    token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
-    String status = token.value;
+    Token token;
+    token = requireToken(Token.ATOM, "err.expected_atom");
+    String status = token.stringValue();
     String text = parseRespText(callback);
     if (OK.equals(status))
       {
@@ -413,12 +457,12 @@ public class IMAPConnection
   {
     String code = null;
     Map params = null;
-    IMAPTokenizer.Token token = in.peek();
-    if (token.type == IMAPTokenizer.LBRACKET)
+    Token token = in.peek();
+    if (token.type == Token.LBRACKET)
       {
         in.next();
-        token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
-        code = token.value;
+        token = requireToken(Token.ATOM, "err.expected_atom");
+        code = token.stringValue();
         params = new HashMap();
         if (PERMANENTFLAGS.equals(code) ||
             BADCHARSET.equals(code))
@@ -429,14 +473,14 @@ public class IMAPConnection
         else if (CAPABILITY.equals(code))
           {
             List<String> data = new ArrayList<String>();
-            while (token.type != IMAPTokenizer.RBRACKET)
+            while (token.type != Token.RBRACKET)
               {
-                token = requireToken(IMAPTokenizer.ATOM |
-                                     IMAPTokenizer.RBRACKET,
+                token = requireToken(Token.ATOM |
+                                     Token.RBRACKET,
                                      "err.expected_capability");
-                if (token.type == IMAPTokenizer.ATOM)
+                if (token.type == Token.ATOM)
                   {
-                    data.add(token.value);
+                    data.add(token.stringValue());
                   }
               }
             params.put(code, data);
@@ -445,22 +489,22 @@ public class IMAPConnection
                  UIDVALIDITY.equals(code) ||
                  UNSEEN.equals(code))
           {
-            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-            params.put(code, token.value);
+            token = requireToken(Token.NUMBER, "err.expected_number");
+            params.put(code, token.stringValue());
           }
         else if (APPENDUID.equals(code) ||
                  COPYUID.equals(code))
           {
             List<String> args = new ArrayList<String>();
-            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-            while (token.type != IMAPTokenizer.RBRACKET)
+            token = requireToken(Token.NUMBER, "err.expected_number");
+            while (token.type != Token.RBRACKET)
               {
-                args.add(token.value);
+                args.add(token.stringValue());
                 token = in.next();
               }
             params.put(code, args);
           }
-        while (token.type != IMAPTokenizer.RBRACKET)
+        while (token.type != Token.RBRACKET)
           {
             token = in.next();
           }
@@ -528,120 +572,120 @@ public class IMAPConnection
    * resp-cond-state | resp-cond-bye | mailbox-data | capability-data
    * token is an atom
    */
-  void parseUntaggedAtom(IMAPTokenizer.Token token, IMAPCallback callback)
+  void parseUntaggedAtom(Token token, IMAPCallback callback)
     throws IOException
   {
-    String status = token.value;
-    if (OK.equals(token.value) ||
-        NO.equals(token.value) ||
-        BYE.equals(token.value))
+    String status = token.stringValue();
+    if (OK.equals(token.stringValue()) ||
+        NO.equals(token.stringValue()) ||
+        BYE.equals(token.stringValue()))
       {
         parseRespText(callback);
       }
-    else if (BAD.equals(token.value))
+    else if (BAD.equals(token.stringValue()))
       {
         String text = parseRespText(callback);
-        throw new IMAPException(token.value, text);
+        throw new IMAPException(token.stringValue(), text);
       }
-    else if (FLAGS.equals(token.value))
+    else if (FLAGS.equals(token.stringValue()))
       {
         callback.flags(parseFlags(false));
       }
-    else if (LIST.equals(token.value) ||
-             LSUB.equals(token.value))
+    else if (LIST.equals(token.stringValue()) ||
+             LSUB.equals(token.stringValue()))
       {
         List<String> flags = parseFlags(false);
-        token = requireToken(IMAPTokenizer.QUOTED_STRING |
-                             IMAPTokenizer.NIL, "err.expected_list_delim");
+        token = requireToken(Token.QUOTED_STRING |
+                             Token.NIL, "err.expected_list_delim");
         String delim = toString(token);
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
         callback.list(flags, delim, mailbox);
       }
-    else if (SEARCH.equals(token.value))
+    else if (SEARCH.equals(token.stringValue()))
       {
         callback.search(parseNumberList());
       }
-    else if (STATUS.equals(token.value))
+    else if (STATUS.equals(token.stringValue()))
       {
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
-        token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+        token = requireToken(Token.LPAREN, "err.expected_lparen");
         Map<String,Integer> data = new LinkedHashMap<String,Integer>();
         do
           {
-            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RPAREN,
+            token = requireToken(Token.ATOM | Token.RPAREN,
                                  "err.expected_status_item");
-            if (token.type == IMAPTokenizer.ATOM)
+            if (token.type == Token.ATOM)
               {
                 String item = toString(token);
-                token = requireToken(IMAPTokenizer.NUMBER,
+                token = requireToken(Token.NUMBER,
                                      "err.expected_number");
                 if (MESSAGES.equals(item))
                   {
-                    callback.exists(Integer.parseInt(token.value));
+                    callback.exists(token.intValue());
                   }
                 else if (RECENT.equals(item))
                   {
-                    callback.recent(Integer.parseInt(token.value));
+                    callback.recent(token.intValue());
                   }
                 else if (UIDNEXT.equals(item))
                   {
-                    callback.uidnext(Long.parseLong(token.value));
+                    callback.uidnext(token.longValue());
                   }
                 else if (UIDVALIDITY.equals(item))
                   {
-                    callback.uidvalidity(Long.parseLong(token.value));
+                    callback.uidvalidity(token.longValue());
                   }
                 else if (UNSEEN.equals(item))
                   {
-                    callback.unseen(Integer.parseInt(token.value));
+                    callback.unseen(token.intValue());
                   }
               }
           }
-        while (token.type != IMAPTokenizer.RPAREN);
+        while (token.type != Token.RPAREN);
       }
-    else if (CAPABILITY.equals(token.value))
+    else if (CAPABILITY.equals(token.stringValue()))
       {
         List<String> data = new ArrayList<String>();
         do
           {
-            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.EOL,
+            token = requireToken(Token.ATOM | Token.EOL,
                                  "err.expected_capability");
-            if (token.type == IMAPTokenizer.ATOM)
+            if (token.type == Token.ATOM)
               {
                 data.add(toString(token));
               }
           }
-        while (token.type != IMAPTokenizer.EOL);
+        while (token.type != Token.EOL);
         callback.capability(data);
       }
-    else if (NAMESPACE.equals(token.value))
+    else if (NAMESPACE.equals(token.stringValue()))
       {
         Namespace personal = parseNamespace();
         Namespace otherUsers = parseNamespace();
         Namespace shared = parseNamespace();
         callback.namespace(personal, otherUsers, shared);
       }
-    else if (ACL.equals(token.value))
+    else if (ACL.equals(token.stringValue()))
       {
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
         Map<String,String> rights = parseACL();
         callback.acl(mailbox, rights);
       }
-    else if (LISTRIGHTS.equals(token.value))
+    else if (LISTRIGHTS.equals(token.stringValue()))
       {
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String identifier = UTF7imap.decode(toAString(token));
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String required = toAString(token);
         List<String> optional = new ArrayList<String>();
-        while (token.type != IMAPTokenizer.EOL)
+        while (token.type != Token.EOL)
           {
-            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+            if ((token.type & Token.ASTRING) == 0)
               {
                 throw new IOException("err.expected_astring");
               }
@@ -650,44 +694,44 @@ public class IMAPConnection
           }
         callback.listrights(mailbox, identifier, required, optional);
       }
-    else if (MYRIGHTS.equals(token.value))
+    else if (MYRIGHTS.equals(token.stringValue()))
       {
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String rights = toAString(token);
         callback.myrights(mailbox, rights);
       }
-    else if (QUOTA.equals(token.value))
+    else if (QUOTA.equals(token.stringValue()))
       {
         Map<String,Integer> currentUsage = new LinkedHashMap<String,Integer>();
         Map<String,Integer> limit = new LinkedHashMap<String,Integer>();
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String quotaRoot = UTF7imap.decode(toAString(token));
-        token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparam");
-        while (token.type != IMAPTokenizer.RPAREN)
+        token = requireToken(Token.LPAREN, "err.expected_lparam");
+        while (token.type != Token.RPAREN)
           {
-            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+            if ((token.type & Token.ASTRING) == 0)
               {
                 throw createException("err.expected_astring", token);
               }
             String resource = UTF7imap.decode(toAString(token));
-            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-            currentUsage.put(resource, new Integer(token.value));
-            token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-            limit.put(resource, new Integer(token.value));
+            token = requireToken(Token.NUMBER, "err.expected_number");
+            currentUsage.put(resource, new Integer(token.stringValue()));
+            token = requireToken(Token.NUMBER, "err.expected_number");
+            limit.put(resource, new Integer(token.stringValue()));
             token = in.next();
           }
         callback.quota(quotaRoot, currentUsage, limit);
       }
-    else if (QUOTAROOT.equals(token.value))
+    else if (QUOTAROOT.equals(token.stringValue()))
       {
         List<String> roots = new ArrayList<String>();
-        token = requireToken(IMAPTokenizer.ASTRING, "err.expected_astring");
+        token = requireToken(Token.ASTRING, "err.expected_astring");
         String mailbox = UTF7imap.decode(toAString(token));
-        while (token.type != IMAPTokenizer.EOL)
+        while (token.type != Token.EOL)
           {
-            if ((token.type & IMAPTokenizer.ASTRING) == 0)
+            if ((token.type & Token.ASTRING) == 0)
               {
                 throw createException("err.expected_astring", token);
               }
@@ -710,70 +754,70 @@ public class IMAPConnection
   void parseUntaggedNumber(int number, IMAPCallback callback)
     throws IOException
   {
-    IMAPTokenizer.Token token;
-    token = requireToken(IMAPTokenizer.ATOM, "err.expected_atom");
-    if (EXPUNGE.equals(token.value))
+    Token token;
+    token = requireToken(Token.ATOM, "err.expected_atom");
+    if (EXPUNGE.equals(token.stringValue()))
       {
         callback.expunge(number);
       }
-    else if (FETCH.equals(token.value))
+    else if (FETCH.equals(token.stringValue()))
       {
         List<FetchDataItem> items = new ArrayList<FetchDataItem>();
-        requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+        requireToken(Token.LPAREN, "err.expected_lparen");
         do
           {
-            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RPAREN,
+            token = requireToken(Token.ATOM | Token.RPAREN,
                                  "err.unexpected_fetch_data_item");
-            if (token.type == IMAPTokenizer.ATOM)
+            if (token.type == Token.ATOM)
               {
-                items.add(parseFetchDataItem(token.value));
+                items.add(parseFetchDataItem(token.stringValue()));
               }
           }
-        while (token.type != IMAPTokenizer.RPAREN);
+        while (token.type != Token.RPAREN);
         callback.fetch(number, items);
       }
-    else if (EXISTS.equals(token.value))
+    else if (EXISTS.equals(token.stringValue()))
       {
         callback.exists(number);
       }
-    else if (RECENT.equals(token.value))
+    else if (RECENT.equals(token.stringValue()))
       {
         callback.recent(number);
       }
     else
       {
-        throw new IMAPException(token.value, "err.unexpected_token");
+        throw new IMAPException(token.stringValue(), "err.unexpected_token");
       }
   }
 
   private FetchDataItem parseFetchDataItem(String code)
     throws IOException
   {
-    IMAPTokenizer.Token token;
+    Token token;
     if (IMAPConstants.FLAGS.equals(code))
       {
         return new FLAGS(parseFlags(false));
       }
     else if (IMAPConstants.UID.equals(code))
       {
-        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-        return new UID(Long.parseLong(token.value));
+        token = requireToken(Token.NUMBER, "err.expected_number");
+        return new UID(token.longValue());
       }
     else if (IMAPConstants.INTERNALDATE.equals(code))
       {
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+        token = requireToken(Token.STRING, "err.expected_string");
         Date date = DATETIME_FORMAT.parse(toString(token),
                                           new ParsePosition(0));
         return new INTERNALDATE(date);
       }
     else if (IMAPConstants.RFC822_SIZE.equals(code))
       {
-        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-        return new RFC822_SIZE(Integer.parseInt(token.value));
+        token = requireToken(Token.NUMBER, "err.expected_number");
+        return new RFC822_SIZE(token.intValue());
       }
     else if (IMAPConstants.BODYSTRUCTURE.equals(code))
       {
-        return new BODYSTRUCTURE(parsePart());
+        return parseBodyStructure();
       }
     else if (IMAPConstants.ENVELOPE.equals(code))
       {
@@ -781,48 +825,50 @@ public class IMAPConnection
       }
     else if (RFC822.equals(code))
       {
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
-        return new BODY(null, -1, token.literal);
+        token = requireToken(Token.STRING, "err.expected_string");
+        return new BODY(null, -1, token.literalValue());
       }
     else if (RFC822_HEADER.equals(code))
       {
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
-        return new BODY("HEADER", -1, token.literal);
+        token = requireToken(Token.STRING, "err.expected_string");
+        return new BODY("HEADER", -1, token.literalValue());
       }
     else if (RFC822_TEXT.equals(code))
       {
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
-        return new BODY("TEXT", -1, token.literal);
+        token = requireToken(Token.STRING, "err.expected_string");
+        return new BODY("TEXT", -1, token.literalValue());
       }
     else if (IMAPConstants.BODY.equals(code))
       {
         token = in.peek();
-        if (token.type == IMAPTokenizer.LBRACKET)
+        if (token.type == Token.LBRACKET)
           {
             token = in.next(); // consume it
             // optional section
-            token = requireToken(IMAPTokenizer.ATOM | IMAPTokenizer.RBRACKET,
+            token = requireToken(Token.NUMBER | Token.ATOM |
+                                 Token.RBRACKET,
                                  "err.expected_section");
             String section = null;
-            if (token.type == IMAPTokenizer.ATOM)
+            if (token.type == Token.ATOM |
+                token.type == Token.NUMBER)
               {
-                section = token.value;
-                token = requireToken(IMAPTokenizer.RBRACKET,
+                section = token.stringValue();
+                token = requireToken(Token.RBRACKET,
                                      "err.expected_rbracket");
               }
             // handle <n>
             int offset = -1;
-            token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.ATOM,
+            token = requireToken(Token.STRING | Token.ATOM,
                                  "err.expected_string");
-            if (token.type == IMAPTokenizer.ATOM)
+            if (token.type == Token.ATOM)
               {
-                int len = token.value.length();
-                if (len > 2 && token.value.charAt(0) == '<' &&
-                    token.value.charAt(len - 1) == '>')
+                int len = token.stringValue().length();
+                if (len > 2 && token.stringValue().charAt(0) == '<' &&
+                    token.stringValue().charAt(len - 1) == '>')
                   {
-                    String so = token.value.substring(1, len - 1);
+                    String so = token.stringValue().substring(1, len - 1);
                     offset = Integer.parseInt(so);
-                    token = requireToken(IMAPTokenizer.STRING,
+                    token = requireToken(Token.STRING,
                                  "err.expected_string");
                   }
                 else
@@ -831,11 +877,11 @@ public class IMAPConnection
                   }
               }
             // body literal
-            return new BODY(section, offset, token.literal);
+            return new BODY(section, offset, token.literalValue());
           }
         else
           {
-            return new BODYSTRUCTURE(parsePart());
+            return parseBodyStructure();
           }
       }
     else
@@ -850,19 +896,19 @@ public class IMAPConnection
     throws IOException
   {
     List<String> data = new ArrayList<String>();
-    IMAPTokenizer.Token token;
-    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
+    Token token;
+    token = requireToken(Token.LPAREN, "err.expected_lparen");
     do
       {
         token = in.next();
         switch (token.type)
           {
-          case IMAPTokenizer.ATOM:
-            data.add(token.value);
+          case Token.ATOM:
+            data.add(token.stringValue());
             break;
-          case IMAPTokenizer.RPAREN:
+          case Token.RPAREN:
             break;
-          case IMAPTokenizer.NIL:
+          case Token.NIL:
             if (allowNil)
               {
                 data.add("NIL");
@@ -872,93 +918,62 @@ public class IMAPConnection
             throw createException("err.expected_atom_or_rparen", token);
           }
       }
-    while (token.type != IMAPTokenizer.RPAREN);
+    while (token.type != Token.RPAREN);
     return data;
   }
+
+  private BODYSTRUCTURE parseBodyStructure()
+    throws IOException
+  {
+    Token token;
+    token = requireToken(Token.LPAREN, "err.expected_lparen");
+    return new BODYSTRUCTURE(parsePart());
+  }
+
+  // (x y z)
+  // ((x y z) (x y z) y z)
+  // (((x y z) (x y z) y z) (x y z) y z)
 
   private BODYSTRUCTURE.Part parsePart()
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
-    switch (token.type)
-      {
-      case IMAPTokenizer.NIL:
-        return null;
-      case IMAPTokenizer.LPAREN:
-        return parsePartInternal();
-      default:
-        throw createException("err.expected_lparen", token);
-      }
+    // We have seen the opening '(' of the part
+    // The final ')' will be consumed by skipExtensionData
+    Token token;
+    token = requireToken(Token.LPAREN | Token.STRING,
+                         "err.expected_part");
+    return (token.type == Token.LPAREN) ?
+        parseMultipart() :
+        parseBodyPart(token);
   }
 
-  private BODYSTRUCTURE.Part parsePartInternal()
-    throws IOException
-  {
-    IMAPTokenizer.Token token = in.next();
-    switch (token.type)
-      {
-      case IMAPTokenizer.LPAREN:
-        return parseMultipart();
-      case IMAPTokenizer.QUOTED_STRING:
-      case IMAPTokenizer.LITERAL:
-        return parseBodyPart(token);
-      default:
-        throw createException("err.expected_part", token);
-      }
-  }
-
-  private String toString(IMAPTokenizer.Token token)
-    throws IOException
-  {
-    switch (token.type)
-      {
-      case IMAPTokenizer.NIL:
-        return null;
-      case IMAPTokenizer.ATOM:
-        return token.value;
-      case IMAPTokenizer.QUOTED_STRING:
-      case IMAPTokenizer.LITERAL:
-        return new String(token.literal, "US-ASCII");
-      default:
-        throw createException("err.expected_string", token);
-      }
-  }
-
-  private String toLowerCaseString(IMAPTokenizer.Token token)
-    throws IOException
-  {
-    String ret = toString(token);
-    return ret == null ? null : ret.toLowerCase();
-  }
-
-  private String toAString(IMAPTokenizer.Token token)
-    throws IOException
-  {
-    String ret = toString(token);
-    return (ret == null) ? "NIL" : ret;
-  }
-
-  private BODYSTRUCTURE.Part parseBodyPart(IMAPTokenizer.Token token)
+  private BODYSTRUCTURE.Part parseBodyPart(Token token)
     throws IOException
   {
     String primaryType = toLowerCaseString(token);
-    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    token = requireToken(Token.NSTRING, "err.expected_nstring");
     String subtype = toLowerCaseString(token);
-    Map<String,String> parameters = parseMIMEParameters();
-    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    Map<String,String> params = null;
+    token = requireToken(Token.NIL | Token.LPAREN,
+                         "err.expected_lparen");
+    if (token.type == Token.LPAREN)
+      {
+        params = parseMIMEParameters();
+      }
+    token = requireToken(Token.NSTRING, "err.expected_nstring");
     String id = toLowerCaseString(token);
-    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    token = requireToken(Token.NSTRING, "err.expected_nstring");
     String description = toLowerCaseString(token);
-    token = requireToken(IMAPTokenizer.NSTRING, "err.expected_nstring");
+    token = requireToken(Token.NSTRING, "err.expected_nstring");
     String encoding = toLowerCaseString(token);
-    token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-    int size = Integer.parseInt(token.value);
+    token = requireToken(Token.NUMBER, "err.expected_number");
+    int size = token.intValue();
     BODYSTRUCTURE.Part ret;
     if ("text".equals(primaryType))
       {
-        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-        int lines = Integer.parseInt(token.value);
-        ret = new BODYSTRUCTURE.TextPart(primaryType, subtype, parameters,
+        token = requireToken(Token.NUMBER, "err.expected_number");
+        int lines = token.intValue();
+        ret = new BODYSTRUCTURE.TextPart(primaryType, subtype, params,
                                          id, description, encoding, size,
                                          lines);
       }
@@ -966,120 +981,158 @@ public class IMAPConnection
       {
         ENVELOPE envelope = parseEnvelope();
         BODYSTRUCTURE.Part bodystructure = parsePart();
-        token = requireToken(IMAPTokenizer.NUMBER, "err.expected_number");
-        int lines = Integer.parseInt(token.value);
-        ret = new BODYSTRUCTURE.MessagePart(primaryType, subtype, parameters,
+        token = requireToken(Token.NUMBER, "err.expected_number");
+        int lines = token.intValue();
+        ret = new BODYSTRUCTURE.MessagePart(primaryType, subtype, params,
                                             id, description, encoding, size,
                                             envelope, bodystructure, lines);
       }
     else
       {
-        ret = new BODYSTRUCTURE.BodyPart(primaryType, subtype, parameters,
+        ret = new BODYSTRUCTURE.BodyPart(primaryType, subtype, params,
                                          id, description, encoding, size);
       }
-    requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+    skipExtensionData();
     return ret;
   }
 
   private BODYSTRUCTURE.Part parseMultipart()
     throws IOException
   {
+    // We have seen the '(' of the first part
     List<BODYSTRUCTURE.Part> parts = new ArrayList<BODYSTRUCTURE.Part>();
-    IMAPTokenizer.Token token;
+    parts.add(parsePart());
+    Token token;
     do
       {
-        token = in.next();
-        if (token.type == IMAPTokenizer.LPAREN)
+        token = requireToken(Token.LPAREN | Token.STRING,
+                             "err.expected_part");
+        if (token.type == Token.LPAREN)
           {
-            parts.add(parsePartInternal());
-          }
-        else if ((token.type & IMAPTokenizer.STRING) == 0)
-          {
-            throw createException("err.expected_part", token);
+            parts.add(parsePart());
           }
       }
-    while (token.type == IMAPTokenizer.LPAREN);
+    while (token.type == Token.LPAREN);
     String subtype = toLowerCaseString(token);
     Map<String,String> parameters = null;
     BODYSTRUCTURE.Disposition disposition = null;
     List<String> language = null;
     List<String> location = null;
-    token = in.peek();
-    if (token.type == IMAPTokenizer.RPAREN)
+    token = requireToken(Token.NIL | Token.RPAREN |
+                         Token.LPAREN, "err.expected_plist");
+    if (token.type != Token.RPAREN)
       {
-        in.next();
-      }
-    else
-      {
-        parameters = parseMIMEParameters();
-        disposition = parseDisposition();
-        language = parseStringList();
-        location = parseStringList();
-        requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+        if (token.type == Token.LPAREN)
+          {
+            parameters = parseMIMEParameters();
+          }
+        token = requireToken(Token.NIL | Token.RPAREN |
+                             Token.LPAREN, "err.expected_plist");
+        if (token.type != Token.RPAREN)
+          {
+            if (token.type == Token.LPAREN)
+              {
+                disposition = parseDisposition();
+              }
+            token = requireToken(Token.NIL | Token.RPAREN |
+                                 Token.LPAREN, "err.expected_plist");
+            if (token.type != Token.RPAREN)
+              {
+                if (token.type == Token.LPAREN)
+                  {
+                    language = parseStringList();
+                  }
+                token = requireToken(Token.NIL | Token.RPAREN |
+                                     Token.LPAREN, "err.expected_plist");
+                if (token.type != Token.RPAREN)
+                  {
+                    if (token.type == Token.LPAREN)
+                      {
+                        location = parseStringList();
+                      }
+                    skipExtensionData();
+                  }
+              }
+          }
       }
     return new BODYSTRUCTURE.Multipart(parts, subtype, parameters,
                                        disposition, language, location);
   }
 
+  private void skipExtensionData()
+    throws IOException
+  {
+    int depth = 1;
+    while (depth > 0)
+      {
+        Token token = in.next();
+        switch (token.type)
+          {
+          case Token.LPAREN:
+            depth++;
+            break;
+          case Token.RPAREN:
+            depth--;
+            break;
+          case Token.EOL:
+            throw createException("err.unexpected_eol");
+          }
+      }
+  }
+
   private Map<String,String> parseMIMEParameters()
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
-    switch (token.type)
+    // We have seen '('
+    Token token;
+    Map<String,String> map = new LinkedHashMap<String,String>();
+    do
       {
-      case IMAPTokenizer.NIL:
-        return null;
-      case IMAPTokenizer.LPAREN:
-        Map<String,String> map = new LinkedHashMap<String,String>();
-        do
+        token = requireToken(Token.STRING | Token.RPAREN,
+                             "err.expected_string");
+        if ((token.type & Token.STRING) != 0)
           {
-            token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.RPAREN,
-                                 "err.expected_body_param");
-            if ((token.type & IMAPTokenizer.STRING) != 0)
-              {
-                String key = toLowerCaseString(token);
-                token = requireToken(IMAPTokenizer.STRING,
-                                     "err.expected_body_param");
-                String val = toString(token);
-                map.put(key, val);
-              }
+            String key = toLowerCaseString(token);
+            token = requireToken(Token.STRING,
+                                 "err.expected_string");
+            String val = toString(token);
+            map.put(key, val);
           }
-        while (token.type != IMAPTokenizer.RPAREN);
-        return map;
-      default:
-        throw new IOException("err.expected_plist");
       }
+    while (token.type != Token.RPAREN);
+    return map;
   }
 
   private BODYSTRUCTURE.Disposition parseDisposition()
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
-    switch (token.type)
+    // We have seen '('
+    Token token;
+    token = requireToken(Token.STRING, "err.expected_string");
+    String type = toLowerCaseString(token);
+    Map<String,String> params = null;
+    token = requireToken(Token.NIL | Token.LPAREN,
+                         "err.expected_lparen");
+    if (token.type == Token.LPAREN)
       {
-      case IMAPTokenizer.NIL:
-        return null;
-      case IMAPTokenizer.LPAREN:
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_body_param");
-        String type = toLowerCaseString(token);
-        return new BODYSTRUCTURE.Disposition(type, parseMIMEParameters());
-      default:
-        throw createException("err.expected_plist", token);
+        params = parseMIMEParameters();
       }
+    token = requireToken(Token.RPAREN, "err.expected_rparen");
+    return new BODYSTRUCTURE.Disposition(type, params);
   }
 
   private ENVELOPE parseEnvelope()
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
+    Token token = in.next();
     switch (token.type)
       {
-      case IMAPTokenizer.NIL:
+      case Token.NIL:
         return null;
-      case IMAPTokenizer.LPAREN:
-        token = requireToken(IMAPTokenizer.STRING, "err.expected_envelope");
+      case Token.LPAREN:
+        token = requireToken(Token.STRING, "err.expected_envelope");
         String date = toString(token);
-        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        token = requireToken(Token.NSTRING, "err.expected_envelope");
         String subject = toString(token);
         List<ENVELOPE.Address> from = parseAddressList();
         List<ENVELOPE.Address> sender = parseAddressList();
@@ -1087,9 +1140,9 @@ public class IMAPConnection
         List<ENVELOPE.Address> to = parseAddressList();
         List<ENVELOPE.Address> cc = parseAddressList();
         List<ENVELOPE.Address> bcc = parseAddressList();
-        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        token = requireToken(Token.NSTRING, "err.expected_envelope");
         String inReplyTo = toString(token);
-        token = requireToken(IMAPTokenizer.NSTRING, "err.expected_envelope");
+        token = requireToken(Token.NSTRING, "err.expected_envelope");
         String messageId = toString(token);
         return new ENVELOPE(date, subject, from, sender, replyTo, to, cc, bcc,
                             inReplyTo, messageId);
@@ -1101,27 +1154,28 @@ public class IMAPConnection
   private List<ENVELOPE.Address> parseAddressList()
     throws IOException
   {
-    IMAPTokenizer.Token token = in.next();
+    // We have NOT seen '('
+    Token token = in.next();
     switch (token.type)
       {
-      case IMAPTokenizer.NIL:
+      case Token.NIL:
         return null;
-      case IMAPTokenizer.LPAREN:
+      case Token.LPAREN:
         List<ENVELOPE.Address> ret = new ArrayList<ENVELOPE.Address>();
         do
           {
-            token = requireToken(IMAPTokenizer.LPAREN | IMAPTokenizer.RPAREN,
+            token = requireToken(Token.LPAREN | Token.RPAREN,
                                  "err.expected_address");
-            if (token.type == IMAPTokenizer.LPAREN)
+            if (token.type == Token.LPAREN)
               {
-                token = requireToken(IMAPTokenizer.NSTRING,
+                token = requireToken(Token.NSTRING,
                                      "err.expected_string");
                 String personal = toString(token);
                 in.next();
-                token = requireToken(IMAPTokenizer.NSTRING,
+                token = requireToken(Token.NSTRING,
                                      "err.expected_string");
                 String address = toString(token);
-                token = requireToken(IMAPTokenizer.NSTRING,
+                token = requireToken(Token.NSTRING,
                                      "err.expected_string");
                 String host = toString(token);
                 if (host != null)
@@ -1130,10 +1184,10 @@ public class IMAPConnection
                       .append(host).toString();
                   }
                 ret.add(new ENVELOPE.Address(personal, address));
-                requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+                requireToken(Token.RPAREN, "err.expected_rparen");
               }
           }
-        while (token.type != IMAPTokenizer.RPAREN);
+        while (token.type != Token.RPAREN);
         return ret;
       default:
         throw new IOException("err.expected_plist");
@@ -1143,19 +1197,19 @@ public class IMAPConnection
   private List<String> parseStringList()
     throws IOException
   {
+    // We have seen '('
+    Token token;
     List<String> data = new ArrayList<String>();
-    IMAPTokenizer.Token token;
-    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
     do
       {
-        token = requireToken(IMAPTokenizer.STRING | IMAPTokenizer.RPAREN,
-                             "err.expected_string_or_rparen");
-        if ((token.type & IMAPTokenizer.STRING) != 0)
+        token = requireToken(Token.STRING | Token.RPAREN,
+                             "err.expected_string");
+        if ((token.type & Token.STRING) != 0)
           {
-            data.add(new String(token.literal, "US-ASCII"));
+            data.add(token.stringValue());
           }
       }
-    while (token.type != IMAPTokenizer.RPAREN);
+    while (token.type != Token.RPAREN);
     return data;
   }
 
@@ -1163,37 +1217,37 @@ public class IMAPConnection
     throws IOException
   {
     List<Integer> data = new ArrayList<Integer>();
-    IMAPTokenizer.Token token;
+    Token token;
     do
       {
-        token = requireToken(IMAPTokenizer.NUMBER | IMAPTokenizer.EOL,
+        token = requireToken(Token.NUMBER | Token.EOL,
                              "err.expected_number");
-        if (token.type == IMAPTokenizer.NUMBER)
+        if (token.type == Token.NUMBER)
           {
-            data.add(new Integer(token.value));
+            data.add(new Integer(token.stringValue()));
           }
       }
-    while (token.type != IMAPTokenizer.EOL);
+    while (token.type != Token.EOL);
     return data;
   }
 
   private Namespace parseNamespace()
     throws IOException
   {
-    IMAPTokenizer.Token token;
-    token = requireToken(IMAPTokenizer.NIL | IMAPTokenizer.LPAREN,
+    Token token;
+    token = requireToken(Token.NIL | Token.LPAREN,
                          "err.expected_namespace");
-    if (token.type == IMAPTokenizer.NIL)
+    if (token.type == Token.NIL)
       {
         return null;
       }
-    token = requireToken(IMAPTokenizer.LPAREN, "err.expected_lparen");
-    token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+    token = requireToken(Token.LPAREN, "err.expected_lparen");
+    token = requireToken(Token.STRING, "err.expected_string");
     String prefix = UTF7imap.decode(toString(token));
-    token = requireToken(IMAPTokenizer.STRING, "err.expected_string");
+    token = requireToken(Token.STRING, "err.expected_string");
     String hierarchyDelimiter = toString(token);
-    token = requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
-    token = requireToken(IMAPTokenizer.RPAREN, "err.expected_rparen");
+    token = requireToken(Token.RPAREN, "err.expected_rparen");
+    token = requireToken(Token.RPAREN, "err.expected_rparen");
     return new Namespace(prefix, hierarchyDelimiter);
   }
 
@@ -1201,21 +1255,21 @@ public class IMAPConnection
     throws IOException
   {
     Map<String, String> acls = new LinkedHashMap<String,String>();
-    IMAPTokenizer.Token token;
+    Token token;
     do
       {
-        token = requireToken(IMAPTokenizer.ASTRING | IMAPTokenizer.EOL,
+        token = requireToken(Token.ASTRING | Token.EOL,
                              "err.expected_acl");
-        if ((token.type & IMAPTokenizer.ASTRING) != 0)
+        if ((token.type & Token.ASTRING) != 0)
           {
             String identifier = UTF7imap.decode(toString(token));
-            token = requireToken(IMAPTokenizer.ASTRING,
+            token = requireToken(Token.ASTRING,
                                  "err.expected_astring");
             String rights = toString(token);
             acls.put(identifier, rights);
           }
       }
-    while (token.type != IMAPTokenizer.EOL);
+    while (token.type != Token.EOL);
     return acls;
   }
 
@@ -1300,7 +1354,7 @@ public class IMAPConnection
         
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
-        in = new IMAPTokenizer(is, this);
+        in = new Tokenizer(is, this, literalFactory, literalThreshold);
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
         out = new CRLFOutputStream(os);
@@ -1383,10 +1437,10 @@ public class IMAPConnection
         sendCommand(tag, buf.toString());
         while (true)
           {
-            IMAPTokenizer.Token token = in.next();
+            Token token = in.next();
             switch (token.type)
               {
-              case IMAPTokenizer.CONTINUATION:
+              case Token.CONTINUATION:
                 String text = in.collectToEOL();
                 in.reset();
                 try
@@ -1413,8 +1467,8 @@ public class IMAPConnection
                 out.writeln();
                 out.flush();
                 break;
-              case IMAPTokenizer.TAG:
-                boolean match = tag.equals(token.value);
+              case Token.TAG:
+                boolean match = tag.equals(token.stringValue());
                 boolean result = parseRespCondState(callback);
                 in.collectToEOL();
                 in.reset();
@@ -1430,7 +1484,7 @@ public class IMAPConnection
                             InputStream is = socket.getInputStream();
                             is = new BufferedInputStream(is);
                             is = new SaslInputStream(sasl, is);
-                            in = new IMAPTokenizer(is, this);
+                            in = new Tokenizer(is, this, literalFactory, literalThreshold);
                             OutputStream os = socket.getOutputStream();
                             os = new BufferedOutputStream(os);
                             os = new SaslOutputStream(sasl, os);
@@ -1440,15 +1494,15 @@ public class IMAPConnection
                     return result;
                   }
                 break;
-              case IMAPTokenizer.UNTAGGED_RESPONSE:
+              case Token.UNTAGGED_RESPONSE:
                 token = in.next();
                 switch (token.type)
                   {
-                  case IMAPTokenizer.NUMBER:
-                    int number = Integer.parseInt(token.value);
+                  case Token.NUMBER:
+                    int number = token.intValue();
                     parseUntaggedNumber(number, callback);
                     break;
-                  case IMAPTokenizer.ATOM:
+                  case Token.ATOM:
                     parseUntaggedAtom(token, callback);
                     break;
                   }
@@ -1713,8 +1767,8 @@ public class IMAPConnection
     buf.append(content.length);
     buf.append('}');
     sendCommand(tag, buf.toString());
-    IMAPTokenizer.Token token = in.next();
-    if (token.type != IMAPTokenizer.CONTINUATION)
+    Token token = in.next();
+    if (token.type != Token.CONTINUATION)
       {
         throw createException("err.expected_continuation", token);
       }

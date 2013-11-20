@@ -48,6 +48,7 @@ import gnu.inet.imap.IMAPAdapter;
 import gnu.inet.imap.IMAPCallback;
 import gnu.inet.imap.IMAPConnection;
 import gnu.inet.imap.FetchDataItem;
+import gnu.inet.imap.Literal;
 import gnu.inet.imap.MessageSet;
 import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.providers.ReadOnlyBodyPart;
@@ -68,6 +69,7 @@ final class IMAPBodyPart
   private ContentType type;
   private ContentDisposition disposition;
   private boolean headersLoaded;
+  private Literal literal;
 
   IMAPBodyPart(IMAPMessage message,
                BODYSTRUCTURE.Part part,
@@ -217,11 +219,11 @@ final class IMAPBodyPart
   protected InputStream getContentStream()
     throws MessagingException
   {
-    if (content == null)
+    if (literal == null)
       {
         fetchContent();
       }
-    return super.getContentStream();
+    return literal.getInputStream();
   }
 
   public DataHandler getDataHandler()
@@ -248,7 +250,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getHeader(name);
   }
@@ -258,7 +260,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getAllHeaders();
   }
@@ -268,7 +270,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getMatchingHeaders(names);
   }
@@ -278,7 +280,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getNonMatchingHeaders(names);
   }
@@ -288,7 +290,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getAllHeaderLines();
   }
@@ -298,7 +300,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getMatchingHeaderLines(names);
   }
@@ -308,7 +310,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     return super.getNonMatchingHeaderLines(names);
   }
@@ -318,7 +320,7 @@ final class IMAPBodyPart
   {
     if (headers == null)
       {
-        fetchContent();
+        fetchHeaders();
       }
     super.updateHeaders();
   }
@@ -331,12 +333,23 @@ final class IMAPBodyPart
     List<String> commands = new ArrayList<String>();
     commands.add(new StringBuilder("BODY.PEEK[")
                  .append(section)
-                 .append(']')
+                 .append("]")
                  .toString());
-    fetch(commands);
+    fetch(commands, false);
   }
 
-  void fetch(List<String> commands)
+  void fetchHeaders()
+    throws MessagingException
+  {
+    List<String> commands = new ArrayList<String>();
+    commands.add(new StringBuilder("BODY.PEEK[")
+                 .append(section)
+                 .append(".HEADER]")
+                 .toString());
+    fetch(commands, true);
+  }
+
+  void fetch(List<String> commands, final boolean isHeader)
     throws MessagingException
   {
     final IMAPStore s = (IMAPStore) message.getFolder().getStore();
@@ -358,16 +371,33 @@ final class IMAPBodyPart
                 if (item instanceof BODY)
                   {
                     BODY body = (BODY) item;
-                    content = body.getContents();
-                    InputStream in = new ByteArrayInputStream(content);
-                    try
+                    if (isHeader)
                       {
-                        headers = new InternetHeaders(in);
+                        Literal lh = body.getContents();
+                        InputStream in = lh.getInputStream();
+                        try
+                          {
+                            headers = new InternetHeaders(in);
+                          }
+                        catch (MessagingException e)
+                          {
+                            throw (RuntimeException) new RuntimeException()
+                              .initCause(e);
+                          }
+                        finally
+                          {
+                            try
+                              {
+                                in.close();
+                              }
+                            catch (IOException e)
+                              {
+                              }
+                          }
                       }
-                    catch (MessagingException e)
+                    else
                       {
-                        throw (RuntimeException) 
-                          new RuntimeException().initCause(e);
+                        literal = body.getContents();
                       }
                   }
               }

@@ -1,5 +1,5 @@
 /*
- * BODY.java
+ * LiteralToken.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -19,48 +19,34 @@
  * along with classpathx.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package gnu.inet.imap;
 
 /**
- * A BODY data item in a FETCH response.
+ * Literal token.
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class BODY
-  extends FetchDataItem
+class LiteralToken
+  extends Token
 {
 
-  private final String section;
-  private final int originOffset;
-  private final Literal contents;
+  private final Literal literal;
 
-  BODY(String section, int originOffset, Literal contents)
+  LiteralToken(int type, Literal literal)
   {
-    this.section = section;
-    this.originOffset = originOffset;
-    this.contents = contents;
+    super(type);
+    this.literal = literal;
   }
 
-  public String getSection()
+  String stringValue()
   {
-    return section;
+    throw new UnsupportedOperationException();
   }
 
-  public boolean isSubstring()
+  Literal literalValue()
   {
-    return originOffset < 0;
-  }
-
-  public int getOriginOffset()
-  {
-    return originOffset < 0 ? 0 : originOffset;
-  }
-
-  public Literal getContents()
-  {
-    return contents;
+    return literal;
   }
 
 }

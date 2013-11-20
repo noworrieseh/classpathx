@@ -325,7 +325,7 @@ public class ParameterList
    */
   public void set(String name, String value)
   {
-    list.put(name.toLowerCase().trim(), name);
+    list.put(name.toLowerCase().trim(), value);
   }
 
   /**

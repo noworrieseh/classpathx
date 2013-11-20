@@ -1,5 +1,5 @@
 /*
- * BODY.java
+ * StringToken.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -19,48 +19,67 @@
  * along with classpathx.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package gnu.inet.imap;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
- * A BODY data item in a FETCH response.
+ * String token.
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class BODY
-  extends FetchDataItem
+class StringToken
+  extends Token
 {
 
-  private final String section;
-  private final int originOffset;
-  private final Literal contents;
+  private final byte[] string;
 
-  BODY(String section, int originOffset, Literal contents)
+  StringToken(int type, byte[] string)
   {
-    this.section = section;
-    this.originOffset = originOffset;
-    this.contents = contents;
+    super(type);
+    this.string = string;
   }
 
-  public String getSection()
+  int intValue()
   {
-    return section;
+    return Integer.parseInt(stringValue());
   }
 
-  public boolean isSubstring()
+  long longValue()
   {
-    return originOffset < 0;
+    return Long.parseLong(stringValue());
   }
 
-  public int getOriginOffset()
+  String stringValue()
   {
-    return originOffset < 0 ? 0 : originOffset;
+    return new String(string, IMAPConnection.US_ASCII);
   }
 
-  public Literal getContents()
+  Literal literalValue()
   {
-    return contents;
+    return new Literal()
+    {
+      public OutputStream getOutputStream()
+      {
+        throw new UnsupportedOperationException();
+      }
+
+      public InputStream getInputStream()
+      {
+        return new ByteArrayInputStream(string);
+      }
+    };
+  }
+
+  public String toString()
+  {
+    return new StringBuilder(super.toString())
+      .append(':')
+      .append(stringValue())
+      .toString();
   }
 
 }

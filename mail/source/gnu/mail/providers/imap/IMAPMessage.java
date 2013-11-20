@@ -61,6 +61,7 @@ import gnu.inet.imap.ENVELOPE;
 import gnu.inet.imap.FetchDataItem;
 import gnu.inet.imap.FLAGS;
 import gnu.inet.imap.INTERNALDATE;
+import gnu.inet.imap.Literal;
 import gnu.inet.imap.MessageSet;
 import gnu.inet.imap.RFC822_SIZE;
 import gnu.inet.imap.UID;
@@ -105,6 +106,7 @@ public final class IMAPMessage
   String section;
   int size = -1;
   ENVELOPE envelope;
+  Literal literal;
 
   IMAPCallback callback = new IMAPAdapter()
   {
@@ -316,7 +318,7 @@ public final class IMAPMessage
       {
         fetchContent();
       }
-    return super.getContentStream();
+    return literal.getInputStream();
   }
 
   public DataHandler getDataHandler()
@@ -558,7 +560,7 @@ public final class IMAPMessage
   }
 
   /**
-   * Fetches the message header.
+   * Fetches the message headers.
    */
   void fetchHeaders()
     throws MessagingException
@@ -590,7 +592,7 @@ public final class IMAPMessage
       }
     else
       {
-        commands.add("BODY.PEEK[" + section + ".MIME]");
+        commands.add("BODY.PEEK[" + section + "]");
       }
     fetch(commands);
   }
@@ -711,20 +713,33 @@ public final class IMAPMessage
   private void updateBODY(BODY body)
   {
     String section = body.getSection();
-    byte[] c = body.getContents();
-    InputStream in = new ByteArrayInputStream(c);
-    try
+    if (section.endsWith(".HEADER"))
       {
-        headers = createInternetHeaders(in);
-        headersComplete = true;
+        Literal lh = body.getContents();
+        InputStream in = lh.getInputStream();
+        try
+          {
+            headers = new InternetHeaders(in);
+            headersComplete = true;
+          }
+        catch (MessagingException e)
+          {
+            throw (RuntimeException) new RuntimeException().initCause(e);
+          }
+        finally
+          {
+            try
+              {
+                in.close();
+              }
+            catch (IOException e)
+              {
+              }
+          }
       }
-    catch (MessagingException e)
+    else
       {
-        throw (RuntimeException) new RuntimeException().initCause(e);
-      }
-    if (section == null || !section.endsWith("HEADERS"))
-      {
-        content = c;
+        literal = body.getContents();
       }
   }
 
@@ -763,6 +778,7 @@ public final class IMAPMessage
 
   private void updateENVELOPE(ENVELOPE envelope)
   {
+    this.envelope = envelope;
     String date = envelope.getDate();
     String subject = envelope.getSubject();
     InternetAddress[] from = getAddressList(envelope.getFrom());

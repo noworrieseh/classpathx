@@ -50,11 +50,16 @@ $(src)/gnu/inet/imap/IMAPCallback.java \
 $(src)/gnu/inet/imap/IMAPConnection.java \
 $(src)/gnu/inet/imap/IMAPConstants.java \
 $(src)/gnu/inet/imap/IMAPException.java \
-$(src)/gnu/inet/imap/IMAPTokenizer.java \
 $(src)/gnu/inet/imap/INTERNALDATE.java \
+$(src)/gnu/inet/imap/Literal.java \
+$(src)/gnu/inet/imap/LiteralFactory.java \
+$(src)/gnu/inet/imap/LiteralToken.java \
 $(src)/gnu/inet/imap/MessageSet.java \
 $(src)/gnu/inet/imap/Namespace.java \
 $(src)/gnu/inet/imap/RFC822_SIZE.java \
+$(src)/gnu/inet/imap/StringToken.java \
+$(src)/gnu/inet/imap/Token.java \
+$(src)/gnu/inet/imap/Tokenizer.java \
 $(src)/gnu/inet/imap/UID.java \
 $(src)/gnu/inet/imap/UIDSet.java \
 $(src)/gnu/inet/imap/UTF7imap.java \

@@ -1,5 +1,5 @@
 /*
- * BODY.java
+ * LiteralFactory.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -19,48 +19,32 @@
  * along with classpathx.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
 package gnu.inet.imap;
 
+import java.io.IOException;
+
 /**
- * A BODY data item in a FETCH response.
+ * Interface defining a mechanism that can handle large IMAP literals.
+ * These may require a significant time to load from the
+ * network, so any application that wishes to provide a progress bar,
+ * or some strategy that can cache the data on disk instead of it all being
+ * held in memory should implement this interface and call
+ * {@link IMAPConnection#setLiteralHandler} with the size threshold before
+ * {@link IMAPConnection#connect}.
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-public class BODY
-  extends FetchDataItem
+public interface LiteralFactory
 {
 
-  private final String section;
-  private final int originOffset;
-  private final Literal contents;
-
-  BODY(String section, int originOffset, Literal contents)
-  {
-    this.section = section;
-    this.originOffset = originOffset;
-    this.contents = contents;
-  }
-
-  public String getSection()
-  {
-    return section;
-  }
-
-  public boolean isSubstring()
-  {
-    return originOffset < 0;
-  }
-
-  public int getOriginOffset()
-  {
-    return originOffset < 0 ? 0 : originOffset;
-  }
-
-  public Literal getContents()
-  {
-    return contents;
-  }
+  /**
+   * Returns a new literal of the specified size.
+   * @param size the number of bytes that are required to store the literal
+   * @exception IOException if the handler cannot store a literal of this
+   * size
+   */
+  Literal newLiteral(int size)
+    throws IOException;
 
 }

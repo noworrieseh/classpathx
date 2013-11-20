@@ -1,5 +1,5 @@
 /*
- * IMAPTokenizer.java
+ * Tokenizer.java
  * Copyright (C) 2013 The Free Software Foundation
  * 
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -21,10 +21,12 @@
  */
 package gnu.inet.imap;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,94 +34,13 @@ import java.util.Map;
 
 /**
  * IMAP stream tokenizer.
+ * This will produce tokens until EOL, whereupon it must be reset.
  * @version 1.2
  * @since 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
-class IMAPTokenizer
+class Tokenizer
 {
-
-  static final int NIL =  1<<0;
-  static final int ATOM = 1<<1;
-  static final int NUMBER = 1<<2;
-  static final int LITERAL = 1<<3;
-  static final int QUOTED_STRING = 1<<4;
-  static final int LPAREN = 1<<5;
-  static final int RPAREN = 1<<6;
-  static final int LBRACKET = 1<<7;
-  static final int RBRACKET = 1<<8;
-  static final int TAG = 1<<9;
-  static final int UNTAGGED_RESPONSE = 1<<10;
-  static final int CONTINUATION = 1<<11;
-  static final int EOL = 1<<12;
-
-  static final int STRING = QUOTED_STRING | LITERAL;
-  static final int ASTRING = ATOM | STRING;
-  static final int NSTRING = NIL | STRING;
-
-  static class Token
-  {
-    final int type;
-    final String value;
-    final byte[] literal;
-
-    Token(int type)
-    {
-      this.type = type;
-      value = null;
-      literal = null;
-    }
-
-    Token(int type, String value)
-    {
-      this.type = type;
-      this.value = value;
-      literal = null;
-    }
-
-    Token(int type, byte[] literal)
-    {
-      this.type = type;
-      this.literal = literal;
-      value = null;
-    }
-
-    public String toString() {
-      StringBuilder buf = new StringBuilder();
-      buf.append(TYPES.get(type));
-      if (value != null)
-        {
-          buf.append(':');
-          buf.append(value);
-        }
-      else if (literal != null)
-        {
-          buf.append(':');
-          buf.append(IMAPTokenizer.asciify(literal));
-        }
-      return buf.toString();
-    }
-
-    private static final Map<Integer,String> TYPES;
-    static
-    {
-      TYPES = new HashMap();
-      TYPES.put(NIL, "NIL");
-      TYPES.put(ATOM, "ATOM");
-      TYPES.put(NUMBER, "NUMBER");
-      TYPES.put(LITERAL, "LITERAL");
-      TYPES.put(QUOTED_STRING, "QUOTED_STRING");
-      TYPES.put(LPAREN, "LPAREN");
-      TYPES.put(RPAREN, "RPAREN");
-      TYPES.put(LBRACKET, "LBRACKET");
-      TYPES.put(RBRACKET, "RBRACKET");
-      TYPES.put(TAG, "TAG");
-      TYPES.put(UNTAGGED_RESPONSE, "UNTAGGED_RESPONSE");
-      TYPES.put(CONTINUATION, "CONTINUATION");
-      TYPES.put(EOL, "EOL");
-    }
-
-  }
 
   private static final int STATE_INIT = 0;
   private static final int STATE_RESPONSE_BODY = 1;
@@ -128,18 +49,27 @@ class IMAPTokenizer
   private static final int LF = 10;
   private static final int CR = 13;
 
+  private static final LiteralFactory DEFAULT_FACTORY =
+    new DefaultLiteralFactory();
+  
   private int state;
-  private int depth; // parenthesized list depth
   private InputStream in;
   private IMAPConnection connection;
+  private LiteralFactory literalFactory;
+  private int literalThreshold;
   private ByteArrayOutputStream sink;
   private ByteArrayOutputStream trace;
   private boolean peeking;
 
-  IMAPTokenizer(InputStream in, IMAPConnection connection)
+  Tokenizer(InputStream in,
+            IMAPConnection connection,
+            LiteralFactory factory,
+            int threshold)
   {
     this.in = in;
     this.connection = connection;
+    literalFactory = (factory != null) ? factory : DEFAULT_FACTORY;
+    literalThreshold = Math.max(4096, threshold);
     sink = new ByteArrayOutputStream();
     if (connection.isDebug())
       {
@@ -163,7 +93,7 @@ class IMAPTokenizer
   {
     if (state == STATE_EOL)
       {
-        return new Token(EOL);
+        return new Token(Token.EOL);
       }
     sink.reset();
     int c = readeof();
@@ -174,7 +104,7 @@ class IMAPTokenizer
         if (d == LF)
           {
             state = STATE_EOL;
-            return new Token(EOL);
+            return new Token(Token.EOL);
           }
         in.reset();
       }
@@ -192,7 +122,7 @@ class IMAPTokenizer
               {
                 throw createException("err.bad_untagged");
               }
-            return new Token(UNTAGGED_RESPONSE);
+            return new Token(Token.UNTAGGED_RESPONSE);
           }
         else if (c == '+')
           {
@@ -200,29 +130,25 @@ class IMAPTokenizer
               {
                 throw createException("err.bad_continuation");
               }
-            return new Token(CONTINUATION);
+            return new Token(Token.CONTINUATION);
           }
-        return new Token(TAG, parseAtom(c));
+        return parseAtom(Token.TAG, c);
       case STATE_RESPONSE_BODY:
         if (c == '(')
           {
-            depth++;
-            return new Token(LPAREN);
+            return new Token(Token.LPAREN);
           }
         else if (c == '[')
           {
-            depth++;
-            return new Token(LBRACKET);
+            return new Token(Token.LBRACKET);
           }
         else if (c == ')')
           {
-            depth--;
-            return new Token(RPAREN);
+            return new Token(Token.RPAREN);
           }
         else if (c == ']')
           {
-            depth--;
-            return new Token(RBRACKET);
+            return new Token(Token.RBRACKET);
           }
         else if (c >= 48 && c <= 57)
           {
@@ -238,12 +164,7 @@ class IMAPTokenizer
           }
         else
           {
-            String atom = parseAtom(c);
-            if ("NIL".equals(atom))
-              {
-                return new Token(NIL);
-              }
-            return new Token(ATOM, atom);
+            return parseAtom(Token.ATOM, c);
           }
       default:
         throw new IllegalStateException();
@@ -342,11 +263,11 @@ class IMAPTokenizer
     return c;
   }
 
-  private String parseAtom(int c)
+  private Token parseAtom(int type, int c)
     throws IOException
   {
     boolean isFlag = false;
-    if (c < SP || Arrays.binarySearch(ATOM_SPECIALS, (byte) c) >= 0)
+    if (c <= SP || Arrays.binarySearch(ATOM_SPECIALS, (byte) c) >= 0)
       {
         if (c == '\\') // NB we treat flags as atoms
           {
@@ -362,7 +283,7 @@ class IMAPTokenizer
         sink.write(c);
         in.mark(1);
         c = readeof();
-        if (c < SP || Arrays.binarySearch(ATOM_SPECIALS, (byte) c) >= 0)
+        if (c <= SP || Arrays.binarySearch(ATOM_SPECIALS, (byte) c) >= 0)
           {
             if (isFlag && c == '*' && sink.size() == 1)
               {
@@ -373,7 +294,12 @@ class IMAPTokenizer
               {
                 in.reset();
               }
-            return new String(sink.toByteArray(), IMAPConnection.US_ASCII);
+            byte[] b = sink.toByteArray();
+            if (b.length == 3 && b[0] == 'N' && b[1] == 'I' && b[2] == 'L')
+              {
+                return new Token(Token.NIL);
+              }
+            return new StringToken(type, b);
           }
       }
     while (true);
@@ -382,20 +308,23 @@ class IMAPTokenizer
   private Token parseNumber(int c)
     throws IOException
   {
+    int t = Token.NUMBER;
     do
       {
         sink.write(c);
         in.mark(1);
         c = readeof();
-        if (c < 48 || c > 57)
+        if (c <= SP || Arrays.binarySearch(ATOM_SPECIALS, (byte) c) >= 0)
           {
             if (c != SP)
               {
                 in.reset();
               }
-            String val = new String(sink.toByteArray(),
-                                    IMAPConnection.US_ASCII);
-            return new Token(NUMBER, val);
+            return new StringToken(t, sink.toByteArray());
+          }
+        if (c < 48 || c > 57)
+          {
+            t = Token.ATOM;
           }
       }
     while (true);
@@ -423,7 +352,8 @@ class IMAPTokenizer
           }
         else if (c == '"')
           {
-            return new Token(QUOTED_STRING, sink.toByteArray());
+            return new StringToken(Token.QUOTED_STRING,
+                                   sink.toByteArray());
           }
         else if (c == LF)
           {
@@ -451,26 +381,67 @@ class IMAPTokenizer
       }
     int total = Integer.parseInt(new String(sink.toByteArray(),
                                             IMAPConnection.US_ASCII));
-    sink.reset();
+    boolean large = total > literalThreshold;
+    Literal literal = large ? literalFactory.newLiteral(total) : null;
+    OutputStream out = large ? literal.getOutputStream() : sink;
     int count = 0;
+    sink.reset();
     byte[] buf = new byte[Math.min(total, 4096)];
     while (count < total)
       {
-        int len = in.read(buf, 0, Math.min(buf.length, total - count));
+        int needed = Math.min(buf.length, total - count);
+        int len = in.read(buf, 0, needed);
         if (len == -1)
           {
             throw new EOFException();
           }
-        sink.write(buf, 0, len);
-        if (trace != null)
+        out.write(buf, 0, len);
+        if (!large && trace != null)
           {
             trace.write(buf, 0, len);
           }
         count += len;
       }
-    byte[] literal = sink.toByteArray();
-    sink.reset();
-    return new Token(LITERAL, literal);
+    if (large)
+      {
+        return new LiteralToken(Token.LITERAL, literal);
+      }
+    else
+      {
+        return new StringToken(Token.LITERAL, sink.toByteArray());
+      }
+  }
+
+  /**
+   * Literal handler that just stores literals in memory.
+   */
+  static class DefaultLiteralFactory
+    implements LiteralFactory
+  {
+
+    public Literal newLiteral(int size)
+    {
+      return new DefaultLiteral();
+    }
+
+  }
+
+  static class DefaultLiteral
+    implements Literal
+  {
+
+    ByteArrayOutputStream sink = new ByteArrayOutputStream();
+
+    public OutputStream getOutputStream()
+    {
+      return sink;
+    }
+
+    public InputStream getInputStream()
+    {
+      return new ByteArrayInputStream(sink.toByteArray());
+    }
+
   }
 
 }
