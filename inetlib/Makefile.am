@@ -183,7 +183,7 @@ dst_l10n = $(patsubst $(src)/%, $(dst)/%, $(src_l10n))
 
 # Jar
 
-$(inetlib_version_jar): $(dst) $(dst_l10n) $(META_INF_FILES) $(classes)
+$(inetlib_version_jar): $(dst) $(META_INF_FILES) $(classes) $(dst_l10n)
 	$(JAR) cf $(inetlib_version_jar) -C $(dst) META-INF -C $(dst) gnu
 	rm -f $(inetlib_jar)
 	ln -s $(inetlib_version_jar) $(inetlib_jar)
