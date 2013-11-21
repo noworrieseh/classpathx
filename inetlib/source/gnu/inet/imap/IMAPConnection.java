@@ -219,8 +219,8 @@ public class IMAPConnection
   /**
    * Connects this connection.
    */
-  public void connect()
-    throws UnknownHostException, IOException
+  private void connect()
+    throws IOException
   { 
     // Set up socket
     try
@@ -315,6 +315,10 @@ public class IMAPConnection
   protected void sendCommand(String tag, String command)
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     if (isDebug())
       {
         debug(new StringBuilder("> ")

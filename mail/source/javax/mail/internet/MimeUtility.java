@@ -30,6 +30,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -40,6 +42,7 @@ import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.inet.util.LineInputStream;
 import gnu.mail.util.Base64InputStream;
 import gnu.mail.util.Base64OutputStream;
@@ -141,7 +144,7 @@ public class MimeUtility
         boolean text = ct.match("text/*");
 
         AsciiOutputStream aos =
-          new AsciiOutputStream(!text, encodeeolStrict() && !text);
+          new AsciiOutputStream(!text, encodeeolStrict && !text);
         try
           {
             dh.writeTo(aos);
@@ -326,8 +329,8 @@ public class MimeUtility
         return etext;
       }
     StringTokenizer st = new StringTokenizer(etext, delimiters, true);
-    StringBuffer buffer = new StringBuffer();
-    StringBuffer extra = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
+    StringBuilder extra = new StringBuilder();
     boolean decoded = false;
     while (st.hasMoreTokens())
       {
@@ -350,7 +353,7 @@ public class MimeUtility
               }
             catch (ParseException e)
               {
-                if (!decodetextStrict())
+                if (!decodetextStrict)
                   {
                     token = decodeInnerText(token);
                   }
@@ -440,14 +443,14 @@ public class MimeUtility
         throw new UnsupportedEncodingException(MessageFormat.format(m, args));
       }
 
-    StringBuffer encodingBuffer = new StringBuffer();
+    StringBuilder encodingBuffer = new StringBuilder();
     encodingBuffer.append("=?");
     encodingBuffer.append(charset);
     encodingBuffer.append("?");
     encodingBuffer.append(encoding);
     encodingBuffer.append("?");
 
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     encodeBuffer(buffer,
                   text,
                   javaCharset,
@@ -459,7 +462,7 @@ public class MimeUtility
     return buffer.toString();
   }
 
-  private static void encodeBuffer(StringBuffer buffer,
+  private static void encodeBuffer(StringBuilder buffer,
                                    String text,
                                    String charset,
                                    boolean bEncoding,
@@ -600,8 +603,7 @@ public class MimeUtility
           }
         else
           {
-            throw new UnsupportedEncodingException("Unknown encoding: " +
-                                                    encoding);
+            throw new UnsupportedEncodingException(encoding);
           }
         len = bis.available();
         bytes = new byte[len];
@@ -610,7 +612,7 @@ public class MimeUtility
         if (text.length() > end + 2)
           {
             String extra = text.substring(end + 2);
-            if (!decodetextStrict())
+            if (!decodetextStrict)
               {
                 extra = decodeInnerText(extra);
               }
@@ -634,36 +636,24 @@ public class MimeUtility
    * needs to be encoded.
    * @since JavaMail 1.3
    */
-  private static boolean encodeeolStrict()
+  private static final boolean encodeeolStrict;
+  static
   {
-    try
-      {
-        String encodeeolStrict =
-          System.getProperty("mail.mime.encodeeol.strict", "false");
-        return Boolean.valueOf(encodeeolStrict).booleanValue();
-      }
-    catch (SecurityException e)
-      {
-        return false;
-      }
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.encodeeol.strict");
+    encodeeolStrict = !"false".equals(AccessController.doPrivileged(a));
   }
 
   /**
    * Indicates if text in the middle of words should be decoded.
    * @since JavaMail 1.3
    */
-  private static boolean decodetextStrict()
+  private static boolean decodetextStrict;
+  static
   {
-    try
-      {
-        String decodetextStrict =
-          System.getProperty("mail.mime.decodetext.strict", "true");
-        return Boolean.valueOf(decodetextStrict).booleanValue();
-      }
-    catch (SecurityException e)
-      {
-        return true;
-      }
+    PrivilegedAction a =
+      new GetSystemPropertyAction("mail.mime.decodetext.strict");
+    decodetextStrict = "true".equals(AccessController.doPrivileged(a));
   }
 
   /**
@@ -675,7 +665,7 @@ public class MimeUtility
   {
     final String LD = "=?", RD = "?=";
     int pos = 0;
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for (int start = text.indexOf(LD, pos); start != -1;
         start = text.indexOf(LD, pos))
       {

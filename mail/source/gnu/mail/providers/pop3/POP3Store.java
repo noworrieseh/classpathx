@@ -142,7 +142,6 @@ public final class POP3Store
                 handler.setLevel(Level.ALL);
                 logger.addHandler(handler);
               }
-            connection.connect();
 
             // Disable APOP if necessary
             if (propertyIsFalse("apop"))

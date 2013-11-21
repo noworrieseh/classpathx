@@ -218,7 +218,7 @@ public class SMTPConnection
   /**
    * Connects the connection.
    */
-  public void connect()
+  private void connect()
     throws IOException
   {
     // Initialise socket
@@ -826,6 +826,10 @@ public class SMTPConnection
   protected void send(String command)
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     if (isDebug())
       {
         debug("> " + command);
@@ -841,6 +845,10 @@ public class SMTPConnection
   protected int getResponse()
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     String line = null;
     try
       {

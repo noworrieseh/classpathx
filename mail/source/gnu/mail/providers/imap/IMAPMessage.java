@@ -257,7 +257,18 @@ public final class IMAPMessage
       }
     if (part instanceof BODYSTRUCTURE.BodyPart)
       {
-        return ((BODYSTRUCTURE.BodyPart) part).getDescription();
+        String description = ((BODYSTRUCTURE.BodyPart) part).getDescription();
+        if (description != null)
+          {
+            try
+              {
+                description = MimeUtility.decodeText(description);
+              }
+            catch (UnsupportedEncodingException e)
+              {
+              }
+            return description;
+          }
       }
     return super.getDescription();
   }
@@ -463,7 +474,18 @@ public final class IMAPMessage
       }
     if (envelope != null)
       {
-        return envelope.getSubject();
+        String subject = envelope.getSubject();
+        if (subject != null)
+          {
+            try
+              {
+                subject = MimeUtility.decodeText(subject);
+              }
+            catch (UnsupportedEncodingException e)
+              {
+              }
+            return subject;
+          }
       }
     return super.getSubject();
   }

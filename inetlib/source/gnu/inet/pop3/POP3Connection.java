@@ -224,8 +224,8 @@ public class POP3Connection
   /**
    * Connects this connection.
    */
-  public void connect()
-    throws UnknownHostException, IOException
+  private void connect()
+    throws IOException
   {
     // Set up socket
     try
@@ -793,6 +793,10 @@ public class POP3Connection
   protected void send(String command)
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     if (isDebug())
       {
         debug("> " + command);
@@ -808,6 +812,10 @@ public class POP3Connection
   protected int getResponse()
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     response = in.readLine();
     if (response == null)
       {

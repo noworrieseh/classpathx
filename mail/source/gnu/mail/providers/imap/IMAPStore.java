@@ -147,7 +147,6 @@ public class IMAPStore
                 handler.setLevel(Level.ALL);
                 logger.addHandler(handler);
               }
-            connection.connect();
 
             final List<String> capabilities = new ArrayList<String>();
             IMAPAdapter callback = this.new DefaultAdapter(capabilities);

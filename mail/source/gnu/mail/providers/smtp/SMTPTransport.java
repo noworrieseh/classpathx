@@ -166,7 +166,6 @@ public class SMTPTransport
             handler.setLevel(Level.ALL);
             logger.addHandler(handler);
           }
-        connection.connect();
 
         // EHLO/HELO
         if (propertyIsFalse("ehlo"))

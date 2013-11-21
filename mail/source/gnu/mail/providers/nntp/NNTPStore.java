@@ -179,7 +179,6 @@ public class NNTPStore extends Store
             logger.setLevel(NNTPConnection.NNTP_TRACE);
             logger.addHandler(handler);
           }
-        connection.connect();
 
         /*
          * FIXME First of all, capability list should be retrieved

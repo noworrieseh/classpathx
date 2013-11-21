@@ -215,7 +215,7 @@ public class NNTPConnection
   /**
    * Connects this connection.
    */
-  public void connect()
+  private void connect()
     throws IOException
   {  
     // Set up the socket and streams
@@ -1543,6 +1543,10 @@ public class NNTPConnection
   protected void send(String line)
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     if (pendingData != null)
       {
         // Clear pending data
@@ -1566,6 +1570,10 @@ public class NNTPConnection
   protected String read()
     throws IOException
   {
+    if (socket == null)
+      {
+        connect();
+      }
     String line = in.readLine();
     if (isDebug())
       {

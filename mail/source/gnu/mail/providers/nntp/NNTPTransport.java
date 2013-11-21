@@ -129,7 +129,6 @@ public class NNTPTransport extends Transport
             handler.setLevel(Level.ALL);
             connection.getLogger().addHandler(handler);
           }
-        connection.connect();
 
         /*
          * FIXME First of all, capability list should be retrieved
