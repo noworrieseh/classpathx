@@ -659,7 +659,7 @@ public class IMAPFolder
         IMAPConnection connection = ((IMAPStore) store).connection;
         try
           {
-            List<Integer> messages = new ArrayList<Integer>(msgs.length);
+            MessageSet messages = new MessageSet();
             seenTryCreate = false;
             for (int i = 0; i < msgs.length; i++)
               {
@@ -1339,6 +1339,7 @@ public class IMAPFolder
         final List<Message> acc = new ArrayList<Message>();
         List<String> cmds = new ArrayList<String>();
         cmds.add(IMAPConstants.FLAGS);
+        cmds.add(IMAPConstants.UID);
         IMAPAdapter adapter = new IMAPAdapter(callback)
         {
           public void fetch(int message, List<FetchDataItem> data)
@@ -1375,6 +1376,7 @@ public class IMAPFolder
         final List<Message> acc = new ArrayList<Message>();
         List<String> cmds = new ArrayList<String>();
         cmds.add(IMAPConstants.FLAGS);
+        cmds.add(IMAPConstants.UID);
         IMAPAdapter adapter = new IMAPAdapter(callback)
         {
           public void fetch(int message, List<FetchDataItem> data)
@@ -1413,6 +1415,7 @@ public class IMAPFolder
         final List<Message> acc = new ArrayList<Message>();
         List<String> cmds = new ArrayList<String>();
         cmds.add(IMAPConstants.FLAGS);
+        cmds.add(IMAPConstants.UID);
         IMAPAdapter adapter = new IMAPAdapter(callback)
         {
           public void fetch(int message, List<FetchDataItem> data)

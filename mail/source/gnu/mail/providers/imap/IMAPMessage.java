@@ -65,6 +65,7 @@ import gnu.inet.imap.Literal;
 import gnu.inet.imap.MessageSet;
 import gnu.inet.imap.RFC822_SIZE;
 import gnu.inet.imap.UID;
+import gnu.inet.imap.UIDSet;
 import gnu.inet.util.GetSystemPropertyAction;
 import gnu.mail.providers.ReadOnlyMessage;
 
@@ -557,10 +558,25 @@ public final class IMAPMessage
             flags.remove(flag);
           }
         List<String> f = IMAPFolder.flagsToString(flags);
-        if (!connection.store(msgnum, "FLAGS", f, callback))
+        if (uid == -1L)
           {
-            flags = null; // re-read
-            throw new MessagingException("Could not store flags");
+            MessageSet messages = new MessageSet();
+            messages.add(msgnum);
+            if (!connection.store(messages, "FLAGS", f, callback))
+              {
+                flags = null; // re-read
+                throw new MessagingException("Could not store flags");
+              }
+          }
+        else
+          {
+            UIDSet uids = new UIDSet();
+            uids.add(uid);
+            if (!connection.uidStore(uids, "FLAGS", f, callback))
+              {
+                flags = null; // re-read
+                throw new MessagingException("Could not store flags");
+              }
           }
       }
     catch (IOException e)

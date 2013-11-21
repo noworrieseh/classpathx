@@ -77,6 +77,13 @@ import gnu.inet.util.TraceLevel;
 
 /**
  * The protocol class implementing IMAP4rev1.
+ * <p>
+ * To use this connection, you must implement an
+ * {@link IMAPCallback} either directly or by subclassing the
+ * {@link IMAPAdapter} class. This callback will be notified of the various
+ * IMAP events that occur during the processing of the command, since a
+ * single command may result in multiple events possibly unrelated to the
+ * intent of the caller (alerts, new message updates, etc).
  * @version 1.2
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
@@ -312,7 +319,7 @@ public class IMAPConnection
   /**
    * Sends the specified IMAP tagged command to the server.
    */
-  protected void sendCommand(String tag, String command)
+  private void sendCommand(String tag, String command)
     throws IOException
   {
     if (socket == null)
@@ -337,7 +344,7 @@ public class IMAPConnection
    * @return true if OK was received, or false if NO was received
    * @exception IOException if BAD was received or an I/O error occurred
    */
-  protected boolean invokeSimpleCommand(String command, IMAPCallback callback)
+  private boolean invokeSimpleCommand(String command, IMAPCallback callback)
     throws IOException
   {
     String tag = newTag();
@@ -1568,8 +1575,8 @@ public class IMAPConnection
     return selectImpl(mailbox, EXAMINE, callback);
   }
 
-  protected boolean selectImpl(String mailbox, String command,
-                               IMAPCallback callback)
+  private boolean selectImpl(String mailbox, String command,
+                             IMAPCallback callback)
     throws IOException
   {
     return invokeSimpleCommand(new StringBuilder(command)
@@ -1681,8 +1688,8 @@ public class IMAPConnection
     return listImpl(LSUB, reference, mailbox, callback);
   }
   
-  protected boolean listImpl(String command, String reference,
-                             String mailbox, IMAPCallback callback)
+  private boolean listImpl(String command, String reference,
+                           String mailbox, IMAPCallback callback)
     throws IOException
   {
     if (reference == null)
@@ -1814,6 +1821,20 @@ public class IMAPConnection
   }
   
   /**
+   * Permanently removes all messages in the specified UID-set that have
+   * the \Delete flag set.
+   * @param uids the non-null set of UIDs
+   */
+  public boolean uidExpunge(UIDSet uids, IMAPCallback callback)
+    throws IOException
+  {
+    StringBuilder buf = new StringBuilder(UID_EXPUNGE)
+      .append(' ')
+      .append(uids.toString());
+    return invokeSimpleCommand(buf.toString(), callback);
+  }
+  
+  /**
    * Searches the currently selected mailbox for messages matching the
    * specified criteria.
    * @param charset optional charset
@@ -1891,119 +1912,33 @@ public class IMAPConnection
   }
 
   /**
-   * Alters data associated with the specified message in the mailbox.
-   * @param message the message number
+   * Alters data associated with the specified messages in the mailbox.
+   * @param messages the message set, or null for all messages
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
    */
-  public boolean store(int message, String flagCommand,
+  public boolean store(MessageSet messages, String flagCommand,
                        List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    String ids = (message < 0) ? "*" : Integer.toString(message);
+    String ids = (messages == null) ? "*" : messages.toString();
     return storeImpl(STORE, ids, flagCommand, flags, callback);
-  }
-
-  /**
-   * Alters data associated with the specified range of messages in the
-   * mailbox.
-   * @param start the message number of the first message
-   * @param end the message number of the last message
-   * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
-   * @param flags message flags to set
-   */
-  public boolean store(int start, int end, String flagCommand,
-                       List<String> flags, IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    ids.append((start == -1) ? '*' : start);
-    ids.append(':');
-    ids.append((end == -1) ? '*' : end);
-    return storeImpl(STORE, ids.toString(), flagCommand, flags, callback);
-  }
-
-  /**
-   * Alters data associated with messages in the mailbox.
-   * @param messages the message numbers
-   * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
-   * @param flags message flags to set
-   */
-  public boolean store(List<Integer> messages, String flagCommand,
-                       List<String> flags, IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    int len = messages.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            ids.append(',');
-          }
-        ids.append(messages.get(i));
-      }
-    return storeImpl(STORE, ids.toString(), flagCommand, flags, callback);
   }
   
   /**
-   * Alters data associated with the specified message in the mailbox.
-   * @param uid the message UID
+   * Alters data associated with the specified messages in the mailbox.
+   * @param uids the message UIDs, or null for all messages
    * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
    * @param flags message flags to set
    */
-  public boolean uidStore(long uid, String flagCommand,
+  public boolean uidStore(UIDSet uids, String flagCommand,
                           List<String> flags, IMAPCallback callback)
     throws IOException
   {
-    String ids = (uid < 0) ? "*" : Long.toString(uid);
+    String ids = (uids == null) ? "*" : uids.toString();
     return storeImpl(UID + ' ' + STORE, ids, flagCommand, flags, callback);
   }
 
-  /**
-   * Alters data associated with the specified range of messages in the
-   * mailbox.
-   * @param start the UID of the first message
-   * @param end the UID of the last message
-   * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
-   * @param flags message flags to set
-   */
-  public boolean uidStore(long start, long end, String flagCommand,
-                          List<String> flags, IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    ids.append((start == -1L) ? '*' : start);
-    ids.append(':');
-    ids.append((end == -1L) ? '*' : end);
-    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags,
-                     callback);
-  }
-
-  /**
-   * Alters data associated with messages in the mailbox.
-   * @param uids the message UIDs
-   * @param flagCommand FLAGS, +FLAGS, -FLAGS(or .SILENT versions)
-   * @param flags message flags to set
-   */
-  public boolean uidStore(List<Long> uids, String flagCommand,
-                          List<String> flags, IMAPCallback callback)
-    throws IOException
-  {
-    StringBuilder ids = new StringBuilder();
-    int len = uids.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            ids.append(',');
-          }
-        ids.append(uids.get(i));
-      }
-    return storeImpl(UID + ' ' + STORE, ids.toString(), flagCommand, flags,
-                     callback);
-  }
-  
   private boolean storeImpl(String cmd, String ids, String flagCommand,
                             List<String> flags, IMAPCallback callback)
     throws IOException
@@ -2030,10 +1965,10 @@ public class IMAPConnection
   
   /**
    * Copies the specified messages to the end of the destination mailbox.
-   * @param messages the message numbers
+   * @param messages the message-set
    * @param mailbox the destination mailbox
    */
-  public boolean copy(List<Integer> messages, String mailbox,
+  public boolean copy(MessageSet messages, String mailbox,
                       IMAPCallback callback)
     throws IOException
   {
@@ -2042,18 +1977,10 @@ public class IMAPConnection
         return true;
       }
     StringBuilder buf = new StringBuilder(COPY)
-      .append(' ');
-    int len = messages.size();
-    for (int i = 0; i < len; i++)
-      {
-        if (i > 0)
-          {
-            buf.append(',');
-          }
-        buf.append(messages.get(i));
-      }
-    buf.append(' ');
-    buf.append(quote(UTF7imap.encode(mailbox)));
+      .append(' ')
+      .append(messages.toString())
+      .append(' ')
+      .append(quote(UTF7imap.encode(mailbox)));
     return invokeSimpleCommand(buf.toString(), callback);
   }
 
