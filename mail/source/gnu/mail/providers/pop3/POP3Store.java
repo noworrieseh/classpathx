@@ -149,7 +149,7 @@ public final class POP3Store
                 disableApop = true;
               }
             // Get capabilities
-            List capa = connection.capa();
+            List<String> capa = connection.capa();
             if (capa != null)
               {
                 if (capa.contains("STLS"))
@@ -176,7 +176,7 @@ public final class POP3Store
                     throw new MessagingException(L10N.getString("err.no_tls"));
                   }
                 // Build list of SASL mechanisms
-                List authenticationMechanisms = null;
+                List<String> authenticationMechanisms = null;
                 for (Iterator i = capa.iterator(); i.hasNext(); )
                   {
                     String cap = (String) i.next();
@@ -184,7 +184,7 @@ public final class POP3Store
                       {
                         if (authenticationMechanisms == null)
                           {
-                            authenticationMechanisms = new ArrayList();
+                            authenticationMechanisms = new ArrayList<String>();
                           }
                         authenticationMechanisms.add(cap.substring(5));
                       }

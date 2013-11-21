@@ -451,12 +451,12 @@ public class SMTPConnection
    * null on failure.
    * @param address a mailbox, or real name and mailbox
    */
-  public List vrfy(String address)
+  public List<String> vrfy(String address)
     throws IOException
   {
     String command = VRFY + ' ' + address;
     send(command);
-    List list = new ArrayList();
+    List<String> list = new ArrayList<String>();
     do
       {
         switch (getResponse())
@@ -490,12 +490,12 @@ public class SMTPConnection
    * or null on failure.
    * @param address a mailing list name
    */
-  public List expn(String address)
+  public List<String> expn(String address)
     throws IOException
   {
     String command = EXPN + ' ' + address;
     send(command);
-    List list = new ArrayList();
+    List<String> list = new ArrayList<String>();
     do
       {
         switch (getResponse())
@@ -519,13 +519,13 @@ public class SMTPConnection
    * @return a list of possibly useful information, or null if the command
    * failed.
    */
-  public List help(String arg)
+  public List<String> help(String arg)
     throws IOException
   {
     String command = (arg == null) ? HELP :
       HELP + ' ' + arg;
     send(command);
-    List list = new ArrayList();
+    List<String> list = new ArrayList<String>();
     do
       {
         switch (getResponse())
@@ -595,12 +595,12 @@ public class SMTPConnection
    * Otherwise returns null, and HELO should be called.
    * @param hostname the local host name
    */
-  public List ehlo(String hostname)
+  public List<String> ehlo(String hostname)
     throws IOException
   {
     String command = EHLO + ' ' + hostname;
     send(command);
-    List extensions = new ArrayList();
+    List<String> extensions = new ArrayList<String>();
     do
       {
         switch (getResponse())

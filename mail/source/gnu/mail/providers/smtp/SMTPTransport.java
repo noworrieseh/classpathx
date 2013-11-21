@@ -83,7 +83,7 @@ public class SMTPTransport
 
   protected String localHostName;
 
-  private List extensions = null;
+  private List<String> extensions = null;
   private List authenticationMechanisms = null;
 
   /**

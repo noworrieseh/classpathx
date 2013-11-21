@@ -731,9 +731,8 @@ public class POP3Connection
 
   /**
    * Returns a map of message number to UID pairs.
-   * Message numbers are Integers, UIDs are Strings.
    */
-  public Map uidl()
+  public Map<Integer,String> uidl()
     throws IOException
   {
     send(UIDL);
@@ -741,7 +740,7 @@ public class POP3Connection
       {
         throw new ProtocolException("UIDL failed: " + response);
       }
-    Map uids = new LinkedHashMap();
+    Map<Integer,String> uids = new LinkedHashMap<Integer,String>();
     String line = in.readLine();
     while (line != null && !(".".equals(line)))
       {
@@ -768,14 +767,14 @@ public class POP3Connection
    * If the server does not support POP3 extensions, returns
    * <code>null</code>.
    */
-  public List capa()
+  public List<String> capa()
     throws IOException
   {
     send(CAPA);
     if (getResponse() == OK)
       {
         final String DOT = ".";
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         for (String line = in.readLine();
              !DOT.equals(line);
              line = in.readLine())
