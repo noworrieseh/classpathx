@@ -415,6 +415,7 @@ gnu.inet.comsat
 
 # Resources
 src_l10n = \
+$(src)/gnu/inet/http/L10N.properties \
 $(src)/gnu/inet/imap/L10N.properties
 
 

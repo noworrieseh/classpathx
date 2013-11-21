@@ -22,6 +22,7 @@
 
 package gnu.inet.http;
 
+import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +31,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -281,7 +283,9 @@ public class Request
   {
     if (dispatched)
       {
-        throw new ProtocolException("request already dispatched");
+        String message =
+          HTTPConnection.L10N.getString("err.request_already_dispatched");
+        throw new ProtocolException(message);
       }
     final String CRLF = "\r\n";
     final String HEADER_SEP = ": ";
@@ -402,7 +406,7 @@ public class Request
     line = in.readLine();
     if (line == null)
       {
-        throw new ProtocolException("Peer closed connection");
+        throw new EOFException();
       }
     if (!line.startsWith("HTTP/"))
       {
@@ -429,6 +433,20 @@ public class Request
     // Read response headers
     Headers responseHeaders = new Headers();
     responseHeaders.parse(in);
+    // Check for upgrade
+    if (connection.http20 == HTTPConnection.HTTP20_UNKNOWN)
+      {
+        connection.http20 = HTTPConnection.HTTP20_NO;
+        if (code == 101)
+          {
+            if ("Upgrade".equals(responseHeaders.getValue("Connection")) &&
+                "HTTP/2.0".equals(responseHeaders.getValue("Upgrade")))
+              {
+                connection.http20 = HTTPConnection.HTTP20_OK;
+                // TODO parse new response
+              }
+          }
+      }
     notifyHeaderHandlers(responseHeaders);
     // Construct response
     int codeClass = code / 100;
@@ -510,8 +528,10 @@ public class Request
           }
         else
           {
-            throw new ProtocolException("Unsupported Content-Encoding: " +
-                                        contentCoding);
+            String message =
+              HTTPConnection.L10N.getString("err.unsupported_content_encoding");
+            message = MessageFormat.format(message, contentCoding);
+            throw new ProtocolException(message);
           }
         response.headers.remove("Content-Encoding");
       }
@@ -596,7 +616,10 @@ public class Request
   {
     if (!authenticate(scheme, null, 0))
       {
-        throw new IOException("Unable to preauthenticate using scheme "+scheme);
+        String message =
+          HTTPConnection.L10N.getString("err.bad_preauth_scheme");
+        message = MessageFormat.format(message, scheme);
+        throw new IOException(message);
       }
   }
 

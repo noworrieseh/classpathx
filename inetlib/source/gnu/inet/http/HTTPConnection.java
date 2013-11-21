@@ -30,12 +30,16 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.AccessController;
 import java.security.GeneralSecurityException;
+import java.security.PrivilegedAction;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -46,6 +50,7 @@ import gnu.inet.http.event.ConnectionEvent;
 import gnu.inet.http.event.ConnectionListener;
 import gnu.inet.http.event.RequestEvent;
 import gnu.inet.http.event.RequestListener;
+import gnu.inet.util.GetSystemPropertyAction;
 import gnu.inet.util.EmptyX509TrustManager;
 
 /**
@@ -55,6 +60,9 @@ import gnu.inet.util.EmptyX509TrustManager;
  */
 public class HTTPConnection
 {
+
+  static final ResourceBundle L10N =
+    ResourceBundle.getBundle("gnu.inet.http.L10N");
 
   /**
    * The default HTTP port.
@@ -66,26 +74,29 @@ public class HTTPConnection
    */
   public static final int HTTPS_PORT = 443;
 
-  private static final String userAgent = initUserAgent();
-
-  private static String initUserAgent()
+  private static final String userAgent;
+  static
   {
-    try
+    String version = "inetlib/1.2";
+    String osName = (String) AccessController
+      .doPrivileged(new GetSystemPropertyAction("os.name"));
+    String osArch = (String) AccessController
+      .doPrivileged(new GetSystemPropertyAction("os.arch"));
+    String userLanguage = (String) AccessController
+      .doPrivileged(new GetSystemPropertyAction("user.language"));
+    if (osName != null && osArch != null && userLanguage != null)
       {
-        StringBuffer buf = new StringBuffer("inetlib/1.1 (");
-        buf.append(System.getProperty("os.name"));
-        buf.append("; ");
-        buf.append(System.getProperty("os.arch"));
-        buf.append("; ");
-        buf.append(System.getProperty("user.language"));
-        buf.append(")");
-        return buf.toString();
+        userAgent = MessageFormat.format("{0} ({1}; {2}; {3})", version,
+                                         osName, osArch, userLanguage);
       }
-    catch (SecurityException e)
+    else
       {
-        return "inetlib/1.1";
+        userAgent = version;
       }
   }
+
+  private static final String acceptEncoding =
+    "chunked;q=1.0, gzip;q=0.9, deflate;q=0.8, identity;q=0.6, *;q=0";
 
   /**
    * The host name of the server to connect to.
@@ -132,8 +143,8 @@ public class HTTPConnection
    */
   protected int minorVersion;
 
-  private final List connectionListeners;
-  private final List requestListeners;
+  private final List<ConnectionListener> connectionListeners;
+  private final List<RequestListener> requestListeners;
 
   /**
    * The socket this connection communicates on.
@@ -159,6 +170,15 @@ public class HTTPConnection
    * The cookie manager for this connection.
    */
   protected CookieManager cookieManager;
+
+  static final int HTTP20_UNKNOWN = 0;
+  static final int HTTP20_OK = 1;
+  static final int HTTP20_NO = -1;
+
+  /**
+   * Negotiate HTTP/2.0.
+   */
+  int http20 = HTTP20_NO; // TODO make UNKNOWN when we support
 
   /**
    * Creates a new HTTP connection.
@@ -231,8 +251,8 @@ public class HTTPConnection
     this.connectionTimeout = connectionTimeout;
     this.timeout = timeout;
     majorVersion = minorVersion = 1;
-    connectionListeners = Collections.synchronizedList(new ArrayList(4));
-    requestListeners = Collections.synchronizedList(new ArrayList(4));
+    connectionListeners = new ArrayList<ConnectionListener>(4);
+    requestListeners = new ArrayList<RequestListener>(4);
   }
 
   /**
@@ -270,23 +290,27 @@ public class HTTPConnection
 
   /**
    * Sets the HTTP version supported by this connection.
-   * @param majorVersion the major version
-   * @param minorVersion the minor version
+   * @param major the major version
+   * @param minor the minor version
    */
-  public void setVersion(int majorVersion, int minorVersion)
+  public void setVersion(int major, int minor)
   {
-    if (majorVersion != 1)
+    if ((major == 1 && minor >= 0 && minor <= 1) ||
+        (major == 2 && minor == 0))
       {
-        throw new IllegalArgumentException("major version not supported: " +
-                                           majorVersion);
+        this.majorVersion = major;
+        this.minorVersion = minor;
+        if (major == 1)
+          {
+            http20 = HTTP20_NO;
+          }
       }
-    if (minorVersion < 0 || minorVersion > 1)
+    else
       {
-        throw new IllegalArgumentException("minor version not supported: " +
-                                           minorVersion);
+        String message = L10N.getString("err.unsupported_version");
+        message = MessageFormat.format(message, major, minor);
+        throw new IllegalArgumentException(message);
       }
-    this.majorVersion = majorVersion;
-    this.minorVersion = minorVersion;
   }
 
   /**
@@ -335,27 +359,39 @@ public class HTTPConnection
   {
     if (method == null || method.length() == 0)
       {
-        throw new IllegalArgumentException("method must have non-zero length");
+        String message = L10N.getString("err.bad_method");
+        message = MessageFormat.format(message, method);
+        throw new IllegalArgumentException(message);
       }
     if (path == null || path.length() == 0)
       {
         path = "/";
       }
     Request ret = new Request(this, method, path);
-    if ((secure && port != HTTPS_PORT) ||
-        (!secure && port != HTTP_PORT))
+    switch (http20)
       {
-        ret.setHeader("Host", hostname + ":" + port);
+      case HTTP20_UNKNOWN:
+        ret.setHeader("Connection", "Upgrade, HTTP2-Settings");
+        ret.setHeader("Upgrade", "HTTP/2.0");
+        ret.setHeader("HTTP2-Settings", null);; // TODO
+        // fall through
+      case HTTP20_NO:
+        if ((secure && port != HTTPS_PORT) ||
+            (!secure && port != HTTP_PORT))
+          {
+            ret.setHeader("Host", hostname + ":" + port);
+          }
+        else
+          {
+            ret.setHeader("Host", hostname);
+          }
+        ret.setHeader("User-Agent", userAgent);
+        ret.setHeader("Accept-Encoding", acceptEncoding);
+        if (http20 == HTTP20_NO)
+          {
+            ret.setHeader("Connection", "keep-alive");
+          }
       }
-    else
-      {
-        ret.setHeader("Host", hostname);
-      }
-    ret.setHeader("User-Agent", userAgent);
-    ret.setHeader("Connection", "keep-alive");
-    ret.setHeader("Accept-Encoding",
-                  "chunked;q=1.0, gzip;q=0.9, deflate;q=0.8, " +
-                  "identity;q=0.6, *;q=0");
     if (cookieManager != null)
       {
         Cookie[] cookies = cookieManager.getCookies(hostname, secure, path);

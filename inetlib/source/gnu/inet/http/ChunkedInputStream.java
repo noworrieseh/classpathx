@@ -26,6 +26,8 @@ import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  * Input stream wrapper for the "chunked" transfer-coding.
@@ -156,7 +158,10 @@ public class ChunkedInputStream
               }
             if (c1 != 0x0d || c2 != 0x0a)
               {
-                throw new ProtocolException("expecting CRLF: " + c1 + "," + c2);
+                ResourceBundle bundle = HTTPConnection.L10N;
+                String message = bundle.getString("err.expected_crlf");
+                message = MessageFormat.format(message, c1, c2);
+                throw new ProtocolException(message);
               }
             meta = true;
           }
