@@ -284,6 +284,7 @@ $(src)/gnu/inet/util/SaslCallbackHandler.java \
 $(src)/gnu/inet/util/SaslCramMD5.java \
 $(src)/gnu/inet/util/SaslInputStream.java \
 $(src)/gnu/inet/util/SaslLogin.java \
+$(src)/gnu/inet/util/SaslNTLM.java \
 $(src)/gnu/inet/util/SaslOutputStream.java \
 $(src)/gnu/inet/util/SaslPlain.java \
 $(src)/gnu/inet/util/TraceLevel.java \
