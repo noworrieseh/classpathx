@@ -751,7 +751,8 @@ public final class IMAPMessage
   private void updateBODY(BODY body)
   {
     String section = body.getSection();
-    if (section.equals("HEADER") || section.endsWith(".HEADER"))
+    if (section != null &&
+        (section.equals("HEADER") || section.endsWith(".HEADER")))
       {
         Literal lh = body.getContents();
         InputStream in = lh.getInputStream();
