@@ -150,6 +150,8 @@ public class IMAPConnection
    */
   private int tagIndex = 0;
 
+  private List<String> capabilities = new ArrayList<String>();
+
   private static final SimpleDateFormat DATETIME_FORMAT =
     new SimpleDateFormat("'\"'dd-MMM-yyyy hh:mm:ss Z'\"'");
 
@@ -484,6 +486,7 @@ public class IMAPConnection
         else if (CAPABILITY.equals(code))
           {
             List<String> data = new ArrayList<String>();
+            this.capabilities.clear();
             while (token.type != Token.RBRACKET)
               {
                 token = requireToken(Token.ATOM |
@@ -491,7 +494,9 @@ public class IMAPConnection
                                      "err.expected_capability");
                 if (token.type == Token.ATOM)
                   {
-                    data.add(token.stringValue());
+                    String cap = token.stringValue();
+                    data.add(cap);
+                    this.capabilities.add(cap);
                   }
               }
             params.put(code, data);
@@ -659,13 +664,16 @@ public class IMAPConnection
     else if (CAPABILITY.equals(token.stringValue()))
       {
         List<String> data = new ArrayList<String>();
+        this.capabilities.clear();
         do
           {
             token = requireToken(Token.ATOM | Token.EOL,
                                  "err.expected_capability");
             if (token.type == Token.ATOM)
               {
-                data.add(toString(token));
+                String cap = token.stringValue();
+                data.add(cap);
+                this.capabilities.add(cap);
               }
           }
         while (token.type != Token.EOL);
@@ -1437,13 +1445,22 @@ public class IMAPConnection
               }
             else
               {
-                logger.log(IMAP_TRACE, mechanism + " not available");
+                String message = L10N.getString("warn.sasl_not_available");
+                message = MessageFormat.format(message, mechanism);
+                logger.log(Level.FINEST, message);
                 return false;
               }
           }
         StringBuilder buf = new StringBuilder(AUTHENTICATE)
             .append(' ')
             .append(mechanism);
+        if (capabilities.contains("SASL-IR") &&
+            sasl.hasInitialResponse()) // see RFC 4959
+          {
+            byte[] ir = BASE64.encode(sasl.evaluateChallenge(new byte[0]));
+            buf.append(' ');
+            buf.append(new String(ir, US_ASCII));
+          }
         String tag = newTag();
         sendCommand(tag, buf.toString());
         while (true)
@@ -1456,14 +1473,14 @@ public class IMAPConnection
                 in.reset();
                 try
                   {
-                    byte[] c0 = text.getBytes("US-ASCII");
+                    byte[] c0 = text.getBytes(US_ASCII);
                     byte[] c1 = BASE64.decode(c0); // challenge
                     byte[] r0 = sasl.evaluateChallenge(c1);
                     byte[] r1 = BASE64.encode(r0); // response
                     out.write(r1);
                     if (isDebug())
                       {
-                        debug(new String(r1, US_ASCII));
+                        debug("> " + new String(r1, US_ASCII));
                       }
                   }
                 catch (SaslException e)
