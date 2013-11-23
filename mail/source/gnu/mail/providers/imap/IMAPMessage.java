@@ -31,6 +31,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -80,6 +81,11 @@ public final class IMAPMessage
 {
 
   private static MailDateFormat dateFormat = new MailDateFormat();
+
+  // NB in alphabetical order to use Arrays.binarySearch
+  private static final String[] ENVELOPE_HEADERS = new String[]
+    { "bcc", "cc", "date", "from", "in-reply-to", "message-id",
+      "reply-to", "sender", "subject", "to" };
 
   static final String PLUS_FLAGS = "+FLAGS";
   static final String MINUS_FLAGS = "-FLAGS";
@@ -381,9 +387,14 @@ public final class IMAPMessage
     String[] header = super.getHeader(name);
     if (header == null && !headersComplete)
       {
+        if (envelope != null &&
+            Arrays.binarySearch(ENVELOPE_HEADERS, name.toLowerCase()) != -1)
+          {
+            return null;
+          }
         fetchHeaders();
+        header = super.getHeader(name);
       }
-    header = super.getHeader(name);
     return header;
   }
 
@@ -400,9 +411,14 @@ public final class IMAPMessage
     String header = super.getHeader(name, delimiter);
     if (header == null && !headersComplete)
       {
+        if (envelope != null &&
+            Arrays.binarySearch(ENVELOPE_HEADERS, name.toLowerCase()) != -1)
+          {
+            return null;
+          }
         fetchHeaders();
+        header = super.getHeader(name, delimiter);
       }
-    header = super.getHeader(name, delimiter);
     return header;
   }
 
@@ -603,6 +619,7 @@ public final class IMAPMessage
   void fetchHeaders()
     throws MessagingException
   {
+    new Throwable().printStackTrace();
     List<String> commands = new ArrayList<String>();
     if (section == null)
       {
