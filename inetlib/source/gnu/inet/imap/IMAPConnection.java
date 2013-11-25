@@ -681,9 +681,9 @@ public class IMAPConnection
       }
     else if (NAMESPACE.equals(token.stringValue()))
       {
-        Namespace personal = parseNamespace();
-        Namespace otherUsers = parseNamespace();
-        Namespace shared = parseNamespace();
+        List<Namespace> personal = parseNamespaces();
+        List<Namespace> otherUsers = parseNamespaces();
+        List<Namespace> shared = parseNamespaces();
         callback.namespace(personal, otherUsers, shared);
       }
     else if (ACL.equals(token.stringValue()))
@@ -1250,22 +1250,37 @@ public class IMAPConnection
     return data;
   }
 
-  private Namespace parseNamespace()
+  private List<Namespace> parseNamespaces()
     throws IOException
   {
     Token token;
-    token = requireToken(Token.NIL | Token.LPAREN,
-                         "err.expected_namespace");
+    token = requireToken(Token.NIL | Token.LPAREN, "err.expected_namespace");
     if (token.type == Token.NIL)
       {
         return null;
       }
-    token = requireToken(Token.LPAREN, "err.expected_lparen");
+    List<Namespace> ret = new ArrayList<Namespace>();
+    do
+      {
+        token = requireToken(Token.LPAREN | Token.RPAREN,
+                             "err.expected_namespace");
+        if (token.type == Token.LPAREN)
+          {
+            ret.add(parseNamespace());
+          }
+      }
+    while (token.type == Token.LPAREN);
+    return ret;
+  }
+
+  private Namespace parseNamespace()
+    throws IOException
+  {
+    Token token;
     token = requireToken(Token.STRING, "err.expected_string");
     String prefix = UTF7imap.decode(toString(token));
     token = requireToken(Token.STRING, "err.expected_string");
     String hierarchyDelimiter = toString(token);
-    token = requireToken(Token.RPAREN, "err.expected_rparen");
     token = requireToken(Token.RPAREN, "err.expected_rparen");
     return new Namespace(prefix, hierarchyDelimiter);
   }

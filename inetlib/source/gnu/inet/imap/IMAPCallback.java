@@ -138,13 +138,13 @@ public interface IMAPCallback
   
   /**
    * Notification of a namespace result.
-   * @param personal the server's Personal namespace
-   * @param otherUsers the Other Users' namespace
-   * @param shared the Shared namespace
+   * @param personal the server's Personal namespaces
+   * @param otherUsers the Other Users' namespaces
+   * @param shared the Shared namespaces
    */
-  void namespace(Namespace personal,
-                 Namespace otherUsers,
-                 Namespace shared);
+  void namespace(List<Namespace> personal,
+                 List<Namespace> otherUsers,
+                 List<Namespace> shared);
 
   /**
    * Notification of a quota.

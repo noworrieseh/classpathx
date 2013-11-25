@@ -452,17 +452,20 @@ public class IMAPStore
               {
                 processAlert(message);
               }
-              public void namespace(Namespace personal,
-                                    Namespace otherUsers,
-                                    Namespace shared)
+              public void namespace(List<Namespace> personal,
+                                    List<Namespace> otherUsers,
+                                    List<Namespace> shared)
               {
                 if (personal != null)
                   {
-                    String d = personal.getHierarchyDelimiter();
-                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
-                    acc.add(new IMAPFolder(IMAPStore.this,
-                                           personal.getPrefix(),
-                                           delimiter));
+                    for (Namespace ns : personal)
+                      {
+                        String d = ns.getHierarchyDelimiter();
+                        char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                        acc.add(new IMAPFolder(IMAPStore.this,
+                                               ns.getPrefix(),
+                                               delimiter));
+                      }
                   }
               }
             };
@@ -485,7 +488,7 @@ public class IMAPStore
    * Returns a list of folders representing other users' namespaces.
    * See RFC 2342 for details.
    */
-  public Folder[] getUserNamespaces()
+  public Folder[] getUserNamespaces(final String user)
     throws MessagingException
   {
     if (!super.isConnected())
@@ -503,17 +506,20 @@ public class IMAPStore
               {
                 processAlert(message);
               }
-              public void namespace(Namespace personal,
-                                    Namespace otherUsers,
-                                    Namespace shared)
+              public void namespace(List<Namespace> personal,
+                                    List<Namespace> otherUsers,
+                                    List<Namespace> shared)
               {
                 if (otherUsers != null)
                   {
-                    String d = otherUsers.getHierarchyDelimiter();
-                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
-                    acc.add(new IMAPFolder(IMAPStore.this,
-                                           otherUsers.getPrefix(),
-                                           delimiter));
+                    for (Namespace ns : otherUsers)
+                      {
+                        String d = ns.getHierarchyDelimiter();
+                        char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                        acc.add(new IMAPFolder(IMAPStore.this,
+                                               ns.getPrefix() + user,
+                                               delimiter));
+                      }
                   }
               }
             };
@@ -554,17 +560,20 @@ public class IMAPStore
               {
                 processAlert(message);
               }
-              public void namespace(Namespace personal,
-                                    Namespace otherUsers,
-                                    Namespace shared)
+              public void namespace(List<Namespace> personal,
+                                    List<Namespace> otherUsers,
+                                    List<Namespace> shared)
               {
                 if (shared != null)
                   {
-                    String d = shared.getHierarchyDelimiter();
-                    char delimiter = (d == null) ? '\u0000' : d.charAt(0);
-                    acc.add(new IMAPFolder(IMAPStore.this,
-                                           shared.getPrefix(),
-                                           delimiter));
+                    for (Namespace ns: shared)
+                      {
+                        String d = ns.getHierarchyDelimiter();
+                        char delimiter = (d == null) ? '\u0000' : d.charAt(0);
+                        acc.add(new IMAPFolder(IMAPStore.this,
+                                               ns.getPrefix(),
+                                               delimiter));
+                      }
                   }
               }
             };

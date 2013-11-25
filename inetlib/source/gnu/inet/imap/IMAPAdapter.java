@@ -183,9 +183,9 @@ public class IMAPAdapter
       }
   }
 
-  public void namespace(Namespace personal,
-                        Namespace otherUsers,
-                        Namespace shared)
+  public void namespace(List<Namespace> personal,
+                        List<Namespace> otherUsers,
+                        List<Namespace> shared)
   {
     if (proxy != null)
       {
