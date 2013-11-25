@@ -170,7 +170,7 @@ public final class UTF7imap
                 buffer.append('&');
                 buffer.append('-');
               }
-            else if (c < 0x1f || c > 0x7f)
+            else if (c < 0x20 || c > 0x7e || c == '"' || c == '\\')
               {
                 // needs encoding
                 if (buffer == null)
