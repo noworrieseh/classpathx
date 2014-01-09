@@ -134,6 +134,7 @@ public final class IMAPMessage
   IMAPMessage(IMAPFolder folder, int msgnum)
   {
     super(folder, msgnum);
+    flags = null;
   }
 
   /**
@@ -152,6 +153,7 @@ public final class IMAPMessage
       {
         envelope = ((BODYSTRUCTURE.MessagePart) part).getEnvelope();
       }
+    flags = null;
   }
 
   public Date getReceivedDate()
