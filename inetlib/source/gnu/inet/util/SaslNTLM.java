@@ -23,7 +23,6 @@
 package gnu.inet.util;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -50,16 +49,14 @@ public class SaslNTLM
   implements SaslClient
 {
 
-  private static final Charset OEM =
-    Charset.forName("ISO-8859-1");
-  private static final Charset UNICODE =
-    Charset.forName("UnicodeLittleUnmarked");
+  private static final String OEM ="ISO-8859-1";
+  private static final String UNICODE = "UnicodeLittleUnmarked";
 
   private static final int STATE_TYPE1MESSAGE = 0;
   private static final int STATE_TYPE3MESSAGE = 1;
   private static final int STATE_DONE = 2;
 
-  private static final byte[] NTLMSSP = "NTLMSSP".getBytes(OEM);
+  private static final byte[] NTLMSSP = getBytes("NTLMSSP", OEM);
   private static final int NTLM_MESSAGE_TYPE1 = 0x1000000;
   private static final int NTLM_MESSAGE_TYPE3 = 0x3000000;
 
@@ -181,11 +178,23 @@ public class SaslNTLM
       }
   }
 
+  private static byte[] getBytes(String text, String charset)
+  {
+    try
+      {
+        return text.getBytes(charset);
+      }
+    catch (UnsupportedEncodingException e)
+      {
+        throw (RuntimeException) new RuntimeException().initCause(e);
+      }
+  }
+
   byte[] createType1Message()
     throws GeneralSecurityException
   {
-    byte[] bdomain = domain.getBytes(OEM);
-    byte[] bhostname = hostname.getBytes(OEM);
+    byte[] bdomain = getBytes(domain, OEM);
+    byte[] bhostname = getBytes(hostname, OEM);
     int domainstart = 32;
     int hostnamestart = domainstart + bdomain.length;
     int end = hostnamestart + bhostname.length;
@@ -210,10 +219,10 @@ public class SaslNTLM
     throws GeneralSecurityException
   {
     int cflags = readNumber(32, challenge, 20);
-    Charset charset = ((cflags & FLAG_UNICODE) != 0) ? UNICODE : OEM;
+    String charset = ((cflags & FLAG_UNICODE) != 0) ? UNICODE : OEM;
     byte[] targetName = readSecurityBuffer(challenge, 12);
-    byte[] busername = username.getBytes(charset);
-    byte[] bhostname = hostname.getBytes(charset);
+    byte[] busername = getBytes(username, charset);
+    byte[] bhostname = getBytes(hostname, charset);
     // NTLM challenge itself is 8 bytes starting at offset 24
     byte[] lmresponse = response(lmhash(), challenge, 24);
     byte[] ntlmresponse = response(ntlmhash(), challenge, 24);
@@ -308,7 +317,7 @@ public class SaslNTLM
   private byte[] lmhash()
     throws GeneralSecurityException
   {
-    byte[] pw = password.toUpperCase().getBytes(OEM);
+    byte[] pw = getBytes(password.toUpperCase(), OEM);
     // pad to 14 bytes
     if (pw.length != 14)
       {
@@ -327,7 +336,7 @@ public class SaslNTLM
 
   private byte[] ntlmhash()
   {
-    byte[] pw = password.getBytes(UNICODE);
+    byte[] pw = getBytes(password, UNICODE);
     byte[] hash = md4.digest(pw);
     byte[] ret = new byte[21];
     System.arraycopy(hash, 0, ret, 0, 16);
