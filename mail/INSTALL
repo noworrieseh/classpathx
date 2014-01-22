@@ -23,6 +23,9 @@ configuration options to specify your own locations. At runtime, you will
 need to reference these libraries in your classpath along with the JavaMail
 jarfiles.
 
+Java 1.5 or later is required. gcj version 4.1.2 does not support Java 5
+language constructs and it snot supported.
+
 
 Configuration
 

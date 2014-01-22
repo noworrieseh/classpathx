@@ -19,6 +19,9 @@ these classes. GNU Classpath's glibj.zip contains implementations of all
 the required classes. Note that the classes will need to be available in
 your classpath at runtime.
 
+Java 1.5 or later is required. gcj version 4.1.2 does not support Java 5
+language constructs and it snot supported.
+
 
 Configuration
 
