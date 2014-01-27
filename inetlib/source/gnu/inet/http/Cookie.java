@@ -1,7 +1,7 @@
 /*
  * Cookie.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -121,7 +121,7 @@ public class Cookie
   {
     return toString(true, true);
   }
-  
+
   public String toString(boolean showPath, boolean showDomain)
   {
     StringBuffer buf = new StringBuffer();

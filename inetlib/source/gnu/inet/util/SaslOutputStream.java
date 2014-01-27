@@ -1,7 +1,7 @@
 /*
  * SaslOutputStream.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -70,7 +70,7 @@ public class SaslOutputStream
   {
     write(bytes, 0, bytes.length);
   }
-  
+
   /**
    * Block write.
    */
@@ -80,6 +80,6 @@ public class SaslOutputStream
     byte[] wrapped = sasl.wrap(bytes, off, len);
     super.write(wrapped, 0, wrapped.length);
   }
-  
+
 }
 

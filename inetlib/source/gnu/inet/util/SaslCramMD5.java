@@ -1,7 +1,7 @@
 /*
  * SaslCramMD5.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -158,6 +158,6 @@ public class SaslCramMD5
     digest = md5.digest();
     return digest;
   }
-  
+
 }
 

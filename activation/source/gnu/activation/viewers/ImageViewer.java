@@ -1,7 +1,7 @@
 /*
  * ImageViewer.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -113,7 +113,7 @@ public class ImageViewer extends Component
         if (is.width > -1 && is.height > -1)
           {
             Dimension cs = getSize();
-            g.drawImage(image, 0, 0, cs.width, cs.height, 
+            g.drawImage(image, 0, 0, cs.width, cs.height,
                         0, 0, is.width, is.height, this);
           }
       }

@@ -1,7 +1,7 @@
 /*
  * CommandInfo.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -38,7 +38,7 @@ public class CommandInfo
 
   private String verb;
   private String className;
-  
+
   /**
    * Constructor.
    * @param verb the command verb
@@ -49,7 +49,7 @@ public class CommandInfo
     this.verb = verb;
     this.className = className;
   }
-  
+
   /**
    * Returns the command verb.
    */
@@ -57,7 +57,7 @@ public class CommandInfo
   {
     return verb;
   }
-  
+
   /**
    * Returns the command class name.
    */
@@ -65,7 +65,7 @@ public class CommandInfo
   {
     return className;
   }
-  
+
   /**
    * Returns the instantiated bean.
    * If the bean implements <code>CommandObject</code>, its
@@ -96,6 +96,6 @@ public class CommandInfo
       }
     return object;
   }
-  
+
 }
 

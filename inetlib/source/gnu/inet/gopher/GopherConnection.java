@@ -1,7 +1,7 @@
 /*
  * GopherConnection.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -57,7 +57,7 @@ public class GopherConnection
   {
     this(host, DEFAULT_PORT);
   }
-  
+
   /**
    * Creates a new connection to the gopher server at the specified
    * hostname with the specified non-standard port.
@@ -71,12 +71,12 @@ public class GopherConnection
       {
         port = DEFAULT_PORT;
       }
-    
+
     socket = new Socket(host, port);
     in = socket.getInputStream();
     out = socket.getOutputStream();
   }
-  
+
   /**
    * Returns the directory listing for this gopher server.
    * When all entries have been read from the listing, the connection will
@@ -92,7 +92,7 @@ public class GopherConnection
     listStream = new MessageInputStream(listStream);
     return new DirectoryListing(listStream);
   }
-  
+
   /**
    * Returns the resource identified by the specified selector.
    * If the resource is text-based, it will need to be wrapped in a

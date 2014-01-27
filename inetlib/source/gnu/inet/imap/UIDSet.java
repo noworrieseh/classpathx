@@ -1,7 +1,7 @@
 /*
  * UIDSet.java
  * Copyright (C) 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -379,7 +379,7 @@ public class UIDSet
 
       private long index;
       private long end;
-      
+
       RangeIterator(long start, long end) {
         index = start;
         this.end = end;

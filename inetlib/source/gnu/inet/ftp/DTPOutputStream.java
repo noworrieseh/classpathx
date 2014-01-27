@@ -1,7 +1,7 @@
 /*
  * DTPOutputStream.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -49,7 +49,7 @@ abstract class DTPOutputStream
     this.dtp = dtp;
     transferComplete = false;
   }
-  
+
   /**
    * Tells this stream whether transfer has completed or not.
    * @param flag true if the process has completed, false otherwise
@@ -58,7 +58,7 @@ abstract class DTPOutputStream
   {
     transferComplete = flag;
   }
-  
+
   /**
    * Notifies the controlling DTP that this stream has been terminated.
    */

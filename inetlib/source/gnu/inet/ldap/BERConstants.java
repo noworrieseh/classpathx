@@ -1,7 +1,7 @@
 /*
  * BERConstants.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -65,5 +65,5 @@ public interface BERConstants
   public static final int FILTER_LESS = 0xa6;
   public static final int FILTER_APPROX = 0xa8;
   public static final int FILTER_EXTENSIBLE = 0xa9;
-  
+
 }

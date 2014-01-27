@@ -1,7 +1,7 @@
 /*
  * UnsupportedDataTypeException.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -39,7 +39,7 @@ public class UnsupportedDataTypeException extends IOException
   public UnsupportedDataTypeException()
   {
   }
-  
+
   /**
    * Constructs an UnsupportedDataTypeException with the specified detail
    * message.
@@ -49,6 +49,6 @@ public class UnsupportedDataTypeException extends IOException
   {
     super(message);
   }
-  
+
 }
 

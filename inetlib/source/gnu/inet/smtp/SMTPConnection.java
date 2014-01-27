@@ -1,7 +1,7 @@
 /*
  * SMTPConnection.java
  * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -187,7 +187,7 @@ public class SMTPConnection
   {
     this(host, port, connectionTimeout, timeout, false, null);
   }
-  
+
   /**
    * Creates a new connection to the specified host, using the specified
    * port.
@@ -256,7 +256,7 @@ public class SMTPConnection
         e2.initCause(e);
         throw e2;
       }
-    
+
     // Initialise streams
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
@@ -265,7 +265,7 @@ public class SMTPConnection
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new SMTPOutputStream(os);
-    
+
     // Greeting
     StringBuffer greetingBuffer = new StringBuffer();
     boolean notFirst = false;
@@ -284,12 +284,12 @@ public class SMTPConnection
             notFirst = true;
           }
         greetingBuffer.append(response);
-        
+
       }
     while (continuation);
     greeting = greetingBuffer.toString();
   }
-  
+
   boolean isDebug()
   {
     return logger.getLevel() == SMTP_TRACE;
@@ -644,7 +644,7 @@ public class SMTPConnection
   {
     return starttls(new EmptyX509TrustManager());
   }
-  
+
   /**
    * Negotiate TLS over the current connection.
    * This depends on many features, such as the JSSE classes being in the
@@ -657,13 +657,13 @@ public class SMTPConnection
     try
       {
         SSLSocketFactory factory = getSSLSocketFactory(tm);
-        
+
         send(STARTTLS);
         if (getAllResponses() != READY)
           {
             return false;
           }
-        
+
         String hostname = socket.getInetAddress().getHostName();
         int port = socket.getPort();
         SSLSocket ss =
@@ -672,7 +672,7 @@ public class SMTPConnection
         ss.setEnabledProtocols(protocols);
         ss.setUseClientMode(true);
         ss.startHandshake();
-        
+
         // Set up streams
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
@@ -735,7 +735,7 @@ public class SMTPConnection
                 return false;
               }
           }
-        
+
         StringBuffer cmd = new StringBuffer(AUTH);
         cmd.append(' ');
         cmd.append(mechanism);
@@ -838,7 +838,7 @@ public class SMTPConnection
     out.write(0x0d);
     out.flush();
   }
-  
+
   /**
    * Returns the next response from the server.
    */

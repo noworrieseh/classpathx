@@ -1,7 +1,7 @@
 /*
  * Headers.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -81,7 +81,7 @@ public class Headers
     {
       return name;
     }
-    
+
   }
 
   static class HeaderEntry
@@ -124,7 +124,7 @@ public class Headers
     {
       return getKey().toString() + "=" + getValue();
     }
-    
+
   }
 
   private LinkedHashMap headers;
@@ -228,7 +228,7 @@ public class Headers
         headers.put(new Header(key), value);
       }
   }
-  
+
   public void clear()
   {
     headers.clear();
@@ -280,7 +280,7 @@ public class Headers
   {
     LineInputStream lin = (in instanceof LineInputStream) ?
       (LineInputStream) in : new LineInputStream(in);
-    
+
     String name = null;
     StringBuffer value = new StringBuffer();
     while (true)
@@ -315,7 +315,7 @@ public class Headers
               {
                 addValue(name, value.toString());
               }
-            
+
             int di = line.indexOf(':');
             name = line.substring(0, di);
             value.setLength(0);
@@ -328,7 +328,7 @@ public class Headers
           }
       }
   }
-  
+
   private void addValue(String name, String value)
   {
     Header key = new Header(name);
@@ -342,6 +342,6 @@ public class Headers
         headers.put(key, old + ", " + value);
       }
   }
-  
+
 }
 

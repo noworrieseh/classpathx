@@ -1,7 +1,7 @@
 /*
  * CRLFOutputStream.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-/** 
+/**
  * An output stream that filters LFs into CR/LF pairs.
  *
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
@@ -90,7 +90,7 @@ public class CRLFOutputStream
       }
     last = ch;
   }
-  
+
   /**
    * Writes a byte array to the underlying stream.
    * @exception IOException if an I/O error occurred
@@ -135,7 +135,7 @@ public class CRLFOutputStream
         out.write (b, d, len - d);
       }
   }
-  
+
   /**
    * Writes the specified ASCII string to the underlying stream.
    * @exception IOException if an I/O error occurred

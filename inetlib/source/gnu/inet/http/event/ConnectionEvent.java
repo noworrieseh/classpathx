@@ -1,7 +1,7 @@
 /*
  * ConnectionEvent.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -37,7 +37,7 @@ public class ConnectionEvent
    * The connection closed event type.
    */
   public static final int CONNECTION_CLOSED = 0;
-  
+
   /**
    * The type of this event.
    */
@@ -60,6 +60,6 @@ public class ConnectionEvent
   {
     return type;
   }
-  
+
 }
 

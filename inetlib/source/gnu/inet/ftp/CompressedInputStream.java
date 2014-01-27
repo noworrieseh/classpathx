@@ -1,7 +1,7 @@
 /*
  * CompressedInputStream.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -117,13 +117,13 @@ class CompressedInputStream
     n--;
     return c;
   }
-  
+
   public int read(byte[] buf)
     throws IOException
   {
     return read(buf, 0, buf.length);
   }
-  
+
   public int read(byte[] buf, int off, int len)
     throws IOException
   {
@@ -170,7 +170,7 @@ class CompressedInputStream
        return l;
      */
   }
-  
+
   /**
    * Reads the block header.
    */

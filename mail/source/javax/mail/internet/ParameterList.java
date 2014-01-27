@@ -453,7 +453,7 @@ public class ParameterList
                         vb.append(Character.forDigit((c >> 4) & 0xf, 16));
                         vb.append(Character.forDigit(c & 0xf, 16));
                       }
-                    else 
+                    else
                       {
                         vb.append(c);
                       }

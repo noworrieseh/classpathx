@@ -1,7 +1,7 @@
 /*
  * LineInputStream.java
  * Copyright (C) 2002,2006 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -118,7 +118,7 @@ public class LineInputStream
             // Use mark and reset to read chunks of bytes
             final int MIN_LENGTH = 1024;
             int len, pos;
-            
+
             len = in.available();
             len = (len < MIN_LENGTH) ? MIN_LENGTH : len;
             byte[] b = new byte[len];

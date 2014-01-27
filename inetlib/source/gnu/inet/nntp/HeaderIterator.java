@@ -1,7 +1,7 @@
 /*
  * HeaderIterator.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -39,7 +39,7 @@ public class HeaderIterator
   {
     super(connection);
   }
-  
+
   /**
    * Returns the next header entry.
    */
@@ -54,7 +54,7 @@ public class HeaderIterator
         throw new NoSuchElementException("I/O error: " + e.getMessage());
       }
   }
-  
+
   /**
    * Returns the next header entry.
    */
@@ -71,7 +71,7 @@ public class HeaderIterator
         String articleId = line.substring(start, end);
         start = end + 1;
         String header = line.substring(start);
-        
+
         return new HeaderEntry(articleId, header);
       }
     catch (StringIndexOutOfBoundsException e)

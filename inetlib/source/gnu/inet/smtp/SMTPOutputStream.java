@@ -1,7 +1,7 @@
 /*
  * SMTPOutputStream.java
  * Copyright (C) 2013 Chris Burdess <dog@gnu.org>
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -32,7 +32,7 @@ import gnu.inet.util.CRLFOutputStream;
  */
 class SMTPOutputStream extends CRLFOutputStream
 {
-    
+
     private byte last = '\n';
 
     SMTPOutputStream(OutputStream out)

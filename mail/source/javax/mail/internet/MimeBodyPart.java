@@ -1194,7 +1194,7 @@ public class MimeBodyPart
       this.contentType = contentType;
       this.encoding = encoding;
     }
-    
+
     EncodedFileDataSource(String name, String contentType, String encoding)
     {
       super(name);

@@ -1,7 +1,7 @@
 /*
  * CompressedOutputStream.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -42,7 +42,7 @@ class CompressedOutputStream
   {
     super(dtp, out);
   }
-  
+
   /**
    * Just one byte cannot be compressed.
    * It takes 5 bytes to transmit - hardly very compressed!
@@ -175,7 +175,7 @@ class CompressedOutputStream
     System.arraycopy(buf, 0, ret, 3, pos);
     return ret;
   }
-  
+
   int flush_compressed(byte[] buf, int pos, int count, byte c)
   {
     buf[pos++] = (byte) (0x80 | count);

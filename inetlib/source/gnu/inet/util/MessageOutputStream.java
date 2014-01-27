@@ -1,7 +1,7 @@
 /*
  * MessageOutputStream.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -73,7 +73,7 @@ public class MessageOutputStream
     last[0] = last[1];
     last[1] = c;
   }
-  
+
   public void write(byte[] bytes)
     throws IOException
   {

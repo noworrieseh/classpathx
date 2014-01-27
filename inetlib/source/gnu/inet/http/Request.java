@@ -1,7 +1,7 @@
 /*
  * Request.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -311,7 +311,7 @@ public class Request
             setHeader("Content-Length", Long.toString(contentLength));
           }
       }
-    
+
     try
       {
         // Loop while authentication fails or continue
@@ -320,7 +320,7 @@ public class Request
             retry = false;
             // Send request
             connection.fireRequestEvent(RequestEvent.REQUEST_SENDING, this);
-            
+
             // Get socket output and input streams
             OutputStream out = connection.getOutputStream();
             LineInputStream in =
@@ -351,7 +351,7 @@ public class Request
                 byte[] buffer = new byte[4096];
                 int len;
                 long count = 0L;
-                
+
                 requestBodyWriter.reset();
                 do
                   {
@@ -395,13 +395,13 @@ public class Request
       }
     return response;
   }
-    
+
   Response readResponse(LineInputStream in)
     throws IOException
   {
     String line;
     int len;
-    
+
     // Read response status line
     line = in.readLine();
     if (line == null)
@@ -504,13 +504,13 @@ public class Request
     byte[] buffer = new byte[4096];
     int contentLength = -1;
     Headers trailer = null;
-    
+
     String transferCoding = response.getHeader("Transfer-Encoding");
     if ("chunked".equalsIgnoreCase(transferCoding))
       {
         trailer = new Headers();
         in = new ChunkedInputStream(in, trailer);
-      } 
+      }
     else
       {
         contentLength = response.getIntHeader("Content-Length");
@@ -535,14 +535,14 @@ public class Request
           }
         response.headers.remove("Content-Encoding");
       }
-    
+
     // Persistent connections are the default in HTTP/1.1
     boolean doClose = "close".equalsIgnoreCase(getHeader("Connection")) ||
       "close".equalsIgnoreCase(response.getHeader("Connection")) ||
       (connection.majorVersion == 1 && connection.minorVersion == 0) ||
       (response.majorVersion == 1 && response.minorVersion == 0) ||
       contentLength == -1;
-    
+
     if (contentLength == 0)
       {
         if (doClose)
@@ -653,7 +653,7 @@ public class Request
           {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             final byte[] COLON = { 0x3a };
-            
+
             // Calculate H(A1)
             md5.reset();
             md5.update(username.getBytes("US-ASCII"));
@@ -674,7 +674,7 @@ public class Request
                 ha1 = md5.digest();
               }
             String ha1Hex = toHexString(ha1);
-            
+
             // Calculate H(A2)
             md5.reset();
             md5.update(method.getBytes("US-ASCII"));
@@ -688,7 +688,7 @@ public class Request
               }
             byte[] ha2 = md5.digest();
             String ha2Hex = toHexString(ha2);
-            
+
             // Calculate response
             md5.reset();
             md5.update(ha1Hex.getBytes("US-ASCII"));
@@ -708,8 +708,8 @@ public class Request
             md5.update(COLON);
             md5.update(ha2Hex.getBytes("US-ASCII"));
             String digestResponse = toHexString(md5.digest());
-            
-            String authorization = scheme + 
+
+            String authorization = scheme +
               " username=\"" + username + "\"" +
               " realm=\"" + realm + "\"" +
               " nonce=\"" + nonceParam + "\"" +
@@ -798,7 +798,7 @@ public class Request
             buf.setLength(0);
           }
         else if (c != ',' || (i <(len - 1) && text.charAt(i + 1) != ' '))
-          {   
+          {
             buf.append(c);
           }
       }

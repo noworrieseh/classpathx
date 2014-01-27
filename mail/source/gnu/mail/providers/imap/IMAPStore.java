@@ -735,7 +735,7 @@ public class IMAPStore
   {
 
     private List<String> capabilities;
-    
+
     DefaultAdapter(List<String> capabilities)
     {
       this.capabilities = capabilities;
@@ -745,7 +745,7 @@ public class IMAPStore
     {
       processAlert(message);
     }
-    
+
     public void capability(List<String> caps)
     {
       if (capabilities != null)

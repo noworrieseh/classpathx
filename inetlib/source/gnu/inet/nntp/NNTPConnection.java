@@ -1,7 +1,7 @@
 /*
  * NNTPConnection.java
  * Copyright (C) 2002, 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -82,7 +82,7 @@ public class NNTPConnection
    * The default NNTP port.
    */
   public static final int DEFAULT_PORT = 119;
-  
+
   /**
    * The default NNTPS port
    */
@@ -161,7 +161,7 @@ public class NNTPConnection
   {
     this(hostname, port, 0, 0, false, null);
   }
-  
+
   /**
    * Creates a new secure connection using the specified trust manager.
    * @param host the name of the host to connect to
@@ -174,7 +174,7 @@ public class NNTPConnection
   {
     this(host, port, 0, 0, true, tm);
   }
-  
+
   /**
    * Creates a new connection object.
    * @param hostname the hostname or IP address of the news server
@@ -217,7 +217,7 @@ public class NNTPConnection
    */
   private void connect()
     throws IOException
-  {  
+  {
     // Set up the socket and streams
     try
       {
@@ -257,7 +257,7 @@ public class NNTPConnection
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
-  
+
     // Read the welcome message(RFC977:2.4.3)
     StatusResponse response = parseResponse(read());
     switch (response.status)
@@ -304,7 +304,7 @@ public class NNTPConnection
     context.init(null, trust, null);
     return context.getSocketFactory();
   }
-  
+
   /**
    * Returns the logger used by this connection for debug output.
    */
@@ -323,7 +323,7 @@ public class NNTPConnection
   {
     return starttls(new EmptyX509TrustManager());
   }
-  
+
   /**
    * This command performs a TLS negotiation.
    * See RFC 4642 for details.
@@ -381,8 +381,8 @@ public class NNTPConnection
         return false;
       }
   }
-  
-  
+
+
   /**
    * Return the welcome message sent by the server in reply to the initial
    * connection.
@@ -393,7 +393,7 @@ public class NNTPConnection
   {
     return welcome;
   }
-  
+
   /*
    * Returns an NNTP-format date string.
    * This is only required when clients use the NEWGROUPS or NEWNEWS
@@ -434,7 +434,7 @@ public class NNTPConnection
   {
     return articleImpl(ARTICLE, Integer.toString(articleNumber));
   }
-  
+
   /**
    * Send an article retrieval request to the server.
    * @param messageId the message-id of the article to retrieve
@@ -562,7 +562,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC977:3.2 The GROUP command
 
   /**
@@ -606,7 +606,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC977:3.4 The IHAVE command
 
   /**
@@ -657,7 +657,7 @@ public class NNTPConnection
   {
     return listImpl(LIST);
   }
-  
+
   GroupIterator listImpl(String command)
     throws IOException
   {
@@ -680,7 +680,7 @@ public class NNTPConnection
    * Returns an iterator over the list of new groups on the server since the
    * specified date.
    * NB this method suffers from a minor millenium bug.
-   * 
+   *
    * @param since the date from which to list new groups
    * @param distributions if non-null, an array of distributions to match
    */
@@ -714,7 +714,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC977:3.8 The NEWNEWS command
 
   /**
@@ -759,7 +759,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC977:3.9 The NEXT command
 
   /**
@@ -798,7 +798,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   /**
    * Indicates that the client has finished writing all the bytes of the
    * article.
@@ -843,7 +843,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC977:3.12 The SLAVE command
 
   /**
@@ -862,7 +862,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:1.1 The CHECK command
 
   public boolean check(String messageId)
@@ -911,7 +911,7 @@ public class NNTPConnection
         return false;
       }
   }
-  
+
   // RFC2980:1.3 The TAKETHIS command
 
   /**
@@ -950,7 +950,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:1.4 The XREPLIC command
 
   // TODO
@@ -975,7 +975,7 @@ public class NNTPConnection
       }
     return listImpl(buffer.toString());
   }
-  
+
   // RFC2980:2.1.3 The LIST ACTIVE.TIMES command
 
   /**
@@ -1059,7 +1059,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:2.1.8 The LIST SUBSCRIPTIONS command
 
   /**
@@ -1124,7 +1124,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:2.4 The XGTITLE command
 
   /**
@@ -1152,7 +1152,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:2.6 The XHDR command
 
   public HeaderIterator xhdr(String header, String range)
@@ -1210,7 +1210,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:2.9 The XPAT command
 
   // TODO
@@ -1301,7 +1301,7 @@ public class NNTPConnection
         throw new NNTPException(response);
       }
   }
-  
+
   // RFC2980:3.1.3 AUTHINFO GENERIC
 
   /**
@@ -1330,7 +1330,7 @@ public class NNTPConnection
       {
         return false;
       }
-    
+
     StringBuffer cmd = new StringBuffer(AUTHINFO_GENERIC);
     cmd.append(' ');
     cmd.append(mechanism);
@@ -1370,7 +1370,7 @@ public class NNTPConnection
         // FIXME how does the server send continuations?
       }
   }
-  
+
   // RFC2980:3.2 The DATE command
 
   /**
@@ -1409,7 +1409,7 @@ public class NNTPConnection
   {
     return parseResponse(line, false);
   }
-  
+
   /**
    * Parse a response object from a response line sent by the server.
    * @param isListGroup whether we are invoking the LISTGROUP command
@@ -1535,7 +1535,7 @@ public class NNTPConnection
       }
     return response;
   }
-  
+
   /**
    * Send a single line to the server.
    * @param line the line to send
@@ -1562,7 +1562,7 @@ public class NNTPConnection
     out.writeln();
     out.flush();
   }
-  
+
   /**
    * Read a single line from the server.
    * @return a line of text
@@ -1588,6 +1588,6 @@ public class NNTPConnection
       }
     return line;
   }
-  
+
 }
 

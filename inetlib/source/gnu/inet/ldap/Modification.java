@@ -1,7 +1,7 @@
 /*
  * Modification.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * An individual modification of an object's attributes.
- * 
+ *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  */
 public final class Modification
@@ -43,7 +43,7 @@ public final class Modification
    * Delete the specified values from the given attribute, removing the
    * entire attribute if no values are listed, or if all current values of
    * the attribute are listed.
-   */ 
+   */
   public static final int DELETE = 1;
 
   /**

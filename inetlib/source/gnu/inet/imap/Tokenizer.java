@@ -1,7 +1,7 @@
 /*
  * Tokenizer.java
  * Copyright (C) 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -51,7 +51,7 @@ class Tokenizer
 
   private static final LiteralFactory DEFAULT_FACTORY =
     new DefaultLiteralFactory();
-  
+
   private int state;
   private InputStream in;
   private IMAPConnection connection;

@@ -1,7 +1,7 @@
 /*
  * LDAPConnection.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -108,11 +108,11 @@ public class LDAPConnection
   protected String host;
   protected int port;
   protected int version; // 2 or 3
-  
+
   private Socket socket;
   private InputStream in;
   private OutputStream out;
-  
+
   private int messageId;
   private Map asyncResponses;
 
@@ -749,6 +749,6 @@ public class LDAPConnection
       }
     return ret & 0xff;
   }
-  
+
 }
 

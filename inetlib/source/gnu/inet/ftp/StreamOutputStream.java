@@ -1,7 +1,7 @@
 /*
  * StreamOutputStream.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -39,7 +39,7 @@ class StreamOutputStream
   {
     super(dtp, out);
   }
-  
+
   public void write(int c)
     throws IOException
   {
@@ -55,7 +55,7 @@ class StreamOutputStream
   {
     write(b, 0, b.length);
   }
-  
+
   public void write(byte[] b, int off, int len)
     throws IOException
   {
@@ -65,6 +65,6 @@ class StreamOutputStream
       }
     out.write(b, off, len);
   }
-  
+
 }
 

@@ -41,7 +41,7 @@ public class AuthenticationFailedException
   {
     super(message);
   }
-  
+
   /**
    * @since JavaMail 1.5
    */

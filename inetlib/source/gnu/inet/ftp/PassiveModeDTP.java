@@ -1,7 +1,7 @@
 /*
  * PassiveModeDTP.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -102,7 +102,7 @@ final class PassiveModeDTP
     in.setTransferComplete(false);
     return in;
   }
-  
+
   /**
    * Returns an output stream to which a local file can be written for
    * upload.
@@ -131,12 +131,12 @@ final class PassiveModeDTP
     out.setTransferComplete(false);
     return out;
   }
-  
+
   public void setTransferMode(int mode)
   {
     transferMode = mode;
   }
-  
+
   public void complete()
   {
     completed = true;

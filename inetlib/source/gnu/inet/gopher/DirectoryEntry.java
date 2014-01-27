@@ -1,7 +1,7 @@
 /*
  * DirectoryEntry.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -128,7 +128,7 @@ public final class DirectoryEntry
   {
     return type;
   }
-  
+
   /**
    * Returns the title for this entry.
    */
@@ -136,7 +136,7 @@ public final class DirectoryEntry
   {
     return title;
   }
-  
+
   /**
    * Returns the selector for this entry.
    * This is used to retrieve the content for the entry.
@@ -145,7 +145,7 @@ public final class DirectoryEntry
   {
     return selector;
   }
-  
+
   /**
    * Returns the hostname for the content of this entry.
    */
@@ -153,7 +153,7 @@ public final class DirectoryEntry
   {
     return hostname;
   }
-  
+
   /**
    * Returns the port on which the content for this entry can be retrieved.
    */
@@ -161,6 +161,6 @@ public final class DirectoryEntry
   {
     return port;
   }
-  
+
 }
 

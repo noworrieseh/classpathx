@@ -1,7 +1,7 @@
 /*
  * FingerURLConnection.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -67,6 +67,6 @@ class FingerURLConnection
     byte[] bytes = response.getBytes("US-ASCII");
     return new ByteArrayInputStream(bytes);
   }
-  
+
 }
 

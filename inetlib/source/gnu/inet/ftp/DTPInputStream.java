@@ -1,7 +1,7 @@
 /*
  * DTPInputStream.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -58,7 +58,7 @@ abstract class DTPInputStream
   {
     transferComplete = flag;
   }
-  
+
   /**
    * Notifies the controlling DTP that this stream has completed transfer.
    */

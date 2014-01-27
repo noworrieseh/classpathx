@@ -1388,7 +1388,7 @@ public class IMAPFolder
         };
         UIDSet uids = new UIDSet();
         for (long i = start; i <= end; i++)
-          { 
+          {
             uids.add(i);
           }
         connection.uidFetch(uids, cmds, adapter);

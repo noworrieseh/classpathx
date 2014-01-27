@@ -1,7 +1,7 @@
 /*
  * ByteArrayResponseBodyReader.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -53,7 +53,7 @@ public class ByteArrayResponseBodyReader
   {
     this(4096);
   }
-  
+
   /**
    * Constructs a new byte array response body reader with the specified
    * initial buffer size.
@@ -67,7 +67,7 @@ public class ByteArrayResponseBodyReader
 
   /**
    * This reader accepts all responses.
-   */ 
+   */
   public boolean accept(Request request, Response response)
   {
     return true;
@@ -102,6 +102,6 @@ public class ByteArrayResponseBodyReader
     System.arraycopy(content, 0, ret, 0, len);
     return ret;
   }
-  
+
 }
 

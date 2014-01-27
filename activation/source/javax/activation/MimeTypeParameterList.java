@@ -1,7 +1,7 @@
 /*
  * MimeTypeParameterList.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -38,10 +38,10 @@ public class MimeTypeParameterList
 {
 
   private static final String TSPECIALS = "()<>@,;:/[]?=\\\"";
-  
+
   private List parameterNames;
   private Map parameterValues;
-  
+
   /**
    * Constructor for an empty parameter list.
    */
@@ -107,7 +107,7 @@ public class MimeTypeParameterList
       {
         params.add(param);
       }
-    
+
     // Tokenize each parameter into name + value
     for (Iterator i = params.iterator(); i.hasNext(); )
       {
@@ -132,12 +132,12 @@ public class MimeTypeParameterList
           {
             MimeType.checkValidity(name, "Parameter value is invalid");
           }
-        
+
         parameterNames.add(name);
         parameterValues.put(name.toLowerCase(), value);
       }
   }
-  
+
   /**
    * Returns the number of parameters.
    */
@@ -145,7 +145,7 @@ public class MimeTypeParameterList
   {
     return parameterNames.size();
   }
-  
+
   /**
    * Indicates if there are no parameters.
    */
@@ -163,7 +163,7 @@ public class MimeTypeParameterList
     name = name.trim();
     return (String) parameterValues.get(name.toLowerCase());
   }
-  
+
   /**
    * Sets the value for the specified parameter name.
    * @param name the parameter name
@@ -187,7 +187,7 @@ public class MimeTypeParameterList
       }
     parameterValues.put(name.toLowerCase(), value);
   }
-  
+
   /**
    * Removes the parameter identified by the specified name.
    * @param name the parameter name
@@ -205,7 +205,7 @@ public class MimeTypeParameterList
       }
     parameterValues.remove(name.toLowerCase());
   }
-  
+
   /**
    * Returns an enumeration of all the parameter names.
    */
@@ -213,7 +213,7 @@ public class MimeTypeParameterList
   {
     return new IteratorEnumeration(parameterNames.iterator());
   }
-  
+
   /**
    * Returns an RFC 2045-compliant string representation of this parameter
    * list.
@@ -225,7 +225,7 @@ public class MimeTypeParameterList
       {
         String name = (String)i.next();
         String value = (String)parameterValues.get(name.toLowerCase());
-        
+
         buffer.append(';');
         buffer.append(' ');
         buffer.append(name);
@@ -234,7 +234,7 @@ public class MimeTypeParameterList
       }
     return buffer.toString();
   }
-  
+
   private static String quote(String value)
   {
     boolean needsQuoting = false;
@@ -247,7 +247,7 @@ public class MimeTypeParameterList
             break;
           }
       }
-    
+
     if (needsQuoting)
       {
         StringBuffer buffer = new StringBuffer();
@@ -266,7 +266,7 @@ public class MimeTypeParameterList
       }
     return value;
   }
-  
+
   private static String unquote(String value)
   {
     int len = value.length();
@@ -290,32 +290,32 @@ public class MimeTypeParameterList
       }
     return buffer.toString();
   }
-  
+
   /**
    * Enumeration proxy for an Iterator.
    */
   static class IteratorEnumeration
     implements Enumeration
   {
-    
+
     final Iterator iterator;
-    
+
     IteratorEnumeration(Iterator iterator)
     {
       this.iterator = iterator;
     }
-    
+
     public boolean hasMoreElements()
     {
       return iterator.hasNext();
     }
-    
+
     public Object nextElement()
     {
       return iterator.next();
     }
-    
+
   }
-  
+
 }
 

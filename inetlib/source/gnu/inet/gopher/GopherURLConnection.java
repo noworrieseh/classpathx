@@ -1,7 +1,7 @@
 /*
  * GopherURLConnection.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -51,7 +51,7 @@ public class GopherURLConnection
   {
     super(url);
   }
-  
+
   /**
    * Establishes the connection.
    */
@@ -66,7 +66,7 @@ public class GopherURLConnection
     int port = url.getPort();
     connection = new GopherConnection(host, port);
   }
-  
+
   /**
    * Returns an input stream that reads from this open connection.
    */

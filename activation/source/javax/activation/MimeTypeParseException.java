@@ -1,7 +1,7 @@
 /*
  * MimeTypeParseException.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -37,7 +37,7 @@ public class MimeTypeParseException
   public MimeTypeParseException()
   {
   }
-  
+
   /**
    * MimeTypeParseException with the specified detail message.
    * @param message the exception message

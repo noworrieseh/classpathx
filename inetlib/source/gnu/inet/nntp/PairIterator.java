@@ -1,7 +1,7 @@
 /*
  * PairIterator.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -54,7 +54,7 @@ public class PairIterator
         throw new NoSuchElementException("I/O error: " + e.getMessage());
       }
   }
-  
+
   /**
    * Returns the next pair.
    */
@@ -71,7 +71,7 @@ public class PairIterator
         String key = line.substring(start, end);
         start = end + 1;
         String value = line.substring(start);
-        
+
         return new Pair(key, value);
       }
     catch (StringIndexOutOfBoundsException e)

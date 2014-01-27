@@ -1,7 +1,7 @@
 /*
  * BERDecoder.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -212,7 +212,7 @@ public class BERDecoder
   {
     return parseSequence(BERConstants.SEQUENCE);
   }
-  
+
   public BERDecoder parseSequence(int code)
     throws BERException
   {
@@ -230,7 +230,7 @@ public class BERDecoder
     control = true;
     return new BERDecoder(ret, utf8);
   }
-  
+
   public BERDecoder parseSet()
     throws BERException
   {
@@ -270,7 +270,7 @@ public class BERDecoder
         for (int i = 0; i < depth; i++)
           {
             System.out.print('\t');
-          } 
+          }
         switch (t)
           {
           case BERConstants.BOOLEAN:
@@ -294,7 +294,7 @@ public class BERDecoder
                                 Integer.toHexString(t) + "): " +
                                 decoder.getLength());
             BERDecoder sequence = decoder.parseSequence(t);
-            debug(sequence, depth + 1);            
+            debug(sequence, depth + 1);
             break;
           }
       }
@@ -311,5 +311,5 @@ public class BERDecoder
         return bytes.toString();
       }
   }
-  
+
 }

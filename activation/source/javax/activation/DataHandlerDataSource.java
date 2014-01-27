@@ -1,7 +1,7 @@
 /*
  * DataHandler.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -36,28 +36,28 @@ final class DataHandlerDataSource
 {
 
   final DataHandler dh;
-  
+
   DataHandlerDataSource(DataHandler dh)
   {
     this.dh = dh;
   }
-  
+
   public String getContentType()
   {
     return dh.getContentType();
   }
-  
+
   public InputStream getInputStream()
     throws IOException
   {
     return dh.getInputStream();
   }
-  
+
   public String getName()
   {
     return dh.getName();
   }
-  
+
   public OutputStream getOutputStream()
     throws IOException
   {

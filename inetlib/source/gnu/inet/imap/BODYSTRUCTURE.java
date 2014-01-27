@@ -1,7 +1,7 @@
 /*
  * BODYSTRUCTURE.java
  * Copyright (C) 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -125,7 +125,7 @@ public class BODYSTRUCTURE
   {
 
     private final int lines;
-    
+
     TextPart(String primaryType,
              String subtype,
              Map<String,String> parameters,
@@ -153,7 +153,7 @@ public class BODYSTRUCTURE
     private final ENVELOPE envelope;
     private final Part bodystructure;
     private final int lines;
-    
+
     MessagePart(String primaryType,
                 String subtype,
                 Map<String,String> parameters,
@@ -170,7 +170,7 @@ public class BODYSTRUCTURE
       this.bodystructure = bodystructure;
       this.lines = lines;
     }
-    
+
     public ENVELOPE getEnvelope()
     {
       return envelope;

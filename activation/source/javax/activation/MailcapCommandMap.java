@@ -1,7 +1,7 @@
 /*
  * MailcapCommandMap.java
  * Copyright (C) 2004, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -64,8 +64,8 @@ public class MailcapCommandMap
   private static boolean debug = false;
   private static final int NORMAL = 0;
   private static final int FALLBACK = 1;
-  
-  static 
+
+  static
   {
     try
       {
@@ -76,9 +76,9 @@ public class MailcapCommandMap
       {
       }
   }
-  
+
   private Map[][] mailcaps;
-  
+
   /**
    * Default constructor.
    */
@@ -86,7 +86,7 @@ public class MailcapCommandMap
   {
     init(null);
   }
-  
+
   /**
    * Constructor specifying a filename.
    * @param fileName the name of the file to read mailcap entries from
@@ -114,7 +114,7 @@ public class MailcapCommandMap
           }
       }
   }
-  
+
   /**
    * Constructor specifying an input stream.
    * @param is the input stream to read mailcap entries from
@@ -148,7 +148,7 @@ public class MailcapCommandMap
           {
           }
       }
-    
+
     if (debug)
       {
         System.out.println("MailcapCommandMap: load HOME");
@@ -167,14 +167,14 @@ public class MailcapCommandMap
     catch (SecurityException e)
       {
       }
-    
+
     if (debug)
       {
         System.out.println("MailcapCommandMap: load SYS");
       }
     try
       {
-        parseFile(SYS, 
+        parseFile(SYS,
                   new StringBuffer(System.getProperty("java.home"))
                   .append(File.separatorChar)                                                     .append("lib")
                   .append(File.separatorChar)
@@ -184,7 +184,7 @@ public class MailcapCommandMap
     catch (SecurityException e)
       {
       }
-    
+
     if (debug)
       {
         System.out.println("MailcapCommandMap: load JAR");
@@ -233,14 +233,14 @@ public class MailcapCommandMap
       {
         parseResource(JAR, "/META-INF/mailcap");
       }
-    
+
     if (debug)
       {
         System.out.println("MailcapCommandMap: load DEF");
       }
     parseResource(DEF, "/META-INF/mailcap.default");
   }
-  
+
   /**
    * Returns the list of preferred commands for a given MIME type.
    * @param mimeType the MIME type
@@ -276,7 +276,7 @@ public class MailcapCommandMap
     cmdList.toArray(cmds);
     return cmds;
   }
-  
+
   /**
    * Returns all commands for the given MIME type.
    * @param mimeType the MIME type
@@ -430,7 +430,7 @@ public class MailcapCommandMap
       }
     return null;
   }
-    
+
   /**
    * Get the native commands for the given MIME type.
    * Returns an array of strings where each string is
@@ -504,7 +504,7 @@ public class MailcapCommandMap
           }
       }
   }
-  
+
   private static String nameOf(int mailcap)
   {
     switch (mailcap)
@@ -521,7 +521,7 @@ public class MailcapCommandMap
         return "DEF";
       default:
         return "ERR";
-      }   
+      }
   }
 
   private void parseFile(int index, String filename)
@@ -558,7 +558,7 @@ public class MailcapCommandMap
           }
       }
   }
-  
+
   private void parseResource(int index, String name)
   {
     Reader in = null;
@@ -597,7 +597,7 @@ public class MailcapCommandMap
           }
       }
   }
-  
+
   private void parse(int index, Reader in)
     throws IOException
   {
@@ -631,7 +631,7 @@ public class MailcapCommandMap
           }
       }
   }
-  
+
   private void parseEntry(int index, String line)
   {
     // Tokenize entry into fields
@@ -673,7 +673,7 @@ public class MailcapCommandMap
         fallback = true;
       }
     fields.add(field);
-    
+
     len = fields.size();
     if (len < 2)
       {
@@ -683,7 +683,7 @@ public class MailcapCommandMap
           }
         return;
       }
-    
+
     Map mailcap = fallback ? mailcaps[index][FALLBACK] :
       mailcaps[index][NORMAL];
     String mimeType = (String) fields.get(0);
@@ -693,7 +693,7 @@ public class MailcapCommandMap
         addField(mailcap, mimeType, null, (String) fields.get(i));
       }
   }
-    
+
   private void addField(Map mailcap, String mimeType, String verb,
                         String command)
   {
@@ -710,7 +710,7 @@ public class MailcapCommandMap
       {
         return; // Invalid field or flag
       }
-      
+
     Map commands = (Map) mailcap.get(mimeType);
     if (commands == null)
       {
@@ -725,7 +725,7 @@ public class MailcapCommandMap
       }
     classNames.add(command);
   }
-  
+
   private Map getCommands(Map mailcap, String mimeType)
   {
     int si = mimeType.indexOf('/');
@@ -763,7 +763,7 @@ public class MailcapCommandMap
   }
 
   // -- Utility methods --
-  
+
   private List getSystemResources(String name)
   {
     List acc = new ArrayList();
@@ -780,6 +780,6 @@ public class MailcapCommandMap
       }
     return acc;
   }
-  
+
 }
 

@@ -1,7 +1,7 @@
 /*
  * ResponseBodyReader.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -34,7 +34,7 @@ public interface ResponseBodyReader
    * Indicate whether this reader is interested in the specified response.
    * If it returns false, it will not receive body content notifications for
    * that response.
-   */ 
+   */
   boolean accept(Request request, Response response);
 
   /**
@@ -49,6 +49,6 @@ public interface ResponseBodyReader
    * Notifies the reader that the end of the content was reached.
    */
   void close();
-  
+
 }
 

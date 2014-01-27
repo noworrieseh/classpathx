@@ -1,7 +1,7 @@
 /*
  * HTTPConnection.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -212,7 +212,7 @@ public class HTTPConnection
     this(hostname, secure ? HTTPS_PORT : HTTP_PORT, secure,
          connectionTimeout, timeout);
   }
-  
+
   /**
    * Creates a new HTTP connection on the specified port.
    * @param hostname the name of the host to connect to
@@ -233,7 +233,7 @@ public class HTTPConnection
   {
     this(hostname, port, secure, 0, 0);
   }
-  
+
   /**
    * Creates a new HTTP or HTTPS connection on the specified port.
    * @param hostname the name of the host to connect to
@@ -585,7 +585,7 @@ public class HTTPConnection
   }
 
   // -- Events --
-  
+
   public void addConnectionListener(ConnectionListener l)
   {
     synchronized (connectionListeners)

@@ -1,7 +1,7 @@
 /*
  * DirectoryListing.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -49,7 +49,7 @@ public final class DirectoryListing
   {
     this.in = new LineInputStream(in);
   }
-  
+
   /**
    * Indicates whether this listing contains more entries.
    */
@@ -80,7 +80,7 @@ public final class DirectoryListing
         throw new NoSuchElementException("I/O error: " + e.getMessage());
       }
   }
-  
+
   /**
    * This iterator is read-only.
    */
@@ -88,7 +88,7 @@ public final class DirectoryListing
   {
     throw new UnsupportedOperationException();
   }
-  
+
   /**
    * Returns the next entry in the directory listing.
    */
@@ -103,7 +103,7 @@ public final class DirectoryListing
     doneRead = false;
     return current;
   }
-  
+
   void fetch()
     throws IOException
   {
@@ -191,6 +191,6 @@ public final class DirectoryListing
         current = new DirectoryEntry(type, title, selector, hostname, port);
       }
   }
-  
+
 }
 

@@ -1,7 +1,7 @@
 /*
  * ActiveModeDTP.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -113,7 +113,7 @@ final class ActiveModeDTP
       }
     acceptThread = null;
   }
-  
+
   /**
    * Returns an input stream from which a remote file can be read.
    */
@@ -198,7 +198,7 @@ final class ActiveModeDTP
     transferComplete();
     return inProgress;
   }
-  
+
   public void transferComplete()
   {
     if (socket == null)
@@ -232,6 +232,6 @@ final class ActiveModeDTP
           }
       }
   }
-  
+
 }
 

@@ -1,7 +1,7 @@
 /*
  * HeaderEntry.java
  * Copyright (C) 2002 The free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -55,6 +55,6 @@ public final class HeaderEntry
   {
     return header;
   }
-  
+
 }
 

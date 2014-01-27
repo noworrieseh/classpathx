@@ -1,7 +1,7 @@
 /*
  * FileNewsrc.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -75,7 +75,7 @@ public class FileNewsrc
       }
     save();
   }
-  
+
   /**
    * Load the file.
    */
@@ -84,11 +84,11 @@ public class FileNewsrc
     long fs = file.length();
     long max = (long) Integer.MAX_VALUE;
     int bs = (int) (fs > max ? max : fs);
-    
+
     groups = new LinkedList();
     lines = new HashMap(bs / 20);
     subs = new LinkedList();
-    
+
     // Load
     try
       {
@@ -98,7 +98,7 @@ public class FileNewsrc
             System.err.println("DEBUG: nntp: newsrc loading " +
                                file.getPath());
           }
-        
+
         FileInputStream fr = new FileInputStream(file);
         InputStreamReader ir = new InputStreamReader(fr, NEWSRC_ENCODING);
         BufferedReader reader = new BufferedReader(ir, bs);
@@ -171,7 +171,7 @@ public class FileNewsrc
       }
     dirty = false;
   }
-  
+
   /**
    * Save the file.
    */

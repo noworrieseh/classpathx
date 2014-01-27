@@ -1,7 +1,7 @@
 /*
  * TextEditor.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -88,7 +88,7 @@ public class TextEditor extends TextArea
                 {
                     try
                     {
-                        
+
                         out.close();
                     }
                     catch (IOException e)
@@ -99,5 +99,5 @@ public class TextEditor extends TextArea
             }
         }
     }
-    
+
 }

@@ -1,7 +1,7 @@
 /*
  * ResultHandler.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -62,6 +62,6 @@ public interface ResultHandler
    * @param urls the list of LDAP URLs
    */
   void searchResultReference(List urls);
-  
+
 }
 

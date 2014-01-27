@@ -1,7 +1,7 @@
 /*
  * MessageSet.java
  * Copyright (C) 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -379,7 +379,7 @@ public class MessageSet
 
       private int index;
       private int end;
-      
+
       RangeIterator(int start, int end) {
         index = start;
         this.end = end;

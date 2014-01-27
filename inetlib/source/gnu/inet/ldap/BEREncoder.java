@@ -1,7 +1,7 @@
 /*
  * BEREncoder.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -106,7 +106,7 @@ public class BEREncoder
   {
     append(value, BERConstants.BOOLEAN);
   }
-  
+
   /**
    * Appends a boolean value with the specified ASN.1 type code.
    * @param value the value
@@ -130,7 +130,7 @@ public class BEREncoder
   {
     append(value, BERConstants.INTEGER);
   }
-  
+
   /**
    * Appends an integer value with the specified ASN.1 type code.
    * @param value the value
@@ -155,9 +155,9 @@ public class BEREncoder
   }
 
   // TODO -- 8.5 Encoding of a real value --
-  
+
   // TODO -- 8.6 Encoding of a bitstring value --
-  
+
   // -- 8.7 Encoding of an octetstring value --
 
   /**
@@ -169,7 +169,7 @@ public class BEREncoder
   {
     append(bytes, BERConstants.OCTET_STRING);
   }
-  
+
   /**
    * Appends an octetstring value with the specified ASN.1 type code.
    * Sequences and sets can be appended by using the corresponding type
@@ -206,7 +206,7 @@ public class BEREncoder
   {
     append(value, BERConstants.UTF8_STRING);
   }
-  
+
   /**
    * Appends a string value with the specified ASN.1 type code.
    * @param value the value
@@ -448,7 +448,7 @@ public class BEREncoder
                 return off;
               }
           }
-          
+
       }
     item.append(bytes, off,(end - off), BERConstants.OCTET_STRING);
     end = indexOf(bytes,(byte) 0x29, ei + 1); // )
@@ -525,6 +525,6 @@ public class BEREncoder
       }
     return buf;
   }
-  
+
 }
 

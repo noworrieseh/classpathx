@@ -1,7 +1,7 @@
 /*
  * PostStream.java
  * Copyright (C) 2002, 2003 The free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -41,14 +41,14 @@ public final class PostStream
   NNTPConnection connection;
   boolean isTakethis;
   byte last;
-  
+
   PostStream(NNTPConnection connection, boolean isTakethis)
   {
     super(connection.out);
     this.connection = connection;
     this.isTakethis = isTakethis;
   }
-  
+
   public void write(int c)
     throws IOException
   {
@@ -96,7 +96,7 @@ public final class PostStream
         super.write(bytes, pos, len);
       }
   }
-  
+
   /**
    * Close the stream.
    * This calls NNTPConnection.postComplete().
@@ -118,6 +118,6 @@ public final class PostStream
         connection.postComplete();
       }
   }
-  
+
 }
 

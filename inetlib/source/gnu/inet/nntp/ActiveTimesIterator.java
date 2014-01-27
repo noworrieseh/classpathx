@@ -1,7 +1,7 @@
 /*
  * ActiveTimesIterator.java
  * Copyright (C) 2002 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -41,7 +41,7 @@ public class ActiveTimesIterator
   {
     super(connection);
   }
-  
+
   /**
    * Returns the next group active time.
    */

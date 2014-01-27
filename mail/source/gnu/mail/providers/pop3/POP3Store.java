@@ -60,7 +60,7 @@ import gnu.inet.util.LaconicFormatter;
 public final class POP3Store
   extends Store
 {
-  
+
   private static final ResourceBundle L10N =
     ResourceBundle.getBundle("gnu.mail.providers.L10N");
 

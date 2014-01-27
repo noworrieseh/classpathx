@@ -1,7 +1,7 @@
 /*
  * RequestEvent.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -38,17 +38,17 @@ public class RequestEvent
    * The request created event type.
    */
   public static final int REQUEST_CREATED = 0;
-  
+
   /**
    * The request sending event type.
    */
   public static final int REQUEST_SENDING = 1;
-  
+
   /**
    * The request sent event type.
    */
   public static final int REQUEST_SENT = 2;
-  
+
   /**
    * The type of this event.
    */
@@ -85,6 +85,6 @@ public class RequestEvent
   {
     return request;
   }
-  
+
 }
 

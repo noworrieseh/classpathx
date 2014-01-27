@@ -1,7 +1,7 @@
 /*
  * UTF7imap.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -227,7 +227,7 @@ public final class UTF7imap
       }
     return name;
   }
-  
+
   /**
    * Decodes the specified name using the UTF-7.imap decoding.
    * See IMAP4rev1 spec, section 5.1.3
@@ -289,7 +289,7 @@ public final class UTF7imap
       }
     return name;
     }
-  
+
   public static void main(String[] args)
   {
     boolean decode = false;
@@ -320,6 +320,6 @@ public final class UTF7imap
           }
       }
   }
-  
+
 }
 

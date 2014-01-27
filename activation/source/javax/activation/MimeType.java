@@ -1,7 +1,7 @@
 /*
  * MimeType.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -35,13 +35,13 @@ import java.io.ObjectOutput;
 public class MimeType
   implements Externalizable
 {
-    
+
   static final String TSPECIALS = "()<>@,;:/[]?=\\\"";
-  
+
   private String primaryType;
   private String subType;
   private MimeTypeParameterList parameters;
-  
+
   /**
    * Constructor for an <code>application/*</code> content type.
    */
@@ -51,7 +51,7 @@ public class MimeType
     subType = "*";
     parameters = new MimeTypeParameterList();
   }
-  
+
   /**
    * Constructor that parses a raw String.
    * @param rawdata the MIME type string
@@ -61,7 +61,7 @@ public class MimeType
   {
     parse(rawdata);
   }
-  
+
   /**
    * Constructor for a new MIME type with the given primary and sub types
    * and an empty parameter list.
@@ -85,7 +85,7 @@ public class MimeType
   {
     return primaryType;
   }
-  
+
   /**
    * Sets the primary type.
    * @param primary the new primary type
@@ -96,7 +96,7 @@ public class MimeType
     checkValidity(primary, "Primary type is invalid");
     primaryType = primary.toLowerCase();
   }
-  
+
   /**
    * Returns the subtype.
    */
@@ -104,7 +104,7 @@ public class MimeType
   {
     return subType;
   }
-  
+
   /**
    * Sets the subtype.
    * @param sub the new subtype
@@ -115,7 +115,7 @@ public class MimeType
     checkValidity(sub, "Sub type is invalid");
     subType = sub.toLowerCase();
   }
-  
+
   /**
    * Returns the MIME parameters.
    */
@@ -123,7 +123,7 @@ public class MimeType
   {
     return parameters;
   }
-  
+
   /**
    * Returns the parameter value for the specified name.
    * @param name the parameter name
@@ -132,7 +132,7 @@ public class MimeType
   {
     return parameters.get(name);
   }
-  
+
   /**
    * Sets the parameter value for the specified name.
    * @param name the parameter name
@@ -142,7 +142,7 @@ public class MimeType
   {
     parameters.set(name, value);
   }
-  
+
   /**
    * Removes the parameter value for the specified name.
    * @param name the parameter name
@@ -151,7 +151,7 @@ public class MimeType
   {
     parameters.remove(name);
   }
-  
+
   /**
    * Returns the complete string representation of this MIME type.
    */
@@ -163,7 +163,7 @@ public class MimeType
       .append(parameters.toString())
       .toString();
   }
-  
+
   /**
    * Returns the string representation of this MIME type without
    * parameters.
@@ -175,7 +175,7 @@ public class MimeType
       .append(subType)
       .toString();
   }
-  
+
   /**
    * Returns true if the primary and subtype of this MIME type are the
    * same as in the given MIME type.
@@ -188,7 +188,7 @@ public class MimeType
                                             "*".equals(subType) ||
                                             "*".equals(sub2));
   }
-  
+
   /**
    * Returns true if the primary and subtype of this MIME type are the
    * same as in the given MIME type string.
@@ -198,14 +198,14 @@ public class MimeType
   {
     return match(new MimeType(rawdata));
   }
-  
+
   public void writeExternal(ObjectOutput out)
     throws IOException
   {
     out.writeUTF(toString());
     out.flush();
   }
-    
+
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
@@ -218,7 +218,7 @@ public class MimeType
         throw new IOException(e.getMessage());
       }
   }
-  
+
   private void parse(String rawdata)
     throws MimeTypeParseException
   {
@@ -265,7 +265,7 @@ public class MimeType
           }
       }
   }
-  
+
   static boolean isValidChar(char c)
   {
     return c > ' ' && c <= '~' && TSPECIALS.indexOf(c) == -1;

@@ -1,7 +1,7 @@
 /*
  * ComsatClient.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -47,7 +47,7 @@ public class ComsatClient
   {
     this(DEFAULT_PORT, 0);
   }
-  
+
   public ComsatClient(int port, int timeout)
     throws IOException
   {
@@ -55,7 +55,7 @@ public class ComsatClient
       {
         port = DEFAULT_PORT;
       }
-    
+
     socket = new DatagramSocket(port);
     if (timeout > 0)
       {

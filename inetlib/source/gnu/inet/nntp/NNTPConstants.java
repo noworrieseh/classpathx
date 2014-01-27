@@ -1,7 +1,7 @@
 /*
  * NNTPConstants.java
  * Copyright (C) 2002 The free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -184,7 +184,7 @@ public interface NNTPConstants
    * Indicates that the server is ready to accept the AUTHINFO password.
    */
   public static final short SEND_AUTHINFOPASS = 381;
-  
+
   /**
    * Indicates that the server is ready to proceed with TLS negotiation.
    */
@@ -304,7 +304,7 @@ public interface NNTPConstants
    * by the server.
    */
   public static final short AUTHINFO_REJECTED = 482;
-  
+
   /**
    * Indicates that the server requires encrypted connection or stronger
    * authentication in order to perform request.
@@ -334,7 +334,7 @@ public interface NNTPConstants
    * internal error.
    */
   public static final short INTERNAL_ERROR = 503;
-  
+
   /**
    * Indicates that the server is unable to proceed with TLS negotiation.
    */

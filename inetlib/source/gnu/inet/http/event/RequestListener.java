@@ -1,7 +1,7 @@
 /*
  * RequestListener.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -49,6 +49,6 @@ public interface RequestListener
    * Callback invoked after all request data has been sent to the server.
    */
   void requestSent(RequestEvent event);
-  
+
 }
 

@@ -1,7 +1,7 @@
 /*
  * HTTPDateFormat.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -123,7 +123,7 @@ public class HTTPDateFormat
     // Get time offset in minutes
     int zoneOffset =(calendar.get(Calendar.ZONE_OFFSET) +
                      calendar.get(Calendar.DST_OFFSET)) / 60000;
-    
+
     // Apply + or - appropriately
     if (zoneOffset < 0)
       {
@@ -134,7 +134,7 @@ public class HTTPDateFormat
       {
         buf.append('+');
       }
-    
+
     // Set the 2 2-char fields as specified above
     int tzhours = zoneOffset / 60;
     buf.append(Character.forDigit(tzhours / 10, 10));
@@ -318,14 +318,14 @@ public class HTTPDateFormat
               }
             second = Integer.parseInt(text.substring(start, end));
           }
-        
+
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.DAY_OF_MONTH, date);
         calendar.set(Calendar.HOUR, hour);
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, second);
-        
+
         if (end != len)
           {
             // Timezone
@@ -358,7 +358,7 @@ public class HTTPDateFormat
               }
           }
         pos.setIndex(end);
-        
+
         return calendar.getTime();
       }
     catch (NumberFormatException e)
@@ -378,7 +378,7 @@ public class HTTPDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   private int skipNonWhitespace(String text, int pos)
@@ -387,7 +387,7 @@ public class HTTPDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   private int skipTo(String text, int pos, char c)
@@ -396,7 +396,7 @@ public class HTTPDateFormat
       {
         pos++;
       }
-    return pos;    
+    return pos;
   }
 
   /**

@@ -1,7 +1,7 @@
 /*
  * ObjectDataContentHandler.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -40,7 +40,7 @@ class ObjectDataContentHandler
   private Object object;
   private String mimeType;
   private DataFlavor[] flavors;
-  
+
   public ObjectDataContentHandler(DataContentHandler dch, Object object,
                                   String mimeType)
   {
@@ -48,12 +48,12 @@ class ObjectDataContentHandler
     this.object = object;
     this.mimeType = mimeType;
   }
-  
+
   public Object getContent(DataSource ds)
   {
     return object;
   }
-  
+
   public DataContentHandler getDCH()
   {
     return dch;
@@ -76,7 +76,7 @@ class ObjectDataContentHandler
       }
     throw new UnsupportedFlavorException(flavor);
   }
-  
+
   public DataFlavor[] getTransferDataFlavors()
   {
     if (flavors == null)
@@ -107,6 +107,6 @@ class ObjectDataContentHandler
         throw new UnsupportedDataTypeException("no object DCH for MIME type " + mimeType);
       }
   }
-  
+
 }
 

@@ -1,7 +1,7 @@
 /*
  * IMAPConnection.java
  * Copyright (C) 2003,2004,2005,2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -163,7 +163,7 @@ public class IMAPConnection
   {
     this(host, -1, 0, 0, false, null);
   }
-  
+
   /**
    * Creates a new connection.
    * @param host the name of the host to connect to
@@ -173,7 +173,7 @@ public class IMAPConnection
   {
     this(host, port, 0, 0, false, null);
   }
-  
+
   /**
    * Creates a new connection.
    * @param host the name of the host to connect to
@@ -186,7 +186,7 @@ public class IMAPConnection
   {
     this(host, port, connectionTimeout, timeout, false, null);
   }
-  
+
   /**
    * Creates a new secure connection using the specified trust manager.
    * @param host the name of the host to connect to
@@ -198,7 +198,7 @@ public class IMAPConnection
   {
     this(host, port, 0, 0, true, tm);
   }
-  
+
   /**
    * Creates a new connection.
    * @param host the name of the host to connect to
@@ -230,7 +230,7 @@ public class IMAPConnection
    */
   private void connect()
     throws IOException
-  { 
+  {
     // Set up socket
     try
       {
@@ -317,7 +317,7 @@ public class IMAPConnection
         h.flush();
       }
   }
-  
+
   /**
    * Sends the specified IMAP tagged command to the server.
    */
@@ -339,7 +339,7 @@ public class IMAPConnection
     out.writeln();
     out.flush();
   }
-  
+
   /**
    * Sends the specified IMAP command.
    * @param command the command
@@ -445,7 +445,7 @@ public class IMAPConnection
       }
     return token;
   }
-  
+
   private boolean parseRespCondState(IMAPCallback callback)
     throws IOException
   {
@@ -1310,7 +1310,7 @@ public class IMAPConnection
   // -- end parsing --
 
   // -- IMAP commands --
-  
+
   /**
    * Returns a list of the capabilities of the IMAP server.
    */
@@ -1319,7 +1319,7 @@ public class IMAPConnection
   {
     return invokeSimpleCommand(CAPABILITY, callback);
   }
-  
+
   /**
    * Ping the server.
    * The callback will be notified of any changes in state.
@@ -1347,7 +1347,7 @@ public class IMAPConnection
     context.init(null, trust, null);
     return context.getSocketFactory();
   }
-  
+
   /**
    * Attempts to start TLS on the specified connection.
    * See RFC 2595 for details.
@@ -1358,7 +1358,7 @@ public class IMAPConnection
   {
     return starttls(callback, new EmptyX509TrustManager());
   }
-  
+
   /**
    * Attempts to start TLS on the specified connection.
    * See RFC 2595 for details.
@@ -1373,19 +1373,19 @@ public class IMAPConnection
         SSLSocketFactory factory = getSSLSocketFactory(tm);
         String hostname = socket.getInetAddress().getHostName();
         int port = socket.getPort();
-        
+
         if (!invokeSimpleCommand(STARTTLS, callback))
           {
             return false;
           }
-        
+
         SSLSocket ss =
           (SSLSocket) factory.createSocket(socket, hostname, port, true);
         String[] protocols = { "TLSv1", "SSLv3" };
         ss.setEnabledProtocols(protocols);
         ss.setUseClientMode(true);
         ss.startHandshake();
-        
+
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
         in = new Tokenizer(is, this, literalFactory, literalThreshold);
@@ -1400,7 +1400,7 @@ public class IMAPConnection
         return false;
       }
   }
-  
+
   /**
    * Login to the connection using the username and password method.
    * @param username the authentication principal
@@ -1418,7 +1418,7 @@ public class IMAPConnection
         .toString();
     return invokeSimpleCommand(cmd, callback);
   }
-  
+
   /**
    * Authenticates the connection using the specified SASL mechanism,
    * username, and password.
@@ -1568,7 +1568,7 @@ public class IMAPConnection
         return false; // No javax.security.sasl classes
       }
   }
-  
+
   /**
    * Logout this connection.
    * Underlying network resources will be freed.
@@ -1580,7 +1580,7 @@ public class IMAPConnection
     in.reset();
     socket.close();
   }
-  
+
   /**
    * Selects the specified mailbox.
    * The mailbox is identified as read-write if writes are permitted.
@@ -1593,7 +1593,7 @@ public class IMAPConnection
   {
     return selectImpl(mailbox, SELECT, callback);
   }
-  
+
   /**
    * Selects the specified mailbox.
    * The mailbox is identified as read-only.
@@ -1616,7 +1616,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(mailbox)))
                                .toString(), callback);
   }
-  
+
   /**
    * Creates a mailbox with the specified name.
    * @param mailbox the mailbox name
@@ -1630,7 +1630,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(mailbox)))
                                .toString(), callback);
   }
-  
+
   /**
    * Deletes the mailbox with the specified name.
    * @param mailbox the mailbox name
@@ -1644,7 +1644,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(mailbox)))
                                .toString(), callback);
   }
-  
+
   /**
    * Renames the source mailbox to the specified name.
    * @param source the source mailbox name
@@ -1661,7 +1661,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(target)))
                                .toString(), callback);
   }
-  
+
   /**
    * Adds the specified mailbox to the set of subscribed mailboxes as
    * returned by the LSUB command.
@@ -1676,7 +1676,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(mailbox)))
                                .toString(), callback);
   }
-  
+
   /**
    * Removes the specified mailbox from the set of subscribed mailboxes as
    * returned by the LSUB command.
@@ -1691,7 +1691,7 @@ public class IMAPConnection
                                .append(quote(UTF7imap.encode(mailbox)))
                                .toString(), callback);
   }
-  
+
   /**
    * Returns a subset of names from the complete set of names available to
    * the client.
@@ -1705,7 +1705,7 @@ public class IMAPConnection
   {
     return listImpl(LIST, reference, mailbox, callback);
   }
-  
+
   /**
    * Returns a subset of subscribed names.
    * @param reference the context relative to which mailbox names are
@@ -1719,7 +1719,7 @@ public class IMAPConnection
   {
     return listImpl(LSUB, reference, mailbox, callback);
   }
-  
+
   private boolean listImpl(String command, String reference,
                            String mailbox, IMAPCallback callback)
     throws IOException
@@ -1739,7 +1739,7 @@ public class IMAPConnection
       .append(quote(UTF7imap.encode(mailbox)));
     return invokeSimpleCommand(buf.toString(), callback);
   }
-  
+
   /**
    * Requests the status of the specified mailbox.
    */
@@ -1764,7 +1764,7 @@ public class IMAPConnection
     buf.append(')');
     return invokeSimpleCommand(buf.toString(), callback);
   }
-  
+
   /**
    * Append a message to the specified mailbox.
    * @param mailbox the mailbox name
@@ -1831,7 +1831,7 @@ public class IMAPConnection
   {
     return invokeSimpleCommand(CHECK, callback);
   }
-  
+
   /**
    * Permanently remove all messages that have the \Deleted flags set,
    * and close the mailbox.
@@ -1842,7 +1842,7 @@ public class IMAPConnection
   {
     return invokeSimpleCommand(CLOSE, callback);
   }
-  
+
   /**
    * Permanently removes all messages that have the \Delete flag set.
    */
@@ -1851,7 +1851,7 @@ public class IMAPConnection
   {
     return invokeSimpleCommand(EXPUNGE, callback);
   }
-  
+
   /**
    * Permanently removes all messages in the specified UID-set that have
    * the \Delete flag set.
@@ -1865,7 +1865,7 @@ public class IMAPConnection
       .append(uids.toString());
     return invokeSimpleCommand(buf.toString(), callback);
   }
-  
+
   /**
    * Searches the currently selected mailbox for messages matching the
    * specified criteria.
@@ -1893,7 +1893,7 @@ public class IMAPConnection
       }
     return invokeSimpleCommand(buf.toString(), callback);
   }
-  
+
   /**
    * Retrieves data associated with the specified message in the mailbox.
    * @param message the message number, or -1 for all messages
@@ -1919,7 +1919,7 @@ public class IMAPConnection
     String ids = (uids == null) ? "*" : uids.toString();
     return fetchImpl(UID + ' ' + FETCH, ids, fetchCommands, callback);
   }
-  
+
   private boolean fetchImpl(String cmd, String ids,
                             List<String> fetchCommands,
                             IMAPCallback callback)
@@ -1956,7 +1956,7 @@ public class IMAPConnection
     String ids = (messages == null) ? "*" : messages.toString();
     return storeImpl(STORE, ids, flagCommand, flags, callback);
   }
-  
+
   /**
    * Alters data associated with the specified messages in the mailbox.
    * @param uids the message UIDs, or null for all messages
@@ -1994,7 +1994,7 @@ public class IMAPConnection
     buf.append(')');
     return invokeSimpleCommand(buf.toString(), callback);
   }
-  
+
   /**
    * Copies the specified messages to the end of the destination mailbox.
    * @param messages the message-set
@@ -2034,7 +2034,7 @@ public class IMAPConnection
    * @param rights the rights to assign
    * @see RFC 4314
    */
-  public boolean setacl(String mailbox, String principal, int rights, 
+  public boolean setacl(String mailbox, String principal, int rights,
                         IMAPCallback callback)
     throws IOException
   {
@@ -2156,7 +2156,7 @@ public class IMAPConnection
       .append(quote(UTF7imap.encode(quotaRoot)));
     return invokeSimpleCommand(cmd.toString(), callback);
   }
-  
+
   /**
    * Returns the quotas for the given mailbox.
    * @param mailbox the mailbox name
@@ -2186,9 +2186,9 @@ public class IMAPConnection
       .append(end);
     return invokeSimpleCommand(cmd.toString(), callback);
   }
-  
+
   // -- Utility methods --
-  
+
   /**
    * Quote the specified text if necessary.
    */
@@ -2205,6 +2205,6 @@ public class IMAPConnection
       }
     return text;
   }
-  
+
 }
 

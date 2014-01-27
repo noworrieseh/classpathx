@@ -1,7 +1,7 @@
 /*
  * FTPURLConnection.java
  * Copyright (C) 2003 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -123,7 +123,7 @@ public class FTPURLConnection
         connection.setTransferMode(transferMode);
       }
   }
-  
+
   /**
    * This connection supports doInput.
    */
@@ -139,7 +139,7 @@ public class FTPURLConnection
   {
     doOutput = dooutput;
   }
-  
+
   /**
    * Returns an input stream that reads from this open connection.
    */
@@ -164,7 +164,7 @@ public class FTPURLConnection
         return this.new ClosingInputStream(connection.retrieve(path));
       }
   }
-  
+
   /**
    * Returns an output stream that writes to this connection.
    */
@@ -239,7 +239,7 @@ public class FTPURLConnection
     String value = getRequestProperty(key);
     map.put(key, value);
   }
-  
+
   public void setRequestProperty(String key, String value)
   {
     if (connected)
@@ -338,7 +338,7 @@ public class FTPURLConnection
       super.close();
       connection.logout();
     }
-    
+
   }
 
   class ClosingOutputStream
@@ -356,7 +356,7 @@ public class FTPURLConnection
       super.close();
       connection.logout();
     }
-    
+
   }
 
 }

@@ -1,7 +1,7 @@
 /*
  * CRLFInputStream.java
  * Copyright (C) 2002,2006 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -85,7 +85,7 @@ public class CRLFInputStream
       }
     return c;
   }
-  
+
   /**
    * Reads up to b.length bytes of data from this input stream into
    * an array of bytes.

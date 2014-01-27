@@ -1,7 +1,7 @@
 /*
  * Response.java
  * Copyright (C) 2004 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -44,7 +44,7 @@ public class Response
 
   /**
    * The HTTP status code of the response.
-   */ 
+   */
   protected final int code;
 
   /**
@@ -106,7 +106,7 @@ public class Response
   /**
    * Returns the HTTP status code of the response.
    * @see #code
-   */ 
+   */
   public int getCode()
   {
     return code;

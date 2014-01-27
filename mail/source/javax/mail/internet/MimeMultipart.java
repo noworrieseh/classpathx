@@ -175,7 +175,7 @@ public class MimeMultipart
   {
     this("mixed", parts);
   }
-   
+
   /**
    * Constructor with the specified subtype and body parts.
    * More body parts may be added later.

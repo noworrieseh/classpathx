@@ -125,7 +125,7 @@ public final class IMAPMessage
           update(item);
         }
     }
-  
+
   };
 
   /**
@@ -281,7 +281,7 @@ public final class IMAPMessage
       }
     return super.getDescription();
   }
-  
+
   public String getMessageID()
     throws MessagingException
   {
@@ -917,7 +917,7 @@ public final class IMAPMessage
   {
     this.internalDate = internaldate.getInternalDate();
   }
-  
+
   private void updateUID(UID uid)
   {
     this.uid = uid.getUid();
@@ -944,5 +944,5 @@ public final class IMAPMessage
       }
     return ret;
   }
-  
+
 }

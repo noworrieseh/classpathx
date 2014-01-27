@@ -1,7 +1,7 @@
 /*
  * POP3Connection.java
  * Copyright (C) 2003, 2013 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -262,7 +262,7 @@ public class POP3Connection
         e2.initCause(e);
         throw e2;
       }
-    
+
     InputStream is = socket.getInputStream();
     is = new BufferedInputStream(is);
     is = new CRLFInputStream(is);
@@ -270,7 +270,7 @@ public class POP3Connection
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
     out = new CRLFOutputStream(os);
-    
+
     if (getResponse() != OK)
       {
         throw new ProtocolException("Connect failed: " + response);
@@ -346,7 +346,7 @@ public class POP3Connection
                 return false;
               }
           }
-        
+
         StringBuffer cmd = new StringBuffer(AUTH);
         cmd.append(' ');
         cmd.append(mechanism);
@@ -413,7 +413,7 @@ public class POP3Connection
         return false;             // No javax.security.sasl classes
       }
   }
-  
+
   /**
    * Authenticate the specified user using the APOP MD5-based method.
    * This does not transmit the password in the clear, but doesn't provide
@@ -466,7 +466,7 @@ public class POP3Connection
         return false;
       }
   }
-  
+
   /**
    * Authenticate the user using the basic USER and PASS handshake.
    * It is recommended to use a more secure authentication method such as
@@ -512,7 +512,7 @@ public class POP3Connection
     context.init(null, trust, null);
     return context.getSocketFactory();
   }
-  
+
   /**
    * Attempts to start TLS on the specified connection.
    * See RFC 2595 for details
@@ -523,7 +523,7 @@ public class POP3Connection
   {
     return stls(new EmptyX509TrustManager());
   }
-  
+
   /**
    * Attempts to start TLS on the specified connection.
    * See RFC 2595 for details
@@ -536,13 +536,13 @@ public class POP3Connection
     try
       {
         SSLSocketFactory factory = getSSLSocketFactory(tm);
-        
+
         send(STLS);
         if (getResponse() != OK)
           {
             return false;
           }
-        
+
         String hostname = socket.getInetAddress().getHostName();
         int port = socket.getPort();
         SSLSocket ss =
@@ -551,7 +551,7 @@ public class POP3Connection
         ss.setEnabledProtocols(protocols);
         ss.setUseClientMode(true);
         ss.startHandshake();
-        
+
         // set up streams
         InputStream is = ss.getInputStream();
         is = new BufferedInputStream(is);
@@ -560,7 +560,7 @@ public class POP3Connection
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
         out = new CRLFOutputStream(os);
-        
+
         return true;
       }
     catch (GeneralSecurityException e)
@@ -568,7 +568,7 @@ public class POP3Connection
         return false;
       }
   }
-  
+
   /**
    * Returns the number of messages in the maildrop.
    */
@@ -594,7 +594,7 @@ public class POP3Connection
         throw new ProtocolException("Not a STAT response: " + response);
       }
   }
-  
+
   /**
    * Returns the size of the specified message.
    * @param msgnum the message number
@@ -618,7 +618,7 @@ public class POP3Connection
         throw new ProtocolException("Not a number: " + response);
       }
   }
-  
+
   /**
    * Returns an input stream containing the entire message.
    * This input stream must be read in its entirety before further commands
@@ -636,7 +636,7 @@ public class POP3Connection
       }
     return new MessageInputStream(in);
   }
-  
+
   /**
    * Marks the specified message as deleted.
    * @param msgnum the message number
@@ -651,7 +651,7 @@ public class POP3Connection
         throw new ProtocolException("DELE failed: " + response);
       }
   }
-  
+
   /**
    * Does nothing.
    * This can be used to keep the connection alive.
@@ -678,7 +678,7 @@ public class POP3Connection
         throw new ProtocolException("RSET failed: " + response);
       }
   }
-  
+
   /**
    * Closes the connection.
    * No further commands may be issued on this connection after this method
@@ -712,7 +712,7 @@ public class POP3Connection
       }
     return new MessageInputStream(in);
   }
-  
+
   /**
    * Returns a unique identifier for the specified message.
    * @param msgnum the message number
@@ -785,8 +785,8 @@ public class POP3Connection
       }
     return null;
   }
-  
-  /** 
+
+  /**
    * Send the command to the server.
    */
   protected void send(String command)
@@ -804,7 +804,7 @@ public class POP3Connection
     out.writeln();
     out.flush();
   }
-  
+
   /**
    * Parse the response from the server.
    */
@@ -844,7 +844,7 @@ public class POP3Connection
         throw new ProtocolException("Unexpected response: " + response);
       }
   }
-  
+
   /*
    * Parse the APOP timestamp from the server's banner greeting.
    */
@@ -867,6 +867,6 @@ public class POP3Connection
       }
     return null;
   }
-  
+
 }
 

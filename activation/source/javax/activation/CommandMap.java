@@ -1,7 +1,7 @@
 /*
  * CommandMap.java
  * Copyright (C) 2004, 2005 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -23,7 +23,7 @@ package javax.activation;
 
 /**
  * Registry of command objects available to the system.
- * 
+ *
  * @author <a href='mailto:dog@gnu.org'>Chris Burdess</a>
  * @version 1.1
  */
@@ -31,9 +31,9 @@ public abstract class CommandMap
 {
 
   /* Class scope */
-  
+
   private static CommandMap defaultCommandMap;
-  
+
   /**
    * Returns the default command map.
    * This returns a MailcapCommandMap if no value has been set using
@@ -47,7 +47,7 @@ public abstract class CommandMap
       }
     return defaultCommandMap;
   }
-  
+
   /**
    * Sets the default command map.
    * @param commandMap the new default command map
@@ -74,19 +74,19 @@ public abstract class CommandMap
   }
 
   /* Instance scope */
-  
+
   /**
    * Returns the list of preferred commands for a MIME type.
    * @param mimeType the MIME type
    */
   public abstract CommandInfo[] getPreferredCommands(String mimeType);
-  
+
   /**
    * Returns the complete list of commands for a MIME type.
    * @param mimeType the MIME type
    */
   public abstract CommandInfo[] getAllCommands(String mimeType);
-  
+
   /**
    * Returns the command corresponding to the specified MIME type and
    * command name.
@@ -94,13 +94,13 @@ public abstract class CommandMap
    * @param cmdName the command name
    */
   public abstract CommandInfo getCommand(String mimeType, String cmdName);
-  
+
   /**
    * Returns a DataContentHandler corresponding to the MIME type.
    * @param mimeType the MIME type
    */
   public abstract DataContentHandler createDataContentHandler(String mimeType);
-  
+
   /**
    * Get all the MIME types known to this command map.
    * If the command map doesn't support this operation, null is returned.
@@ -111,7 +111,7 @@ public abstract class CommandMap
   {
     return null;
   }
-  
+
   /**
    * Get the preferred command list from a MIME Type. The actual semantics
    * are determined by the implementation of the CommandMap.
@@ -131,7 +131,7 @@ public abstract class CommandMap
   {
     return getPreferredCommands(mimeType);
   }
-  
+
   /**
    * Get all the available commands for this type. This method
    * should return all the possible commands for this MIME type.
@@ -150,7 +150,7 @@ public abstract class CommandMap
   {
     return getAllCommands(mimeType);
   }
-  
+
   /**
    * Get the default command corresponding to the MIME type.
    * <p>
@@ -170,7 +170,7 @@ public abstract class CommandMap
   {
     return getCommand(mimeType, cmdName);
   }
-  
+
   /**
    * Locate a DataContentHandler that corresponds to the MIME type.
    * The mechanism and semantics for determining this are determined
@@ -190,7 +190,7 @@ public abstract class CommandMap
                                                      DataSource ds)
   {
     return createDataContentHandler(mimeType);
-  }  
+  }
 
 }
 

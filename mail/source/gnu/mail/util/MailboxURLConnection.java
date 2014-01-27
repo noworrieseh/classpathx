@@ -344,7 +344,7 @@ public class MailboxURLConnection
                       writeAddresses(w, "replyTo", m[i].getReplyTo());
                       writeAddresses(w, "to",
                                      m[i].getRecipients(Message.RecipientType.TO));
-                      writeAddresses(w, "cc", 
+                      writeAddresses(w, "cc",
                                      m[i].getRecipients(Message.RecipientType.CC));
                       w.writeEndElement();
                     }

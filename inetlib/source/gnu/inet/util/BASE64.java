@@ -1,7 +1,7 @@
 /*
  * BASE64.java
  * Copyright (C) 2003, 2010 The Free Software Foundation
- * 
+ *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
  *
@@ -141,7 +141,7 @@ public final class BASE64
       }
     return buffer;
   }
-  
+
   public static void main(String[] args)
   {
     boolean decode = false;
@@ -167,5 +167,5 @@ public final class BASE64
           }
       }
   }
-  
+
 }
