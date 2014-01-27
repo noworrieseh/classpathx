@@ -42,10 +42,10 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 		<pathelement path='${install-dir}/javax-security.jar'/>
 		<pathelement path='${install-dir}/jsse.jar'/>
 	</path>
-	
+
 	<!-- Targets -->
 	<target name='init'>
-                <echo>WARNING: compilation using Ant is not supported, see the file INSTALL for details</echo>
+		<echo>WARNING: compilation using Ant is not supported, see the file INSTALL for details</echo>
 		<tstamp/>
 		<mkdir dir='${build}'/>
 		<mkdir dir='${META-INF}'/>
@@ -110,8 +110,8 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 			<include name='gnu/inet/util/*.java'/>
 		</javac>
 	</target>
-	
-        <target name='finger' depends='init' unless='disable-finger'>
+
+	<target name='finger' depends='init' unless='disable-finger'>
 		<javac srcdir='${src}' destdir='${build}' debug='true'>
 			<classpath refid='inetlib.classpath'/>
 			<include name='gnu/inet/finger/*.java'/>
@@ -119,7 +119,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 		</javac>
 	</target>
 
-        <target name='ldap' depends='init' unless='disable-ldap'>
+	<target name='ldap' depends='init' unless='disable-ldap'>
 		<javac srcdir='${src}' destdir='${build}' debug='true'>
 			<classpath refid='inetlib.classpath'/>
 			<include name='gnu/inet/ldap/*.java'/>
@@ -173,5 +173,5 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 			</packageset>
 		</javadoc>
 	</target>
-	
+
 </project>

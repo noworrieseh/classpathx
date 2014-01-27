@@ -1,3 +1,7 @@
+2014-01-27  Conrad T. Pino  <Conrad@Pino.com>
+
+	* build.xml: Leading spaces become tabs.
+
 2011-02-23  Chris Burdess  <dog@gnu.org>
 
 	* source/gnu/inet/http/ByteArrayRequestBodyWriter.java,
