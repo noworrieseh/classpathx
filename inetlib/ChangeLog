@@ -1,5 +1,10 @@
 2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
 
+	* source/gnu/inet/util/CRLFOutputStream.java: patch #8294:
+	  gnu.inet.util.CRLFOutputStream add beginning of line field: atBOL
+
+2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/inet/smtp/SMTPOutputStream.java: patch #8295:
 	  gnu.inet.smtp.SMTPOutputStream newline portability
 

@@ -112,14 +112,14 @@ public class CRLFOutputStream
         switch (b[i])
           {
           case CR:
-            out.write (b, d, i - d);
+            out.write(b, d, i - d);
             writeln();
             d = i + 1;
             break;
           case LF:
             if (last != CR)
               {
-                out.write (b, d, i - d);
+                out.write(b, d, i - d);
                 writeln();
               }
             d = i + 1;
@@ -127,9 +127,10 @@ public class CRLFOutputStream
           }
         last = b[i];
       }
-    if (len - d > 0)
+    if ((len -= d) > 0)
       {
-        out.write (b, d, len - d);
+        out.write(b, d, len);
+        atBOL = false;
       }
   }
 
