@@ -1,6 +1,6 @@
 /*
  * CRLFOutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2014 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -41,17 +41,22 @@ public class CRLFOutputStream
   /**
    * The CR octet.
    */
-  public static final int CR = 13;
+  public static final int CR = '\r';
 
   /**
    * The LF octet.
    */
-  public static final int LF = 10;
+  public static final int LF = '\n';
 
   /**
    * The CR/LF pair.
    */
   public static final byte[] CRLF = { CR, LF };
+
+  /**
+   * At beginning of line.
+   */
+  protected boolean atBOL;
 
   /**
    * The last byte read.
@@ -64,6 +69,7 @@ public class CRLFOutputStream
   public CRLFOutputStream(OutputStream out)
   {
     super(out);
+    atBOL = true;
     last = -1;
   }
 
@@ -73,20 +79,21 @@ public class CRLFOutputStream
    */
   public void write(int ch) throws IOException
   {
-    if (ch == CR)
+    switch (ch)
       {
-        out.write(CRLF);
-      }
-    else if (ch == LF)
-      {
+      case CR:
+        writeln();
+        break;
+      case LF:
         if (last != CR)
           {
-            out.write(CRLF);
+            writeln();
           }
-      }
-    else
-      {
+        break;
+      default:
         out.write(ch);
+        atBOL = false;
+        break;
       }
     last = ch;
   }
@@ -106,14 +113,14 @@ public class CRLFOutputStream
           {
           case CR:
             out.write (b, d, i - d);
-            out.write (CRLF, 0, 2);
+            writeln();
             d = i + 1;
             break;
           case LF:
             if (last != CR)
               {
                 out.write (b, d, i - d);
-                out.write (CRLF, 0, 2);
+                writeln();
               }
             d = i + 1;
             break;
@@ -152,7 +159,8 @@ public class CRLFOutputStream
   public void writeln()
     throws IOException
   {
-    out.write(CRLF, 0, 2);
+    out.write(CRLF, 0, CRLF.length);
+    atBOL = true;
   }
 
 }
