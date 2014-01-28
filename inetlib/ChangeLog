@@ -1,3 +1,8 @@
+2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
+
+	* source/gnu/inet/util/CRLFOutputStream.java: patch #8291:
+	  Remove gnu.inet.util.CRLFOutputStream public void write(byte[] b)
+
 2014-01-27  Conrad T. Pino  <Conrad@Pino.com>
 
 	* build.xml: Leading spaces become tabs.

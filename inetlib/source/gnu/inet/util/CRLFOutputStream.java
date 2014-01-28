@@ -92,16 +92,6 @@ public class CRLFOutputStream
   }
 
   /**
-   * Writes a byte array to the underlying stream.
-   * @exception IOException if an I/O error occurred
-   */
-  public void write(byte[] b)
-    throws IOException
-  {
-    write(b, 0, b.length);
-  }
-
-  /**
    * Writes a portion of a byte array to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
@@ -166,4 +156,3 @@ public class CRLFOutputStream
   }
 
 }
-
