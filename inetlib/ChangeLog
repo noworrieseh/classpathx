@@ -1,5 +1,11 @@
 2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
 
+	* build.xml: Change default target to JAR file build.
+	  Add JAR file delete to clean target.
+	  Removed unused JAR file from classpath.
+
+2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/inet/util/CRLFOutputStream.java: patch #8291:
 	  Remove gnu.inet.util.CRLFOutputStream public void write(byte[] b)
 

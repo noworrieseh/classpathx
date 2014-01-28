@@ -1,6 +1,5 @@
 <!--
-$Id: build.xml,v 1.9 2005-08-25 12:32:02 dog Exp $
-(C) Copyright 2003 The Free Software Foundation
+(c) Copyright 2003, 2014 The Free Software Foundation
 
 This file is part of GNU inetlib.
 
@@ -20,7 +19,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA.
 -->
 
-<project name='mail' default='inetlib'>
+<project name='mail' default='inetlib.jar'>
 
 	<description>
 	This file is provided in the event that you do not have GNU Make
@@ -38,14 +37,11 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 	<path id='inetlib.classpath'>
 		<pathelement path='${classpath}'/>
-		<!-- gnu-crypto and jessie -->
-		<pathelement path='${install-dir}/javax-security.jar'/>
-		<pathelement path='${install-dir}/jsse.jar'/>
 	</path>
 
 	<!-- Targets -->
 	<target name='init'>
-		<echo>WARNING: compilation using Ant is not supported, see the file INSTALL for details</echo>
+		<echo>WARNING: compilation using Ant is not officially supported, see the file INSTALL for details</echo>
 		<tstamp/>
 		<mkdir dir='${build}'/>
 		<mkdir dir='${META-INF}'/>
@@ -149,6 +145,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 	<target name='clean'>
 		<delete dir='${build}'/>
 		<delete dir='${doc}'/>
+		<delete file='${inetlib.jar}'/>
 	</target>
 
 	<!-- API documentation -->
@@ -158,7 +155,7 @@ Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 			windowtitle='GNU inetlib API documentation'
 			classpathref='provider.classpath'>
 			<doctitle><![CDATA[<h3>GNU inetlib</h3>]]></doctitle>
-			<bottom><![CDATA[&copy;]]> Copyright 2003 The Free Software Foundation,
+			<bottom><![CDATA[&copy;]]> Copyright 2003-2014 The Free Software Foundation,
 			all rights reserved</bottom>
 			<packageset dir='${src}'>
 				<include name='gnu/inet/finger'/>
