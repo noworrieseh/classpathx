@@ -1,5 +1,6 @@
 /*
  * SMTPOutputStream.java
+ * Copyright (C) 2014 The Free Software Foundation
  * Copyright (C) 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -33,7 +34,10 @@ import gnu.inet.util.CRLFOutputStream;
 class SMTPOutputStream extends CRLFOutputStream
 {
 
-    private byte last = '\n';
+    /**
+     * The Period octet.
+     */
+    public static final int Period = '.';
 
     SMTPOutputStream(OutputStream out)
     {
@@ -43,12 +47,11 @@ class SMTPOutputStream extends CRLFOutputStream
     public void write(int c)
         throws IOException
     {
-        if (last == '\n' && c == '.')
+        if (atBOL && c == Period)
         {
             super.write(c); // double dot at start of line
         }
         super.write(c);
-        last = (byte) c;
     }
 
     public void write(byte[] b, int off, int len)
@@ -56,13 +59,12 @@ class SMTPOutputStream extends CRLFOutputStream
     {
         if (len > 0)
         {
-            byte b0 = b[off];
-            if (last == '\n' && b0 == '.')
+            int b0 = b[off];
+            if (atBOL && b0 == Period)
             {
-                super.write((int) b0); // double dot at start of line
+                super.write(b0); // double dot at start of line
             }
             super.write(b, off, len);
-            last = b[off + (len - 1)];
         }
     }
 
