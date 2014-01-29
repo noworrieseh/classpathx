@@ -1,5 +1,6 @@
 /*
  * SMTPConnection.java
+ * Copyright (C) 2014 The Free Software Foundation
  * Copyright (C) 2003, 2013 Chris Burdess <dog@gnu.org>
  *
  * This file is part of GNU Classpath Extensions (classpathx).
@@ -51,6 +52,7 @@ import javax.security.sasl.SaslException;
 
 import gnu.inet.util.BASE64;
 import gnu.inet.util.CRLFInputStream;
+import gnu.inet.util.CRLFOutputStream;
 import gnu.inet.util.EmptyX509TrustManager;
 import gnu.inet.util.LineInputStream;
 import gnu.inet.util.MessageOutputStream;
@@ -91,7 +93,7 @@ public class SMTPConnection
   protected static final String RCPT_TO = "RCPT TO:";
   protected static final String SP = " ";
   protected static final String DATA = "DATA";
-  protected static final String FINISH_DATA = "\n.";
+  protected static final String FINISH_DATA = ".";
   protected static final String RSET = "RSET";
   protected static final String VRFY = "VRFY";
   protected static final String EXPN = "EXPN";
@@ -136,7 +138,7 @@ public class SMTPConnection
   /**
    * The output stream used to send commands to the server.
    */
-  private SMTPOutputStream out;
+  private CRLFOutputStream out;
 
   /**
    * The last response message received from the server.
@@ -264,7 +266,7 @@ public class SMTPConnection
     in = new LineInputStream(is);
     OutputStream os = socket.getOutputStream();
     os = new BufferedOutputStream(os);
-    out = new SMTPOutputStream(os);
+    out = new CRLFOutputStream(os);
 
     // Greeting
     StringBuffer greetingBuffer = new StringBuffer();
@@ -421,6 +423,7 @@ public class SMTPConnection
   public boolean finishData()
     throws IOException
   {
+    out.ensureBOL();
     send(FINISH_DATA);
     switch (getAllResponses())
       {
@@ -680,7 +683,7 @@ public class SMTPConnection
         in = new LineInputStream(is);
         OutputStream os = ss.getOutputStream();
         os = new BufferedOutputStream(os);
-        out = new SMTPOutputStream(os);
+        out = new CRLFOutputStream(os);
         return true;
       }
     catch (GeneralSecurityException e)
@@ -765,7 +768,7 @@ public class SMTPConnection
                     byte[] r0 = sasl.evaluateChallenge(c1);
                     byte[] r1 = BASE64.encode(r0);       // response
                     out.write(r1);
-                    out.write(0x0d);
+                    out.writeln();
                     out.flush();
                     if (isDebug())
                       {
@@ -776,7 +779,7 @@ public class SMTPConnection
                   {
                     // Error in SASL challenge evaluation - cancel exchange
                     out.write(0x2a);
-                    out.write(0x0d);
+                    out.writeln();
                     out.flush();
                     if (isDebug())
                       {
@@ -797,7 +800,7 @@ public class SMTPConnection
                     OutputStream os = socket.getOutputStream();
                     os = new BufferedOutputStream(os);
                     os = new SaslOutputStream(sasl, os);
-                    out = new SMTPOutputStream(os);
+                    out = new CRLFOutputStream(os);
                   }
                 return true;
               default:
@@ -835,7 +838,7 @@ public class SMTPConnection
         debug("> " + command);
       }
     out.write(command.getBytes("US-ASCII"));
-    out.write(0x0d);
+    out.writeln();
     out.flush();
   }
 
@@ -901,4 +904,3 @@ public class SMTPConnection
   }
 
 }
-

@@ -1,3 +1,14 @@
+2014-01-29  Conrad T. Pino  <Conrad@Pino.com>
+
+	* source/gnu/inet/util/CRLFOutputStream.java: patch #8296:
+	  gnu.inet.util.CRLFOutputStream add writeAtBOL notification methods
+	* source/gnu/inet/util/MessageOutputStream.java: patch #8298:
+	  gnu.inet.util.MessageOutputStream newline portability and performance
+	* source/gnu/inet/smtp/SMTPConnection.java: patch #8299:
+	  gnu.inet.smtp.SMTPConnection bug #40378 and bug #41383
+	* source/gnu/inet/smtp/SMTPOutputStream.java: deleted per
+	  bug #40378: SMTP client does not do dot stuffing comment#10
+
 2014-01-28  Conrad T. Pino  <Conrad@Pino.com>
 
 	* source/gnu/inet/util/CRLFOutputStream.java: patch #8294:

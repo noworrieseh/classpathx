@@ -74,6 +74,28 @@ public class CRLFOutputStream
   }
 
   /**
+   * Constructs a CR/LF output stream connected to the specified output stream.
+   */
+  protected CRLFOutputStream(CRLFOutputStream out)
+  {
+    super(out);
+    atBOL = out.atBOL;
+    last = out.last;
+  }
+
+  /**
+   * Writes newline to the underlying stream if ! atBOL.
+   * @exception IOException if an I/O error occurred
+   */
+  public void ensureBOL() throws IOException
+  {
+    if (! atBOL)
+      {
+        writeln();
+      }
+  }
+
+  /**
    * Writes a character to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
@@ -91,6 +113,10 @@ public class CRLFOutputStream
           }
         break;
       default:
+        if (atBOL)
+          {
+            writeAtBOL(ch);
+          }
         out.write(ch);
         atBOL = false;
         break;
@@ -112,15 +138,13 @@ public class CRLFOutputStream
         switch (b[i])
           {
           case CR:
-            out.write(b, d, i - d);
-            writeln();
+            writeln(b, d, i - d);
             d = i + 1;
             break;
           case LF:
             if (last != CR)
               {
-                out.write(b, d, i - d);
-                writeln();
+                writeln(b, d, i - d);
               }
             d = i + 1;
             break;
@@ -129,6 +153,10 @@ public class CRLFOutputStream
       }
     if ((len -= d) > 0)
       {
+        if (atBOL)
+          {
+            writeAtBOL(b, d, len);
+          }
         out.write(b, d, len);
         atBOL = false;
       }
@@ -154,6 +182,24 @@ public class CRLFOutputStream
   }
 
   /**
+   * Write At Beginning Of Line event; notify subclass, if any.
+   * @exception IOException if an I/O error occurred
+   */
+  protected void writeAtBOL(int ch)
+    throws IOException
+  {
+  }
+
+  /**
+   * Write At Beginning Of Line event; notify subclass, if any.
+   * @exception IOException if an I/O error occurred
+   */
+  protected void writeAtBOL(byte[] b, int off, int len)
+    throws IOException
+  {
+  }
+
+  /**
    * Writes a newline to the underlying stream.
    * @exception IOException if an I/O error occurred
    */
@@ -162,6 +208,27 @@ public class CRLFOutputStream
   {
     out.write(CRLF, 0, CRLF.length);
     atBOL = true;
+  }
+
+  /**
+   * DANGER - private method for internal use only - DANGER
+   * Private method for public void write(byte[] b, int off, int len)
+   * Writes a portion of a byte array and newline to underlying stream.
+   * @exception IOException if an I/O error occurred
+   */
+  private void writeln(byte[] b, int off, int len)
+    throws IOException
+  {
+    // Leading newlines in buffer have d == i therefore len == 0 here
+    if (len > 0)
+    {
+      if (atBOL)
+        {
+          writeAtBOL(b, off, len);
+        }
+      out.write(b, off, len);
+    }
+    writeln();
   }
 
 }

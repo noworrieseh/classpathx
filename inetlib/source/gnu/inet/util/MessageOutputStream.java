@@ -1,6 +1,6 @@
 /*
  * MessageOutputStream.java
- * Copyright (C) 2002 The Free Software Foundation
+ * Copyright (C) 2002, 2014 The Free Software Foundation
  *
  * This file is part of GNU Classpath Extensions (classpathx).
  * For more information please visit https://www.gnu.org/software/classpathx/
@@ -22,9 +22,9 @@
 
 package gnu.inet.util;
 
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import gnu.inet.util.CRLFOutputStream;
 
 /**
  * An output stream that escapes any dots on a line by themself with
@@ -34,20 +34,13 @@ import java.io.OutputStream;
  * @author <a href="mailto:dog@gnu.org">Chris Burdess</a>
  */
 public class MessageOutputStream
-  extends FilterOutputStream
+  extends CRLFOutputStream
 {
 
   /**
    * The stream termination octet.
    */
-  public static final int END = 46;
-
-  /**
-   * The line termination octet.
-   */
-  public static final int LF = 10;
-
-  int[] last = { LF, LF };      // the last character written to the stream
+  public static final int END = '.';
 
   /**
    * Constructs a message output stream connected to the specified output
@@ -60,50 +53,39 @@ public class MessageOutputStream
   }
 
   /**
-   * Character write.
+   * Constructs a message output stream connected to the specified output
+   * stream.
+   * @param out the target output stream
    */
-  public void write(int c)
-    throws IOException
+  public MessageOutputStream(CRLFOutputStream out)
   {
-    if (last[0] == LF && last[1] == END && c == LF)
-      {
-        out.write (END);
-      }
-    out.write(c);
-    last[0] = last[1];
-    last[1] = c;
-  }
-
-  public void write(byte[] bytes)
-    throws IOException
-  {
-    write(bytes, 0, bytes.length);
+    super(out);
   }
 
   /**
-   * Block write.
+   * Write At Beginning Of Line event
+   * @exception IOException if an I/O error occurred
    */
-  public void write(byte[] bytes, int off, int len)
-    throws IOException
+  protected void writeAtBOL(int ch)
+      throws IOException
   {
-    for (int i = 0; i < len; i++)
-      {
-        int c = (int) bytes[off + i];
-        if (last[0] == LF && last[1] == END && c == LF)
-          {
-            byte[] b2 = new byte[bytes.length + 1];
-            System.arraycopy(bytes, off, b2, off, i);
-            b2[off + i] = END;
-            System.arraycopy(bytes, off + i, b2, off + i + 1, len - i);
-            bytes = b2;
-            i++;
-            len++;
-          }
-        last[0] = last[1];
-        last[1] = c;
-      }
-    out.write(bytes, off, len);
+    if (ch == END)
+    {
+      // DANGER - avoid super.write(int) method - DANGER
+      // Reset atBOL first before super.write(int) method
+      // otherwise a recursive infinite loop shall occur.
+      out.write(END); // Double At Beginning Of Line
+    }
+  }
+
+  /**
+   * Write At Beginning Of Line event
+   * @exception IOException if an I/O error occurred
+   */
+  protected void writeAtBOL(byte[] b, int off, int len)
+      throws IOException
+  {
+    writeAtBOL(b[off]);
   }
 
 }
-
