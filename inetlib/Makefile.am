@@ -40,7 +40,6 @@ $(src)/gnu/inet/util/TraceLevel.java \
 $(src)/gnu/inet/smtp/Parameter.java \
 $(src)/gnu/inet/smtp/ParameterList.java \
 $(src)/gnu/inet/smtp/SMTPConnection.java \
-$(src)/gnu/inet/smtp/SMTPOutputStream.java \
 $(src)/gnu/inet/imap/BODY.java \
 $(src)/gnu/inet/imap/BODYSTRUCTURE.java \
 $(src)/gnu/inet/imap/ENVELOPE.java \

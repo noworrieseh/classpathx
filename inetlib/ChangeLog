@@ -1,5 +1,13 @@
 2014-01-29  Conrad T. Pino  <Conrad@Pino.com>
 
+	* Makefile.am,
+	* Makefile.in,
+	* aclocal.m4,
+	* configure: Rebuilt on Debian wheezy platform
+	  for source/gnu/inet/smtp/SMTPOutputStream.java delete
+
+2014-01-29  Conrad T. Pino  <Conrad@Pino.com>
+
 	* source/gnu/inet/util/CRLFOutputStream.java: patch #8296:
 	  gnu.inet.util.CRLFOutputStream add writeAtBOL notification methods
 	* source/gnu/inet/util/MessageOutputStream.java: patch #8298:
