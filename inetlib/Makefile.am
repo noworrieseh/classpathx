@@ -210,8 +210,7 @@ javadoc:
 	$(JAVADOC) -d $(doc) -windowtitle "GNU inetlib API documentation" -sourcepath $(src) $(package_names)
 
 clean-local:
-	rm -rf $(META_INF) $(doc) $(inetlib_version_jar) $(inetlib_jar)
-	find $(dst) -name '*.class' -exec rm -f '{}' ';'
+	rm -rf $(dst) $(doc) $(inetlib_version_jar) $(inetlib_jar)
 
 datadir = $(prefix)/share/java
 data_DATA = $(inetlib_jar) $(inetlib_version_jar)

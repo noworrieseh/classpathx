@@ -1,6 +1,12 @@
 2014-01-29  Conrad T. Pino  <Conrad@Pino.com>
 
 	* Makefile.am,
+	* Makefile.in:bug #41398: inetlib
+	  make targets clean and distclean leave build products
+
+2014-01-29  Conrad T. Pino  <Conrad@Pino.com>
+
+	* Makefile.am,
 	* Makefile.in,
 	* aclocal.m4,
 	* configure: Rebuilt on Debian wheezy platform
