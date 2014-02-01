@@ -4,11 +4,11 @@ space:=$(empty) $(empty)
 
 # Set by configure.
 PROJECTROOT = .
-JAVA = jamvm
+JAVA = java
 JAVAC = javac
-JAVAC_OPTS = 
+JAVAC_OPTS =
 JAR = jar
-CLASSPATH = 
+CLASSPATH =
 
 prefix = /usr/local/share/java
 extra = /usr/local/share/java
@@ -67,6 +67,6 @@ distclean: clean
 	-rm -rf Makefile Makefile.in config.*
 
 mrproper: distclean
-	-rm -rf configure  
+	-rm -rf configure
 
 # End Makefile.

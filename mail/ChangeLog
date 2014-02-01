@@ -1,3 +1,13 @@
+2014-02-01  Conrad T. Pino  <Conrad@Pino.com>
+
+	* test/Makefile: Remove trailing white space from lines:
+	    JAVAC_OPTS =
+	    CLASSPATH =
+	        -rm -rf configure
+	  Change "JAVA" (JVM) variable:
+	    -JAVA = jamvm
+	    +JAVA = java
+
 2009-12-08  Chris Burdess  <dog@gnu.org>
 
 	* build.xml: Fix echo message.
