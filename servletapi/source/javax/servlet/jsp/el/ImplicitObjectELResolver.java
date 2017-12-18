@@ -604,7 +604,7 @@ public class ImplicitObjectELResolver
             return ret;
         }
 
-        public Object remove(Object key, Object value)
+        public Object remove(Object key)
         {
             Object ret = _get((String) key);
             _del((String) key);
