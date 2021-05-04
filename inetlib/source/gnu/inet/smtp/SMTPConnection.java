@@ -25,6 +25,7 @@ package gnu.inet.smtp;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -856,6 +857,10 @@ public class SMTPConnection
     try
       {
         line = in.readLine();
+        if (line == null)
+          {
+            throw new EOFException();
+          }
         // Handle special case eg 334 where CRLF occurs after code.
         if (line.length() < 4)
           {
